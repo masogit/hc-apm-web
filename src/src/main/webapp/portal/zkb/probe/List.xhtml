@@ -3,8 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
-<ui:define name="content">
+    template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
     <div class="ui-g">
         <div class="ui-g-12 card cardTitle">
             <p:outputLabel class="pageTitle" value="探头信息列表"/>
@@ -17,8 +17,9 @@
                              rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              rows="20" emptyMessage="数据为空"
+                             currentPageReportTemplate="总行数: {totalRecords}"
                              rowsPerPageTemplate="20,50,100,500">
-                    <p:ajax event="rowSelect" update="editButton"/>
+                    <p:ajax event="rowSelect" update="editButton deleteButton"  listener="#{zkbProbeController.upDateInUsed()}"/>
                     <p:ajax event="filter" listener="#{zkbProbeController.onFilter}" />
                     <p:column headerText="探头号" filterBy="#{item.catNo}"  filterMatchMode="LIKE" >
                         <h:outputText value="#{item.catNo}"/>
@@ -48,11 +49,11 @@
                         </f:facet>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="新增" actionListener="#{zkbProbeController.prepareCreate}" update="probeEditDlg" oncomplete="PF('probeEditDialog').show()" />
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="新增" actionListener="#{zkbProbeController.prepareCreate}" update=":probeEditDlg" oncomplete="PF('probeEditDialog').show()" />
                         <p:commandButton id="editButton"  icon="ui-icon-pencil" title="编辑" actionListener="#{zkbProbeController.prepareEdit}" update="probeEditDlg" oncomplete="PF('probeEditDialog').show()" disabled="#{empty zkbProbeController.selected.id}" />
-                       <!-- <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{zkbProbeController.delete}" update=":probeListForm:datalist_probe" disabled="#{empty zkbProbeController.selected.id}">
-                            <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert"/>
-                        </p:commandButton>-->
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{zkbProbeController.delete}" update=":probeListForm:datalist_probe" disabled="#{zkbProbeController.inUsed}">
+                            <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert" />
+                        </p:commandButton>
                         <p:commandButton title="导出到EXCEL" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist_probe" fileName="zkbProbe_export"/>
                         </p:commandButton>
