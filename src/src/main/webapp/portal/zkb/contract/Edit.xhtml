@@ -316,6 +316,15 @@
                                      rowsPerPageTemplate="20,50,100,500">
 
                             <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractAssetDatalist:deleteAssetButton :zkbContractEditForm:zkbContractAssetDatalist:editAssetButton"/>
+                            <p:column headerText="租户" exportable="true" visible="false">
+                                <h:outputText value="#{zkbContractEditController.tenantInfo.name}"/>
+                            </p:column>
+                            <p:column headerText="合同号" exportable="true" visible="false">
+                                <h:outputText value="#{zkbContractEditController.selected.contractNo}"/>
+                            </p:column>
+                            <p:column headerText="合同类型" exportable="true" visible="false">
+                                <h:outputText value="#{zkbContractEditController.selected.contractType}"/>
+                            </p:column>
                             <p:column headerText="二维码">
                                 <h:outputText value="#{zkbContractAssetItem.assetInfo.qrCode}"/>
                             </p:column>

@@ -5,6 +5,8 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbPartOrderCat;
 import com.ge.apm.service.zkb.ZkbProbeService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
@@ -44,6 +46,8 @@ public class ZkbProbeController extends GenericCRUDUUIDController<ZkbPartOrderCa
 
     private UserAccount currentUser;
 
+    private boolean inUsed = false;
+
     @Override
     protected GenericRepositoryUUID<ZkbPartOrderCat> getDAO() {
         return dao;
@@ -74,6 +78,14 @@ public class ZkbProbeController extends GenericCRUDUUIDController<ZkbPartOrderCa
         errorImportList = zkbProbeService.handleExcel(file, currentUser);
     }
 
+    public void upDateInUsed() {
+        inUsed = false;
+        List<String> ids = dao.queryInUsedIds(selected.getId());
+        if(CollectionUtils.isNotEmpty(ids)){
+            inUsed = true;
+        }
+    }
+
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
 
@@ -101,6 +113,17 @@ public class ZkbProbeController extends GenericCRUDUUIDController<ZkbPartOrderCa
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
+    }
+
+    public boolean isInUsed() {
+        if(selected==null|| StringUtils.isBlank(selected.getId())){
+            inUsed = true;
+        }
+        return inUsed;
+    }
+
+    public void setInUsed(boolean inUsed) {
+        this.inUsed = inUsed;
     }
 
     public List<ZkbPartOrderCat> getErrorImportList() {
