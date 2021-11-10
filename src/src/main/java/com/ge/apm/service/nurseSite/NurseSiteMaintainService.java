@@ -1162,6 +1162,10 @@ public class NurseSiteMaintainService {
 		return tempNurseSiteMaintain;
 	}
 
+	public List<NurseSiteMaintain> checkAgain(String name , Date currDate){
+		return nurseSiteMaintainRepository.checkAgain(name,currDate);
+	}
+
 	public NurseSiteMaintain createMaintain(Date date, UserAccount currentUser, NurseSiteMaintainConfig nurseSiteMaintainConfig, List<AssetInfo> listCheckAssets,
 			Integer sequence) {
 		if (nurseSiteMaintainConfig.getType() != null && nurseSiteMaintainConfig.getType() != 1) {
