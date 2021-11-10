@@ -548,6 +548,18 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "UCMID")
     private String UCMID;
 
+
+    //射频码
+    @Column(name = "rfId")
+    private String rfId;
+    //射频码分组
+    @Column(name = "rf_group")
+    private String rfGroup;
+    //开机电流阈值
+    @Column(name = "power_on_threshold")
+    private Double powerOnThreshold;
+
+
     @Size(max = 256)
     @Column(name = "one_qr_code")
     private String oneQrCode;
@@ -2227,6 +2239,30 @@ public class AssetInfo implements ChineseName,Serializable {
         } else {
             return input;
         }
+    }
+
+    public Double getPowerOnThreshold() {
+        return powerOnThreshold;
+    }
+
+    public void setPowerOnThreshold(Double powerOnThreshold) {
+        this.powerOnThreshold = powerOnThreshold;
+    }
+
+    public String getRfId() {
+        return rfId;
+    }
+
+    public void setRfId(String rfId) {
+        this.rfId = rfId;
+    }
+
+    public String getRfGroup() {
+        return rfGroup;
+    }
+
+    public void setRfGroup(String rfGroup) {
+        this.rfGroup = rfGroup;
     }
 
     public String getUCMID() {
