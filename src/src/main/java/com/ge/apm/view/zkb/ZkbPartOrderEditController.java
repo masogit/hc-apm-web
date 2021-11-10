@@ -927,10 +927,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         valueTypeTips = "";
                     }
                 }else {
-                    if(CopyByInvok.FOUR_TO_ONE.equals(this.selected.getContractCatId())){
-                        this.selected.setQty(4);
-                    }else{
-                        this.selected.setQty(0);
+                    if(StringUtils.isNotEmpty(this.selected.getContractCatId())){
+                        ZkbContractCat zkbContractCat = zkbPartOrderService.getZkbContractCatRepository().findById(this.selected.getContractCatId());
+                        if(zkbContractCat != null && CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
+                            this.selected.setQty(4);
+                        }else{
+                            this.selected.setQty(0);
+                        }
                     }
                 }
             }else if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selectedContract.getQuotaDeductType())) {
@@ -951,14 +954,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         this.selected.setQty(selected.getQty() * 2);
                     }
                 }else{
-                    if(CopyByInvok.FOUR_TO_ONE.equals(this.selected.getContractCatId())){
-                        if(CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
-                            this.selected.setQty(8);
+                    if(StringUtils.isNotEmpty(this.selected.getContractCatId())){
+                        ZkbContractCat zkbContractCat = zkbPartOrderService.getZkbContractCatRepository().findById(this.selected.getContractCatId());
+                        if(zkbContractCat != null && CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
+                            if(CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
+                                this.selected.setQty(8);
+                            }else{
+                                this.selected.setQty(4);
+                            }
                         }else{
-                            this.selected.setQty(4);
+                            this.selected.setQty(0);
                         }
-                    }else{
-                        this.selected.setQty(0);
                     }
                 }
             }
