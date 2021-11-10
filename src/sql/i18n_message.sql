@@ -4385,3 +4385,16 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- 调剂名称设置页面新增字段
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','SwappedEquipmentNo','调剂编号','accounting Department',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','powerOnThreshold','开机电流阈值','start powerOnThreshold',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfGroup','射频码分组','rfGroup',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfId','射频码','rfId',NULL,-1);
+
+-- 探头信息维护 （是否有效isVaild）
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_isVaild', 'N', '有效', 'efficient', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_isVaild','Y','无效','invalid',NULL,-1);
+-- 探头信息维护 （价值类型valueType）
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType', 'HighValue', '高值', 'HighValue', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType','NormalValue','普通','NormalValue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType','SpecialValue','特殊','SpecialValue',NULL,-1);
+-- 探头信息维护
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZkbPartOrderCat','探头信息','ZkbPartOrderCat',NULL,-1);

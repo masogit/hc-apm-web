@@ -33,15 +33,19 @@ public class ZkbPartOrderCat implements Serializable {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
+    //探头号*
     @Column(name = "cat_no")
     private String catNo;
 
+    //探头型号*
     @Column(name = "cat_model")
     private String catModel;
 
+    //
     @Column(name = "cat_type")
     private String catType;
 
+    //价值类型
     @Column(name = "value_type")
     private String valueType;
 
@@ -64,6 +68,12 @@ public class ZkbPartOrderCat implements Serializable {
 
     @Transient
     private String catText;
+
+    @Transient
+    private Integer excelIdex;
+
+    @Transient
+    private String errorInfo;
 
     public String getCatText() {
         return this.catModel +"(" + this.catNo +")";
@@ -143,5 +153,41 @@ public class ZkbPartOrderCat implements Serializable {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public Integer getExcelIdex() {
+        return excelIdex;
+    }
+
+    public void setExcelIdex(Integer excelIdex) {
+        this.excelIdex = excelIdex;
+    }
+
+    public String getErrorInfo() {
+        return errorInfo;
+    }
+
+    public void setErrorInfo(String errorInfo) {
+        this.errorInfo = errorInfo;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof ZkbPartOrderCat)) {
+            return false;
+        }
+        ZkbPartOrderCat other = (ZkbPartOrderCat) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
     }
 }

@@ -59,6 +59,9 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	@Query(value="select o.* from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<=?3 and o.clinical_dept_uid =?1 order by o.schedule_date",nativeQuery=true)
 	public List<NurseSiteMaintain> findDataByClinicalOrgUid(String clinicalUid,Date startDate,Date endDate);
 
+	@Query(value="select o.* from nurse_site_maintain o where o.name=?1 and o.schedule_date=?2",nativeQuery=true)
+	public List<NurseSiteMaintain> checkAgain(String name,Date currDate);
+
 	@Transactional
 	@Modifying
 	@Query(value = "update nurse_site_maintain set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0, status=?5 where id = ?1", nativeQuery = true)
