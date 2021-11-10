@@ -511,6 +511,24 @@
                             <label class="label">调剂设备安全基准</label>
                             <p:inputNumber value="#{workflowConfigController.selected.sharedAssetSafetyThreshold}" minValue="0.0" decimalPlaces="1"/>
                         </h:panelGroup>
+
+<!--                        //新增字段-->
+                        <h:panelGroup>
+                            <label class="label">出库状态检查间隔</label>
+                            <p:inputNumber value="#{workflowConfigController.selected.outboundstatuscheckinterval}" minValue="0.0" decimalPlaces="1"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">预约状态锁定时长</label>
+                            <p:inputNumber value="#{workflowConfigController.selected.appointmentstatuslockedtime}" minValue="0.0" decimalPlaces="1"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否启用无人值守</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.whethertoenableunattended}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+
+
                     </p:panelGrid>
                 </p:fieldset>
 
@@ -657,7 +675,12 @@
                             <label class="label">是否支持手动更改开关机时间</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableUpdateSwitchingTime}"/>
                         </h:panelGroup >
-
+                        <h:panelGroup >
+                            <label class = "label">手机建档是否需要审核</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isMobilePhoneFileReview}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
                 <!-- <p:spacer/> -->
