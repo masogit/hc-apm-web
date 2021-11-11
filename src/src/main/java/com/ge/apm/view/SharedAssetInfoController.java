@@ -124,7 +124,6 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                 }
             }
 
-
             this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
             for(AssetInfo assetInfo : res.getContent()) {
                 for(SharedAssetSwapIndex sharedAssetSwapIndex : sharedAssetSwapIndexList ) {
