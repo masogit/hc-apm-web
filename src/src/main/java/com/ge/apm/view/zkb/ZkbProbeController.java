@@ -20,6 +20,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -76,6 +77,7 @@ public class ZkbProbeController extends GenericCRUDUUIDController<ZkbPartOrderCa
         FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
         this.file = event.getFile();
         errorImportList = zkbProbeService.handleExcel(file, currentUser);
+        FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
     public void upDateInUsed() {
