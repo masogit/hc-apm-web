@@ -900,8 +900,8 @@ public class NurseSiteMaintainService {
             for (NurseSiteMaintainData nurseSiteMaintainDataNew : listData){
                 for (NurseSiteMaintainData nurseSiteMaintainDataOld : list){
                     if(nurseSiteMaintainDataNew.getId().equals(nurseSiteMaintainDataOld.getId())){
-                        Boolean checkValueNew = nurseSiteMaintainDataNew.getCheckValue()!= null ?nurseSiteMaintainDataNew.getCheckValue() :false;
-                        Boolean checkValueOld = nurseSiteMaintainDataOld.getCheckValue() !=null ?nurseSiteMaintainDataOld.getCheckValue() :false;
+                        Boolean checkValueNew = nurseSiteMaintainDataNew.getCheckValue();
+                        Boolean checkValueOld = nurseSiteMaintainDataOld.getCheckValue();
                         if(checkValueNew != checkValueOld){
                             tempItem.setUpdateByUid(user.getUid());
                         }
