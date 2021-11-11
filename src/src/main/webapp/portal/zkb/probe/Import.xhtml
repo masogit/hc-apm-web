@@ -6,7 +6,11 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
-        <div class="ui-g">
+            <div class="ui-g">
+                <div class="ui-g-12 card cardTitle">
+                        <p:outputLabel class="pageTitle" value="探头信息导入"/>
+                </div>
+            </div>
             <div class="ui-g-12 card">
                 <h:form enctype="multipart/form-data">
                     <p:fieldset  legend="批量导入探头信息数据" id="probeImportForm">
@@ -18,12 +22,12 @@
                                           sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
                                           update=":errorDataListForm"
                                           label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
-                            <p:growl id="messages" showDetail="true"/>
                         </p:panelGrid>
                         <h:panelGroup>
                             <p>说明</p>
                             <p>1. <a href="ZKB_PROBE_Template.xls" title="download">下载模板</a> </p>
-                            <p>2. 文件中填入要导入的设备信息数据</p>
+                            <p>2. 文件中填入要导入的探头信息数据<br/>
+                            其中：探头号，探头型号，探头类型，价值类型，是否有效为必填字段</p>
                             <p>3. 上传文件进行导入</p>
                         </h:panelGroup>
                     </p:fieldset>
@@ -36,6 +40,7 @@
 
             <div class="ui-g-12 card">
                 <h:form id="errorDataListForm">
+                    <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
                     <p:fieldset  legend="导入失败的数据">
                         <p:dataTable id="datalist" rendered="#{not empty zkbProbeController.errorImportList}" value="#{zkbProbeController.errorImportList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -72,7 +77,6 @@
                     </p:fieldset>
                 </h:form>
             </div>
-        </div>
     </ui:define>
 </ui:composition>
 
