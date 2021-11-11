@@ -25,7 +25,4 @@ CREATE TABLE shared_asset_swap_index(
         asset_uid char(32) ,
         swap_index varchar(32)
 )
---对shared_asset_swap_index表新增字段注释
-COMMENT ON COLUMN "public"."shared_asset_swap_index"."shared_asset_type" IS '调剂设备类型uid ,  对应shared_asset_type表主键';
-COMMENT ON COLUMN "public"."shared_asset_swap_index"."asset_uid" IS '对应asset_info表uid';
-COMMENT ON COLUMN "public"."shared_asset_swap_index"."swap_index" IS '同一调剂设备类型shared_asset_type下应唯一';
+
