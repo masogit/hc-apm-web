@@ -12,22 +12,22 @@
         <h:form id="probeEditForm">
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                 <h:panelGroup>
-                    <label>探头号：</label>
+                    <label>探头号*：</label>
                     <p:inputText id="catNo" value="#{zkbProbeController.selected.catNo}" required="true" requiredMessage="请输入探头号"/>
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <label>探头型号：</label>
+                    <label>探头型号*：</label>
                     <p:inputText id="catModel"   value="#{zkbProbeController.selected.catModel}" required="true" requiredMessage="请输入探头型号" />
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <label>探头类型：</label>
+                    <label>探头类型*：</label>
                     <p:inputText id="catType"  value="#{zkbProbeController.selected.catType}" required="true" requiredMessage="请输入探头类型" />
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <label class="label">价值类型：</label>
+                    <label class="label">价值类型*：</label>
                     <p:selectOneMenu  id="valueType" autoWidth="false" style="width: 80%" value="#{zkbProbeController.selected.valueType}" required="true" requiredMessage="请输入价值类型" >
                         <f:selectItem itemLabel="请选择..."/>
                         <c:forEach items="#{fieldMsg.getFieldValueList('zkbProbe_valueType')}" var="v">
@@ -36,7 +36,7 @@
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">是否有效：</label>
+                    <label class="label">是否有效*：</label>
                     <p:selectOneMenu id="vaild" autoWidth="false" style="width: 80%" value="#{zkbProbeController.selected.isVaild}" required="true" requiredMessage="请输入是否有效" >
                         <f:selectItem itemLabel="请选择..."/>
                         <c:forEach items="#{fieldMsg.getFieldValueList('zkbProbe_isVaild')}" var="v">
