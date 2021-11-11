@@ -666,6 +666,20 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     private List<String> tags = new ArrayList<>();
 
+    @Transient
+    private String sharedAssetSwapIndex;
+
+    public String getSharedAssetSwapIndexId() {
+        return sharedAssetSwapIndexId;
+    }
+
+    public void setSharedAssetSwapIndexId(String sharedAssetSwapIndexId) {
+        this.sharedAssetSwapIndexId = sharedAssetSwapIndexId;
+    }
+
+    @Transient
+    private String sharedAssetSwapIndexId;
+
     public String getDashboardPage() {
         return dashboardPage;
     }
@@ -2336,4 +2350,7 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setAnnualMaintenanceTimes(Integer annualMaintenanceTimes) {
         this.annualMaintenanceTimes = annualMaintenanceTimes;
     }
+    public String getSharedAssetSwapIndex() { return sharedAssetSwapIndex; }
+
+    public void setSharedAssetSwapIndex(String sharedAssetSwapIndex) { this.sharedAssetSwapIndex = sharedAssetSwapIndex; }
 }
