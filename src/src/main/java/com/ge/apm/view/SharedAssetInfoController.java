@@ -230,44 +230,50 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         this.selectedMap.clear();
     }
 
-    public void saveOne(){
+    public void saveOne() {
         String ind = this.selected.getSharedAssetSwapIndex();
         String msg = "该调机设备下已存在此调机编号";
-        SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findBySharedAssetTypeaAndSwapIndexAnd(this.selected.getSharedAssetTypeUid()  , ind);
-        //未配置调剂名称   
-        if(queryIndex == -1){
-            if(entity == null){
-                super.save();
-                SharedAssetSwapIndex sharedAssetSwapIndex = new SharedAssetSwapIndex();
-                sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
-                sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
-                sharedAssetSwapIndex.setSwapIndex(ind);
-                sharedAssetSwapIndexDao.save(sharedAssetSwapIndex);
-                swapIndex = null;
-                this.selectedMap.clear();
-            }else{
-                WebUtil.addWarnMessage(msg);
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            }
-        }else{
-            //已配置调剂名称
-            //查找除当前数据以外的数据
-            entity = sharedAssetSwapIndexDao.findNotData(this.selected.getSharedAssetTypeUid()  , ind , this.selected.getSharedAssetSwapIndexId());
-            //查找当前数据
-            SharedAssetSwapIndex swapIndexEntity = sharedAssetSwapIndexDao.findById(this.selected.getSharedAssetSwapIndexId());
-            if(entity == null){
-                super.save();
-                this.selectedMap.clear();
-                SharedAssetSwapIndex sharedAssetSwapIndex = new SharedAssetSwapIndex();
-                sharedAssetSwapIndex.setId(swapIndexEntity.getId());
-                sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
-                sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
-                sharedAssetSwapIndex.setSwapIndex(ind);
-                sharedAssetSwapIndexDao.save(sharedAssetSwapIndex);
-                swapIndex = null;
-            }else{
-                WebUtil.addWarnMessage(msg);
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        String nullMsg = "请填写设备名称和调剂编号";
+        if (this.selected.getSharedAssetTypeUid() == null || ind == null) {
+            WebUtil.addWarnMessage(nullMsg);
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        } else {
+            SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findBySharedAssetTypeaAndSwapIndexAnd(this.selected.getSharedAssetTypeUid(), ind);
+            //未配置调剂名称
+            if (queryIndex == -1) {
+                if (entity == null) {
+                    super.save();
+                    SharedAssetSwapIndex sharedAssetSwapIndex = new SharedAssetSwapIndex();
+                    sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
+                    sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
+                    sharedAssetSwapIndex.setSwapIndex(ind);
+                    sharedAssetSwapIndexDao.save(sharedAssetSwapIndex);
+                    swapIndex = null;
+                    this.selectedMap.clear();
+                } else {
+                    WebUtil.addWarnMessage(msg);
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                }
+            } else {
+                //已配置调剂名称
+                //查找除当前数据以外的数据
+                entity = sharedAssetSwapIndexDao.findNotData(this.selected.getSharedAssetTypeUid(), ind, this.selected.getSharedAssetSwapIndexId());
+                //查找当前数据
+                SharedAssetSwapIndex swapIndexEntity = sharedAssetSwapIndexDao.findById(this.selected.getSharedAssetSwapIndexId());
+                if (entity == null) {
+                    super.save();
+                    this.selectedMap.clear();
+                    SharedAssetSwapIndex sharedAssetSwapIndex = new SharedAssetSwapIndex();
+                    sharedAssetSwapIndex.setId(swapIndexEntity.getId());
+                    sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
+                    sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
+                    sharedAssetSwapIndex.setSwapIndex(ind);
+                    sharedAssetSwapIndexDao.save(sharedAssetSwapIndex);
+                    swapIndex = null;
+                } else {
+                    WebUtil.addWarnMessage(msg);
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                }
             }
         }
     }
