@@ -171,10 +171,10 @@
                 <p:menuitem value="积分" outcome="/portal/zkb/integral/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"  />
                 <p:menuitem value="权重配置" outcome="/portal/zkb/keyHehaviorIndex/ConfigList.xhtml" rendered="#{userContextService.geAdmin}"/>
             </p:submenu>
-
-            <p:submenu label="报表管理" icon="fa fa-wrench" rendered="#{userContextService.zkbUser or userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}">
+            <!-- 是智康保用户  -->
+            <p:submenu label="报表管理" icon="fa fa-wrench" rendered="#{ userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}">
                 <p:menuitem value="维修工单报表" outcome="/portal/zkb/report/List.xhtml" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}" />
-                <p:menuitem value="历史数据一键导出" outcome="/portal/zkb/export/Export.xhtml" rendered="#{!userContextService.zkbUser}" />
+                <p:menuitem value="历史数据一键导出" outcome="/portal/zkb/export/Export.xhtml"  />
             </p:submenu>
 
             <!--Super admin and GE OP only-->
