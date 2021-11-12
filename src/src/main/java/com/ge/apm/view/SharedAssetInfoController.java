@@ -232,13 +232,13 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void saveOne() {
         String ind = this.selected.getSharedAssetSwapIndex();
-        String msg = "该调机设备下已存在此调机编号";
+        String msg = "调剂编号已存在";
         String nullMsg = "请填写设备名称和调剂编号";
         if (this.selected.getSharedAssetTypeUid() == null || ind == null) {
             WebUtil.addWarnMessage(nullMsg);
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
         } else {
-            SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findBySharedAssetTypeaAndSwapIndexAnd(this.selected.getSharedAssetTypeUid(), ind);
+            SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findBySharedAssetTypeaAndSwapIndexAnd(ind);//this.selected.getSharedAssetTypeUid(),
             //未配置调剂名称
             if (queryIndex == -1) {
                 if (entity == null) {
