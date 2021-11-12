@@ -174,7 +174,7 @@
 
             <p:submenu label="报表管理" icon="fa fa-wrench" rendered="#{userContextService.zkbUser or userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}">
                 <p:menuitem value="维修工单报表" outcome="/portal/zkb/report/List.xhtml" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}" />
-                <p:menuitem value="一键导出" outcome="/portal/zkb/export/Export.xhtml" />
+                <p:menuitem value="历史数据一键导出" outcome="/portal/zkb/export/Export.xhtml" rendered="#{!userContextService.zkbUser}" />
             </p:submenu>
 
             <!--Super admin and GE OP only-->

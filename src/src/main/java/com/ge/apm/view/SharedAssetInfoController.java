@@ -1,15 +1,10 @@
 package com.ge.apm.view;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SharedAssetTypeRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SharedAssetType;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.data.FilterEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +15,10 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -29,12 +27,16 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     AssetInfoRepository dao = null;
     private SharedAssetTypeRepository swapDao;
+    SharedAssetSwapIndexRepository sharedAssetSwapIndexDao;
     private WorkflowConfigRepository wfcDao;
     private UaaService uaaService;
     private OrgInfoRepository orgInfoRepository;
     private String oneSearchStr;
 
     private String filterSatId;
+
+    //调剂编号
+    private String swapIndex;
 
     private Map<String, Boolean> selectedMap;
 
@@ -65,6 +67,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
         UserAccount user = UserContextService.getCurrentUserAccount();
         deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
+        sharedAssetSwapIndexDao = WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         this.selectedMap = new HashMap();
 
     }
@@ -81,7 +84,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             this.searchFilters = new ArrayList<>();
         }
         setUserSearchFilters();
-
+        List<SharedAssetSwapIndex> sharedAssetSwapIndexList = new ArrayList<>();
         //1、使用科室：调剂中心  所属科室：空
         searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNull,null));
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,deptids));
@@ -98,12 +101,38 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.EQ,filterSatId));
         }
 
+        if(swapIndex != null && !swapIndex.equals("")){
+            /*searchFilters.add(new SearchFilter("sharedAssetSwapIndex.swapIndex",SearchFilter.Operator.LIKE,swapIndex));*/
+            sharedAssetSwapIndexList = sharedAssetSwapIndexDao.findBySwapIndexLike(swapIndex);
+            List<String> assetUids = new ArrayList<>();
+            sharedAssetSwapIndexList.stream().forEach(sharedAssetSwapIndex -> assetUids.add(sharedAssetSwapIndex.getAssetUid()));
+            searchFilters.add(new SearchFilter("uid",SearchFilter.Operator.IN,assetUids));
+        }
+
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
             Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPageAssets = res.getContent();
+            SharedAssetSwapIndex index = null;
+
+            if(queryIndex == 1){
+                for(AssetInfo assetInfo : res.getContent()) {
+                    index = sharedAssetSwapIndexDao.findByAssetUid(assetInfo.getUid());
+                    assetInfo.setSharedAssetSwapIndex(index == null ?  null : index.getSwapIndex());
+                    assetInfo.setSharedAssetSwapIndexId(index == null ?  null : index.getId());
+                }
+            }
+
             this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+            for(AssetInfo assetInfo : res.getContent()) {
+                for(SharedAssetSwapIndex sharedAssetSwapIndex : sharedAssetSwapIndexList ) {
+                    if(sharedAssetSwapIndex.getAssetUid().equals(assetInfo.getUid())) {
+                        assetInfo.setSharedAssetSwapIndex(sharedAssetSwapIndex.getSwapIndex());
+                        assetInfo.setSharedAssetSwapIndexId(sharedAssetSwapIndex.getId());
+                    }
+                }
+            }
             return res;
         }
     }
@@ -201,9 +230,52 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         this.selectedMap.clear();
     }
 
-    public void saveOne(){
-        super.save();
-        this.selectedMap.clear();
+    public void saveOne() {
+        String ind = this.selected.getSharedAssetSwapIndex();
+        String msg = "调剂编号已存在";
+        String nullMsg = "请填写设备名称和调剂编号";
+        if (this.selected.getSharedAssetTypeUid() == null || ind == null) {
+            WebUtil.addWarnMessage(nullMsg);
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        } else {
+            SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findBySharedAssetTypeaAndSwapIndexAnd(ind);//this.selected.getSharedAssetTypeUid(),
+            //未配置调剂名称
+            if (queryIndex == -1) {
+                if (entity == null) {
+                    super.save();
+                    SharedAssetSwapIndex sharedAssetSwapIndex = new SharedAssetSwapIndex();
+                    sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
+                    sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
+                    sharedAssetSwapIndex.setSwapIndex(ind);
+                    sharedAssetSwapIndexDao.save(sharedAssetSwapIndex);
+                    swapIndex = null;
+                    this.selectedMap.clear();
+                } else {
+                    WebUtil.addWarnMessage(msg);
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                }
+            } else {
+                //已配置调剂名称
+                //查找除当前数据以外的数据
+                entity = sharedAssetSwapIndexDao.findNotData(this.selected.getSharedAssetTypeUid(), ind, this.selected.getSharedAssetSwapIndexId());
+                //查找当前数据
+                SharedAssetSwapIndex swapIndexEntity = sharedAssetSwapIndexDao.findById(this.selected.getSharedAssetSwapIndexId());
+                if (entity == null) {
+                    super.save();
+                    this.selectedMap.clear();
+                    SharedAssetSwapIndex sharedAssetSwapIndex = new SharedAssetSwapIndex();
+                    sharedAssetSwapIndex.setId(swapIndexEntity.getId());
+                    sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
+                    sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
+                    sharedAssetSwapIndex.setSwapIndex(ind);
+                    sharedAssetSwapIndexDao.save(sharedAssetSwapIndex);
+                    swapIndex = null;
+                } else {
+                    WebUtil.addWarnMessage(msg);
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                }
+            }
+        }
     }
 
     @Override
@@ -232,6 +304,13 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void prepareEditOne(String uid){
         selected = dao.findByUid(uid);
+        if(queryIndex == 1){
+            //通过asset_info中uid查找swap_index(调剂编号)
+            SharedAssetSwapIndex sharedAssetSwapIndex = sharedAssetSwapIndexDao.findByAssetUid(uid);
+            selected.setSharedAssetSwapIndex(sharedAssetSwapIndex == null ? "" : sharedAssetSwapIndex.getSwapIndex());
+            selected.setSharedAssetSwapIndexId(sharedAssetSwapIndex == null ? "" : sharedAssetSwapIndex.getId());
+        }
+
     }
 
     public String getFilterSatId() {
@@ -269,5 +348,13 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setBatchSharedAssetTypeUid(String batchSharedAssetTypeUid) {
         this.batchSharedAssetTypeUid = batchSharedAssetTypeUid;
+    }
+
+    public String getSwapIndex() {
+        return swapIndex;
+    }
+
+    public void setSwapIndex(String swapIndex) {
+        this.swapIndex = swapIndex;
     }
 }

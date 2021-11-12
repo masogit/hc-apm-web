@@ -21,11 +21,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 
 
 /**
@@ -45,7 +42,7 @@ public class ZkbProbeService {
     private final String VALUETYPE_HIGHVALUE = "高值";
     private final String VALUETYPE_NORMALVALUE = "普通";
     private final String VALUETYPE_SPECIALVALUE = "特殊";
-
+    private final String ISVAILD_Y = "是";
     @Autowired
     private ZkbPartOrderCatRepository zkbPartOrderCatRepository;
 
@@ -98,7 +95,7 @@ public class ZkbProbeService {
      }
 
     public ZkbPartOrderCat convertDownBox(ZkbPartOrderCat probe){
-        probe.setIsVaild("是".equals(probe.getIsVaild())?"Y":"N");
+        probe.setIsVaild(ISVAILD_Y.equals(probe.getIsVaild())?"Y":"N");
         /**
          * HighValue:高值
          * NormalValue:普通
