@@ -47,7 +47,7 @@
             </p:panelGrid>
             <br/>
             <p:commandButton validateClient="true" value="保存" actionListener="#{zkbProbeController.save}" icon="ui-icon-check" update=":growl probeListForm:datalist_probe" oncomplete="PF('probeEditDialog').hide()"/>
-            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('probeEditDialog').hide()"/>
+            <p:commandButton immediate="true" process="@this"  update="probeListForm:datalist_probe" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('probeEditDialog').hide()"/>
         </h:form>
     </p:dialog>
 
