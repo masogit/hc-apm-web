@@ -550,7 +550,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
 
     //射频码
-    @Column(name = "rfId")
+    @Column(name = "rf_id")
     private String rfId;
     //射频码分组
     @Column(name = "rf_group")
