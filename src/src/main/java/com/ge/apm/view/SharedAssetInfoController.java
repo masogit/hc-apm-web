@@ -242,7 +242,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             //未配置调剂名称
             if (queryIndex == -1) {
                 //查询数据库是否已存在调剂编号
-                SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findBySharedAssetTypeaAndSwapIndexAnd(ind);
+                SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findBySharedAssetTypeaAndSwapIndexAnd(ind , this.selected.getClinicalDeptUID());
                 if (entity == null) {
                     super.save();
                     this.selectedMap.clear();
@@ -259,7 +259,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             } else {
                 //已配置调剂名称
                 //查找除当前数据以外的数据
-                SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findNotData(ind, this.selected.getUid());
+                SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findNotData(ind, this.selected.getUid() , this.selected.getClinicalDeptUID());
                 if (entity == null) {
                     super.save();
                     this.selectedMap.clear();
