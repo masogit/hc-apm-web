@@ -8,7 +8,7 @@
 
     <ui:composition>
 <!--新增 医联体/租户信息-->
-        <p:dialog id="SiteInfoEditDlg" widgetVar="SiteInfoEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{tenantInfoController.CRUDActionName} #{msg.SiteInfo}">
+        <p:dialog id="SiteInfoEditDlg" widgetVar="SiteInfoEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{tenantInfoController.CRUDActionName} #{msg.SiteInfo}" width="780" >
             <p:ajax event="close" update=":SiteInfoListForm:datalist" />
             <h:form id="SiteInfoEditForm">
                 <h:panelGroup id="display">
@@ -115,6 +115,11 @@
                         <h:panelGroup>
                             <label class="label">&nbsp;</label>
                             <p:selectBooleanCheckbox itemLabel="是否有IB版设备" value="#{tenantInfoController.selected.haveIbDevice}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">&nbsp;</label>
+<!--                            isEnablesAdverseEvents-->
+                            <p:selectBooleanCheckbox itemLabel="是否开启不良事件上报" value="#{tenantInfoController.selected.isEnablesAdverseEvents}"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
