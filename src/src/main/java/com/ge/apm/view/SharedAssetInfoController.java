@@ -217,7 +217,6 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void batchSave(){
-
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
 
         if (deptids.size() > 0 && batchSharedAssetTypeUid != null){
@@ -234,22 +233,25 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         String ind = this.selected.getSharedAssetSwapIndex();
         String msg = "调剂编号已存在";
         String nullMsg = "请填写设备名称和调剂编号";
+        AssetInfo assetInfo = dao.getByUid(this.selected.getUid());
+        //点击行修改按钮 设备表和调剂编号表同时做修改
         if (this.selected.getSharedAssetTypeUid() == null || ind == null) {
             WebUtil.addWarnMessage(nullMsg);
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
         } else {
-            SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findBySharedAssetTypeaAndSwapIndexAnd(ind);//this.selected.getSharedAssetTypeUid(),
             //未配置调剂名称
             if (queryIndex == -1) {
+                //查询数据库是否已存在调剂编号
+                SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findBySharedAssetTypeaAndSwapIndexAnd(ind);
                 if (entity == null) {
                     super.save();
+                    this.selectedMap.clear();
                     SharedAssetSwapIndex sharedAssetSwapIndex = new SharedAssetSwapIndex();
                     sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
                     sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
                     sharedAssetSwapIndex.setSwapIndex(ind);
                     sharedAssetSwapIndexDao.save(sharedAssetSwapIndex);
                     swapIndex = null;
-                    this.selectedMap.clear();
                 } else {
                     WebUtil.addWarnMessage(msg);
                     RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -257,14 +259,16 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             } else {
                 //已配置调剂名称
                 //查找除当前数据以外的数据
-                entity = sharedAssetSwapIndexDao.findNotData(this.selected.getSharedAssetTypeUid(), ind, this.selected.getSharedAssetSwapIndexId());
-                //查找当前数据
-                SharedAssetSwapIndex swapIndexEntity = sharedAssetSwapIndexDao.findById(this.selected.getSharedAssetSwapIndexId());
+                SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findNotData(ind, this.selected.getUid());
                 if (entity == null) {
                     super.save();
                     this.selectedMap.clear();
+                    //查找当前数据;
                     SharedAssetSwapIndex sharedAssetSwapIndex = new SharedAssetSwapIndex();
-                    sharedAssetSwapIndex.setId(swapIndexEntity.getId());
+                    if(this.selected.getSharedAssetSwapIndexId() != null){
+                        SharedAssetSwapIndex swapIndexEntity = sharedAssetSwapIndexDao.findById(this.selected.getSharedAssetSwapIndexId());
+                        sharedAssetSwapIndex.setId(swapIndexEntity.getId());
+                    }
                     sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
                     sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
                     sharedAssetSwapIndex.setSwapIndex(ind);
@@ -310,7 +314,6 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setSharedAssetSwapIndex(sharedAssetSwapIndex == null ? "" : sharedAssetSwapIndex.getSwapIndex());
             selected.setSharedAssetSwapIndexId(sharedAssetSwapIndex == null ? "" : sharedAssetSwapIndex.getId());
         }
-
     }
 
     public String getFilterSatId() {

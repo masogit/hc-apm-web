@@ -77,8 +77,8 @@
                        <!-- <p:column headerText="#{msg.SwappedEquipmentNo}" filterBy="#{item.sharedAssetSwapIndex.swapIndex}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.sharedAssetSwapIndex.swapIndex}"/>
                         </p:column>-->
-
-                        <p:column headerText="#{msg.SwappedEquipmentNo}" filterBy="#{item.swapIndex}"  filterMatchMode="LIKE">
+                        <!-- sortBy="#{item.swapIndex}"  filterBy="#{item.swapIndex}"  -->
+                        <p:column headerText="#{msg.SwappedEquipmentNo}" filterMatchMode="LIKE">
                                 <h:outputText value="#{item.sharedAssetSwapIndex}"/>
                         </p:column>
 
@@ -155,8 +155,20 @@
                                 <p:inputText id="swapIndex" value="#{sharedAssetInfoController.selected.sharedAssetSwapIndex}" />
                             </h:panelGroup>
 
+                            <!--测试代码start-->
+                            <!--<h:panelGroup>
+                                <label class="label">测试222</label>
+                                <p:inputText id="aaa" value="#{sharedAssetInfoController.selected.sharedAssetSwapIndexId}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">测试111</label>
+                                <p:inputText id="bbb" value="#{sharedAssetInfoController.selected.uid}" />
+                            </h:panelGroup>-->
+                            <!--测试代码 end-->
+
 
                             <h:inputHidden value="#{sharedAssetInfoController.selected.sharedAssetSwapIndexId}"></h:inputHidden>
+                            <h:inputHidden value="#{sharedAssetInfoController.selected.uid}"></h:inputHidden>
 
                         </p:panelGrid>
                         <br/>

@@ -18,21 +18,11 @@ public interface SharedAssetSwapIndexRepository extends GenericRepositoryUUID<Sh
 
     List<SharedAssetSwapIndex> findBySwapIndexLike(String swapIndex);
 
+    @Query(value="select * from shared_asset_swap_index where swap_index = ?1",nativeQuery=true)
+    SharedAssetSwapIndex findBySharedAssetTypeaAndSwapIndexAnd(String swapIndex);
 
-
-//    @Query(value="select * from shared_asset_swap_index where shared_asset_type = ?1",nativeQuery=true)
-//    List<SharedAssetSwapIndex> findBySharedAssetTypeaAndSwapIndex(String sharedAssetType);
-
-
-//    SharedAssetSwapIndex findBySharedAssetTypeAndAssetUid(String sharedAssetType , String assetUid);
-
-
-
-    @Query(value="select * from shared_asset_swap_index where swap_index = ?1",nativeQuery=true) //shared_asset_type = ?1 and
-    SharedAssetSwapIndex findBySharedAssetTypeaAndSwapIndexAnd(String swapIndex);//String sharedAssetType ,
-
-    @Query(value="select * from shared_asset_swap_index where shared_asset_type = ?1 and swap_index = ?2 and id != ?3",nativeQuery=true)
-    SharedAssetSwapIndex findNotData (String sharedAssetType , String swapIndex , String id);
+    @Query(value="select * from shared_asset_swap_index where swap_index = ?1 and asset_uid != ?2",nativeQuery=true)//shared_asset_type = ?1 and
+    SharedAssetSwapIndex findNotData (String swapIndex , String id);
 
 
 }
