@@ -34,6 +34,7 @@ import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -92,6 +93,14 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      */
     private String loginName = "";
 
+    private UserAccountRepository userAccountRepository;
+
+    private List<String> configTypeList = Arrays.asList("OrderExtraPending","OrderPending","CommercialPending","ClosePending");
+
+    /**
+     * 是否同步创建或更新GeFeConfig用户角色
+     */
+    private Boolean synGeFeConfigFlag = false;
     /**
      * 初始化
      */
@@ -103,6 +112,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         zkbPartOrderRepository=WebUtil.getBean(ZkbPartOrderRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         this.loginName=currentUser.getLoginName();
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 
     }
 
@@ -244,6 +254,13 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             WebUtil.addErrorMessage("保存失败,不能保存空数据!");
             return;
         }
+
+        UserAccount userAccount = userAccountRepository.getByLoginName(this.selected.getLoginName());
+        if(userAccount==null) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameNotExist"));
+            return;
+        }
+
         if(this.selected.getLoginName()!=null&&this.selected.getLoginName().startsWith(ZkbFePartOrderService.testLoginNameStartWith))
         {
             this.selected.setTestStatus("t");
@@ -271,7 +288,9 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             selected.setUsBackUpName(backUpUser.getName());
         }
         super.save();
-        SynCreateFePartOrderUser(selected);
+        if(synGeFeConfigFlag){
+            SynCreateFePartOrderUser(selected, userAccount.getTenantUID());
+        }
         this.selected = null;
         this.backUpUser = null;
     }
@@ -282,7 +301,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      * @param zkbPartOrderUserConfig
      */
     @Transactional(rollbackFor = Exception.class)
-    public void  SynCreateFePartOrderUser(ZkbPartOrderUserConfig zkbPartOrderUserConfig){
+    public void  SynCreateFePartOrderUser(ZkbPartOrderUserConfig zkbPartOrderUserConfig, String tenantUid){
         String geFeConfigType = null;
         if("OrderExtraPending".equals(zkbPartOrderUserConfig.getConfigType())||"OrderPending".equals(zkbPartOrderUserConfig.getConfigType())){
             if(selected.getOrderType() == null || !selected.getOrderType().equals("Probe")){
@@ -297,12 +316,6 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             geFeConfigType = "GEAdmin";
         }
         if(geFeConfigType != null){
-            UserAccountRepository userAccountRepository=WebUtil.getBean(UserAccountRepository.class);
-            UserAccount userAccount = userAccountRepository.getByLoginName(zkbPartOrderUserConfig.getLoginName());
-            if(userAccount==null) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameNotExist"));
-                return;
-            }
             List<ZkbFePartOrderUserConfig> list = null;
             ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
             list = zkbFePartOrderUserConfigRepository.findByLoginName(zkbPartOrderUserConfig.getLoginName());
@@ -313,7 +326,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
                 zkbFePartOrderUserConfig = list.get(0);
                 //GE FE User Config中已存在用户，不能修改用户配置的角色，其他信息可修改。
                 if(!zkbFePartOrderUserConfig.getConfigType().equals(geFeConfigType)){
-                   WebUtil.addErrorMessage("用户添加成功，但此用户在FE USER CONFIG中已有角色："+WebUtil.getMessage(zkbFePartOrderUserConfig.getConfigType()));
+                   WebUtil.addErrorMessage("此用户在FE USER CONFIG中已有其他角色："+WebUtil.getMessage(zkbFePartOrderUserConfig.getConfigType()) +"，不能修改其信息。");
                    return;
                 }
             }
@@ -324,10 +337,19 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
 //            zkbFePartOrderUserConfig.setSso(zkbPartOrderUserConfig.getSso());
             zkbFePartOrderUserConfig.setConfigType(geFeConfigType);
             zkbFePartOrderUserConfig.setIsVacation(zkbPartOrderUserConfig.getIsVacation());
-            zkbFePartOrderUserConfig.setRemark("本用户由ZKB FE USER CONFIG页面中同步创建");
-            zkbFePartOrderUserConfig.setTenantUid(userAccount.getTenantUID());
+            zkbFePartOrderUserConfig.setRemark("本用户由《USER CONFIG配置》页面同步创建");
+            zkbFePartOrderUserConfig.setTenantUid(tenantUid);
             zkbFePartOrderUserConfigRepository.save(zkbFePartOrderUserConfig);
         }
+    }
+
+    public Boolean isGeFeConfigType(){
+        if(selected != null && selected.getConfigType() != null){
+            if(configTypeList.contains(selected.getConfigType())){
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
     }
 
     public List<ZkbPartOrderUserConfig> autoCompleteBackUpList(String query){
@@ -391,5 +413,13 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
 
     public void setExportFile(StreamedContent exportFile) {
         this.exportFile = exportFile;
+    }
+
+    public Boolean getSynGeFeConfigFlag() {
+        return synGeFeConfigFlag;
+    }
+
+    public void setSynGeFeConfigFlag(Boolean synGeFeConfigFlag) {
+        this.synGeFeConfigFlag = synGeFeConfigFlag;
     }
 }
