@@ -399,7 +399,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'rfId')}" >
         <h:panelGroup>
             <label class="label">#{msg.rfId}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['rfId'].required? '*':''}</span></label>
-            <p:inputText  id="rfId" value="#{assetInfoEditController.selected.powerOnThreshold}" required="#{assetInfoEditController.customConfig.assetFields['rfId'].required}"
+            <p:inputText  id="rfId" value="#{assetInfoEditController.selected.rfId}" required="#{assetInfoEditController.customConfig.assetFields['rfId'].required}"
                           readonly="#{!assetInfoEditController.needEdit('rfId')}" />
         </h:panelGroup>
     </c:if>
