@@ -3849,7 +3849,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_systemIdError', '错误：SYSTEM ID不存在', '错误：SYSTEM ID不存在', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_loginNameError', '错误：账号不能重复', '错误：账号不能重复', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_loginNameNotExist', '错误：账号不存在', '错误：账号不存在', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_loginNameNotExist', 'APM用户不存在，请先在用户管理中创建用户', 'APM用户不存在，请先在用户管理中创建用户', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_emailError', '错误：邮箱必填', '错误：邮箱必填', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_configTypeError', '错误：类型值不对', '错误：类型值不对', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_assetTypeError', '错误：资产值不对', '错误：资产值不对', NULL, '-1');
