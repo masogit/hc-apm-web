@@ -44,9 +44,18 @@
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_type}</label>
                         <p:selectOneMenu id="configType" value="#{zkbPartOrderUserConfigController.selected.configType}"  required="true" requiredMessage="类型#{msg.ValidationRequire}">
+                            <p:ajax event="change" update="checkboxConfigType" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoStepsRole')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="checkboxConfigType">
+                        <h:panelGroup rendered="#{zkbPartOrderUserConfigController.isGeFeConfigType()}">
+                            <label class="label">是否同步创建或更新GE FE USER CONFIG</label>
+                            <p:selectBooleanCheckbox value="#{zkbPartOrderUserConfigController.synGeFeConfigFlag}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_propertyType}</label>

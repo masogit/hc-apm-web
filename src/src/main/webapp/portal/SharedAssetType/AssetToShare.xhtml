@@ -45,6 +45,7 @@
                         <!--<p:ajax  event="rowSelect" oncomplete="PF('AssetEditDialog').show()" update="AssetEditDlg"/>-->
                         <p:ajax event="filter" listener="#{sharedAssetInfoController.onFilter}"/>
 
+
                         <p:column width="50">
                             <p:selectBooleanCheckbox value="#{sharedAssetInfoController.selectedMap[item.uid]}" rendered="#{!sharedAssetInfoController.isBorrow(item.uid)}"  class="selectCheckBox">
                                 <p:ajax listener="#{sharedAssetInfoController.onItemSelected}" update="@this @(.selectCheckBoxHeader) @(.btn-gray)"/>
@@ -68,8 +69,17 @@
                             <!--<h:outputText value="在借中" />-->
                         <!--</p:column>-->
 
+
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
+                        </p:column>
+
+                       <!-- <p:column headerText="#{msg.SwappedEquipmentNo}" filterBy="#{item.sharedAssetSwapIndex.swapIndex}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.sharedAssetSwapIndex.swapIndex}"/>
+                        </p:column>-->
+                        <!-- sortBy="#{item.swapIndex}"  filterBy="#{item.swapIndex}"  -->
+                        <p:column headerText="#{msg.SwappedEquipmentNo}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.sharedAssetSwapIndex}"/>
                         </p:column>
 
                         <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE" >
@@ -139,10 +149,32 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
 
+                            <!-- 调剂编号   #{msg.swapIndex} -->
+                            <h:panelGroup>
+                                <label class="label">#{msg.SwappedEquipmentNo}</label>
+                                <p:inputText id="swapIndex" value="#{sharedAssetInfoController.selected.sharedAssetSwapIndex}" />
+                            </h:panelGroup>
+
+                            <!--测试代码start-->
+                            <!--<h:panelGroup>
+                                <label class="label">测试222</label>
+                                <p:inputText id="aaa" value="#{sharedAssetInfoController.selected.sharedAssetSwapIndexId}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">测试111</label>
+                                <p:inputText id="bbb" value="#{sharedAssetInfoController.selected.uid}" />
+                            </h:panelGroup>-->
+                            <!--测试代码 end-->
+
+
+                            <h:inputHidden value="#{sharedAssetInfoController.selected.sharedAssetSwapIndexId}"></h:inputHidden>
+                            <h:inputHidden value="#{sharedAssetInfoController.selected.uid}"></h:inputHidden>
+
                         </p:panelGrid>
                         <br/>
+                        <!--oncomplete="handleSubmit(args, 'AssetEditDialog');"-->
                         <p:commandButton validateClient="true" actionListener="#{sharedAssetInfoController.saveOne}" value="#{msg.Save}"
-                                         update=" :AssetInfoListForm:datalist" icon="ui-icon-check" oncomplete="PF('AssetEditDialog').hide()" />
+                                         update=" :AssetInfoListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetEditDialog');"/>
                         <!--&nbsp;&nbsp;-->
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('AssetEditDialog').hide()"/>
                     </h:panelGroup>

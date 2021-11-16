@@ -550,7 +550,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
 
     //射频码
-    @Column(name = "rfId")
+    @Column(name = "rf_id")
     private String rfId;
     //射频码分组
     @Column(name = "rf_group")
@@ -665,6 +665,20 @@ public class AssetInfo implements ChineseName,Serializable {
     private String dashboardPage;
     @Transient
     private List<String> tags = new ArrayList<>();
+
+    @Transient
+    private String sharedAssetSwapIndex;
+
+    public String getSharedAssetSwapIndexId() {
+        return sharedAssetSwapIndexId;
+    }
+
+    public void setSharedAssetSwapIndexId(String sharedAssetSwapIndexId) {
+        this.sharedAssetSwapIndexId = sharedAssetSwapIndexId;
+    }
+
+    @Transient
+    private String sharedAssetSwapIndexId;
 
     public String getDashboardPage() {
         return dashboardPage;
@@ -2336,4 +2350,7 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setAnnualMaintenanceTimes(Integer annualMaintenanceTimes) {
         this.annualMaintenanceTimes = annualMaintenanceTimes;
     }
+    public String getSharedAssetSwapIndex() { return sharedAssetSwapIndex; }
+
+    public void setSharedAssetSwapIndex(String sharedAssetSwapIndex) { this.sharedAssetSwapIndex = sharedAssetSwapIndex; }
 }

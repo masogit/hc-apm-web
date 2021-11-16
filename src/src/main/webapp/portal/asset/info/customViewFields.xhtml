@@ -192,6 +192,26 @@
             <p:inputText id="nationalStandardCode" value="#{assetInfoDetailController.selected.nationalStandardCode}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+<!--新增-->
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'rfId')}">
+        <h:panelGroup >
+            <label class="label">#{msg.rfId}ppppp</label>
+            <p:inputText id="rfId" value="#{assetInfoDetailController.selected.rfId}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'rfGroup')}">
+        <h:panelGroup >
+            <label class="label">#{msg.rfGroup}</label>
+            <p:inputText id="rfGroup" value="#{assetInfoDetailController.selected.rfGroup}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'powerOnThreshold')}">
+        <h:panelGroup >
+            <label class="label">#{msg.powerOnThreshold}</label>
+            <p:inputText id="powerOnThreshold" value="#{assetInfoDetailController.selected.powerOnThreshold}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+
     <!--计量负责人-->
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'measuringOwner')}" >
         <h:panelGroup >
