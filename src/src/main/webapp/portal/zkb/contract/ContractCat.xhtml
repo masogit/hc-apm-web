@@ -16,7 +16,7 @@
                             <p:inputText id="snNo" disabled="#{zkbContractEditController.fourInOneFlag}"  required="true" requiredMessage="sn编号不能为空" value="#{zkbContractEditController.zkbContractCatSelected.snNo}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:selectBooleanCheckbox value="#{zkbContractEditController.fourInOneFlag}" itemLabel="是否四合一" style="float: left">
+                            <p:selectBooleanCheckbox value="#{zkbContractEditController.fourInOneFlag}" itemLabel="是否选择四合一" style="float: left">
                                 <p:ajax update="snNo" listener="#{zkbContractEditController.fourInOneFlagChange}"/>
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>

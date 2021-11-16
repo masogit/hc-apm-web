@@ -425,7 +425,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             zkbContractCatSelected.setContractId(this.selected.getId());
         }
         zkbContractService.saveCat(zkbContractCatSelected,actionCatName,reason,currentUser,selected);
-        //zkbContractCatList = zkbContractService.queryCatByContractId(selected.getId());
+        zkbContractCatList = zkbContractService.queryCatByContractId(selected.getId());
         fourInOneFlag = false;
         this.zkbContractCatSelected = null;
     }
