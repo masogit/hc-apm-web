@@ -3849,7 +3849,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_systemIdError', '错误：SYSTEM ID不存在', '错误：SYSTEM ID不存在', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_loginNameError', '错误：账号不能重复', '错误：账号不能重复', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_loginNameNotExist', '错误：账号不存在', '错误：账号不存在', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_loginNameNotExist', 'APM用户不存在，请先在用户管理中创建用户', 'APM用户不存在，请先在用户管理中创建用户', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_emailError', '错误：邮箱必填', '错误：邮箱必填', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_configTypeError', '错误：类型值不对', '错误：类型值不对', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_assetTypeError', '错误：资产值不对', '错误：资产值不对', NULL, '-1');
@@ -4383,16 +4383,26 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','adverseEvents_supplement','不良事件产品信息维护','adverseEvents supplement',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventsSupplementCard','adverseEvents_supplement.filled','待填写','To be filled',NULL,-1);
 
+-- 调剂名称设置页面新增字段
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','SwappedEquipmentNo','调剂编号','accounting Department',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','powerOnThreshold','开机电流阈值','start powerOnThreshold',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfGroup','射频码分组','rfGroup',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfId','射频码','rfId',NULL,-1);
 
 -- 探头信息维护 （是否有效isVaild）
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_isVaild', 'N', '有效', 'efficient', NULL, -1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_isVaild','Y','无效','invalid',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_isVaild', 'N', '无效', 'efficient', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_isVaild','Y','有效','invalid',NULL,-1);
 -- 探头信息维护 （价值类型valueType）
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType', 'HighValue', '高值', 'HighValue', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType', 'HighValue', '高值', 'HighValue', NULL, -1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType','NormalValue','普通','NormalValue',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType','SpecialValue','特殊','SpecialValue',NULL,-1);
 -- 探头信息维护
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZkbPartOrderCat','探头信息','ZkbPartOrderCat',NULL,-1);
+
+-- 无人值守
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WhetherToEnableUnattended', '是否启用无人值守', 'Whether To Enable Unattended', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AppointmentStatusLockedTime', '预约状态锁定时长', 'Appointment Status Locked Time', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'OutboundStatusCheckInterval', '出库状态检查间隔', 'Out bound Status Check Interval', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfGroup','射频码分组','rfGroup',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfId','射频码','rfId',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','powerOnThreshold','开机电流阈值','start powerOnThreshold',NULL,-1);

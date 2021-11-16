@@ -167,6 +167,17 @@ public class TenantInfo implements Serializable {
     @Column(name = "custom_tenant")
     private String customTenant;//有定制化需求的租户可以使用该字段作为租户标识 1、仁济
 
+    @Column(name="is_enables_adverse_events" )
+    private Boolean isEnablesAdverseEvents; // 控制不良事件相关微信卡片是否显示 （true/false 默认false不显示）
+
+    public Boolean getIsEnablesAdverseEvents() {
+        return isEnablesAdverseEvents==null?Boolean.FALSE:isEnablesAdverseEvents;
+    }
+
+    public void setIsEnablesAdverseEvents(Boolean isEnablesAdverseEvents) {
+        this.isEnablesAdverseEvents = isEnablesAdverseEvents;
+    }
+
     public String getCustomTenant() {
         return customTenant;
     }

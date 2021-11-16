@@ -35,4 +35,6 @@ public interface ZkbFePartOrderUserConfigRepository extends GenericRepositoryUUI
      */
     List<ZkbFePartOrderUserConfig> findByLoginNameAndConfigType(String loginName,String configType);
 
+    List<ZkbFePartOrderUserConfig> findByTenantUidAndConfigType(String tenantUid,String configType);
+
 }
