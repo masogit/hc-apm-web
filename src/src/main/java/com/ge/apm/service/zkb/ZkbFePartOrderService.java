@@ -555,7 +555,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         list.add(item);
         return list;
     }
-
     /**
      * @param zkbContract    合同信息
      * @param type           1.把剩余名额移入申请名额 2.把申请名额移入已使用名额 3.把申请名额移入剩余名额
@@ -895,7 +894,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public ZkbFePartOrder calDeductQtyByNew(ZkbFePartOrder zkbFePartOrder) {
         zkbFePartOrder.setQty(1);
         if ("High".equals(zkbFePartOrder.getZkbPoProbeQuotaType())) {
-            if (ZkbFePartOrderProbeController.four_in_one.equals(zkbFePartOrder.getContractCatId())) {
+            if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(zkbFePartOrder.getContractCatSnNo())) {
                 zkbFePartOrder.setQty(4);
             } else {
                 zkbFePartOrder.setQty(0);
@@ -913,7 +912,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public ZkbFePartOrder calDeductQtyByOld(ZkbFePartOrder zkbFePartOrder) {
         zkbFePartOrder.setQty(0);
         if (ZkbFePartOrderService.testStatusTrueValue.equals(zkbFePartOrder.getHighCatFlag())) {
-            if (ZkbFePartOrderProbeController.four_in_one.equals(zkbFePartOrder.getContractCatId())) {
+            if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(zkbFePartOrder.getContractCatSnNo())) {
                 zkbFePartOrder.setQty(4);
             }
         } else {
@@ -1793,9 +1792,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             if (zkbFePartOrder.getQty() != null && zkbFePartOrder.getQty() > 0) {
                 this.moveProbe(5, zkbContract, zkbFePartOrder.getQty(), showZkbPoProbeQuotaType, zkbFePartOrder.getZkbPoProbeQuotaType(), userAccount, zkbFePartOrder, true, i18Map.get("GEAdminAccept"));
             }
-            if (StringUtils.isNotBlank(zkbFePartOrder.getContractCatId()) && !ZkbFePartOrderProbeController.four_in_one.equals(zkbFePartOrder.getContractCatId())) {
+//            if (StringUtils.isNotBlank(zkbFePartOrder.getContractCatId()) && !ZkbFePartOrderProbeController.four_in_one.equals(zkbFePartOrder.getContractCatId())) {
                 this.updateZkbContractCat(userAccount, true, zkbFePartOrder.getContractCatId());
-            }
+//            }
         }
         Date date = new Date();
         return this.wolkFlowToComplete(

@@ -223,6 +223,7 @@
                         <c:if test="#{zkbFePartOrderProbeController.checkShowSN()}">
                             <label class="label">SN编号*</label>
                             <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.contractCatId}" required="true" requiredMessage="SN编号 #{msg.ValidationRequire}" >
+                                <p:ajax event="itemSelect" listener="#{zkbFePartOrderProbeController.setContractCatSnNo()}"  process="@parent"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{zkbFePartOrderProbeController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
