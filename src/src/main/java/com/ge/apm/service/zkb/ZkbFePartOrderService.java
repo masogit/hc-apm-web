@@ -1792,9 +1792,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             if (zkbFePartOrder.getQty() != null && zkbFePartOrder.getQty() > 0) {
                 this.moveProbe(5, zkbContract, zkbFePartOrder.getQty(), showZkbPoProbeQuotaType, zkbFePartOrder.getZkbPoProbeQuotaType(), userAccount, zkbFePartOrder, true, i18Map.get("GEAdminAccept"));
             }
-//            if (StringUtils.isNotBlank(zkbFePartOrder.getContractCatId()) && !ZkbFePartOrderProbeController.four_in_one.equals(zkbFePartOrder.getContractCatId())) {
+            if (StringUtils.isNotBlank(zkbFePartOrder.getContractCatId())) {
                 this.updateZkbContractCat(userAccount, true, zkbFePartOrder.getContractCatId());
-//            }
+            }
         }
         Date date = new Date();
         return this.wolkFlowToComplete(
