@@ -495,7 +495,9 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         {
             this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("TenantReject"));
         }
-        this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
+        if (StringUtils.isNotBlank(selected.getContractCatId())) {
+            this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
+        }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
@@ -533,7 +535,9 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         {
             this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("TenantReject"));
         }
-        this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
+        if (StringUtils.isNotBlank(selected.getContractCatId())) {
+            this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
+        }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.CommercialReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
@@ -903,7 +907,9 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             if (type > 0 && selected.getQty() != null && selected.getQty() > 0) {
                 zkbFePartOrderService.moveProbe(type, zkbContract, selected.getQty(), showZkbPoProbeQuotaType, selected.getZkbPoProbeQuotaType(), currentUser, selected, true, step);
             }
-            zkbFePartOrderService.updateZkbContractCat(currentUser, true, selected.getContractCatId());
+            if (StringUtils.isNotBlank(selected.getContractCatId())) {
+                zkbFePartOrderService.updateZkbContractCat(currentUser, true, selected.getContractCatId());
+            }
         }
 
         zkbFePartOrderService.saveReturnModify(selected,currentUser);
