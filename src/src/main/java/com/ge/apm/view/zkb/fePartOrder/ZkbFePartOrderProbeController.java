@@ -360,7 +360,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             WebUtil.addErrorMessage(WebUtil.getMessage("不能选择高值探头"));
             return "";
         }
-        if(this.checkShowSN() && !FOUR_IN_ONE.equalsIgnoreCase(this.selected.getContractCatSnNo()))
+        if(this.checkShowSN() && !FOUR_IN_ONE.equals(this.selected.getContractCatSnNo()))
         {
             this.selected.setQty(0);
             ZkbContractCat zkbContractCat = this.zkbContractCatRepository.findById(this.selected.getContractCatId());
