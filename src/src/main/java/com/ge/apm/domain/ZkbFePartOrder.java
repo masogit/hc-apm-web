@@ -581,6 +581,11 @@ public class ZkbFePartOrder {
     private String contractCatId;
 
     /**
+     * 因四合一修改，需保存原contract_cat_id数据，contract_cat_id则保存zkb_contract_cat表的id
+     */
+    @Column(name = "contract_cat_sn_no")
+    private String contractCatSnNo;
+    /**
      * Commercial审批备注
      */
     @Column(name = "commercial_comment")
@@ -1326,5 +1331,13 @@ public class ZkbFePartOrder {
 
     public void setCommercialAssignDate(Date commercialAssignDate) {
         this.commercialAssignDate = commercialAssignDate;
+    }
+
+    public String getContractCatSnNo() {
+        return contractCatSnNo;
+    }
+
+    public void setContractCatSnNo(String contractCatSnNo) {
+        this.contractCatSnNo = contractCatSnNo;
     }
 }
