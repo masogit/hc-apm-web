@@ -245,8 +245,6 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "whether_to_enable_unattended ")
     private Boolean whethertoenableunattended;
 
-
-
     public Boolean getWhethertoenableunattended() {
         return whethertoenableunattended;
     }
