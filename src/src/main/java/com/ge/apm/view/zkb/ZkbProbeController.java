@@ -74,9 +74,13 @@ public class ZkbProbeController extends GenericCRUDUUIDController<ZkbPartOrderCa
     }
 
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException{
-        FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,"导入完成", event.getFile().getFileName() + " 导入完成！");
         this.file = event.getFile();
         errorImportList = zkbProbeService.handleExcel(file, currentUser);
+        //有错误数据 warning 没有错误数据  info
+        if (CollectionUtils.isNotEmpty(errorImportList)){
+            message = new FacesMessage(FacesMessage.SEVERITY_WARN,"导入完成", event.getFile().getFileName() + " 导入完成，但有错误数据！");
+        }
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
