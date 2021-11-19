@@ -179,6 +179,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     public static final String four_in_one = "fourToOne";
 
+    public static final String FOUR_IN_ONE = "FourInOne";
+
     /**
      * PDF上传列表
      */
@@ -358,7 +360,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             WebUtil.addErrorMessage(WebUtil.getMessage("不能选择高值探头"));
             return "";
         }
-        if(this.checkShowSN()&&!four_in_one.equals(this.selected.getContractCatId()))
+        if(this.checkShowSN() && !FOUR_IN_ONE.equals(this.selected.getContractCatSnNo()))
         {
             this.selected.setQty(0);
             ZkbContractCat zkbContractCat = this.zkbContractCatRepository.findById(this.selected.getContractCatId());
@@ -492,8 +494,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if(this.selected.getQty()>0)
         {
             this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("TenantReject"));
-        }else if(StringUtils.isNotBlank(this.selected.getContractCatId())&&!four_in_one.equals(this.selected.getContractCatId()))
-        {
+        }
+        if (StringUtils.isNotBlank(selected.getContractCatId())) {
             this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
@@ -532,8 +534,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if(this.selected.getQty()>0)
         {
             this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("TenantReject"));
-        }else if(StringUtils.isNotBlank(this.selected.getContractCatId())&&!four_in_one.equals(this.selected.getContractCatId()))
-        {
+        }
+        if (StringUtils.isNotBlank(selected.getContractCatId())) {
             this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.CommercialReject.toString(),
@@ -905,7 +907,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             if (type > 0 && selected.getQty() != null && selected.getQty() > 0) {
                 zkbFePartOrderService.moveProbe(type, zkbContract, selected.getQty(), showZkbPoProbeQuotaType, selected.getZkbPoProbeQuotaType(), currentUser, selected, true, step);
             }
-            if (StringUtils.isNotBlank(selected.getContractCatId()) && !ZkbFePartOrderProbeController.four_in_one.equals(selected.getContractCatId())) {
+            if (StringUtils.isNotBlank(selected.getContractCatId())) {
                 zkbFePartOrderService.updateZkbContractCat(currentUser, true, selected.getContractCatId());
             }
         }
@@ -913,4 +915,16 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         zkbFePartOrderService.saveReturnModify(selected,currentUser);
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
     }
+
+    public void setContractCatSnNo(){
+        if(selected.getContractCatId() != null && highCatList != null){
+            for (Map<String, String> contractCat : highCatList){
+                if(contractCat != null && contractCat.get("msgKey").equals(selected.getContractCatId())){
+                    selected.setContractCatSnNo(contractCat.get("value"));
+                    break;
+                }
+            }
+        }
+    }
+
 }

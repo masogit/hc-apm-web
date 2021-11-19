@@ -142,6 +142,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_mobile_phone_file_review")
     private Boolean isMobilePhoneFileReview ; // 手机建档是否需要审核
 
+    @Column(name = "is_nursing_staff_code_ledger")
+    private Boolean isNursingStaffCodeLedger ; // 护理人员扫码是否跳转至台账
+
     @Column(name = "is_pm_take_order_enabled")
     private Boolean isPmTakeOrderEnabled; //是否允许抢单
 
@@ -345,6 +348,15 @@ public class WorkflowConfig implements Serializable {
 
     public void setIsMobilePhoneFileReview(Boolean isMobilePhoneFileReview) {
         this.isMobilePhoneFileReview = isMobilePhoneFileReview;
+    }
+
+
+    public Boolean getIsNursingStaffCodeLedger() {
+        return isNursingStaffCodeLedger == null ? false : isNursingStaffCodeLedger;
+    }
+
+    public void setIsNursingStaffCodeLedger(Boolean isNursingStaffCodeLedger) {
+        this.isNursingStaffCodeLedger = isNursingStaffCodeLedger;
     }
 
 
