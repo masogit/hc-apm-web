@@ -38,6 +38,14 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     //调剂编号
     private String swapIndex;
 
+    public String getSwapIndex() {
+        return swapIndex;
+    }
+
+    public void setSwapIndex(String swapIndex) {
+        this.swapIndex = swapIndex;
+    }
+
     private Map<String, Boolean> selectedMap;
 
     private List<AssetInfo> currentPageAssets;
@@ -101,13 +109,18 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.EQ,filterSatId));
         }
 
-        if(swapIndex != null && !swapIndex.equals("")){
-            /*searchFilters.add(new SearchFilter("sharedAssetSwapIndex.swapIndex",SearchFilter.Operator.LIKE,swapIndex));*/
-            sharedAssetSwapIndexList = sharedAssetSwapIndexDao.findBySwapIndexLike(swapIndex);
-            List<String> assetUids = new ArrayList<>();
-            sharedAssetSwapIndexList.stream().forEach(sharedAssetSwapIndex -> assetUids.add(sharedAssetSwapIndex.getAssetUid()));
-            searchFilters.add(new SearchFilter("uid",SearchFilter.Operator.IN,assetUids));
+        for(int i = 0 ; i < this.searchFilters.size() ; i++){
+            String fieldName = this.searchFilters.get(i).fieldName;
+            if(fieldName.equals("swapIndex")){
+                sharedAssetSwapIndexList = sharedAssetSwapIndexDao.findBySwapIndexLike("%" + this.searchFilters.get(i).value.toString() + "%");
+                List<String> assetUids = new ArrayList<>();
+                sharedAssetSwapIndexList.stream().forEach(sharedAssetSwapIndex -> assetUids.add(sharedAssetSwapIndex.getAssetUid()));
+                searchFilters.add(new SearchFilter("uid",SearchFilter.Operator.IN,assetUids));
+                this.removeFilterOnField("swapIndex");
+            }
         }
+
+
 
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
@@ -353,11 +366,4 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         this.batchSharedAssetTypeUid = batchSharedAssetTypeUid;
     }
 
-    public String getSwapIndex() {
-        return swapIndex;
-    }
-
-    public void setSwapIndex(String swapIndex) {
-        this.swapIndex = swapIndex;
-    }
 }

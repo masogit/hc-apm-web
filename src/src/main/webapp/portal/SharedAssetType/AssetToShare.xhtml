@@ -77,8 +77,7 @@
                        <!-- <p:column headerText="#{msg.SwappedEquipmentNo}" filterBy="#{item.sharedAssetSwapIndex.swapIndex}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.sharedAssetSwapIndex.swapIndex}"/>
                         </p:column>-->
-                        <!-- sortBy="#{item.swapIndex}"  filterBy="#{item.swapIndex}"  -->
-                        <p:column headerText="#{msg.SwappedEquipmentNo}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.SwappedEquipmentNo}" sortBy="#{sharedAssetInfoController.swapIndex}"  filterBy="#{sharedAssetInfoController.swapIndex}" filterMatchMode="LIKE">
                                 <h:outputText value="#{item.sharedAssetSwapIndex}"/>
                         </p:column>
 
