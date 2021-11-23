@@ -902,7 +902,7 @@ public class NurseSiteMaintainService {
                     if(nurseSiteMaintainDataNew.getId().equals(nurseSiteMaintainDataOld.getId())){
                         Boolean checkValueNew = nurseSiteMaintainDataNew.getCheckValue();
                         Boolean checkValueOld = nurseSiteMaintainDataOld.getCheckValue();
-                        if(!checkValueNew.equals(checkValueOld)){
+                        if(checkValueNew != null && !checkValueNew.equals(checkValueOld)){
                             tempItem.setUpdateByUid(user.getUid());
                         }
                     }
