@@ -260,7 +260,12 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     public void saveOne() {
         String ind = this.selected.getSharedAssetSwapIndex();
         String msg = "调剂编号已存在";
-        String nullMsg = "请填写设备名称";
+        String nullMsg = "";
+        if(whethertoenableunattended){
+            nullMsg = "请填写设备名称和调剂编号";
+        }else{
+            nullMsg = "请填写设备名称";
+        }
         AssetInfo assetInfo = dao.getByUid(this.selected.getUid());
         //点击行修改按钮 设备表和调剂编号表同时做修改
         if (this.selected.getSharedAssetTypeUid() == null || ind == null) {
