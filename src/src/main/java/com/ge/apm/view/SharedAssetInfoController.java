@@ -87,7 +87,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         UserAccount user = UserContextService.getCurrentUserAccount();
         deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
         WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(user.getSiteUID());
-        whethertoenableunattended = workflowConfig.getWhethertoenableunattended() == true ? true : false;
+        whethertoenableunattended = workflowConfig.getWhethertoenableunattended() == null || false ? false : true;
         sharedAssetSwapIndexDao = WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         this.selectedMap = new HashMap();
 
@@ -266,7 +266,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         }else{
             nullMsg = "请填写设备名称";
         }
-        AssetInfo assetInfo = dao.getByUid(this.selected.getUid());
+
         //点击行修改按钮 设备表和调剂编号表同时做修改
         if (this.selected.getSharedAssetTypeUid() == null || ind == null) {
             WebUtil.addWarnMessage(nullMsg);
