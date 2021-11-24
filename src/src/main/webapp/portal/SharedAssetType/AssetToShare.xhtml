@@ -77,7 +77,9 @@
                             <h:outputText value="#{item.sharedAssetSwapIndex.swapIndex}"/>
                         </p:column>-->
                         <!--sortBy="#{sharedAssetInfoController.swapIndex}" -->
-                        <p:column headerText="#{msg.SwappedEquipmentNo}"  filterBy="#{sharedAssetInfoController.swapIndex}" filterMatchMode="LIKE">
+
+                        <p:column headerText="#{msg.SwappedEquipmentNo}"  filterBy="#{sharedAssetInfoController.swapIndex}" filterMatchMode="LIKE"
+                                  rendered="#{sharedAssetInfoController.whethertoenableunattended}">
                                 <h:outputText value="#{item.sharedAssetSwapIndex}"/>
                         </p:column>
 
@@ -149,7 +151,7 @@
                             </h:panelGroup>
 
                             <!-- 调剂编号   #{msg.swapIndex} -->
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{sharedAssetInfoController.whethertoenableunattended}">
                                 <label class="label">#{msg.SwappedEquipmentNo}</label>
                                 <p:inputText id="swapIndex" value="#{sharedAssetInfoController.selected.sharedAssetSwapIndex}" />
                             </h:panelGroup>
