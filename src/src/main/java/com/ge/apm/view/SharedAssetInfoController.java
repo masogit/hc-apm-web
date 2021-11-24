@@ -35,6 +35,17 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private String filterSatId;
 
+    //是否启用无人值守 true：启动
+    private boolean whethertoenableunattended;
+
+    public boolean isWhethertoenableunattended() {
+        return whethertoenableunattended;
+    }
+
+    public void setWhethertoenableunattended(boolean whethertoenableunattended) {
+        this.whethertoenableunattended = whethertoenableunattended;
+    }
+
     //调剂编号
     private String swapIndex;
 
@@ -75,6 +86,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
         UserAccount user = UserContextService.getCurrentUserAccount();
         deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
+        WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(user.getSiteUID());
+        whethertoenableunattended = workflowConfig.getWhethertoenableunattended() == true ? true : false;
         sharedAssetSwapIndexDao = WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         this.selectedMap = new HashMap();
 
@@ -87,6 +100,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+
+
 
         if (this.searchFilters == null){
             this.searchFilters = new ArrayList<>();
