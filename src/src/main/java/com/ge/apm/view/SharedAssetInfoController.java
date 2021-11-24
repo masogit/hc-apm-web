@@ -87,7 +87,6 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         UserAccount user = UserContextService.getCurrentUserAccount();
         deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
         WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(user.getSiteUID());
-//        whethertoenableunattended = workflowConfig.getWhethertoenableunattended() == null || false ? false : true;
         if(workflowConfig.getWhethertoenableunattended() == null || workflowConfig.getWhethertoenableunattended() == false){
             whethertoenableunattended = false;
         }else {
