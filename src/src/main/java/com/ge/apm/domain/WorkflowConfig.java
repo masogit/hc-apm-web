@@ -246,6 +246,9 @@ public class WorkflowConfig implements Serializable {
     private Boolean whethertoenableunattended;
 
     public Boolean getWhethertoenableunattended() {
+        if(whethertoenableunattended ==null){
+            return false;
+        }
         return whethertoenableunattended;
     }
 
