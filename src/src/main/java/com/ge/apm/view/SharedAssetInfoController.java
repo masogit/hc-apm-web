@@ -86,6 +86,12 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
         UserAccount user = UserContextService.getCurrentUserAccount();
         deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
+        WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(user.getSiteUID());
+        if(workflowConfig.getWhethertoenableunattended() == null || workflowConfig.getWhethertoenableunattended() == false){
+            whethertoenableunattended = false;
+        }else {
+            whethertoenableunattended = true;
+        }
         sharedAssetSwapIndexDao = WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         this.selectedMap = new HashMap();
 
