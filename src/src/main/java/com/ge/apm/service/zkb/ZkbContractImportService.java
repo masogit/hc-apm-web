@@ -827,6 +827,8 @@ public class ZkbContractImportService {
                 return "lowMachine";
             case "N/A":
                 return "empty";
+            case "depot":
+                return "depot";
             default:
                 return "";
         }
