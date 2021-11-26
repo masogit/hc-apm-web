@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * Created by 503035627 on 2018/3/7.
  */
 @Entity
-@Table(name = "nurse_site_maintain_config_item",indexes = {@Index(columnList = "id")})
+@Table(name = "nurse_site_maintain_config_item",indexes = {@Index(columnList = "parent_id"),@Index(columnList = "asset_uid")})
 public class NurseSiteMaintainConfigItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
