@@ -131,6 +131,30 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         }
     }
 
+    public String qtyRender(String type, String contractType, String value){
+        if(userContextService.isZkbUser()) {
+            if(ZkbContract.ContractType.DI.toString().equals(contractType)){
+                if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
+                    ZkbContractQuotaLog.OrderTypeEnum.Probe.toString().equals(type) ||
+                    ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
+                ){
+                    return "-";
+                }
+            }else if(ZkbContract.ContractType.Biomed.toString().equals(contractType) || ZkbContract.ContractType.CCS.toString().equals(contractType)){
+                if(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString().equals(type)){
+                    return "-";
+                }
+            }else if(ZkbContract.ContractType.PCB.toString().equals(contractType) || "PCB MVS".equals(contractType)){
+                if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
+                    ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
+                ){
+                    return "-";
+                }
+            }
+        }
+        return value;
+    }
+
 
     public String importAction(){
         return UrlEncryptController.encodeUrlParam("ContractImport?1=1");
