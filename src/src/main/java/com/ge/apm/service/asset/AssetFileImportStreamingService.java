@@ -112,9 +112,9 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 // key "name" is used by a lot of modules, the definition is wrong, so use a new key name "EquipmentName" to redefine
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentName")), "setName", false);
 
-                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("rfId")), "setRfId", true);
-                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("rfGroup")), "setRfGroup", true);
-                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("powerOnThreshold")), "setPowerOnThreshold", true);
+//                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("rfId")), "setRfId", true);
+//                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("rfGroup")), "setRfGroup", true);
+//                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("powerOnThreshold")), "setPowerOnThreshold", true);
 
 
 
