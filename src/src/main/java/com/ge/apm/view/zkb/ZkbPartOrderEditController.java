@@ -866,7 +866,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(ZkbContract.YOrNEnum.Y.toString().equals(selectedContract.getFiveNineNineFlag()) && ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType()) ){
                         this.selected.setArtificialType(CopyByInvok.NORMAL_TWO);
                     } else{
-                        this.selected.setArtificialType(CopyByInvok.NORMAL_THREE);
+                        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
+                            this.selected.setArtificialType(CopyByInvok.NORMAL_THREE);
+                        }else if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType())){
+                            this.selected.setArtificialType(CopyByInvok.NORMAL_DEPOT);
+                        }
+
                     }
                 }
                 

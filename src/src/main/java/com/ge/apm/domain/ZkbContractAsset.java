@@ -17,7 +17,7 @@ public class ZkbContractAsset {
     private static final long serialVersionUID = 1L;
 
     public enum AssetTypeEnum{
-        highMachine,lowMachine,empty
+        highMachine,lowMachine,empty,depot
     }
 
     @Id
