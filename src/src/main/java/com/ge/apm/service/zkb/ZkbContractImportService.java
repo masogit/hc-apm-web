@@ -700,23 +700,25 @@ public class ZkbContractImportService {
                 item.put("status", ImportStatus.Failure);
                 ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbQrCodeIsNotExist"));
             }else{
-                boolean flag = true;
-                if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
-                    flag = false;
-                }
-                if(!assetInfo.getIsValid()){
-                    flag = false;
-                }
-                if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
-                    flag = false;
-                }
+                if(!"Y".equals(zkbContractAssetVO.getFlag())){
+                    boolean flag = true;
+                    if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
+                        flag = false;
+                    }
+                    if(!assetInfo.getIsValid()){
+                        flag = false;
+                    }
+                    if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
+                        flag = false;
+                    }
 
-                if(!flag){
-                    isValidateData = false;
-                    item.put("status", ImportStatus.Failure);
-                    ZkbContractAssetRow.addErrMessage(item, "设备状态异常，请检查！");
-                }else{
-                    zkbContractAssetVO.setAssetId(assetInfo.getUid());
+                    if(!flag){
+                        isValidateData = false;
+                        item.put("status", ImportStatus.Failure);
+                        ZkbContractAssetRow.addErrMessage(item, "设备状态异常，请检查！");
+                    }else{
+                        zkbContractAssetVO.setAssetId(assetInfo.getUid());
+                    }
                 }
             }
         }
@@ -825,6 +827,8 @@ public class ZkbContractImportService {
                 return "lowMachine";
             case "N/A":
                 return "empty";
+            case "depot":
+                return "depot";
             default:
                 return "";
         }

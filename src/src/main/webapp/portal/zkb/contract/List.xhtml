@@ -70,28 +70,28 @@
                             <h:outputText value="#{item.ibNumber}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_spareQuota_total}">
-                            <h:outputText value="#{item.spareQuotaTotal}"/>
+                            <h:outputText value="#{zkbContractController.qtyRender('Spare', item.contractType, item.spareQuotaTotal)}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_spareQuota}">
-                            <h:outputText value="#{item.spareQuota}"/>
+                            <h:outputText value="#{zkbContractController.qtyRender('Spare', item.contractType, item.spareQuota)}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_probeQuota_total}" >
-                            <h:outputText value="#{item.probeQuotaTotal}"/>
+                            <h:outputText value="#{zkbContractController.qtyRender('Probe', item.contractType, item.probeQuotaTotal)}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_probeQuota}" >
-                            <h:outputText value="#{item.probeQuota}"/>
+                            <h:outputText value="#{zkbContractController.qtyRender('Probe', item.contractType, item.probeQuota)}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes_total}" >
-                            <h:outputText value="#{item.geArtificialSupportTimesTotal}"/>
+                            <h:outputText value="#{zkbContractController.qtyRender('Artificial', item.contractType, item.geArtificialSupportTimesTotal)}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
-                            <h:outputText value="#{item.geArtificialSupportTimes}"/>
+                            <h:outputText value="#{zkbContractController.qtyRender('Artificial', item.contractType, item.geArtificialSupportTimes)}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_spareArtificail_total}">
-                            <h:outputText value="#{item.spareArtificailTotal}"/>
+                            <h:outputText value="#{zkbContractController.qtyRender('SpareArtificial', item.contractType, item.spareArtificailTotal)}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_spareArtificail}">
-                            <h:outputText value="#{item.spareArtificail}"/>
+                            <h:outputText value="#{zkbContractController.qtyRender('SpareArtificial', item.contractType, item.spareArtificail)}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_startDate}" filterBy="#{item.startDate}" sortBy="#{item.startDate}" filterMatchMode="GTE">
                             <f:facet name="filter">
