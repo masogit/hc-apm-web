@@ -69,7 +69,6 @@
                             <!--<h:outputText value="在借中" />-->
                         <!--</p:column>-->
 
-
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
@@ -77,8 +76,10 @@
                        <!-- <p:column headerText="#{msg.SwappedEquipmentNo}" filterBy="#{item.sharedAssetSwapIndex.swapIndex}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.sharedAssetSwapIndex.swapIndex}"/>
                         </p:column>-->
-                        <!-- sortBy="#{item.swapIndex}"  filterBy="#{item.swapIndex}"  -->
-                        <p:column headerText="#{msg.SwappedEquipmentNo}" filterMatchMode="LIKE">
+                        <!--sortBy="#{sharedAssetInfoController.swapIndex}" -->
+
+                        <p:column headerText="#{msg.SwappedEquipmentNo}"  filterBy="#{sharedAssetInfoController.swapIndex}" filterMatchMode="LIKE"
+                                  rendered="#{sharedAssetInfoController.whethertoenableunattended}">
                                 <h:outputText value="#{item.sharedAssetSwapIndex}"/>
                         </p:column>
 
@@ -150,7 +151,7 @@
                             </h:panelGroup>
 
                             <!-- 调剂编号   #{msg.swapIndex} -->
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{sharedAssetInfoController.whethertoenableunattended}">
                                 <label class="label">#{msg.SwappedEquipmentNo}</label>
                                 <p:inputText id="swapIndex" value="#{sharedAssetInfoController.selected.sharedAssetSwapIndex}" />
                             </h:panelGroup>
