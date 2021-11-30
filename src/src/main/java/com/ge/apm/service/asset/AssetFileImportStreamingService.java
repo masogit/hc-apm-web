@@ -114,7 +114,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("rfId")), "setRfId", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("rfGroup")), "setRfGroup", true);
-                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("powerOnThreshold")), "setPowerOnThreshold", true);
+                assetRow.setFieldDoubleValue(trimMsgKey(WebUtil.getMessage("powerOnThreshold")), "setPowerOnThreshold");
 
 
 
