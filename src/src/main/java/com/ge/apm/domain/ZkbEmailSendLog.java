@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -39,6 +38,9 @@ public class ZkbEmailSendLog implements Serializable {
 
     @Column(name = "step")//步骤
     private String step;
+
+    @Column(name = "mail_type")//邮件类型
+    private String mailType;//zkb fe  gefe
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -82,6 +84,14 @@ public class ZkbEmailSendLog implements Serializable {
 
     public void setStep(String step) {
         this.step = step;
+    }
+
+    public String getMailType() {
+        return mailType;
+    }
+
+    public void setMailType(String mailType) {
+        this.mailType = mailType;
     }
 
     @Override
