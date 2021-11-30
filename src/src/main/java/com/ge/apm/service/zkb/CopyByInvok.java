@@ -24,6 +24,7 @@ public class CopyByInvok {
     public static String NORMAL_ZERO = "0";
     public static String NORMAL_TWO = "2";
     public static String NORMAL_THREE = "3";
+    public static String NORMAL_DEPOT = "depot";
 
     public static <T> T translateField(Object souce, Class<T> target) throws Exception {
         T tarObj = target.newInstance();

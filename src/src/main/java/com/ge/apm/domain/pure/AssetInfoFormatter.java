@@ -922,7 +922,9 @@ public class AssetInfoFormatter {
         map.put(getMessage("mainDirectory"), assetInfo.getMainDirectory());
         map.put(getMessage("secondDirectory"), assetInfo.getSecondDirectory());
         map.put(getMessage("UUID"), this.getUid());
-
+        map.put(getMessage("rfId"), assetInfo.getRfId());
+        map.put(getMessage("rfGroup"), assetInfo.getRfGroup());
+        map.put(getMessage("powerOnThreshold"), assetInfo.getPowerOnThreshold());
         return map;
 
     }
