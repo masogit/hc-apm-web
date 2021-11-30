@@ -364,9 +364,9 @@
                         <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderProbeController.selected.fullApmInfoDate}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
-<!--                    <h:panelGroup rendered="#{zkbFePartOrderProbeController.hasOrderModifyRight()}">-->
-<!--                        <p:commandButton process="@this" icon="ui-icon-pencil" value="下单信息修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>-->
-<!--                    </h:panelGroup>-->
+                    <h:panelGroup rendered="#{zkbFePartOrderProbeController.hasOrderModifyRight()}">
+                        <p:commandButton process="@this" icon="ui-icon-pencil" value="下单信息修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>
+                    </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
             <p:fieldset legend="探头说明函信息" rendered="#{'t' eq zkbFePartOrderProbeController.selected.needLetterFlag}">
@@ -436,9 +436,9 @@
                         <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" value="#{zkbFePartOrderProbeController.selected.geAdminComment}" rows="2" cols="20">
                         </p:inputTextarea>
                     </h:panelGroup>
-<!--                    <h:panelGroup rendered="#{zkbFePartOrderProbeController.hasOrderReturnModifyRight()}">-->
-<!--                        <p:commandButton process="@this" icon="ui-icon-pencil" value="FE归还信息修改" update="growl zkbPartOrderRetrunModifyDlg"  oncomplete="PF('zkbPartOrderRetrunModifyDlg').show()"/>-->
-<!--                    </h:panelGroup>-->
+                    <h:panelGroup rendered="#{zkbFePartOrderProbeController.hasOrderReturnModifyRight()}">
+                        <p:commandButton process="@this" icon="ui-icon-pencil" value="FE归还信息修改" update="growl zkbPartOrderRetrunModifyDlg"  oncomplete="PF('zkbPartOrderRetrunModifyDlg').show()"/>
+                    </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm" action="#{zkbFePartOrderProbeController.saveAndToListPage}" style="float:left"/>
