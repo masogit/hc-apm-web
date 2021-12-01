@@ -16,9 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
@@ -136,6 +134,21 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
     }
 
+    public List<String> getMvsAssectUids(String token) {
+        String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID);
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<ArrayList> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, ArrayList.class);
+        if (response.getBody() != null && response.getStatusCode().equals(HttpStatus.OK)) {
+            ArrayList<String> mvsAssetUidsByVisibleScope = (ArrayList<String>) response.getBody();
+            if(mvsAssetUidsByVisibleScope.isEmpty()){
+                return new ArrayList<String>();
+            }
+            return mvsAssetUidsByVisibleScope;
+        } else {
+            return new ArrayList<String>();
+        }
+    }
 
 
     public void updateAccessPrice(V2_WorkOrder_Detail workOrderDetail){

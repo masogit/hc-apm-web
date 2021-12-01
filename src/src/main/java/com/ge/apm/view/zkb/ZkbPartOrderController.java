@@ -54,6 +54,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = new ArrayList<>();
     private String queryStatus = "";
     private boolean showStatusBtn = true;
+    /**
+     * 按钮待办是否显示
+     */
+    private boolean showPendingStatusBtn = true;
     private boolean vacationBtn = false;
     private String isVacation;
     private boolean canDelete= false;
@@ -87,6 +91,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
                 ){
                     showStatusBtn =false;
+                }
+                if(ZkbPartOrderStep.PartOrderStep.Reviewer.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    showPendingStatusBtn =false;
                 }
                 if(zkbPartOrderUserConfigList.size() == 2){
                     for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
@@ -274,9 +281,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.Reviewer.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(StringUtils.isEmpty(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ReturnPending.toString()));
-                    }else if(!"all".equals(queryStatus)){
+                    if(!"all".equals(queryStatus)&&StringUtils.isNotBlank(queryStatus)){
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
                     }
                 }
@@ -545,6 +550,14 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setShowStatusBtn(boolean showStatusBtn) {
         this.showStatusBtn = showStatusBtn;
+    }
+
+    public boolean isShowPendingStatusBtn() {
+        return showPendingStatusBtn;
+    }
+
+    public void setShowPendingStatusBtn(boolean showPendingStatusBtn) {
+        this.showPendingStatusBtn = showPendingStatusBtn;
     }
 
     public String getIsVacation() {
