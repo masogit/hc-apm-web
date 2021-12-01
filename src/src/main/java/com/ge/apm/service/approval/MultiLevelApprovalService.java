@@ -372,8 +372,15 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         for (MultiLevelApprovalConfig config : configList) {
             if(null != config.getConfigration()){
                 Map configMap = JSON.parseObject(config.getConfigration(), Map.class);
-                if((int)configMap.get("minAmount") < amount.doubleValue() && amount.doubleValue() <= (int)configMap.get("maxAmount")){
+                Integer minAmount = ((Integer) configMap.get("minAmount"));
+                Integer maxAmount = ((Integer) configMap.get("maxAmount"));
+                if(minAmount < amount.doubleValue() && amount.doubleValue() <= maxAmount){
                     return config;
+                }
+                if(minAmount > 0 && maxAmount == 0){
+                    if(minAmount< amount.doubleValue()){
+                        return config;
+                    }
                 }
             }
         }

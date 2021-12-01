@@ -2057,7 +2057,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return;
         }
         BigDecimal totalPriceToBigDecimal = BigDecimal.ZERO;
-        if(accessoryList!=null && accessoryList.isEmpty()){
+        if(accessoryList!=null && !accessoryList.isEmpty()){
             for (V2_WorkOrder_Detail detail:accessoryList) {
                 if(detail.getApproved()==null || !detail.getApproved()){
                     BigDecimal bigDecimal = new BigDecimal(detail.getClosedPrice()==null?0:detail.getClosedPrice()).setScale(2,BigDecimal.ROUND_HALF_UP);
