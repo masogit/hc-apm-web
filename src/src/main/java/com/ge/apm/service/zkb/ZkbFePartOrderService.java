@@ -639,6 +639,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + qty);
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - qty);
                     break;
+                case 5://好还变坏还，已使用名额+ qty，剩余名额- qty，坏变好走第3步骤
+                    opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse() + qty);
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() - qty);
+                    break;
             }
         } else if ("CCS".equals(zkbContract.getContractType())
                 || "Biomed".equals(zkbContract.getContractType())) {
@@ -661,6 +666,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
                     zkbContract.setSpareQuota(zkbContract.getSpareQuota() + qty);
                     zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply() - qty);
+                    break;
+                case 5://好还变坏还，已使用名额+ qty，剩余名额- qty，坏变好走第3步骤
+                    opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
+                    zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse() + qty);
+                    zkbContract.setSpareQuota(zkbContract.getSpareQuota() - qty);
                     break;
             }
         }

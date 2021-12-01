@@ -21,7 +21,7 @@
                 <h:panelGroup id="partSerialNumberGroup" style="text-align: left">
                     <h:panelGroup rendered="#{(zkbFePartOrderProbeController.selected.returnType eq 'DOA')}" style="text-align: left">
                         <label class="label">#{msg.zkbFePartOrder_partSerialNumber}*</label>
-                        <p:inputText  value="#{zkbFePartOrderProbeController.selected.partSerialNumber}" style="text-align: left" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}"  required="true" requiredMessage="#{msg.zkbFePartOrder_partSerialNumber} #{msg.ValidationRequire}" />
+                        <p:inputText  value="#{zkbFePartOrderProbeController.selected.partSerialNumber}" style="text-align: left" required="true" requiredMessage="#{msg.zkbFePartOrder_partSerialNumber} #{msg.ValidationRequire}" />
                     </h:panelGroup>
                 </h:panelGroup>
                 <h:panelGroup id="partQualityIssueGroup" style="text-align: left">
@@ -39,7 +39,7 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_returnDate1}*</label>
-                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbFePartOrderProbeController.selected.returnDate}" showOn="button"  Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
+                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbFePartOrderProbeController.selected.returnDate}" showOn="button"  Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_newCatSn}*</label>
@@ -47,7 +47,7 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_remark}</label>
-                    <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" value="#{zkbFePartOrderProbeController.selected.geAdminComment}" rows="2" cols="20">
+                    <p:inputTextarea value="#{zkbFePartOrderProbeController.selected.geAdminComment}" rows="2" cols="20">
                     </p:inputTextarea>
                 </h:panelGroup>
             </p:panelGrid>
