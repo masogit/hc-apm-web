@@ -26,6 +26,8 @@ public enum GatewayURL {
     WORK_ORDER_ACTION("/hcapmassetservice/api/apm/asset/workOrders/{workOrderId}/action"),
     CREATE_WORK_ORDER("/hcapmassetservice/api/apm/asset/workOrders"),
     UPDATE_WODETAIL_PRICE("/hcapmassetservice/api/apm/asset/workOrderDetails"),
+    //租户的mvs的设备uid获取
+    GET_MVSASSECT_UID("/hcapmassetservice/api/apm/asset/mvsassetinfos/byUserVisibleScope"),
     // Asset Owners
     GET_RESPONSER_BY_ASSET("/hcapmassetservice/api/apm/asset/tags/assets/{assetId}/owners"),
 
