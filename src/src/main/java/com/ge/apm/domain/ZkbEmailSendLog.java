@@ -33,8 +33,8 @@ public class ZkbEmailSendLog implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date sendTime;
 
-    @Column(name = "recipient")//收件人
-    private String recipient;
+    @Column(name = "recipient_email")//收件人邮箱
+    private String recipientEmail;
 
     @Column(name = "step")//步骤
     private String step;
@@ -70,12 +70,12 @@ public class ZkbEmailSendLog implements Serializable {
         this.sendTime = sendTime;
     }
 
-    public String getRecipient() {
-        return recipient;
+    public String getRecipientEmail() {
+        return recipientEmail;
     }
 
-    public void setRecipient(String recipient) {
-        this.recipient = recipient;
+    public void setRecipientEmail(String recipientEmail) {
+        this.recipientEmail = recipientEmail;
     }
 
     public String getStep() {
