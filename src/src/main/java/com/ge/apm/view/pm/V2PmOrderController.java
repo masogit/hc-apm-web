@@ -75,6 +75,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -2055,6 +2056,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(selectedPmOrder ==null){
             return;
         }
+        BigDecimal totalPriceToBigDecimal = BigDecimal.ZERO;
+        if(accessoryList!=null && accessoryList.isEmpty()){
+            for (V2_WorkOrder_Detail detail:accessoryList) {
+                if(detail.getApproved()==null || !detail.getApproved()){
+                    BigDecimal bigDecimal = new BigDecimal(detail.getClosedPrice()==null?0:detail.getClosedPrice()).setScale(2,BigDecimal.ROUND_HALF_UP);
+                    totalPriceToBigDecimal = totalPriceToBigDecimal.add(bigDecimal);
+                }
+            }
+        }
+        selectedPmOrder.setTotalPriceToBigDecimal(totalPriceToBigDecimal);
         MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selectedPmOrder, null, false);
         if (approval == null) {
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
@@ -2062,6 +2073,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         selectedPmOrder.setApprovalStatus(PmConstant.PM_APPROVAL_STATUS_PENDING);
         dao.save(selectedPmOrder);
+        WebUtil.addErrorMessage("审批发起成功");
+        return ;
     }
 
     public void prepareCompleteOrder(String woid) throws Exception {
