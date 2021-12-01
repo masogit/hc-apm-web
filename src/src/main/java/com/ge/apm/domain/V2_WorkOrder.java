@@ -290,6 +290,9 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Transient
     private Integer orderCount;
+    @Transient
+    private BigDecimal totalPriceToBigDecimal;
+
 
     public Integer getCreateType() {
         return createType;
@@ -301,7 +304,11 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
-        return totalPrice == null ? null : new BigDecimal(totalPrice);
+        return totalPriceToBigDecimal;
+    }
+
+    public void setTotalPriceToBigDecimal(BigDecimal totalPriceToBigDecimal) {
+        this.totalPriceToBigDecimal = totalPriceToBigDecimal;
     }
 
     @Override

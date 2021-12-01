@@ -196,11 +196,10 @@ public class ZkbAssetStatisticService {
         String qrCodeCountState = zkbAssetQrCodeInfo.getQrCodeCountState();
         Date date = new Date();
         if(qrCodeCountState == null || qrCodeCountState.equals("N")){
-            if(zkbAssetQrCodeInfo.getCanNotPastQrCode() != null && zkbAssetQrCodeInfo.getCanNotPastQrCode().equals("Y")){
+            if("Y".equals(zkbAssetQrCodeInfo.getCanNotPastQrCode())){
                 zkbAssetQrCodeInfo.setQrCodeCountState("N");
                 zkbAssetQrCodeInfo.setCreatedDate(date);
-            }else if(zkbAssetQrCodeInfo.getIbQrCodeTemporary() != null && zkbAssetQrCodeInfo.getIbQrCodeTemporary() == true){
-                zkbAssetQrCodeInfo.setIbQrCodeState("Y");
+            }else if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
                 zkbAssetQrCodeInfo.setQrCodeDate(date);
                 zkbAssetQrCodeInfo.setQrCodeCountState("Y");
                 zkbAssetQrCodeInfo.setCreatedDate(date);

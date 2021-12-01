@@ -65,11 +65,11 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     @Autowired
     private SimplePartsConfigService partsConfigService;
 
-    public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget) {
+    public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget,boolean approvalFlag) {
         // 需要调用服务端提供的接口
         BigDecimal totalPrice = approvableTarget.getTotalPriceToBigDecimal();
         MultiLevelApprovalConfig multiLevelApprovalConfig =
-                this.getApproveConfig(switchBusyTypeToString(approvableTarget.getBusinessType()), totalPrice);
+                this.getApproveConfig(switchBusyTypeToString(approvableTarget.getBusinessType()), totalPrice,approvalFlag);
         return multiLevelApprovalConfig;
     }
 
@@ -126,14 +126,14 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             level = 1;
         }
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getFirstApprovalList(approvableTarget);
+        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getFirstApprovalList(approvableTarget,false);
         if (multiLevelApprovalConfig != null) {
             String approvalItem = multiLevelApprovalConfig.getApprovalItem();
             if (null != approvalItem) {
                 MultiLevelApproval multiLevelApproval = new MultiLevelApproval();
                 List<String> weChatIdList = new ArrayList<>();
                 List<com.ge.apm.domain.ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<com.ge.apm.domain.ApprovalNode>>() {});
-                if (approvalNodes != null) {
+                if (approvalNodes != null && !approvalNodes.isEmpty()) {
                     com.ge.apm.domain.ApprovalNode approvalNode = approvalNodes.get(0);
                     if (approvalNode != null) {
                         boolean usingRole = approvalNode.getUsingRole();
@@ -316,12 +316,17 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
      * @date 2020/7/30 16:00
      * 根据金额查询审批配置信息
      */
-    public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount) {
+    public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount,boolean approvalFlag) {
         logger.info("-----校验开启多级审核请求参数 busiType : "+" , amount : "+amount);
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = new ArrayList<>(Arrays.asList(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID()));
         for (String orgUid: orgUidList) {
-            MultiLevelApprovalConfig approveConfig = getApproveConfigByOrgUid(orgUid, busiType, amount);
+            MultiLevelApprovalConfig approveConfig= null;
+            if(approvalFlag){
+                approveConfig = getApproveConfigByOrgUid(orgUid, busiType, amount);
+            }else {
+                approveConfig = getApproveConfigByOrgUidApprovalFlag(orgUid, busiType, amount);
+            }
             if(null != approveConfig){
                 return approveConfig;
             }
@@ -345,14 +350,37 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         return null;
     }
 
+    MultiLevelApprovalConfig getApproveConfigByOrgUidApprovalFlag(String orgUid, String busiType, BigDecimal amount){
+        if (StringUtils.isEmpty(busiType)){
+            return null;
+        }
+        List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
+        if(null != configList &&configList.size()>0){
+            logger.info("多级审核  configList : "+configList.toString());
+            if(ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType) || ApprovalConstant.APPROVAL_ASSET_REPAIR.equals(busiType) || ApprovalConstant.APPROVAL_ASSET_MAINTAIN.equals(busiType)){
+                return getPartsSteam(configList,amount);
+            }else{
+                return configList.get(0);
+            }
+        }
+        return null;
+    }
+
     //获取备件库存审批流
     MultiLevelApprovalConfig getPartsSteam(List<MultiLevelApprovalConfig> configList,BigDecimal amount){
         //先遍历所有 有配置金额信息的
         for (MultiLevelApprovalConfig config : configList) {
             if(null != config.getConfigration()){
                 Map configMap = JSON.parseObject(config.getConfigration(), Map.class);
-                if((int)configMap.get("minAmount") < amount.doubleValue() && amount.doubleValue() <= (int)configMap.get("maxAmount")){
+                Integer minAmount = ((Integer) configMap.get("minAmount"));
+                Integer maxAmount = ((Integer) configMap.get("maxAmount"));
+                if(minAmount < amount.doubleValue() && amount.doubleValue() <= maxAmount){
                     return config;
+                }
+                if(minAmount > 0 && maxAmount == 0){
+                    if(minAmount< amount.doubleValue()){
+                        return config;
+                    }
                 }
             }
         }
@@ -633,7 +661,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
      * 判断有没有配置多级审核
      */
     public MultiLevelApprovalConfig checkMultiLevelApprovalPersonAndSubmit(ApprovableTarget approvableTarget) {
-        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getFirstApprovalList(approvableTarget);
+        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getFirstApprovalList(approvableTarget,true);
         return multiLevelApprovalConfig;
     }
 
