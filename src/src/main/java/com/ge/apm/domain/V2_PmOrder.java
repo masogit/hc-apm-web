@@ -240,11 +240,17 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @JsonIgnore
     private String strFinishTime;
 
+    @Transient
+    private BigDecimal totalPriceToBigDecimal;
+
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
-        return totalPrice == null ? null : new BigDecimal(totalPrice);
+        return totalPriceToBigDecimal;
     }
 
+    public void setTotalPriceToBigDecimal(BigDecimal totalPriceToBigDecimal) {
+        this.totalPriceToBigDecimal = totalPriceToBigDecimal;
+    }
     @Override
     public String getBusinessNumber() {
         return getPmNum();
