@@ -58,6 +58,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1302,6 +1303,16 @@ public void test1(){
         if(selectedWorkOrder == null){
             return;
         }
+        BigDecimal totalPriceToBigDecimal = BigDecimal.ZERO;
+        if(accessoryList!=null && !accessoryList.isEmpty()){
+            for (V2_WorkOrder_Detail detail:accessoryList) {
+                if(detail.getApproved()==null || !detail.getApproved()){
+                    BigDecimal bigDecimal = new BigDecimal(detail.getClosedPrice()==null?0:detail.getClosedPrice()).setScale(2,BigDecimal.ROUND_HALF_UP);
+                    totalPriceToBigDecimal = totalPriceToBigDecimal.add(bigDecimal);
+                }
+            }
+        }
+        selectedWorkOrder.setTotalPriceToBigDecimal(totalPriceToBigDecimal);
         MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selectedWorkOrder, null, false);
         if (approval == null) {
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
@@ -1309,6 +1320,9 @@ public void test1(){
         }
         selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
         dao.save(selectedWorkOrder);
+        WebUtil.addErrorMessage("审批发起成功!");
+        return ;
+
     }
 
     //  提交审核前的计算
