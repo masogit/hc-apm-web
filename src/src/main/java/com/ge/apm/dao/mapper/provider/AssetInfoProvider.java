@@ -75,12 +75,14 @@ public class AssetInfoProvider {
 		String orgUidList = getSetValue(param.get("orgList")) ;
 		String tenantUid = (String) param.get("tenantUid");//
 		StringBuilder sb = new StringBuilder();
-		sb.append(" select wo.id from asset_info ai2,v2_pm_order wo,asset_info ai where ai.is_deleted ='false' and ai.is_valid = 'true' and ai.system_id like 'MVS-%' ");
-		sb.append(" and (ai.institution_uid in "+orgUidList+" or ai.hospital_uid in "+orgUidList+"or ai.site_uid in "+orgUidList);
-		sb.append(" or ai.clinical_dept_uid in "+orgUidList+" or ai.asset_dept_uid in "+orgUidList+" or ai.tenant_uid in "+orgUidList+")");
-		sb.append(" and wo.tenant_uid  = '"+tenantUid+"'");
-		sb.append(" and ai2.id  = wo.asset_id ");
-		sb.append(" and concat('MVS-',ai2.qr_code) = ai.system_id");
+		sb.append(" select id from v2_pm_order where asset_uid in "+orgUidList+"and tenant_uid = '"+tenantUid+"'");
+
+//		sb.append(" select wo.id from asset_info ai2,v2_pm_order wo,asset_info ai where ai.is_deleted ='false' and ai.is_valid = 'true' and ai.system_id like 'MVS-%' ");
+//		sb.append(" and (ai.institution_uid in "+orgUidList+" or ai.hospital_uid in "+orgUidList+"or ai.site_uid in "+orgUidList);
+//		sb.append(" or ai.clinical_dept_uid in "+orgUidList+" or ai.asset_dept_uid in "+orgUidList+" or ai.tenant_uid in "+orgUidList+")");
+//		sb.append(" and wo.tenant_uid  = '"+tenantUid+"'");
+//		sb.append(" and ai2.id  = wo.asset_id ");
+//		sb.append(" and concat('MVS-',ai2.qr_code) = ai.system_id");
 		return sb.toString();
 	}
 
