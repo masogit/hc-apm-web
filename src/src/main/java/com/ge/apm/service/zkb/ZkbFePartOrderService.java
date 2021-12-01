@@ -1017,6 +1017,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             right = true;
         } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())) {
             right = true;
+        }else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Reviewer.toString())) {
+            right = true;
         }
         return right;
     }

@@ -4409,3 +4409,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfGroup','射频码分组','rfGroup',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfId','射频码','rfId',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','powerOnThreshold','开机电流阈值','start powerOnThreshold',NULL,-1);
+--YHAAO-14128  加一个管理租户用户到APM中  审阅人
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType', 'Reviewer', '审阅人', 'Reviewer', null, -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStepsRole', 'Reviewer', '审阅人', 'Reviewer', null, -1);
