@@ -185,7 +185,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             this.contractError = true;
             return;
         }
-        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         Boolean fiveNineNine = zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             contractError = true;
