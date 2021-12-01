@@ -14,7 +14,7 @@
             <div class="ui-g-12 card">
                 <h:form id="zkbFePartOrderListForm">
 
-                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}">
+                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam') or userContextService.isZkbFeUserConfig('Reviewer')}">
                         <p:outputLabel value="#{msg.zkbContact_tenant}*:"/>
                         <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbFePartOrderController.queryTenantUID}">
                             <p:ajax  update="datalist"/>
