@@ -24,9 +24,10 @@ public class ZkbFePartOrderUserConfig implements Serializable {
      * GEAdmin GEAdmin
      * FourHundredsTeam_Probe 400团队探头
      * PublicEmail 公共邮箱
+     * Reviewer  审阅人
      */
     public enum ConfigTypeEnum {
-        FourHundredsTeam,Supplier,Commercial,FourHundredsTeam_Probe,GEAdmin,PublicEmail
+        FourHundredsTeam,Supplier,Commercial,FourHundredsTeam_Probe,GEAdmin,PublicEmail,Reviewer
     }
 
     @Id

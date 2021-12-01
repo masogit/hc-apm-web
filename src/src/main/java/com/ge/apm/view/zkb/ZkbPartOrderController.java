@@ -273,6 +273,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
 
                     }
+                }else if(ZkbPartOrderStep.PartOrderStep.Reviewer.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    if(StringUtils.isEmpty(queryStatus)){
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ReturnPending.toString()));
+                    }else if(!"all".equals(queryStatus)){
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
+                    }
                 }
                 //endregion
             }else if(zkbPartOrderUserConfigList.size() == 2){
