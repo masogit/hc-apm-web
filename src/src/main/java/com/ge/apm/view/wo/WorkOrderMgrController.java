@@ -1891,10 +1891,19 @@ public void test1(){
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
+
 //            if(itemDetail.getPartsPrice() != null && itemDetail.getPartsPrice() < 0.01) {
 //                WebUtil.addErrorMessage("预估单价不能小于0.01元");
 //                return;
 //            }
+            if(itemDetail.getParts()==null && partsItem==null) {
+                WebUtil.addErrorMessage("备件名称必填！");
+                return;
+            }
+            if(itemDetail.getPartsPrice() != null && itemDetail.getPartsPrice() < 0.01) {
+                WebUtil.addErrorMessage("预估单价不能小于0.01元");
+                return;
+            }
             if (itemDetail.getClosedPrice() == null) {
                 itemDetail.setClosedPrice(itemDetail.getPartsPrice());
             }

@@ -123,7 +123,7 @@
                                             completeMethod="#{v2PmOrderController.autosparePartName()}"
                                             var="item" itemLabel="#{item.name}"
                                             itemValue="#{item}"
-                                            converter="simplePartsItemConverter">
+                                            converter="simplePartsItemConverter" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
                                 <p:ajax event="itemSelect"
                                         listener="#{v2PmOrderController.onSparePartsValueChange}"
                                         update="pmmoreAccDialogForm"/>
@@ -142,7 +142,7 @@
                                             completeMethod="#{v2PmOrderController.initSparePartsMaster()}"
                                             var="item" itemLabel="#{item.name}"
                                             itemValue="#{item}"
-                                            converter="simplePartsItemConverter">
+                                            converter="simplePartsItemConverter" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
                                 <p:ajax event="itemSelect"
                                         listener="#{v2PmOrderController.onSparePartsMasterValueChange}"
                                         update="pmmoreAccDialogForm"/>
