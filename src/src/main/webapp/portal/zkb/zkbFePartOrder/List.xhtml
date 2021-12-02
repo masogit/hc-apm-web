@@ -24,7 +24,7 @@
                     </h:panelGrid>
 
                     <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
-                        <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
+                        <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="#{zkbFePartOrderController.showPendingStatusBtn}" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
                         <p:commandButton value="待代理商确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment')}" />
                         <p:commandButton value="待Commercial确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingCommercial'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingCommercial')}" />
                         <p:commandButton value="待400开单/下单"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingApm'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingApm')}" />

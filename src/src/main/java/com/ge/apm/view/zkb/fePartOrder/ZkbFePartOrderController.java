@@ -185,7 +185,10 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     Map<String, String> map = null;
 
     private Map<String, String> i18Map;
-
+    /**
+     * 按钮待办是否显示
+     */
+    private boolean showPendingStatusBtn = true;
     /**
      * 初始化数据
      */
@@ -210,6 +213,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             fourHundredsTeam = true;
         } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString())) {
             fourHundredsTeam = true;
+        }else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Reviewer.toString())) {
+            showPendingStatusBtn = false;
         }
         if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())) {
             this.geAdmin = true;
@@ -297,8 +302,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, this.tenantUID));
         } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Commercial.toString())) {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString()));
-        } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())
-                ||configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Reviewer.toString())) {
+        } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())) {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString()));
         }
     }
@@ -510,6 +514,14 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
 
     public StreamedContent getExportFile() {
         return exportFile;
+    }
+
+    public boolean isShowPendingStatusBtn() {
+        return showPendingStatusBtn;
+    }
+
+    public void setShowPendingStatusBtn(boolean showPendingStatusBtn) {
+        this.showPendingStatusBtn = showPendingStatusBtn;
     }
 
     public void setExportFile(StreamedContent exportFile) {
