@@ -514,6 +514,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newSupplier = new Supplier();
     }
     public void saveItem(){
+        if(partsItem==null && itemDetail.getParts()==null) {
+            WebUtil.addErrorMessage("备件名称不能为空");
+            return;
+        }
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
             if(itemDetail.getClosedPrice()==null) {
