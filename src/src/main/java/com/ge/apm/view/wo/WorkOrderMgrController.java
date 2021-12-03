@@ -1085,6 +1085,18 @@ public void test1(){
         return pList;
     }
 
+    public Double getTotalPrice(String id,Double totalPrice){
+        List<V2_WorkOrder_Detail> WorkOrderDetails = getWorkOrderDetail(id);
+        Double totalPriceToTotal = totalPrice != null ? totalPrice : 0;
+        double detail = 0;
+        for(V2_WorkOrder_Detail item : WorkOrderDetails){
+            if(item.getClosedPrice() != null){
+                detail += item.getClosedPrice();
+            }
+        }
+        Double total= totalPriceToTotal + detail;
+        return total;
+    }
 
     /*
      *   if type =1 -->picList
