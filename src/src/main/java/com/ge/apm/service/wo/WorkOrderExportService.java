@@ -8,6 +8,7 @@ import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -75,25 +77,13 @@ public class WorkOrderExportService {
     @Autowired
     private WorkOrderReportMapper worDao;
     @Autowired
-    private AssetInfoMapper assetInfoMapper;
-    @Autowired
-    private UaaService uaaService;
-    @Autowired
-    private TenantInfoRepository tenantDao;
+    private ServiceRequestApiService serviceRequestApiService;
 
 
-    List<String> getVisableMvsAssetSystemId(){
-        List<String> result = new ArrayList<>();
-        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
-        if(tenantInfo.isPresent()) {
-            String tenantUid = tenantInfo.get().getUid();
-            UserAccount user = UserContextService.getCurrentUserAccount();
-            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            result = assetInfoMapper.getMvsWorkOrders(orgUidList,tenantUid);
-        }
-        return result;
+    List<Integer> getVisableMvAssetUids(){
+        String token = UserContextService.getAccessToken();
+        return serviceRequestApiService.getVisableMvsAssetSystemId(token);
     }
-
 
     public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap,String currentStep){
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -162,14 +152,14 @@ public class WorkOrderExportService {
         if(filterTotalPrice != null){
             searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
         }
-        List<String> visableMvsAssetSystemIds = getVisableMvsAssetSystemId();
+        List<Integer> assetIds = getVisableMvAssetUids();
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
-        if(visableMvsAssetSystemIds.size()>0) {
-            searchFilters.add(new SearchFilter("woIds", SearchFilter.Operator.IN, visableMvsAssetSystemIds));
+        if(assetIds.size()>0) {
+            searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, assetIds));
             workOrderList.addAll(worDao.workOrderExportForMVS(searchFilters));
         }
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
-            if(visableMvsAssetSystemIds.contains(workOrderExportPojo.getId())) {
+            if(assetIds.contains(workOrderExportPojo.getAssetId())) {
                 workOrderExportPojo.setMVSWorkOrder(true);
             } else {
                 workOrderExportPojo.setMVSWorkOrder(false);
