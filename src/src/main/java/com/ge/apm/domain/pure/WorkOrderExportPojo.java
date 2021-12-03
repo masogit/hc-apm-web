@@ -11,6 +11,8 @@ public class WorkOrderExportPojo {
     private String Id;
     //报修单号
     private String srNum;
+    //设备UID
+    private Integer assetId;
     //设备编号
     private String assetDepartNum;
     //工单状态
@@ -185,6 +187,10 @@ public class WorkOrderExportPojo {
     public void setSrNum(String srNum) {
         this.srNum = srNum;
     }
+
+    public Integer getAssetId() { return assetId; }
+
+    public void setAssetId(Integer assetId) { this.assetId = assetId; }
 
     public String getAssetDepartNum() {
         return assetDepartNum;

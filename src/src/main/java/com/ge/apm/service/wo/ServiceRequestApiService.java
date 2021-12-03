@@ -9,10 +9,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.*;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 import com.ge.apm.view.sysutil.UserContextService;
@@ -244,6 +241,13 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         } else {
             return null;
         }
+    }
+
+    public List<Integer> getVisableMvsAssetSystemId(String token) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(null, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID);
+        ResponseEntity<ArrayList> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity,ArrayList.class);
+        return response.getBody();
     }
 
 }
