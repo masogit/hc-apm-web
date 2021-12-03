@@ -513,6 +513,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void prepareCreateSupplier() {
         newSupplier = new Supplier();
     }
+
+    public double getClosePrice(Double apartsQuantity,Double partsPrice){
+        if(apartsQuantity != null && partsPrice != null){
+            return apartsQuantity * partsPrice;
+        }
+        return 0;
+    }
+
     public void saveItem(){
         if(partsItem==null && itemDetail.getParts()==null) {
             WebUtil.addErrorMessage("备件名称不能为空");

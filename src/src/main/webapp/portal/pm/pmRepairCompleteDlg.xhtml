@@ -49,7 +49,8 @@
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="#{msg.ContractPriceRMB}">
-                                        <h:outputText value="#{item.closedPrice}">
+<!--                                        <h:outputText value="#{item.closedPrice}">-->
+                                        <h:outputText value="#{v2PmOrderController.getClosePrice(item.apartsQuantity,item.partsPrice)}">
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
 
