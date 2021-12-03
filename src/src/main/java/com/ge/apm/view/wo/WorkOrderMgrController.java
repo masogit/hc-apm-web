@@ -956,8 +956,8 @@ public void test1(){
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
 
-        List<String> orderIds = getVisableMvsAssetSystemId();
-        filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+        List<Integer> assetIds = serviceRequestApiService.getVisableMvsAssetSystemId(UserContextService.getAccessToken());
+        filters.add(new SearchFilter("assetId",SearchFilter.Operator.IN,assetIds));
 
         for (SearchFilter searchFilter :searchFilters) {
             if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
@@ -968,14 +968,6 @@ public void test1(){
         return filters;
     }
 
-    List<String> getVisableMvsAssetSystemId(){
-        TenantInfoRepository tenantDao=WebUtil.getBean(TenantInfoRepository.class);
-        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
-        String tenantUid = tenantInfo.get().getUid();
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        return assetInfoMapper.getMvsWorkOrders(orgUidList,tenantUid);
-    }
     @Override
     public void setSearchFilter() {
         if (this.searchFilters == null) {

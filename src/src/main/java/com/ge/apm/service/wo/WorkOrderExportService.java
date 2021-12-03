@@ -80,7 +80,7 @@ public class WorkOrderExportService {
     private ServiceRequestApiService serviceRequestApiService;
 
 
-    List<String> getVisableMvAssetUids(){
+    List<Integer> getVisableMvAssetUids(){
         String token = UserContextService.getAccessToken();
         return serviceRequestApiService.getVisableMvsAssetSystemId(token);
     }
@@ -152,14 +152,14 @@ public class WorkOrderExportService {
         if(filterTotalPrice != null){
             searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
         }
-        List<String> assetUids = getVisableMvAssetUids();
+        List<Integer> assetIds = getVisableMvAssetUids();
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
-        if(assetUids.size()>0) {
-            searchFilters.add(new SearchFilter("assetUids", SearchFilter.Operator.IN, assetUids));
+        if(assetIds.size()>0) {
+            searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, assetIds));
             workOrderList.addAll(worDao.workOrderExportForMVS(searchFilters));
         }
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
-            if(assetUids.contains(workOrderExportPojo.getAssetUid())) {
+            if(assetIds.contains(workOrderExportPojo.getAssetId())) {
                 workOrderExportPojo.setMVSWorkOrder(true);
             } else {
                 workOrderExportPojo.setMVSWorkOrder(false);
