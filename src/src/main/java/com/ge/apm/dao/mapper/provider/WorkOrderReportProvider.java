@@ -455,7 +455,7 @@ public class WorkOrderReportProvider {
         for (SearchFilter searchFilter1 : searchFilterList) {
             String tempColumn1 = searchFilter1.fieldName;
             Object value1 = searchFilter1.value;
-            if(tempColumn1.equals("assetUids")) {
+            if(tempColumn1.equals("assetIds")) {
                 String str1 = "";
                 List<Object> valueList = (List<Object>) value1;
                 if(valueList.size()==0) return null;
@@ -463,7 +463,7 @@ public class WorkOrderReportProvider {
                     str1 += "'" + obj + "',";
                 }
                 str1 = str1.substring(0, str1.length() - 1);
-                sb.append("and ai.uid in (" + str1 + ") ");
+                sb.append("and ai.id in (" + str1 + ") ");
 
                 //页面原有的条件
                 for (SearchFilter searchFilter : searchFilterList) {
