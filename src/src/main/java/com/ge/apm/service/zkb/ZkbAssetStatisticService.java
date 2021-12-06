@@ -197,6 +197,7 @@ public class ZkbAssetStatisticService {
                 zkbAssetQrCodeInfo.setQrCodeDate(date);
                 zkbAssetQrCodeInfo.setQrCodeCountState("Y");
                 zkbAssetQrCodeInfo.setCreatedDate(date);
+                zkbAssetQrCodeInfo.setQrCodeState(null);
             }else{
                 Integer qrCodeCount = zkbAssetQrCodeInfoRepository.findAttachedCount(zkbAssetQrCodeInfo.getAssetUid());
                 if(qrCodeCount != null && qrCodeCount == 3){
@@ -209,6 +210,11 @@ public class ZkbAssetStatisticService {
                     zkbAssetQrCodeInfo.setCreatedDate(date);
                 }
             }
+        }
+        if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
+            zkbAssetQrCodeInfo.setQrCodeState(null);
+        }else{
+            zkbAssetQrCodeInfo.setGeFlag(null);
         }
         zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
     }
