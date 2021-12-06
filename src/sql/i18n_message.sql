@@ -1563,6 +1563,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantType','0','普通租户','Ordinary Tenant',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantType','1','代理商租户','Agent Tenant',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantType','5','供应商租户','Supplier Tenant',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantType','6','县域租户','County Area Tenant',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','tenantType','租户类型','Tenant Type',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetStatus','1','正常','Normal',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('deviceStatus','0','正常','Normal',NULL,-1);
@@ -4100,7 +4101,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_assetTypeDi','XR','XR','XR',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_artificialType','High','超声高端机','High level machine',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_artificialType','Low','超声低端机','Low level machine',NULL,-1);
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_artificialType','Depot','超声Depot产品','超声Depot产品',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_partQualityIssue','Boot Up Issue','Boot Up Issue','Boot Up Issue',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_partQualityIssue','Cosmetic Issue','Cosmetic Issue','Cosmetic Issue',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_partQualityIssue','Disassembled','Disassembled','Disassembled',NULL,-1);
@@ -4315,6 +4316,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetRepair', '设备维修', 'assetRepair', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetMaintain', '设备保养', 'assetMaintain', NULL, '-1');
     -- end
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'auditGroupConfiguration', '审核分组配置', 'auditGroupConfiguration', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaDeductType','Null','N/A','Null',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaDeductType','New','新逻辑扣减','New',NULL,-1);
@@ -4408,3 +4410,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfGroup','射频码分组','rfGroup',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfId','射频码','rfId',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','powerOnThreshold','开机电流阈值','start powerOnThreshold',NULL,-1);
+--YHAAO-14128  加一个管理租户用户到APM中  审阅人
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType', 'Reviewer', '审阅人', 'Reviewer', null, -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStepsRole', 'Reviewer', '审阅人', 'Reviewer', null, -1);

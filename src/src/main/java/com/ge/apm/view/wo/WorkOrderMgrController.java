@@ -58,6 +58,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -955,8 +956,8 @@ public void test1(){
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
 
-        List<String> orderIds = getVisableMvsAssetSystemId();
-        filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+        List<Integer> assetIds = serviceRequestApiService.getVisableMvsAssetSystemId(UserContextService.getAccessToken());
+        filters.add(new SearchFilter("assetId",SearchFilter.Operator.IN,assetIds));
 
         for (SearchFilter searchFilter :searchFilters) {
             if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
@@ -967,14 +968,6 @@ public void test1(){
         return filters;
     }
 
-    List<String> getVisableMvsAssetSystemId(){
-        TenantInfoRepository tenantDao=WebUtil.getBean(TenantInfoRepository.class);
-        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
-        String tenantUid = tenantInfo.get().getUid();
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        return assetInfoMapper.getMvsWorkOrders(orgUidList,tenantUid);
-    }
     @Override
     public void setSearchFilter() {
         if (this.searchFilters == null) {
@@ -1092,6 +1085,18 @@ public void test1(){
         return pList;
     }
 
+    public Double getTotalPrice(String id,Double totalPrice){
+        List<V2_WorkOrder_Detail> WorkOrderDetails = getWorkOrderDetail(id);
+        Double totalPriceToTotal = totalPrice != null ? totalPrice : 0;
+        double detail = 0;
+        for(V2_WorkOrder_Detail item : WorkOrderDetails){
+            if(item.getClosedPrice() != null){
+                detail += item.getClosedPrice();
+            }
+        }
+        Double total= totalPriceToTotal + detail;
+        return total;
+    }
 
     /*
      *   if type =1 -->picList
@@ -1302,6 +1307,16 @@ public void test1(){
         if(selectedWorkOrder == null){
             return;
         }
+        BigDecimal totalPriceToBigDecimal = BigDecimal.ZERO;
+        if(accessoryList!=null && !accessoryList.isEmpty()){
+            for (V2_WorkOrder_Detail detail:accessoryList) {
+                if(detail.getApproved()==null || !detail.getApproved()){
+                    BigDecimal bigDecimal = new BigDecimal(detail.getClosedPrice()==null?0:detail.getClosedPrice()).setScale(2,BigDecimal.ROUND_HALF_UP);
+                    totalPriceToBigDecimal = totalPriceToBigDecimal.add(bigDecimal);
+                }
+            }
+        }
+        selectedWorkOrder.setTotalPriceToBigDecimal(totalPriceToBigDecimal);
         MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selectedWorkOrder, null, false);
         if (approval == null) {
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
@@ -1309,6 +1324,9 @@ public void test1(){
         }
         selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
         dao.save(selectedWorkOrder);
+        WebUtil.addErrorMessage("审批发起成功!");
+        return ;
+
     }
 
     //  提交审核前的计算
@@ -1877,10 +1895,26 @@ public void test1(){
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
-            if(itemDetail.getPartsPrice() != null && itemDetail.getPartsPrice() < 0.01) {
-                WebUtil.addErrorMessage("预估单价不能小于0.01元");
+            if(itemDetail.getParts()==null && partsItem==null) {
+                WebUtil.addErrorMessage("备件名称必填！");
                 return;
             }
+            if (isEnableIntegrationWithWorkOrder()==true){
+                if (itemDetail.getPartsType().equals("1")){
+                    if(itemDetail.getPartsPrice() != null && itemDetail.getPartsPrice() < 0.01) {
+                        WebUtil.addErrorMessage("预估单价不能小于0.01元");
+                        return;
+                    }
+                }
+                if (itemDetail.getPartsType().equals("2")){
+                    if(itemDetail.getPartsPrice() != null && itemDetail.getPartsPrice() < 0.01) {
+                        WebUtil.addErrorMessage("预估单价不能小于0.01元");
+                        return;
+                    }
+                }
+
+            }
+
             if (itemDetail.getClosedPrice() == null) {
                 itemDetail.setClosedPrice(itemDetail.getPartsPrice());
             }
