@@ -272,7 +272,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             weChatIdList.add(user.getWeChatId());
         }
         String message = ApprovalConstant.WX_MESSAGE_DISAGREE_1+businessType+ApprovalConstant.WX_MESSAGE_DISAGREE_2+businessNumber+ApprovalConstant.WX_MESSAGE_DISAGREE_3;
-        this.sendWxMsg(weChatIdList,message);
+        this.sendWxMsg(weChatIdList,message,"审批失败");
     }
 
     public void doWorkDetailByIsAgreeType(String id,int isAgreeType, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList) {
@@ -506,7 +506,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 weChatIdList.add(user.getWeChatId());
                             }
                             String message = ApprovalConstant.WX_MESSAGE_AGREE_1 + businessType + ApprovalConstant.WX_MESSAGE_AGREE_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_AGREE_3;
-                            this.sendWxMsg(weChatIdList, message);
+                            this.sendWxMsg(weChatIdList, message,"审批通过");
                         }
                         switch (multiLevelApproval.getBusinessType()){
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT://维修
@@ -592,7 +592,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             multiLevelApprovalRepository.save(date);
                             //审批同意时 给审批人发送微信
                             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1+ApprovalConstant.WX_MESSAGE_APPROVAL_2+date.getBusinessNumber()+ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                            this.sendWxMsg(weChatIdList,message);
+                            this.sendWxMsg(weChatIdList,message,"待审批");
                         }
                     }
                 }
@@ -600,17 +600,20 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }
     }
 
-    public void sendWxMsg(List<String>weChatIdList,String message){
+    public void sendWxMsg(List<String>weChatIdList,String message,String remark){
         if(weChatIdList == null) return;
-        for (int i = 0; i < weChatIdList.size(); i++) {
-            String str = weChatIdList.get(i);
-            if(str != null){
-                Map<String,Object> map = new HashMap<>();
-                map.put("_openId",str);
-                map.put("_templateId","no_template");
-                map.put("message", ApprovalConstant.WX_MESSAGE_APPROVAL+TimeUtils.getStrDate(new Date(), "yyyy-MM-dd HH:mm:ss") + message);
-                wechatSendMsgService.sendWxMsg(map);
-            }
+        String token = UserContextService.getAccessToken();
+        Map<String,Object> map = new HashMap<>();
+        map.put("weChatIdList",weChatIdList);
+        map.put("message", ApprovalConstant.WX_MESSAGE_APPROVAL+TimeUtils.getStrDate(new Date(), "yyyy-MM-dd HH:mm:ss") + message);
+        map.put("remark",remark);
+        HttpEntity<Map> requestEntity = new HttpEntity<>(map,createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.APPROVAL_TO_SEND_WE_CHAT);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        if (!isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            String str = responseMap.get("message").toString();
+            throw new RuntimeException(str);
         }
     }
 
