@@ -601,6 +601,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     }
 
     public void sendWxMsg(List<String>weChatIdList,String message,String remark){
+        logger.info("weChatIdList{}"+weChatIdList.size());
         if(weChatIdList == null) return;
         String token = UserContextService.getAccessToken();
         Map<String,Object> map = new HashMap<>();
