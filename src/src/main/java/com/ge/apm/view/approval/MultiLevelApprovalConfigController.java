@@ -203,8 +203,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         }
         if (null != configrationOld) {
             Map map = JSON.parseObject(configrationOld, Map.class);
-            Integer minAmount = ((Integer) map.get("minAmount"));
-            Integer maxAmount = ((Integer) map.get("maxAmount"));
+            Integer minAmount = (Integer) map.get("minAmount");
+            Integer maxAmount = (Integer) map.get("maxAmount");
             if (minAmountNew != minAmount || maxAmountNew != maxAmount || !enable){
                 if(this.check(minAmountNew, maxAmountNew ,enable)) return;
             }
