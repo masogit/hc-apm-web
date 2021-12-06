@@ -277,7 +277,7 @@ public class WorkOrderReportProvider {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
+        sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.uid as assetUid,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
             "wo.status as status, " +
             "wo.sub_status as subStatus, " +
             "sr.hospital_name as hospitalName,ai.manufacture as assetManufacture, " +
@@ -335,7 +335,7 @@ public class WorkOrderReportProvider {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
+        sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.uid as assetUid,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
                 "wo.status as status, " +
                 "wo.sub_status as subStatus, " +
                 "sr.hospital_name as hospitalName,ai.manufacture as assetManufacture, " +
@@ -371,9 +371,8 @@ public class WorkOrderReportProvider {
                 "ai.status as assetStatus," +
                 "wo.signature as signature,wo.ack_signature as ackSignature,wo.maintenance_value as maintenanceValue,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes " +
                 "from v2_work_order wo " +
-                "LEFT JOIN v2_service_request sr ON wo.sr_id = sr.id " +
-                "LEFT JOIN asset_info ai2 ON ai2.id = wo.asset_id " +
-                "LEFT JOIN asset_info ai ON concat('MVS-',ai2.qr_code) = ai.system_id " +
+                "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
+                "INNER JOIN asset_info ai ON ai.id = wo.asset_id " +
                 "LEFT JOIN user_account ua ON ua.id = sr.requestor_id " +
                 "LEFT JOIN asset_fault_type aft ON aft.id=wo.case_type " +
                 "LEFT JOIN org_info oi ON ai.clinical_dept_uid = oi.uid " +
@@ -456,7 +455,7 @@ public class WorkOrderReportProvider {
         for (SearchFilter searchFilter1 : searchFilterList) {
             String tempColumn1 = searchFilter1.fieldName;
             Object value1 = searchFilter1.value;
-            if(tempColumn1.equals("woIds")) {
+            if(tempColumn1.equals("assetIds")) {
                 String str1 = "";
                 List<Object> valueList = (List<Object>) value1;
                 if(valueList.size()==0) return null;
@@ -464,7 +463,7 @@ public class WorkOrderReportProvider {
                     str1 += "'" + obj + "',";
                 }
                 str1 = str1.substring(0, str1.length() - 1);
-                sb.append("and wo.id in (" + str1 + ") ");
+                sb.append("and ai.id in (" + str1 + ") ");
 
                 //页面原有的条件
                 for (SearchFilter searchFilter : searchFilterList) {

@@ -1325,4 +1325,16 @@ public class UserContextService implements Serializable {
         I18nMessageRepository msgRepo = WebUtil.getBean(I18nMessageRepository.class);
         return msgRepo.getByMsgTypeAndMsgKey(msgType, msgKey);
     }
+
+    /**
+     * 是否是县域租户
+     * @return
+     */
+    public boolean isCountyArea(){
+        TenantInfo tenantInfo = getTenantInfo();
+        if(tenantInfo.getType() != null && tenantInfo.getType() == 6){
+            return true;
+        }
+        return false;
+    }
 }

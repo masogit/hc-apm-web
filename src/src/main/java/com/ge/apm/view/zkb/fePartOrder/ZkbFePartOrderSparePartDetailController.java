@@ -976,19 +976,20 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
             List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
-            int oldBadReturnCount = getBadReturnCount(oldZkbFePartOrderReturnList);
-            int badreturnCount = getBadReturnCount(zkbFePartOrderReturnList);
-            if(badreturnCount > oldBadReturnCount){
-                this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,oldBadReturnCount-badreturnCount,this.currentUser,this.selected,"备件申请已归还信息修改补扣名额");
-            }else if(badreturnCount < oldBadReturnCount){
-                this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,badreturnCount-oldBadReturnCount,this.currentUser,this.selected,"备件申请已归还信息修改退还名额");
+            int oldReturnCount = getModifyReturnCount(oldZkbFePartOrderReturnList);
+            int returnCount = getModifyReturnCount(zkbFePartOrderReturnList);
+            if(returnCount > oldReturnCount){
+                this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount-oldReturnCount,this.currentUser,this.selected,"GE FE备件已归还信息修改【返还名额】");
+            }else if(returnCount < oldReturnCount){//当前归还数量小于修改前原数量=好还变坏还,则需要补扣名额。
+                this.zkbFePartOrderService.moveSpareQuota(5,zkbContract,oldReturnCount-returnCount,this.currentUser,this.selected,"GE FE备件已归还信息修改【补扣名额】");
             }
         }
         zkbFePartOrderService.saveReturnModify(selected,currentUser);
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
         selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId()));
 //        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=myWork");
+        urlPage =UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=myWork");
+        return urlPage;
     }
 
     public String cancelOrderModify(){
@@ -996,15 +997,16 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     }
 
     /**
-     * 获取坏还总数
-     * @param zkbFePartOrderReturnList
+     * 获取归还数量
+     * @param zkbFePartOrderReturnList 归还列表
      * @return
      */
-    public int getBadReturnCount(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList){
+    public int getModifyReturnCount(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList) {
         int qty = 0;
-        for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList) {
-            if(badReturnValue.equals(item.getReturnType())||StringUtils.isNotBlank(item.getId())){
-                qty = qty + item.getQty();
+        for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
+        {
+            if(!badReturnValue.equals(item.getReturnType())){
+                qty += item.getQty();
             }
         }
         return qty;
