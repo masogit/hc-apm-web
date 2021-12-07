@@ -5,7 +5,9 @@
  */
 package com.ge.apm.view.wo;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONPath;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
@@ -101,6 +103,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
     private V2_WorkOrderService woService;
+    private AuditGroupConfigurationRepository auditGroupConfigurationRepository;
     private UaaService uaaService;
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
@@ -227,6 +230,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             //orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
             token = UserContextService.getAccessToken();
             dao = WebUtil.getBean(V2_WorkOrderRepository.class);
+            auditGroupConfigurationRepository = WebUtil.getBean(AuditGroupConfigurationRepository.class);
             userDao = WebUtil.getBean(UserAccountRepository.class);
             orgDao = WebUtil.getBean(OrgInfoRepository.class);
             woService = WebUtil.getBean(V2_WorkOrderService.class);
@@ -2163,10 +2167,28 @@ public void test1(){
     }
 
     public List<UserAccount> getApproverList(String name) {
-        List<UserAccount> uaList = woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
-      /* List<String> ua1List = uaList.stream().map(UserAccount::getUid).collect(Collectors.toList());
-        List<UserAccount> tmp=  userDao.findByUidIn(ua1List);*/
-        return uaList;
+        Boolean hospitalNameBoolean = UserContextService.isHospitalName("");
+        List<UserAccount> uaList=new ArrayList<>();
+        if (hospitalNameBoolean){
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getSiteUID(), "医工组长分组");
+            String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+            List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+            if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                    AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                    List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                    UserAccount userAccount = userDao.getByUid(userUids.get(0));
+                    uaList.add(userAccount);
+                }
+
+            }
+        }else {
+            uaList= woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
+            /* List<String> ua1List = uaList.stream().map(UserAccount::getUid).collect(Collectors.toList());
+             List<UserAccount> tmp=  userDao.findByUidIn(ua1List);*/
+        }
+            return uaList;
 
     }
 
