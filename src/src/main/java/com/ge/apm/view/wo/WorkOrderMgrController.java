@@ -1102,7 +1102,12 @@ public void test1(){
                 detail += item.getClosedPrice();
             }
         }
-        Double total= totalPriceToTotal - detailOld + detail;
+        double total = 0;
+        if(totalPriceToTotal == 0 ){
+            total= detail;
+        }else{
+            total= totalPriceToTotal - detailOld + detail;
+        }
         return total;
     }
 
