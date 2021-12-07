@@ -195,12 +195,13 @@ public class AssetOwnerSettingController {
             selectedOrg = null;
         } else {
             selectedOrg = orgInfo;
+            queryAsset.setSiteUID(selectedOrg.getUid());
         }
         getQueryAssetsList();
     }
 
     public void getQueryAssetsList() {
-        if(queryAsset.getHospitalId()==null&&queryAsset.getAssetGroup() == null && queryAsset.getClinicalDeptUID() == null && queryAsset.getAssetOwnerId() == null && queryAsset.getAssetOwnerId2() == null && queryAsset.getAssetOwnerId3() == null){
+        if(queryAsset.getSiteUID()==null&&queryAsset.getAssetGroup() == null && queryAsset.getClinicalDeptUID() == null && queryAsset.getAssetOwnerId() == null && queryAsset.getAssetOwnerId2() == null && queryAsset.getAssetOwnerId3() == null){
             availableAssets = new DualListModel<>(Collections.emptyList(), targetAssets);
             return;
         }
