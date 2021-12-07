@@ -67,7 +67,9 @@ public class AssetOwnerService {
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
         //OrgInfoFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
         //OrgInfoFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
-
+        if (null != queryAsset.getHospitalId()) {
+            OrgInfoFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
+        }
         if (null != queryAsset.getAssetGroup()) {
             OrgInfoFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
         }

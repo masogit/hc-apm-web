@@ -1241,6 +1241,29 @@ public class UserContextService implements Serializable {
             return false;
         }
     }
+    /***
+     *  判断是否是北京积水潭医院
+     * @param tenantName
+     * @return
+     */
+    public static Boolean isHospitalName(String tenantName){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        TenantInfo currentTenantInfo = userContextService.getTenantInfo();
+        if(currentTenantInfo == null){
+            return Boolean.FALSE;
+        }
+        if(StringUtils.isBlank(tenantName)){
+            //tenantName为空则验证下面租户
+            if("北京积水潭医院".equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }else{
+            if(tenantName.equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
 
 
 
