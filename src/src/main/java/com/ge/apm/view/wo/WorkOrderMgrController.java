@@ -1906,7 +1906,7 @@ public void test1(){
     //保存一个备件
     public void saveItem(){
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        if (!accessoryList.contains(itemDetail)) {
+//        if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
             if(itemDetail.getParts()==null && partsItem==null) {
                 WebUtil.addErrorMessage("备件名称必填！");
@@ -1942,7 +1942,7 @@ public void test1(){
             itemDetail.setInstitutionUID(currentUserAccount.getInstitutionUID());
             itemDetail.setHospitalUID(currentUserAccount.getHospitalUID());
             accessoryList.add(itemDetail);
-        }
+
         //调用微服务来存附件
         if(switchTmp==true){
             itemDetail.setId(null);
