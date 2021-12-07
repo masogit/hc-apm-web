@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+<ui:composition>
+
+    <p:dialog id="ApproveDlg" widgetVar="ApproveDialog" modal="true" resizable="true" draggable="true" width="1050"
+              height="600" appendTo="@(body)" header="#{msg.auditGroupConfiguration}">
+        <h:form id="ApproveForm">
+            <p:fieldset id="basic" legend="基本信息">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                    <h:panelGroup>
+                        <label class="label" style="font-size: medium; font-weight: bold">分组名称</label>
+                        <p:selectOneMenu id="approvename"
+                                         value="#{auditGroupConfigurationController.selected.groupName}"
+                                         required="true" requiredMessage="分组名称不能为空">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{auditGroupConfigurationController.getGroupNameList()}" var="item"
+                                           itemLabel="#{item.valueZh}" itemValue="#{item.valueZh}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+
+
+            <p:fieldset id="approver" legend="分组成员">
+                <p:dataTable id="nodeInfoList" value="#{auditGroupConfigurationController.nodesList}" var="item"
+                             lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
+                             emptyMessage="#{msg.noRecordFound}">
+
+                    <p:column headerText="成员名称">
+                        <h:outputText value="#{auditGroupConfigurationController.getName(item.approveUsers)}"/>
+                    </p:column>
+
+                    <p:column headerText="操作">
+                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"
+                                         oncomplete="PF('approverInfoDlg').show()"
+                                         disabled="#{'view'.equals(multiLevelApprovalConfigController.operateType)}"
+                                         rendered="#{empty item.approveUsers}"
+                                         actionListener="#{auditGroupConfigurationController.onAddNode()}"
+                                         update="approverInfoDlg"/>
+                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
+                                         actionListener="#{auditGroupConfigurationController.delNode(item.nodeId)}"
+                                         rendered="#{not empty item.approveUsers}"
+                                         update="nodeInfoList">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                       icon="ui-icon-alert"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:fieldset>
+
+            <br/>
+            <p:commandButton validateClient="true" actionListener="#{auditGroupConfigurationController.save}"
+                             value="#{msg.Save}" update="auditGroupConfigurationlListForm" icon="ui-icon-check"
+                             oncomplete="handleSubmit(args, 'ApproveDialog');"/>
+
+            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                             onclick="PF('ApproveDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="approverInfoDlg" widgetVar="approverInfoDlg" modal="true" resizable="true" draggable="true"
+              appendTo="@(body)" header="新增成员" width="350" height="350">
+        <h:form id="approverInfoEditForm">
+            <h:panelGroup id="approveuser">
+                <label class="label"> 成员选择 </label>
+                <p:selectCheckboxMenu
+                        value="#{auditGroupConfigurationController.auditGroupConfigurationNode.approveUsers}"
+                        panelStyle="width:280px" style="width:100%"
+                        converter="userAccountConverter" multiple="true" filter="true"
+                        filterMatchMode="contains" required="true" requiredMessage="成员不能为空">
+                    <f:selectItems value="#{auditGroupConfigurationController.getUsersAudit()}" var="item"
+                                   itemLabel="#{auditGroupConfigurationController.getNameWithOrgName(item)}" itemValue="#{item}"/>
+                    <p:ajax process="@this"/>
+                </p:selectCheckboxMenu>
+            </h:panelGroup>
+            <h:panelGroup id="displayy">
+                <br/>
+                <p:commandButton validateClient="true" actionListener="#{auditGroupConfigurationController.saveNode}"
+                                 value="#{msg.Save}" update="ApproveForm:nodeInfoList" icon="ui-icon-check"
+                                 oncomplete="handleSubmit(args, 'approverInfoDlg');"
+                                />
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                 onclick="PF('approverInfoDlg').hide()"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+</html>
