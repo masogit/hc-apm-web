@@ -1093,12 +1093,16 @@ public void test1(){
         List<V2_WorkOrder_Detail> WorkOrderDetails = getWorkOrderDetail(id);
         Double totalPriceToTotal = totalPrice != null ? totalPrice : 0;
         double detail = 0;
+        double detailOld = 0;
         for(V2_WorkOrder_Detail item : WorkOrderDetails){
+            if(item.getApartsQuantity() != null && item.getPartsPrice() != null){
+                detailOld += item.getApartsQuantity() * item.getPartsPrice();
+            }
             if(item.getClosedPrice() != null){
                 detail += item.getClosedPrice();
             }
         }
-        Double total= totalPriceToTotal + detail;
+        Double total= totalPriceToTotal - detailOld + detail;
         return total;
     }
 
