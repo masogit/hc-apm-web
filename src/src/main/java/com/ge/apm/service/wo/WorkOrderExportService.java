@@ -80,7 +80,7 @@ public class WorkOrderExportService {
     private ServiceRequestApiService serviceRequestApiService;
 
 
-    List<Integer> getVisableMvAssetUids(){
+    public List<Integer> getVisableMvAssetIds(){
         String token = UserContextService.getAccessToken();
         return serviceRequestApiService.getVisableMvsAssetSystemId(token);
     }
@@ -152,7 +152,7 @@ public class WorkOrderExportService {
         if(filterTotalPrice != null){
             searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
         }
-        List<Integer> assetIds = getVisableMvAssetUids();
+        List<Integer> assetIds = getVisableMvAssetIds();
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
         if(assetIds.size()>0) {
             searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, assetIds));
