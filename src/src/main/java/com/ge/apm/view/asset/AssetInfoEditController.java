@@ -129,6 +129,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Getter
     private boolean isStatus;
     private boolean isStatusAssetHistory;
+    @Setter
+    @Getter
+    private boolean countyArea = false;
+
     @Getter
     @Setter
     private List<V2_BlobObject> pictureList;
@@ -156,6 +160,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
      * 目录关系service
      */
     private ZkbFileDirectoryService zkbFileDirectoryService;
+
+    private UserContextService userContextService;
 
     //设备状态
     @Getter
@@ -205,6 +211,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
+        userContextService = WebUtil.getBean(UserContextService.class);
+
+        countyArea = userContextService.isCountyArea();
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
