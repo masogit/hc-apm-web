@@ -55,11 +55,22 @@ public class ZkbContractLog {
     @Column(name = "asset_data")
     private String assetData;
 
+    @Column(name = "cat_data")
+    private String catData;
+
     @Column(name = "reason")
     private String reason;
 
     @Column(name= "json_data",length = 4000)
     private String jsonData;
+
+    public String getCatData() {
+        return catData;
+    }
+
+    public void setCatData(String catData) {
+        this.catData = catData;
+    }
 
     public String getJsonData() {
         return jsonData;

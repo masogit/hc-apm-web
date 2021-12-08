@@ -512,7 +512,7 @@ public class ZkbContractService {
         zkbContract.setLastModifiedBy(currentUser.getLoginName());
         if("Edit".equals(actionName)){
             ZkbContract oldContract = contractRepository.findById(zkbContract.getId());
-            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractUpdate","","",reason,currentUser);
+            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractUpdate",null,null,reason,currentUser,null);
             quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),currentUser);
             quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),currentUser);
             quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),currentUser);
@@ -671,10 +671,11 @@ public class ZkbContractService {
         return va == null ? 0 : va;
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
     public void deleteContract(ZkbContract zkbContract,String reason,UserAccount currentUser){
         String courseData = "";
         String assetData = "";
+        String catData = "";
         if(zkbContract.getZkbContractCourses() != null && zkbContract.getZkbContractCourses().size() > 0){
             for(ZkbContractCourse c : zkbContract.getZkbContractCourses()){
                 courseData += c.getZkbCourse().getCid()+",";
@@ -692,8 +693,18 @@ public class ZkbContractService {
                 assetData = assetData.substring(0,assetData.length()-1);
             }
         }
+
+        List<ZkbContractCat> zkbContractCats = zkbContractCatRepository.findByContractId(zkbContract.getId());
+        if(zkbContractCats != null && zkbContractCats.size() > 0){
+            for(ZkbContractCat c : zkbContractCats){
+                catData += c.getSnNo()+",";
+            }
+            if(catData.length() >0){
+                catData = catData.substring(0,catData.length()-1);
+            }
+        }
         contractRepository.delete(zkbContract);
-        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractDelete",courseData,assetData,reason,currentUser);
+        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractDelete",courseData,assetData,reason,currentUser,catData);
 
     }
 
@@ -714,7 +725,7 @@ public class ZkbContractService {
         }
         contractCourseRepository.save(zkbContractCourse);
         if("Edit".equals(actionDetailName)){
-            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"courseUpdate",zkbContractCourse.getZkbCourse().getCid(),"",reason,currentUser);
+            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"courseUpdate",zkbContractCourse.getZkbCourse().getCid(),"",reason,currentUser,null);
         }
         return contractCourseList;
     }
@@ -725,7 +736,7 @@ public class ZkbContractService {
     @Transactional(rollbackFor = Exception.class)
     public List<ZkbContractCourse> delContractCourse(ZkbContractCourse zkbContractCourse,List<ZkbContractCourse> contractCourseList,ZkbContract zkbContract,UserAccount currentUser,String reason){
         contractCourseRepository.delete(zkbContractCourse);
-        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"courseDelete",zkbContractCourse.getZkbCourse().getCid(),"",reason,currentUser);
+        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"courseDelete",zkbContractCourse.getZkbCourse().getCid(),"",reason,currentUser,null);
 
         List<ZkbContractCourse> tempZkbContractCourseList = new ArrayList<>();
         contractCourseList.forEach((item) -> {
@@ -780,14 +791,14 @@ public class ZkbContractService {
             zkbContract.setLastModifiedBy(currentUser.getLoginName());
             contractRepository.save(zkbContract);
 
-            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetAdd","",a.getQrCode(),"",currentUser);
+            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetAdd","",a.getQrCode(),"",currentUser,null);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void updateAsset(ZkbContract zkbContract,ZkbContractAsset zkbContractAsset,String reason,UserAccount currentUser){
         zkbContractAssetRepository.save(zkbContractAsset);
-        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetEdit","",zkbContractAsset.getAssetInfo().getQrCode(),reason,currentUser);
+        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetEdit","",zkbContractAsset.getAssetInfo().getQrCode(),reason,currentUser,null);
 
         AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
         assetInfo.setRepairForm(zkbContractAsset.getAssetInfo().getRepairForm());
@@ -797,7 +808,7 @@ public class ZkbContractService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteAsset(ZkbContractAsset zkbContractAsset,ZkbContract zkbContract,UserAccount currentUser,String reason) {
         zkbContractAssetRepository.delete(zkbContractAsset);
-        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetDelete","",zkbContractAsset.getAssetInfo().getQrCode(),reason,currentUser);
+        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetDelete","",zkbContractAsset.getAssetInfo().getQrCode(),reason,currentUser,null);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -813,13 +824,13 @@ public class ZkbContractService {
         zkbContractCatRepository.save(zkbContractCat);
 
         if("Edit".equals(actionCatName)){
-            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"catUpdate",zkbContractCat.getSnNo(),"",reason,currentUser);
+            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"catUpdate","","",reason,currentUser,zkbContractCat.getSnNo());
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteCat(ZkbContractCat zkbContractCat,ZkbContract zkbContract,UserAccount currentUser,String reason){
         zkbContractCatRepository.delete(zkbContractCat);
-        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"catDelete","",zkbContractCat.getSnNo(),reason,currentUser);
+        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"catDelete","","",reason,currentUser,zkbContractCat.getSnNo());
     }
 }
