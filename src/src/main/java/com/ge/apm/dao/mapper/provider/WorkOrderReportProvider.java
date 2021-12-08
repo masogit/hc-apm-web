@@ -470,7 +470,7 @@ public class WorkOrderReportProvider {
                     String tempColumn = searchFilter.fieldName;
                     Object value = searchFilter.value;
                     SearchFilter.Operator op = searchFilter.operator;
-                    if(tempColumn.equals("orgUID")){
+                    /* if(tempColumn.equals("orgUID")){
                         sb.append(" and (ai.tenant_uid='" + value + "' or ai.institution_uid='" + value + "' or ai.hospital_uid='" + value + "' or ai.site_uid='" + value + "') ");
                     }else if(tempColumn.equals("assetInfo.clinicalDeptUID")){
                         String str = "";
@@ -479,7 +479,8 @@ public class WorkOrderReportProvider {
                         }
                         str = str.substring(0, str.length() - 1);
                         sb.append(" and ai.clinical_dept_uid in (" + str + ") ");
-                    }else if(tempColumn.equals("currentPersonId")){
+                    }else */
+                    if(tempColumn.equals("currentPersonId")){
                         sb.append(" and wo.current_person_id=" + value);
                     }else if(tempColumn.equals("createdDate")){
                         if(op.equals(SearchFilter.Operator.GTE)){

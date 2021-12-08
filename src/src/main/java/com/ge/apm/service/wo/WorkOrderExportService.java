@@ -80,9 +80,15 @@ public class WorkOrderExportService {
     private ServiceRequestApiService serviceRequestApiService;
 
 
-    public List<Integer> getVisableMvAssetIds(){
+    public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg,OrgInfo clinicalDepte){
         String token = UserContextService.getAccessToken();
-        return serviceRequestApiService.getVisableMvsAssetSystemId(token);
+        if(clinicalDepte!=null) {
+            return serviceRequestApiService.getVisableMvsAssetSystemIdByClinaicalDept(token,clinicalDepte.getUid());
+        } else if(siteOrg!=null) {
+            return serviceRequestApiService.getVisableMvsAssetSystemIdBySite(token,siteOrg.getUid());
+        } else {
+            return serviceRequestApiService.getVisableMvsAssetSystemId(token);
+        }
     }
 
     public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap,String currentStep){
@@ -152,7 +158,7 @@ public class WorkOrderExportService {
         if(filterTotalPrice != null){
             searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
         }
-        List<Integer> assetIds = getVisableMvAssetIds();
+        List<Integer> assetIds = getVisableMvAssetIds(selectedOrg,clinicalDept);
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
         if(assetIds.size()>0) {
             searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, assetIds));
