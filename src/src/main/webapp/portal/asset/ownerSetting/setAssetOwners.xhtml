@@ -17,7 +17,7 @@
 
 
                     <h:panelGroup>
-                        <label class="label">#{msg.hospitalId}</label>
+                        <label class="label">#{msg.hospitalId}*</label>
                         <p:inputText id="selectedOrgName" value="#{assetOwnerSettingController.selectedOrg==null ? '': assetOwnerSettingController.selectedOrg.name}" readonly="true" required="true"/>
                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                         <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
