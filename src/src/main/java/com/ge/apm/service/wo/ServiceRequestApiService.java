@@ -252,6 +252,20 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         return response.getBody();
     }
 
+    public List<Integer> getVisableMvsAssetSystemIdBySite(String token,String siteUID) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(null, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID_BYSITE);
+        ResponseEntity<ArrayList> response = template.exchange(gatewayURL.toString()+"?siteUid="+siteUID, HttpMethod.GET, requestEntity,ArrayList.class);
+        return response.getBody();
+    }
+
+    public List<Integer> getVisableMvsAssetSystemIdByClinaicalDept(String token,String deptUid) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(null, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID_BYCLINICALDEPT);
+        ResponseEntity<ArrayList> response = template.exchange(gatewayURL+"?deptUid="+deptUid, HttpMethod.GET, requestEntity,ArrayList.class);
+        return response.getBody();
+    }
+
 }
 
 class ServiceRequestForm {
