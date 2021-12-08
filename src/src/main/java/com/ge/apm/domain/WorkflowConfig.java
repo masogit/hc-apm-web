@@ -139,6 +139,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "wo_direct_reception")
     private Boolean woDirectReception ; // 设备直接验收(接收)
 
+    @Column(name = "wo_spare_parts_sign")
+    private Boolean woSparePartsSign ; // 新增备件是否需要签名
+
     @Column(name = "is_mobile_phone_file_review")
     private Boolean isMobilePhoneFileReview ; // 手机建档是否需要审核
 
@@ -342,6 +345,14 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "other_clinical_dept_head_weight")
     private Integer otherClinicalDeptHeadWeight = 1;//院区下的其他科室主任
+
+    public Boolean getWoSparePartsSign() {
+        return woSparePartsSign;
+    }
+
+    public void setWoSparePartsSign(Boolean woSparePartsSign) {
+        this.woSparePartsSign = woSparePartsSign;
+    }
 
     public Boolean getIsMobilePhoneFileReview() {
         return isMobilePhoneFileReview == null ? false : isMobilePhoneFileReview;
