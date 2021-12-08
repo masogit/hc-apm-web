@@ -608,6 +608,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "annual_maintenance_times")
     private Integer annualMaintenanceTimes;
 
+    // 设备性质
+    @Column(name = "asset_quality")
+    private Integer assetQuality;
+
     @Transient
     private int lineNum;
 
@@ -2353,4 +2357,12 @@ public class AssetInfo implements ChineseName,Serializable {
     public String getSharedAssetSwapIndex() { return sharedAssetSwapIndex; }
 
     public void setSharedAssetSwapIndex(String sharedAssetSwapIndex) { this.sharedAssetSwapIndex = sharedAssetSwapIndex; }
+
+    public Integer getAssetQuality() {
+        return assetQuality;
+    }
+
+    public void setAssetQuality(Integer assetQuality) {
+        this.assetQuality = assetQuality;
+    }
 }
