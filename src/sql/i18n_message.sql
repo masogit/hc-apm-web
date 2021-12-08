@@ -4416,3 +4416,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 --YHAAO-14128  加一个管理租户用户到APM中  审阅人
 INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType', 'Reviewer', '审阅人', 'Reviewer', null, -1);
 INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStepsRole', 'Reviewer', '审阅人', 'Reviewer', null, -1);
+-- 设备档案-基本信息添加新字段-设备性质
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetQuality','设备性质','Asset Quality',NULL,-1);
+-- 设备性质code值
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetQuality','1','GE全程支持的GE设备','GE equipment supported by GE',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetQuality','2','GE全程支持的非GE设备','Non-GE equipment supported by GE',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetQuality','3','GE远程支持/县域场地支持的设备','GE Remote Support/County Site Support Equipment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetQuality','4','县域全程支持的设备','Equipment supported throughout the county Site',NULL,-1);
