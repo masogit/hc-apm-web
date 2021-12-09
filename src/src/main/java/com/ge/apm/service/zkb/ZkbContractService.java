@@ -58,6 +58,12 @@ public class ZkbContractService {
     private ZkbPartOrderCatRepository zkbPartOrderCatRepository;
 
     @Autowired
+    private ZkbPartOrderRepository zkbPartOrderRepository;
+
+    @Autowired
+    private ZkbFePartOrderRepository zkbFePartOrderRepository;
+
+    @Autowired
     private ZkbContractQuotaLogService zkbContractQuotaLogService;
 
     public List<TenantInfo> getSourceTenantInfoList(){
@@ -669,6 +675,18 @@ public class ZkbContractService {
 
     public Integer nullToZero(Integer va){
         return va == null ? 0 : va;
+    }
+
+    public boolean checkForDelete(ZkbContract zkbContract){
+        Integer zkbFeQty = zkbPartOrderRepository.fetchQty(zkbContract.getId());
+        Integer geFeQty = zkbFePartOrderRepository.fetchQty(zkbContract.getId());
+        if(zkbFeQty != null && zkbFeQty > 0 ){
+            return false;
+        }
+        if(geFeQty != null && geFeQty > 0 ){
+            return false;
+        }
+        return true;
     }
 
     @Transactional(rollbackFor = Exception.class)

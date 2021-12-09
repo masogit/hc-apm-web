@@ -26,6 +26,9 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT sum(qty) from zkb_part_order where contract_id in ?1", nativeQuery = true)
     Integer fetchQty(List<String> contractIdList);
 
+    @Query(value = "SELECT sum(qty) from zkb_part_order where contract_id = ?1", nativeQuery = true)
+    Integer fetchQty(String contractId);
+
     /**
      * 根据多个合同ID，获取总申请数
      * @param contractIdList
