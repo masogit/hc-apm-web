@@ -50,6 +50,11 @@ public class AuditGroupConfigurationDetail implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "actual_audit_date")
     private Date actualAuditDate;
+    /**
+     * 审批签名
+     */
+    @Column(name = "approver_signature")
+    private String ApproverSignature;
 
     @Override
     public int hashCode() {
