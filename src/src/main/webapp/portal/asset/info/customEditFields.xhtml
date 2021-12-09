@@ -882,4 +882,12 @@
             <p:autoComplete id="createdBy" value="#{assetInfoEditController.selectCreatedBy(assetInfoEditController.selected.createdBy)}"  readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetQuality') and assetInfoEditController.countyArea}" ><!--设备性质-->
+        <h:panelGroup>
+            <label class="label">#{msg.assetQuality}</label>
+            <p:selectOneMenu id="assetQuality" value="#{assetInfoEditController.selected.assetQuality}" requiredMessage="#{msg.assetQuality} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetQuality')}">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetQuality')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>
