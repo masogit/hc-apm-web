@@ -202,7 +202,10 @@ public class V2_ServiceRequest implements Serializable {
 
     @Transient
     private String clinicalDeptName;
-
+    @Column(name="sieble_number")
+    private String siebleNumber;
+    @Column(name="call_center_number")
+    private String callCenterNumber;
     public String getTenantUID() {
         return tenantUID;
     }
@@ -538,6 +541,23 @@ public class V2_ServiceRequest implements Serializable {
     public void setAssetLocation(String assetLocation) {
         this.assetLocation = assetLocation;
     }
+
+    public String getSiebleNumber() {
+        return siebleNumber;
+    }
+
+    public void setSiebleNumber(String siebleNumber) {
+        this.siebleNumber = siebleNumber;
+    }
+
+    public String getCallCenterNumber() {
+        return callCenterNumber;
+    }
+
+    public void setCallCenterNumber(String callCenterNumber) {
+        this.callCenterNumber = callCenterNumber;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;

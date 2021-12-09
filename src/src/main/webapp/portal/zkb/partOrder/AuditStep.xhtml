@@ -149,12 +149,13 @@
                             </h:panelGroup>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.artificialType eq '1'}">
-                            <label class="label">是否需要SSA Key*</label>
+                            <label class="label">是否需要SSA Key/Dongle*</label>
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.ssaKeyFlag}" required="true" requiredMessage="是否需要SSA Key #{msg.ValidationRequire}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>
                                 <f:selectItem itemLabel="否" itemValue="f"/>
                             </p:selectOneMenu>
+                            <label style="color: red">CT、DXR、OEC产品维修，维修需要SSA key时选"是"；超声低端机，维修需要Dongle时选"是"</label>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and !(zkbPartOrderAuditController.selected.artificialType eq '2')}">
                             <label class="label">是否使用积分抵扣*</label>
@@ -171,6 +172,7 @@
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItem itemLabel="超声高端机" itemValue="2"/>
                                     <f:selectItem itemLabel="超声低端机" itemValue="3"/>
+                                    <f:selectItem itemLabel="超声Depot产品" itemValue="depot"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
@@ -195,13 +197,10 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
-
                       <!--  <h:panelGroup>
                             <label class="label">订单日期*</label>
                             <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" readonly="true" value="#{zkbPartOrderAuditController.selected.partOrderDate}" required="true" requiredMessage="#{msg.zkbPartOrder_partOrderDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>-->
-
                         <h:panelGroup>
                             <label class="label">医院名称*</label>
                             <p:inputTextarea id="hospitalName" value="#{zkbPartOrderAuditController.selected.hospitalName}" disabled="true" />
@@ -660,7 +659,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.artificialType eq '2')}">
                                     <label class="label">是否扣除名额*</label>
-                                    <p:selectOneMenu id="whetherDeduct" value="#{zkbPartOrderAuditController.selected.whetherDeduct}" disabled="#{zkbPartOrderAuditController.whetherDeductEdit}" required="true" requiredMessage="#{msg.zkbPartOrder_whetherDeduct} #{msg.ValidationRequire}" >
+                                    <p:selectOneMenu id="whetherDeduct" value="#{zkbPartOrderAuditController.selected.whetherDeduct}" disabled="#{zkbPartOrderAuditController.whetherDeductEdit or !(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_whetherDeduct} #{msg.ValidationRequire}" >
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItem itemLabel="是" itemValue="t"/>
                                         <f:selectItem itemLabel="否" itemValue="f"/>

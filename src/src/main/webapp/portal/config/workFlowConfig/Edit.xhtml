@@ -276,6 +276,12 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">新增备件是否需要签名</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.woSparePartsSign}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 

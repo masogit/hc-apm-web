@@ -160,13 +160,14 @@
                             </h:panelGroup>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.artificialType eq '1'}">
-                            <label class="label">是否需要SSA Key*</label>
+                            <label class="label">是否需要SSA Key/Dongle*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.ssaKeyFlag}" required="true" requiredMessage="是否需要SSA Key #{msg.ValidationRequire}" >
                                 <p:ajax event="change" update="scoreFlagGroup"  listener="#{zkbPartOrderEditController.scoreFlagChange}"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>
                                 <f:selectItem itemLabel="否" itemValue="f"/>
                             </p:selectOneMenu>
+                            <label style="color: red">CT、DXR、OEC产品维修，维修需要SSA key时选"是"；超声低端机，维修需要Dongle时选"是"</label>
                         </h:panelGroup>
                         <h:panelGroup id="scoreFlagGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and !(zkbPartOrderEditController.artificialType eq '2')}">
                             <label class="label">是否使用积分抵扣*</label>

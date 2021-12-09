@@ -182,6 +182,7 @@ public class CustomConfigConstant {
         allFields.put("powerOnThreshold", WebUtil.getMessage("powerOnThreshold"));
         allFields.put("rfId", WebUtil.getMessage("rfId"));
         allFields.put("rfGroup", WebUtil.getMessage("rfGroup"));
+        allFields.put("assetQuality", WebUtil.getMessage("assetQuality"));
         return allFields;
     }
 
@@ -210,7 +211,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
-                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID");
+                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID","assetQuality");
     }
 
     public static List<String> getAssetsEditpageCodesFields() {

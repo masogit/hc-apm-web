@@ -5,7 +5,9 @@
  */
 package com.ge.apm.view.wo;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONPath;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
@@ -101,6 +103,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
     private V2_WorkOrderService woService;
+    private AuditGroupConfigurationRepository auditGroupConfigurationRepository;
     private UaaService uaaService;
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
@@ -227,6 +230,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             //orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
             token = UserContextService.getAccessToken();
             dao = WebUtil.getBean(V2_WorkOrderRepository.class);
+            auditGroupConfigurationRepository = WebUtil.getBean(AuditGroupConfigurationRepository.class);
             userDao = WebUtil.getBean(UserAccountRepository.class);
             orgDao = WebUtil.getBean(OrgInfoRepository.class);
             woService = WebUtil.getBean(V2_WorkOrderService.class);
@@ -1089,12 +1093,21 @@ public void test1(){
         List<V2_WorkOrder_Detail> WorkOrderDetails = getWorkOrderDetail(id);
         Double totalPriceToTotal = totalPrice != null ? totalPrice : 0;
         double detail = 0;
+        double detailOld = 0;
         for(V2_WorkOrder_Detail item : WorkOrderDetails){
+            if(item.getApartsQuantity() != null && item.getClosedPrice() != null){
+                detailOld += item.getApartsQuantity() * item.getClosedPrice();
+            }
             if(item.getClosedPrice() != null){
                 detail += item.getClosedPrice();
             }
         }
-        Double total= totalPriceToTotal + detail;
+        double total = 0;
+        if(totalPriceToTotal == 0 ){
+            total= detail;
+        }else{
+            total= totalPriceToTotal - detailOld + detail;
+        }
         return total;
     }
 
@@ -1481,7 +1494,14 @@ public void test1(){
         } else if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
-
+        if(userContextService.isCountyArea()){
+            if(!whetherCheckIn()){
+                WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
+                valid = false;
+            };
+        }
         if (!valid) {
             return;
         }
@@ -1498,7 +1518,14 @@ public void test1(){
         woService.repairWorkOrder(selectedWorkOrder,assigneeId, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
-
+    public boolean whetherCheckIn(){
+        V2_WorkOrder workOrder = dao.findById(selectedWorkOrder.getId());
+        if(workOrder != null){
+            Integer checkin = workOrder.getCheckin();
+            return  checkin==null?false:checkin == 1;
+        }
+        return false;
+    }
     public void cancelWorkOrder() {
 //tbc: cancelReason assetStatus
       //  assetStatus=  assetDao.getById(selectedWorkOrder.getAssetId()).getStatus().toString();
@@ -1893,7 +1920,7 @@ public void test1(){
     //保存一个备件
     public void saveItem(){
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        if (!accessoryList.contains(itemDetail)) {
+//        if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
             if(itemDetail.getParts()==null && partsItem==null) {
                 WebUtil.addErrorMessage("备件名称必填！");
@@ -1929,7 +1956,7 @@ public void test1(){
             itemDetail.setInstitutionUID(currentUserAccount.getInstitutionUID());
             itemDetail.setHospitalUID(currentUserAccount.getHospitalUID());
             accessoryList.add(itemDetail);
-        }
+
         //调用微服务来存附件
         if(switchTmp==true){
             itemDetail.setId(null);
@@ -2163,10 +2190,28 @@ public void test1(){
     }
 
     public List<UserAccount> getApproverList(String name) {
-        List<UserAccount> uaList = woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
-      /* List<String> ua1List = uaList.stream().map(UserAccount::getUid).collect(Collectors.toList());
-        List<UserAccount> tmp=  userDao.findByUidIn(ua1List);*/
-        return uaList;
+        Boolean hospitalNameBoolean = UserContextService.isHospitalName("");
+        List<UserAccount> uaList=new ArrayList<>();
+        if (hospitalNameBoolean){
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getSiteUID(), "医工组长分组");
+            String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+            List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+            if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                    AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                    List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                    UserAccount userAccount = userDao.getByUid(userUids.get(0));
+                    uaList.add(userAccount);
+                }
+
+            }
+        }else {
+            uaList= woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
+            /* List<String> ua1List = uaList.stream().map(UserAccount::getUid).collect(Collectors.toList());
+             List<UserAccount> tmp=  userDao.findByUidIn(ua1List);*/
+        }
+            return uaList;
 
     }
 
@@ -2581,6 +2626,31 @@ public void test1(){
 
     public void setSubStatus(Integer subStatus) {
         this.subStatus = subStatus;
+    }
+
+    public List<I18nMessage> initStatus(String ... msgKey){
+        List<String> msgKeys = new ArrayList<>(Arrays.asList(msgKey));
+        String msgType="assetStatus";
+        List<I18nMessage> fieldValueListByMsgType = FieldValueMessageController.getFieldValueListByMsgType(msgType);
+        boolean countyArea = userContextService.isCountyArea();
+        if(countyArea){
+            msgKeys.add("6");
+        }else{
+            msgKeys.remove("6");
+        }
+
+        fieldValueListByMsgType = fieldValueListByMsgType.stream().filter(item -> msgKeys.contains(item.getMsgKey())).collect(Collectors.toList());
+        return fieldValueListByMsgType;
+    }
+
+    /**
+     *  县域： 登录人是否有报修权限
+     * @param role
+     * @return
+     */
+    public boolean  canCreate(String role){
+        UserContextService userContextService = this.userContextService;
+        return userContextService.isCountyArea() ? userContextService.hasRole(role):Boolean.TRUE;
     }
 }
 
