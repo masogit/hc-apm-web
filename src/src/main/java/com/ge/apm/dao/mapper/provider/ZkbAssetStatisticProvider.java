@@ -144,10 +144,11 @@ public class ZkbAssetStatisticProvider {
                 " qr_code_info.can_not_past_qr_code," +
                 " qr_code_info.reason_date,"+
                 " qr_code_info.qr_code_count_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date," +
-                " case when ib_qr_code.is_qr_code=true then 'Y' else ib_qr_code_state end as ib_qr_code_state,case when ib_qr_code.ge_upload_flag='t' then 'Y' when ib_qr_code.ge_upload_flag='f' then 'N' else ge_flag end as ge_flag"+
+                " case when ib_qr_code.is_qr_code=true then 'Y' end as ib_qr_code_state," +
+                " case when ib_qr_code.ge_upload_flag='t' then 'Y' when ib_qr_code.ge_upload_flag='f' then 'N' end as ge_flag"+
                 " FROM" +
                 " zkb_contract ac" +
-                " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
+                " INNER JOIN zkb_contract_asset zca ON zca.contract_id=ac.id" +
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
                 " INNER JOIN asset_info ai ON ai.uid= zca.asset_id AND ai.is_deleted=false AND ai.is_valid=true" +
                 " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.asset_uid = ai.uid " +
