@@ -771,7 +771,7 @@ public class ZkbContractImportService {
                     zkbContractAsset.setTrainReasonFlag("empty");
                 }
                 zkbContractAssetRepository.save(zkbContractAsset);
-                zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetEdit","",zkbContractAssetVO.getQrCode(),"导入设备编辑",currentUser);
+                zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetEdit","",zkbContractAssetVO.getQrCode(),"导入设备编辑",currentUser,null);
 
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
                     Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
@@ -801,7 +801,7 @@ public class ZkbContractImportService {
                 newZkbContractAsset.setResponsiblEngineer(zkbContractAssetVO.getResponsiblEngineer());
                 newZkbContractAsset.setKa(zkbContractAssetVO.getKa());
                 zkbContractAssetRepository.save(newZkbContractAsset);
-                zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser);
+                zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser,null);
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
                     Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
                     AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
@@ -815,7 +815,7 @@ public class ZkbContractImportService {
             }
         }else if("Y".equals(zkbContractAssetVO.getFlag())){
             zkbContractAssetRepository.delete(zkbContractAssetVO.getZkbContractAssetId());
-            zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetDelete","",zkbContractAssetVO.getQrCode(),"导入删除",currentUser);
+            zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetDelete","",zkbContractAssetVO.getQrCode(),"导入删除",currentUser,null);
         }
     }
 
@@ -948,7 +948,7 @@ public class ZkbContractImportService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void  importOneContractCat(ZkbContractCatVO zkbContractCatVO,UserAccount currentUser){
+    public void importOneContractCat(ZkbContractCatVO zkbContractCatVO,UserAccount currentUser){
         ZkbContractCat zkbContractCat = new ZkbContractCat();
         zkbContractCat.setContractId(zkbContractCatVO.getContractId());
         zkbContractCat.setSnNo(zkbContractCatVO.getSnNo());
@@ -960,12 +960,9 @@ public class ZkbContractImportService {
         zkbContractCat.setCreatedBy(currentUser.getName());
         zkbContractCat.setCreatedDate(new Date());
         zkbContractCatRepository.save(zkbContractCat);
-        zkbContractLogService.addLog(zkbContractCatVO.getContractId(),zkbContractCatVO.getContractNo(),"catAdd","",zkbContractCatVO.getSnNo(),"导入新增",currentUser);
+        zkbContractLogService.addLog(zkbContractCatVO.getContractId(),zkbContractCatVO.getContractNo(),"catAdd","",zkbContractCatVO.getSnNo(),"导入新增",currentUser,null);
     }
-
     //endregion
-
-
 
     public List<Map<String, Object>> filterErrorRecords(List<Map<String, Object>> importContractMapList) {
         List<Map<String, Object>> result = new ArrayList<>();
