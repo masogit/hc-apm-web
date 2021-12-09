@@ -54,7 +54,7 @@ public class AuditGroupConfigurationDetail implements Serializable {
      * 审批签名
      */
     @Column(name = "approver_signature")
-    private String ApproverSignature;
+    private String approverSignature;
 
     @Override
     public int hashCode() {
