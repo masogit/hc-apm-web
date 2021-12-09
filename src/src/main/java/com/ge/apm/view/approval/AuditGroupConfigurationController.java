@@ -72,7 +72,15 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
         approveUserList = new ArrayList<>();
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         String siteUID = userAccount.getSiteUID();
-        approveUserList= userAccountDao.findBySiteUID(siteUID);
+        List<SysRole> sysRoles = roleDao.getByNameIn(Arrays.asList("AssetHead", "AssetStaff"));//医学工程处主任/工程师
+        List<Integer> sysRoleIdS = new ArrayList<>();
+        if(sysRoles!=null && !sysRoles.isEmpty()){
+            for ( SysRole sysRole:sysRoles) {
+                sysRoleIdS.add(sysRole.getId());
+            }
+        }
+        List<Integer> userIds = userRoleDao.findByRoleIds(sysRoleIdS);
+        approveUserList = userAccountDao.getUserAccounts(userIds, siteUID);
     }
     @Override
     protected Page<AuditGroupConfiguration> loadData(PageRequest pageRequest) {
