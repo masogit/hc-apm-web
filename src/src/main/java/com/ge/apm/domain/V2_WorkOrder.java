@@ -216,6 +216,9 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name = "signature")
     private String signature;
 
+    @Column(name = "wo_approver_signature")
+    private String woApproverSignature;
+
     @Column(name = "ack_signature")
     private String ackSignature;
     @Column(name="approval_date")
@@ -297,6 +300,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private Integer orderCount;
     @Transient
     private BigDecimal totalPriceToBigDecimal;
+
+    public String getWoApproverSignature() {
+        return woApproverSignature;
+    }
+
+    public void setWoApproverSignature(String woApproverSignature) {
+        this.woApproverSignature = woApproverSignature;
+    }
 
     public Boolean getCoreMemberApproval() {
         return isCoreMemberApproval;
