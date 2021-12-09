@@ -21,6 +21,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -173,6 +174,10 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
         });
         String nodes = JSON.toJSONString(collect);
         selected.setGroupMemberItem(nodes);
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        selected.setCreatedBy(userAccount.getName());
+        selected.setCreatedDate(new Date());
+        selected.setHierOrgUid(userAccount.getSiteUID());
         super.save();
     }
     public String getName(List<UserAccount> approveUsers){
