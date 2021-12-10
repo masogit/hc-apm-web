@@ -1093,12 +1093,21 @@ public void test1(){
         List<V2_WorkOrder_Detail> WorkOrderDetails = getWorkOrderDetail(id);
         Double totalPriceToTotal = totalPrice != null ? totalPrice : 0;
         double detail = 0;
+        double detailOld = 0;
         for(V2_WorkOrder_Detail item : WorkOrderDetails){
+            if(item.getApartsQuantity() != null && item.getClosedPrice() != null){
+                detailOld += item.getApartsQuantity() * item.getClosedPrice();
+            }
             if(item.getClosedPrice() != null){
                 detail += item.getClosedPrice();
             }
         }
-        Double total= totalPriceToTotal + detail;
+        double total = 0;
+        if(totalPriceToTotal == 0 ){
+            total= detail;
+        }else{
+            total= totalPriceToTotal - detailOld + detail;
+        }
         return total;
     }
 
@@ -1485,7 +1494,14 @@ public void test1(){
         } else if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
-
+        if(userContextService.isCountyArea()){
+            if(!whetherCheckIn()){
+                WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
+                valid = false;
+            };
+        }
         if (!valid) {
             return;
         }
@@ -1502,7 +1518,14 @@ public void test1(){
         woService.repairWorkOrder(selectedWorkOrder,assigneeId, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
-
+    public boolean whetherCheckIn(){
+        V2_WorkOrder workOrder = dao.findById(selectedWorkOrder.getId());
+        if(workOrder != null){
+            Integer checkin = workOrder.getCheckin();
+            return  checkin==null?false:checkin == 1;
+        }
+        return false;
+    }
     public void cancelWorkOrder() {
 //tbc: cancelReason assetStatus
       //  assetStatus=  assetDao.getById(selectedWorkOrder.getAssetId()).getStatus().toString();
@@ -1897,7 +1920,7 @@ public void test1(){
     //保存一个备件
     public void saveItem(){
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        if (!accessoryList.contains(itemDetail)) {
+//        if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
             if(itemDetail.getParts()==null && partsItem==null) {
                 WebUtil.addErrorMessage("备件名称必填！");
@@ -1933,7 +1956,7 @@ public void test1(){
             itemDetail.setInstitutionUID(currentUserAccount.getInstitutionUID());
             itemDetail.setHospitalUID(currentUserAccount.getHospitalUID());
             accessoryList.add(itemDetail);
-        }
+
         //调用微服务来存附件
         if(switchTmp==true){
             itemDetail.setId(null);
@@ -2603,6 +2626,31 @@ public void test1(){
 
     public void setSubStatus(Integer subStatus) {
         this.subStatus = subStatus;
+    }
+
+    public List<I18nMessage> initStatus(String ... msgKey){
+        List<String> msgKeys = new ArrayList<>(Arrays.asList(msgKey));
+        String msgType="assetStatus";
+        List<I18nMessage> fieldValueListByMsgType = FieldValueMessageController.getFieldValueListByMsgType(msgType);
+        boolean countyArea = userContextService.isCountyArea();
+        if(countyArea){
+            msgKeys.add("6");
+        }else{
+            msgKeys.remove("6");
+        }
+
+        fieldValueListByMsgType = fieldValueListByMsgType.stream().filter(item -> msgKeys.contains(item.getMsgKey())).collect(Collectors.toList());
+        return fieldValueListByMsgType;
+    }
+
+    /**
+     *  县域： 登录人是否有报修权限
+     * @param role
+     * @return
+     */
+    public boolean  canCreate(String role){
+        UserContextService userContextService = this.userContextService;
+        return userContextService.isCountyArea() ? userContextService.hasRole(role):Boolean.TRUE;
     }
 }
 

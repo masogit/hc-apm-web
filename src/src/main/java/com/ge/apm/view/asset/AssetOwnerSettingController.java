@@ -195,13 +195,27 @@ public class AssetOwnerSettingController {
             selectedOrg = null;
         } else {
             selectedOrg = orgInfo;
-            queryAsset.setSiteUID(selectedOrg.getUid());
+            if(selectedOrg.getOrgLevel()==0 && selectedOrg.getOrgType()!=4){
+                queryAsset.setTenantUID(selectedOrg.getUid());
+            }
+            if(selectedOrg.getOrgLevel()==1 && selectedOrg.getOrgType()!=4){
+                queryAsset.setInstitutionUID(selectedOrg.getUid());
+            }
+            if(selectedOrg.getOrgLevel()==2 && selectedOrg.getOrgType()!=4){
+                queryAsset.setHospitalUID(selectedOrg.getUid());
+            }
+            if(selectedOrg.getOrgLevel()==3 && selectedOrg.getOrgType()!=4){
+                queryAsset.setSiteUID(selectedOrg.getUid());
+            }
+            if(selectedOrg.getOrgType()==4){
+                queryAsset.setClinicalDeptUID(selectedOrg.getUid());
+            }
         }
         getQueryAssetsList();
     }
 
     public void getQueryAssetsList() {
-        if(queryAsset.getSiteUID()==null&&queryAsset.getAssetGroup() == null && queryAsset.getClinicalDeptUID() == null && queryAsset.getAssetOwnerId() == null && queryAsset.getAssetOwnerId2() == null && queryAsset.getAssetOwnerId3() == null){
+        if(queryAsset.getTenantUID()==null&&queryAsset.getInstitutionUID()==null&&queryAsset.getHospitalUID()==null&&queryAsset.getClinicalDeptUID()==null&&queryAsset.getSiteUID()==null&&queryAsset.getAssetGroup() == null && queryAsset.getClinicalDeptUID() == null && queryAsset.getAssetOwnerId() == null && queryAsset.getAssetOwnerId2() == null && queryAsset.getAssetOwnerId3() == null){
             availableAssets = new DualListModel<>(Collections.emptyList(), targetAssets);
             return;
         }
