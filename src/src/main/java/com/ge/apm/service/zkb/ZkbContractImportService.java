@@ -700,6 +700,7 @@ public class ZkbContractImportService {
                 item.put("status", ImportStatus.Failure);
                 ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbQrCodeIsNotExist"));
             }else{
+                zkbContractAssetVO.setAssetId(assetInfo.getUid());
                 if(!"Y".equals(zkbContractAssetVO.getFlag())){
                     boolean flag = true;
                     if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
@@ -716,8 +717,6 @@ public class ZkbContractImportService {
                         isValidateData = false;
                         item.put("status", ImportStatus.Failure);
                         ZkbContractAssetRow.addErrMessage(item, "设备状态异常，请检查！");
-                    }else{
-                        zkbContractAssetVO.setAssetId(assetInfo.getUid());
                     }
                 }
             }
