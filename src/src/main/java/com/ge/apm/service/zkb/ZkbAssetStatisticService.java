@@ -197,7 +197,9 @@ public class ZkbAssetStatisticService {
                 zkbAssetQrCodeInfo.setQrCodeDate(date);
                 zkbAssetQrCodeInfo.setQrCodeCountState("Y");
                 zkbAssetQrCodeInfo.setCreatedDate(date);
+                zkbAssetQrCodeInfo.setQrCodeState(null);
             }else{
+                zkbAssetQrCodeInfo.setQrCodeState(null);
                 Integer qrCodeCount = zkbAssetQrCodeInfoRepository.findAttachedCount(zkbAssetQrCodeInfo.getAssetUid());
                 if(qrCodeCount != null && qrCodeCount == 3){
                     zkbAssetQrCodeInfo.setQrCodeState("Y");
@@ -209,6 +211,15 @@ public class ZkbAssetStatisticService {
                     zkbAssetQrCodeInfo.setCreatedDate(date);
                 }
             }
+        }
+        if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
+            zkbAssetQrCodeInfo.setQrCodeState(null);
+        }else{
+            zkbAssetQrCodeInfo.setGeFlag(null);
+        }
+        if("Y".equals(zkbAssetQrCodeInfo.getQrCodeState())){
+            zkbAssetQrCodeInfo.setIbQrCodeState(null);
+            zkbAssetQrCodeInfo.setGeFlag(null);
         }
         zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
     }

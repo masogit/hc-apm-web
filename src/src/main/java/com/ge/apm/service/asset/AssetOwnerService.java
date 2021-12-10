@@ -70,6 +70,18 @@ public class AssetOwnerService {
         if (null != queryAsset.getSiteUID()) {
             OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, queryAsset.getSiteUID()));
         }
+        if (null != queryAsset.getInstitutionUID()) {
+            OrgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, queryAsset.getInstitutionUID()));
+        }
+        if (null != queryAsset.getTenantUID()) {
+            OrgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
+        }
+        if (null != queryAsset.getClinicalDeptUID()) {
+            OrgInfoFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptUID()));
+        }
+        if (null != queryAsset.getHospitalUID()) {
+            OrgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, queryAsset.getHospitalUID()));
+        }
         if (null != queryAsset.getAssetGroup()) {
             OrgInfoFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
         }

@@ -20,9 +20,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +46,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     @Setter
     private List<AuditGroupConfigurationNode> nodesList;
     private List<UserAccount> approveUserList;
+    private List<UserAccount> approveExistUserList=new ArrayList<>();
     @Getter
     private String operateType;
     @Getter
@@ -73,7 +72,15 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
         approveUserList = new ArrayList<>();
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         String siteUID = userAccount.getSiteUID();
-        approveUserList= userAccountDao.findBySiteUID(siteUID);
+        List<SysRole> sysRoles = roleDao.getByNameIn(Arrays.asList("AssetHead", "AssetStaff"));//医学工程处主任/工程师
+        List<Integer> sysRoleIdS = new ArrayList<>();
+        if(sysRoles!=null && !sysRoles.isEmpty()){
+            for ( SysRole sysRole:sysRoles) {
+                sysRoleIdS.add(sysRole.getId());
+            }
+        }
+        List<Integer> userIds = userRoleDao.findByRoleIds(sysRoleIdS);
+        approveUserList = userAccountDao.getUserAccounts(userIds, siteUID);
     }
     @Override
     protected Page<AuditGroupConfiguration> loadData(PageRequest pageRequest) {
@@ -83,17 +90,23 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     public void preCreate() throws IllegalAccessException, InstantiationException {
         operateType = ApprovalConstant.OPERATE_TYPE_CREATE;
         nodesList.clear();
+        approveExistUserList.clear();
         super.prepareCreate();
     }
     //保存分组节点
     public void saveNode() {
+        if(approveExistUserList.contains(auditGroupConfigurationNode.getAuditUser())){
+            WebUtil.addWarnMessage(auditGroupConfigurationNode.getAuditUser().getName()+"已经存在,不能重复添加");
+            return;
+        }
         if (null != auditGroupConfigurationNode.getNodeId()) {
             return;
         }
         AuditGroupConfigurationNode node = new AuditGroupConfigurationNode();
         node.setId(UUID.randomUUID().toString().replace("-", ""));
         node.setNodeId(nodesList.size());
-        node.setApproveUsers(auditGroupConfigurationNode.getApproveUsers());
+        node.setApproveUsers(Arrays.asList(auditGroupConfigurationNode.getAuditUser()));
+        approveExistUserList.add(auditGroupConfigurationNode.getAuditUser());
         nodesList.add(node);
     }
     public void preEdit() {
@@ -167,12 +180,23 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     }
     //保存配置
     public void save() {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        AuditGroupConfiguration groupName = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), selected.getGroupName());
+        if(groupName!=null){
+            if(!groupName.getId().equals(selected.getId())){
+                WebUtil.addWarnMessage(selected.getGroupName()+"已经存在,不能重复添加");
+                return;
+            }
+        }
         List<AuditGroupConfigurationNode> collect = nodesList.stream().filter(item -> item.getId() != SimplePartsConstant.PARTS_LOCAL_ORG_ID).collect(Collectors.toList());
         collect.stream().forEach(item -> {
             item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
         });
         String nodes = JSON.toJSONString(collect);
         selected.setGroupMemberItem(nodes);
+        selected.setCreatedBy(userAccount.getName());
+        selected.setCreatedDate(new Date());
+        selected.setHierOrgUid(userAccount.getSiteUID());
         super.save();
     }
     public String getName(List<UserAccount> approveUsers){
@@ -203,4 +227,5 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
         }
         return groupMember;
     }
+    public void setNothing(){}
 }
