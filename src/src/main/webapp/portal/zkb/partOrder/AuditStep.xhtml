@@ -149,13 +149,12 @@
                             </h:panelGroup>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.artificialType eq '1'}">
-                            <label class="label">是否需要SSA Key/Dongle*</label>
+                            <label class="label">是否需要SSA Key*</label>
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.ssaKeyFlag}" required="true" requiredMessage="是否需要SSA Key #{msg.ValidationRequire}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>
                                 <f:selectItem itemLabel="否" itemValue="f"/>
                             </p:selectOneMenu>
-                            <label style="color: red">CT、DXR、OEC产品维修，维修需要SSA key时选"是"；超声低端机，维修需要Dongle时选"是"</label>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and !(zkbPartOrderAuditController.selected.artificialType eq '2')}">
                             <label class="label">是否使用积分抵扣*</label>
