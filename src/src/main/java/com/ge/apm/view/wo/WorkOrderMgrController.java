@@ -894,20 +894,23 @@ public void test1(){
                     if (userAccountList.contains(userAccount)){
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.IN, Arrays.asList(0,1)));
                     }else {
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0));
+                    }
+                }else {
+                    if (!(userContextService.hasRole("AssetHead") || userContextService.hasRole("DeptHead"))) {
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+                    }
+                    if (userContextService.hasRole("DeptHead")) {
+                        List<String> clinicalUidList = orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+                        searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalUidList, "1*2+"));
                     }
                 }
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
                 searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
                 searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
-                if(!(userContextService.hasRole("AssetHead")||userContextService.hasRole("DeptHead"))){
-                    searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-                }
-                if(userContextService.hasRole("DeptHead")){
-                    List<String> clinicalUidList =  orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
-                    searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-                    searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalUidList,"1*2+"));
-                }
+
 
             } else if (queryIndex == 11) { //全部维修单
                 if(stepFileter!=null) {
