@@ -301,6 +301,26 @@
                                     <h:outputText value="#{item.financingNum}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'rfId'}">
+                                <p:column headerText="#{msg.rfId}" exportable="true" sortBy="#{item.rfId}" filterBy="#{item.rfId}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.rfId}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'modalityType'}">
+                                <p:column headerText="#{msg.modalityType}" exportable="true" sortBy="#{item.modalityType}" filterBy="#{item.modalityType}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.modalityType}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'medicalApparatusClassification'}">
+                                <p:column headerText="#{msg.medicalApparatusClassification}" exportable="true" sortBy="#{item.medicalApparatusClassification}" filterBy="#{item.medicalApparatusClassification}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.medicalApparatusClassification}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'rfGroup'}">
+                                <p:column headerText="#{msg.rfGroup}" exportable="true" sortBy="#{item.rfGroup}" filterBy="#{item.rfGroup}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.rfGroup}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'qrCode'}">
                                 <p:column headerText="#{msg.QRCode}" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.qrCode}"/>
