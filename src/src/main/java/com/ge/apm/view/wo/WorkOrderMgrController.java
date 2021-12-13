@@ -877,9 +877,9 @@ public void test1(){
                 UserAccount userAccount = userContextService.getCurrentUserAccount();
                 String tenantUID = userAccount.getTenantUID();
                 TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
-                if("北京积水潭医院".equals(this.tenantInfo.getName().trim())){
+                if(WorkOrderConstant.DESIGNATED_USER.equals(this.tenantInfo.getName().trim())){
                     List<UserAccount> userAccountList = new ArrayList<>();
-                    AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), "核心组成员");
+                    AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
                     String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
                     List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
                     if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
@@ -2221,7 +2221,7 @@ public void test1(){
         List<UserAccount> uaList=new ArrayList<>();
         if (hospitalNameBoolean){
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getSiteUID(), "医工组长分组");
+            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getSiteUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
             String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
             List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
             if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
