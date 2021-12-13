@@ -649,7 +649,7 @@ public class ZkbContractImportService {
             zkbContractAssetRow.setFieldStringValue("KA","setKa");
             zkbContractAssetRow.setFieldStringValue("维修类型","setRepairForm");
             zkbContractAssetRow.setFieldStringValue("是否代理商自身原因未完成培训","setTrainReasonFlag");
-
+            zkbContractAssetRow.setFieldStringValue("ID","setId");
             map.put("zkbContractAssetVO", zkbContractAssetVO);
             map.put("rowData", rowMap);
             map.put("status", StringUtils.isEmpty(zkbContractAssetVO.getId()) ? ImportStatus.New.name() : ImportStatus.Exist.name());
@@ -689,42 +689,13 @@ public class ZkbContractImportService {
             }
         }
 
-        if(zkbContractAssetVO.getQrCode() == null){
-            item.put("status", ImportStatus.Failure);
-            ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbQrCodeIsEmpty"));
-            isValidateData = false;
-        }else{
-            AssetInfo assetInfo = queryAssetInfoByQrCode(zkbContractAssetVO.getQrCode());
-            if(assetInfo ==null){
-                isValidateData = false;
+        if("Y".equals(zkbContractAssetVO.getFlag())){
+            if(StringUtils.isEmpty(zkbContractAssetVO.getId())){
                 item.put("status", ImportStatus.Failure);
-                ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbQrCodeIsNotExist"));
-            }else{
-                zkbContractAssetVO.setAssetId(assetInfo.getUid());
-                if(!"Y".equals(zkbContractAssetVO.getFlag())){
-                    boolean flag = true;
-                    if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
-                        flag = false;
-                    }
-                    if(!assetInfo.getIsValid()){
-                        flag = false;
-                    }
-                    if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
-                        flag = false;
-                    }
-
-                    if(!flag){
-                        isValidateData = false;
-                        item.put("status", ImportStatus.Failure);
-                        ZkbContractAssetRow.addErrMessage(item, "设备状态异常，请检查！");
-                    }
-                }
-            }
-        }
-
-        if(!StringUtils.isEmpty(zkbContractAssetVO.getContractNo()) && !StringUtils.isEmpty(zkbContractAssetVO.getQrCode())){
-            ZkbContractAsset zkbContractAsset = queryContractAssetByContractIdAndAssetId(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getAssetId());
-            if("Y".equals(zkbContractAssetVO.getFlag())){
+                ZkbContractAssetRow.addErrMessage(item, "删除设备时请输入ID");
+                isValidateData = false;
+            }else {
+                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findById(zkbContractAssetVO.getId());
                 if(zkbContractAsset ==null){
                     isValidateData = false;
                     item.put("status", ImportStatus.Failure);
@@ -732,15 +703,54 @@ public class ZkbContractImportService {
                 }else{
                     zkbContractAssetVO.setZkbContractAssetId(zkbContractAsset.getId());
                 }
+            }
+        }else{
+            if(zkbContractAssetVO.getQrCode() == null){
+                item.put("status", ImportStatus.Failure);
+                ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbQrCodeIsEmpty"));
+                isValidateData = false;
             }else{
-                if(zkbContractAsset != null){
-                    //zkbContractAssetVO.setFlag("N");
-                    //isValidateData = false;
-                    //item.put("status", ImportStatus.Failure);
-                    //ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbContractAssetIsExist"));
+                AssetInfo assetInfo = queryAssetInfoByQrCode(zkbContractAssetVO.getQrCode());
+                if(assetInfo ==null){
+                    isValidateData = false;
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbQrCodeIsNotExist"));
+                }else{
+                    zkbContractAssetVO.setAssetId(assetInfo.getUid());
+                    if(!"Y".equals(zkbContractAssetVO.getFlag())){
+                        boolean flag = true;
+                        if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
+                            flag = false;
+                        }
+                        if(!assetInfo.getIsValid()){
+                            flag = false;
+                        }
+                        if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
+                            flag = false;
+                        }
+
+                        if(!flag){
+                            isValidateData = false;
+                            item.put("status", ImportStatus.Failure);
+                            ZkbContractAssetRow.addErrMessage(item, "设备状态异常，请检查！");
+                        }
+                    }
                 }
             }
+
+            if(!StringUtils.isEmpty(zkbContractAssetVO.getContractNo()) && !StringUtils.isEmpty(zkbContractAssetVO.getQrCode())){
+                ZkbContractAsset zkbContractAsset = queryContractAssetByContractIdAndAssetId(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getAssetId());
+                if(zkbContractAsset ==null){
+                    isValidateData = false;
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbContractAssetIsNotExist"));
+                }else{
+                    zkbContractAssetVO.setZkbContractAssetId(zkbContractAsset.getId());
+                }
+            }
+
         }
+
 
         for (Map<String, Object> tempContractAssetMap: importContractCourseMapList) {
             ZkbContractAssetVO tempZkbContractAssetVO = (ZkbContractAssetVO)tempContractAssetMap.get("zkbContractAssetVO");
