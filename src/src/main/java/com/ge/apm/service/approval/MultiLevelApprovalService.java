@@ -193,16 +193,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         if (multiLevel != null) {
                             // 发送短信
                             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-//                            for (int k = 0; k < weChatIdList.size(); k++) {
-//                                String str = weChatIdList.get(k);
-//                                if (str != null) {
-//                                    Map<String, Object> m = new HashMap<>();
-//                                    m.put("_openId", str);
-//                                    m.put("_templateId", "no_template");
-//                                    m.put("message", ApprovalConstant.WX_MESSAGE_APPROVAL + TimeUtils.getStrDate(new Date(), "yyyy-MM-dd HH:mm:ss") + message);
-//                                    wechatSendMsgService.sendWxMsg(m);
-//                                }
-//                            }
                             this.sendWxMsg(weChatIdList,message,"待审批");
                         }
                         return multiLevel;
