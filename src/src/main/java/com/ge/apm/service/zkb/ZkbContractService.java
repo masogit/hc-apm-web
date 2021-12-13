@@ -264,6 +264,7 @@ public class ZkbContractService {
                 zkbContractAssetDataMap.put("是否代理商自身原因未完成培训", WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAsset.getTrainReasonFlag()));
             }
             zkbContractAssetDataMap.put("备注", zkbContractAsset.getAssetInfo().getComments());
+            zkbContractAssetDataMap.put("ID", zkbContractAsset.getId());
             zkbContractAssetDataList.add(zkbContractAssetDataMap);
         }
 
