@@ -27,6 +27,14 @@ public interface SimplePartsWarehouseUserRepository extends GenericRepositoryUUI
     List<SimplePartsWareHouseUser> findAllByPartsWarehouseId(String partsWarehouseId);
 
     /**
+     * @param userUid
+     * @return java.util.List<com.ge.apm.domain.simpleparts.PartsWareHouseUser>
+     * @date 2021/7/23 15:40
+     * 根据用户uid,查询该用户的uid下的所有仓库
+     */
+    @Query(value = "select parts_warehouse_id from simple_parts_warehouse_user where user_uid=?1", nativeQuery = true)
+    List<String> findAllByPartsWarehouseByUserUid(String userUid);
+    /**
      * 清空仓库下管理员
      *
      * @param partsWarehouseId

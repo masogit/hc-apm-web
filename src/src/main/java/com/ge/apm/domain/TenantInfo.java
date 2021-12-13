@@ -148,6 +148,7 @@ public class TenantInfo implements Serializable {
     @Transient
     private String cpmURL;
 
+
     @Column(name = "international_version")
     private Integer internationalVersion;//是否是国际化租户 0或null:不是 1：是
 
@@ -159,6 +160,28 @@ public class TenantInfo implements Serializable {
 
     @Column(name = "qrcode_editable")
     private Boolean qrCodeEditable;
+
+    @Column(name = "is_support_multi_language")
+    private Boolean isSupportMultiLanguage;//是否支持同租户多语言 0、不支持 1、支持
+
+    @Column(name = "custom_tenant")
+    private String customTenant;//有定制化需求的租户可以使用该字段作为租户标识 1、仁济
+
+    public String getCustomTenant() {
+        return customTenant;
+    }
+
+    public void setCustomTenant(String customTenant) {
+        this.customTenant = customTenant;
+    }
+
+    public Boolean getIsSupportMultiLanguage() {
+        return isSupportMultiLanguage;
+    }
+
+    public void setIsSupportMultiLanguage(Boolean isSupportMultiLanguage) {
+        isSupportMultiLanguage = isSupportMultiLanguage;
+    }
 
     public boolean getQrCodeEditable() {
         if(null == qrCodeEditable){

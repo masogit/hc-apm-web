@@ -107,6 +107,37 @@
             <p:inputText value="#{assetInfoDetailController.selected.clinicalDeptName}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'accountingDeptName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.accountingDeptName}</label>
+            <p:inputText value="#{assetInfoDetailController.getOrgInfoByUid(assetInfoDetailController.selected.accountingDeptUID).name}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'modalityType')}">
+        <h:panelGroup >
+            <label class="label">设备modality</label>
+            <p:inputText value="#{assetInfoDetailController.selected.modalityType}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'monitorRate')}">
+        <h:panelGroup >
+            <label class="label">#{msg.monitorRate}(W)</label>
+            <p:inputText value="#{assetInfoDetailController.selected.monitorRate}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'otherPower')}">
+        <h:panelGroup >
+            <label class="label">#{msg.otherPower}(W)</label>
+            <p:inputText value="#{assetInfoDetailController.selected.otherPower}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'unitPriceElectricity')}">
+        <h:panelGroup >
+            <label class="label">电费单价(元)</label>
+            <p:inputText value="#{assetInfoDetailController.selected.unitPriceElectricity}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'clinicalOwnerName')}">
         <h:panelGroup >
             <label class="label">#{msg.clinicalOwnerName}</label>

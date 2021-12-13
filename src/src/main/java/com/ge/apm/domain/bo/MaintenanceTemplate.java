@@ -63,6 +63,10 @@ public class MaintenanceTemplate {
             this.content.put(Component.ACCESSORY_INFORMATION.toString(), Component.ACCESSORY_INFORMATION.value());
             this.content.put(Component.ACCESSORY_SIGNATURE.toString(), Component.ACCESSORY_SIGNATURE.value());
             this.content.put(Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.value());
+            this.content.put(Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), Component.MAINTENANCE_COMPLETION_SIGNATURE.value());
+            this.content.put(Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.value());
+            this.content.put(Component.ACCEPTANCE_SIGNATURE.toString(), Component.ACCEPTANCE_SIGNATURE.value());
+            this.content.put(Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), Component.ACCEPTANCE_SIGNATURE_TITLE.value());
             this.content.put(Component.MAINTENANCE_WORKFLOW.toString(), Component.MAINTENANCE_WORKFLOW.value());
             this.content.put(Component.AUDIT_RECORDS.toString(), Component.AUDIT_RECORDS.value());
             this.content.put(Component.CHECK_LIST.toString(), Component.CHECK_LIST.value());
@@ -186,6 +190,10 @@ public class MaintenanceTemplate {
         ACCESSORY_INFORMATION("accessory_information", Widget.TABLE),
         ACCESSORY_SIGNATURE("accessory_signature", Widget.PICTURE),
         ACCESSORY_SIGNATURE_PLACE_HOLDER("accessory_signature_place_holder", Widget.TEXT),
+        MAINTENANCE_COMPLETION_SIGNATURE("maintenance_completion_signature", Widget.PICTURE),
+        MAINTENANCE_COMPLETION_SIGNATURE_TITLE("maintenance_completion_signature_title", Widget.TEXT),
+        ACCEPTANCE_SIGNATURE("acceptance_signature", Widget.PICTURE),
+        ACCEPTANCE_SIGNATURE_TITLE("acceptance_signature_title", Widget.TEXT),
         MAINTENANCE_WORKFLOW("maintenance_workflow", Widget.TABLE),
         AUDIT_RECORDS("audit_records", Widget.TABLE),
         CHECK_LIST("check_list", Widget.TABLE),

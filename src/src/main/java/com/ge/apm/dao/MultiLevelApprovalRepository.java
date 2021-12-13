@@ -26,11 +26,6 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
     @Query("select m from MultiLevelApproval m  where m.actualApproverUid = ?1 and m.approvalNodeStatus != ?2 Order By m.createdDate DESC ")
     public List<MultiLevelApproval> getMultiLevelApprovalList(String actualApproverUid, Integer approvalNodeStatus);
 
-    @Modifying
-    @Query(value = "update simple_parts_warehouse_locator set approval_status =?1 where business_number = ?2", nativeQuery = true)
-    @Transactional(propagation = Propagation.REQUIRED)
-    MultiLevelApproval updateByBusinessNumber(Integer approvalStatus, String requestCode);
-
     @Query(value=
             "SELECT MAX (A .approva_number) FROM ( SELECT MAX ( to_number( B.approva_number, '99999999999999' )) approva_number FROM multi_level_approval B WHERE B.approva_number IN ( SELECT C .approva_number FROM multi_level_approval C WHERE C .approva_number LIKE ?1% )) A",nativeQuery = true)
     String selectMaxApprovalNum(String format);

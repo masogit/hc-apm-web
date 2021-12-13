@@ -4,6 +4,7 @@ import com.ge.apm.dao.ZkbAssetQrCodeInfoRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbAssetQrCodeInfo;
 import com.ge.apm.domain.ZkbAssetStatistic;
+import com.ge.apm.domain.ZkbFePartOrder;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbAssetStatisticService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -13,7 +14,10 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -22,6 +26,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +36,7 @@ import java.util.Map;
  */
 @ManagedBean
 @ViewScoped
-public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAssetStatistic> {
+public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAssetQrCodeInfo> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkbAssetStatisticController.class);
 
@@ -117,7 +123,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
                 this.tenantUid="-";
             }
         }
-        loadData();
+//        loadData();
     }
 
     /**
@@ -125,6 +131,19 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
      */
     public void loadData() {
         zkbAssetStatisticList=this.zkbAssetStatisticService.loadAllAsset(this.tenantUid,this.systemId,this.qrCodeCount,this.qrCodeCountState,this.contractNo,this.hospitalName,this.functionType,this.canNotPastQrCode);
+    }
+
+    /**
+     * 列表加载
+     *
+     * @param pageRequest
+     * @return
+     */
+    @Override
+    protected Page<ZkbAssetQrCodeInfo> loadData(PageRequest pageRequest) {
+        List<SearchFilter> searchFilters = getSearchFilters();
+        Page<ZkbAssetQrCodeInfo> ZkbAssetQrCodeInfo = zkbAssetQrCodeInfoRepository.findBySearchFilter(searchFilters, pageRequest);
+        return ZkbAssetQrCodeInfo;
     }
 
     public String getTenantUid() {
@@ -136,7 +155,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
     }
 
     @Override
-    protected GenericRepositoryUUID<ZkbAssetStatistic> getDAO() {
+    protected GenericRepositoryUUID<ZkbAssetQrCodeInfo> getDAO() {
         return null;
     }
 
@@ -182,24 +201,10 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
 
     @Override
     public void save() {
-        if(StringUtils.isBlank(this.selected.getSystemId()))
-        {
-            return;
+        if(selected.getReason() != null){
+            selected.setReasonDate(new Date());
         }
-        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = this.zkbAssetQrCodeInfoRepository.findBySystemId(this.selected.getSystemId());
-        ZkbAssetQrCodeInfo zkbAssetQrCodeInfo = null;
-        if(CollectionUtils.isNotEmpty(zkbAssetQrCodeInfoList))
-        {
-            zkbAssetQrCodeInfo=zkbAssetQrCodeInfoList.get(0);
-        }else
-            {
-                zkbAssetQrCodeInfo = new ZkbAssetQrCodeInfo();
-            }
-        zkbAssetQrCodeInfo.setReason(this.selected.getReason());
-        zkbAssetQrCodeInfo.setSystemId(this.selected.getSystemId());
-        zkbAssetQrCodeInfo.setCanNotPastQrCode(this.selected.getCanNotPastQrCode());
-        zkbAssetQrCodeInfo.setTenantUID(this.selected.getTenantUid());
-        zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
+        zkbAssetQrCodeInfoRepository.save(selected);
     }
 
     public String getSystemId() {
@@ -255,5 +260,53 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
 
     public void setCanNotPastQrCode(String canNotPastQrCode) {
         this.canNotPastQrCode = canNotPastQrCode;
+    }
+
+    /**
+     * 重新生成二维码统计数据
+     */
+    public String regenerateZkbAssetQrCodeInfo(){
+        zkbAssetStatisticService.regenerateZkbAssetQrCodeInfo(getSearchFilters());
+        return "List.xhtml?faces-redirect=true";
+    }
+
+    public List<SearchFilter> getSearchFilters(){
+        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+        if(tenantUid!=null)
+        {
+            SearchFilter dataTypeFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUid);
+            searchFilters.add(dataTypeFilter);
+        }
+        if(systemId!=null)
+        {
+            SearchFilter systemIdFilter = new SearchFilter("systemId", SearchFilter.Operator.EQ, systemId);
+            searchFilters.add(systemIdFilter);
+        }
+        if(contractNo!=null)
+        {
+            SearchFilter systemIdFilter = new SearchFilter("contractNo", SearchFilter.Operator.EQ, contractNo);
+            searchFilters.add(systemIdFilter);
+        }
+        if(StringUtils.isNotBlank(hospitalName))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("hospitalName", SearchFilter.Operator.EQ, hospitalName);
+            searchFilters.add(systemIdFilter);
+        }
+        if(StringUtils.isNotBlank(functionType))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("functionType", SearchFilter.Operator.EQ, functionType);
+            searchFilters.add(systemIdFilter);
+        }
+        if(StringUtils.isNotBlank(qrCodeCountState))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("qrCodeCountState", SearchFilter.Operator.EQ, qrCodeCountState);
+            searchFilters.add(systemIdFilter);
+        }
+        if(StringUtils.isNotBlank(canNotPastQrCode))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("canNotPastQrCode", SearchFilter.Operator.EQ, canNotPastQrCode);
+            searchFilters.add(systemIdFilter);
+        }
+        return searchFilters;
     }
 }

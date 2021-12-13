@@ -3,8 +3,8 @@
     <div class="menu-content" tabindex="0">
         <pu:menu widgetVar="me">
 
-           <!-- <p:menuitem style=" font-size: 30" id="um000" value="ChangeToEnglish" rendered="#{localeService.language eq 'zh'}" icon="language" url="#{request.requestURI}?locale=en"/>
-            <p:menuitem style=" font-size: 30" id="um001" value="切换成中文"  rendered="#{localeService.language eq 'en'}" icon="language" url="#{request.requestURI}?locale=zh"/>-->
+            <p:menuitem style=" font-size: 30" id="um9001" value="ChangeToEnglish" rendered="#{(localeService.language eq 'zh') and (userContextService.getTenantInfo().isSupportMultiLanguage)}" icon="language" url="#{request.requestURI}?locale=en"/>
+            <p:menuitem style=" font-size: 30" id="um9002" value="切换成中文"  rendered="#{(localeService.language eq 'en') and (userContextService.getTenantInfo().isSupportMultiLanguage)}" icon="language" url="#{request.requestURI}?locale=zh"/>
             <p:menuitem style=" font-size: 30" id="um01" value="#{msg.HomePage}" icon="&#xE871;" outcome="#{userContextService.userDefaultHomePage}" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('homePage')}"/>
             
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.accessContains('asset')}">
@@ -27,6 +27,11 @@
                 <p:menuitem id="um091" value="#{msg.inventoryWorkorder}" outcome="/portal/inventory/inventoryOrder.xhtml" rendered="#{userContextService.accessContains('asset.inventory') and !userContextService.hasCurrentTenantName('')}"/>
                 <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContains('asset.scrapTempMgt')}"/>
                 <p:menuitem id="um090" value="#{msg.HistoryOperations}" outcome="/portal/asset/info/HistoryOperations.xhtml" rendered="#{!userContextService.isDeparmentUser()}"/>
+            </p:submenu>
+
+            <!--多级审批  -->
+            <p:submenu id="um001" label="审批" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRole('MultiLevelAuditor')}">
+                <p:menuitem id="um0011" value="多级审批" outcome="/portal/approval/MultiLevelApproval.xhtml" rendered="true"/>
             </p:submenu>
 
             <p:submenu id="um010" label="备件管理" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRole('SparePartsAdmin')}">
@@ -76,7 +81,7 @@
                 <p:menuitem id="um200" value="#{msg.RepairWorkorderReport}" outcome="/portal/wo/woExport/woReportMain.xhtml" rendered="#{userContextService.accessContains('repair.report')}"/>
                 <p:menuitem id="um201" value="#{msg.WorkScheduleManagement}" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.accessContains('repair.workSchedule')}"/>
                 <p:menuitem id="um202" value="#{msg.VacationManagement}" outcome="/portal/schedule/userVacationList.xhtml" rendered="#{userContextService.accessContains('repair.vacationMgt')}"/>
-                <p:menuitem id="um203" value="不良事件"  onclick="window.open('https://maers.adrs.org.cn').location.href = 'https://maers.adrs.org.cn'" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}"/>
+                <p:menuitem id="um203" value="不良事件"  outcome="/portal/iframe/mears.xhtml" rendered="#{userContextService.accessContains('repair.adverseEvents')}"/>
                 <p:menuitem id="um220" value="#{msg.ReportTemplateManagement}" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.accessContains('repair.reportMgt')}"/>
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('maintain')}">
@@ -172,6 +177,7 @@
                 <p:menuitem id="um497" value="#{msg.AssetTag}" outcome="/portal/asset/tag/List.xhtml" rendered="#{userContextService.accessContains('config.assetMark')}"/>
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml" rendered="#{userContextService.accessContains('config.engineerGroup')}"/>
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/workFlowConfig/List.xhtml" rendered="#{userContextService.accessContains('config.workFlow')}"/>
+                <p:menuitem id="um500" value="#{msg.MultiLevelConfig}" outcome="/portal/config/multilevelApproveConfig/List.xhtml" rendered="#{userContextService.accessContains('config.workFlow')}"/>
                 <p:menuitem id="um504" value="#{msg.CustomConfiguration}" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContains('config.custom')}"/>
                 <p:menuitem id="um505" value="#{msg.AttributeConfiguration}" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContains('config.attribute')}"/>
                 <p:menuitem id="um506" value="#{msg.RepairMessageConfiguration}" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContains('config.repairMessage')}"/>
@@ -210,6 +216,22 @@
             </p:submenu>
 
             <p:menuitem value="设备数据概览" icon="fa fa-bar-chart" outcome="/portal/nine.xhtml"/>
+
+            <p:submenu id="um24_supplier" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('supplierMaintain')}">
+                <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/supplier/pmSupplierOrderListAll.xhtml" rendered="#{userContextService.accessContains('supplierMaintain.workbench')}"/>
+
+            </p:submenu>
+            <p:submenu id="um25_supplier" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.accessContains('supplierRepair')}">
+                <p:menuitem value="#{msg.RepairWorkbench}" outcome="/portal/woMgr/supplier/workOrderSupplierList.xhtml" rendered="#{userContextService.accessContains('supplierRepair.workbench')}"/>
+
+            </p:submenu>
+
+            <p:submenu label="供应商管理" icon="settings"  rendered="#{userContextService.accessContains('supplierManagement')}"  >
+                <p:menuitem id="mirage_userAccount" rendered="#{userContextService.accessContains('supplierManagement.supplierUser')}"  value="供应商用户管理" outcome="/portal/mirage/mirage.xhtml?route=/userAccount/page"    />
+                <p:menuitem id="mirage_tenantSupplierMapping" rendered="#{userContextService.accessContains('supplierManagement.tenantSupplierMapping')}" value="租户供应商绑定" outcome="/portal/mirage/mirage.xhtml?route=/orgSupplierMapping"    />
+                <p:menuitem id="mirage_AssetBindSupplier" rendered="#{userContextService.accessContains('supplierManagement.assetBindSupplier')}" value="供应商设备绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplier"    />
+                <p:menuitem id="mirage_AssetBindSupplierFE" rendered="#{userContextService.accessContains('supplierManagement.assetBindSupplierFE')}" value="维修工程师绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplierFE"    />
+            </p:submenu>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
             <p:menuitem id="logout" value="#{msg.Logout}" icon="&#xe8ac;" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>

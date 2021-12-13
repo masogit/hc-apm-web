@@ -157,6 +157,12 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             case 2:{
                 pmOrderRule = pmOrderRuleRepository.findPmOrderRuleLevel2(v2PmOrder.getAssetUid());break;
             }
+            case 1:{
+                pmOrderRule= pmOrderRuleRepository.findPmOrderRuleLevel1(v2PmOrder.getAssetUid());break;
+            }
+            case 4:{
+                pmOrderRule = pmOrderRuleRepository.findPmOrderRuleLevel4(v2PmOrder.getAssetUid());break;
+            }
         }
         return pmOrderRule;
     }

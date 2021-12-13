@@ -14,6 +14,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import webapp.framework.util.TimeUtil;
 
 import javax.persistence.*;
@@ -148,6 +149,12 @@ public class AssetInfo implements ChineseName,Serializable {
     @Size(max = 64)
     @Column(name = "clinical_dept_name")
     private String clinicalDeptName;//所属科室
+
+    @Column(name = "accounting_dept_uid", columnDefinition = "CHAR(32)")
+    private String accountingDeptUID;//账号科室
+
+    @Column(name = "modality_type")
+    private String modalityType;
 
     @Transient
     private String assetDeptName;//使用科室
@@ -576,6 +583,19 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "visible_status")
     private Integer visibleStatus = 1;
 
+    @Column(name = "monitor_rate")//主机功率
+    private Double monitorRate;
+
+    @Column(name = "other_power")//其他功率
+    private Double otherPower;
+
+    @Column(name = "unit_price_electricity")//电费单价
+    private Double unitPriceElectricity;
+
+    // 年保养次数
+    @Column(name = "annual_maintenance_times")
+    private Integer annualMaintenanceTimes;
+
     @Transient
     private int lineNum;
 
@@ -615,9 +635,127 @@ public class AssetInfo implements ChineseName,Serializable {
     @Getter
     @Setter
     private String errorMessage;
-
+    @Transient
+    private String aet;
+    @Transient
+    private Date studydate;
+    @Transient
+    private Date startTime;
+    @Transient
+    private Date endTime;
+    @Transient
+    private Double studyexposuretime;
+    @Transient
+    private String usageRate;
+    @Transient
+    private Double energyConsumption;
+    @Transient
+    private String dashboardPage;
     @Transient
     private List<String> tags = new ArrayList<>();
+
+    public String getDashboardPage() {
+        return dashboardPage;
+    }
+
+    public void setDashboardPage(String dashboardPage) {
+        this.dashboardPage = dashboardPage;
+    }
+
+    public String getUsageRate() {
+        return usageRate;
+    }
+
+    public void setUsageRate(String usageRate) {
+        this.usageRate = usageRate;
+    }
+
+    public Double getEnergyConsumption() {
+        return energyConsumption;
+    }
+
+    public void setEnergyConsumption(Double energyConsumption) {
+        this.energyConsumption = energyConsumption;
+    }
+
+    public String getAet() {
+        return aet;
+    }
+
+    public void setAet(String aet) {
+        this.aet = aet;
+    }
+
+    public Date getStudydate() {
+        return studydate;
+    }
+
+    public void setStudydate(Date studydate) {
+        this.studydate = studydate;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public Double getStudyexposuretime() {
+        return studyexposuretime;
+    }
+
+    public void setStudyexposuretime(Double studyexposuretime) {
+        this.studyexposuretime = studyexposuretime;
+    }
+
+    public Double getMonitorRate() {
+        return monitorRate;
+    }
+
+    public void setMonitorRate(Double monitorRate) {
+        this.monitorRate = monitorRate == null ? 0D : monitorRate;
+    }
+
+    public Double getUnitPriceElectricity() {
+        return unitPriceElectricity;
+    }
+
+    public void setUnitPriceElectricity(Double unitPriceElectricity) {
+        this.unitPriceElectricity = unitPriceElectricity;
+    }
+
+    public Double getOtherPower() {
+        return otherPower;
+    }
+
+    public void setOtherPower(Double otherPower) {
+        this.otherPower = otherPower == null ? 0D : otherPower;
+    }
+
+    /**
+     * 新供应商uid 关联 tenant_info
+     */
+    @Column(name = "supplier_new_uid")
+    private String supplierNewUID;
+
+
+    public String getSupplierNewUID() {
+        return supplierNewUID;
+    }
+
+    public void setSupplierNewUID(String supplierNewUID) {
+        this.supplierNewUID = supplierNewUID;
+    }
 
     public String getIsCheckedValue() {
         return isCheckedValue;
@@ -1002,6 +1140,22 @@ public class AssetInfo implements ChineseName,Serializable {
             this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
         }
 
+    }
+
+    public String getAccountingDeptUID() {
+        return accountingDeptUID;
+    }
+
+    public void setAccountingDeptUID(String accountingDeptUID) {
+        this.accountingDeptUID = accountingDeptUID;
+    }
+
+    public String getModalityType() {
+        return modalityType;
+    }
+
+    public void setModalityType(String modalityType) {
+        this.modalityType = modalityType;
     }
 
     public String getAliasName() {
@@ -2137,5 +2291,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setQrCodeLib(QrCodeLib qrCodeLib) {
         this.qrCodeLib = qrCodeLib;
+    }
+
+    public Integer getAnnualMaintenanceTimes() {
+        return annualMaintenanceTimes;
+    }
+
+    public void setAnnualMaintenanceTimes(Integer annualMaintenanceTimes) {
+        this.annualMaintenanceTimes = annualMaintenanceTimes;
     }
 }

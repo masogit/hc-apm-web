@@ -155,7 +155,7 @@ public class SimplePartsCategoryController extends GenericCRUDController<SimpleP
 
     public void deleteSelectedPartsCategory() {
         encoded = selected.getEncoded() == null ? "" : selected.getEncoded().trim();
-        List<SimplePartsItem> partsItemInfos = partsItemRepository.findByCategoryCode(encoded);
+        List<SimplePartsItem> partsItemInfos = partsItemRepository.findByCategoryCode(encoded, UserContextService.getCurrentUserAccount().getTenantUID());
         if (partsItemInfos.size() >= 1) {
             WebUtil.addErrorMessage(selected.getName() + "已绑定备件");
             return;

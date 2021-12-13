@@ -9,6 +9,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -55,6 +56,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private AssetInfoRepository assetInfoRepository;
 	private QueryAsset queryAsset;
 	private RelRuleAssetRepository relRuleAssetRepository;
+    private ConfigService configService;
 	private Integer level;
 	private PmOrderRuleRepository pmOrderRuleRepository;
 	private OrgInfoRepository orgInfoRepository;
@@ -94,6 +96,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		pmOrderRequestApiService = WebUtil.getBean(PmOrderRequestApiService.class);
 		pmOrderRepository =  WebUtil.getBean(V2_PmOrderRepository.class);
 		supplierService = WebUtil.getBean(SupplierService.class);
+        configService = WebUtil.getBean(ConfigService.class);
 		targetAssets = new ArrayList<AssetInfo>();
 		queryAsset = new QueryAsset();
 		queryAsset.setTenantUID(user.getTenantUID());
@@ -110,6 +113,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         //initTree(user.getTenantUID());
 		initOrgTree();
 	}
+
+    public boolean getPmRule(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
+    }
 
 	public void initOrgTree() {
 		UserAccount loginUser = UserContextService.getCurrentUserAccount();

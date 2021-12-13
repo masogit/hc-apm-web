@@ -696,6 +696,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
                                     if(userOrg.getOrgType()==3 || userOrg.getOrgType()==4){
                                         depts.stream().findFirst().ifPresent(infoVo::setAssetDeptUID);
+                                        infoVo.setAssetDeptId(infoVo.getClinicalDeptId());
                                         String clinicalDeptUid = infoVo.getClinicalDeptUID();
                                         if(StringUtils.isNotBlank(clinicalDeptUid)) {
                                             OrgInfo clinicalDept = orgInfoDao.findByUid(clinicalDeptUid);

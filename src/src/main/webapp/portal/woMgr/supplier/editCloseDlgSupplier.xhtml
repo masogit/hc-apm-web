@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition><!--关单对话框-->
+        <p:dialog id="EditCloseDiaSupplierlog" widgetVar="EditCloseDiaSupplierlog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="#{msg.closeWo}" height="500">
+            <h:form id="EditCloseDialogSupplierForm" >
+                <h:panelGroup id="display3" rendered="#{not empty workOrderMgrSupplierController.selectedWorkOrder}">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.caseType}</label>
+                            <p:selectOneMenu id="caseType"  value="#{workOrderMgrSupplierController.selectedWorkOrder.caseType}" disabled="false">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.RepairResult}*</label>
+                            <p:selectOneMenu id="repairResult"  value="#{workOrderMgrSupplierController.selectedWorkOrder.repairResult}" required="false" requiredMessage="#{msg.RepairResult} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.patProblems}</label>
+                            <p:inputTextarea value="#{workOrderMgrSupplierController.selectedWorkOrder.patProblems}" rows="2"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4" readonly="false"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.patActions}</label>
+                            <p:inputTextarea value="#{workOrderMgrSupplierController.selectedWorkOrder.patActions}" rows="2"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4" readonly="false"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.patTests}</label>
+                            <p:inputTextarea value="#{workOrderMgrSupplierController.selectedWorkOrder.patTests}" rows="3"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4" readonly="false"/>
+                        </h:panelGroup>
+                        <h:panelGroup  id="equipmentTaker" >
+                            <label class="label">#{msg.equipmentTaker}</label>
+                            <p:inputText id="taker" value="#{workOrderMgrSupplierController.equipmentTaker}"  maxlength="40" readonly="false"/>
+                            <label class="label">#{msg.equiptaketime}</label>
+                            <h:outputText value="#{workOrderMgrSupplierController.takeTime}"  >
+                                <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                            <p:commandButton title="#{msg.equiptake}" process="@(equipmentTaker)" actionListener="#{workOrderMgrSupplierController.takeEquip}" update="woSupplierTab:EditCloseDialogSupplierForm:equipmentTaker :growl" disabled="false"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                    <p:fieldset legend="#{msg.expensedetail}" >
+
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.manhours}</label>
+                                <p:inputText value="#{workOrderMgrSupplierController.selectedWorkOrder.manHours}" readonly="false" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.otherExpense}</label>
+                                <p:inputNumber maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrSupplierController.selectedWorkOrder.otherExpense}" readonly="false"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.ExternalExpenses}</label><!--外部费用-->
+                                <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrSupplierController.selectedWorkOrder.externalExpense}" readonly="false"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.maintenanceValue}</label>
+                                <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrSupplierController.selectedWorkOrder.maintenanceValue}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+                    </p:fieldset>、
+
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrSupplierController.saveEditedWorkOrder}" value="#{msg.save}" update="woSupplierTab:woMgrSupplierListForm woSupplierTab:woMgrSupplierDetailForm" icon="ui-icon-check" oncomplete="handleEditClose(xhr, status, args);"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrSupplierController.cancel()}" icon="ui-icon-cancel" onclick="PF('EditCloseDiaSupplierlog').hide()"/>
+                    </h:panelGroup>
+
+                    <br/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+            function handleEditClose(xhr, status, args) {
+                if (args.caseType) {
+                    $('#woSupplierTab\\:EditCloseDialogSupplierForm\\:caseType').addClass("ui-state-error");
+                }else{
+                    handleSubmit(args, 'EditCloseDiaSupplierlog');
+                }
+            }
+        </script>
+    </ui:composition>
+</html>
