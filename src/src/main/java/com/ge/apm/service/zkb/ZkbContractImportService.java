@@ -737,18 +737,6 @@ public class ZkbContractImportService {
                     }
                 }
             }
-
-            if(!StringUtils.isEmpty(zkbContractAssetVO.getContractNo()) && !StringUtils.isEmpty(zkbContractAssetVO.getQrCode())){
-                ZkbContractAsset zkbContractAsset = queryContractAssetByContractIdAndAssetId(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getAssetId());
-                if(zkbContractAsset ==null){
-                    isValidateData = false;
-                    item.put("status", ImportStatus.Failure);
-                    ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbContractAssetIsNotExist"));
-                }else{
-                    zkbContractAssetVO.setZkbContractAssetId(zkbContractAsset.getId());
-                }
-            }
-
         }
 
 
