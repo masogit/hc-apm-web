@@ -892,7 +892,7 @@ public void test1(){
 
                     }
                     if (userAccountList.contains(userAccount)){
-                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.IN, Arrays.asList(0,1)));
+                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1));
                     }else {
                         searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0));
