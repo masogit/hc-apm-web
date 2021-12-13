@@ -8,6 +8,7 @@ import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.google.common.base.Strings;
@@ -1254,7 +1255,7 @@ public class UserContextService implements Serializable {
         }
         if(StringUtils.isBlank(tenantName)){
             //tenantName为空则验证下面租户
-            if("北京积水潭医院".equals(currentTenantInfo.getName().trim())){
+            if(WorkOrderConstant.DESIGNATED_USER.equals(currentTenantInfo.getName().trim())){
                 return Boolean.TRUE;
             }
         }else{
