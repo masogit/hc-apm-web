@@ -151,6 +151,8 @@ public class WorkOrderExportPojo {
     private String closeStepInfo;
     //维修子状态
     private Integer subStatus;
+    //是否是MVS工单
+    private Boolean isMVSWorkOrder;
 
     public Integer getSubStatus() { return subStatus; }
 
@@ -735,4 +737,8 @@ public class WorkOrderExportPojo {
     public void setRepairResult(Integer repairResult) {
         this.repairResult = repairResult;
     }
+
+    public Boolean getMVSWorkOrder() { return isMVSWorkOrder; }
+
+    public void setMVSWorkOrder(Boolean MVSWorkOrder) { isMVSWorkOrder = MVSWorkOrder; }
 }

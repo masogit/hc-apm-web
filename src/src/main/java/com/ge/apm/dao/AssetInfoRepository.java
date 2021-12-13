@@ -18,7 +18,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select o from AssetInfo o where o.hospitalId = ?1 and o.isValid = true")
     public List<AssetInfo> getByHospitalId(int hospitalId);
-
+    @Query("select siteUID from AssetInfo where id = ?1")
+    String findSiteUidByAssetId(Integer id);
     @Query("select o from AssetInfo o where o.siteId=?1 and o.modalityId = ?2 and o.isValid = true")
     public List<AssetInfo> getBySiteIdAndModalityId(int siteId, String modalityId);
 
@@ -127,7 +128,10 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public List<AssetInfo> findByDepartNumAndSiteUID(String num, String siteUID);
     public List<AssetInfo> findByFinancingNumAndSiteUID(String num, String siteUID);
     public List<AssetInfo> findByQrCodeAndSiteUID(String qrCode, String siteUID);
-
+    public List<AssetInfo> findByDepartNumAndFinancingNumAndSiteUID(String num1,String num2,String siteUid);
+    List<AssetInfo> findByDepartNum(String departNum);
+    List<AssetInfo> findByFinancingNum(String financingNum);
+    List<AssetInfo> findByDepartNumAndFinancingNum(String departNum,String financingNum);
     @Modifying
     @Transactional
     @Query("update AssetInfo ai set ai.swapTypeState = :swapTypeState where ai.id = :id")
@@ -268,4 +272,12 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "UPDATE asset_info SET shared_asset_type = NULL WHERE uid IN ?1",nativeQuery = true)
     void  clearShareAssetTypeByIds(List<String> assetIds);
 
+    @Query(value = "select o.* from asset_info o where o.uid in ?1", nativeQuery = true)
+    List<AssetInfo> fetchListByUid(Set<String> listUid);
+
+    @Query(value = "select a.* from asset_info a " +
+            "left outer join zkb_asset_qr_code_from_ib q on a.id = q.asset_id " +
+            "left join tenant_info t on t.uid = a.tenant_uid " +
+            "where t.type ='3' and (q.is_qr_code != true or q.is_qr_code is null) and a.system_id like '0824%' and a.tenant_uid = ?1", nativeQuery = true)
+    List<AssetInfo> queryAssetByZkbQrCode(String tenantUid);
 }

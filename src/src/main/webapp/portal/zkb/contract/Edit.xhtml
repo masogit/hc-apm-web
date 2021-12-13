@@ -37,10 +37,18 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">是否ZKB 599方案*</label>
+                            <p:selectOneMenu  value="#{zkbContractEditController.selected.fiveNineNineFlag}" required="true" requiredMessage="是否ZKB 599合同 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemValue="Y" itemLabel="是"/>
+                                <f:selectItem itemValue="N" itemLabel="否"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_contractType}*</label>
                             <p:selectOneMenu id="status" value="#{zkbContractEditController.selected.contractType}" required="true" requiredMessage="#{msg.zkbContract_contractType} #{msg.ValidationRequire}">
+                                <p:ajax event="itemSelect" update="quotaDeductType" listener="#{zkbContractEditController.contractTypeSelect}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
@@ -48,20 +56,22 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_startDate}*</label>
-                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.contractStartDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_endDate}*
                             </label>
-                            <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.contractEndDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">名额扣除类型*</label>
+                            <p:selectOneMenu id="quotaDeductType" value="#{zkbContractEditController.selected.quotaDeductType}" required="true" requiredMessage="名额扣除类型 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{zkbContractEditController.quotaDeductTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_ibNumber}</label>
-                            <p:spinner id="ibNumber" value="#{zkbContractEditController.selected.ibNumber}" min="0" max="1000" />
-                        </h:panelGroup>
-                        <h:panelGroup></h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_spareQuota_total}</label>
                             <p:spinner id="spareQuotaTotal" value="#{zkbContractEditController.selected.spareQuotaTotal}" min="0" max="1000"  />
@@ -79,7 +89,7 @@
                             <p:spinner id="spareQuotaUse" value="#{zkbContractEditController.selected.spareQuotaUse}" min="0" max="1000"  />
                         </h:panelGroup>
 
-                        <c:if test="#{!zkbContractEditController.newContractFlag}">
+                        <c:if test="#{!(zkbContractEditController.selected.quotaDeductType eq 'New')}">
                             <h:panelGroup>
                                 <label class="label">#{msg.zkbContract_probeQuota_total}</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaTotal}" min="0" max="1000"  />
@@ -97,7 +107,7 @@
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaUse}" min="0" max="1000"  />
                             </h:panelGroup>
                         </c:if>
-                        <c:if test="#{zkbContractEditController.newContractFlag}">
+                        <c:if test="#{zkbContractEditController.selected.quotaDeductType eq 'New'}">
                             <h:panelGroup>
                                 <label class="label">探头任意总名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaTotal}" min="0" max="1000"  />
@@ -196,7 +206,10 @@
                             <label class="label">#{msg.zkbContract_spareArtificail_use}</label>
                             <p:spinner id="spareArtificailUse" value="#{zkbContractEditController.selected.spareArtificailUse}" min="0" max="1000"  />
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbContract_ibNumber}</label>
+                            <p:spinner id="ibNumber" value="#{zkbContractEditController.selected.ibNumber}" min="0" max="1000" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_principal}</label>
                             <p:inputText id="principal" value="#{zkbContractEditController.selected.principal}" />
@@ -236,7 +249,18 @@
                             <label class="label">#{msg.zkbContract_remark}</label>
                             <p:inputText id="remark" value="#{zkbContractEditController.selected.remark}" />
                         </h:panelGroup>
-
+                       <!-- <h:panelGroup>
+                            <label class="label">实际开始时间</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">实际结束时间</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">599计数年</label>
+                            <p:inputText value="#{zkbContractEditController.selected.yearCount}" />
+                        </h:panelGroup>-->
                     </p:panelGrid>
 
 
@@ -282,7 +306,6 @@
                         </p:dataTable>
                     </p:fieldset>
 
-
                     <p:fieldset id="zkbContractAssetFieldset" legend="相关设备" rendered="#{not empty zkbContractEditController.selected.id}">
                         <p:dataTable id="zkbContractAssetDatalist" value="#{zkbContractEditController.zkbContractAssetList}" var="zkbContractAssetItem"
                                      widgetVar="zkbContractAssetDatalist" selectionMode="single" selection="#{zkbContractEditController.zkbContractAssetSelected}"
@@ -323,6 +346,12 @@
                             <p:column headerText="是否超声高低机" >
                                 <h:outputText value="#{fieldMsg.fieldValue('zkbContractAssetType',zkbContractAssetItem.assetType)}" />
                             </p:column>
+                            <p:column headerText="是否代理商自身原因未完成培训" >
+                                <h:outputText value="#{fieldMsg.fieldValue('zkbPoAssetTrainReasonFlag',zkbContractAssetItem.trainReasonFlag)}" />
+                            </p:column>
+                           <!-- <p:column headerText="申请数量" >
+                                <h:outputText value="#{zkbContractAssetItem.applyNum}" />
+                            </p:column>-->
                             <f:facet name="{Toolbar}">
                                 <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.operateFlag}"/>
                                 <p:commandButton id="editAssetButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareAssetEdit}" update=":growl :zkbContractAssetModifyDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbContractAssetModifyDlg').show()" rendered="#{zkbContractEditController.operateFlag}"/>
@@ -334,7 +363,30 @@
                         </p:dataTable>
                     </p:fieldset>
 
-                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" action="#{zkbContractEditController.createContract}" update=":zkbContractEditForm :growl " style="float:left" rendered="#{zkbContractEditController.createHide}"/>
+                <p:fieldset id="zkbContractCatFieldset" legend="相关高值探头" rendered="#{not empty zkbContractEditController.selected.id}">
+                    <p:dataTable id="zkbContractCatDatalist" value="#{zkbContractEditController.zkbContractCatList}" var="zkbContractCatItem"
+                                 widgetVar="zkbContractCatDatalist" selectionMode="single" sortOrder="descending" sortBy="#{zkbContractCatItem.createdDate}" selection="#{zkbContractEditController.zkbContractCatSelected}"
+                                 lazy="false" paginator="true" rowKey="#{zkbContractCatItem.id}" sortMode="single"
+                                 paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+
+                        <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractCatDatalist:editCatButton :zkbContractEditForm:zkbContractCatDatalist:deleteCatButton"/>
+                        <p:column headerText="探头名称">
+                            <h:outputText value="#{zkbContractCatItem.snNo}"/>
+                        </p:column>
+                        <p:column headerText="状态">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractCatEnabled',zkbContractCatItem.enabled)}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton immediate="false"  process="@this" id="createCatButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareCatCreate}" update=":growl :zkbContractCatEditDlg" oncomplete="PF('zkbContractCatEditDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.operateFlag}"/>
+                            <p:commandButton immediate="true" process="@this" id="editCatButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareCatEdit}" update=":growl :zkbContractCatEditDlg" disabled="#{zkbContractEditController.catCanOperate}" oncomplete="PF('zkbContractCatEditDlg').show()" rendered="#{zkbContractEditController.operateFlag}"/>
+                            <p:commandButton immediate="true" process="@this" id="deleteCatButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('catDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.catCanOperate}" oncomplete="PF('zkbConfigDlg').show()" rendered="#{zkbContractEditController.operateFlag}">
+                                <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </p:fieldset>
+
+                <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" action="#{zkbContractEditController.createContract}" update=":zkbContractEditForm :growl " style="float:left" rendered="#{zkbContractEditController.createHide}"/>
                     <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbContractEditController.preForLog('contractUpdate')}" update=":growl :zkbConfigDlg" oncomplete="PF('zkbConfigDlg').show()" rendered="#{zkbContractEditController.editHide}"/>
                     <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" />
 
@@ -343,6 +395,7 @@
             <ui:include src="ContractCourse.xhtml"/>
             <ui:include src="ContractAsset.xhtml"/>
             <ui:include src="ContractAssetEdit.xhtml"/>
+            <ui:include src="ContractCat.xhtml"/>
             <p:dialog id="zkbConfigDlg" widgetVar="zkbConfigDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="操作原因" height="300">
 
                 <h:form id="zkbConfigForm">

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 <ui:composition>
 
-	<p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" width="800" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)"
+	<p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" width="950" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)"
 		header="#{customRoleController.CRUDActionName} #{msg.CustomRole}">
 		<h:form id="CustomRoleEditForm">
 			<h:panelGroup id="display">
@@ -54,8 +54,12 @@
 				<p:fieldset id="cardConfig" legend="#{msg.WeChatCardConfiguration}">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
-							<p:selectManyCheckbox value="#{customRoleController.cards}" layout="responsive" columns="4">
-								<f:selectItems value="#{customRoleController.listI18nCards}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+							<p:selectManyCheckbox value="#{customRoleController.cards}" layout="responsive" columns="4" >
+								<c:forEach items="#{customRoleController.listI18nCards}" var="item">
+								<c:if test="#{!('adverseEvents_supplement'.equals(item.msgKey) and !'1'.equals(userContextService.tenantInfo.customTenant))}" >
+									<f:selectItem itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+								</c:if>
+								</c:forEach>
 							</p:selectManyCheckbox>
 						</h:panelGroup>
 					</p:panelGrid>
@@ -78,6 +82,12 @@
 							<label class="label">#{msg.nurseSiteAssetScrapped}</label>
 							<p:selectManyCheckbox value="#{customRoleController.mapAuthCard['assetScrapped']}" layout="responsive" columns="4">
 								<f:selectItems value="#{fieldMsg.getFieldValueList('assetScrapped')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+							</p:selectManyCheckbox>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{('1'.equals(userContextService.tenantInfo.customTenant))}">
+							<label class="label">#{msg.adverseEvents_supplement}</label>
+							<p:selectManyCheckbox value="#{customRoleController.mapAuthCard['adverseEvents_supplement']}" layout="responsive" columns="4">
+								<f:selectItems value="#{fieldMsg.getFieldValueList('adverseEventsSupplementCard')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 							</p:selectManyCheckbox>
 						</h:panelGroup>
 					</p:panelGrid>

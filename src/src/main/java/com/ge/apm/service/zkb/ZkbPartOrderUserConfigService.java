@@ -1,7 +1,9 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.ZkbPartOrder;
 import com.ge.apm.domain.ZkbPartOrderUserConfig;
 import com.ge.apm.domain.ZkbPartOrderUserConfigVO;
 import com.ge.apm.service.asset.ZkbPartOrderUserConfigRow;
@@ -32,6 +34,9 @@ public class ZkbPartOrderUserConfigService {
     @Autowired
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
 
+    @Autowired
+    private ZkbPartOrderRepository zkbPartOrderRepository;
+
     /**
      * 导入模板头部行数
      */
@@ -51,6 +56,11 @@ public class ZkbPartOrderUserConfigService {
      * excel模板名称
      */
     public static final String EXCEL_TEMPLATE_NAME="Part_Order_User_Config_Template.xlsx";
+
+    /**
+     * excel模板名称
+     */
+    public static final String EXCEL_TEMPLATE_IMPORT_NAME="Part_Order_User_Config_Template_Import.xlsx";
 
     /**
      * 目录地址
@@ -89,17 +99,19 @@ public class ZkbPartOrderUserConfigService {
             ZkbPartOrderUserConfigVO zkbPartOrderUserConfigVO = new ZkbPartOrderUserConfigVO();
             zkbPartOrderUserConfigVO.setLineNum(i);
             ZkbPartOrderUserConfigRow zkbPartOrderUserConfigRow = new ZkbPartOrderUserConfigRow(zkbPartOrderUserConfigVO,rowMap);
-            zkbPartOrderUserConfigRow.setFieldStringValue("APM用户名", "setLoginName");
-            zkbPartOrderUserConfigRow.setFieldStringValue("名称", "setName");
-            zkbPartOrderUserConfigRow.setFieldStringValue("邮箱", "setEmail");
-            zkbPartOrderUserConfigRow.setFieldStringValue("电话", "setPhone");
-            zkbPartOrderUserConfigRow.setFieldStringValue("用户SSO", "setSso");
-            zkbPartOrderUserConfigRow.setFieldStringValue("区域", "setRegion");
-            zkbPartOrderUserConfigRow.setFieldStringValue("类型", "setConfigType");
-            zkbPartOrderUserConfigRow.setFieldStringValue("资产类型", "setAssetType");
-            zkbPartOrderUserConfigRow.setFieldStringValue("备注", "setRemark");
-            zkbPartOrderUserConfigRow.setFieldStringValue("订单类型", "setOrderType");
-            zkbPartOrderUserConfigRow.setFieldStringValue("是否休假", "setIsVacation");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_systemId"), "setId");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_apm"), "setLoginName");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_name"), "setName");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_email"), "setEmail");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_phone"), "setPhone");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_sso"), "setSso");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_region"), "setRegion");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_type"), "setConfigType");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_propertyType"), "setAssetType");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_remark"), "setRemark");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_orderType"), "setOrderType");
+            zkbPartOrderUserConfigRow.setFieldStringValue(WebUtil.getMessage("zkbKeyUserConfig_holiday"), "setIsVacation");
+            zkbPartOrderUserConfigRow.setFieldStringValue("是否删除", "setDelFlag");
             if(zkbPartOrderUserConfigVO.isNull()){
                 break;
             }
@@ -131,7 +143,9 @@ public class ZkbPartOrderUserConfigService {
      * @param importUserConfigMapList 用户配置信息
      */
     public void importData(List<Map<String, Object>> importUserConfigMapList) {
+        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = new ArrayList<>();
         LocalDateTime startTime = LocalDateTime.now();
+        boolean allDateRight = true;
         int row = 0;
         try {
             for (Map<String, Object> item : importUserConfigMapList) {
@@ -140,8 +154,11 @@ public class ZkbPartOrderUserConfigService {
                     ZkbPartOrderUserConfigVO zkbPartOrderUserConfigVO = (ZkbPartOrderUserConfigVO)item.get("zkbPartOrderUserConfigVO");
                     ZkbPartOrderUserConfig zkbPartOrderUserConfig = new ZkbPartOrderUserConfig();
                     BeanUtils.copyProperties(zkbPartOrderUserConfigVO, zkbPartOrderUserConfig);
-                    this.zkbPartOrderUserConfigRepository.save(zkbPartOrderUserConfig);
-                }
+                    zkbPartOrderUserConfigList.add(zkbPartOrderUserConfig);
+                }else
+                    {
+                        allDateRight=false;
+                    }
 
             }
         } catch (Exception e) {
@@ -151,6 +168,65 @@ public class ZkbPartOrderUserConfigService {
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
+        if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList)&&allDateRight)
+        {
+            for(ZkbPartOrderUserConfig item:zkbPartOrderUserConfigList)
+            {
+                if(StringUtils.isNotBlank(item.getId())&&"是".equals(item.getDelFlag()))
+                {
+                    this.zkbPartOrderUserConfigRepository.delete(item.getId());
+                    continue;
+                }
+                if(StringUtils.isBlank(item.getId())&&"是".equals(item.getDelFlag()))
+                    continue;
+                if(StringUtils.isNotBlank(item.getId()))
+                {
+                    ZkbPartOrderUserConfig temple = this.zkbPartOrderUserConfigRepository.findById(item.getId());
+                    item.setUsBackUpId(temple.getUsBackUpId());
+                    item.setUsBackUpName(temple.getUsBackUpName());
+                }
+                this.zkbPartOrderUserConfigRepository.save(item);
+            }
+        }
+    }
+
+    public List<Map<String, Object>> createExportPartOrderUserConfigData(List<ZkbPartOrderUserConfig> zkbFePartOrderList){
+        Map<String, String> listI18nMessageMap =
+                ZkbPartOrderUserConfigService.listI18nMessage.stream().collect(Collectors.toMap(I18nMessage::getMsgKey,
+                        I18nMessage::getValueZh));
+        List<Map<String, Object>> zkbPartOrderList = new ArrayList<>();
+        for (ZkbPartOrderUserConfig zkbPartOrderUserConfig : zkbFePartOrderList) {
+            Map<String, Object> orderHistoryMap = new HashMap<>();
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_systemId"),zkbPartOrderUserConfig.getId());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_apm"),zkbPartOrderUserConfig.getLoginName());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_name"),zkbPartOrderUserConfig.getName());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_email"),zkbPartOrderUserConfig.getEmail());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_phone"),zkbPartOrderUserConfig.getPhone());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_sso"),zkbPartOrderUserConfig.getSso());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_region"),zkbPartOrderUserConfig.getRegion());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_type"),listI18nMessageMap.get(zkbPartOrderUserConfig.getConfigType()));
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_propertyType"),zkbPartOrderUserConfig.getAssetType());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_usBackUp"),zkbPartOrderUserConfig.getUsBackUpName());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_remark"),zkbPartOrderUserConfig.getRemark());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_orderType"),zkbPartOrderUserConfig.getOrderType());
+            if("t".equals(zkbPartOrderUserConfig.getIsVacation()))
+            {
+                orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_holiday"),"是");
+            }else
+            {
+                orderHistoryMap.put(WebUtil.getMessage("zkbKeyUserConfig_holiday"),"否");
+            }
+            orderHistoryMap.put("是否删除","否");
+            zkbPartOrderList.add(orderHistoryMap);
+        }
+        return zkbPartOrderList;
+    }
+
+    public void exportData(ExcelDocument doc, List<Map<String, Object>> orderHistoryMapList) {
+        Integer dataRow = 2;
+        for (Map<String, Object> item : orderHistoryMapList) {
+            doc.writeRowData(SHEET_SERVICE_KEY_USER_CONFIG_INDEX, 1, dataRow++, item);
+        }
     }
 
     /**
@@ -166,16 +242,47 @@ public class ZkbPartOrderUserConfigService {
         boolean isValidateData = true;
         ZkbPartOrderUserConfigVO zkbPartOrderUserConfigVO = (ZkbPartOrderUserConfigVO)item.get("zkbPartOrderUserConfigVO");
         ZkbPartOrderUserConfigRow.clearErrMessage(item);
+        boolean checkExistName = true;
+        boolean idExist = true;
+        if(StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getId()))
+        {
+            ZkbPartOrderUserConfig zkbPartOrderUserConfig = this.zkbPartOrderUserConfigRepository.findById(zkbPartOrderUserConfigVO.getId());
+            if(zkbPartOrderUserConfig==null)
+            {
+                item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
+                ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_systemIdError"));
+                isValidateData = false;
+                checkExistName=false;
+                idExist=false;
+            }
+        }
+        if(StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getId())&&idExist&&"是".equals(zkbPartOrderUserConfigVO.getDelFlag()))
+        {
+            List<ZkbPartOrder> list =  this.zkbPartOrderRepository.findByOnline(zkbPartOrderUserConfigVO.getId());
+            if(CollectionUtils.isNotEmpty(list))
+            {
+                item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
+                ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_deleteError"));
+                isValidateData = false;
+                return isValidateData;
+            }
+        }
         if(StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getLoginName()))
         {
             if(!("OrderExtraPending".equals(zkbPartOrderUserConfigVO.getConfigType())||"OrderPending".equals(zkbPartOrderUserConfigVO.getConfigType())))
             {
-                List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginName(zkbPartOrderUserConfigVO.getLoginName());
-                if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList))
-                {
-                    item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
-                    ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
-                    isValidateData = false;
+                if(checkExistName) {
+                    List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = null;
+                    if (StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getId())) {
+                        zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginNameAndIdNot(zkbPartOrderUserConfigVO.getLoginName(), zkbPartOrderUserConfigVO.getId());
+                    } else {
+                        zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginName(zkbPartOrderUserConfigVO.getLoginName());
+                    }
+                    if (CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList)) {
+                        item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
+                        ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
+                        isValidateData = false;
+                    }
                 }
             }
         }else
@@ -200,7 +307,7 @@ public class ZkbPartOrderUserConfigService {
             isValidateData = false;
         }
         Map<String,String> assetTypeMap = new HashMap<>();
-        assetTypeMap.put("CS","CS");
+        assetTypeMap.put("US","US");
         assetTypeMap.put("CT","CT");
         assetTypeMap.put("XR","XR");
         if(StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getAssetType())&&!assetTypeMap.containsKey(zkbPartOrderUserConfigVO.getAssetType()))

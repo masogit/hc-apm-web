@@ -2,6 +2,9 @@ package com.ge.apm.service.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -261,5 +264,20 @@ public class TimeUtils {
         DateTime now = new DateTime();
         DateTime lastTime = new DateTime(time);
         return Days.daysBetween(lastTime, now).getDays();
+    }
+
+    /**
+     * @return java.util.Date
+     * @throws
+     * @params [localDateTime]
+     * @author kwg
+     * @createTime 2020/6/10 13:48
+     * @description localDateTime 转换成Date类型
+     */
+    public static Date localDateTimeConverterToDate(LocalDateTime localDateTime) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId);
+        Date date = Date.from(zonedDateTime.toInstant());
+        return date;
     }
 }

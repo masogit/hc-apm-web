@@ -596,6 +596,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
     }
 
+    public void onSupplierChange2() {
+        if (null != supplier) {
+            this.supplierUserList = supplierService.getApprovedUserList(supplier.getId());
+        }
+    }
+
     public void onManufactureChange() {
         if (null != manufacture) {
             selected.setManufactureId(manufacture.getId().toString());
@@ -886,6 +892,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
     }
 
+    public void updateIsEdit(){
+        selected.setIsEdit(true);
+        dao.updateIsEdit(selected.getId());
+    }
 
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -939,4 +949,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
         return false;
     }
+
+    public void saveDistributeSupplier(Map<String, Boolean> selectedMap){
+        List<String> selectedIds = new ArrayList<>();
+        selectedMap.keySet().stream().forEach(id -> { if(selectedMap.get(id)) selectedIds.add(id); });
+        dao.updateBatchSupplier(supplier.getName(),supplier.getId(),installCount,selectedIds);
+    }
+
 }

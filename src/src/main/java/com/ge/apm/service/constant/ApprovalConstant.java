@@ -7,6 +7,9 @@ public interface ApprovalConstant {
     //审批业务类型businessType
     public static final String BUSINESS_TYPE_SPARE_PARTS_REQUEST = "申领单";//备件申领单
     public static final String BUSINESS_TYPE_SPARE_PARTS_PURCHASE = "申购单";//备件申购单
+    String BUSINESS_TYPE_SPARE_PARTS_RETURN = "退货单";
+    public static final String BUSINESS_TYPE_FILE_INFORMATION_MODIFICATION = "档案信息修改";
+
     /**
      * @date 2020/7/14 13:58
      * 审批状态--待审批
@@ -68,9 +71,77 @@ public interface ApprovalConstant {
     public static final String WX_MESSAGE_APPROVAL_2 = " 单号: ";
     public static final String WX_MESSAGE_APPROVAL_3 = " 请及时查看并进行审批操作,谢谢!!!";
 
+
+    String APPROVAL_ASSET_REPAIR_CHi = "设备维修";//设备维修 assetRepair
+    String APPROVAL_ASSET_MAINTAIN_CHi = "设备保养";//设备保养 assetMaintain
+    String APPROVAL_ASSET_BIG_REPAIR = "设备大修";
+    String APPROVAL_ASSET_BORROW_CHI = "设备借用";
+    String APPROVAL_ASSET_RECEIVE_CHI = "设备领用";
+    String APPROVAL_ASSET_BORROW_RETURN_CHI = "设备借用归还";
+    String APPROVAL_ASSET_RECEIVE_RETURN_CHI = "设备领用归还";
+    String APPROVAL_ASSET_TRANSFER_CHI = "设备转移";
+
     //审批单号头部
-    static final String APPROVAL_NUM = "SP";
+    String APPROVAL_NUM = "SP";
 
     //审批业务类型
-    static final String APPROVAL_PARTS_STOCK = "partsStock";
+    String APPROVAL_PARTS_STOCK = "partsStock";//备件库存
+    String APPROVAL_ASSET_INFO_MODIFY = "assetInfoModify";//档案信息修改
+    String APPROVAL_ASSET_OVERHAUL = "assetOverhaul";//设备大修
+    String APPROVAL_ASSET_BORROW = "assetBorrow";//设备借用
+    String APPROVAL_ASSET_RECEIVE = "assetReceive";//设备领用
+    String APPROVAL_ASSET_REPAIR = "assetRepair";//设备维修
+    String APPROVAL_ASSET_MAINTAIN = "assetMaintain";//设备保养
+    String APPROVAL_ASSET_BORROW_RETURN = "assetBorrowReturn";//设备借用归还
+    String APPROVAL_ASSET_RECEIVE_RETURN = "assetReceiveReturn";//设备领用归还
+    String APPROVAL_ASSET_TRANSFER = "assetTransfer";//设备转移
+    String APPROVAL_ADVERSE_EVENTS = "adverseEvents"; // 不良事件上报
+
+
+    int BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT = 1;//备件申领单
+    int BUSINESS_TYPE_SPARE_PARTS_PURCHASE_INT = 2;//备件申购单
+    int BUSINESS_TYPE_FILE_INFORMATION_MODIFICATION_INT = 3;//档案信息修改
+    int BUSINESS_TYPE_ASSET_OVERHAUL_INT = 4;//设备大修
+    int BUSINESS_TYPE_ASSET_BORROW = 5;//借用申请
+    int BUSINESS_TYPE_ASSET_RECEIVE = 6;//领用申请
+    int BUSINESS_TYPE_ASSET_REPAIR_INT = 7;//设备维修
+    int BUSINESS_TYPE_ASSET_MAINTAIN_INT = 8;//设备保养
+    int BUSINESS_TYPE_ASSET_BORROW_RETURN = 9;//借用归还申请
+    int BUSINESS_TYPE_ASSET_RECEIVE_RETURN = 10;//领用归还申请
+    int BUSINESS_TYPE_ASSET_TRANSFER = 11;//设备转移
+    int BUSINESS_TYPE_SPARE_PARTS_RETURN_INT = 12; //备件申退单
+    int BUSINESS_TYPE_ADVERSE_EVENTS = 13; // 不良事件上报
+
+
+    String BUSINESS_TYPE_ADVERSE_EVENTS_NAME = "不良事件上报"; // 不良事件上报
+    /**
+     * 档案信息修改 是否需要审批标识
+     * 1.资产维修审批中 2.资产维修不需要审批
+     */
+    public static final int ASSET_INTO_APPROVE_STATUS_YES = 1;
+    public static final int ASSET_INTO_APPROVE_STATUS_NO = 2;
+
+    //资产分类
+    String GROUP_MEDICAL = "01"; //医疗组
+    String GROUP_OFFICE = "02"; //办公组
+    String GROUP_INFORMATION = "03"; //信息组
+
+    public static final int BUSINESSSTATUS_COMPLETE_NOT_APPROVAL = 4;
+    public static final int BUSINESSSTATUS_COMPLETE_APPLY = 5;
+    public static final int BUSINESSSTATUS_COMPLETE = 6;
+
+    String MULTILEVEL_AUDITOR = "MultiLevelAuditor";
+
+//    static final String ALL_GROUP = "allGroup"; // TODO ACCT 不需要资产分类,测试稳定后删除
+    static final String BUSINESS_TYPE = "businessType";
+
+    String OPERATE_TYPE_CREATE = "create";
+    String OPERATE_TYPE_EDIT = "edit";
+    String  OPERATE_TYPE_VIEW = "view";
+
+    public static final String APPROVAL_SEPARATOR = ",";
+
+    //维修保养工单审批备件,同意状态
+    Integer WORK_DETAIL_STATUS_DISAGREE = 0;//不同意
+    Integer WORK_DETAIL_STATUS_AGREE = 1;//同意
 }

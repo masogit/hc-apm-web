@@ -289,6 +289,15 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
     }
+
+    public void setResetSearchFilter() {
+        // TODO Auto-generated method stub
+        super.setSearchFilter();
+        if(searchFilters.size()>0){
+            searchFilters.clear();
+        }
+        this.setOneSearchStr("");
+    }
     
      public List<UserAccount> getOwnerList() {
         return aiService.getWorkerList();

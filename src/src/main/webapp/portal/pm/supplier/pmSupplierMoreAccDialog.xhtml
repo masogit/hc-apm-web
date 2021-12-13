@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition><!--备件对话框 保养-->
+        <p:dialog class="pmmoreAccDialogDlgCls" id="pmmoreAccDialogDlg" widgetVar="pmmoreAccDialogDlg" modal="true" width="1250"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Part}">
+            <h:form class="pmmoreAccDialogFormCls"  id="pmmoreAccDialogForm" >
+                <h:panelGroup id="display42">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{!workOrderMgrController.isEnableIntegrationWithWorkOrder()}">
+                        <h:panelGroup>
+                            <label class="label">#{msg.PartName}*</label>
+                            <p:inputText id="parts1" value="#{v2SupplierPmOrderController.itemDetail.parts}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.PartQuantity}*</label>
+                            <p:inputNumber  maxValue="999"  decimalPlaces="0"  id="apartsQuantity1" value="#{v2SupplierPmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
+                            <f:convertNumber pattern="0" type="number"/>
+                            </p:inputNumber>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
+                            <p:inputNumber  disabled="#{v2SupplierPmOrderController.nochange}" decimalPlaces="4" maxValue="999999" id="partsPrice1"  value="#{v2SupplierPmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.EstimatedUnitPriceRMB} #{msg.ValidationRequire}">
+                                <p:ajax listener="#{v2SupplierPmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
+                                </p:ajax>
+
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.PartType}</label>
+                            <p:selectOneMenu value="#{v2SupplierPmOrderController.itemDetail.partsType}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.InvoiceNumber}</label>
+                            <p:inputText value="#{v2SupplierPmOrderController.itemDetail.invoiceNum}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.InvoicingTime}</label>
+                            <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd" value="#{v2SupplierPmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.InvoiceProvider}</label>
+                            <p:autoComplete id="vendor1" dropdown="true" value="#{v2SupplierPmOrderController.supplierName}" scrollHeight="300"
+                                            forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}"
+                                            completeMethod="#{v2SupplierPmOrderController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
+                                <p:ajax event="itemSelect" listener="#{v2SupplierPmOrderController.onSupplierChange()}"/>
+                                <p:ajax listener="#{v2SupplierPmOrderController.onSupplierChange()}" />
+                            </p:autoComplete>
+                            <p:commandButton id="createSupplierButton1" icon="ui-icon-plus" action="#{v2SupplierPmOrderController.prepareCreateSupplier}" title="#{msg.Create}" process="@this" update="@(.SupplierEditDlgCls)" oncomplete="PF('SupplierEditDialog').show()"/>
+
+
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ContractNumber}</label>
+                            <p:inputText value="#{v2SupplierPmOrderController.itemDetail.contractNum}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ContractPriceRMB}</label>
+                            <p:inputNumber  decimalPlaces="4" maxValue="999999" class="hetongjia" id="closedPrice1"  value="#{v2SupplierPmOrderController.itemDetail.closedPrice}">
+                                <p:ajax listener="#{v2SupplierPmOrderController.closePrcieUpdate()}">
+                                </p:ajax>
+                            </p:inputNumber>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.WarrantyDate}</label>
+                            <p:calendar timeZone="GMT+8" label="#{msg.EquipmentTakingTime}" pattern="yyyy/MM/dd" value="#{v2SupplierPmOrderController.itemDetail.warrantyDate}" showOn="button"
+                                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.SerialNumber}</label>
+                            <p:inputText value="#{v2SupplierPmOrderController.itemDetail.serialNum}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.EstimatedArrivalTime}</label>
+                            <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2SupplierPmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ApplyTime}</label>
+                            <p:calendar disabled="#{workOrderMgrController.nochange}" timeZone="GMT+8" label="#{msg.ApplyTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2SupplierPmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                        <p:column headerText="#{msg.Arrival}">
+                            <p:selectBooleanButton   value="#{v2SupplierPmOrderController.itemDetail.arrived}" onLabel="#{msg.Arrived}" offLabel="#{msg.NonArrived}">
+                                <p:ajax listener="#{v2SupplierPmOrderController.arrivalTimeSet}" event="change"></p:ajax>
+                            </p:selectBooleanButton>
+                            <p:selectBooleanButton   value="#{v2SupplierPmOrderController.itemDetail.closed}" onLabel="#{msg.Closed}" offLabel="#{msg.Opened}">
+                                <p:ajax listener="#{v2SupplierPmOrderController.orderSet}" event="change"></p:ajax>
+                            </p:selectBooleanButton>
+                        </p:column>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.feedbackComment}</label>
+                            <p:inputTextarea id="area" value="#{v2SupplierPmOrderController.itemDetail.comment}"/>
+                        </h:panelGroup>
+
+                    </p:panelGrid>
+            <!-- =================================启用集成工单时===============================-->
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workOrderMgrController.isEnableIntegrationWithWorkOrder()}">
+                        <h:panelGroup>
+                            <label class="label">#{msg.PartType}</label>
+                            <p:selectOneMenu value="#{v2SupplierPmOrderController.itemDetail.partsType}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                <p:ajax event="itemSelect"  update="pmmoreAccDialogForm" listener="#{v2SupplierPmOrderController.changeStatus()}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup id="sparePartsName" rendered="#{v2SupplierPmOrderController.statusFlag==1}">
+                            <label class="label">#{msg.PartName}*</label>
+                            <p:autoComplete id="sparePartName" dropdown="true"
+                                            value="#{v2SupplierPmOrderController.partsItem}"
+                                            readonly="false"
+                                            forceSelection="true"
+                                            completeMethod="#{v2SupplierPmOrderController.autosparePartName()}"
+                                            var="item" itemLabel="#{item.name}"
+                                            itemValue="#{item}"
+                                            converter="simplePartsItemConverter">
+                                <p:ajax event="itemSelect"
+                                        listener="#{v2SupplierPmOrderController.onSparePartsValueChange}"
+                                        update="pmmoreAccDialogForm"/>
+                            </p:autoComplete>
+
+                        </h:panelGroup>
+                        <h:panelGroup  rendered="#{v2SupplierPmOrderController.statusFlag==3}">
+                            <label class="label">#{msg.PartName}*</label>
+                            <p:inputText id="partsOther" value="#{v2SupplierPmOrderController.itemDetail.parts}"  requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{v2SupplierPmOrderController.statusFlag==2}">
+                            <label class="label">#{msg.PartName}*</label>
+                            <p:autoComplete id="parts" dropdown="true"
+                                            value="#{v2SupplierPmOrderController.partsItem}"
+                                            readonly="false" forceSelection="true"
+                                            completeMethod="#{v2SupplierPmOrderController.initSparePartsMaster()}"
+                                            var="item" itemLabel="#{item.name}"
+                                            itemValue="#{item}"
+                                            converter="simplePartsItemConverter">
+                                <p:ajax event="itemSelect"
+                                        listener="#{v2SupplierPmOrderController.onSparePartsMasterValueChange}"
+                                        update="pmmoreAccDialogForm"/>
+                            </p:autoComplete>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.PartQuantity}*</label>
+                            <p:inputNumber  decimalPlaces="0"  id="apartsQuantity" value="#{v2SupplierPmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup id="remainingStock" rendered="#{v2SupplierPmOrderController.statusFlag==1}">
+                            <label class="label">所剩库存</label>
+                            <p:inputText id="remainingStock2" name="remainingStock" placeholder="剩余库存"
+                                         readonly="true"
+                                         value="#{v2SupplierPmOrderController.itemDetail.currentQuantity}"/>
+                        </h:panelGroup>
+                        <h:panelGroup id="EstimatedUnitPriceRMB">
+                            <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
+                            <p:inputNumber disabled="#{v2SupplierPmOrderController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2SupplierPmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}" >
+                                <p:ajax listener="#{v2SupplierPmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
+                                </p:ajax>
+                            </p:inputNumber>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.InvoiceNumber}</label>
+                            <p:inputText value="#{v2SupplierPmOrderController.itemDetail.invoiceNum}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.InvoicingTime}</label>
+                            <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd" value="#{v2SupplierPmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.InvoiceProvider}</label>
+                            <p:autoComplete id="vendor" dropdown="true" value="#{v2SupplierPmOrderController.supplierName}" scrollHeight="300"
+                                            forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}"
+                                            completeMethod="#{v2SupplierPmOrderController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
+                                <p:ajax event="itemSelect" listener="#{v2SupplierPmOrderController.onSupplierChange()}"/>
+                                <p:ajax listener="#{v2SupplierPmOrderController.onSupplierChange()}" />
+                            </p:autoComplete>
+                            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{v2SupplierPmOrderController.prepareCreateSupplier}" title="#{msg.Create}" process="@this" update="@(.SupplierEditDlgCls)" oncomplete="PF('SupplierEditDialog').show()"/>
+
+
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ContractNumber}</label>
+                            <p:inputText value="#{v2SupplierPmOrderController.itemDetail.contractNum}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ContractPriceRMB}</label>
+                            <p:inputNumber  decimalPlaces="4" maxValue="999999" class="hetongjia" id="closedPrice"  value="#{v2SupplierPmOrderController.itemDetail.closedPrice}">
+                                <p:ajax listener="#{v2SupplierPmOrderController.closePrcieUpdate()}">
+                                </p:ajax>
+                            </p:inputNumber>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.WarrantyDate}</label>
+                            <p:calendar timeZone="GMT+8" label="#{msg.EquipmentTakingTime}" pattern="yyyy/MM/dd" value="#{v2SupplierPmOrderController.itemDetail.warrantyDate}" showOn="button"
+                                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.SerialNumber}</label>
+                            <p:inputText value="#{v2SupplierPmOrderController.itemDetail.serialNum}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.EstimatedArrivalTime}</label>
+                            <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2SupplierPmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.ApplyTime}</label>
+                            <p:calendar disabled="#{workOrderMgrController.nochange}" timeZone="GMT+8" label="#{msg.ApplyTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2SupplierPmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:column headerText="#{msg.Arrival}">
+                                <p:selectBooleanButton   value="#{v2SupplierPmOrderController.itemDetail.arrived}" onLabel="#{msg.Arrived}" offLabel="#{msg.NonArrived}">
+                                    <p:ajax listener="#{v2SupplierPmOrderController.arrivalTimeSet}" event="change"></p:ajax>
+                                </p:selectBooleanButton>
+                                <p:selectBooleanButton   value="#{v2SupplierPmOrderController.itemDetail.closed}" onLabel="#{msg.Closed}" offLabel="#{msg.Opened}">
+                                    <p:ajax listener="#{v2SupplierPmOrderController.orderSet}" event="change"></p:ajax>
+                                </p:selectBooleanButton>
+                            </p:column>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.feedbackComment}</label>
+                            <p:inputTextarea id="area1" value="#{v2SupplierPmOrderController.itemDetail.comment}"/>
+                        </h:panelGroup>
+
+                    </p:panelGrid>
+                    <br/>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{v2SupplierPmOrderController.addAcessItem}" value="#{msg.Save}" update="pmTab:pmrepairCompleteDialogForm:accessList  pmTab:pmrepairCompleteDialogForm:cmd1 :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
+                        <p:commandButton immediate="true" actionListener="#{v2SupplierPmOrderController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
+                    </h:panelGroup>
+
+                    <p:commandButton validateClient="true" actionListener="#{v2SupplierPmOrderController.saveAndadd(1)}" rendered="#{v2SupplierPmOrderController.switchTmp}" value="#{msg.SaveAdd}" update="@(.pmmoreAccDialogFormCls) pmTab:pmrepairCompleteDialogForm:accessList  :growl" icon="ui-icon-check"/>
+
+                </h:panelGroup>
+            </h:form>
+<!--
+            <ui:include src="createSupplierAccPm.xhtml" />
+-->
+
+        </p:dialog>
+
+    </ui:composition>
+</html>

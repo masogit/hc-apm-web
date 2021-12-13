@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <h:form id="ItemDetailViewForm">
+
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{not empty multiLevelApprovalController.selected}" >
+                <p:fieldset legend="审批详情">
+
+                    <!--节点详情-->
+                    <ui:include src="MultiLeveApprovalNodesDetail.xhtml"></ui:include>
+
+                    <!--备件内容-->
+                    <!--<ui:include src="content/PartsApproval.xhtml"></ui:include>-->
+
+                    <!--档案信息修改-->
+                    <!--<ui:include src="content/AssetChangeApproval.xhtml"></ui:include>-->
+
+                    <!--设备大修-->
+                    <!--<ui:include src="content/OverhaulRepairApproval.xhtml"></ui:include>-->
+
+                    <!--借用申请和借用归还申请-->
+                    <!--<ui:include src="content/BorrowApproval.xhtml"></ui:include>-->
+
+                    <!--领用申请和领用归还申请-->
+                    <!--<ui:include src="content/ReceiveApproval.xhtml"></ui:include>-->
+
+                    <!--设备维修-->
+                    <ui:include src="content/AssetRepairApproval.xhtml"></ui:include>
+
+                    <!--设备保养-->
+                    <ui:include src="content/AssetMaintenanceApproval.xhtml"></ui:include>
+
+                    <!--设备转移-->
+                    <!--<ui:include src="content/AssetTransferApproval.xhtml"></ui:include>-->
+
+                    <!--不良事件-->
+                    <ui:include src="content/AdverseEventsApproval.xhtml"></ui:include>
+                </p:fieldset>
+            </p:panelGrid>
+
+        </h:form>
+
+    </ui:composition>
+</html>

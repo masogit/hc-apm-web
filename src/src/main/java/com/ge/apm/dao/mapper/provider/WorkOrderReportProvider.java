@@ -1,6 +1,5 @@
 package com.ge.apm.dao.mapper.provider;
 
-import com.ge.apm.service.wo.WorkOrderExportService;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.List;
@@ -330,6 +329,64 @@ public class WorkOrderReportProvider {
 
     }
 
+    public String workOrderExportForMVS(Map<String,Object> param){
+
+        List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
+                "wo.status as status, " +
+                "wo.sub_status as subStatus, " +
+                "sr.hospital_name as hospitalName,ai.manufacture as assetManufacture, " +
+                "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,sr.asset_location as locationName, " +
+                "oi.short_name as assetClinicalDeptName, " +
+                "ai.asset_group as assetGroup, " +
+                "ai.function_group as assetFunctionGroup, " +
+                "ai.asset_code68 as assetCode68, " +
+                "ai.function_type as assetFunctionType,wo.current_person_name as currentPersonName, " +
+                "wo.current_step_id as currentStepId, " +
+                "sr.requestor_name as requestorName,sr.request_time as requestTime,sr.request_reason as requestReason, " +
+                "wo.send_step_owner_name as sendStepOwnerName, " +
+                "wo.send_step_start_time as sendStepStartTime, " +
+                "wo.int_ext_type as intExtType, " +
+                "wo.repair_result as repairResult, " +
+                "wo.repair_type as repairType, " +
+                "wo.accept_step_owner_name as acceptStepOwnerName, " +
+                "wo.accept_step_start_time as acceptStepStartTime, " +
+                "wo.work_step_end_time as workStepEndTime, " +
+                "wo.checkin_time as checkinTime,wo.man_hours as manHours,wo.total_man_hour as totalManHour, " +
+                "(select string_agg(concat(wod.parts,concat(',数量:',concat(wod.parts_quantity,concat(',合同价格:',concat(wod.closed_price, ';'))))),'') from v2_work_order_detail wod where wod.wo_id=wo.id GROUP BY wod.wo_id) as parts, " +
+                "(select sum(wod.parts_quantity * wod.closed_price) from v2_work_order_detail wod where wod.wo_id=wo.id and (wod.approved = true or wod.approved is null) GROUP BY wod.wo_id) as partsTotalPrice, " +
+                "wo.other_expense as otherExpense,wo.external_expense as externalExpense,wo.total_price as totalPrice, " +
+                "wo.evaluate_step_owner_name as evaluateStepOwnerName, " +
+                "wo.evaluate_step_end_time as evaluateStepEndTime," +
+                "wo.close_step_owner_name as closeStepOwnerName, " +
+                "wo.close_step_end_time as closeStepEndTime, " +
+                "(select string_agg(woc.cowoker_user_name,',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworker, " +
+                "(select string_agg(to_char(woc.man_hours,'9999990.99'),',') from v2_work_order_coworker woc where woc.wo_id=wo.id GROUP BY woc.wo_id) as coworkManHour, " +
+                "sr.nearest_sr_days as nearestWorkDay,sr.confirmed_down_time as confirmedDownTime,sr.confirmed_up_time as confirmedUpTime,wo.feedback_rating as feedbackRating, " +
+                "ua.telephone as telephone," +
+                "aft.fault_name as caseTypeName, " +
+                "ai.status as assetStatus," +
+                "wo.signature as signature,wo.ack_signature as ackSignature,wo.maintenance_value as maintenanceValue,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes " +
+                "from v2_work_order wo " +
+                "LEFT JOIN v2_service_request sr ON wo.sr_id = sr.id " +
+                "LEFT JOIN asset_info ai2 ON ai2.id = wo.asset_id " +
+                "LEFT JOIN asset_info ai ON concat('MVS-',ai2.qr_code) = ai.system_id " +
+                "LEFT JOIN user_account ua ON ua.id = sr.requestor_id " +
+                "LEFT JOIN asset_fault_type aft ON aft.id=wo.case_type " +
+                "LEFT JOIN org_info oi ON ai.clinical_dept_uid = oi.uid " +
+                "WHERE 1=1 "
+        );
+        String filter = buildFilterForMVS(searchFilterList);
+        sb.append(filter);
+        sb.append(" order by wo.created_date desc ");
+
+        return sb.toString();
+
+    }
+
     private static final String FILTERPARTS_EXIST = "Exist";
     private static final String FILTERPARTS_UNEXIST = "UnExist";
     private static final String FILTERTOTALPRICE_EXIST = "Exist";
@@ -389,6 +446,78 @@ public class WorkOrderReportProvider {
 
         }
 
+        return sb.toString();
+
+    }
+
+    public String buildFilterForMVS(List<SearchFilter> searchFilterList){
+
+        StringBuilder sb = new StringBuilder();
+        for (SearchFilter searchFilter1 : searchFilterList) {
+            String tempColumn1 = searchFilter1.fieldName;
+            Object value1 = searchFilter1.value;
+            if(tempColumn1.equals("woIds")) {
+                String str1 = "";
+                List<Object> valueList = (List<Object>) value1;
+                if(valueList.size()==0) return null;
+                for (Object obj : (List<Object>) value1) {
+                    str1 += "'" + obj + "',";
+                }
+                str1 = str1.substring(0, str1.length() - 1);
+                sb.append("and wo.id in (" + str1 + ") ");
+
+                //页面原有的条件
+                for (SearchFilter searchFilter : searchFilterList) {
+                    String tempColumn = searchFilter.fieldName;
+                    Object value = searchFilter.value;
+                    SearchFilter.Operator op = searchFilter.operator;
+                    if(tempColumn.equals("orgUID")){
+                        sb.append(" and (ai.tenant_uid='" + value + "' or ai.institution_uid='" + value + "' or ai.hospital_uid='" + value + "' or ai.site_uid='" + value + "') ");
+                    }else if(tempColumn.equals("assetInfo.clinicalDeptUID")){
+                        String str = "";
+                        for (Object obj : (List<Object>)value) {
+                            str += "'" + obj + "',";
+                        }
+                        str = str.substring(0, str.length() - 1);
+                        sb.append(" and ai.clinical_dept_uid in (" + str + ") ");
+                    }else if(tempColumn.equals("currentPersonId")){
+                        sb.append(" and wo.current_person_id=" + value);
+                    }else if(tempColumn.equals("createdDate")){
+                        if(op.equals(SearchFilter.Operator.GTE)){
+                            sb.append(" and wo.created_date>='" + value + "' ");
+                        }else if (op.equals(SearchFilter.Operator.LT)) {
+                            sb.append(" and wo.created_date<'" + value + "' ");
+                        }
+                    }else if(tempColumn.equals("closeTime")){
+                        if(op.equals(SearchFilter.Operator.GTE)){
+                            sb.append(" and wo.close_time>='" + value + "' ");
+                        }else if (op.equals(SearchFilter.Operator.LT)){
+                            sb.append(" and wo.close_time<'" + value + "' ");
+                        }
+                    }else if(tempColumn.equals("status")){
+                        String str = "";
+                        for (Object obj : (List<Object>)value) {
+                            str += obj + ",";
+                        }
+                        str = str.substring(0, str.length() - 1);
+                        sb.append(" and wo.status in (" + str + ") ");
+                    }else if(tempColumn.equals("filterParts")){
+                        if(FILTERPARTS_EXIST.equals(value)){
+                            sb.append(" and (select count(*) from v2_work_order_detail wod where wod.wo_id=wo.id) > 0 ");
+                        }else if(FILTERPARTS_UNEXIST.equals(value)){
+                            sb.append(" and (select count(*) from v2_work_order_detail wod where wod.wo_id=wo.id) <= 0 ");
+                        }
+                    }else if(tempColumn.equals("filterTotalPrice")){
+                        if(FILTERTOTALPRICE_EXIST.equals(value)){
+                            sb.append(" and wo.total_price > 0 ");
+                        }else if(FILTERTOTALPRICE_UNEXIST.equals(value)){
+                            sb.append(" and wo.total_price <= 0 ");
+                        }
+                    }
+
+                }
+            }
+        }
         return sb.toString();
 
     }

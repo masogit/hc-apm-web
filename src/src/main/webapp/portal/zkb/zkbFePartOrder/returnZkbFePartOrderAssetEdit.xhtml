@@ -60,7 +60,7 @@
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbFePartOrderSparePartDetailController.saveReturnZkbFePartOrderAssetInfoTemp()}" update=":growl :zkbFePartOrderSparePartsEditForm:zkbFePartOrderReturnList"
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbFePartOrderSparePartDetailController.saveReturnZkbFePartOrderAssetInfoTemp()}" update=":growl :zkbFePartOrderSparePartsEditForm:zkbFePartOrderReturnList :zkbOrderRetrunModifyForm:zkbFePartOrderReturnListModify"
                  icon="ui-icon-check" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').hide()" />
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('returnZkbFePartOrderAssetInfoEditDlg').hide()"/>
         </h:form>

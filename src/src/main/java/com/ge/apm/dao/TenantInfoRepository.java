@@ -41,6 +41,14 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
      */
     List<TenantInfo> findByType(Integer type);
 
+    /**
+     * 根据类型和名称获取
+     * @param type  类型
+     * @param name 名称
+     * @return
+     */
+    List<TenantInfo> findByTypeAndNameNotLike(Integer type,String name);
+
     TenantInfo findByUid(String uid);
 
     @Modifying
@@ -57,4 +65,7 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
      * @return
      */
     List<TenantInfo> findByUidIn(Set<String> uidSet);
+
+    @Query(value = " select ti.* from tenant_info ti join supplier_tenant_join stj on stj.tenant_id = ti.id where stj.supplier_id = ?1  ", nativeQuery = true)
+    List<TenantInfo> findSupplierJoinTenant(Integer  siteId);
 }

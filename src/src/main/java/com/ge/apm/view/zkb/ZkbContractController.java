@@ -5,10 +5,13 @@ import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
@@ -141,6 +144,13 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedid=".concat(selected.getId()));
     }
 
+    public void doubleClick(SelectEvent event){
+        selected = (ZkbContract) event.getObject();
+        String str = "action=Edit&selectedid=".concat(selected.getId());
+        String url = "Edit.xhtml?str="+ UrlParamUtil.encodeUrlQueryString(str);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
 
     private StreamedContent exportFile;
     public void exportAll(){
@@ -160,7 +170,7 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/contract/excel/APM_ZKB_Contract_Exp_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            zkbContractService.exportData(doc, zkbContractDataList, zkbContractService.createZkbContractCourseData(zkbContractDataList), zkbContractService.createZkbContractAssetData(zkbContractDataList));
+            zkbContractService.exportData(doc, zkbContractDataList);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZKBContractData.xlsx");
         } catch (IOException ex) {
             Logger.getLogger(ZkbContractController.class.getName()).log(Level.SEVERE, null, ex);
@@ -182,10 +192,10 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     public boolean isDeleteCanOperate(){
         if(this.selected == null){
-            return true;
+            return false;
         }
         if(StringUtils.isEmpty(this.selected.getId())){
-            return true;
+            return false;
         }else{
             if(operateFlag){
                 return true;

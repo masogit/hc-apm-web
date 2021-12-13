@@ -938,11 +938,12 @@ public class UserContextService implements Serializable {
         return false;
     }
 
-    public boolean isZkbFeUserConfig() {
+    public boolean isZkbFeUserConfig(String configType)
+    {
         UserAccount user = getLoginUser();
         if(StringUtils.isBlank(user.getLoginName()))
             return false;
-        List<ZkbFePartOrderUserConfig>  zkbFePartOrderUserConfig= this.zkbFePartOrderUserConfigRepository.findByLoginName(user.getLoginName());
+        List<ZkbFePartOrderUserConfig>  zkbFePartOrderUserConfig= this.zkbFePartOrderUserConfigRepository.findByLoginNameAndConfigType(user.getLoginName(),configType);
         if(CollectionUtils.isNotEmpty(zkbFePartOrderUserConfig))
             return true;
         return false;
@@ -969,6 +970,14 @@ public class UserContextService implements Serializable {
     public boolean isMvsTenant() {
         TenantInfo tenantInfo = getTenantInfo();
         return ApmConstant.MVS_TENANT_NAME.equals(tenantInfo.getName());
+    }
+
+    public boolean isSupportMultiLanguage(){
+        TenantInfo tenantInfo = getTenantInfo();
+        if(tenantInfo.getIsSupportMultiLanguage() != null && tenantInfo.getIsSupportMultiLanguage() == true){
+            return true;
+        }
+        return false;
     }
 
     public boolean isYiMaiYangGuangTenant() {

@@ -10,6 +10,7 @@
 <ui:composition>
     <h:panelGroup id="zkbFePartOrderSparePartsEditpanelGroup">
         <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='SpareParts'}">
+            <p:messages id="messages" showDetail="true" closable="false" autoUpdate="true" ></p:messages>
             <p:fieldset id="zkbWorkFlowFieldset" legend="工单信息" >
                 <h:form id="searchForm">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbFePartOrderSparePartDetailController.workFlowInFistStep()}">
@@ -21,7 +22,7 @@
                         <label class="label">#{msg.zkbFePartOrder_sr}</label>
                         <p:inputText id="fatherPartOrderNo" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  />
                     </h:panelGroup>
-                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderSparePartDetailController.getSparePartsZkbFePartOrder(param['searchForm:systemId'],param['searchForm:fatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderForm:sparePartsZkbFePartOrder"/>
+                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderSparePartDetailController.getSparePartsZkbFePartOrder(param['searchForm:systemId'],param['searchForm:fatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderForm:sparePartsZkbFePartOrder messages"/>
                 </p:panelGrid>
                 </h:form>
                 <h:form id="zkbFePartOrderForm">
@@ -29,7 +30,7 @@
                              widgetVar="sparePartsZkbFePartOrder" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrder}"
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.reportDate}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm" />
+                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm messages" />
                     <p:column headerText="报修单号">
                         <h:outputText value="#{item.partOrderNo}"/>
                     </p:column>
@@ -86,10 +87,6 @@
                     <p:column headerText="#{msg.zkbContract_spareQuota}">
                         <h:outputText value="#{item.spareQuota}"/>
                     </p:column>
-<!--                    <p:column headerText="#{msg.zkbContract_probeQuota}" >-->
-<!--                        <h:outputText value="#{item.probeQuota}"/>-->
-<!--                    </p:column>-->
-
                     <p:column headerText="探头任意剩余名额" >
                         <h:outputText value="#{item.probeQuota}"/>
                     </p:column>
@@ -99,10 +96,6 @@
                     <p:column headerText="探头特殊剩余名额" >
                         <h:outputText value="#{item.probeQuotaSpecial}"/>
                     </p:column>
-<!--                    <p:column headerText="探头高值剩余名额" >-->
-<!--                        <h:outputText value="#{item.probeQuotaHigh}"/>-->
-<!--                    </p:column>-->
-
                     <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
                         <h:outputText value="#{item.geArtificialSupportTimes}"/>
                     </p:column>
@@ -122,6 +115,7 @@
                     <f:facet name="{Toolbar}">
                     </f:facet>
                 </p:dataTable>
+                <p:outputLabel id="tips" rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested') and zkbFePartOrderSparePartDetailController.checkContractDate()}" style="color: red;font-weight:bold;margin-left: 30px;font-size: larger"  value="您选择的合同已不在有效期内，请结合业务确认是否继续申请流程！"/>
             </p:fieldset>
             <p:fieldset id="basicInfoMation"  legend="基本信息" >
                 <p:panelGrid columns="3"  layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -129,10 +123,6 @@
                             <label class="label">#{msg.zkbFePartOrder_systemId}</label>
                             <p:inputText   disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.systemId}"    />
                         </h:panelGroup>
-<!--                        <h:panelGroup>-->
-<!--                            <label class="label">报修单号</label>-->
-<!--                            <p:inputText  disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.fatherPartOrderNo}" />-->
-<!--                        </h:panelGroup>-->
                         <h:panelGroup rendered="#{'2'.equals(zkbFePartOrderSparePartDetailController.selected.assetGroup)}">
                             <label class="label">#{msg.zkbFePartOrder_artificialType}*</label>
                             <p:selectOneMenu id="artificialType" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')||'highMachine' eq zkbFePartOrderSparePartDetailController.selected.assetType}" value="#{zkbFePartOrderSparePartDetailController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbFePartOrder_artificialType} #{msg.ValidationRequire}">
@@ -144,10 +134,6 @@
                             <label class="label">#{msg.zkbFePartOrder_reportUser}</label>
                             <p:inputText id="applyPerson" disabled="true"   value="#{zkbFePartOrderSparePartDetailController.selected.reportUser}"  />
                         </h:panelGroup>
-<!--                        <h:panelGroup>-->
-<!--                            <label class="label">#{msg.zkbFePartOrder_applyPersonPhone}</label>-->
-<!--                            <p:inputText id="applyPersonPhone" value="#{zkbFePartOrderSparePartDetailController.selected.applyPersonPhone}" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" />-->
-<!--                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.zkbFePartOrder_probeReportDate}</label>
                             <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.reportDate}"
@@ -179,10 +165,6 @@
                             <label class="label">#{msg.zkbFePartOrder_productNumber}</label>
                             <p:inputText id="productNumber"  disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.productNumber}" />
                         </h:panelGroup>
-<!--                        <h:panelGroup>-->
-<!--                            <label class="label">#{msg.zkbFePartOrder_softwareVersion}*</label>-->
-<!--                            <p:inputText id="softwareVersion" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" required="true" requiredMessage="#{msg.zkbFePartOrder_softwareVersion} #{msg.ValidationRequire}"  value="#{zkbFePartOrderSparePartDetailController.selected.softwareVersion}" />-->
-<!--                        </h:panelGroup>-->
                         <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('Requested')}">
                             <label class="label">#{msg.zkbFePartOrder_currentStatus}</label>
                             <p:selectOneMenu id="status" disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.status}">
@@ -247,16 +229,26 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
+                <p:fieldset id="CommercialManagementFieldset" legend="Commercial确认信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingCommercial')}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingCommercial')}">
+                            <label class="label">#{msg.zkbFePartOrder_commercialAssignUser}*：</label>
+                            <p:inputText  disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.commercialAssignUser}"  />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingCommercial')}">
+                            <label class="label">#{msg.zkbFePartOrder_commercialAssignDate}*：</label>
+                            <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.commercialAssignDate}"
+                                        showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_commercialComment}</label>
+                            <p:inputTextarea  id="commercialComment" required="true" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" requiredMessage="#{msg.zkbFePartOrder_commercialComment} #{msg.ValidationRequire}" value="#{zkbFePartOrderSparePartDetailController.selected.commercialComment}" rows="2" cols="20">
+                            </p:inputTextarea>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
             <p:fieldset id="apmFieldset" legend="400下单信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-<!--                    <h:panelGroup >-->
-<!--                        <label class="label">#{msg.zkbFePartOrder_sr}*</label>-->
-<!--                        <p:inputText disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderSparePartDetailController.selected.sr}"  required="true" requiredMessage="#{msg.zkbFePartOrder_sr} #{msg.ValidationRequire}"/>-->
-<!--                    </h:panelGroup>-->
-<!--                    <h:panelGroup>-->
-<!--                        <label class="label">#{msg.zkbFePartOrder_act}*</label>-->
-<!--                        <p:inputText disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderSparePartDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>-->
-<!--                    </h:panelGroup>-->
                     <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingApm')}">
                         <label class="label">#{msg.zkbFePartOrder_orderedPerson}*：</label>
                         <p:inputText  disabled="true"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoUser}"  />
@@ -266,6 +258,9 @@
                         <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoDate}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
+<!--                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.hasOrderModifyRight()}">-->
+<!--                        <p:commandButton process="@this" icon="ui-icon-pencil" value="下单信息修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>-->
+<!--                    </h:panelGroup>-->
                 </p:panelGrid>
                 <p:dataTable id="zkbFePartOrderAssetInfoList_APM" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item"
                              widgetVar="zkbFePartOrderAssetInfoList_APM" selectionMode="single"
@@ -287,18 +282,14 @@
                         <p:inputText  disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.price}"  />
                     </p:column>
                     <p:column headerText="#{msg.zkbFePartOrder_spareParts}">
-                        <p:inputText disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.sparePart}"  />
+                        <p:inputTextarea disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.sparePart}"  />
                     </p:column>
                 </p:dataTable>
             </p:fieldset>
             <p:fieldset id="geAdminFieldset" legend="FE归还信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
-<!--                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
-<!--                    <h:panelGroup>-->
-<!--                        <label class="label">备注</label>-->
-<!--                        <p:inputTextarea disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" id="geAdminComment" value="#{zkbFePartOrderSparePartDetailController.selected.geAdminComment}" rows="2" cols="20">-->
-<!--                        </p:inputTextarea>-->
-<!--                    </h:panelGroup>-->
-<!--                </p:panelGrid>-->
+<!--                <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.hasOrderReturnModifyRight()}">-->
+<!--                    <p:commandButton process="@this" icon="ui-icon-pencil" value="FE归还信息修改" update="growl zkbPartOrderRetrunModifyDlg"  oncomplete="PF('zkbPartOrderRetrunModifyDlg').show()"/>-->
+<!--                </h:panelGroup>-->
                 <p:dataTable id="zkbFePartOrderReturnList" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderReturnList}" var="item"
                              widgetVar="zkbFePartOrderReturnList" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn}"
                              lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
@@ -324,12 +315,6 @@
                     <p:column headerText="#{msg.zkbFePartOrder_remark}">
                         <h:outputText value="#{item.comment}"/>
                     </p:column>
-<!--                    <p:column headerText="Part Serial Number">-->
-<!--                        <h:outputText value="#{item.partSerialNumber}"/>-->
-<!--                    </p:column>-->
-<!--                    <p:column headerText="故障描述">-->
-<!--                        <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_partQualityIssue', item.partQualityIssue)}"/>-->
-<!--                    </p:column>-->
                     <f:facet name="{Toolbar}">
                         <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" immediate="false" process="@this" id="createReturnDetailButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemCreate}"  update="returnZkbFePartOrderAssetInfoEditForm" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" />
                         <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" immediate="false" process="@this" id="editReturnDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemEdit}" update="returnZkbFePartOrderAssetInfoEditForm"  oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" disabled="#{zkbFePartOrderSparePartDetailController.returnItemDisabled}" />
@@ -339,10 +324,11 @@
                     </f:facet>
                 </p:dataTable>
             </p:fieldset>
-
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.saveAndToListPage}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="暂不订购" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.supplierReject}" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" value="同意" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.commercialAccept(param['zkbFePartOrderSparePartsEditForm:commercialComment'])}" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" value="不同意" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.commercialReject}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderSparePartsEditForm"  validateClient="true" action="#{zkbFePartOrderSparePartDetailController.fullApmInfo}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderSparePartsEditForm"  validateClient="true" action="#{zkbFePartOrderSparePartDetailController.geAdminReturn}" style="float:left"/>
             <p:commandButton  immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbFePartOrderSparePartDetailController.backList}" />

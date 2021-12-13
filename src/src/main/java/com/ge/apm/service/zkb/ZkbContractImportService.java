@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
+import java.text.ParseException;
 import java.time.*;
 import java.util.*;
 
@@ -28,6 +29,7 @@ public class ZkbContractImportService {
     public static final String SHEET_SERVICE_CONTRACT = "合同";
     public static final String SHEET_SERVICE_CONTRACT_COURSE = "相关课程";
     public static final String SHEET_SERVICE_CONTRACT_Asset = "相关设备";
+    public static final String SHEET_SERVICE_CONTRACT_Cat = "相关高值探头";
     public static final int EXCEL_CONTRACT_HEADER_ROW = 1;
     public static final int EXCEL_CONTRACT_DATA_ROW = 2;
 
@@ -53,6 +55,9 @@ public class ZkbContractImportService {
     private TenantInfoRepository tenantInfoDao;
     @Autowired
     private ZkbContractLogService zkbContractLogService;
+
+    @Autowired
+    private ZkbContractCatRepository zkbContractCatRepository;
 
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
@@ -90,8 +95,6 @@ public class ZkbContractImportService {
 
             Map<String, Object> map = new LinkedHashMap();
             ZkbContractVO contractInfoVO = new ZkbContractVO();
-
-
             contractInfoVO.setLineNum(i);
 
             ZkbContractRow contractRow = new ZkbContractRow(contractInfoVO, rowMap);
@@ -99,8 +102,9 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("区域","setRegion");
             contractRow.setFieldStringValue("代理商","setAgentName");
             contractRow.setFieldStringValue("合同类型", "setContractType");
-            contractRow.setFieldDateValue("合同开始日期", "setStartDate");
-            contractRow.setFieldDateValue("合同结束日期", "setEndDate");
+            contractRow.setFieldDateValue("合同开始日期", "setContractStartDate");
+            contractRow.setFieldDateValue("合同结束日期", "setContractEndDate");
+            contractRow.setFieldStringValue("名额扣除类型", "setQuotaDeductType");
             contractRow.setFieldNumValue("IB数量", "setIbNumber");
             contractRow.setFieldNumValue("备件剩余名额", "setSpareQuota");
             contractRow.setFieldNumValue("备件总额", "setSpareQuotaTotal");
@@ -111,7 +115,6 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("探头任意总额", "setProbeQuotaTotal");
             contractRow.setFieldNumValue("探头任意剩余名额", "setProbeQuota");
             contractRow.setFieldNumValue("探头任意已使用名额", "setProbeQuotaUse");
-
 
             contractRow.setFieldNumValue("探头普通总额", "setProbeQuotaNormalTotal");
             contractRow.setFieldNumValue("探头普通剩余名额", "setProbeQuotaNormal");
@@ -128,6 +131,7 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("备件+人工+保养总额", "setSpareArtificailTotal");
             contractRow.setFieldNumValue("备件+人工+保养剩余名额", "setSpareArtificail");
             contractRow.setFieldNumValue("备件+人工+保养已使用名额", "setSpareArtificailUse");
+            contractRow.setFieldStringValue("是否ZKB 599方案", "setFiveNineNineFlag");
             contractRow.setFieldStringValue("备注", "setRemark");
 
             if(contractInfoVO.isNull()){
@@ -190,6 +194,15 @@ public class ZkbContractImportService {
     protected void importOneContract(ZkbContractVO contractInfoVO,UserAccount currentUser) {
         ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
         if(zkbContract != null){
+            if(StringUtils.isNotEmpty(contractInfoVO.getQuotaDeductType())){
+                if("旧逻辑扣减".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+                }else if("新逻辑扣减".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }else if("N/A".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+                }
+            }
             zkbContract.setSpareQuotaTotal(contractInfoVO.getSpareQuotaTotal());
             zkbContract.setSpareQuota(contractInfoVO.getSpareQuota());
             zkbContract.setSpareQuotaUse(contractInfoVO.getSpareQuotaUse());
@@ -206,6 +219,26 @@ public class ZkbContractImportService {
             zkbContract.setGeArtificialSupportTimes(contractInfoVO.getGeArtificialSupportTimes());
             zkbContract.setGeArtificialSupportTimesUse(contractInfoVO.getGeArtificialSupportTimesUse());
 
+            if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
+                if("是".equals(contractInfoVO.getFiveNineNineFlag())){
+                    zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
+                    zkbContract.setYearCount(1);
+                    zkbContract.setStartDate(zkbContract.getContractStartDate());
+                    int year = zkbContract.getYearCount() == null ? 1 :  zkbContract.getYearCount();
+                    if(zkbContract.getYearCount() == null){
+                        zkbContract.setYearCount(1);
+                    }
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(zkbContract.getContractStartDate());
+                    cal.add(Calendar.YEAR, year);
+                    cal.add(Calendar.DATE, -1);
+                    zkbContract.setEndDate(cal.getTime());
+                }else{
+                    zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.N.toString());
+                    zkbContract.setStartDate(zkbContract.getContractStartDate());
+                    zkbContract.setEndDate(zkbContract.getContractEndDate());
+                }
+            }
             zkbContract.setLastModifiedBy(currentUser.getLoginName());
             zkbContract.setLastModifiedDate(new Date());
             zkbContractRepository.save(zkbContract);
@@ -214,7 +247,31 @@ public class ZkbContractImportService {
             BeanUtils.copyProperties(contractInfoVO, newZkbContract);
             newZkbContract.setCreatedBy(currentUser.getLoginName());
             newZkbContract.setCreatedDate(new Date());
-
+            if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
+                if("旧逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+                }else if("新逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }else if("N/A".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+                }
+            }
+            if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
+                if("是".equals(contractInfoVO.getFiveNineNineFlag())){
+                    newZkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
+                    newZkbContract.setYearCount(1);
+                    newZkbContract.setStartDate(newZkbContract.getContractStartDate());
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(newZkbContract.getContractStartDate());
+                    cal.add(Calendar.YEAR, 1);
+                    cal.add(Calendar.DATE, -1);
+                    newZkbContract.setEndDate(cal.getTime());
+                }else{
+                    newZkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.N.toString());
+                    newZkbContract.setStartDate(newZkbContract.getContractStartDate());
+                    newZkbContract.setEndDate(newZkbContract.getContractEndDate());
+                }
+            }
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
             newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
             newZkbContract.setGeArtificialSupportTimesApply(newZkbContract.getGeArtificialSupportTimesTotal() - newZkbContract.getGeArtificialSupportTimesUse() - newZkbContract.getGeArtificialSupportTimes());
@@ -261,20 +318,39 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractTypeIsEmpty"));
             isValidateData = false;
         }else{
-            if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){
+            /*if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){
                 item.put("status", ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTypeIsNotRange"));
                 isValidateData = false;
+            }*/
+        }
+        if(StringUtils.isEmpty(contractInfoVO.getFiveNineNineFlag())){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item, "是否ZKB 599方案不能为空！");
+            isValidateData = false;
+        }else{
+            if("是".equals(contractInfoVO.getFiveNineNineFlag()) && contractInfoVO.getContractStartDate() != null && contractInfoVO.getContractEndDate() != null){
+                try {
+                    int n = CopyByInvok.getBetweenYear(contractInfoVO.getContractStartDate(),contractInfoVO.getContractEndDate());
+                    if(n < 3){
+                        item.put("status", ImportStatus.Failure);
+                        ZkbContractRow.addErrMessage(item, "ZKB 599方案的合同有效期不能小于3年！");
+                        isValidateData = false;
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
 
-        if(contractInfoVO.getStartDate() == null){
+        if(contractInfoVO.getContractStartDate() == null){
             item.put("status", ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorStartTimeIsEmpty"));
             isValidateData = false;
         }
 
-        if(contractInfoVO.getEndDate() == null ){
+        if(contractInfoVO.getContractEndDate() == null ){
             item.put("status", ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractEndTimeEmpty"));
             isValidateData = false;
@@ -290,6 +366,11 @@ public class ZkbContractImportService {
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTenantUIDExist"));
                 isValidateData = false;
             }
+        }
+        if(StringUtils.isEmpty(contractInfoVO.getQuotaDeductType())){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item, "探头名额扣除类型不能为空！");
+            isValidateData = false;
         }
 
         int spareQuotaTotal = contractInfoVO.getSpareQuotaTotal() == null ? 0 : contractInfoVO.getSpareQuotaTotal();
@@ -354,7 +435,13 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item,  "备件/人工/保养总额小于备件/人工/保养剩余名额、备件/人工/保养已使用名额之和");
             isValidateData = false;
         }
-
+        if(ZkbContract.ContractType.Biomed.toString().equals(contractInfoVO.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(contractInfoVO.getContractType())) {
+            if (ZkbContract.QuotaDeductTypeEnum.Null.toString().equals(contractInfoVO.getQuotaDeductType())) {
+                item.put("status", ImportStatus.Failure);
+                ZkbContractRow.addErrMessage(item, "合同扣除类型不能为N/A");
+                isValidateData = false;
+            }
+        }
         for (Map<String, Object> tempContractMap: importContractMapList) {
             ZkbContractVO tempZkbContractVO = (ZkbContractVO)tempContractMap.get("contractInfoVO");
             Integer tempHashCode = Integer.valueOf(tempContractMap.get("hashCode").toString());
@@ -561,6 +648,7 @@ public class ZkbContractImportService {
             zkbContractAssetRow.setFieldStringValue("责任工程师","setResponsiblEngineer");
             zkbContractAssetRow.setFieldStringValue("KA","setKa");
             zkbContractAssetRow.setFieldStringValue("维修类型","setRepairForm");
+            zkbContractAssetRow.setFieldStringValue("是否代理商自身原因未完成培训","setTrainReasonFlag");
 
             map.put("zkbContractAssetVO", zkbContractAssetVO);
             map.put("rowData", rowMap);
@@ -571,14 +659,13 @@ public class ZkbContractImportService {
         return result;
     }
 
-    public List<ZkbContractCourse> importAssetData(List<Map<String, Object>>impAssetMap,UserAccount currentUser){
+    public void importAssetData(List<Map<String, Object>>impAssetMap,UserAccount currentUser){
         for (Map<String, Object> item : impAssetMap) {
             ZkbContractAssetVO zkbContractAssetVO = (ZkbContractAssetVO)item.get("zkbContractAssetVO");
             if(zkbContractAssetVO != null && checkAssetData(item,impAssetMap)) {
                 importOneContractAsset(zkbContractAssetVO,currentUser);
             } 
         }
-        return null;
     }
 
     public boolean checkAssetData(Map<String, Object> item, List<Map<String, Object>> importContractCourseMapList){
@@ -613,7 +700,24 @@ public class ZkbContractImportService {
                 item.put("status", ImportStatus.Failure);
                 ZkbContractAssetRow.addErrMessage(item, WebUtil.getMessage("ErrorImpZkbQrCodeIsNotExist"));
             }else{
-                zkbContractAssetVO.setAssetId(assetInfo.getUid());
+                boolean flag = true;
+                if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
+                    flag = false;
+                }
+                if(!assetInfo.getIsValid()){
+                    flag = false;
+                }
+                if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
+                    flag = false;
+                }
+
+                if(!flag){
+                    isValidateData = false;
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractAssetRow.addErrMessage(item, "设备状态异常，请检查！");
+                }else{
+                    zkbContractAssetVO.setAssetId(assetInfo.getUid());
+                }
             }
         }
 
@@ -659,6 +763,11 @@ public class ZkbContractImportService {
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getAssetType())){
                     zkbContractAsset.setAssetType(getHighLowAssetFromCh(zkbContractAssetVO.getAssetType()));
                 }
+                if(StringUtils.isNotEmpty(zkbContractAssetVO.getTrainReasonFlag())){
+                    zkbContractAsset.setTrainReasonFlag(getTrainReasonFlagFromCh(zkbContractAssetVO.getTrainReasonFlag()));
+                }else {
+                    zkbContractAsset.setTrainReasonFlag("empty");
+                }
                 zkbContractAssetRepository.save(zkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetEdit","",zkbContractAssetVO.getQrCode(),"导入设备编辑",currentUser);
 
@@ -679,6 +788,11 @@ public class ZkbContractImportService {
                 newZkbContractAsset.setHighLowMachine(zkbContractAssetVO.getHighLowMachine());
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getAssetType())){
                     newZkbContractAsset.setAssetType(getHighLowAssetFromCh(zkbContractAssetVO.getAssetType()));
+                }
+                if(StringUtils.isNotEmpty(zkbContractAssetVO.getTrainReasonFlag())){
+                    newZkbContractAsset.setTrainReasonFlag(getTrainReasonFlagFromCh(zkbContractAssetVO.getTrainReasonFlag()));
+                }else {
+                    newZkbContractAsset.setTrainReasonFlag("empty");
                 }
                 newZkbContractAsset.setSubRegion(zkbContractAssetVO.getSubRegion());
                 newZkbContractAsset.setModality(zkbContractAssetVO.getModality());
@@ -702,12 +816,26 @@ public class ZkbContractImportService {
             zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetDelete","",zkbContractAssetVO.getQrCode(),"导入删除",currentUser);
         }
     }
+
     public String getHighLowAssetFromCh(String va){
         switch (va){
             case "超声高端机":
                 return "highMachine";
             case "超声低端机":
                 return "lowMachine";
+            case "N/A":
+                return "empty";
+            default:
+                return "";
+        }
+    }
+
+    public String getTrainReasonFlagFromCh(String va){
+        switch (va){
+            case "是":
+                return "t";
+            case "否":
+                return "f";
             case "N/A":
                 return "empty";
             default:
@@ -727,6 +855,110 @@ public class ZkbContractImportService {
                 return null;
         }
     }
+    //endregion
+
+    //region 合同高值探头
+    public List<Map<String, Object>> getContractCatMapFromTemplate(ExcelDocument doc) throws Exception{
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (int i = EXCEL_CONTRACT_DATA_ROW ; i <= doc.getWorkBook().getSheet(SHEET_SERVICE_CONTRACT_Cat).getLastRowNum() + 1 ; i++) {
+            Map< String, Object> rowMap = doc.getDataRowMap(SHEET_SERVICE_CONTRACT_Cat, EXCEL_CONTRACT_HEADER_ROW, i);
+            Map<String, Object> map = new LinkedHashMap();
+            ZkbContractCatVO zkbContractCatVO = new ZkbContractCatVO();
+            zkbContractCatVO.setLineNum(i);
+
+            ZkbContractCatRow zkbContractCatRow = new ZkbContractCatRow(zkbContractCatVO, rowMap);
+            zkbContractCatRow.setFieldStringValue("合同号", "setContractNo");
+            zkbContractCatRow.setFieldStringValue("SN编号","setSnNo");
+            zkbContractCatRow.setFieldStringValue("状态","setEnabledName");
+
+            map.put("zkbContractCatVO", zkbContractCatVO);
+            map.put("rowData", rowMap);
+            map.put("status", StringUtils.isEmpty(zkbContractCatVO.getId()) ? ImportStatus.New.name() : ImportStatus.Exist.name());
+            map.put("hashCode", zkbContractCatVO.hashCode());
+            result.add(map);
+        }
+        return result;
+    }
+    public void importCatData(List<Map<String, Object>>impCatMap,UserAccount currentUser){
+        for (Map<String, Object> item : impCatMap) {
+            ZkbContractCatVO zkbContractCatVO = (ZkbContractCatVO)item.get("zkbContractCatVO");
+            if(zkbContractCatVO != null && checkCatData(item,impCatMap)) {
+                importOneContractCat(zkbContractCatVO,currentUser);
+            }
+        }
+    }
+
+    public boolean checkCatData(Map<String, Object> item, List<Map<String, Object>> importContractCatMapList){
+        boolean isValidateData = true;
+        ZkbContractCatVO zkbContractCatVO = (ZkbContractCatVO)item.get("zkbContractCatVO");
+        Integer hashCode = Integer.valueOf(item.get("hashCode").toString());
+
+        ZkbContractCatRow.clearErrMessage(item);
+        if(zkbContractCatVO.getContractNo() == null){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractCatRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNumberIsEmpty"));
+            isValidateData = false;
+        }else {
+            ZkbContract zkbContract =  queryContractByNo(zkbContractCatVO.getContractNo());
+            if(zkbContract == null){
+                isValidateData = false;
+                item.put("status", ImportStatus.Failure);
+                ZkbContractCatRow.addErrMessage(item, WebUtil.getMessage("ErrorContractIsNotExist"));
+            }else{
+                zkbContractCatVO.setContractId(zkbContract.getId());
+            }
+        }
+
+        if(StringUtils.isEmpty(zkbContractCatVO.getSnNo())){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractCatRow.addErrMessage(item, "SN编号不能为空");
+            isValidateData = false;
+        }else{
+            if(StringUtils.isNotEmpty(zkbContractCatVO.getContractId())){
+                ZkbContractCat zkbContractCat = zkbContractCatRepository.findFirstByContractIdAndSnNo(zkbContractCatVO.getContractId(),zkbContractCatVO.getSnNo());
+                if(zkbContractCat != null){
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractCatRow.addErrMessage(item, "SN编号不能重复");
+                    isValidateData = false;
+                }
+            }
+        }
+
+        if(zkbContractCatVO.getEnabledName() == null){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractCatRow.addErrMessage(item, "状态不能为空");
+            isValidateData = false;
+        }
+
+        for (Map<String, Object> tempContractCatMap: importContractCatMapList) {
+            ZkbContractCatVO tempZkbContractCatVO = (ZkbContractCatVO)tempContractCatMap.get("zkbContractCatVO");
+            Integer tempHashCode = Integer.valueOf(tempContractCatMap.get("hashCode").toString());
+            if(hashCode.equals(tempHashCode) && zkbContractCatVO.getLineNum() != tempZkbContractCatVO.getLineNum()){
+                item.put("status", ImportStatus.Failure);
+                ZkbContractCatRow.addErrMessage(item, WebUtil.getMessage("ErrorDuplicatedData"));
+                isValidateData = false;
+                break;
+            }
+        }
+        return isValidateData;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void  importOneContractCat(ZkbContractCatVO zkbContractCatVO,UserAccount currentUser){
+        ZkbContractCat zkbContractCat = new ZkbContractCat();
+        zkbContractCat.setContractId(zkbContractCatVO.getContractId());
+        zkbContractCat.setSnNo(zkbContractCatVO.getSnNo());
+        if("可用".equals(zkbContractCatVO.getEnabledName())){
+            zkbContractCat.setEnabled(true);
+        }else if("不可用".equals(zkbContractCatVO.getEnabledName())){
+            zkbContractCat.setEnabled(false);
+        }
+        zkbContractCat.setCreatedBy(currentUser.getName());
+        zkbContractCat.setCreatedDate(new Date());
+        zkbContractCatRepository.save(zkbContractCat);
+        zkbContractLogService.addLog(zkbContractCatVO.getContractId(),zkbContractCatVO.getContractNo(),"catAdd","",zkbContractCatVO.getSnNo(),"导入新增",currentUser);
+    }
+
     //endregion
 
 

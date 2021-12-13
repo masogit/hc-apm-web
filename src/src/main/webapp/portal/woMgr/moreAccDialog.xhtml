@@ -16,7 +16,10 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.PartQuantity}*</label>
-                        <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity1" value="#{workOrderMgrController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
+                        <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity1" value="#{workOrderMgrController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
+                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)" >
+                            </p:ajax>
+                        </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
@@ -28,7 +31,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
-                        <img src="#{fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
+                        <img src="#{workOrderMgrController.itemDetail.detailReviewSignature == null ? '' :  fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
@@ -163,7 +166,10 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.PartQuantity}*</label>
-                        <p:inputNumber  decimalPlaces="0"  id="apartsQuantity" value="#{workOrderMgrController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
+                        <p:inputNumber  decimalPlaces="0"  id="apartsQuantity" value="#{workOrderMgrController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
+                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)" >
+                            </p:ajax>
+                        </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup id="remainingStock" rendered="#{workOrderMgrController.statusFlag==1}">
                         <label class="label">所剩库存</label>
@@ -181,7 +187,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
-                        <img src="#{fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
+                        <img src="#{workOrderMgrController.itemDetail.detailReviewSignature == null ? '' :  fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
                     </h:panelGroup>
 
                     <h:panelGroup id="invoiceNum">

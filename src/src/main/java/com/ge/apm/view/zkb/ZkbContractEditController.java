@@ -1,11 +1,13 @@
 package com.ge.apm.view.zkb;
 
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -40,6 +42,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private ZkbContractAsset zkbContractAssetSelected;
     private String actionDetailName;
     private String actionAssetName;
+    private String actionCatName;
     private ZkbContractService zkbContractService;
     private UserContextService userContextService;
     private AssetTagService assetTagService;
@@ -51,10 +54,13 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     private List<ZkbContractCourse> contractCourseList ;
     private List<ZkbContractAsset> zkbContractAssetList;
+    private List<ZkbContractCat> zkbContractCatList;
     private String reason;
     private boolean operateFlag = false;
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
-    private boolean newContractFlag = false;
+    private ZkbContractCat zkbContractCatSelected;
+    private List<I18nMessage> quotaDeductTypeList = new ArrayList<>();
+    I18nMessageRepository i18nMessageRepository;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -69,6 +75,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         zkbContractService = WebUtil.getBean(ZkbContractService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         assetTagService = WebUtil.getBean(AssetTagService.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
@@ -83,21 +90,16 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             } catch (InstantiationException e) {
                 e.printStackTrace();
             }
-
         }else {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             this.selected = dao.findById(selectedId);
             contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
             this.selected.setZkbContractCourses(contractCourseList);
             zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
+            zkbContractCatList = zkbContractService.queryCatByContractId(this.selected.getId());
             prepareEdit();
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            if(zkbContractService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(selected.getStartDate()))< 0){
-                newContractFlag = false;
-            }else{
-                newContractFlag = true;
-            }
         }
+        queryQuota();
         targetAssets = new ArrayList();
         queryAsset = new AssetInfo();
         this.getQueryAssetsList();
@@ -135,6 +137,38 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         zkbContractAssetList = new ArrayList<>();
     }
 
+
+    public void queryQuota(){
+        if(StringUtils.isEmpty(selected.getContractType())){
+            quotaDeductTypeList = i18nMessageRepository.getByMsgType("zkbContractQuotaDeductType");
+        }else if(ZkbContract.ContractType.Biomed.toString().equals(selected.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(selected.getContractType())){
+            quotaDeductTypeList = i18nMessageRepository.getByMsgType("zkbContractQuotaDeductType");
+            for(I18nMessage i : quotaDeductTypeList){
+                if(i.getMsgKey().equals(ZkbContract.QuotaDeductTypeEnum.Null.toString())){
+                    quotaDeductTypeList.remove(i);
+                    break;
+                }
+            }
+        }else{
+            quotaDeductTypeList = i18nMessageRepository.getByMsgType("zkbContractQuotaDeductType");
+        }
+    }
+
+    public void contractTypeSelect(){
+        queryQuota();
+        if ("Create".equalsIgnoreCase(actionName)) {
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
+                selected.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+            }
+        }else {
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
+                if(StringUtils.isEmpty(selected.getQuotaDeductType())){
+                    selected.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+                }
+            }
+        }
+    }
+
     /**
      * 合同编辑前操作
      */
@@ -158,7 +192,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
             return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedid=".concat(selected.getId()));
         }else{
-            WebUtil.addErrorMessage(WebUtil.getMessage("ErrorContractNoIsExist"));
+            String errorLog = (String) r.get("errorLog");
+            WebUtil.addErrorMessage(errorLog);
             return "";
         }
     }
@@ -332,6 +367,52 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     }
     //endregion
 
+    //region 探头
+    public void prepareCatCreate(){
+        actionCatName="Create";
+        zkbContractCatSelected = new ZkbContractCat();
+        this.reason = "";
+    }
+
+    public void prepareCatEdit(){
+        actionCatName="Edit";
+        this.reason = "";
+    }
+
+    public void saveCat(){
+        boolean flag=true;
+        for(ZkbContractCat c : zkbContractCatList){
+            if(zkbContractCatSelected.getSnNo().equals(c.getSnNo())){
+                if("Create".equals(actionCatName)){
+                    flag=false;
+                    break;
+                }else if("Edit".equals(actionCatName)){
+                    if(!zkbContractCatSelected.getId().equals(c.getId())){
+                        flag=false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!flag){
+            WebUtil.addErrorMessage("sn编号已存在");
+            contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
+            return;
+        }
+
+        if("Create".equals(actionCatName)) {
+            zkbContractCatSelected.setContractId(this.selected.getId());
+        }
+        zkbContractService.saveCat(zkbContractCatSelected,actionCatName,reason,currentUser,selected);
+        zkbContractCatList = zkbContractService.queryCatByContractId(selected.getId());
+    }
+
+    public void deleteCat(){
+        zkbContractService.deleteCat(zkbContractCatSelected,selected,currentUser,reason);
+        zkbContractCatList = zkbContractService.queryCatByContractId(selected.getId());
+    }
+    //endregion
+
     private String logType;
     public void preForLog(String _logType){
         this.logType = _logType;
@@ -356,6 +437,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             case assetDelete:
                 deleteAsset();
                 break;
+            case catUpdate:
+                break;
+            case catDelete:
+                deleteCat();
+                break;
         }
         this.reason="";
     }
@@ -370,6 +456,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public boolean isCourseCanOperate(){
         if(zkbContractCourseSelected == null || zkbContractCourseSelected.getZkbCourse() ==null || userContextService.isZkbUser()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isCatCanOperate(){
+        if(zkbContractCatSelected == null || zkbContractCatSelected.getId() ==null || userContextService.isZkbUser()){
             return true;
         }else{
             return false;
@@ -522,12 +616,37 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         this.operateFlag = operateFlag;
     }
 
-    public boolean isNewContractFlag() {
-        return newContractFlag;
+    public ZkbContractCat getZkbContractCatSelected() {
+        return zkbContractCatSelected;
     }
 
-    public void setNewContractFlag(boolean newContractFlag) {
-        this.newContractFlag = newContractFlag;
+    public void setZkbContractCatSelected(ZkbContractCat zkbContractCatSelected) {
+        this.zkbContractCatSelected = zkbContractCatSelected;
+    }
+
+    public List<ZkbContractCat> getZkbContractCatList() {
+        return zkbContractCatList;
+    }
+
+    public void setZkbContractCatList(List<ZkbContractCat> zkbContractCatList) {
+        this.zkbContractCatList = zkbContractCatList;
+    }
+
+
+    public String getActionCatName() {
+        return actionCatName;
+    }
+
+    public void setActionCatName(String actionCatName) {
+        this.actionCatName = actionCatName;
+    }
+
+    public List<I18nMessage> getQuotaDeductTypeList() {
+        return quotaDeductTypeList;
+    }
+
+    public void setQuotaDeductTypeList(List<I18nMessage> quotaDeductTypeList) {
+        this.quotaDeductTypeList = quotaDeductTypeList;
     }
 
     @Override

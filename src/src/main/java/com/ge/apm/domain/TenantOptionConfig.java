@@ -29,4 +29,7 @@ public class TenantOptionConfig implements Serializable {
 
     @Column(name = "active_supplier")
     private Boolean activeSupplier;
+
+    @Column(name = "show_is_pm")
+    private Boolean showIsPm;
 }
