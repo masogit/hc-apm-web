@@ -67,7 +67,13 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(0, 1)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="true"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrController.selected.serviceRequest.status ne 1}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(3, 4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrController.selected.serviceRequest.status ne 1 or !assetInfoEditController.hasScrappedAuthority()}"/>
-
+                                <c:if test="#{workOrderMgrController.queryIndex eq 4 }">
+                                    <c:if test="#{userContextService.countyArea}" >
+                                        <c:forEach items="#{fieldMsg.getFieldValueList('assetStatus').subList(5,6)}" var="item">
+                                        <f:selectItem  itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="true" />
+                                        </c:forEach>
+                                    </c:if>
+                                </c:if>
                             </p:selectOneRadio>
                             <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime"  value="#{workOrderMgrController.confirmedDownTime}" showOn="button"
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
@@ -116,6 +122,15 @@
                             <label class="label">医院客户职务</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.customerPosition}" />
                         </h:panelGroup>
+                            <h:panelGroup rendered="#{userContextService.countyArea}">
+                                <label class="label">#{msg.siebleNumber}</label>
+                                <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.siebleNumber}" />
+                            </h:panelGroup>
+
+                            <h:panelGroup rendered="#{userContextService.countyArea}">
+                                <label class="label">#{msg.callCenterNumber}</label>
+                                <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.callCenterNumber}" />
+                            </h:panelGroup>
                     </p:panelGrid>
 
                     <p:dataGrid var="picItem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
@@ -171,7 +186,8 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.totalPrice}</label>
-                                    <p:outputLabel value="#{woItem.totalPrice}"/>
+<!--                                    <p:outputLabel value="#{woItem.totalPrice}"/>-->
+                                    <p:outputLabel value="#{workOrderMgrController.getTotalPrice(woItem.id,woItem.totalPrice)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.CheckInTime}</label>

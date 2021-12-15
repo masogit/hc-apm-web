@@ -128,6 +128,39 @@ public class OrgInfo implements Serializable, ChineseName {
     @Transient
     private String orgUri;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "contact_person")
+    private String contactPerson;
+
+    @Column(name = "contact_phone")
+    private String contactPhone;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
+    }
+
     public OrgInfo() {
     }
 

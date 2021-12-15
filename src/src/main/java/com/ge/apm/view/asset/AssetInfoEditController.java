@@ -129,6 +129,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Getter
     private boolean isStatus;
     private boolean isStatusAssetHistory;
+    @Setter
+    @Getter
+    private boolean countyArea = false;
+
     @Getter
     @Setter
     private List<V2_BlobObject> pictureList;
@@ -156,6 +160,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
      * 目录关系service
      */
     private ZkbFileDirectoryService zkbFileDirectoryService;
+
+    private UserContextService userContextService;
 
     //设备状态
     @Getter
@@ -205,6 +211,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
+        userContextService = WebUtil.getBean(UserContextService.class);
+
+        countyArea = userContextService.isCountyArea();
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -325,13 +334,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     //重新获取资产状态枚举
     public void updateAssetStatusList() {
         assetStatusList = i18nDao.getByMsgTypeAndSiteId("assetStatus", ApmConstant.DEFAULT_SITE_ID);
-        assetStatusList.stream().forEach(status ->{
-            if(status.getMsgKey().equals("4")){
-                status.setEditable(hasScrappedAuthority());
-            }else{
-                status.setEditable(true);
-            }
-        });
+//        assetStatusList.stream().forEach(status ->{
+//            if(status.getMsgKey().equals("4")){
+//                status.setEditable(hasScrappedAuthority());
+//            }else{
+//                status.setEditable(true);
+//            }
+//        });
+        // 过滤'可正常使用'状态(县域)
+        assetStatusList=assetStatusList.stream().filter(s->!"6".equals(s.getMsgKey()))
+                                .map(s->{
+                                    if(s.getMsgKey().equals("4")){
+                                        s.setEditable(hasScrappedAuthority());
+                                    }else{
+                                        s.setEditable(true);
+                                    }
+                                    return s;
+                                }).collect(Collectors.toList());
     }
 
     public void returnBack() {

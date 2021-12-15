@@ -283,6 +283,11 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name = "supplier_uid")
     private String supplierUid;
     /**
+     * 核心组是否审核通过 0 未审批 1 医工审批 2 核心审批
+     */
+    @Column(name = "is_core_member_approval")
+    private Integer isCoreMemberApproval;
+    /**
      * 工单创建类型  1:医院创建   2:供应商创建
      */
     @Column(name = "create_type",columnDefinition=" integer default 1 ")
@@ -293,6 +298,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Transient
     private BigDecimal totalPriceToBigDecimal;
 
+    public Integer getCoreMemberApproval() {
+        return isCoreMemberApproval;
+    }
+
+    public void setCoreMemberApproval(Integer coreMemberApproval) {
+        isCoreMemberApproval = coreMemberApproval;
+    }
 
     public Integer getCreateType() {
         return createType;
