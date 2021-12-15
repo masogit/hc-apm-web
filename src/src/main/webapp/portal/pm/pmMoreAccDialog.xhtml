@@ -19,6 +19,8 @@
                             <label class="label">#{msg.PartQuantity}*</label>
                             <p:inputNumber  maxValue="999"  decimalPlaces="0"  id="apartsQuantity1" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
                             <f:convertNumber pattern="0" type="number"/>
+                                <p:ajax listener="#{v2PmOrderController.partsQuantity1Update()}" update="@(.hetongjia)" >
+                                </p:ajax>
                             </p:inputNumber>
                         </h:panelGroup>
 

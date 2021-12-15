@@ -178,6 +178,7 @@
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml" rendered="#{userContextService.accessContains('config.engineerGroup')}"/>
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/workFlowConfig/List.xhtml" rendered="#{userContextService.accessContains('config.workFlow')}"/>
                 <p:menuitem id="um500" value="#{msg.MultiLevelConfig}" outcome="/portal/config/multilevelApproveConfig/List.xhtml" rendered="#{userContextService.accessContains('config.workFlow')}"/>
+                <p:menuitem id="um509" value="#{msg.auditGroupConfiguration}" outcome="/portal/config/multilevelApproveConfig/auditGroupConfigurationList.xhtml" rendered="#{userContextService.isHospitalName('')}"/>
                 <p:menuitem id="um504" value="#{msg.CustomConfiguration}" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContains('config.custom')}"/>
                 <p:menuitem id="um505" value="#{msg.AttributeConfiguration}" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContains('config.attribute')}"/>
                 <p:menuitem id="um506" value="#{msg.RepairMessageConfiguration}" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContains('config.repairMessage')}"/>

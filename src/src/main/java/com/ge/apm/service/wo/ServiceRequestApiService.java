@@ -9,10 +9,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.*;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 import com.ge.apm.view.sysutil.UserContextService;
@@ -197,6 +194,8 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setCustomerPosition(newServiceRequest.getCustomerPosition());
         formData.setCreateType(createType!= null ?createType :1);
         formData.setSupplierUid(asset.getSupplierNewUID());
+        formData.setSiebleNumber(newServiceRequest.getSiebleNumber());
+        formData.setCallCenterNumber(newServiceRequest.getCallCenterNumber());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
@@ -246,6 +245,27 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
     }
 
+    public List<Integer> getVisableMvsAssetSystemId(String token) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(null, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID);
+        ResponseEntity<ArrayList> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity,ArrayList.class);
+        return response.getBody();
+    }
+
+    public List<Integer> getVisableMvsAssetSystemIdBySite(String token,String siteUID) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(null, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID_BYSITE);
+        ResponseEntity<ArrayList> response = template.exchange(gatewayURL.toString()+"?siteUid="+siteUID, HttpMethod.GET, requestEntity,ArrayList.class);
+        return response.getBody();
+    }
+
+    public List<Integer> getVisableMvsAssetSystemIdByClinaicalDept(String token,String deptUid) {
+        HttpEntity<V2_WorkOrder_Detail> requestEntity = new HttpEntity<V2_WorkOrder_Detail>(null, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID_BYCLINICALDEPT);
+        ResponseEntity<ArrayList> response = template.exchange(gatewayURL+"?deptUid="+deptUid, HttpMethod.GET, requestEntity,ArrayList.class);
+        return response.getBody();
+    }
+
 }
 
 class ServiceRequestForm {
@@ -270,7 +290,8 @@ class ServiceRequestForm {
      */
     Integer createType;
     String supplierUid;
-
+    String siebleNumber;
+    String callCenterNumber;
     public String getSupplierUid() {
         return supplierUid;
     }
@@ -405,6 +426,22 @@ class ServiceRequestForm {
 
     public void setCustomerPosition(String customerPosition) {
         this.customerPosition = customerPosition;
+    }
+
+    public String getSiebleNumber() {
+        return siebleNumber;
+    }
+
+    public void setSiebleNumber(String siebleNumber) {
+        this.siebleNumber = siebleNumber;
+    }
+
+    public String getCallCenterNumber() {
+        return callCenterNumber;
+    }
+
+    public void setCallCenterNumber(String callCenterNumber) {
+        this.callCenterNumber = callCenterNumber;
     }
 }
 

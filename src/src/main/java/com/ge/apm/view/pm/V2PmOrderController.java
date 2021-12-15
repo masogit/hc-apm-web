@@ -513,6 +513,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void prepareCreateSupplier() {
         newSupplier = new Supplier();
     }
+
+    public double getClosePrice(Double apartsQuantity,Double partsPrice){
+        if(apartsQuantity != null && partsPrice != null){
+            return apartsQuantity * partsPrice;
+        }
+        return 0;
+    }
+
     public void saveItem(){
         if(partsItem==null && itemDetail.getParts()==null) {
             WebUtil.addErrorMessage("备件名称不能为空");
@@ -730,6 +738,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
        }else{
            itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
        }
+    }
+
+    public void partsQuantity1Update() {
+        if(itemDetail.getApartsQuantity() == null || itemDetail.getPartsPrice() == null){
+            itemDetail.setClosedPrice(0.0);
+        }else{
+            itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
+        }
     }
 
     public void closePrcieUpdate() {
@@ -1889,7 +1905,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         /*根据登录进来的租户获取到该租户绑定的设备的uid*/
         String token = UserContextService.getAccessToken();
 //        String to = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ5bXlnQWRtaW4iLCJhdXRoIjoieW15Z0FkbWluIiwidWlkIjoiYmI5MDQ5NDYxMWIxNDllYzk0MWMzZTUyMTUwZDQ0YjQiLCJ1c2VySWQiOjE4Mjg4LCJleHAiOjE2MzgzNDYzOTB9.S6s0ow5Ab9RUO5Efo9XG-lAQmQxbxrf6aDsuUsnApStJ3iCdE7bjJHLs6hKJAQK-QYY4i9w8VmTlps7WZk0-iA";
-        List<String> orgUidList = pmOrderService.getMvsAssectUids(token);
+        List<Integer> orgUidList = pmOrderService.getMvsAssectUids(token);
         return assetInfoMapper.getMvsPmOrders(orgUidList,tenantUid);
     }
 

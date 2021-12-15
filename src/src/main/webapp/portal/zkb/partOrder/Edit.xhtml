@@ -159,8 +159,13 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.artificialType eq '1'}">
-                            <label class="label">是否需要SSA Key*</label>
+                        <h:panelGroup id="ArtificialGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.artificialType eq '1'}">
+                            <c:if test="#{zkbPartOrderEditController.artificialType eq '1'}">
+                                <label class="label" >是否需要SSA Key*</label>
+                            </c:if>
+                            <c:if test="#{!(zkbPartOrderEditController.artificialType eq '1')}">
+                                <label class="label" >是否需要Dongle*</label>
+                            </c:if>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.ssaKeyFlag}" required="true" requiredMessage="是否需要SSA Key #{msg.ValidationRequire}" >
                                 <p:ajax event="change" update="scoreFlagGroup"  listener="#{zkbPartOrderEditController.scoreFlagChange}"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>

@@ -148,6 +148,11 @@ public class MultiLevelApproval implements Serializable {
      */
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
+    /**
+     * 审批签名-同意/不同意时用
+     */
+    @Column(name = "audit_signature")
+    private String auditSignature;
 
     public boolean getApprovalIng() {
         return approvalIng;

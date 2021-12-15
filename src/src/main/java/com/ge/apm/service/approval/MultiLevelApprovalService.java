@@ -193,16 +193,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         if (multiLevel != null) {
                             // 发送短信
                             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                            for (int k = 0; k < weChatIdList.size(); k++) {
-                                String str = weChatIdList.get(k);
-                                if (str != null) {
-                                    Map<String, Object> m = new HashMap<>();
-                                    m.put("_openId", str);
-                                    m.put("_templateId", "no_template");
-                                    m.put("message", ApprovalConstant.WX_MESSAGE_APPROVAL + TimeUtils.getStrDate(new Date(), "yyyy-MM-dd HH:mm:ss") + message);
-                                    wechatSendMsgService.sendWxMsg(m);
-                                }
-                            }
+                            this.sendWxMsg(weChatIdList,message,"待审批");
                         }
                         return multiLevel;
                     }
@@ -272,7 +263,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             weChatIdList.add(user.getWeChatId());
         }
         String message = ApprovalConstant.WX_MESSAGE_DISAGREE_1+businessType+ApprovalConstant.WX_MESSAGE_DISAGREE_2+businessNumber+ApprovalConstant.WX_MESSAGE_DISAGREE_3;
-        this.sendWxMsg(weChatIdList,message);
+        this.sendWxMsg(weChatIdList,message,"审批失败");
     }
 
     public void doWorkDetailByIsAgreeType(String id,int isAgreeType, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList) {
@@ -319,7 +310,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount,boolean approvalFlag) {
         logger.info("-----校验开启多级审核请求参数 busiType : "+" , amount : "+amount);
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = new ArrayList<>(Arrays.asList(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID()));
+        List<String> orgUidList = new ArrayList<>(Arrays.asList(user.getSiteUID()));
         for (String orgUid: orgUidList) {
             MultiLevelApprovalConfig approveConfig= null;
             if(approvalFlag){
@@ -444,6 +435,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         MultiLevelApproval multiLevelApproval = multiLevelApprovalNew;
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         MultiLevelApprovalConfig multiLevelApprovalConfig = this.getApproveWorkflowConfig(multiLevelApproval.getWorkflowConfigApproveUid());
+        logger.info("multiLevelApprovalConfig"+multiLevelApprovalConfig.toString());
         if (multiLevelApprovalConfig != null) {
             multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
             multiLevelApproval.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
@@ -455,6 +447,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             int approvalLevel = multiLevelApproval.getApprovalLevel();
             int level = approvalLevel + 1;
             multiLevelApproval.setApprovalLevelNow(level);
+            logger.info("approvalLevel"+approvalLevel);
             //更新审批数据
             multiLevelApprovalRepository.save(multiLevelApproval);
             //更新审批进度
@@ -466,23 +459,28 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         if (multi != null && multi.getApprovalLevelNow() != level){
                             multi.setApprovalLevelNow(level);
                             multiLevelApprovalRepository.save(multi);
+                            logger.info("multi"+multi.toString());
                         }
                     }
                 }
             }
             String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+            logger.info("approvalItem"+approvalItem);
             if (null != approvalItem) {
                 List<String> weChatIdList = new ArrayList<>();
                 List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {});
                 if (approvalNodes != null) {
                     MultiLevelApproval date = multiLevelApprovalNew;
                     int maxNodeId = approvalNodes.size();
+                    logger.info("maxNodeId"+maxNodeId);
                     if (level > maxNodeId) {//最后一个人审批通过 更新审批状态为通过 业务状态为审批通过
                         List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
                         //发起人UID
                         String initiateApproverUid = null;
                         String businessType = this.getBusinessType(multiLevelApproval.getBusinessType());
+                        logger.info("list==="+list.size());
                         if (null != list) {
+
                             for (int i = 0; i < list.size(); i++) {
                                 MultiLevelApproval multi = list.get(i);
                                 if (null != multi.getInitiateApproverUid() && !"".equals(multi.getInitiateApproverUid())) {
@@ -491,6 +489,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 multi.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
                                 multi.setApprovalLevelNow(ApprovalConstant.APPROVAL_NOW_AGREE);
                                 multiLevelApprovalRepository.save(multi);
+                                logger.info("multi==="+multi.toString());
                             }
                             //微信通知发起人审批通过
                             UserAccount user = userAccountRepository.getByUid(initiateApproverUid);
@@ -498,7 +497,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 weChatIdList.add(user.getWeChatId());
                             }
                             String message = ApprovalConstant.WX_MESSAGE_AGREE_1 + businessType + ApprovalConstant.WX_MESSAGE_AGREE_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_AGREE_3;
-                            this.sendWxMsg(weChatIdList, message);
+                            this.sendWxMsg(weChatIdList, message,"审批通过");
                         }
                         switch (multiLevelApproval.getBusinessType()){
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT://维修
@@ -512,6 +511,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
                                     generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList, userAccountRepository.findById(v2WorkOrder.getCurrentPersonId()));
                                 }
+                                logger.info("维修完成===");
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT://保养
                                 V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
@@ -583,7 +583,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             multiLevelApprovalRepository.save(date);
                             //审批同意时 给审批人发送微信
                             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1+ApprovalConstant.WX_MESSAGE_APPROVAL_2+date.getBusinessNumber()+ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                            this.sendWxMsg(weChatIdList,message);
+                            this.sendWxMsg(weChatIdList,message,"待审批");
                         }
                     }
                 }
@@ -591,17 +591,21 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }
     }
 
-    public void sendWxMsg(List<String>weChatIdList,String message){
+    public void sendWxMsg(List<String>weChatIdList,String message,String remark){
+        logger.info("weChatIdList{}"+weChatIdList.size());
         if(weChatIdList == null) return;
-        for (int i = 0; i < weChatIdList.size(); i++) {
-            String str = weChatIdList.get(i);
-            if(str != null){
-                Map<String,Object> map = new HashMap<>();
-                map.put("_openId",str);
-                map.put("_templateId","no_template");
-                map.put("message", ApprovalConstant.WX_MESSAGE_APPROVAL+TimeUtils.getStrDate(new Date(), "yyyy-MM-dd HH:mm:ss") + message);
-                wechatSendMsgService.sendWxMsg(map);
-            }
+        String token = UserContextService.getAccessToken();
+        Map<String,Object> map = new HashMap<>();
+        map.put("weChatIdList",weChatIdList);
+        map.put("message", ApprovalConstant.WX_MESSAGE_APPROVAL+TimeUtils.getStrDate(new Date(), "yyyy-MM-dd HH:mm:ss") + message);
+        map.put("remark",remark);
+        HttpEntity<Map> requestEntity = new HttpEntity<>(map,createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.APPROVAL_TO_SEND_WE_CHAT);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        if (!isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            String str = responseMap.get("message").toString();
+            throw new RuntimeException(str);
         }
     }
 

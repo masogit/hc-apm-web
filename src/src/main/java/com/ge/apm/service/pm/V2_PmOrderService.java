@@ -134,19 +134,19 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
     }
 
-    public List<String> getMvsAssectUids(String token) {
+    public List<Integer> getMvsAssectUids(String token) {
         String gatewayURL = getGatewayURL(GatewayURL.GET_MVSASSECT_UID);
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         ResponseEntity<ArrayList> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, ArrayList.class);
         if (response.getBody() != null && response.getStatusCode().equals(HttpStatus.OK)) {
-            ArrayList<String> mvsAssetUidsByVisibleScope = (ArrayList<String>) response.getBody();
+            ArrayList<Integer> mvsAssetUidsByVisibleScope = (ArrayList<Integer>) response.getBody();
             if(mvsAssetUidsByVisibleScope.isEmpty()){
-                return new ArrayList<String>();
+                return new ArrayList<Integer>();
             }
             return mvsAssetUidsByVisibleScope;
         } else {
-            return new ArrayList<String>();
+            return new ArrayList<Integer>();
         }
     }
 

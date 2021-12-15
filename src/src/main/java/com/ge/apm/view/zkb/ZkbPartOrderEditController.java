@@ -403,9 +403,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameIsNotContaining("TechnicalPending",ZkbPartOrder.CONFIG_US,ZkbPartOrder.DATA_TYPE_TEST);
                 }
             }
-            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && ZkbContract.YOrNEnum.Y.toString().equals(selectedContract.getFiveNineNineFlag())){
-                if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+                if(StringUtils.isEmpty(zkbContractAsset.getAssetType())){
+                    selected.setArtificialType(CopyByInvok.NORMAL_THREE);
+                }else if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
                     selected.setArtificialType(CopyByInvok.NORMAL_TWO);
+                }else if(ZkbContractAsset.AssetTypeEnum.lowMachine.toString().equals(zkbContractAsset.getAssetType())){
+                    selected.setArtificialType(CopyByInvok.NORMAL_THREE);
+                }else if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType())){
+                    selected.setArtificialType(CopyByInvok.NORMAL_DEPOT);
+                }else if(ZkbContractAsset.AssetTypeEnum.empty.toString().equals(zkbContractAsset.getAssetType())){
+                    selected.setArtificialType(CopyByInvok.NORMAL_THREE);
                 }
             }
             selected.setRegion(selectedContract.getRegion());
@@ -418,7 +426,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && assetInfo.getAssetGroup() == 2){
                 //如果是备件机型默认超神低端机
-                selected.setArtificialType("3");
+                //selected.setArtificialType("3");
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
                 scoreFlagChange();
             }
@@ -922,14 +930,16 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(StringUtils.isNotEmpty(selectedContract.getQuotaDeductType())){
             if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType())){
                 if(!ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
-                    if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                        this.selected.setQty(1);
-                        valueTypeTips = "";
-                    }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                        this.selected.setQty(null);
-                    }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                        this.selected.setQty(1);
-                        valueTypeTips = "";
+                    if(this.selected.getZkbPartOrderCat() != null){
+                        if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                            this.selected.setQty(1);
+                            valueTypeTips = "";
+                        }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                            this.selected.setQty(null);
+                        }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                            this.selected.setQty(1);
+                            valueTypeTips = "";
+                        }
                     }
                 }else {
                     if(StringUtils.isNotEmpty(this.selected.getContractCatId())){
