@@ -558,7 +558,9 @@ public class AssetInfo implements ChineseName,Serializable {
     //开机电流阈值
     @Column(name = "power_on_threshold")
     private Double powerOnThreshold;
-
+    //电源ID
+    @Column(name = "current_id")
+    private String currentId;
 
     @Size(max = 256)
     @Column(name = "one_qr_code")
@@ -672,6 +674,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private String sharedAssetSwapIndex;
+
+    public String getCurrentId() {
+        return currentId;
+    }
+
+    public void setCurrentId(String currentId) {
+        this.currentId = currentId;
+    }
 
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
