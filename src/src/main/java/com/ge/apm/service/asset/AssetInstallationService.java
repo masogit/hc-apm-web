@@ -230,6 +230,10 @@ public class AssetInstallationService {
         return blobDao.findByBoUuid(itemId);
     }
 
+    public List<V2_BlobObject> getPartPictures(Set<String> ids){
+        return blobDao.getPartPictures(ids);
+    }
+
     public OrgInfo getOrgInfoByUid(String siteUID) {
         return orgDao.getByUid(siteUID);
     }
