@@ -165,6 +165,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Map<String, Boolean> selectedMap;
     private String selectedApproverUid;
     private ServiceRequestApiService serviceRequestApiService;
+    private AuditGroupConfigurationDetailRepository auditGroupConfigurationDetailRepository;
     private WorkflowConfigRepository woConDao;
     private String token;
     private OrgInfoTreeService orgInfoTreeService;
@@ -224,6 +225,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
             customConfigService = WebUtil.getBean(CustomConfigService.class);
             tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+            auditGroupConfigurationDetailRepository = WebUtil.getBean(AuditGroupConfigurationDetailRepository.class);
             currentCustomConfig = customConfigService.getCurrentCustomConfig(
                     UserContextService.getCurrentUserAccount().getSiteUID());
             aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -877,7 +879,7 @@ public void test1(){
                 UserAccount userAccount = userContextService.getCurrentUserAccount();
                 String tenantUID = userAccount.getTenantUID();
                 TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
-                if(WorkOrderConstant.DESIGNATED_USER.equals(this.tenantInfo.getName().trim())){
+                if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
                     List<UserAccount> userAccountList = new ArrayList<>();
                     AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
                     String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
@@ -984,6 +986,25 @@ public void test1(){
         return   bySearchFilter;
     }
 
+    public Boolean getSign(String uid){
+        UserAccount userAccount = userContextService.getCurrentUserAccount();
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+            List<AuditGroupConfigurationDetail> details = auditGroupConfigurationDetailRepository.findByBusinessUidAndActualAuditUidAndDeleteFlag(uid, userAccount.getUid(),0);
+            if(details==null || details.isEmpty()){
+                return true;
+            }else {
+                for (AuditGroupConfigurationDetail auditGroupConfigurationDetail:details) {
+                    if(auditGroupConfigurationDetail.getAuditNodeStatus()==0){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        return true;
+    }
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
 
