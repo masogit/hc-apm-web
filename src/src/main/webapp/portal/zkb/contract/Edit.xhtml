@@ -37,10 +37,18 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">是否ZKB 599方案*</label>
+                            <p:selectOneMenu  value="#{zkbContractEditController.selected.fiveNineNineFlag}" required="true" requiredMessage="是否ZKB 599合同 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemValue="Y" itemLabel="是"/>
+                                <f:selectItem itemValue="N" itemLabel="否"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_contractType}*</label>
                             <p:selectOneMenu id="status" value="#{zkbContractEditController.selected.contractType}" required="true" requiredMessage="#{msg.zkbContract_contractType} #{msg.ValidationRequire}">
+                                <p:ajax event="itemSelect" update="quotaDeductType" listener="#{zkbContractEditController.contractTypeSelect}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
@@ -48,101 +56,103 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_startDate}*</label>
-                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.contractStartDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_endDate}*
                             </label>
-                            <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.contractEndDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">名额扣除类型*</label>
+                            <p:selectOneMenu id="quotaDeductType" value="#{zkbContractEditController.selected.quotaDeductType}" required="true" requiredMessage="名额扣除类型 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{zkbContractEditController.quotaDeductTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_ibNumber}</label>
-                            <p:spinner id="ibNumber" value="#{zkbContractEditController.selected.ibNumber}" min="0" max="1000" />
-                        </h:panelGroup>
-                        <h:panelGroup></h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Spare')}">
                             <label class="label">#{msg.zkbContract_spareQuota_total}</label>
                             <p:spinner id="spareQuotaTotal" value="#{zkbContractEditController.selected.spareQuotaTotal}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Spare')}">
                             <label class="label">#{msg.zkbContract_spareQuota}</label>
                             <p:spinner id="spareQuota" value="#{zkbContractEditController.selected.spareQuota}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Spare')}">
                             <label class="label">#{msg.zkbContract_spareQuota_apply}</label>
                             <p:spinner id="spareQuotaApply" value="#{zkbContractEditController.selected.spareQuotaApply}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Spare')}">
                             <label class="label">#{msg.zkbContract_spareQuota_use}</label>
                             <p:spinner id="spareQuotaUse" value="#{zkbContractEditController.selected.spareQuotaUse}" min="0" max="1000"  />
                         </h:panelGroup>
 
-                        <c:if test="#{!zkbContractEditController.newContractFlag}">
-                            <h:panelGroup>
+                        <c:if test="#{!(zkbContractEditController.selected.quotaDeductType eq 'New')}">
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">#{msg.zkbContract_probeQuota_total}</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaTotal}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">#{msg.zkbContract_probeQuota}</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuota}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">#{msg.zkbContract_probeQuota_apply}</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaApply}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">#{msg.zkbContract_probeQuota_use}</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaUse}" min="0" max="1000"  />
                             </h:panelGroup>
                         </c:if>
-                        <c:if test="#{zkbContractEditController.newContractFlag}">
-                            <h:panelGroup>
+                        <c:if test="#{zkbContractEditController.selected.quotaDeductType eq 'New'}">
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头任意总名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaTotal}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头任意剩余名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuota}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头任意申请名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaApply}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头任意已使用名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaUse}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头普通总名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaNormalTotal}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头普通剩余名额</label>
                                 <p:spinner id="probeQuotaNormal" value="#{zkbContractEditController.selected.probeQuotaNormal}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头普通申请名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaNormalApply}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头普通已使用名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaNormalUse}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头特殊总名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaSpecialTotal}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头特殊剩余名额</label>
                                 <p:spinner id="probeQuotaSpecial" value="#{zkbContractEditController.selected.probeQuotaSpecial}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头特殊申请名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaSpecialApply}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Probe')}">
                                 <label class="label">探头特殊已使用名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaSpecialUse}" min="0" max="1000"  />
                             </h:panelGroup>
@@ -163,40 +173,43 @@
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaHighUse}" min="0" max="1000"  />
                             </h:panelGroup>-->
                         </c:if>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Artificial')}">
                             <label class="label">#{msg.zkbContract_geArtificialSupportTimes_total}</label>
                             <p:spinner id="geArtificialSupportTimesTotal" value="#{zkbContractEditController.selected.geArtificialSupportTimesTotal}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Artificial')}">
                             <label class="label">#{msg.zkbContract_geArtificialSupportTimes}</label>
                             <p:spinner id="geArtificialSupportTimes" value="#{zkbContractEditController.selected.geArtificialSupportTimes}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Artificial')}">
                             <label class="label">#{msg.zkbContract_geArtificialSupportTimes_apply}</label>
                             <p:spinner id="geArtificialSupportTimesApply" value="#{zkbContractEditController.selected.geArtificialSupportTimesApply}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Artificial')}">
                             <label class="label">#{msg.zkbContract_geArtificialSupportTimes_use}</label>
                             <p:spinner id="geArtificialSupportTimesUse" value="#{zkbContractEditController.selected.geArtificialSupportTimesUse}" min="0" max="1000"  />
                         </h:panelGroup>
 
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('SpareArtificial')}">
                             <label class="label">#{msg.zkbContract_spareArtificail_total}</label>
                             <p:spinner id="spareArtificailTotal" value="#{zkbContractEditController.selected.spareArtificailTotal}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('SpareArtificial')}">
                             <label class="label">#{msg.zkbContract_spareArtificail}</label>
                             <p:spinner id="maintenanceQuota" value="#{zkbContractEditController.selected.spareArtificail}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('SpareArtificial')}">
                             <label class="label">#{msg.zkbContract_spareArtificail_apply}</label>
                             <p:spinner id="maintenanceQuota_apply" value="#{zkbContractEditController.selected.spareArtificailApply}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('SpareArtificial')}">
                             <label class="label">#{msg.zkbContract_spareArtificail_use}</label>
                             <p:spinner id="spareArtificailUse" value="#{zkbContractEditController.selected.spareArtificailUse}" min="0" max="1000"  />
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbContract_ibNumber}</label>
+                            <p:spinner id="ibNumber" value="#{zkbContractEditController.selected.ibNumber}" min="0" max="1000" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_principal}</label>
                             <p:inputText id="principal" value="#{zkbContractEditController.selected.principal}" />
@@ -236,7 +249,18 @@
                             <label class="label">#{msg.zkbContract_remark}</label>
                             <p:inputText id="remark" value="#{zkbContractEditController.selected.remark}" />
                         </h:panelGroup>
-
+                       <!-- <h:panelGroup>
+                            <label class="label">实际开始时间</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">实际结束时间</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">599计数年</label>
+                            <p:inputText value="#{zkbContractEditController.selected.yearCount}" />
+                        </h:panelGroup>-->
                     </p:panelGrid>
 
 
@@ -292,6 +316,15 @@
                                      rowsPerPageTemplate="20,50,100,500">
 
                             <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractAssetDatalist:deleteAssetButton :zkbContractEditForm:zkbContractAssetDatalist:editAssetButton"/>
+                            <p:column headerText="租户" exportable="true" visible="false">
+                                <h:outputText value="#{zkbContractEditController.tenantInfo.name}"/>
+                            </p:column>
+                            <p:column headerText="合同号" exportable="true" visible="false">
+                                <h:outputText value="#{zkbContractEditController.selected.contractNo}"/>
+                            </p:column>
+                            <p:column headerText="合同类型" exportable="true" visible="false">
+                                <h:outputText value="#{zkbContractEditController.selected.contractType}"/>
+                            </p:column>
                             <p:column headerText="二维码">
                                 <h:outputText value="#{zkbContractAssetItem.assetInfo.qrCode}"/>
                             </p:column>
@@ -322,11 +355,20 @@
                             <p:column headerText="是否超声高低机" >
                                 <h:outputText value="#{fieldMsg.fieldValue('zkbContractAssetType',zkbContractAssetItem.assetType)}" />
                             </p:column>
+                            <p:column headerText="是否代理商自身原因未完成培训" >
+                                <h:outputText value="#{fieldMsg.fieldValue('zkbPoAssetTrainReasonFlag',zkbContractAssetItem.trainReasonFlag)}" />
+                            </p:column>
+                           <!-- <p:column headerText="申请数量" >
+                                <h:outputText value="#{zkbContractAssetItem.applyNum}" />
+                            </p:column>-->
                             <f:facet name="{Toolbar}">
                                 <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.operateFlag}"/>
                                 <p:commandButton id="editAssetButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareAssetEdit}" update=":growl :zkbContractAssetModifyDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbContractAssetModifyDlg').show()" rendered="#{zkbContractEditController.operateFlag}"/>
                                 <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('assetDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbConfigDlg').show()" rendered="#{zkbContractEditController.operateFlag}">
                                     <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
+                                </p:commandButton>
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xls" target="zkbContractAssetDatalist" fileName="ZKB_ContactPerson_Export"/>
                                 </p:commandButton>
                             </f:facet>
 

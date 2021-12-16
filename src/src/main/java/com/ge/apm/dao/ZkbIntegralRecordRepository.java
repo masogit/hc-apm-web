@@ -16,5 +16,5 @@ public interface ZkbIntegralRecordRepository extends GenericRepositoryUUID<ZkbIn
     @Query(value = "select * from zkb_integral_record r where  r.zkb_integral_id = ?1 and r.record_type in ?2 and r.kpi_month = ?3 order by r.created_date desc limit 1  ", nativeQuery = true)
     ZkbIntegralRecord findFirstByRecord(String zkbIntegralId,List<String> recordType,String kpiMonth);
 
-    List<ZkbIntegralRecord> findByZkbIntegralIdOrderByCreatedDateDesc(String zkbIntegralId);
+    List<ZkbIntegralRecord> findByZkbIntegralIdAndRecordTypeNotOrderByCreatedDateDesc(String zkbIntegralId,String recordType);
 }

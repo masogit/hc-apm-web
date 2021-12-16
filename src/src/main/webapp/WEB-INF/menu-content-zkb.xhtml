@@ -164,15 +164,18 @@
                 <p:menuitem value="ZKB FE 维修申请" outcome="/portal/zkb/partOrder/List.xhtml" />
                 <p:menuitem value="GEFE 维修申请" outcome="/portal/zkb/zkbFePartOrder/List.xhtml" />
                 <p:menuitem  value="FE USER CONFIG 配置" outcome="/portal/zkb/fePartOrderUserConfig/List.xhtml" />
-                <p:menuitem value="历史申请数据 New" outcome="/portal/zkb/orderHistory/List.xhtml"/>
+                <p:menuitem value="历史申请数据 New" outcome="/portal/zkb/orderHistory/List.xhtml"  rendered="#{!userContextService.zkbUser}"/>
                 <p:menuitem value="二维码实施统计表" outcome="/portal/zkb/assetStatistic/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"/>
+                <p:menuitem  value="探头信息维护" outcome="/portal/zkb/probe/List.xhtml"  rendered="#{ userContextService.geAdmin}"/>
                 <p:menuitem value="KPI" outcome="/portal/zkb/keyHehaviorIndex/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"  />
                 <p:menuitem value="积分" outcome="/portal/zkb/integral/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"  />
                 <p:menuitem value="权重配置" outcome="/portal/zkb/keyHehaviorIndex/ConfigList.xhtml" rendered="#{userContextService.geAdmin}"/>
             </p:submenu>
+            <!-- 是智康保用户  -->
 
-            <p:submenu label="报表管理" icon="fa fa-wrench" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}">
-                <p:menuitem value="维修工单报表" outcome="/portal/zkb/report/List.xhtml" />
+            <p:submenu label="报表管理" icon="fa fa-wrench" rendered="#{userContextService.zkbUser or userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}">
+                <p:menuitem value="维修工单报表" outcome="/portal/zkb/report/List.xhtml" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}" />
+                <p:menuitem value="历史数据一键导出" outcome="/portal/zkb/export/Export.xhtml" />
             </p:submenu>
 
             <!--Super admin and GE OP only-->
@@ -202,7 +205,7 @@
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml" rendered="#{userContextService.accessContains('config.engineerGroup')}"/>
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/workFlowConfig/List.xhtml" rendered="#{userContextService.accessContains('config.workFlow')}"/>
                 <p:menuitem id="um504" value="#{msg.CustomConfiguration}" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContains('config.custom')}"/>
-                <p:menuitem id="um505" value="#{msg.AttributeConfiguration}" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContains('config.attribute')}"/>
+                <p:menuitem id="um505" value="#{msg.AttributeCAonfiguration}" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContains('config.attribute')}"/>
                 <p:menuitem id="um506" value="#{msg.RepairMessageConfiguration}" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContains('config.repairMessage')}"/>
                 <!--<p:menuitem id="um500" value="#{msg.V2_WorkOrderWorkflowConfig}" outcome="/portal/config/workFlowConfig/Wo_Edit.xhtml"/>-->
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->

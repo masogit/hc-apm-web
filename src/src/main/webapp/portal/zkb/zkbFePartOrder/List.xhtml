@@ -13,9 +13,20 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="zkbFePartOrderListForm">
+
+                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam') or userContextService.isZkbFeUserConfig('Reviewer')}">
+                        <p:outputLabel value="#{msg.zkbContact_tenant}*:"/>
+                        <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbFePartOrderController.queryTenantUID}">
+                            <p:ajax  update="datalist"/>
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{zkbPartOrderController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+
                     <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
-                        <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
+                        <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="#{zkbFePartOrderController.showPendingStatusBtn}" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
                         <p:commandButton value="待代理商确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment')}" />
+                        <p:commandButton value="待Commercial确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingCommercial'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingCommercial')}" />
                         <p:commandButton value="待400开单/下单"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingApm'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingApm')}" />
                         <p:commandButton value="待FE归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingGEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingGEAdmin')}" />
                         <p:commandButton value="完成"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'Complete'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('Complete')}" />
@@ -101,12 +112,19 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.zkbFePartOrder_currentStatus}" filterBy="#{item.status}" filterMatchMode="EQ">
-                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_status', item.status)}"/>
+                        <p:column  headerText="#{msg.zkbFePartOrder_currentStatus}" filterBy="#{item.status}" filterMatchMode="EQ">
+                                <h:outputText value="#{zkbFePartOrderController.getI18(item.status,item.orderType)}" />
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_status')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItem itemLabel="已申请" itemValue="Requested"/>
+                                    <f:selectItem itemLabel="代理商同意" itemValue="TenantAccept"/>
+                                    <f:selectItem itemLabel="代理商不同意" itemValue="TenantReject"/>
+                                    <f:selectItem itemLabel="Commercial同意" itemValue="CommercialAccept"/>
+                                    <f:selectItem itemLabel="Commercial不同意" itemValue="CommercialReject"/>
+                                    <f:selectItem itemLabel="400已下单/开单" itemValue="FourHundredsAccept"/>
+                                    <f:selectItem itemLabel="FE已部分归还" itemValue="GEAdminAcceptPart"/>
+                                    <f:selectItem itemLabel="FE已归还" itemValue="GEAdminAccept"/>
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
@@ -119,12 +137,6 @@
                         <p:column headerText="#{msg.zkbFePartOrder_hospitalClientPhone}" filterBy="#{item.hospitalClientPhone}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.hospitalClientPhone}"/>
                         </p:column>
-<!--                        <p:column headerText="#{msg.zkbFePartOrder_position}" filterBy="#{item.position}" filterMatchMode="LIKE">-->
-<!--                            <h:outputText value="#{item.position}"/>-->
-<!--                        </p:column>-->
-<!--                        <p:column headerText="#{msg.zkbFePartOrder_location}" filterBy="#{item.location}" filterMatchMode="LIKE">-->
-<!--                            <h:outputText value="#{item.location}"/>-->
-<!--                        </p:column>-->
                         <p:column headerText="#{msg.zkbFePartOrder_phenomenon}" filterBy="#{item.phenomenon}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.phenomenon}"/>
                         </p:column>

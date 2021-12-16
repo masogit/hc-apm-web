@@ -682,13 +682,13 @@
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
                         </p:menuButton>
-                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{!userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);">
+                        <p:commandButton validateClient="true"  action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{!userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">
                              <p:confirm header="确认安装" message="您确定要完成安装吗?" icon="ui-icon-warning"/>
                         </p:commandButton>
-                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstallBatch}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);">
+                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstallBatch}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args)">
                             <p:confirm header="确认批量安装" message="您确定要批量完成安装吗?" icon="ui-icon-warning"/>
                         </p:commandButton>
-                        <p:commandButton immediate="true" style="margin-left: 4px;margin-right: 5px" action="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
+                        <p:commandButton immediate="true" style="margin-left: 4px;margin-right: 5px" actionListener="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="#{assetInstallationController.returnAction}" immediate="true" />
@@ -696,6 +696,7 @@
 
                 </h:form>
             </div>
+<!--            <ui:include src="RelRuleAsset.xhtml"/>-->
             <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码展示">
                 <h:form id="qrCodeLibShowForm">
                     <h:panelGroup rendered="#{not empty assetInstallationController.arrivalListItem.qrCode}">
@@ -746,8 +747,20 @@
                     var d = $('#ItemEditDlgForm\\:workHours');
                     $('#ItemEditDlgForm\\:workHours_input').addClass("ui-state-error");
                 }
-
             }
+<!--            function changeDiaLog() {-->
+<!--                PF('relRuleAssetDialog').hide();-->
+<!--                PF('redirectDialog').show();-->
+<!--            }-->
+<!--            function showBoole(){-->
+<!--                  window.location.reload();-->
+<!--                var showbool = #{assetInstallationController.showBool}-->
+
+<!--                alert(showbool);-->
+<!--                if(#{assetInstallationController.showBool}==true){-->
+<!--                    PF('relRuleAssetDialog').show()-->
+<!--                }-->
+<!--            }-->
         </script>
 
     </ui:define>

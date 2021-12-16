@@ -15,6 +15,7 @@ import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,7 @@ import webapp.framework.web.WebUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -114,6 +112,12 @@ public class AssetFileImportBaseService {
 
     @Autowired
     public AssetTagsMapper assetTagsMapper;
+
+    @Autowired
+    private AssetInfoBulkEditCheckService assetInfoBulkEditCheckService;
+
+    @Autowired
+    private V2ServiceRequestRepository v2ServiceRequestRepository;
 
     @Autowired
     MvsUtil mvsUtil;
@@ -550,6 +554,9 @@ public class AssetFileImportBaseService {
             }
             //check clinical dept
             String clinicalDeptName = newAsset.getClinicalDeptName();
+            List<AssetInfo> assets = new ArrayList<>();
+            AssetInfo asset = assetDao.findByUid(newAsset.getUid());
+            assets.add(asset);
             if (StringUtils.isEmpty(clinicalDeptName)) {
                 //新增的时候不允许为空，更新的时候允许为空。
                 if (StringUtils.isEmpty(newAsset.getUid())) {
@@ -617,6 +624,54 @@ public class AssetFileImportBaseService {
                             result.add(Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误: 使用科室没有找到! " + assetDeptName + ",请添加到科室列表页");
                         }
+                    }
+                }
+            }
+
+            if(asset != null){
+                if((!StringUtils.isEmpty(assetDeptName) && !assetDeptName.equals(asset.getAssetDeptName()) )|| (!StringUtils.isEmpty(clinicalDeptName) && !clinicalDeptName.equals(asset.getClinicalDeptName()))){
+                    if(asset.getSharedAssetTypeUid() != null){
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 设备已绑定调剂名称,不能修改科室");
+                    }
+
+                    if(!assetInfoBulkEditCheckService.verifyForMaintain(assets)){
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 设备有未完成的保养工单,不能修改科室");
+                    }
+
+                    if(!assetInfoBulkEditCheckService.verifyForInventory(assets)){
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 设备有未盘点的工单,不能修改科室");
+                    }
+                    for(AssetInfo as:assets){
+                        boolean assetFlag =true;
+                        List<V2_ServiceRequest> serviceRequestList =v2ServiceRequestRepository.findByAssetId(as.getId());
+                        if(CollectionUtils.isNotEmpty(serviceRequestList)){
+                            for(V2_ServiceRequest service: serviceRequestList){
+                                if(service.getCloseTime()==null){
+                                    assetFlag=false;
+                                }
+                            }
+                            if(assetFlag){
+                                continue;
+                            }else{
+                                item.put("status", ImportStatus.CheckFail);
+                                result.add(Boolean.FALSE);
+                                AssetRow.addErrMessage(item, "错误: 设备有未完成的维修工单,不能修改科室");
+                            }
+                        }
+                    }
+
+                    //临床助手检查进行中
+                    Optional<String> optionalResult = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchImport(assets);
+                    if (optionalResult.isPresent()) {
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 设备有未完成的日常检查工单,不能修改科室");
                     }
                 }
             }

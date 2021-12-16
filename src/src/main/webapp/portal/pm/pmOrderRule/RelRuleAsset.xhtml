@@ -142,7 +142,12 @@
                            <p:selectOneMenu value="#{relRuleAssetController.queryAsset.queryLevel}">
                                <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                               <f:selectItems value="#{fieldMsg.getFieldValueList('pmOrderRuleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                               <c:if test="#{relRuleAssetController.getPmRule()}">
+                                   <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                               </c:if>
+                               <c:if test="#{!relRuleAssetController.getPmRule()}">
+                                   <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                               </c:if>
                            </p:selectOneMenu>
                        </h:panelGroup>
                     </p:panelGrid>
@@ -184,8 +189,13 @@
                               <p:selectOneMenu id="ruleLevel" value="#{relRuleAssetController.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
 	                            	<p:ajax listener="#{relRuleAssetController.clearPmOrderRule()}" update="PmOrderRule"/>
 	                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-	                             <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-		                      </p:selectOneMenu>
+                                  <c:if test="#{relRuleAssetController.getPmRule()}">
+                                      <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                  </c:if>
+                                  <c:if test="#{!relRuleAssetController.getPmRule()}">
+                                      <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                  </c:if>
+                              </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.PmOrderRule}*</label>

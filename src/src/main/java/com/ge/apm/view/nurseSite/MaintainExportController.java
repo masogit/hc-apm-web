@@ -235,8 +235,7 @@ public class MaintainExportController implements ServerEventInterface{
             long t2 = System.currentTimeMillis();
             LOGGER.info("Export docx: loading data: {}", t2 - t1);
 
-            byte[] templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/nurseSite/template.docx"));
-            byte[] result = wordReportExportService.writeMaintainDetailToDocx(templateBytes, checkedMaintainList);
+            byte[] result = wordReportExportService.writeMaintainDetailToDocx(checkedMaintainList);
             if (result != null) {
                 exportFile = new DefaultStreamedContent(new ByteArrayInputStream(result), "application/zip", "Report.zip");
             }

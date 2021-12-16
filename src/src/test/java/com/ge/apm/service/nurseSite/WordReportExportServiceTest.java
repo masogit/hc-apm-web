@@ -113,8 +113,8 @@ public class WordReportExportServiceTest {
         bytes.add(FileUtils.readFileToByteArray(file1));
         bytes.add(FileUtils.readFileToByteArray(file2));
 
-        byte[] zip = service.zip(bytes);
-        FileUtils.writeByteArrayToFile(new File("d:\\myzip.zip"), zip);
+//        byte[] zip = service.zip(bytes);
+//        FileUtils.writeByteArrayToFile(new File("d:\\myzip.zip"), zip);
     }
 
 

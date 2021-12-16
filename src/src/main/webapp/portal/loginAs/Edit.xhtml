@@ -70,13 +70,22 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('region')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+ <!--                       <h:panelGroup rendered="#{userContextService.isSupportMultiLanguage()}">
+                            <label class="label">#{msg.defaultLang}</label>
+                            <p:selectOneMenu value="#{userAccountController.selected.defaultLanguage}">
+                                <f:selectItem itemLabel="zh" itemValue="zh"/>
+                                <f:selectItem itemLabel="en" itemValue="en"/>
+                                &lt;!&ndash;<f:selectItem itemLabel="tw" itemValue="tw"/>&ndash;&gt;
+                            </p:selectOneMenu>
+                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.userPosition}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.position}" >
-                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true" />
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('userPosition')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.InitialPassword}</label>
                             <p:password id="password" value="#{userAccountController.selected.plainPassword}"  autocomplete="new-password"/>

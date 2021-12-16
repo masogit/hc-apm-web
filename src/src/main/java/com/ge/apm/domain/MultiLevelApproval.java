@@ -138,34 +138,21 @@ public class MultiLevelApproval implements Serializable {
     private String createdBy;
 
     /**
-     * 租户
-     */
-    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
-    private String tenantUID;
-
-    /**
-     * 集团
-     */
-    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
-    private String institutionUID;
-
-    /**
-     * 医院
-     */
-    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
-    private String hospitalUID;
-
-    /**
-     * 院区
-     */
-    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
-    private String siteUID;
-
-    /**
      * 组织id
      */
     @Column(name = "hier_org_uid", columnDefinition = "CHAR(32)")
     private String hierOrgUid;
+
+    /**
+     * 租户
+     */
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUID;
+    /**
+     * 审批签名-同意/不同意时用
+     */
+    @Column(name = "audit_signature")
+    private String auditSignature;
 
     public boolean getApprovalIng() {
         return approvalIng;

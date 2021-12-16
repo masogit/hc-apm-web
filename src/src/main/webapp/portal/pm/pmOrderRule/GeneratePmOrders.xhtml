@@ -26,9 +26,14 @@
 					   <h:panelGroup>
 						   <label class="label">#{msg.ruleLevel}*</label>
 						   <p:selectOneMenu id="level" value="#{generatePmOrdersController.level}" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
-							   <!--<p:ajax listener="#{generatePmOrdersController.addFilter()}" update="GeneratePmOrderForm" process="@this" />-->
+							   <p:ajax listener="#{generatePmOrdersController.addSelected()}" process="@this" />
 							   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-							   <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                               <c:if test="#{generatePmOrdersController.getPmRule()}">
+                                   <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                               </c:if>
+                               <c:if test="#{!generatePmOrdersController.getPmRule()}">
+                                   <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                               </c:if>
 						   </p:selectOneMenu>
 					   </h:panelGroup>
 

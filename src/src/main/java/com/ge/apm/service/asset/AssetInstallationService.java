@@ -383,4 +383,15 @@ public class AssetInstallationService {
 
     }
 
+    public void updateAssetInfo(ArrivalListItem item){
+        AssetInfo assetInfo = assetDao.getByUid(item.getAssetUID());
+        assetInfo.setName(item.getArrivalList().getAssetName());
+        assetInfo.setFunctionType(item.getFunctionType());
+        assetInfo.setImportEquipment(item.getImportEquipment());
+        assetInfo.setWarrantyMonth(item.getWarrantyMonth());
+        assetInfo.setAnnualMaintenanceTimes(item.getAnnualMaintenanceTimes());
+        assetInfo.setSerialNum(item.getSerialNum());
+        assetInfo.setLocationName(item.getLocationName());
+        assetDao.save(assetInfo);
+    }
 }

@@ -19,6 +19,8 @@
                             <label class="label">#{msg.PartQuantity}*</label>
                             <p:inputNumber  maxValue="999"  decimalPlaces="0"  id="apartsQuantity1" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
                             <f:convertNumber pattern="0" type="number"/>
+                                <p:ajax listener="#{v2PmOrderController.partsQuantity1Update()}" update="@(.hetongjia)" >
+                                </p:ajax>
                             </p:inputNumber>
                         </h:panelGroup>
 
@@ -123,7 +125,7 @@
                                             completeMethod="#{v2PmOrderController.autosparePartName()}"
                                             var="item" itemLabel="#{item.name}"
                                             itemValue="#{item}"
-                                            converter="simplePartsItemConverter">
+                                            converter="simplePartsItemConverter" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
                                 <p:ajax event="itemSelect"
                                         listener="#{v2PmOrderController.onSparePartsValueChange}"
                                         update="pmmoreAccDialogForm"/>
@@ -142,7 +144,7 @@
                                             completeMethod="#{v2PmOrderController.initSparePartsMaster()}"
                                             var="item" itemLabel="#{item.name}"
                                             itemValue="#{item}"
-                                            converter="simplePartsItemConverter">
+                                            converter="simplePartsItemConverter" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
                                 <p:ajax event="itemSelect"
                                         listener="#{v2PmOrderController.onSparePartsMasterValueChange}"
                                         update="pmmoreAccDialogForm"/>
@@ -150,7 +152,10 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.PartQuantity}*</label>
-                            <p:inputNumber  decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
+                           <p:inputNumber  decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
+                                <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
+                                </p:ajax>
+                           </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup id="remainingStock" rendered="#{v2PmOrderController.statusFlag==1}">
                             <label class="label">所剩库存</label>

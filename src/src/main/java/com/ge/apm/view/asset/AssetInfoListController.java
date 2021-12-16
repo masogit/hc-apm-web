@@ -8,9 +8,12 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -58,6 +61,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private I18nMessageRepository i18nDao;
     private TenantOptionConfigRepository tenantOptionConfigRepository;
     private AssetHistoryService assetHistoryService;
+    private RelRuleAssetRepository relRuleAssetRepository;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -73,6 +77,18 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     //搜索字串
     private String oneSearchStr;
+    //是否保养
+    @Getter @Setter
+    private String isPmSearch;
+
+    //显示子设备，主设备，或者全部类型的设备
+    @Getter
+    private int queryType = 1;
+    public void setQueryType(int queryType) {
+        this.searchFilters.clear();
+        this.queryType = queryType;
+    }
+    private List<String> relRuleAssetUids = new ArrayList<>();
 
     private boolean terminate = false;
 
@@ -148,12 +164,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
+        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
         loadCustomConfig();
         loadClinicalDeptList();
-
+        getRelRuleAssetUids();
         warrantyAlertDays = getWarrantyAlertDaysConfig();
     }
     
@@ -220,7 +237,32 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             pageRequest =addRequiredSortById(pageRequest);
 
         lastPageSort = pageRequest.getSort(); //export excel use
-        Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        boolean createdByBoolean = false;
+        String value = null;
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("createdBy".equals(searchFilter.fieldName)) {
+                createdByBoolean = true;
+                value = (String)searchFilter.value;
+            }
+        }
+        Page<AssetInfo> res;
+        if(createdByBoolean) {
+            List<SearchFilter> searchFiltersList = new ArrayList(searchFilters);
+            searchFiltersList.removeIf(e -> e.fieldName.equals("createdBy"));
+            List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
+            List<String> loginNamList = new ArrayList<>();
+            if(!userAccountList.isEmpty()){
+                for (UserAccount userAccount:userAccountList) {
+                    loginNamList.add(userAccount.getLoginName());
+                }
+            }
+            searchFiltersList.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
+            res = dao.findBySearchFilter(searchFiltersList, pageRequest);
+        }else {
+            res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        }
+
         currentPageAssets = res.getContent();
 
         //设置OneQrCodeStatus
@@ -298,6 +340,20 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private void setUserSearchFilters() {
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        if(isPmSearch!=null) {
+            if(isPmSearch.equals("ypz")) {
+                this.updateSearchFilter(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+                this.updateSearchFilter(new SearchFilter("uid",SearchFilter.Operator.IN,relRuleAssetUids));
+            } else if(isPmSearch.equals("wpz")) {
+                this.updateSearchFilter(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+                this.updateSearchFilter(new SearchFilter("uid",SearchFilter.Operator.NotIN,relRuleAssetUids));
+            } else if(isPmSearch.equals("bpz")) {
+                this.updateSearchFilter(new SearchFilter("isPm", SearchFilter.Operator.EQ, false));
+            }
+        } else {
+            this.removeFilterOnField("isPm");
+            this.removeFilterOnField("uid");
+        }
         if (terminate) {
             this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
         } else {
@@ -333,6 +389,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("assetTags.tag", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
+        if(queryType == 1) //全部
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "parentAssetId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        if(queryType == 2) //主设备
+            this.updateSearchFilter(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, null, "1*"));
+        if(queryType == 3) //子设备
+            this.updateSearchFilter(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNotNull, null,"1*"));
 
         if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*"));
@@ -541,6 +603,47 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public boolean isChecked() {
         return selectedMap.containsValue(true);
+    }
+
+    public void getRelRuleAssetUids() {
+        relRuleAssetUids = relRuleAssetRepository.findAssetUidsByTenantUID(userContextService.getLoginUser().getTenantUID());
+    }
+
+    public void setSelectedAssetsUids() {
+        List<String> selectedAssetUids = new ArrayList<>();
+        selectedMap.keySet().stream().forEach(assetUid -> { if(selectedMap.get(assetUid)) selectedAssetUids.add(assetUid); });
+        RelRuleAssetController.assetInfoUids = selectedAssetUids;
+    }
+
+    public List<I18nMessage> getListForRelRule() {
+        List<I18nMessage> result = new ArrayList<>();
+        result.add(new I18nMessage(null,"wpz","未配置规则"));
+        result.add(new I18nMessage(null,"ypz","已配置规则"));
+        result.add(new I18nMessage(null,"bpz","不能配置规则"));
+        return result;
+    }
+
+    public Boolean showIsPm() {
+        Boolean flag = Boolean.FALSE;
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
+        if (tenantOptionConfigOptional.isPresent()) {
+            flag = tenantOptionConfigOptional.get().getShowIsPm();
+        }
+        return flag;
+    }
+
+    public String getRelRuleStatusName(String uid,Boolean isPm) {
+        String result = null;
+        if(isPm==null || isPm == false) {
+            result = "不能配置规则";
+        } else {
+            if(relRuleAssetUids.contains(uid)) {
+                result = "已配置规则";
+            } else {
+                result = "未配置规则";
+            }
+        }
+        return result;
     }
 
     public List<AssetInfo> getExportList() {

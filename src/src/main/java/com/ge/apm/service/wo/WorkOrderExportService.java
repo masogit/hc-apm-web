@@ -3,11 +3,15 @@ package com.ge.apm.service.wo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -19,6 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -71,8 +76,22 @@ public class WorkOrderExportService {
     private OrgInfoTreeService orgInfoTreeService;
     @Autowired
     private WorkOrderReportMapper worDao;
+    @Autowired
+    private ServiceRequestApiService serviceRequestApiService;
 
-    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice){
+
+    public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg,OrgInfo clinicalDepte){
+        String token = UserContextService.getAccessToken();
+        if(clinicalDepte!=null) {
+            return serviceRequestApiService.getVisableMvsAssetSystemIdByClinaicalDept(token,clinicalDepte.getUid());
+        } else if(siteOrg!=null) {
+            return serviceRequestApiService.getVisableMvsAssetSystemIdBySite(token,siteOrg.getUid());
+        } else {
+            return serviceRequestApiService.getVisableMvsAssetSystemId(token);
+        }
+    }
+
+    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap,String currentStep){
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
@@ -139,8 +158,70 @@ public class WorkOrderExportService {
         if(filterTotalPrice != null){
             searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
         }
-
+        List<Integer> assetIds = getVisableMvAssetIds(selectedOrg,clinicalDept);
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
+        if(assetIds.size()>0) {
+            searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, assetIds));
+            workOrderList.addAll(worDao.workOrderExportForMVS(searchFilters));
+        }
+        workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
+            if(assetIds.contains(workOrderExportPojo.getAssetId())) {
+                workOrderExportPojo.setMVSWorkOrder(true);
+            } else {
+                workOrderExportPojo.setMVSWorkOrder(false);
+            }
+            boolean isReturn = true;
+            if(isReturn && filterMap.get("srNum")!=null && filterMap.get("srNum").length()>0) {   //报修单号
+                if(workOrderExportPojo.getSrNum()!=null) {
+                    isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("srNum").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn && filterMap.get("assetDepartNum")!=null && filterMap.get("assetDepartNum").length()>0) {  //设备编号
+                if(workOrderExportPojo.getAssetDepartNum()!=null) {
+                    isReturn = workOrderExportPojo.getAssetDepartNum().contains(filterMap.get("assetDepartNum").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn  && filterMap.get("assetName")!=null && filterMap.get("assetName").length()>0) {    //设备名称
+                if(workOrderExportPojo.getAssetName()!=null) {
+                    isReturn = workOrderExportPojo.getAssetName().contains(filterMap.get("assetName").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn && filterMap.get("assetFunctionType")!=null && filterMap.get("assetFunctionType").length()>0) {  //设备型号
+                if(workOrderExportPojo.getAssetFunctionType()!=null) {
+                    isReturn = workOrderExportPojo.getAssetFunctionType().contains(filterMap.get("assetFunctionType").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn  && filterMap.get("requestorName")!=null && filterMap.get("requestorName").length()>0) {  //报修人
+                if(workOrderExportPojo.getRequestorName()!=null && filterMap.get("requestorName")!=null) {
+                    isReturn = workOrderExportPojo.getRequestorName().contains(filterMap.get("requestorName").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn && filterMap.get("requestReason")!=null && filterMap.get("requestReason").length()>0) {  //故障描述
+                if(workOrderExportPojo.getRequestReason()!=null) {
+                    isReturn = workOrderExportPojo.getRequestReason().contains(filterMap.get("requestReason").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn && currentStep!=null) {  //当前步骤
+                if(workOrderExportPojo.getCurrentStepId()!=null) {
+                    isReturn = Integer.parseInt(currentStep)==workOrderExportPojo.getCurrentStepId();
+                } else {
+                    isReturn = false;
+                }
+            }
+            return isReturn;
+        }).collect(Collectors.toList());
 
         for(WorkOrderExportPojo workOrderExportPojo : workOrderList){
             Map<String, Object> workOrderMap = new HashedMap();
@@ -178,6 +259,7 @@ public class WorkOrderExportService {
                 workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), currentStepId != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()) : "");
             }
 
+            workOrderMap.put("是否MVS工单",workOrderExportPojo.getMVSWorkOrder()? "是" : "否");
             workOrderMap.put(WebUtil.getMessage("requestorId"), workOrderExportPojo.getRequestorName());
             workOrderMap.put(WebUtil.getMessage("RequestTime_xlsx"), formatDate(workOrderExportPojo.getRequestTime()));
             workOrderMap.put(WebUtil.getMessage("FaultDescription_xlsx"), workOrderExportPojo.getRequestReason());

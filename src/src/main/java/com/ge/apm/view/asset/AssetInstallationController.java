@@ -16,7 +16,10 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.view.pm.RelRuleAssetController;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -26,22 +29,6 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 
-import com.ge.apm.dao.ArrivalListItemRepository;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.GbCodeRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.domain.ArrivalList;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.GbCode;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.QrCodeTemplate;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
@@ -68,6 +55,12 @@ public class AssetInstallationController {
     @Setter
     private ArrivalListItem arrivalListItem;
     private ArrivalListItemRepository itemDao;
+    private WorkflowConfigRepository workflowDao;
+    private UserAccountRepository userAccountDao;
+    private ArrivalListRepository arrivalListDao;
+    private RelRuleAssetRepository relRuleAssetDao;
+    private AssetInfoRepository assetInfoRepository;
+    private TableDefinitionRepository tableDefinitionRepository;
     private AssetInstallationService aiService;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
@@ -77,7 +70,6 @@ public class AssetInstallationController {
     private CustomConfigService ccService;
 
     private List<V2_BlobObject> attachList;
-
     @Getter
     @Setter
     private List<I18nMessage> code68List;
@@ -162,6 +154,12 @@ public class AssetInstallationController {
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
+        workflowDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        arrivalListDao = WebUtil.getBean(ArrivalListRepository.class);
+        relRuleAssetDao = WebUtil.getBean(RelRuleAssetRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        tableDefinitionRepository = WebUtil.getBean(TableDefinitionRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         assetInstallationReportService = WebUtil.getBean(AssetInstallationReportService.class);
@@ -266,6 +264,7 @@ public class AssetInstallationController {
     }
 
     public String finishInstall() {
+
         Boolean isValidate = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
@@ -365,6 +364,77 @@ public class AssetInstallationController {
                 WebUtil.addErrorMessage("提交失败");
             }
 
+        }
+        String arrivalListId = arrivalListItem.getArrivalListId();
+
+        if(arrivalListId != null ){
+            //获取到arrival_list实体类对象
+            ArrivalList arrivalList1 = arrivalListDao.findById(arrivalListId);
+            //获取到院区编号
+            String siteId = arrivalList1.getSiteUID();
+            //获取到医院编号
+            String hospitalId = arrivalList1.getHospitalUID();
+            //获取到集团编号
+            String institutionId = arrivalList1.getInstitutionUID();
+            //获取到租户编号
+            String tenantId = arrivalList1.getTenantUID();
+            //获取到订单号（同一个合同号会有多个订单号）
+            String orderNumber = arrivalList1.getName();
+            List<WorkflowConfig> workflowConfigItems = workflowDao.findBySiteUID(siteId);
+            WorkflowConfig workflowConfigItem =null;
+            if(workflowConfigItems.size()>0){
+                workflowConfigItem = workflowConfigItems.get(0);
+            }else{
+                workflowConfigItems = workflowDao.findByHospitalUID(hospitalId);
+                if(workflowConfigItems.size()>0){
+                    workflowConfigItem = workflowConfigItems.get(0);
+                }else{
+                    workflowConfigItems = workflowDao.findByInstitutionUID(institutionId);
+                    if(workflowConfigItems.size()>0){
+                        workflowConfigItem = workflowConfigItems.get(0);
+                    }else{
+                        workflowConfigItems = workflowDao.findByTenantUID(tenantId);
+                        if(workflowConfigItems.size()>0){
+
+                            workflowConfigItem = workflowConfigItems.get(0);
+                        }
+                    }
+                }
+            }
+            if(workflowConfigItem != null){
+                //获取到workflow中是否售后服务
+                Boolean anBool = workflowConfigItem.getAiNeedMaintenance();
+                if(anBool != null && anBool  == true){
+                    ArrivalList arrivalListToStatus = arrivalListDao.findByName(orderNumber);
+                    if(arrivalListToStatus.getStatus()!=3){
+                        return returnAction();
+                    }
+                    List<TableDefinition> tableDefinitions = tableDefinitionRepository.getBySiteUID(siteId);
+                    if(tableDefinitions.size()>0){
+                        //需要判断设备分类是否相同而跳转到I产规则管理
+                        //获取到安装设备的分类编号
+                        Integer assetGroupNum1 = arrivalList1.getAssetGroup();
+                        //获取到多个保养报告模板，循环每一个获取到设备分类的编号和安装设备编号对比
+                        //有相同编号的跳转到资产规则管理，没有跳转到保养报告模板
+                        for(TableDefinition tableDefinition : tableDefinitions){
+                            Integer assetGroupId = tableDefinition.getAssetGroup();
+                            if(assetGroupNum1.equals(assetGroupId)){
+                                //获取到assetinfo表中设备想对应的uid值
+                                List<String> assetIds = itemDao.getAssetUid(arrivalListId);
+                                //通过assetinfo中的uid值，获取到id值保存到集合
+                                RelRuleAssetController.assetInfoUids=assetIds;
+                                return "/portal/asset/arrived/ItemEdit2?faces-redirect=true";
+                            }else{
+                                return "/portal/reporter/schemaList?faces-redirect=true";
+                            }
+                        }
+                    }else{
+                        return "/portal/reporter/schemaList?faces-redirect=true";
+                    }
+                }else{
+                    return returnAction();
+                }
+            }
         }
         return returnAction();
     }
@@ -476,6 +546,10 @@ public class AssetInstallationController {
             } else {
                 arrivalListItem.setUsageStatus(3);
             }
+            //保存品牌
+            if(StringUtils.isBlank(arrivalListItem.getBrand())){
+                arrivalListItem.setBrand(arrivalListItem.getArrivalList().getBrand());
+            }
         }
 
         if(StringUtils.isNotBlank(errorMessage)){
@@ -484,7 +558,6 @@ public class AssetInstallationController {
         }
 
         finishInstallHandle(itemList);
-
         return returnAction();
     }
     public void finishInstallHandle(List<ArrivalListItem> itemList) {
@@ -683,6 +756,7 @@ public class AssetInstallationController {
         asset.setFinancingNum(arrivalListItem.getFinancingNum());
         asset.setModalityId(arrivalListItem.getModalityId());
         asset.setSystemId(arrivalListItem.getSystemId());
+        asset.setMakerShortName(arrivalListItem.getArrivalList().getMakerShortName());
         String tempSiteUid = arrivalListItem.getArrivalList().getSiteUID();
         //check to delete
         String tempQrCode = asset.getQrCode();

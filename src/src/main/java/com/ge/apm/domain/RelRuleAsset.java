@@ -25,13 +25,19 @@ public class RelRuleAsset {
 	
 	@Column(name = "rule_uid")
 	private String ruleUID;
+
+    @Column(name = "rule_uid_inspection")
+    private String ruleUIDInspection;   //巡检
 	
 	@Column(name = "rule_uid2")
-	private String ruleUID2;
-	
-	@Column(name = "rule_uid1")
+	private String ruleUID2;   //二级保养规则
+
+	@Column(name = "rule_uid1")  //一级保养规则
 	private String ruleUID1;
-	
+
+	@Column(name = "rule_uid4")  //质量控制
+	private String ruleUID4;
+
 	 @Column(name = "asset_uid")
 	private String assetUID;
 	 
@@ -52,8 +58,24 @@ public class RelRuleAsset {
 
 	@Column(name="site_uid",columnDefinition = "CHAR(32)")
 	private String siteUID;
-    
-	public String getTenantUID() {
+
+    public String getRuleUIDInspection() {
+        return ruleUIDInspection;
+    }
+
+    public void setRuleUIDInspection(String ruleUIDInspection) {
+        this.ruleUIDInspection = ruleUIDInspection;
+    }
+
+    public String getRuleUID4() {
+        return ruleUID4;
+    }
+
+    public void setRuleUID4(String ruleUID4) {
+        this.ruleUID4 = ruleUID4;
+    }
+
+    public String getTenantUID() {
 		return tenantUID;
 	}
 
