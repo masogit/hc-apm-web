@@ -101,6 +101,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private List<OrgInfo> clinicalDeptList;
     private boolean terminate = false;
     private OrgInfoRepository orgDao;
+    private TenantInfoRepository tenantInfoRepository;
     private UserAccountRepository userDao;
     private V2_WorkOrderService woService;
     private AuditGroupConfigurationRepository auditGroupConfigurationRepository;
@@ -165,6 +166,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Map<String, Boolean> selectedMap;
     private String selectedApproverUid;
     private ServiceRequestApiService serviceRequestApiService;
+    private AuditGroupConfigurationDetailRepository auditGroupConfigurationDetailRepository;
     private WorkflowConfigRepository woConDao;
     private String token;
     private OrgInfoTreeService orgInfoTreeService;
@@ -224,6 +226,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             ccService = WebUtil.getBean(CustomConfigService.class);
             blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
             customConfigService = WebUtil.getBean(CustomConfigService.class);
+            tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+            auditGroupConfigurationDetailRepository = WebUtil.getBean(AuditGroupConfigurationDetailRepository.class);
             currentCustomConfig = customConfigService.getCurrentCustomConfig(
                     UserContextService.getCurrentUserAccount().getSiteUID());
             aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -875,18 +879,43 @@ public void test1(){
 //            }
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
             } else if (queryIndex == 10) { //待审批
+                UserAccount userAccount = userContextService.getCurrentUserAccount();
+                String tenantUID = userAccount.getTenantUID();
+                TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+                if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+                    List<UserAccount> userAccountList = new ArrayList<>();
+                    AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
+                    String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+                    List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+                    if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                        for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                            AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                            List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                            UserAccount account = userDao.getByUid(userUids.get(0));
+                            userAccountList.add(account);
+                        }
 
+                    }
+                    if (userAccountList.contains(userAccount)){
+                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1));
+                    }else {
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0));
+                    }
+                }else {
+                    if (!(userContextService.hasRole("AssetHead") || userContextService.hasRole("DeptHead"))) {
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+                    }
+                    if (userContextService.hasRole("DeptHead")) {
+                        List<String> clinicalUidList = orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
+                        searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalUidList, "1*2+"));
+                    }
+                }
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
                 searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
                 searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
-                if(!(userContextService.hasRole("AssetHead")||userContextService.hasRole("DeptHead"))){
-                    searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-                }
-                if(userContextService.hasRole("DeptHead")){
-                    List<String> clinicalUidList =  orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
-                    searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-                    searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalUidList,"1*2+"));
-                }
+
 
             } else if (queryIndex == 11) { //全部维修单
                 if(stepFileter!=null) {
@@ -960,6 +989,25 @@ public void test1(){
         return   bySearchFilter;
     }
 
+    public Boolean getSign(String uid){
+        UserAccount userAccount = userContextService.getCurrentUserAccount();
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+            List<AuditGroupConfigurationDetail> details = auditGroupConfigurationDetailRepository.findByBusinessUidAndActualAuditUidAndDeleteFlag(uid, userAccount.getUid(),0);
+            if(details==null || details.isEmpty()){
+                return true;
+            }else {
+                for (AuditGroupConfigurationDetail auditGroupConfigurationDetail:details) {
+                    if(auditGroupConfigurationDetail.getAuditNodeStatus()==0){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        return true;
+    }
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
 
@@ -2227,7 +2275,7 @@ public void test1(){
         List<UserAccount> uaList=new ArrayList<>();
         if (hospitalNameBoolean){
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getSiteUID(), "医工组长分组");
+            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getSiteUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
             String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
             List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
             if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {

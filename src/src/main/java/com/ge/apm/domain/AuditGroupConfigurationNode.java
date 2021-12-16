@@ -21,7 +21,10 @@ public class AuditGroupConfigurationNode implements Serializable {
 
 
     @JSONField(serialize = false)
-    private List<UserAccount> approveUsers; //审核人
+    private List<UserAccount> approveUsers; //审核人集合
+
+    @JSONField(serialize = false)
+    private UserAccount auditUser; //审核人
 
 
     private List<String> userUids; //审核人

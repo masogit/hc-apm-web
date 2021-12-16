@@ -39,6 +39,12 @@ public class AuditGroupConfigurationDetail implements Serializable {
      */
     @Column(name = "audit_node_status")
     private Integer auditNodeStatus;
+
+    /**
+     * 0 在用 1失效
+     */
+    @Column(name = "delete_flag")
+    private Integer deleteFlag;
     /**
      * 审批人UID
      */
@@ -50,6 +56,11 @@ public class AuditGroupConfigurationDetail implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "actual_audit_date")
     private Date actualAuditDate;
+    /**
+     * 审批签名
+     */
+    @Column(name = "approver_signature")
+    private String approverSignature;
 
     @Override
     public int hashCode() {

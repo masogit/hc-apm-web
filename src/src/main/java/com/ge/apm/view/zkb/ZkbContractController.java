@@ -100,6 +100,10 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     @Override
     public void delete() {
+        if(!zkbContractService.checkForDelete(selected)){
+            WebUtil.addSuccessMessage("合同已存在业务数据，不能删除！");
+            return;
+        }
         zkbContractService.deleteContract(this.selected,this.reason,currentUser);
         this.selected= null;
         this.reason="";
