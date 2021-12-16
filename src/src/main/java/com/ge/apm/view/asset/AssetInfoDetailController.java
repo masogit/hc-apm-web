@@ -24,6 +24,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
@@ -82,6 +83,10 @@ public class AssetInfoDetailController {
     @Getter
     private List<JSONObject> changeHistoryList = Collections.emptyList();
     private SysAuthGroup selectedAuthGroup;
+    @Getter
+    private boolean countyArea = false;
+
+    private UserContextService userContextService;
 
     @PostConstruct
     protected void init() {
@@ -110,6 +115,9 @@ public class AssetInfoDetailController {
         if(selectedId!=null) selected = assetDao.findById(Integer.parseInt(selectedId));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        userContextService = WebUtil.getBean(UserContextService.class);
+        countyArea = userContextService.isCountyArea();
 
         if(selected!=null) {
             if (selected.getSupplierId() != null) {
