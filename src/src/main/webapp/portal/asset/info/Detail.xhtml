@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
     <ui:define name="head">
         <h:outputStylesheet name="css/assetUsageAll.css"/>
@@ -199,8 +200,11 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.status}</label>
                                     <p:selectOneRadio id="status"  label="#{msg.status}" value="#{assetInfoController.selected.status}" disabled="true">
-                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                    </p:selectOneRadio>
+                                        <c:forEach items="#{fieldMsg.getFieldValueList('assetStatus')}" var="item">
+                                            <c:if test="#{item.msgKey != '6'}">
+                                                <f:selectItem  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            </c:if>
+                                        </c:forEach>                                    </p:selectOneRadio>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.deviceStatus}</label>

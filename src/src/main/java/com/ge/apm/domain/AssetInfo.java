@@ -558,7 +558,9 @@ public class AssetInfo implements ChineseName,Serializable {
     //开机电流阈值
     @Column(name = "power_on_threshold")
     private Double powerOnThreshold;
-
+    //电源ID
+    @Column(name = "current_id")
+    private String currentId;
 
     @Size(max = 256)
     @Column(name = "one_qr_code")
@@ -611,6 +613,10 @@ public class AssetInfo implements ChineseName,Serializable {
     // 设备性质
     @Column(name = "asset_quality")
     private Integer assetQuality;
+
+    //无人值守设备状态  0:关机  1:待机 2:在用
+    @Column(name = "running_status")
+    private Integer runningStatus;
 
     @Transient
     private int lineNum;
@@ -2357,6 +2363,14 @@ public class AssetInfo implements ChineseName,Serializable {
     public String getSharedAssetSwapIndex() { return sharedAssetSwapIndex; }
 
     public void setSharedAssetSwapIndex(String sharedAssetSwapIndex) { this.sharedAssetSwapIndex = sharedAssetSwapIndex; }
+
+    public Integer getRunningStatus() {
+        return runningStatus;
+    }
+
+    public void setRunningStatus(Integer runningStatus) {
+        this.runningStatus = runningStatus;
+    }
 
     public Integer getAssetQuality() {
         return assetQuality;

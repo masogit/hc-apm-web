@@ -247,6 +247,9 @@ public class WorkflowConfig implements Serializable {
     //是否启用无人值守
     @Column(name = "whether_to_enable_unattended ")
     private Boolean whethertoenableunattended;
+    //是否启用院间借调
+    @Column(name = "enable_site_to_site_allocation")
+    private Boolean enableSiteToSiteAllocation;
 
     public Boolean getWhethertoenableunattended() {
         if(whethertoenableunattended ==null){
@@ -1308,6 +1311,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setEnableUpdateSwitchingTime(Boolean enableUpdateSwitchingTime) {
         this.enableUpdateSwitchingTime = enableUpdateSwitchingTime;
+    }
+
+    public Boolean getEnableSiteToSiteAllocation() {
+        return enableSiteToSiteAllocation;
+    }
+
+    public void setEnableSiteToSiteAllocation(Boolean enableSiteToSiteAllocation) {
+        this.enableSiteToSiteAllocation = enableSiteToSiteAllocation;
     }
 
     /**

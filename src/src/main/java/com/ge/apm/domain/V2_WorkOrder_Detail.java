@@ -92,6 +92,11 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
 
     @Column(name = "parts_type")
     private String partsType;
+    /**
+     * 添加备件签名
+     */
+    @Column(name = "parts_signature")
+    private String partsSignature;
 
     @Column(name = "approved")
     private Boolean approved;
@@ -177,6 +182,14 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
      */
     @Column(name = "detail_review_signature")
     private String detailReviewSignature;
+
+    public String getPartsSignature() {
+        return partsSignature;
+    }
+
+    public void setPartsSignature(String partsSignature) {
+        this.partsSignature = partsSignature;
+    }
 
     public String getCreatedBy() {
         return createdBy;

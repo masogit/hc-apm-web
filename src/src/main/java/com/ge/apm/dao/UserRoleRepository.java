@@ -23,6 +23,9 @@ public interface UserRoleRepository extends GenericRepository<UserRole> {
     
     public List<UserRole> findByUserId(int userId);
 
+    @Query(value="select user_id from user_role where role_id in ?1",nativeQuery=true)
+    public List<Integer> findByRoleIds(List<Integer> userId);
+
     //0 means sys role 1 means custom role
     List<UserRole> findByUserIdAndRoleType(Integer userId, Integer roleType);
 
