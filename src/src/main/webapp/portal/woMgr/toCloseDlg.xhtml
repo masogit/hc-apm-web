@@ -122,6 +122,35 @@
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
+                            <h:panelGroup rendered="#{userContextService.isCountyArea}">
+                                <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturn(workOrderMgrController.selectedWorkOrder.id)}"
+                                             var="item" widgetVar="detailReturnList" lazy="false" paginator="false" rowKey="#{item.id}" rows="100" emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="#{msg.accessory}">
+                                        <h:outputText value="#{item.partName}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.assetsDashboardclm2}">
+                                        <h:outputText value="#{item.serialNum}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.returnNum}">
+                                        <h:outputText value="#{item.returnNum}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.returnType}">
+                                        <p:selectOneMenu id="partReturnType" value="#{item.partReturnType}">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('partReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <p:ajax listener="#{workOrderMgrController.savePartReturnInfo(item)}" update="detailReturnList"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg.returnTime}">
+                                        <h:outputText value="#{item.returnTime}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+                                        </h:outputText>
+                                    </p:column>
+<!--                                    <f:facet name="{Toolbar}">-->
+<!--                                        <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update="detailReturnList" icon="ui-icon-check"/>-->
+<!--                                    </f:facet>-->
+                                </p:dataTable>
+                            </h:panelGroup>
                         </p:panelGrid>
 
                     </p:fieldset>

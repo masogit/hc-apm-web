@@ -110,6 +110,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
+    private WorkOrderDetailReturnRepository detailReturnDao;
     private V2_WorkOrderCoworkerRepository coWorkerDao;
     private V2_WorkOrderRepository woDao;
     private String locationName;
@@ -214,6 +215,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private MultiLevelApprovalService multiLevelApprovalService;
     @Setter@Getter
     private String highlevelApprovalComments;
+    List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
     @Override
     protected void init() {
         super.init();
@@ -254,6 +256,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             partsRequestWorkOrderService = WebUtil.getBean(SimplePartsRequestWorkOrderService.class);
             partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
             multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
+            detailReturnDao = WebUtil.getBean(WorkOrderDetailReturnRepository.class);
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -1155,6 +1158,13 @@ public void test1(){
         return woService.getWorkOrderDetails(woId);
     }
 
+    public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
+        if(v2WorkOrderDetailReturnList == null){
+            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(woId);
+        }
+        return v2WorkOrderDetailReturnList;
+    }
+
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return woService.getWorkOrderCoworker(woId);
     }
@@ -1516,8 +1526,32 @@ public void test1(){
         //更新维修子状态
         updateSelectedWorkOrder(selectedWorkOrder);
         woService.repairWorkOrder(selectedWorkOrder,assigneeId, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
+        saveCountyAreaPartReturnInfo();
         cancel();
     }
+
+    /**
+     * 保存县域租户待归还备件信息
+     */
+    public void saveCountyAreaPartReturnInfo(){
+        if(accessoryList != null && userContextService.isCountyArea()){
+            for(V2_WorkOrder_Detail v2_workOrder_detail:accessoryList){
+                for(int i=0;i< v2_workOrder_detail.getApartsQuantity();i++){
+                    V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn = new V2_WorkOrder_Detail_Return();
+                    v2WorkOrderDetailReturn.setWoId(v2_workOrder_detail.getWoId());
+                    v2WorkOrderDetailReturn.setWorkOrderDetailId(v2_workOrder_detail.getId());
+                    v2WorkOrderDetailReturn.setPartsItemId(v2_workOrder_detail.getPartsItemId());
+                    v2WorkOrderDetailReturn.setPartName(v2_workOrder_detail.getParts());
+                    v2WorkOrderDetailReturn.setReturnNum(1);
+                    v2WorkOrderDetailReturn.setSerialNum(v2_workOrder_detail.getSerialNum());
+                    v2WorkOrderDetailReturn.setCreatedDate(new Date());
+                    v2WorkOrderDetailReturn.setCreatedBy(v2_workOrder_detail.getCreatedBy());
+                    detailReturnDao.save(v2WorkOrderDetailReturn);
+                }
+            }
+        }
+    }
+
     public boolean whetherCheckIn(){
         V2_WorkOrder workOrder = dao.findById(selectedWorkOrder.getId());
         if(workOrder != null){
@@ -1915,7 +1949,6 @@ public void test1(){
         selectedObjectMap = new HashMap();
         itemDetail= vwd;
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
-
     }
     //保存一个备件
     public void saveItem(){
@@ -2651,6 +2684,18 @@ public void test1(){
     public boolean  canCreate(String role){
         UserContextService userContextService = this.userContextService;
         return userContextService.isCountyArea() ? userContextService.hasRole(role):Boolean.TRUE;
+    }
+
+    /**
+     * 县域：更新备件归还信息。
+     */
+    public void savePartReturnInfo(V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn){
+        if(v2WorkOrderDetailReturn != null && v2WorkOrderDetailReturn.getReturnType() != null){
+            v2WorkOrderDetailReturn.setReturnTime(new Date());
+            v2WorkOrderDetailReturn.setReturnBy(userContextService.getLoginUser().getLoginName());
+            detailReturnDao.save(v2WorkOrderDetailReturn);
+            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(v2WorkOrderDetailReturn.getWoId());
+        }
     }
 }
 
