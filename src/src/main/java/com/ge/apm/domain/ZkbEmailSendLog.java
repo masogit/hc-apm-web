@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -49,6 +50,7 @@ public class ZkbEmailSendLog implements Serializable {
     private Boolean hasException;
 
     @Column(name = "error_message")//错误信息
+    @Size(max = 4000)
     private String errorMessage;
 
     public String getCcEmail() {
