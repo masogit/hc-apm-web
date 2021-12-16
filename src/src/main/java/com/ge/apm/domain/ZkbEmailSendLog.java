@@ -42,6 +42,17 @@ public class ZkbEmailSendLog implements Serializable {
     @Column(name = "mail_type")//邮件类型
     private String mailType;//zkb fe  gefe
 
+    @Column(name = "has_exception")//是否异常
+    private Boolean hasException;
+
+    public Boolean getHasException() {
+        return hasException;
+    }
+
+    public void setHasException(Boolean hasException) {
+        this.hasException = hasException;
+    }
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
