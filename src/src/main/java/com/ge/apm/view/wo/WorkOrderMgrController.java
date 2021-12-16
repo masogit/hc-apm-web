@@ -45,6 +45,7 @@ import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -986,14 +987,40 @@ public void test1(){
             LOGGER.error("load data occur exception,{}", e.getMessage());
             throw e;
         }
-        return   bySearchFilter;
-    }
-
-    public Boolean getSign(String uid){
         UserAccount userAccount = userContextService.getCurrentUserAccount();
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+        List<V2_WorkOrder> workOrderList = new ArrayList<>();
         if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
-            List<AuditGroupConfigurationDetail> details = auditGroupConfigurationDetailRepository.findByBusinessUidAndActualAuditUidAndDeleteFlag(uid, userAccount.getUid(),0);
+            List<V2_WorkOrder> v2_workOrders = bySearchFilter.getContent();
+            if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
+                for (V2_WorkOrder v2_workOrder :v2_workOrders) {
+                    if (getSign(v2_workOrder.getId(), userAccount)) {
+                        workOrderList.add(v2_workOrder);
+                    }
+                }
+                int size = workOrderList.size();
+                workOrderList= this.pageNum(workOrderList, pageRequest);
+                bySearchFilter = new PageImpl<V2_WorkOrder>(workOrderList, pageRequest, size);
+            }
+        }
+        return   bySearchFilter;
+    }
+    private List<V2_WorkOrder> pageNum(List<V2_WorkOrder> v2_workOrderList,PageRequest pageRequest){
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize() - 1;
+        int numStart = pageNumber * pageSize;
+        numStart = numStart + pageNumber;
+        int numEnd = numStart + pageSize + 1;
+        int size = v2_workOrderList.size();
+        if(size > numEnd){
+            v2_workOrderList = v2_workOrderList.subList(numStart ,numEnd);
+        }else {
+            v2_workOrderList = v2_workOrderList.subList(numStart ,size);
+        }
+        return v2_workOrderList;
+    }
+    public Boolean getSign(String woId,UserAccount userAccount){
+            List<AuditGroupConfigurationDetail> details = auditGroupConfigurationDetailRepository.findByBusinessUidAndActualAuditUidAndDeleteFlag(woId, userAccount.getUid(),0);
             if(details==null || details.isEmpty()){
                 return true;
             }else {
@@ -1004,9 +1031,6 @@ public void test1(){
                 }
             }
             return false;
-        }
-
-        return true;
     }
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();

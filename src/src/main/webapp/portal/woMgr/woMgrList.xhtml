@@ -217,7 +217,7 @@
                     <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==10}"><!--审批-->
-                    <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()" rendered="#{workOrderMgrController.getSign(item.id)}"/>
+                    <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
                     <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm"  oncomplete="PF('ackDialog').show()"/>
