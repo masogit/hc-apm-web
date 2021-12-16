@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -1583,18 +1584,21 @@ public void test1(){
      */
     public void saveCountyAreaPartReturnInfo(){
         if(accessoryList != null && userContextService.isCountyArea()){
-            for(V2_WorkOrder_Detail v2_workOrder_detail:accessoryList){
-                for(int i=0;i< v2_workOrder_detail.getApartsQuantity();i++){
-                    V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn = new V2_WorkOrder_Detail_Return();
-                    v2WorkOrderDetailReturn.setWoId(v2_workOrder_detail.getWoId());
-                    v2WorkOrderDetailReturn.setWorkOrderDetailId(v2_workOrder_detail.getId());
-                    v2WorkOrderDetailReturn.setPartsItemId(v2_workOrder_detail.getPartsItemId());
-                    v2WorkOrderDetailReturn.setPartName(v2_workOrder_detail.getParts());
-                    v2WorkOrderDetailReturn.setReturnNum(1);
-                    v2WorkOrderDetailReturn.setSerialNum(v2_workOrder_detail.getSerialNum());
-                    v2WorkOrderDetailReturn.setCreatedDate(new Date());
-                    v2WorkOrderDetailReturn.setCreatedBy(v2_workOrder_detail.getCreatedBy());
-                    detailReturnDao.save(v2WorkOrderDetailReturn);
+            V2_WorkOrder v2WorkOrder = dao.findById(selectedWorkOrder.getId());
+            if(v2WorkOrder.getCurrentStepId()>4){
+                for(V2_WorkOrder_Detail v2_workOrder_detail:accessoryList){
+                    for(int i=0;i< v2_workOrder_detail.getApartsQuantity();i++){
+                        V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn = new V2_WorkOrder_Detail_Return();
+                        v2WorkOrderDetailReturn.setWoId(v2_workOrder_detail.getWoId());
+                        v2WorkOrderDetailReturn.setWorkOrderDetailId(v2_workOrder_detail.getId());
+                        v2WorkOrderDetailReturn.setPartsItemId(v2_workOrder_detail.getPartsItemId());
+                        v2WorkOrderDetailReturn.setPartName(v2_workOrder_detail.getParts());
+                        v2WorkOrderDetailReturn.setReturnNum(1);
+                        v2WorkOrderDetailReturn.setSerialNum(v2_workOrder_detail.getSerialNum());
+                        v2WorkOrderDetailReturn.setCreatedDate(new Date());
+                        v2WorkOrderDetailReturn.setCreatedBy(v2_workOrder_detail.getCreatedBy());
+                        detailReturnDao.save(v2WorkOrderDetailReturn);
+                    }
                 }
             }
         }
@@ -1645,6 +1649,18 @@ public void test1(){
 //               return;
 //           }else {
 //           }
+        if(userContextService.isCountyArea()){//关单前县域租户备件必须全部归还
+//            List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList = detailReturnDao.findByWoIdAndReturnType(selectedWorkOrder.getId(),null);
+            if(v2WorkOrderDetailReturnList != null){
+                for(V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn:v2WorkOrderDetailReturnList){
+                    if(v2WorkOrderDetailReturn.getReturnType() == null){
+                        WebUtil.addErrorMessage(WebUtil.getMessage("countyAreaPartReturnError"));
+                        RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
+                        return ;
+                    }
+                }
+            }
+        }
         woService.closeWorkOrder(selectedWorkOrder, comments, picList);
         cancel();
     }
@@ -2737,7 +2753,9 @@ public void test1(){
     /**
      * 县域：更新备件归还信息。
      */
+    @Transactional
     public void savePartReturnInfo(V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn){
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
         if(v2WorkOrderDetailReturn != null && v2WorkOrderDetailReturn.getReturnType() != null){
             v2WorkOrderDetailReturn.setReturnTime(new Date());
             v2WorkOrderDetailReturn.setReturnBy(userContextService.getLoginUser().getLoginName());
