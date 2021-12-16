@@ -35,6 +35,13 @@ public interface ZkbPartOrderMapper {
     @SelectProvider(type = ZkbPartOrderProvider.class, method = "queryBySystemIdAndSr")
     List<ZkbPartOrder> queryBySystemIdAndSr(@Param("systemId") String systemId,@Param("sr") String sr,@Param("partOrderNo") String partOrderNo,@Param("assetGroup") Integer assetGroup);
 
+    /**
+     * 查询所有单子
+     * @return
+     */
+    @SelectProvider(type = ZkbPartOrderProvider.class, method = "batchExport")
+    List<ZkbPartOrder> batchExport(@Param("testLogin")String testLogin, @Param("tenantUid")String tenantUid);
+
 
 
 }

@@ -395,6 +395,54 @@ public class ArrivalListItem implements Serializable {
     //设备型号
     @Column(name = "function_type")
     private String functionType;
+    //品牌
+    @Size(max = 64)
+    @Column(name = "brand")
+    private String brand;
+
+    @Column(name = "site_uid")
+    private String siteUid;
+
+    @Column(name = "hospital_uid")
+    private String hospitalUid;
+
+    @Column(name = "institution_uid")
+    private String institutionUid;
+
+    @Column(name = "tenant_uid")
+    private String tenantUid;
+
+    public void setSiteUid(String siteUid) {
+        this.siteUid = siteUid;
+    }
+
+    public void setHospitalUid(String hospitalUid) {
+        this.hospitalUid = hospitalUid;
+    }
+
+    public void setInstitutionUid(String institutionUid) {
+        this.institutionUid = institutionUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
+    }
+
+    public String getSiteUid() {
+        return siteUid;
+    }
+
+    public String getHospitalUid() {
+        return hospitalUid;
+    }
+
+    public String getInstitutionUid() {
+        return institutionUid;
+    }
+
+    public String getTenantUid() {
+        return tenantUid;
+    }
 
     public String getBuildingName() {
         return buildingName;
@@ -1132,5 +1180,13 @@ public class ArrivalListItem implements Serializable {
 
     public void setFunctionType(String functionType) {
         this.functionType = functionType;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 }

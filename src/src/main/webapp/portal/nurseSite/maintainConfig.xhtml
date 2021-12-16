@@ -14,6 +14,28 @@
                 <p:outputLabel class="pageTitle" value="日常检查配置" />
             </div>
             <div class="ui-g-12 card ">
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="3">
+                        <h:panelGroup>
+                            <p:commandButton id="btnOrg" value="#{empty maintainConfigController.selectSite? msg.AllHospitals:maintainConfigController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process="searchForm:treeNodeNameFilter @this" update="orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{maintainConfigController.onSelectSiteTreeNode}" update="maintainConfigListForm:datalist searchForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:form>
                 <h:form id="maintainConfigListForm">
                     <p:dataTable id="datalist" value="#{maintainConfigController.lazyModel}" var="item" widgetVar="varDataList"
                         selection="#{maintainConfigController.listSelected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"

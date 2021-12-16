@@ -12,9 +12,6 @@
                 <p:outputLabel class="pageTitle" value="USER CONFIG配置"/>
             </div>
             <div class="ui-g-12 card">
-                <h:form rendered="#{userContextService.zkbAdmin}">
-                    <p:commandButton id="importButton" icon="ui-icon-extlink" value="#{msg.zkbKeyUserConfig_userConfigImport}" title="#{msg.zkbKeyUserConfig_userConfigImport}" action="#{zkbPartOrderUserConfigController.importAction}"/>
-                </h:form>
                 <h:form id="zkbPartOrderUserConfigListForm">
                     <p:dataTable id="datalist" value="#{zkbPartOrderUserConfigController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbPartOrderUserConfigController.selected}"
@@ -26,22 +23,22 @@
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:ajax event="rowSelect" listener="#{zkbPartOrderUserConfigController.prepareEdit}" update="deleteButton editButton"/>
                         <p:ajax event="filter" listener="#{zkbPartOrderUserConfigController.onFilter}" />
-                        <p:column headerText="APM用户名" filterBy="#{item.loginName}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_apm}" filterBy="#{item.loginName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.loginName}"/>
                         </p:column>
-                        <p:column headerText="名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
-                        <p:column headerText="邮箱" filterBy="#{item.email}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_email}" filterBy="#{item.email}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.email}"/>
                         </p:column>
-                        <p:column headerText="电话" filterBy="#{item.phone}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_phone}" filterBy="#{item.phone}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.phone}"/>
                         </p:column>
-                        <p:column headerText="用户sso" filterBy="#{item.sso}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_sso}" filterBy="#{item.sso}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.sso}"/>
                         </p:column>
-                        <p:column headerText="区域" filterBy="#{item.region}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_region}" filterBy="#{item.region}" filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbContractRegion', item.region)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -50,8 +47,8 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="类型" filterBy="#{item.configType}" filterMatchMode="LIKE">
-                            <h:outputText  value="#{item.configTypeName}" />
+                        <p:column headerText="#{msg.zkbKeyUserConfig_type}" filterBy="#{item.configType}" filterMatchMode="LIKE">
+                            <h:outputText  value="#{fieldMsg.fieldValue('zkbPoStepsRole', item.configType)}" />
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -59,7 +56,7 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="资产类型" filterBy="#{item.assetType}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_propertyType}" filterBy="#{item.assetType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetType}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -70,13 +67,13 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="UsBackUp" >
+                        <p:column headerText="#{msg.zkbKeyUserConfig_usBackUp}" >
                             <h:outputText  value="#{item.usBackUpName}" />
                         </p:column>
-                        <p:column headerText="备注" filterBy="#{item.remark}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.remark}"/>
                         </p:column>
-                        <p:column headerText="订单类型" filterBy="#{item.orderType}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_orderType}" filterBy="#{item.orderType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.orderType}"/>
                             <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -85,7 +82,7 @@
                             </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="是否休假" filterBy="#{item.isVacation}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbKeyUserConfig_holiday}" filterBy="#{item.isVacation}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.vacationText}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -96,9 +93,14 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbPartOrderUserConfigController.prepareCreate}" update=":zkbPartOrderUserConfigEditForm" />
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}" actionListener="#{zkbPartOrderUserConfigController.prepareEdit}"  update=":zkbPartOrderUserConfigEditForm" disabled="#{empty zkbPartOrderUserConfigController.selected.id}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="删除" actionListener="#{zkbPartOrderUserConfigController.delete}" update=":zkbPartOrderUserConfigListForm :zkbPartOrderUserConfigEditForm :growl" disabled="#{empty zkbPartOrderUserConfigController.selected.id}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" actionListener="#{zkbPartOrderUserConfigController.prepareCreate}" update=":zkbPartOrderUserConfigEditForm" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" actionListener="#{zkbPartOrderUserConfigController.prepareEdit}"  update=":zkbPartOrderUserConfigEditForm" disabled="#{empty zkbPartOrderUserConfigController.selected.id}"/>
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbPartOrderUserConfigController.exportAll}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{zkbPartOrderUserConfigController.exportFile}"/>
+                            </p:commandButton>
+                            <p:commandButton id="importButton" ajax="false"   title="#{msg.Import}" action="#{zkbPartOrderUserConfigController.importAction}"  icon="ui-icon-arrowstop-1-n">
+                            </p:commandButton>
+                            <p:commandButton id="deleteButton" icon="ui-icon-delete"  title="删除" actionListener="#{zkbPartOrderUserConfigController.delete}" update=":zkbPartOrderUserConfigListForm :zkbPartOrderUserConfigEditForm :growl" disabled="#{empty zkbPartOrderUserConfigController.selected.id}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </f:facet>

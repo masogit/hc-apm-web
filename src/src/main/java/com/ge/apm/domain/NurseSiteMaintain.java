@@ -7,20 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -36,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * Created by 503035627 on 2018/3/7.
  */
 @Entity
-@Table(name = "nurse_site_maintain")
+@Table(name = "nurse_site_maintain",indexes = {@Index(columnList = "id")})
 @Cacheable(false)
 @Cache(usage=CacheConcurrencyStrategy.NONE)
 public class NurseSiteMaintain implements Serializable {

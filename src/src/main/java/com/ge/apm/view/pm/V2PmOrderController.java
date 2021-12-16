@@ -6,6 +6,7 @@
 package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONPath;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.exception.BusinessException;
@@ -19,6 +20,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -26,10 +28,7 @@ import com.ge.apm.service.pm.PmFileExportTemplate;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
-import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
-import com.ge.apm.service.simpleparts.SimplePartsItemService;
-import com.ge.apm.service.simpleparts.SimplePartsRequestService;
-import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
+import com.ge.apm.service.simpleparts.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.FileScanService;
@@ -55,10 +54,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.ToggleEvent;
+import org.primefaces.event.*;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.LoggerFactory;
@@ -71,6 +67,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -78,6 +75,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -157,6 +155,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private AssetInfoMgrService aimService;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private V2_PmOrderRepository dao;
+    private AssetInfoMapper assetInfoMapper;
     @Getter @Setter
     private Double totalManHours;
     @Getter @Setter
@@ -231,14 +230,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Map<String, Object> selectedObjectMap = new HashMap();
     private PmReportService pmReportService;
     private MultiLevelApprovalService multiLevelApprovalService;
-
     private String queryAssetUid;
     private ConfigService configService;
-
+    private SimplePartsConfigService partsConfigService;
+    //tab Title
+    @Getter
+    private String tabTitle;
     private String plannedCompletionTimeFormat = null;
     private String actualCompletionTimeFormat = null;
     @Setter@Getter
     private boolean hasConfigMultiLevelApproval = false;
+    private String filterPmRuleLevel;
     //备注
     @Getter @Setter
     private String remarks;
@@ -511,7 +513,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void prepareCreateSupplier() {
         newSupplier = new Supplier();
     }
+
+    public double getClosePrice(Double apartsQuantity,Double partsPrice){
+        if(apartsQuantity != null && partsPrice != null){
+            return apartsQuantity * partsPrice;
+        }
+        return 0;
+    }
+
     public void saveItem(){
+        if(partsItem==null && itemDetail.getParts()==null) {
+            WebUtil.addErrorMessage("备件名称不能为空");
+            return;
+        }
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
             if(itemDetail.getClosedPrice()==null) {
@@ -657,6 +671,29 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService.invokeBatchPmOrderCancel(cancelReason, selectedMap, cancelInt);
     }
 
+    public boolean getPmRule(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
+    }
+
+    public String getRuleLevelName(Integer ruleLevel){
+        switch (ruleLevel){
+            case 1:
+                return "巡检";
+
+            case 2:
+                return "2";
+
+            case 3:
+                return "3";
+
+            case 4:
+                return "质量控制";
+            default:
+                return "";
+        }
+    }
 
 
     public boolean allowChanged() {
@@ -696,7 +733,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void partsPriceUpdate() {
-       itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+       if(itemDetail.getPartsPrice() == null || itemDetail.getApartsQuantity() == null){
+           itemDetail.setClosedPrice(0.0);
+       }else{
+           itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
+       }
+    }
+
+    public void partsQuantity1Update() {
+        if(itemDetail.getApartsQuantity() == null || itemDetail.getPartsPrice() == null){
+            itemDetail.setClosedPrice(0.0);
+        }else{
+            itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
+        }
     }
 
     public void closePrcieUpdate() {
@@ -745,6 +794,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
              result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 3);
              if(result){
                  WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel3WorkOrdersInBatches"));
+                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
+                 return result;
+             }
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 4);
+             if(result){
+                 WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel4WorkOrdersInBatches"));
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return result;
              }
@@ -1150,8 +1205,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return orgDao.getByUid(orgUid);
     }
 
-    public void savePM() {
-        PmOrderActionForm formData = new PmOrderActionForm();
+    public void savePM(){
+        this.savePM(new PmOrderActionForm());
+    }
+
+    public void savePM(PmOrderActionForm formData) {
         if (selectedAsset.getStatus() == 5) {
             WebUtil.addErrorMessage(WebUtil.getMessage("DeactivatedCantRepair"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -1325,7 +1383,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 newServiceRequest.setCasePriority(casePriority);
             }
 
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP,null);
             //报修完后直接关单
             //pmOrderService.closePM(selectedPmOrder,picList);
             cancel();
@@ -1360,14 +1418,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         supplierController = WebUtil.getBean(SupplierController.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-
         token = UserContextService.getAccessToken();
+        partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
         pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         unstructuredDataDao = WebUtil.getBean(UnstructuredDataRepository.class);
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
         pmckLstDao = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         reportDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
@@ -1646,7 +1705,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             Sort sort= returnSort(pageRequest);
 
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-            Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
+            if("MVS保养".equals(tabTitle)){
+                List<SearchFilter> filters = buildMvsSearchFilter();
+                result  = dao.findBySearchFilter(filters, pageRequest);
+            }else{
+                result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            }
+//            Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
             result.getContent().forEach(item->pmIdList.add(item.getId()));
             return result;
@@ -1679,7 +1744,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-            Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            if("MVS保养".equals(tabTitle)){
+                List<SearchFilter> filters = buildMvsSearchFilter();
+                result  = dao.findBySearchFilter(filters, pageRequest);
+            }else{
+                result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            }
+//            Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
            // result.getContent().forEach(item->pmIdList.add(item.getId()));
             currentPagePmOrders = result.getContent();
             return result;
@@ -1781,7 +1852,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.selected = null;
         Sort sort = returnSort(pageRequest);
         pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-        result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        //查询Mvs保养
+        if("MVS保养".equals(tabTitle)){
+            List<SearchFilter> filters = buildMvsSearchFilter();
+            result = dao.findBySearchFilter(filters, pageRequest);
+        }else{
+            result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        }
         currentPagePmOrders = result.getContent();
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
         if(queryIndex==20 || queryIndex== 8){
@@ -1794,7 +1871,59 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return result;
     }
 
-    private Sort returnSort(PageRequest pageRequest){
+    public String getFilterPmRuleLevel() {
+        return filterPmRuleLevel;
+    }
+
+    public void setFilterPmRuleLevel(String filterPmRuleLevel) {
+        this.filterPmRuleLevel = filterPmRuleLevel;
+    }
+
+    public List<SearchFilter> buildMvsSearchFilter(){
+        List<SearchFilter> filters = new ArrayList<>();
+
+        List<String> orderIds = getVisableMvsAssetSystemId();
+        filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
+                filters.add(searchFilter);
+            }
+        }
+
+        return filters;
+    }
+
+    List<String> getVisableMvsAssetSystemId(){
+        /*获取一脉阳光租户的mvs工单id*/
+        TenantInfoRepository tenantDao=WebUtil.getBean(TenantInfoRepository.class);
+        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
+        String tenantUid = tenantInfo.get().getUid();
+
+//        UserAccount user = UserContextService.getCurrentUserAccount();
+//        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        /*根据登录进来的租户获取到该租户绑定的设备的uid*/
+        String token = UserContextService.getAccessToken();
+//        String to = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ5bXlnQWRtaW4iLCJhdXRoIjoieW15Z0FkbWluIiwidWlkIjoiYmI5MDQ5NDYxMWIxNDllYzk0MWMzZTUyMTUwZDQ0YjQiLCJ1c2VySWQiOjE4Mjg4LCJleHAiOjE2MzgzNDYzOTB9.S6s0ow5Ab9RUO5Efo9XG-lAQmQxbxrf6aDsuUsnApStJ3iCdE7bjJHLs6hKJAQK-QYY4i9w8VmTlps7WZk0-iA";
+        List<Integer> orgUidList = pmOrderService.getMvsAssectUids(token);
+        return assetInfoMapper.getMvsPmOrders(orgUidList,tenantUid);
+    }
+
+    //tab切换
+    public void onTabChange(TabChangeEvent event) {
+        FacesMessage msg = new FacesMessage("activeTab", event.getTab().getTitle());
+        tabTitle = msg.getDetail();
+        /*if("MVS工单".equals(tabTitle)){
+        }*/
+//        queryIndex = -1;
+        selected = null;
+    }
+    public void updateQueryIndex(int query){
+        queryIndex = query;
+        selected = null;
+    }
+
+    protected Sort returnSort(PageRequest pageRequest){
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
         orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
         orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
@@ -1912,25 +2041,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                    }
                }
            }
-           //最后一个审批通过的时候 生成相应单子
-           List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
-           List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
-           if (!approvedDetailsNew.isEmpty()) {
-               for (int i = 0; i < approvedDetailsNew.size(); i++) {
-                   V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
-                   if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
-                       accessorySparePartsRequestList.add(v2_workOrder_detail);
-                   } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
-                       accessorySparePartsBuyList.add(v2_workOrder_detail);
+           if(partsConfigService.isEnableIntegrationWithWorkOrder()){
+               //最后一个审批通过的时候 生成相应单子
+               List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
+               List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
+               if (!approvedDetailsNew.isEmpty()) {
+                   for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                       V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                       if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
+                           accessorySparePartsRequestList.add(v2_workOrder_detail);
+                       } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
+                           accessorySparePartsBuyList.add(v2_workOrder_detail);
+                       }
                    }
-               }
-               if (!accessorySparePartsRequestList.isEmpty()) {
-                   LOGGER.info("保养工单生成申领单start!!!!");
-                   partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER);//生成申领单
-               }
-               if (!accessorySparePartsBuyList.isEmpty()) {
-                   LOGGER.info("保养工单生成申购单start!!!!");
-                   partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER);//生成申购单
+                   if (!accessorySparePartsRequestList.isEmpty()) {
+                       V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                       partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getOwnerId()));//生成申领单
+                   }
+                   if (!accessorySparePartsBuyList.isEmpty()) {
+                       V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsBuyList.get(0).getWoId());
+                       partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getOwnerId()));//生成申购单
+                   }
                }
            }
             approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));
@@ -1951,13 +2082,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(selectedPmOrder ==null){
             return;
         }
+        BigDecimal totalPriceToBigDecimal = BigDecimal.ZERO;
+        if(accessoryList!=null && !accessoryList.isEmpty()){
+            for (V2_WorkOrder_Detail detail:accessoryList) {
+                if(detail.getApproved()==null || !detail.getApproved()){
+                    BigDecimal bigDecimal = new BigDecimal(detail.getClosedPrice()==null?0:detail.getClosedPrice()).setScale(2,BigDecimal.ROUND_HALF_UP);
+                    totalPriceToBigDecimal = totalPriceToBigDecimal.add(bigDecimal);
+                }
+            }
+        }
+        selectedPmOrder.setTotalPriceToBigDecimal(totalPriceToBigDecimal);
         MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selectedPmOrder, null, false);
         if (approval == null) {
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
             return ;
         }
-        selectedPmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_AGREE);
+        selectedPmOrder.setApprovalStatus(PmConstant.PM_APPROVAL_STATUS_PENDING);
         dao.save(selectedPmOrder);
+        WebUtil.addErrorMessage("审批发起成功");
+        return ;
     }
 
     public void prepareCompleteOrder(String woid) throws Exception {
@@ -1966,7 +2109,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedPmOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
-            logger.info("多级审核已激活");
+            logger.info("保养------------多级审核已激活");
             hasConfigMultiLevelApproval = true;
         }
         if (selectedPmOrder.getManHours() == null) {
@@ -2007,7 +2150,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 pmIdList.add(k);
 
         });
-        System.out.println();
     }
 
     public void onItemSelected() {
@@ -2271,6 +2413,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedPmOrder.getSiteUID());
             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
+            String partsType = String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType"));
+            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+            }
+            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+            }
         } else {
             switchTmp=false;
             if (accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()) {

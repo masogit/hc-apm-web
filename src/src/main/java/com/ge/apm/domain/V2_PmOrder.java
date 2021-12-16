@@ -135,6 +135,11 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planTime;  //计划时间
 
+    @Column(name = "origin_plan_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date originPlanTime;  //原计划时间
+
     @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
@@ -164,6 +169,12 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     @Column(name="pm_num")
     private String pmNum;
+
+    @Column(name="origin_pm_num")
+    private String originPmNum;
+
+    @Column(name="import_by")
+    private String importBy;  //导入人
 
     @Column(name="inst_id")
     private String instId;
@@ -215,6 +226,12 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Column(name = "auto_ack_maintenance")
     private Boolean autoAckMaintenance;
 
+    /**
+     * 供应商派工时  供应商uid
+     */
+    @Column(name = "supplier_uid")
+    private String supplierUid;
+
     @Transient
     @JsonIgnore
     private String strPlanTime;
@@ -223,11 +240,17 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @JsonIgnore
     private String strFinishTime;
 
+    @Transient
+    private BigDecimal totalPriceToBigDecimal;
+
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
-        return totalPrice == null ? null : new BigDecimal(totalPrice);
+        return totalPriceToBigDecimal;
     }
 
+    public void setTotalPriceToBigDecimal(BigDecimal totalPriceToBigDecimal) {
+        this.totalPriceToBigDecimal = totalPriceToBigDecimal;
+    }
     @Override
     public String getBusinessNumber() {
         return getPmNum();
@@ -410,6 +433,10 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
         this.planTime = planTime;
     }
 
+    public Date getOriginPlanTime() { return originPlanTime; }
+
+    public void setOriginPlanTime(Date originPlanTime) { this.originPlanTime = originPlanTime; }
+
     public String getPmNum() {
         return pmNum;
     }
@@ -417,6 +444,10 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     public void setPmNum(String pmNum) {
         this.pmNum = pmNum;
     }
+
+    public String getOriginPmNum() { return originPmNum; }
+
+    public void setOriginPmNum(String originPmNum) { this.originPmNum = originPmNum; }
 
     public String getInstId() {
         return instId;

@@ -107,6 +107,12 @@ public class ZkbPartOrderUserConfig implements Serializable {
     @Column(name = "us_back_up_name")
     private String usBackUpName;
 
+    @Transient
+    private String delFlag;
+
+    @Column(name = "test_status")
+    private String testStatus;
+
     public String getUsBackUpId() {
         return usBackUpId;
     }
@@ -287,9 +293,26 @@ public class ZkbPartOrderUserConfig implements Serializable {
                 &&StringUtils.isBlank(this.getConfigType())
                 &&StringUtils.isBlank(this.getAssetType())
                 &&StringUtils.isBlank(this.getRemark())
-                &&StringUtils.isBlank(this.getOrderType())){
+                &&StringUtils.isBlank(this.getOrderType())
+                &&StringUtils.isBlank(this.getId())){
             flag = true;
         }
         return flag;
+    }
+
+    public String getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(String delFlag) {
+        this.delFlag = delFlag;
+    }
+
+    public String getTestStatus() {
+        return testStatus;
+    }
+
+    public void setTestStatus(String testStatus) {
+        this.testStatus = testStatus;
     }
 }

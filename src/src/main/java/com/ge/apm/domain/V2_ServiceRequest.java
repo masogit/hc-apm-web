@@ -1,20 +1,25 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "v2_service_request")
-public class V2_ServiceRequest  implements Serializable {
+public class V2_ServiceRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -128,8 +133,23 @@ public class V2_ServiceRequest  implements Serializable {
     @Column(name = "sr_repair_type")
     private String srRepairType;
 
+    @Column(name="report_source")
+    private String reportSource; // 1: web(default) 2: wechat 3:rfid
+
     @Column(name="asset_location")
     private String assetLocation;
+
+
+/*    @Column(name = "created_by")
+    private String createdBy = "system";
+
+    @Column(name = "last_modified_by")
+    private String lastModifiedBy;
+
+    @Column(name = "last_modified_date")
+    private ZonedDateTime lastModifiedDate = ZonedDateTime.now();*/
+
+
 
     @Column(name = "take_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
@@ -168,6 +188,9 @@ public class V2_ServiceRequest  implements Serializable {
     @Column(name = "sr_num")
     private String srNum;
 
+    @Column(name = "origin_sr_num")
+    private String originSrNum;
+
     @Column(name="customer_name")
     private String customerName;
 
@@ -179,7 +202,10 @@ public class V2_ServiceRequest  implements Serializable {
 
     @Transient
     private String clinicalDeptName;
-
+    @Column(name="sieble_number")
+    private String siebleNumber;
+    @Column(name="call_center_number")
+    private String callCenterNumber;
     public String getTenantUID() {
         return tenantUID;
     }
@@ -420,17 +446,31 @@ public class V2_ServiceRequest  implements Serializable {
         this.nearestSrId = nearestSrId;
     }
 
-    public String getSrNum() {
-        return srNum;
-    }
+    public String getSrNum() { return srNum; }
 
     public void setSrNum(String srNum) {
         this.srNum = srNum;
     }
 
+    public String getOriginSrNum() { return originSrNum; }
+
+    public void setOriginSrNum(String originSrNum) { this.originSrNum = originSrNum; }
+
     public String getFromDeptUID() {
         return fromDeptUID;
     }
+
+/*    public String getCreatedBy() { return createdBy; }
+
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+
+    public String getLastModifiedBy() { return lastModifiedBy; }
+
+    public void setLastModifiedBy(String lastModifiedBy) { this.lastModifiedBy = lastModifiedBy; }
+
+    public ZonedDateTime getLastModifiedDate() { return lastModifiedDate; }
+
+    public void setLastModifiedDate(ZonedDateTime lastModifiedDate) { this.lastModifiedDate = lastModifiedDate; }*/
 
     public void setFromDeptUID(String fromDeptUID) {
         this.fromDeptUID = fromDeptUID;
@@ -464,9 +504,11 @@ public class V2_ServiceRequest  implements Serializable {
         return srRepairType;
     }
 
-    public void setSrRepairType(String srRepairType) {
-        this.srRepairType = srRepairType;
-    }
+    public void setSrRepairType(String srRepairType) { this.srRepairType = srRepairType; }
+
+    public String getReportSource() { return reportSource; }
+
+    public void setReportSource(String reportSource) { this.reportSource = reportSource; }
 
     public String getCustomerName() {
         return customerName;
@@ -499,6 +541,23 @@ public class V2_ServiceRequest  implements Serializable {
     public void setAssetLocation(String assetLocation) {
         this.assetLocation = assetLocation;
     }
+
+    public String getSiebleNumber() {
+        return siebleNumber;
+    }
+
+    public void setSiebleNumber(String siebleNumber) {
+        this.siebleNumber = siebleNumber;
+    }
+
+    public String getCallCenterNumber() {
+        return callCenterNumber;
+    }
+
+    public void setCallCenterNumber(String callCenterNumber) {
+        this.callCenterNumber = callCenterNumber;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;

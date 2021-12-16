@@ -7,20 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
@@ -39,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Cacheable(false)
 @Cache(usage=CacheConcurrencyStrategy.NONE)
-@Table(name = "nurse_site_maintain_item")
+@Table(name = "nurse_site_maintain_item",indexes = {@Index(columnList = "parent_id")})
 public class NurseSiteMaintainItem implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainItem.class);
 	private static final long serialVersionUID = 1L;
@@ -144,8 +131,20 @@ public class NurseSiteMaintainItem implements Serializable {
 	
 	@Transient
 	private boolean blnEditComment=false;
-	
-	public NurseSiteMaintainItem() {
+
+    @Column(name = "update_by")
+    private String updateByUid;
+
+
+    public String getUpdateByUid() {
+        return updateByUid;
+    }
+
+    public void setUpdateByUid(String updateByUid) {
+        this.updateByUid = updateByUid;
+    }
+
+    public NurseSiteMaintainItem() {
 		super();
 	}
 

@@ -1,6 +1,8 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.ZkbAssetQrCodeInfoRepository;
 import com.ge.apm.dao.mapper.ZkbAssetStatisticMapper;
+import com.ge.apm.domain.ZkbAssetQrCodeInfo;
 import com.ge.apm.domain.ZkbAssetStatistic;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.collections.CollectionUtils;
@@ -9,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -49,6 +52,9 @@ public class ZkbAssetStatisticService {
      * excel sheet 名称
      */
     public static final String SHEET_ASSET_STATISTIC_LIST = "ASSET STATISTIC LIST";
+
+    @Autowired
+    private ZkbAssetQrCodeInfoRepository zkbAssetQrCodeInfoRepository;
 
     /**
      * 根据添加统计设备信息
@@ -162,4 +168,59 @@ public class ZkbAssetStatisticService {
         }
     }
 
+    public void regenerateZkbAssetQrCodeInfo(List<SearchFilter> searchFilter){
+        //先清除已过期的合同中关联的设备、已修改system_id和已失效的设备数据
+        zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo(new Date());
+        // TODO 查出所有合同有效内关联设备的贴码数据，兼顾历史数据的更新。只限于WEB端，Schedule微服务那边只查询为"NULL"、"N"的数据
+        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(null);
+        if(zkbAssetQrCodeInfoList == null || zkbAssetQrCodeInfoList.size() == 0){
+            WebUtil.addErrorMessage("没有新的二维码记录需要生成");
+            return ;
+        }
+        for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList){
+            handleQRCodeInfo(zkbAssetQrCodeInfo);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void handleQRCodeInfo(ZkbAssetQrCodeInfo zkbAssetQrCodeInfo){
+        if(zkbAssetQrCodeInfo == null){
+            return;
+        }
+        String qrCodeCountState = zkbAssetQrCodeInfo.getQrCodeCountState();
+        Date date = new Date();
+        if(qrCodeCountState == null || qrCodeCountState.equals("N")){
+            if("Y".equals(zkbAssetQrCodeInfo.getCanNotPastQrCode())){
+                zkbAssetQrCodeInfo.setQrCodeCountState("N");
+                zkbAssetQrCodeInfo.setCreatedDate(date);
+            }else if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
+                zkbAssetQrCodeInfo.setQrCodeDate(date);
+                zkbAssetQrCodeInfo.setQrCodeCountState("Y");
+                zkbAssetQrCodeInfo.setCreatedDate(date);
+                zkbAssetQrCodeInfo.setQrCodeState(null);
+            }else{
+                zkbAssetQrCodeInfo.setQrCodeState(null);
+                Integer qrCodeCount = zkbAssetQrCodeInfoRepository.findAttachedCount(zkbAssetQrCodeInfo.getAssetUid());
+                if(qrCodeCount != null && qrCodeCount == 3){
+                    zkbAssetQrCodeInfo.setQrCodeState("Y");
+                    zkbAssetQrCodeInfo.setQrCodeDate(date);
+                    zkbAssetQrCodeInfo.setQrCodeCountState("Y");
+                    zkbAssetQrCodeInfo.setCreatedDate(date);
+                }else if(zkbAssetQrCodeInfo.getId() == null || qrCodeCountState == null){//ID == null 则新增记录
+                    zkbAssetQrCodeInfo.setQrCodeCountState("N");
+                    zkbAssetQrCodeInfo.setCreatedDate(date);
+                }
+            }
+        }
+        if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
+            zkbAssetQrCodeInfo.setQrCodeState(null);
+        }else{
+            zkbAssetQrCodeInfo.setGeFlag(null);
+        }
+        if("Y".equals(zkbAssetQrCodeInfo.getQrCodeState())){
+            zkbAssetQrCodeInfo.setIbQrCodeState(null);
+            zkbAssetQrCodeInfo.setGeFlag(null);
+        }
+        zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
+    }
 }

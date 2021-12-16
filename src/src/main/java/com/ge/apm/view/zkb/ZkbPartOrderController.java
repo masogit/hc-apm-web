@@ -13,6 +13,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -53,6 +54,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = new ArrayList<>();
     private String queryStatus = "";
     private boolean showStatusBtn = true;
+    /**
+     * 按钮待办是否显示
+     */
+    private boolean showPendingStatusBtn = true;
     private boolean vacationBtn = false;
     private String isVacation;
     private boolean canDelete= false;
@@ -82,12 +87,22 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
                 if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
+                    ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
+                ){
                     showStatusBtn =false;
                 }
+                if(ZkbPartOrderStep.PartOrderStep.Reviewer.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    showPendingStatusBtn =false;
+                }
                 if(zkbPartOrderUserConfigList.size() == 2){
-                    isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
-                    vacationBtn = true;
+                    for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
+                        if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(c.getConfigType())){
+                            isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
+                            vacationBtn = true;
+                            break;
+                        }
+                    }
                 }else if(zkbPartOrderUserConfigList.size() == 1){
                     if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) && ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
                         isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
@@ -118,20 +133,23 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     @Override
     protected Page<ZkbPartOrder> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters,"");
+        List<ZkbPartOrder> zkbPartOrders = zkbPartOrderService.getZkbPartOrderRepository().find();
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
         //searchFilters.clear();
         return zkbContractPage;
     }
 
-    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters){
+    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters,String type){
         List<SearchFilter> searchFilters = csearchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
 
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
-            searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.EQ, ZkbPartOrder.DATA_TYPE_TEST));
+            if(StringUtils.isEmpty(type)){
+                searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.EQ, ZkbPartOrder.DATA_TYPE_TEST));
+            }
         }else {
             searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.IsNull, ""));
         }
@@ -262,17 +280,25 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
 
                     }
+                }else if(ZkbPartOrderStep.PartOrderStep.Reviewer.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    if(!"all".equals(queryStatus)&&StringUtils.isNotBlank(queryStatus)){
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
+                    }
                 }
                 //endregion
             }else if(zkbPartOrderUserConfigList.size() == 2){
                 //判断是否为肖雨的角色
                 boolean is4ooRole = true;
-                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
-                    if(StringUtils.isEmpty(c.getConfigType())){
+                boolean isCommercialRole = false;
+                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList) {
+                    if (StringUtils.isEmpty(c.getConfigType())) {
                         is4ooRole = false;
                     }
-                    if(!c.getConfigType().contains("Order")){
+                    if (!c.getConfigType().contains("Order")) {
                         is4ooRole = false;
+                    }
+                    if(c.getConfigType().equals(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString())){
+                        isCommercialRole = true;
                     }
                 }
                 if(is4ooRole) {
@@ -288,6 +314,30 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }
                     }else if(!"all".equals(queryStatus)){
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
+                    }
+                }
+                if(isCommercialRole) {
+                    if (StringUtils.isEmpty(queryStatus)) {
+                        if(searchFilters.size() > 0){
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1*2+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1*2+"));
+                        }else{
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1+"));
+                        }
+                    }else if("all".equals(queryStatus)){
+                        if(searchFilters.size() > 0) {
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1*2+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1*2+"));
+                            searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                            searchFilters.add(new SearchFilter("commercialAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                        }else {
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1+"));
+                            searchFilters.add(new SearchFilter("commercialAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                            searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+
+                        }
                     }
                 }
             }
@@ -328,28 +378,6 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         String url = "AuditStep.xhtml?str="+UrlParamUtil.encodeUrlQueryString(str);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
-    }
-
-    public boolean isContainOrder(){
-        boolean flag = false;
-        for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
-            if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(c.getConfigType())){
-                flag = true;
-                break;
-            }
-        }
-        return  flag;
-    }
-
-    public boolean isContainManage(){
-        boolean flag = false;
-        for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
-            if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(c.getConfigType())){
-                flag = true;
-                break;
-            }
-        }
-        return flag;
     }
 
     public TenantInfo getTenantInfo(String tenantInfoUID){
@@ -428,7 +456,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private StreamedContent exportFile;
 
     public void exportAll(){
-        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters, "export");
         Sort sort=new Sort(Sort.Direction.DESC,"createdDate");
         List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters,sort);
         HashMap<String, Object> dataMap = zkbPartOrderExcelService.createZkbPartOrderData(zkbPartOrders);
@@ -522,6 +550,14 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setShowStatusBtn(boolean showStatusBtn) {
         this.showStatusBtn = showStatusBtn;
+    }
+
+    public boolean isShowPendingStatusBtn() {
+        return showPendingStatusBtn;
+    }
+
+    public void setShowPendingStatusBtn(boolean showPendingStatusBtn) {
+        this.showPendingStatusBtn = showPendingStatusBtn;
     }
 
     public String getIsVacation() {

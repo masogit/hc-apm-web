@@ -5,10 +5,13 @@ import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
@@ -97,6 +100,10 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     @Override
     public void delete() {
+        if(!zkbContractService.checkForDelete(selected)){
+            WebUtil.addSuccessMessage("合同已存在业务数据，不能删除！");
+            return;
+        }
         zkbContractService.deleteContract(this.selected,this.reason,currentUser);
         this.selected= null;
         this.reason="";
@@ -128,6 +135,30 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         }
     }
 
+    public String qtyRender(String type, String contractType, String value){
+        if(userContextService.isZkbUser()) {
+            if(ZkbContract.ContractType.DI.toString().equals(contractType)){
+                if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
+                    ZkbContractQuotaLog.OrderTypeEnum.Probe.toString().equals(type) ||
+                    ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
+                ){
+                    return "-";
+                }
+            }else if(ZkbContract.ContractType.Biomed.toString().equals(contractType) || ZkbContract.ContractType.CCS.toString().equals(contractType)){
+                if(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString().equals(type)){
+                    return "-";
+                }
+            }else if(ZkbContract.ContractType.PCB.toString().equals(contractType) || "PCB MVS".equals(contractType)){
+                if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
+                    ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
+                ){
+                    return "-";
+                }
+            }
+        }
+        return value;
+    }
+
 
     public String importAction(){
         return UrlEncryptController.encodeUrlParam("ContractImport?1=1");
@@ -141,6 +172,13 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedid=".concat(selected.getId()));
     }
 
+    public void doubleClick(SelectEvent event){
+        selected = (ZkbContract) event.getObject();
+        String str = "action=Edit&selectedid=".concat(selected.getId());
+        String url = "Edit.xhtml?str="+ UrlParamUtil.encodeUrlQueryString(str);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
 
     private StreamedContent exportFile;
     public void exportAll(){

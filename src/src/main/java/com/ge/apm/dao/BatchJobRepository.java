@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.ge.apm.domain.BatchJob;
 
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 /**
@@ -41,5 +42,10 @@ public interface BatchJobRepository extends GenericRepositoryUUID<BatchJob> {
     @Modifying
     @Query(value = "update batch_job set logs=logs||?2 where id=?1", nativeQuery = true)
     void appendLog(String id,String log);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update batch_job set status=?2 where status=?1", nativeQuery = true)
+    void updateJobStatus(int originStatus,int newStatus);
 
 }

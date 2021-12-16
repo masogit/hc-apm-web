@@ -37,10 +37,12 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private OrgInfoService orgInfoService;
     private OrgInfoClinicalDeptService clinicalDeptService;
     private UserOrgInfoRepository userOrgDao;
+    private UserContextService userContextService;
 
     private boolean acShow = false;
     private boolean isShow = false;
     private boolean isShjyDept = false;
+    private boolean countyArea = false;
 
     private String orgName;
     private String orgNameEn;
@@ -48,6 +50,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private UserAccount loginUser;
     private String hospitalUcmid;
     private Integer status;
+    private String  address;
+    private String  contactPerson;
+    private String  contactPhone;
 
     private UserCommonService userCommonService;
 
@@ -66,11 +71,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
         clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
 
         findPerson();
         loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
         currentOrg = dao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+        countyArea = userContextService.isCountyArea();
         buildOrdTree();
     }
 
@@ -332,6 +339,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         selected.setNameEn(orgNameEn);
         selected.setHospitalUcmid(hospitalUcmid);
         selected.setStatus(status);
+        selected.setAddress(address);
+        selected.setContactPerson(contactPerson);
+        selected.setContactPhone(contactPhone);
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
 
@@ -367,6 +377,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgName = null;
         orgNameEn = null;
         hospitalUcmid = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
     }
 
     public void buildOrdTree46AfterSave(String institutionUID) {
@@ -550,6 +563,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgNameEn = selected.getNameEn();
         hospitalUcmid = selected.getHospitalUcmid();
         status = selected.getStatus();
+        address = selected.getAddress();
+        contactPerson = selected.getContactPerson();
+        contactPhone = selected.getContactPhone();
         if (selected != null) {
             isShow = selected.getOrgType() == 2;
             acShow = selected.getOrgType() == 4;
@@ -669,5 +685,37 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void setShjyDept(boolean shjyDept) {
         isShjyDept = shjyDept;
+    }
+
+    public boolean getCountyArea() {
+        return countyArea;
+    }
+
+    public void setCountyArea(boolean countyArea) {
+        countyArea = countyArea;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
     }
 }

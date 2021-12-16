@@ -34,6 +34,8 @@ public class TenantInfoConfigService {
 	public static final String ZKB_VERSION ="ZKBVersion";//智康宝版
 	public static final String AUDIT_VERSION ="audit";//质控评审版
 	public static final String SWAP_CENTER_VERSION ="swapCenter";//质控评审版
+	public static final String SUPPLIER_VERSION ="supplierVersion";//供应商版
+
 	public static final String TREE_TYPE = "tenantConfigTree";
 	private static final String MSG_TYPE = "tenantVersionMenu";
 	private String edition;
@@ -156,6 +158,8 @@ public class TenantInfoConfigService {
 //				tempItem.setValue(true);
 				resetNotAuditVersion(tempItem);
 			}
+			//默认不勾选 菜单
+			defaultNotSelectedMenu(tempItem);
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
 				//默认不勾选”质控评审“菜单
@@ -240,6 +244,8 @@ public class TenantInfoConfigService {
 				}else if(key.contains("install")){
 					tempItem.setValue(false);
 				}
+			}else if(edition.equals(SUPPLIER_VERSION)){
+				supplierVersionMenuValueSet(tempItem);
 			}
 			if (key.equals("examineMgt")) {
 				tempItem.setValue(false);
@@ -329,6 +335,39 @@ public class TenantInfoConfigService {
 		}
 	}
 
+	private void defaultNotSelectedMenu(TenantInfoConfigItem item) {
+		String key = item.getKey();
+		switch (key){
+			case "supplierManagement":
+			case "supplierManagement.supplierUser":
+			case "supplierManagement.tenantSupplierMapping":
+			case "supplierManagement.assetBindSupplier":
+			case "supplierManagement.assetBindSupplierFE":
+			case "supplierMaintain":
+			case "supplierMaintain.workbench":
+			case "supplierRepair":
+			case "supplierRepair.workbench":
+				item.setValue(false);
+		}
+	}
+
+	private void supplierVersionMenuValueSet(TenantInfoConfigItem item) {
+		String key = item.getKey();
+		switch (key){
+			case "supplierManagement":
+			case "supplierManagement.supplierUser":
+			case "supplierManagement.assetBindSupplierFE":
+			case "supplierMaintain":
+			case "supplierMaintain.workbench":
+            case "supplierRepair":
+            case "supplierRepair.workbench":
+				item.setValue(true);
+				return;
+			default:
+				item.setValue(false);
+		}
+	}
+
 	void resetNotAuditVersion(TenantInfoConfigItem item){
 		if(Arrays.asList("audit").contains(item.getKey())){
 			item.setValue(false);
@@ -412,6 +451,7 @@ public class TenantInfoConfigService {
 		this.cpmURL="";
 		menuList = getListVersions();
 		setEdition(VERSION_COMMON);
+		resetVersion();
 	}
 
 	// public static void main(String[] args) {

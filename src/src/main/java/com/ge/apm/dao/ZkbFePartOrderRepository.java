@@ -40,7 +40,7 @@ public interface ZkbFePartOrderRepository extends GenericRepositoryUUID<ZkbFePar
      * @param orderType 流程类型
      * @return
      */
-    List<ZkbFePartOrder> findByPartOrderNoAndOrderType(String partOrderNo,String orderType);
+    List<ZkbFePartOrder> findByPartOrderNoAndOrderType(String partOrderNo, String orderType);
 
     /**
      * 根据流程订单编号 备件号 Order#查找信息
@@ -50,6 +50,9 @@ public interface ZkbFePartOrderRepository extends GenericRepositoryUUID<ZkbFePar
      * @return
      */
     @Query(value = "SELECT zkb_fe_part.* from zkb_fe_part_order zkb_fe_part INNER JOIN zkb_fe_part_order_asset_info zkb_fe_asset on zkb_fe_part.id = zkb_fe_asset.fe_part_order_id where zkb_fe_part.part_order_no = ?1 and zkb_fe_asset.order_no = ?2 and zkb_fe_asset.part_order_no=?3",nativeQuery = true)
-    List<ZkbFePartOrder> findNeedReturnPartOrder(String partOrderNo,String orderNo,String assetNo);
+    List<ZkbFePartOrder> findNeedReturnPartOrder(String partOrderNo, String orderNo, String assetNo);
+
+    @Query(value = "SELECT sum(qty) from zkb_part_order where contract_id = ?1", nativeQuery = true)
+    Integer fetchQty(String contractId);
 
 }

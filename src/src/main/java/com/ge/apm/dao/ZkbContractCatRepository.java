@@ -14,6 +14,7 @@ import java.util.List;
 public interface ZkbContractCatRepository extends GenericRepositoryUUID<ZkbContractCat> {
 
     List<ZkbContractCat> findByContractId(String contractId);
+    ZkbContractCat findFirstByContractIdAndSnNo(String contractId,String snNo);
     List<ZkbContractCat> findByContractIdAndIsEnabled(String contractId,boolean enabled);
 
     @Query("select c from ZkbContractCat c where c.contractId =?1 and c.isEnabled = true order by c.createdDate desc")

@@ -64,6 +64,9 @@
                     <p:column headerText="#{msg.AssetName}"  filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getAssetName(item.assetUID)}"/>
                     </p:column>
+                    <p:column headerText="#{msg.Level1RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE" rendered="#{relRuleAssetManagerController.getPmRule()}">
+                        <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUIDInspection)}"/>
+                    </p:column>
                     <p:column headerText="#{msg.Level2RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID2)}"/>
                     		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID2))}"/> -->
@@ -71,6 +74,9 @@
                     <p:column headerText="#{msg.Level3RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID)}"/>
                     		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID))}"/> -->
+                    </p:column>
+                    <p:column headerText="#{msg.Level4RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE" rendered="#{relRuleAssetManagerController.getPmRule()}">
+                    		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID4)}"/>
                     </p:column>
                     <p:column headerText="#{msg.departNum}"  filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getDepartNum(item.assetUID)}"/>
@@ -101,8 +107,16 @@
                     <f:facet name="{Toolbar}">
                     	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings" class="btn btn-sm btn-gray"  title="#{msg.SetRulesInBatch}"/>
                     	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-collections" class="btn btn-sm btn-gray"  title="#{msg.GenerateMaintenanceWorkordersInBatch}"/>
-                        <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+<!--                        <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
+                        </p:commandButton>-->
+                        <p:commandButton title="已配置规则设备导出" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.exportRelRuleAssets}" update=":growl"
+                                         onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                            <p:fileDownload value="#{relRuleAssetManagerController.excelFile}" />
+                        </p:commandButton>
+                        <p:commandButton title="全量导出" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.exportAllAssets}" update=":growl"
+                                         onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                            <p:fileDownload value="#{relRuleAssetManagerController.excelFile}" />
                         </p:commandButton>
 
                         <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}"

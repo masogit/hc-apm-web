@@ -592,12 +592,20 @@ public class MaintainController implements ServerEventInterface{
 		Integer type = nurseSiteMaintainConfig.getType();
 		String typeValue = nurseSiteMaintainConfig.getTypeValue();
 		List<NurseSiteMaintain> listMaintainData = new ArrayList<NurseSiteMaintain>();
+		Integer sum = 0;
 		if (StringUtils.isNotEmpty(typeValue)) {
 			String arr[] = typeValue.split(",");
 			if (type == 1) {
 				// value,hours,1-24
 				Integer intTypeValue = Integer.parseInt(typeValue);
 				while (startCalendar.getTimeInMillis() <= endCalendar.getTimeInMillis()) {
+					String currName = nurseSiteMaintainConfig.getName();
+					List<NurseSiteMaintain> ns = nurseSiteMaintainService.checkAgain(currName,startCalendar.getTime());
+					if(ns.size()>0){
+						sum++;
+						startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+						continue;
+					}
 					for (int i = 0; i < intTypeValue; ++i) {
 						Date date = null;
 						try {
@@ -617,6 +625,13 @@ public class MaintainController implements ServerEventInterface{
 			} else if (type == 2) {
 				// weekday,1-7
 				while (startCalendar.getTimeInMillis() <= endCalendar.getTimeInMillis()) {
+					String currName = nurseSiteMaintainConfig.getName();
+					List<NurseSiteMaintain> ns = nurseSiteMaintainService.checkAgain(currName,startCalendar.getTime());
+					if(ns.size()>0){
+						sum++;
+						startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+						continue;
+					}
 					for (int i = 0; i < arr.length; ++i) {
 						try {
 							if (startCalendar.get(Calendar.DAY_OF_WEEK) == Integer.parseInt(arr[i])) {
@@ -637,6 +652,13 @@ public class MaintainController implements ServerEventInterface{
 			} else if (type == 3) {
 				// month day,1-31
 				while (startCalendar.getTimeInMillis() <= endCalendar.getTimeInMillis()) {
+					String currName = nurseSiteMaintainConfig.getName();
+					List<NurseSiteMaintain> ns = nurseSiteMaintainService.checkAgain(currName,startCalendar.getTime());
+					if(ns.size()>0){
+						sum++;
+						startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+						continue;
+					}
 					int currentDay = startCalendar.get(Calendar.DAY_OF_MONTH);
 					int currentMonth = startCalendar.get(Calendar.MONTH);
 					int currentValue = 1;
@@ -668,6 +690,11 @@ public class MaintainController implements ServerEventInterface{
 					}
 				}
 			}
+		}
+		if(!sum.equals(0)){
+//			addMessage("部分工单已创建，已跳过");
+			addMessage("部分工单已创建，已跳过");
+			sum=0;
 		}
 		if (listMaintainData.size() > 0) {
 			nurseSiteMaintainService.save(listMaintainData);
@@ -740,6 +767,11 @@ public class MaintainController implements ServerEventInterface{
 			listCheckedNurseSiteMaintainConfig.addAll(listNurseSiteMaintainConfig);
 		}
 
+	}
+
+	public void onCheckDefault(){
+		listCheckedNurseSiteMaintainConfig = new ArrayList<>();
+		setSelectAll(false);
 	}
 
 	public UserAccount getCurrentUser() {

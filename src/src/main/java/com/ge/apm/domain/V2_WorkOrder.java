@@ -274,12 +274,53 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="close_Step_End_Time")
     private Date closeStepEndTime;
 
+    @Column(name = "import_by")
+    private String importBy; //  工单导入人
+
+    /**
+     * 供应商派工时  供应商uid
+     */
+    @Column(name = "supplier_uid")
+    private String supplierUid;
+    /**
+     * 核心组是否审核通过 0 未审批 1 医工审批 2 核心审批
+     */
+    @Column(name = "is_core_member_approval")
+    private Integer isCoreMemberApproval;
+    /**
+     * 工单创建类型  1:医院创建   2:供应商创建
+     */
+    @Column(name = "create_type",columnDefinition=" integer default 1 ")
+    private Integer createType = 1;
+
     @Transient
     private Integer orderCount;
+    @Transient
+    private BigDecimal totalPriceToBigDecimal;
+
+    public Integer getCoreMemberApproval() {
+        return isCoreMemberApproval;
+    }
+
+    public void setCoreMemberApproval(Integer coreMemberApproval) {
+        isCoreMemberApproval = coreMemberApproval;
+    }
+
+    public Integer getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(Integer createType) {
+        this.createType = createType;
+    }
 
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
-        return totalPrice == null ? null : new BigDecimal(totalPrice);
+        return totalPriceToBigDecimal;
+    }
+
+    public void setTotalPriceToBigDecimal(BigDecimal totalPriceToBigDecimal) {
+        this.totalPriceToBigDecimal = totalPriceToBigDecimal;
     }
 
     @Override
@@ -303,6 +344,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setDispatchMode(Integer dispatchMode) {
         this.dispatchMode = dispatchMode;
+    }
+
+    public String getSupplierUid() {
+        return supplierUid;
+    }
+
+    public void setSupplierUid(String supplierUid) {
+        this.supplierUid = supplierUid;
     }
 
     public String getTenantUID() {
@@ -392,6 +441,10 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public void setV2_workOrder_detail_list(List<V2_WorkOrder_Detail> v2_workOrder_detail_list) {
         this.v2_workOrder_detail_list = v2_workOrder_detail_list;
     }
+
+    public String getImportBy() { return importBy; }
+
+    public void setImportBy(String importBy) { this.importBy = importBy; }
 
     public AssetInfo getAssetInfo() {
         return assetInfo;

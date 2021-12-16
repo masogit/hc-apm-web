@@ -1,22 +1,27 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.ZkbFePartOrderUserConfigRepository;
+import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
-import com.ge.apm.domain.ZkbPartOrder;
-import com.ge.apm.domain.ZkbPartOrderCat;
-import com.ge.apm.domain.ZkbPartOrderStep;
-import com.ge.apm.domain.ZkbPartOrderUserConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.service.zkb.ZkbPartOrderUserConfigService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -27,7 +32,9 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -52,6 +59,8 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      */
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
 
+    private ZkbPartOrderRepository zkbPartOrderRepository;
+
     /**
      * 目录关系分页数据
      */
@@ -63,6 +72,11 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     private UploadedFile file;
 
     /**
+     * 导出文件
+     */
+    private StreamedContent exportFile;
+
+    /**
      * 错误列表
      */
     private List<Map<String, Object>> errorList;
@@ -70,7 +84,23 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     private ZkbPartOrderUserConfig backUpUser = new ZkbPartOrderUserConfig();
     private List<ZkbPartOrderUserConfig> backUpList = new ArrayList<>();
 
+    /**
+     * 当前登录用户信息service
+     */
+    private UserAccount currentUser;
+    /**
+     * 当前用户登录名
+     */
+    private String loginName = "";
 
+    private UserAccountRepository userAccountRepository;
+
+    private List<String> configTypeList = Arrays.asList("OrderExtraPending","OrderPending","CommercialPending","ClosePending");
+
+    /**
+     * 是否同步创建或更新GeFeConfig用户角色
+     */
+    private Boolean synGeFeConfigFlag = false;
     /**
      * 初始化
      */
@@ -79,18 +109,25 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         super.init();
         zkbPartOrderUserConfigService = WebUtil.getBean(ZkbPartOrderUserConfigService.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+        zkbPartOrderRepository=WebUtil.getBean(ZkbPartOrderRepository.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        this.loginName=currentUser.getLoginName();
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 
     }
 
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
-        backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        initBackUpList();
         if(selected != null){
-            for(ZkbPartOrderUserConfig c : backUpList){
-                if(selected.getId().equals(c.getId())){
-                    backUpList.remove(c);
-                    break;
+            if(CollectionUtils.isNotEmpty(backUpList))
+            {
+                for(ZkbPartOrderUserConfig c : backUpList){
+                    if(c.getId().equals(selected.getId())){
+                        backUpList.remove(c);
+                        break;
+                    }
                 }
             }
         }
@@ -99,7 +136,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     @Override
     public void prepareEdit() {
         super.prepareEdit();
-        backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        initBackUpList();
         if(selected != null){
             for(ZkbPartOrderUserConfig c : backUpList){
                 if(selected.getId().equals(c.getId())){
@@ -112,6 +149,17 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             backUpUser = zkbPartOrderUserConfigRepository.findById(selected.getUsBackUpId());
         }else {
             backUpUser =new ZkbPartOrderUserConfig();
+        }
+    }
+
+    private void initBackUpList()
+    {
+        if(this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        }else
+        {
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameNotLike(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US",ZkbFePartOrderService.testLoginNameStartWith+"%");
         }
     }
 
@@ -128,6 +176,13 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     @Override
     protected Page<ZkbPartOrderUserConfig> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        if(!this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.EQ, "f"));
+        }
         zkbPartOrderUserConfigPage=zkbPartOrderUserConfigRepository.findBySearchFilter(searchFilters, pageRequest);
         return zkbPartOrderUserConfigPage;
     }
@@ -182,7 +237,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      * @return
      */
     public String getTemplateName(){
-        return ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_NAME;
+        return ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_IMPORT_NAME;
     }
 
     /**
@@ -199,6 +254,20 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             WebUtil.addErrorMessage("保存失败,不能保存空数据!");
             return;
         }
+
+        UserAccount userAccount = userAccountRepository.getByLoginName(this.selected.getLoginName());
+        if(userAccount==null) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameNotExist"));
+            return;
+        }
+
+        if(this.selected.getLoginName()!=null&&this.selected.getLoginName().startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            this.selected.setTestStatus("t");
+        }else
+            {
+                this.selected.setTestStatus("f");
+            }
         if(!("OrderExtraPending".equals(this.selected.getConfigType())||"OrderPending".equals(this.selected.getConfigType())))
         {
             List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = null;
@@ -210,8 +279,8 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             }
             if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList))
             {
-                WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
-                return;
+                //WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
+                //return;
             }
         }
         if(backUpUser != null && StringUtils.isNotEmpty(backUpUser.getId())){
@@ -219,13 +288,99 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             selected.setUsBackUpName(backUpUser.getName());
         }
         super.save();
+        if(synGeFeConfigFlag){
+            SynCreateFePartOrderUser(selected, userAccount.getTenantUID());
+        }
         this.selected = null;
         this.backUpUser = null;
+    }
+
+    /**
+     * 400开单、400下单、GE Admin、Commercial4个角色自动同步信息到GE FE User Config中
+     * 注意：GE FE User Config中已存在用户，则不能在新增，不能修改用户配置的角色，其他信息可修改。
+     * @param zkbPartOrderUserConfig
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void  SynCreateFePartOrderUser(ZkbPartOrderUserConfig zkbPartOrderUserConfig, String tenantUid){
+        String geFeConfigType = null;
+        if("OrderExtraPending".equals(zkbPartOrderUserConfig.getConfigType())||"OrderPending".equals(zkbPartOrderUserConfig.getConfigType())){
+            if(selected.getOrderType() == null || !selected.getOrderType().equals("Probe")){
+                geFeConfigType = "FourHundredsTeam";
+            }else{
+                geFeConfigType = "FourHundredsTeam_Probe";
+            }
+        }
+        if(zkbPartOrderUserConfig.getConfigType().equals("CommercialPending")){
+            geFeConfigType = "Commercial";
+        }else if(zkbPartOrderUserConfig.getConfigType().equals("ClosePending")){
+            geFeConfigType = "GEAdmin";
+        }
+        if(geFeConfigType != null){
+            List<ZkbFePartOrderUserConfig> list = null;
+            ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
+            list = zkbFePartOrderUserConfigRepository.findByLoginName(zkbPartOrderUserConfig.getLoginName());
+            ZkbFePartOrderUserConfig zkbFePartOrderUserConfig = null;
+            if(CollectionUtils.isEmpty(list)){
+                zkbFePartOrderUserConfig = new ZkbFePartOrderUserConfig();
+            }else{
+                zkbFePartOrderUserConfig = list.get(0);
+                //GE FE User Config中已存在用户，不能修改用户配置的角色，其他信息可修改。
+                if(!zkbFePartOrderUserConfig.getConfigType().equals(geFeConfigType)){
+                   WebUtil.addErrorMessage("此用户在FE USER CONFIG中已有其他角色："+WebUtil.getMessage(zkbFePartOrderUserConfig.getConfigType()) +"，不能修改其信息。");
+                   return;
+                }
+            }
+            zkbFePartOrderUserConfig.setLoginName(zkbPartOrderUserConfig.getLoginName());
+            zkbFePartOrderUserConfig.setName(zkbPartOrderUserConfig.getName());
+            zkbFePartOrderUserConfig.setEmail(zkbPartOrderUserConfig.getEmail());
+            zkbFePartOrderUserConfig.setPhone(zkbPartOrderUserConfig.getPhone());
+//            zkbFePartOrderUserConfig.setSso(zkbPartOrderUserConfig.getSso());
+            zkbFePartOrderUserConfig.setConfigType(geFeConfigType);
+            zkbFePartOrderUserConfig.setIsVacation(zkbPartOrderUserConfig.getIsVacation());
+            zkbFePartOrderUserConfig.setRemark("本用户由《USER CONFIG配置》页面同步创建");
+            zkbFePartOrderUserConfig.setTenantUid(tenantUid);
+            zkbFePartOrderUserConfigRepository.save(zkbFePartOrderUserConfig);
+        }
+    }
+
+    public Boolean isGeFeConfigType(){
+        if(selected != null && selected.getConfigType() != null){
+            if(configTypeList.contains(selected.getConfigType())){
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
     }
 
     public List<ZkbPartOrderUserConfig> autoCompleteBackUpList(String query){
         List<ZkbPartOrderUserConfig> res = backUpList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).collect(Collectors.toList());
         return res;
+    }
+
+    public void exportAll(){
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        List<ZkbPartOrderUserConfig> zkbFePartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findBySearchFilter(this.searchFilters,sort);
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(ZkbPartOrderUserConfigService.USER_CONFIG_PATH+ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_NAME);
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            List<Map<String, Object>> zkbPartOrderList = this.zkbPartOrderUserConfigService.createExportPartOrderUserConfigData(zkbFePartOrderUserConfigList);
+            zkbPartOrderUserConfigService.exportData(doc, zkbPartOrderList);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_NAME);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ZkbPartOrderUserConfigController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    @Override
+    public void delete() {
+        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByOnline(this.selected.getId());
+        if(CollectionUtils.isNotEmpty(zkbPartOrderList))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_deleteError"));
+            return;
+        }
+        super.delete();
     }
 
     public ZkbPartOrderUserConfig getBackUpUser() {
@@ -250,5 +405,21 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
 
     public void setErrorList(List<Map<String, Object>> errorList) {
         this.errorList = errorList;
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+
+    public Boolean getSynGeFeConfigFlag() {
+        return synGeFeConfigFlag;
+    }
+
+    public void setSynGeFeConfigFlag(Boolean synGeFeConfigFlag) {
+        this.synGeFeConfigFlag = synGeFeConfigFlag;
     }
 }

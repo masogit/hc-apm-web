@@ -8,6 +8,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -354,4 +355,14 @@ public class UserAccountService {
 		return userAccountMapper.getLoginNameBySiteId(siteId);
 	}
 
+    public String getDefaultLanguage(String loginName) {
+		UserAccount userAccount = userAccountRepository.findByLoginName(loginName);
+		if(userAccount == null){
+			return null;
+		}
+		if(StringUtils.isNotEmpty(userAccount.getDefaultLanguage())){
+			return userAccount.getDefaultLanguage();
+		}
+		return null;
+    }
 }

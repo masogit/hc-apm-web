@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+            <div class="ui-g">
+                <div class="ui-g-12 card cardTitle">
+                        <p:outputLabel class="pageTitle" value="探头信息导入"/>
+                </div>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form enctype="multipart/form-data">
+                    <p:fieldset  legend="批量导入探头信息数据" id="probeImportForm">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <p:fileUpload fileUploadListener="#{zkbProbeController.handleFileUpload}" mode="advanced"
+                                          dragDropSupport="false" multiple="false" auto="true"
+                                          invalidFileMessage="只支持xls或xlsx格式的文件"
+                                          invalidSizeMessage="文件大小不得超过5M"
+                                          sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                          update=":errorDataListForm"
+                                          label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p>说明</p>
+                            <p>1. <a href="ZKB_PROBE_Template.xlsx" title="download">下载模板</a> </p>
+                            <p>2. 文件中填入要导入的探头信息数据<br/>
+                            其中：探头号，探头型号，探头类型，价值类型，是否有效为必填字段</p>
+                            <p>3. 上传文件进行导入</p>
+                        </h:panelGroup>
+                    </p:fieldset>
+                    <h:panelGroup>
+                        <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="List.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+
+
+            <div class="ui-g-12 card">
+                <h:form id="errorDataListForm">
+                    <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
+                    <p:fieldset  legend="导入失败的数据">
+                        <p:dataTable id="datalist" rendered="#{not empty zkbProbeController.errorImportList}" value="#{zkbProbeController.errorImportList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="数据为空"
+                                     rowsPerPageTemplate="20,50,100,500">
+                            <p:column headerText="EXCEL行数">
+                                <h:outputText value="#{item.excelIdex}" />
+                            </p:column>
+                            <p:column headerText="探头号"  >
+                                <h:outputText value="#{item.catNo}"/>
+                            </p:column>
+                            <p:column headerText="探头型号"  >
+                                <h:outputText value="#{item.catModel}"/>
+                            </p:column>
+                            <p:column headerText="探头类型"  >
+                                <h:outputText value="#{item.catType}" />
+                            </p:column>
+                            <p:column headerText="价值类型"  >
+                                <h:outputText value="#{item.valueType}" />
+                            </p:column>
+                            <p:column headerText="是否有效"  >
+                                <h:outputText value="#{item.isVaild}"/>
+                            </p:column>
+                            <p:column headerText="错误信息"  >
+                                <h:outputText value="#{item.errorInfo}"/>
+                            </p:column>
+
+                           <f:facet name="{Toolbar}">
+                                <p:commandButton title="导出错误数据" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xls" target="datalist" fileName="ProbeFailed_export"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:fieldset>
+                </h:form>
+            </div>
+    </ui:define>
+</ui:composition>
+
+

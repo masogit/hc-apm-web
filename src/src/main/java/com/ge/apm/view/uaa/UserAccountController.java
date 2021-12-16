@@ -609,6 +609,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if(ti.getType() != null && ti.getType().equals(3)){
             try{
                 uaaService.addZkbIbCrossUserStatus(selected,assignedRoles);
+                if(ti.getTestStatus() != null && ti.getTestStatus() != -1){
+                    uaaService.addZkbFeSupplierAdminUser(selected,assignedRoles);
+                }
             }catch (Exception e){
                 e.printStackTrace();
             }
