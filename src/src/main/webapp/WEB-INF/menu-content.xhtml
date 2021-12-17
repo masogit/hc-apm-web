@@ -233,6 +233,7 @@
                 <p:menuitem id="mirage_AssetBindSupplier" rendered="#{userContextService.accessContains('supplierManagement.assetBindSupplier')}" value="供应商设备绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplier"    />
                 <p:menuitem id="mirage_AssetBindSupplierFE" rendered="#{userContextService.accessContains('supplierManagement.assetBindSupplierFE')}" value="维修工程师绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplierFE"    />
             </p:submenu>
+            <p:menuitem id="unattended" value="#{msg.unattended}" icon="fa fa-bar-chart" outcome="/portal/iframe/dispensingCenter.xhtml"/>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
             <p:menuitem id="logout" value="#{msg.Logout}" icon="&#xe8ac;" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>
