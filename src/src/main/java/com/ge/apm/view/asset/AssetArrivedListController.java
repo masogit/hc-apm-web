@@ -264,11 +264,12 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             String tenantUid = currentUserAccount.getTenantUID();
             List<TenantInfo> tanentIfos = tenantInfoDao.getByName("浙江大学医学院附属邵逸夫医院");
             String tanentInfoUid = tanentIfos.get(0).getUid();
+            File xsl = null;
             if(tenantUid.equals(tanentInfoUid)){
-                File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+                 xsl = new File(WorkOrderReportExportController.class.getClassLoader().
                     getResource("../../portal/pdf/arrivalItem2.xsl").getPath());
             }else{
-                File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+                 xsl = new File(WorkOrderReportExportController.class.getClassLoader().
                         getResource("../../portal/pdf/arrivalItem.xsl").getPath());
             }
 
