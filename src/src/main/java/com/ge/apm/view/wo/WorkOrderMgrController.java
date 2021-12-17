@@ -2780,7 +2780,11 @@ public void test1(){
     @Transactional
     public void savePartReturnInfo(V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn){
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-        if(v2WorkOrderDetailReturn != null && v2WorkOrderDetailReturn.getReturnType() != null){
+        if(v2WorkOrderDetailReturn.getReturnType() == null){
+            WebUtil.addErrorMessage(WebUtil.getMessage("selectedReturnTypeError"));
+            return;
+        }
+        if(v2WorkOrderDetailReturn != null){
             v2WorkOrderDetailReturn.setReturnTime(new Date());
             v2WorkOrderDetailReturn.setReturnBy(userContextService.getLoginUser().getLoginName());
             detailReturnDao.save(v2WorkOrderDetailReturn);

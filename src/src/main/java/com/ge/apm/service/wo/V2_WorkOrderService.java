@@ -93,7 +93,7 @@ public class V2_WorkOrderService {
     }
 
     public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
-        return detailReturnDao.findByWoId(woId);
+        return detailReturnDao.findByWoIdSort(woId);
     }
 
     public List<MeasuringOrderDetail> getWorkOrderMeasuringDetails(String woId) {
