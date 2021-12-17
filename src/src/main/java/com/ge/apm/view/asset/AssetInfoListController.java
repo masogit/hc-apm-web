@@ -140,6 +140,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private SupplierRepository supplierDao;
     private UserAccountRepository userDao;
     private String oneQrCodeStatus;
+    private boolean countyArea = false;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -172,6 +173,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         loadClinicalDeptList();
         getRelRuleAssetUids();
         warrantyAlertDays = getWarrantyAlertDaysConfig();
+        countyArea = userContextService.isCountyArea();
     }
     
     private Integer getWarrantyAlertDaysConfig(){
@@ -1120,5 +1122,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setOneQrCodeStatus(String oneQrCodeStatus) {
         this.oneQrCodeStatus = oneQrCodeStatus;
+    }
+
+    public boolean getCountyArea() {
+        return countyArea;
+    }
+
+    public void setCountyArea(boolean countyArea) {
+        this.countyArea = countyArea;
     }
 }

@@ -1529,12 +1529,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      */
     public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType,String token){
         try {
-            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
             emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
-
+            emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
             String url = "";
             if(StringUtils.isEmpty(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
@@ -1565,13 +1565,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
         if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
             ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrder.getCurrentStep())) {
-            HashMap<String, String> emailWrapperMap = null;
+            HashMap<String, Object> emailWrapperMap = null;
             try {
                 emailWrapperMap = new HashMap<>();
                 emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
                 emailWrapperMap.put("systemId", zkbPartOrder.getId());
                 emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
                 emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
+                emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
                 String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
                 //String token = UserContextService.getAccessToken();
                 HttpHeaders header = createHttpHeaders(token);
@@ -1630,8 +1631,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     public void sendEmailForProbeLetter(ZkbPartOrder zkbPartOrder){
         try {
-            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
+            emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_PROBE_LETTER_EMAIL);
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
@@ -1661,7 +1663,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public boolean sendWeChatReturnAudit(ZkbPartOrder zkbPartOrder){
-        System.out.println("---sendWeChatReturnAudit----");
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_RETURN_AUDIT).concat("?id=").concat(zkbPartOrder.getId());
             String token = UserContextService.getAccessToken();
@@ -1692,20 +1693,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrderRepository.save(zkbPartOrder);
             return true;
         }).isPresent();
-        /*if (null != v2_blobObject) {
-            //blobObject.setBoId(selected.getId());
-            v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
-            v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_LETTER);
-            v2_blobObject.setBoUuid(zkbPartOrder.getId());
-            blobObjectRepository.save(v2_blobObject);
 
-            zkbPartOrder.setUploadLetterFileName(v2_blobObject.getObjectName());
-            zkbPartOrder.setUploadLetterFlag("t");
-            zkbPartOrder.setUploadLetterFileId(v2_blobObject.getId());
-            zkbPartOrderRepository.save(zkbPartOrder);
-            return true;
-        }
-        return false;*/
     }
 
     @Transactional(rollbackFor = Exception.class)
