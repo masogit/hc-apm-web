@@ -712,6 +712,8 @@ class WorkOrderForm {
     List<V2_BlobObject> attachments;
     String assetStatus;
 
+    private String siebleNumber;// 县域需求字段sieble单号
+    private String callCenterNumber; // 县域需求call center单号
     public Integer getAssetId() {
         return assetId;
     }
@@ -768,4 +770,19 @@ class WorkOrderForm {
         this.assetStatus = assetStatus;
     }
 
+    public String getSiebleNumber() {
+        return siebleNumber;
+    }
+
+    public void setSiebleNumber(String siebleNumber) {
+        this.siebleNumber = siebleNumber;
+    }
+
+    public String getCallCenterNumber() {
+        return callCenterNumber;
+    }
+
+    public void setCallCenterNumber(String callCenterNumber) {
+        this.callCenterNumber = callCenterNumber;
+    }
 }

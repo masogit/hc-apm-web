@@ -865,8 +865,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             this.selected.setQty(0);
             if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 this.selected.setCatNum(1);
-            }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && assetInfo.getAssetGroup().equals(2)){
-                //this.selected.setArtificialType("3");
+            }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
                 if(assetInfo == null || StringUtils.isEmpty(assetInfo.getUid()) || selectedContract == null){
                     this.selected.setArtificialType(CopyByInvok.NORMAL_THREE);
                 }else{
@@ -882,7 +881,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
                     }
                 }
-                
             }
         }
         calcRemainQty();
