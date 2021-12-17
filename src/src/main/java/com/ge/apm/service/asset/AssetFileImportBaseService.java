@@ -70,6 +70,7 @@ public class AssetFileImportBaseService {
     public List<I18nMessage> capitalSource2List = FieldValueMessageController.getFieldValueList("capitalSource2", siteId);
     public List<I18nMessage> deviceStatusList = FieldValueMessageController.getFieldValueList("deviceStatus", siteId);
     public List<I18nMessage> proprietaryClassList = FieldValueMessageController.getFieldValueList("proprietaryClass", siteId);
+    public List<I18nMessage> assetQualityList = FieldValueMessageController.getFieldValueList("assetQuality", siteId);
 
     @Autowired
     protected AssetInfoRepository assetDao;
@@ -756,6 +757,13 @@ public class AssetFileImportBaseService {
                     AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("medicalApparatusClassification") + "编码不存在");
                     continue;
                 }
+            }
+            // 县域租户添加设备性质字段，且必填
+            if (newAsset.getAssetQuality() == null && userContextService.isCountyArea()) {
+                item.put("status", ImportStatus.CheckFail);
+                result.add(Boolean.FALSE);
+                AssetRow.addErrMessage(item, "错误: 设备性质是必须的");
+                continue;
             }
 
         }
