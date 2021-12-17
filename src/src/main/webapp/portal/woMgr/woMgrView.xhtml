@@ -122,15 +122,7 @@
                             <label class="label">医院客户职务</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.customerPosition}" />
                         </h:panelGroup>
-                            <h:panelGroup rendered="#{userContextService.countyArea}">
-                                <label class="label">#{msg.siebleNumber}</label>
-                                <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.siebleNumber}" />
-                            </h:panelGroup>
 
-                            <h:panelGroup rendered="#{userContextService.countyArea}">
-                                <label class="label">#{msg.callCenterNumber}</label>
-                                <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.callCenterNumber}" />
-                            </h:panelGroup>
                     </p:panelGrid>
 
                     <p:dataGrid var="picItem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
@@ -254,7 +246,15 @@
                                     <label class="label">#{msg.maintenanceValue}</label>
                                     <p:outputLabel value="#{woItem.maintenanceValue}"/>
                                 </h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.countyArea}">
+                                    <label class="label">#{msg.siebleNumber}</label>
+                                    <p:outputLabel value="#{woItem.siebleNumber}" />
+                                </h:panelGroup>
 
+                                <h:panelGroup rendered="#{userContextService.countyArea}">
+                                    <label class="label">#{msg.callCenterNumber}</label>
+                                    <p:outputLabel value="#{woItem.callCenterNumber}" />
+                                </h:panelGroup>
                             </p:panelGrid>
 
 

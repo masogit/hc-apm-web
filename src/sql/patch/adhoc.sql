@@ -25,4 +25,5 @@ CREATE TABLE shared_asset_swap_index(
         asset_uid char(32) ,
         swap_index varchar(32)
 )
+insert into sys_role (id,name,role_desc,role_desc_en) values ((select max(id)+1 from sys_role)+1,'OpWorker','无人值守登录的账号','No Work People')
 
