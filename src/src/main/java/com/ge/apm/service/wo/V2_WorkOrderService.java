@@ -48,6 +48,8 @@ public class V2_WorkOrderService {
     @Autowired
     private WorkOrderDetailRepository detailDao;
     @Autowired
+    private WorkOrderDetailReturnRepository detailReturnDao;
+    @Autowired
     private WorkOrderDetailMeasuringRepository detailMeasuringDao;
     @Autowired
     private UserAccountRepository userDao;
@@ -88,6 +90,10 @@ public class V2_WorkOrderService {
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetails(String woId) {
         return detailDao.findByWoId(woId);
+    }
+
+    public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
+        return detailReturnDao.findByWoId(woId);
     }
 
     public List<MeasuringOrderDetail> getWorkOrderMeasuringDetails(String woId) {
@@ -482,6 +488,8 @@ public class V2_WorkOrderService {
         formData.setRequestReason(reason);
         formData.setIntExtType(extType);
         formData.setAttachments(picList);
+        formData.setSiebleNumber(selectedWorkOrder.getSiebleNumber());
+        formData.setCallCenterNumber(selectedWorkOrder.getCallCenterNumber());
         String res = srApi.createWorkOrder(token, formData);
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "创建"));

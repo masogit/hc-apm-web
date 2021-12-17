@@ -45,8 +45,10 @@ import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -111,6 +113,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
+    private WorkOrderDetailReturnRepository detailReturnDao;
     private V2_WorkOrderCoworkerRepository coWorkerDao;
     private V2_WorkOrderRepository woDao;
     private String locationName;
@@ -165,6 +168,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Map<String, Boolean> selectedMap;
     private String selectedApproverUid;
     private ServiceRequestApiService serviceRequestApiService;
+    private AuditGroupConfigurationDetailRepository auditGroupConfigurationDetailRepository;
     private WorkflowConfigRepository woConDao;
     private String token;
     private OrgInfoTreeService orgInfoTreeService;
@@ -215,6 +219,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private MultiLevelApprovalService multiLevelApprovalService;
     @Setter@Getter
     private String highlevelApprovalComments;
+    List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
     @Override
     protected void init() {
         super.init();
@@ -224,6 +229,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
             customConfigService = WebUtil.getBean(CustomConfigService.class);
             tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+            auditGroupConfigurationDetailRepository = WebUtil.getBean(AuditGroupConfigurationDetailRepository.class);
             currentCustomConfig = customConfigService.getCurrentCustomConfig(
                     UserContextService.getCurrentUserAccount().getSiteUID());
             aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -256,6 +262,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             partsRequestWorkOrderService = WebUtil.getBean(SimplePartsRequestWorkOrderService.class);
             partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
             multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
+            detailReturnDao = WebUtil.getBean(WorkOrderDetailReturnRepository.class);
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -877,7 +884,7 @@ public void test1(){
                 UserAccount userAccount = userContextService.getCurrentUserAccount();
                 String tenantUID = userAccount.getTenantUID();
                 TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
-                if(WorkOrderConstant.DESIGNATED_USER.equals(this.tenantInfo.getName().trim())){
+                if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
                     List<UserAccount> userAccountList = new ArrayList<>();
                     AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
                     String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
@@ -981,9 +988,51 @@ public void test1(){
             LOGGER.error("load data occur exception,{}", e.getMessage());
             throw e;
         }
+        UserAccount userAccount = userContextService.getCurrentUserAccount();
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+        List<V2_WorkOrder> workOrderList = new ArrayList<>();
+        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+            List<V2_WorkOrder> v2_workOrders = bySearchFilter.getContent();
+            if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
+                for (V2_WorkOrder v2_workOrder :v2_workOrders) {
+                    if (getSign(v2_workOrder.getId(), userAccount)) {
+                        workOrderList.add(v2_workOrder);
+                    }
+                }
+                int size = workOrderList.size();
+                workOrderList= this.pageNum(workOrderList, pageRequest);
+                bySearchFilter = new PageImpl<V2_WorkOrder>(workOrderList, pageRequest, size);
+            }
+        }
         return   bySearchFilter;
     }
-
+    private List<V2_WorkOrder> pageNum(List<V2_WorkOrder> v2_workOrderList,PageRequest pageRequest){
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize() - 1;
+        int numStart = pageNumber * pageSize;
+        numStart = numStart + pageNumber;
+        int numEnd = numStart + pageSize + 1;
+        int size = v2_workOrderList.size();
+        if(size > numEnd){
+            v2_workOrderList = v2_workOrderList.subList(numStart ,numEnd);
+        }else {
+            v2_workOrderList = v2_workOrderList.subList(numStart ,size);
+        }
+        return v2_workOrderList;
+    }
+    public Boolean getSign(String woId,UserAccount userAccount){
+            List<AuditGroupConfigurationDetail> details = auditGroupConfigurationDetailRepository.findByBusinessUidAndActualAuditUidAndDeleteFlag(woId, userAccount.getUid(),0);
+            if(details==null || details.isEmpty()){
+                return true;
+            }else {
+                for (AuditGroupConfigurationDetail auditGroupConfigurationDetail:details) {
+                    if(auditGroupConfigurationDetail.getAuditNodeStatus()==0){
+                        return true;
+                    }
+                }
+            }
+            return false;
+    }
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
 
@@ -1180,6 +1229,13 @@ public void test1(){
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         return woService.getWorkOrderDetails(woId);
+    }
+
+    public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
+        if(v2WorkOrderDetailReturnList == null){
+            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(woId);
+        }
+        return v2WorkOrderDetailReturnList;
     }
 
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
@@ -1521,14 +1577,7 @@ public void test1(){
         } else if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
-        if(userContextService.isCountyArea()){
-            if(!whetherCheckIn()){
-                WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
-                valid = false;
-            };
-        }
+
         if (!valid) {
             return;
         }
@@ -1543,8 +1592,35 @@ public void test1(){
         //更新维修子状态
         updateSelectedWorkOrder(selectedWorkOrder);
         woService.repairWorkOrder(selectedWorkOrder,assigneeId, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
+        saveCountyAreaPartReturnInfo();
         cancel();
     }
+
+    /**
+     * 保存县域租户待归还备件信息
+     */
+    public void saveCountyAreaPartReturnInfo(){
+        if(accessoryList != null && userContextService.isCountyArea()){
+            V2_WorkOrder v2WorkOrder = dao.findById(selectedWorkOrder.getId());
+            if(v2WorkOrder.getCurrentStepId()>4){
+                for(V2_WorkOrder_Detail v2_workOrder_detail:accessoryList){
+                    for(int i=0;i< v2_workOrder_detail.getApartsQuantity();i++){
+                        V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn = new V2_WorkOrder_Detail_Return();
+                        v2WorkOrderDetailReturn.setWoId(v2_workOrder_detail.getWoId());
+                        v2WorkOrderDetailReturn.setWorkOrderDetailId(v2_workOrder_detail.getId());
+                        v2WorkOrderDetailReturn.setPartsItemId(v2_workOrder_detail.getPartsItemId());
+                        v2WorkOrderDetailReturn.setPartName(v2_workOrder_detail.getParts());
+                        v2WorkOrderDetailReturn.setReturnNum(1);
+                        v2WorkOrderDetailReturn.setSerialNum(v2_workOrder_detail.getSerialNum());
+                        v2WorkOrderDetailReturn.setCreatedDate(new Date());
+                        v2WorkOrderDetailReturn.setCreatedBy(v2_workOrder_detail.getCreatedBy());
+                        detailReturnDao.save(v2WorkOrderDetailReturn);
+                    }
+                }
+            }
+        }
+    }
+
     public boolean whetherCheckIn(){
         V2_WorkOrder workOrder = dao.findById(selectedWorkOrder.getId());
         if(workOrder != null){
@@ -1590,6 +1666,24 @@ public void test1(){
 //               return;
 //           }else {
 //           }
+        if(userContextService.isCountyArea()){//关单前县域租户备件必须全部归还
+//            List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList = detailReturnDao.findByWoIdAndReturnType(selectedWorkOrder.getId(),null);
+            if(v2WorkOrderDetailReturnList != null){
+                for(V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn:v2WorkOrderDetailReturnList){
+                    if(v2WorkOrderDetailReturn.getReturnType() == null){
+                        WebUtil.addErrorMessage(WebUtil.getMessage("countyAreaPartReturnError"));
+                        RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
+                        return ;
+                    }
+                }
+            }
+            if(!whetherCheckIn()){ //关单前县域租户备件必须签到
+                WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
+                return;
+            };
+        }
         woService.closeWorkOrder(selectedWorkOrder, comments, picList);
         cancel();
     }
@@ -1942,7 +2036,6 @@ public void test1(){
         selectedObjectMap = new HashMap();
         itemDetail= vwd;
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
-
     }
     //保存一个备件
     public void saveItem(){
@@ -2678,6 +2771,20 @@ public void test1(){
     public boolean  canCreate(String role){
         UserContextService userContextService = this.userContextService;
         return userContextService.isCountyArea() ? userContextService.hasRole(role):Boolean.TRUE;
+    }
+
+    /**
+     * 县域：更新备件归还信息。
+     */
+    @Transactional
+    public void savePartReturnInfo(V2_WorkOrder_Detail_Return v2WorkOrderDetailReturn){
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        if(v2WorkOrderDetailReturn != null && v2WorkOrderDetailReturn.getReturnType() != null){
+            v2WorkOrderDetailReturn.setReturnTime(new Date());
+            v2WorkOrderDetailReturn.setReturnBy(userContextService.getLoginUser().getLoginName());
+            detailReturnDao.save(v2WorkOrderDetailReturn);
+            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(v2WorkOrderDetailReturn.getWoId());
+        }
     }
 }
 

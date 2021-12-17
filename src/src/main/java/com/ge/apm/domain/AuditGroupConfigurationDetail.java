@@ -39,6 +39,12 @@ public class AuditGroupConfigurationDetail implements Serializable {
      */
     @Column(name = "audit_node_status")
     private Integer auditNodeStatus;
+
+    /**
+     * 0 在用 1失效
+     */
+    @Column(name = "delete_flag")
+    private Integer deleteFlag;
     /**
      * 审批人UID
      */

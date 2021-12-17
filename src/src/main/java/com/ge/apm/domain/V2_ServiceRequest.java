@@ -202,9 +202,9 @@ public class V2_ServiceRequest implements Serializable {
 
     @Transient
     private String clinicalDeptName;
-    @Column(name="sieble_number")
+    @Transient
     private String siebleNumber;
-    @Column(name="call_center_number")
+    @Transient
     private String callCenterNumber;
     public String getTenantUID() {
         return tenantUID;
