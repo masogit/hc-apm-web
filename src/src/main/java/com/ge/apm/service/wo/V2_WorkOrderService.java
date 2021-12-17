@@ -488,6 +488,8 @@ public class V2_WorkOrderService {
         formData.setRequestReason(reason);
         formData.setIntExtType(extType);
         formData.setAttachments(picList);
+        formData.setSiebleNumber(selectedWorkOrder.getSiebleNumber());
+        formData.setCallCenterNumber(selectedWorkOrder.getCallCenterNumber());
         String res = srApi.createWorkOrder(token, formData);
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "创建"));
