@@ -39,6 +39,15 @@
                             <p:column headerText="#{msg.PartsName}" >
                                 <h:outputText value="#{item.name}"/>
                             </p:column>
+                            <p:column headerText="#{msg.PartsItemCode}" >
+                                <h:outputText value="#{item.itemCode}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.PartsEnglishName}" >
+                                <h:outputText value="#{item.englishName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.PartsUnitPrice}" >
+                                <h:outputText value="#{item.unitPrice}"/>
+                            </p:column>
                             <p:column headerText="#{msg.PartsSupplier}" >
                                 <h:outputText value="#{item.supplier}"/>
                             </p:column>
@@ -80,10 +89,28 @@
                                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
                                              rendered="true">
                                     <h:panelGroup>
+                                        <label class="label">#{msg.PartsItemCode}</label>
+                                        <p:inputText id="sparePartsItemCode" name="sparePartsItemCode" readonly="false"
+                                                     style="width: 220px;"
+                                                     value="#{simplePartsItemController.selected.itemCode}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
                                         <label class="label">#{msg.PartsName}</label>
                                         <p:inputText id="sparePartsName" name="sparePartsName" readonly="false"
                                                      style="width: 220px;"
                                                      value="#{simplePartsItemController.selected.name}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.PartsEnglishName}</label>
+                                        <p:inputText id="sparePartsEnglishName" name="sparePartsEnglishName" readonly="false"
+                                                     style="width: 220px;"
+                                                     value="#{simplePartsItemController.selected.englishName}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.PartsUnitPrice}</label>
+                                        <p:inputNumber id="sparePartsUnitPrice" name="sparePartsUnitPrice" readonly="false"
+                                                     style="width: 220px;"
+                                                     value="#{simplePartsItemController.selected.unitPrice}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.PartsSupplier}</label>
