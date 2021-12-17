@@ -106,12 +106,20 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 
         String fileName = "APM_Asset_Dynamic_Template.xlsx";
-        if (userContextService.isLocale()){
-            fileName = "APM_Asset_Dynamic_Template.xlsx";
-        } else {
-            fileName = "APM_Asset_Dynamic_Template_en.xlsx";
-
+        if(userContextService.isCountyArea()){
+            if (userContextService.isLocale()){
+                fileName = "APM_Asset_Dynamic_CountryArea_Template.xlsx";
+            } else {
+                fileName = "APM_Asset_Dynamic_CountryArea_Template_en.xlsx";
+            }
+        }else{
+            if (userContextService.isLocale()){
+                fileName = "APM_Asset_Dynamic_Template.xlsx";
+            } else {
+                fileName = "APM_Asset_Dynamic_Template_en.xlsx";
+            }
         }
+
         InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
