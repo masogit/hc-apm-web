@@ -1577,14 +1577,7 @@ public void test1(){
         } else if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
-        if(userContextService.isCountyArea()){
-            if(!whetherCheckIn()){
-                WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
-                valid = false;
-            };
-        }
+
         if (!valid) {
             return;
         }
@@ -1684,6 +1677,12 @@ public void test1(){
                     }
                 }
             }
+            if(!whetherCheckIn()){ //关单前县域租户备件必须签到
+                WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
+                return;
+            };
         }
         woService.closeWorkOrder(selectedWorkOrder, comments, picList);
         cancel();
