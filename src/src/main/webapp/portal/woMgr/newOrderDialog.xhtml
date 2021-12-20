@@ -31,10 +31,10 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{userContextService.countyArea}">
                                 <label class="label">#{msg.siebleNumber}</label>
-                                <p:inputText value="#{workOrderMgrController.selectedWorkOrder.siebleNumber}" maxlength="16"  requiredMessage="sieble单号 #{msg.ValidationRequire}"/>
+                                <p:inputText value="#{workOrderMgrController.selectedWorkOrder.siebleNumber}" maxlength="12"  requiredMessage="sieble单号 #{msg.ValidationRequire}"/>
                                 <br/><br/>
                                 <label class="label">#{msg.callCenterNumber}</label>
-                                <p:inputText value="#{workOrderMgrController.selectedWorkOrder.callCenterNumber}" maxlength="16" requiredMessage="呼叫中心单号 #{msg.ValidationRequire}"/>
+                                <p:inputText value="#{workOrderMgrController.selectedWorkOrder.callCenterNumber}" maxlength="12" requiredMessage="呼叫中心单号 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                         </p:panelGrid>
                         <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">

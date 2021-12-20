@@ -773,11 +773,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         selected.setEnableUpdateSwitchingTime(true);
 /*		updateDispater();
 		updateApproverList();*/
-        setManualEnabled();
     }
-    private void setManualEnabled(){
-            selected.setIsManualEnabled(userContextService.isCountyArea());
-    }
+
     public void onSelect() {
         if (selected != null && selected.getId() != null) {
             selected = dao.findById(selected.getId());
