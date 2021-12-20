@@ -138,8 +138,7 @@
                                         <h:outputText value="#{item.returnNum}"/>
                                     </p:column>
                                     <p:column headerText="#{msg.returnType}">
-                                        <p:selectOneMenu id="partReturnType" value="#{item.returnType}" required="true"
-                                                         requiredMessage="#{msg.returnType} #{msg.ValidationRequire}">
+                                        <p:selectOneMenu id="partReturnType" value="#{item.returnType}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('partReturnType')}" var="item1" itemLabel="#{item1.value}" itemValue="#{item1.msgKey}"/>
                                             <p:ajax listener="#{workOrderMgrController.savePartReturnInfo(item)}" update="detailReturnList"/>
