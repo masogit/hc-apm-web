@@ -422,6 +422,15 @@ public class AssetInfoFormatter {
         return value;
     }
 
+    public String getAssetQualityAsString() {
+
+        if (assetInfo.getAssetQuality() == null) return null;
+
+        String value = findMatchValue(assetInfo.getAssetQuality(), importService.assetQualityList);
+
+        return value;
+    }
+
     public String getAssetClassAsString() {
 
         if (assetInfo.getAssetClass() == null) return null;
@@ -925,6 +934,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("rfId"), assetInfo.getRfId());
         map.put(getMessage("rfGroup"), assetInfo.getRfGroup());
         map.put(getMessage("powerOnThreshold"), assetInfo.getPowerOnThreshold());
+        map.put(getMessage("assetQuality"), this.getAssetQualityAsString());
         return map;
 
     }
