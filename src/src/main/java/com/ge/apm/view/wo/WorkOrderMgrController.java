@@ -1564,7 +1564,12 @@ public void test1(){
             RequestContext.getCurrentInstance().addCallbackParam("repairResult", true);
             valid = false;
         }
-
+        if(userContextService.isCountyArea() && !whetherCheckIn()){ //关单前县域租户备件必须签到
+            WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
+            valid = false;
+        };
 
        /* WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         hourRequired=  woc.getHourRequired();*/
@@ -1677,12 +1682,7 @@ public void test1(){
                     }
                 }
             }
-            if(!whetherCheckIn()){ //关单前县域租户备件必须签到
-                WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
-                return;
-            };
+
         }
         woService.closeWorkOrder(selectedWorkOrder, comments, picList);
         cancel();

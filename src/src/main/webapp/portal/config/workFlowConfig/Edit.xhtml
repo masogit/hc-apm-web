@@ -4,8 +4,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"  >
+      xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
 
@@ -140,20 +139,18 @@
                                 <p:ajax process="@this"  update="V2_WorkflowConfigEditForm:wo"      />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                            <c:if test="#{!userContextService.countyArea}">
-                                <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
-                                    <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
-                                    <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isAutoEnabled}" >
-                                        <p:ajax process="@this" />
-                                    </p:selectBooleanCheckbox>
-                                </h:panelGroup >
-                                <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}" >
-                                    <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
-                                    <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isTakeOrderEnabled}">
-                                        <p:ajax process="@this" />
-                                    </p:selectBooleanCheckbox>
-                                </h:panelGroup >
-                            </c:if>
+                        <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
+                            <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isAutoEnabled}" >
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup >
+                        <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}" >
+                            <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isTakeOrderEnabled}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup >
                         <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
                             <label class = "label">#{msg.ManuallySendWorkers}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isManualEnabled}" >
@@ -255,14 +252,12 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <c:if test="#{!userContextService.countyArea}">
-                            <h:panelGroup>
-                                <label class = "label">#{msg.NoInformation}?</label>
-                                <p:selectBooleanCheckbox value="#{workflowConfigController.selected.notSendMsgInTakeOrderMode}">
-                                    <p:ajax process="@this" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup >
-                        </c:if>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.NoInformation}?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.notSendMsgInTakeOrderMode}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup >
                         <h:panelGroup>
                             <label class = "label">#{msg.CaseTypeRequired}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isCasetypeRequired}">
