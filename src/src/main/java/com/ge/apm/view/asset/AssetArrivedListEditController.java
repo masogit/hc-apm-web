@@ -176,7 +176,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
             initEasyInstallItem();
             this.changeFunctionGroup();
-            if(userContextService.activeSupplier() && selected.getContractNum() != null){
+            if(activeSupplier() && selected.getContractNum() != null){
                 Set<String> ids = new HashSet<>();
                 ids.add(selected.getId());
                 ids.add(selected.getContractNum());
@@ -189,7 +189,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 //                this.changeFunctionGroup();
 //
 //            }
-            if(activeSupplier() && null == selected.getBoxInstallationDate()) {
+            if(null == selected.getBoxInstallationDate()) {
                 selected.setBoxInstallationDate(selected.getArrivalDate());
             }
             prepareEdit();
@@ -277,6 +277,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         selected = dao.findById(selected.getId());
         if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
             contractService.contractItemArrival(arrivalItemList);
+        }
+        if(userContextService.activeSupplier() && selected.getContractNum() != null){
+            Set<String> ids = new HashSet<>();
+            ids.add(selected.getId());
+            ids.add(selected.getContractNum());
+            attachList = aiService.getPartPictures(ids);
         }
     }
 
@@ -523,7 +529,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalList);
             blobObject.setBoUuid(selected.getId());
-            if(userContextService.activeSupplier() && verifyFileSuffixName(blobObject.getObjectName(),".JPEG|.JPG|.PNG|.PDF")){
+            if(activeSupplier()){//已激活的供应商：使用合同号作为BoUuid
                 blobObject.setBoUuid(selected.getContractNum());
             }
             blobObject.setBoSubType(type);

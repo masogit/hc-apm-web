@@ -190,8 +190,17 @@ public class AssetInstallationController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
 
-        deptInfoList = uaaService.getClinicalDeptListBySiteUID(arrivalListItem.getArrivalList().getSiteUID());
-        attachList = aiService.getPicList(arrivalListItem.getArrivalList().getId());
+        ArrivalList arrivalList = arrivalListItem.getArrivalList();
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(arrivalList.getSiteUID());
+        String contractNum = arrivalList.getContractNum();
+        if(activeSupplier() && contractNum != null){
+            Set<String> ids = new HashSet<>();
+            ids.add(arrivalList.getId());
+            ids.add(contractNum);
+            attachList = aiService.getPartPictures(ids);
+        }else{
+            attachList = aiService.getPicList(arrivalList.getId());
+        }
         attachList.addAll(aiService.getPicList(arrivalListItem.getId()));
         initGbTree();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -651,6 +660,26 @@ public class AssetInstallationController {
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalListItem);
             blobObject.setBoUuid(arrivalListItem.getId());
+            blobObject.setBoSubType(typeName);
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    /**
+     * 已激活的供应商页面：临床验收确认模块上传文件使用
+     * @param event
+     */
+    public void handleFileUploadActiveSupplier(FileUploadEvent event) {
+        String typeName = event.getComponent().getClientId();
+        typeName = typeName.substring(typeName.indexOf("type") + 4);
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            attachList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalListItem);
+            blobObject.setBoUuid(arrivalListItem.getArrivalList().getContractNum());
             blobObject.setBoSubType(typeName);
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
