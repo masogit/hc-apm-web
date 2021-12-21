@@ -388,7 +388,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail.setPartsItemId(partsItem.getId());
     }
     public List<SimplePartsItem> autosparePartName() {
-        List<SimplePartsItem> all = partsInventoryService.findAll();
+        List<SimplePartsItem> all = null;
+        if(userContextService.isCountyArea()){
+            all = initSparePartsMaster();
+        }else{
+            all = partsInventoryService.findAll();
+        }
         return all;
     }
     public List<SimplePartsItem> initSparePartsMaster() {
@@ -1923,6 +1928,17 @@ public void test1(){
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
             supplierName = itemDetail.getSupplier();
+        }
+        if(userContextService.isCountyArea()){//县域租户拼凑收货信息：“收货地址”、“收货人+联系方式”、”工程师姓名“、”工程师联系电话
+            UserAccount userAccount = userContextService.getLoginUser();
+            if(!userAccount.getId().equals(selectedWorkOrder.getAcceptStepOwnerId())){
+                userAccount = userDao.getById(selectedWorkOrder.getAcceptStepOwnerId());
+            }
+            OrgInfo orgInfo = orgDao.getByUid(userAccount.getSiteUID());
+            StringBuilder sb = new StringBuilder();
+            sb.append(orgInfo.getAddress()).append(",").append(orgInfo.getContactPerson()).append(",").append(orgInfo.getContactPhone())
+                    .append(",").append(userAccount.getLoginName()).append(",").append(userAccount.getTelephone());
+            itemDetail.setComment(sb.toString());
         }
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         nochange=false;

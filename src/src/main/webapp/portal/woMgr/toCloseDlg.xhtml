@@ -125,7 +125,7 @@
                         </p:panelGrid>
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup rendered="#{userContextService.isCountyArea()}">
-                                <label class="label" style="color: black!important;font-size: 16px!important;">县域租户备件归还：</label>
+                                <label class="label" style="color: black!important;font-size: 16px!important;margin-bottom:4px;">县域租户备件归还：</label>
                                 <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturn(workOrderMgrController.selectedWorkOrder.id)}"
                                              var="item" widgetVar="detailReturnList" lazy="false" paginator="false" rowKey="#{item.id}" rows="100" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.accessory}">

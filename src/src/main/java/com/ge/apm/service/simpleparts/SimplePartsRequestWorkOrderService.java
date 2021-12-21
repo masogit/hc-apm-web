@@ -78,6 +78,8 @@ public class SimplePartsRequestWorkOrderService {
     @Autowired
     private SimplePartsConfigService partsConfigService;
 
+    @Autowired
+    private UserContextService userContextService;
     /**
      * 生成申购单
      * @param accessoryList
@@ -110,6 +112,9 @@ public class SimplePartsRequestWorkOrderService {
             SimplePartsRequestLineItem partsRequestLineItem = new SimplePartsRequestLineItem();
             partsRequestLineItem.setTotalPrice(oneTotalPrice);
             partsRequestLineItem.setRequestQty(apartsQuantity);
+            if(userContextService.isCountyArea()){//保存县域租户备件表拼凑的收货信息
+                partsRequestLineItem.setAddressInfo(item.getComment());
+            }
             assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, userAccount);
             // 未入库
             partsRequestLineItem.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);
@@ -192,7 +197,9 @@ public class SimplePartsRequestWorkOrderService {
             SimplePartsRequestLineItem partsRequestLineItem = new SimplePartsRequestLineItem();
             partsRequestLineItem.setTotalPrice(oneTotalPrice);
             partsRequestLineItem.setRequestQty(apartsQuantity);
-
+            if(userContextService.isCountyArea()){//保存县域租户备件表拼凑的收货信息
+                partsRequestLineItem.setAddressInfo(item.getComment());
+            }
             assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, userAccount);
             // 未出库
             partsRequestLineItem.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);

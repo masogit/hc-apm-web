@@ -211,6 +211,12 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     }
 
 
+    /**
+     * 县域用件类型 “1保内用件”，“2保外用件”
+     */
+    @Column(name = "part_use_type")
+    private String partUseType;
+
     public String getPartsSignature() {
         return partsSignature;
     }
@@ -537,6 +543,14 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
 
     public void setDetailReviewSignature(String detailReviewSignature) {
         this.detailReviewSignature = detailReviewSignature;
+    }
+
+    public String getPartUseType() {
+        return partUseType;
+    }
+
+    public void setPartUseType(String partUseType) {
+        this.partUseType = partUseType;
     }
 
     @Override
