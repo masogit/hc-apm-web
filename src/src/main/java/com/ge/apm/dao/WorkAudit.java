@@ -32,8 +32,10 @@ public class WorkAudit implements Serializable {
     @Column(name = "audit_group_configuration_detail_id")
     private String auditGroupConfigurationDetailId;
 
-    @JoinColumn(name = "work_order_detail_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "work_order_detail_id", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @NotFound(action=NotFoundAction.IGNORE)
+    @org.hibernate.annotations.ForeignKey(name = "none")
     private V2_WorkOrder_Detail v2WorkOrderDetail;
     @JoinColumn(name = "audit_group_configuration_detail_id", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
