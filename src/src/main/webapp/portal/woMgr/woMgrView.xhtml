@@ -350,6 +350,34 @@
                                 </p:dataTable>
                             </h:panelGroup>
 
+                            <h:panelGroup rendered="#{userContextService.isCountyArea()}">
+                                <label class="label" >县域租户备件归还</label>
+                                <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturn(workOrderMgrController.selectedWorkOrder.id)}"
+                                             var="item"  lazy="false" paginator="false" rowKey="#{item.id}" rows="100" emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="#{msg.accessory}">
+                                        <h:outputText value="#{item.partName}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.assetsDashboardclm2}">
+                                        <h:outputText value="#{item.serialNum}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.returnNum}">
+                                        <h:outputText value="#{item.returnNum}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.returnType}">
+                                        <p:selectOneMenu id="partReturnType" value="#{item.returnType}" disabled="true">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('partReturnType')}" var="item1" itemLabel="#{item1.value}" itemValue="#{item1.msgKey}"/>
+                                            <p:ajax listener="#{workOrderMgrController.savePartReturnInfo(item)}" update="detailReturnList"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg.returnTime}">
+                                        <h:outputText value="#{item.returnTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                        </h:outputText>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+
                             <p:dataGrid id="partPictureList" var="fileitem" value="#{workOrderMgrController.getPartPictures(woItem.id)}" columns="5" layout="grid">
                                 <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                                 <p:panel  style="text-align:center">
