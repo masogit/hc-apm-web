@@ -98,6 +98,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     private Map<String, String> i18Map;
 
     private ZkbContractAssetService zkbContractAssetService;
+
+    /**
+     *  提示信息confirm message
+     */
+    private String confirmMessage;
     @Override
     protected void init() {
         super.init();
@@ -166,6 +171,33 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         super.prepareEdit();
         this.selected = this.zkbFePartOrderRepository.findById(this.id);
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
+        this.confirmMessage =this.genConfirmMessage();
+    }
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
+    */
+
+    public String genConfirmMessage(){
+        String confirmMessage = new String();
+        ZkbContract zct = this.contractList.get(0);
+        if("ManMade".equals(this.selected.getOrderType())){//人工
+            String geArtificialSupportTimes = zct.getGeArtificialSupportTimes()!= null?zct.getGeArtificialSupportTimes().toString():"0";
+            confirmMessage += "人工支持剩余次数:"+geArtificialSupportTimes;
+        }else if("Probe".equals(this.selected.getOrderType())){//探头
+            String probeQuota = zct.getProbeQuota()!=null?zct.getProbeQuota().toString():"0";
+            String probeQuotaNormal = zct.getProbeQuotaNormal()!=null?zct.getProbeQuotaNormal().toString():"0";
+            String probeQuotaSpecial = zct.getProbeQuotaSpecial()!=null?zct.getProbeQuotaSpecial().toString():"0";
+            confirmMessage += "探头任意剩余名额:"+probeQuota+"\n";
+            confirmMessage += "探头普通剩余名额:"+probeQuotaNormal+"\n";
+            confirmMessage += "探头特殊剩余名额:"+probeQuotaSpecial;
+        }else if("SpareParts".equals(this.selected.getOrderType())){//备件
+            String spareQuota = zct.getSpareQuota()!=null?zct.getSpareQuota().toString():"0";
+            confirmMessage += "备件剩余名额:"+spareQuota;
+        }
+        return confirmMessage.toString();
     }
 
     /**
@@ -358,5 +390,13 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 
     public void setContractError(Boolean contractError) {
         this.contractError = contractError;
+    }
+
+    public String getConfirmMessage() {
+        return confirmMessage;
+    }
+
+    public void setConfirmMessage(String confirmMessage) {
+        this.confirmMessage = confirmMessage;
     }
 }

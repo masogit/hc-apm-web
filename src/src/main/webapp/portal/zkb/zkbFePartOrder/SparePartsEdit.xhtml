@@ -325,7 +325,9 @@
                 </p:dataTable>
             </p:fieldset>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.saveAndToListPage}" style="float:left"/>
-            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left"/>
+                <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left">
+                    <p:confirm header="请确认剩余名额信息" message="#{zkbFePartOrderDetailController.confirmMessage}" icon="ui-icon-alert"/>
+                </p:commandButton>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="暂不订购" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.supplierReject}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" value="同意" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.commercialAccept(param['zkbFePartOrderSparePartsEditForm:commercialComment'])}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" value="不同意" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.commercialReject}" style="float:left"/>
