@@ -67,6 +67,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget,boolean approvalFlag) {
         // 需要调用服务端提供的接口
+        logger.info("approvableTarget"+approvableTarget);
         BigDecimal totalPrice = approvableTarget.getTotalPriceToBigDecimal();
         MultiLevelApprovalConfig multiLevelApprovalConfig =
                 this.getApproveConfig(switchBusyTypeToString(approvableTarget.getBusinessType()), totalPrice,approvalFlag);

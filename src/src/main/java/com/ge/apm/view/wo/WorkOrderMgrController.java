@@ -1341,6 +1341,8 @@ public void test1(){
 
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
+        logger.info("selectedWorkOrder"+selectedWorkOrder);
+        logger.info("multiLevelApprovalService"+multiLevelApprovalService);
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
