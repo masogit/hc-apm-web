@@ -183,6 +183,22 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     @Column(name = "detail_review_signature")
     private String detailReviewSignature;
 
+
+    /**
+     * 审批签名(核心组)
+     */
+    @Transient
+    private List<String> approverSignatureList;
+
+    public List<String> getApproverSignatureList() {
+        return approverSignatureList;
+    }
+
+    public void setApproverSignatureList(List<String> approverSignatureList) {
+        this.approverSignatureList = approverSignatureList;
+    }
+
+
     /**
      * 县域用件类型 “1保内用件”，“2保外用件”
      */

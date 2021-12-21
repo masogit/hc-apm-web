@@ -215,6 +215,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private String attributes;
     @Column(name = "signature")
     private String signature;
+    /**
+     * 审批签名(医工组)
+     */
+    @Column(name = "medical_worker_approver_signature")
+    private String medicalWorkerApproverSignature;
+
+
 
     @Column(name = "ack_signature")
     private String ackSignature;
@@ -302,14 +309,22 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Column(name="call_center_number") // 县域需求call center单号
     private String callCenterNumber;
-    public Integer getCoreMemberApproval() {
+
+    public String getMedicalWorkerApproverSignature() {
+        return medicalWorkerApproverSignature;
+    }
+
+    public void setMedicalWorkerApproverSignature(String medicalWorkerApproverSignature) {
+        this.medicalWorkerApproverSignature = medicalWorkerApproverSignature;
+    }
+
+    public Integer getIsCoreMemberApproval() {
         return isCoreMemberApproval;
     }
 
-    public void setCoreMemberApproval(Integer coreMemberApproval) {
-        isCoreMemberApproval = coreMemberApproval;
+    public void setIsCoreMemberApproval(Integer isCoreMemberApproval) {
+        this.isCoreMemberApproval = isCoreMemberApproval;
     }
-
     public Integer getCreateType() {
         return createType;
     }
