@@ -668,26 +668,6 @@ public class AssetInstallationController {
         }
     }
 
-    /**
-     * 已激活的供应商页面：临床验收确认模块上传文件使用
-     * @param event
-     */
-    public void handleFileUploadActiveSupplier(FileUploadEvent event) {
-        String typeName = event.getComponent().getClientId();
-        typeName = typeName.substring(typeName.indexOf("type") + 4);
-        V2_BlobObject blobObject = blobService.uploadFile(event);
-        if (null != blobObject) {
-            attachList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalListItem);
-            blobObject.setBoUuid(arrivalListItem.getArrivalList().getContractNum());
-            blobObject.setBoSubType(typeName);
-            blobService.saveBlobObject(blobObject);
-            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
-        } else {
-            WebUtil.addErrorMessage("fail to upload file");
-        }
-    }
-
     public void onFunctionGroupChange() {
         code68List = new ArrayList<>();
         this.arrivalListItem.setAssetCode68(null);
