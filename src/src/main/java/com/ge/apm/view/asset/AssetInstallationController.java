@@ -193,6 +193,7 @@ public class AssetInstallationController {
         ArrivalList arrivalList = arrivalListItem.getArrivalList();
         deptInfoList = uaaService.getClinicalDeptListBySiteUID(arrivalList.getSiteUID());
         String contractNum = arrivalList.getContractNum();
+        supplierService = WebUtil.getBean(SupplierService.class);
         if(activeSupplier() && contractNum != null){
             Set<String> ids = new HashSet<>();
             ids.add(arrivalList.getId());
@@ -209,7 +210,6 @@ public class AssetInstallationController {
             parentAssetInfo = assetDao.findById(arrivalListItem.getParentAssetId());
         }
         getParentAssetList();
-        supplierService = WebUtil.getBean(SupplierService.class);
     }
 
     private void initOwner() {
