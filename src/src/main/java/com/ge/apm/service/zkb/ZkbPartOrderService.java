@@ -1142,6 +1142,87 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Autowired
     private ZkbContractQuotaLogService zkbContractQuotaLogService;
 
+    public String preSave(ZkbPartOrder zkbPartOrder, ZkbContract zkbContract, AssetInfo assetInfo) {
+        if (ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())) {
+            ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), assetInfo.getUid());
+            if (ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag()) && "highMachine".equals(zkbContractAsset.getAssetType())) {
+                return "该申请不扣任何名额！";
+            } else {
+                if (ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
+                    return "当前合同剩余备件名额为"+zkbContract.getSpareQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个备件名额！";
+                } else {
+                    return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+";此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
+                }
+            }
+        } else if (ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
+            if (ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType()) || StringUtils.isEmpty(zkbContract.getQuotaDeductType())) {
+                if (StringUtils.isEmpty(zkbPartOrder.getHighCatFlag())) {
+                    return "当前合同剩余探头名额为"+zkbContract.getProbeQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头名额！";
+                } else if (CopyByInvok.F.equals(zkbPartOrder.getHighCatFlag())) {
+                    return "当前合同剩余探头名额为"+zkbContract.getProbeQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头名额！";
+                } else if (CopyByInvok.T.equals(zkbPartOrder.getHighCatFlag())) {
+                    ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                    if (zkbContractCat != null) {
+                        if (CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
+                            //扣除名额，同时将cat设置不可用
+                            return "当前合同剩余探头名额为"+zkbContract.getProbeQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头名额以及扣除SN编号:"+zkbContractCat.getSnNo()+"！";
+                        } else {
+                            return "该申请扣除SN编号:"+zkbContractCat.getSnNo()+"！";
+                        }
+                    }
+                }
+            }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
+                if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                    return "当前合同剩余探头任意名额为"+zkbContract.getProbeQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头任意名额！";
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                    return "当前合同剩余探头普通名额为"+zkbContract.getProbeQuotaNormal()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头普通名额！";
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                    return "当前合同剩余探头特殊名额为"+zkbContract.getProbeQuotaSpecial()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头特殊名额！";
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                    ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                    if(zkbContractCat != null){
+                        if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
+                            return "当前合同剩余探头普通名额为"+zkbContract.getProbeQuotaNormal()+";此次申请扣除"+ zkbPartOrder.getQty() +"个普通名额以及扣除SN编号:"+zkbContractCat.getSnNo()+"！";
+                        }else {
+                            return "该申请扣除SN编号:"+zkbContractCat.getSnNo()+"！";
+                        }
+                    }
+                }
+            }
+        } else if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
+            //region  人工
+            if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
+                return "该申请不扣任何名额";
+            }
+            if(CopyByInvok.NORMAL_ONE.equals(zkbPartOrder.getArtificialType()) && CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+                return "该申请不扣任何名额";
+            }
+            if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
+                //扣除积分
+                return "该申请扣除积分:"+ zkbPartOrder.getQty() * 200;
+            }else{
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                    //人工名额
+                    return "当前合同剩余人工名额为"+zkbContract.getGeArtificialSupportTimes()+";此次申请扣除"+ zkbPartOrder.getQty() +"个人工名额！";
+                }else{
+                    //联合名额
+                    return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+";此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
+                }
+            }
+            //endregion
+        } else if (ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) ||
+                    ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                //备件名额
+                return "当前合同剩余备件名额为"+zkbContract.getSpareQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个备件名额！";
+            }else{
+                //联合名额
+                return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+";此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
+            }
+        }
+        return "";
+    }
+
 
 
     public void subApplyQty(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty,UserAccount userAccount,boolean acceptFlag){
