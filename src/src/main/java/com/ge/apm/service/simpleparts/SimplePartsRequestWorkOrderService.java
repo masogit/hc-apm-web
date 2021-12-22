@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.web.WebUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -78,8 +79,6 @@ public class SimplePartsRequestWorkOrderService {
     @Autowired
     private SimplePartsConfigService partsConfigService;
 
-    @Autowired
-    private UserContextService userContextService;
     /**
      * 生成申购单
      * @param accessoryList
@@ -112,7 +111,7 @@ public class SimplePartsRequestWorkOrderService {
             SimplePartsRequestLineItem partsRequestLineItem = new SimplePartsRequestLineItem();
             partsRequestLineItem.setTotalPrice(oneTotalPrice);
             partsRequestLineItem.setRequestQty(apartsQuantity);
-            if(userContextService.isCountyArea()){//保存县域租户备件表拼凑的收货信息
+            if(isCountyArea()){//保存县域租户备件表拼凑的收货信息
                 partsRequestLineItem.setAddressInfo(item.getComment());
             }
             assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, userAccount);
@@ -197,7 +196,7 @@ public class SimplePartsRequestWorkOrderService {
             SimplePartsRequestLineItem partsRequestLineItem = new SimplePartsRequestLineItem();
             partsRequestLineItem.setTotalPrice(oneTotalPrice);
             partsRequestLineItem.setRequestQty(apartsQuantity);
-            if(userContextService.isCountyArea()){//保存县域租户备件表拼凑的收货信息
+            if(isCountyArea()){//保存县域租户备件表拼凑的收货信息
                 partsRequestLineItem.setAddressInfo(item.getComment());
             }
             assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, userAccount);
@@ -379,4 +378,8 @@ public class SimplePartsRequestWorkOrderService {
         return isPartsRequestValid;
     }
 
+    public boolean isCountyArea(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.isCountyArea();
+    }
 }
