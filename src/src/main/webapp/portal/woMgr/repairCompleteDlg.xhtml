@@ -182,7 +182,7 @@
                                     <p:column headerText="#{msg.arrival}">
                                         <h:outputText value="#{item.arrived?msg.Arrived:msg.NonArrived}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
                                     </p:column>
-                                    <c:if test="#{userContextService.isCountyArea}">
+                                    <c:if test="#{userContextService.countyArea}">
                                         <p:column headerText="#{msg.partUseType}">
                                             <h:outputText value="#{fieldMsg.fieldValue('partUseType', item.partUseType)}" />
                                         </p:column>

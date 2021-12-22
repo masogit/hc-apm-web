@@ -2806,20 +2806,22 @@ public void test1(){
      * 保存县域租户备件收货信息
      */
     public void saveCountyAreaAddressInfo(){
-        //县域租户拼凑收货信息：“收货地址”、“收货人+联系方式”、”工程师姓名“、”工程师联系电话
-        UserAccount userAccount = userContextService.getLoginUser();
-        if(!userAccount.getId().equals(selectedWorkOrder.getAcceptStepOwnerId())){
-            userAccount = userDao.getById(selectedWorkOrder.getAcceptStepOwnerId());
+        if(userContextService.isCountyArea()){
+            //县域租户拼凑收货信息：“收货地址”、“收货人+联系方式”、”工程师姓名“、”工程师联系电话
+            UserAccount userAccount = userContextService.getLoginUser();
+            if(!userAccount.getId().equals(selectedWorkOrder.getAcceptStepOwnerId())){
+                userAccount = userDao.getById(selectedWorkOrder.getAcceptStepOwnerId());
+            }
+            AssetInfo assetInfo = selectedWorkOrder.getAssetInfo();
+            OrgInfo orgInfo = orgDao.getByUid(assetInfo.getHospitalUID());
+            StringBuilder sb = new StringBuilder();
+            sb.append("收货地址：").append(orgInfo.getAddress()==null?"":orgInfo.getAddress()).append(",")
+                    .append("收货人：").append(orgInfo.getContactPerson()==null?"":orgInfo.getContactPerson()).append(",")
+                    .append("联系方式：").append(orgInfo.getContactPhone()==null?"":orgInfo.getContactPhone()).append(",")
+                    .append("工程师姓名：").append(userAccount.getName()==null?"":userAccount.getName()).append(",")
+                    .append("联系电话：").append(userAccount.getTelephone()==null?"":userAccount.getTelephone());
+            itemDetail.setComment(sb.toString());
         }
-        AssetInfo assetInfo = selectedWorkOrder.getAssetInfo();
-        OrgInfo orgInfo = orgDao.getByUid(assetInfo.getHospitalUID());
-        StringBuilder sb = new StringBuilder();
-        sb.append("收货地址：").append(orgInfo.getAddress()==null?"":orgInfo.getAddress()).append(",")
-                .append("收货人：").append(orgInfo.getContactPerson()==null?"":orgInfo.getContactPerson()).append(",")
-                .append("联系方式：").append(orgInfo.getContactPhone()==null?"":orgInfo.getContactPhone()).append(",")
-                .append("工程师姓名：").append(userAccount.getName()==null?"":userAccount.getName()).append(",")
-                .append("联系电话：").append(userAccount.getTelephone()==null?"":userAccount.getTelephone());
-        itemDetail.setComment(sb.toString());
     }
 }
 
