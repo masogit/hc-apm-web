@@ -388,7 +388,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail.setPartsItemId(partsItem.getId());
     }
     public List<SimplePartsItem> autosparePartName() {
-        List<SimplePartsItem> all = partsInventoryService.findAll();
+        List<SimplePartsItem> all = null;
+        if(userContextService.isCountyArea()){
+            all = initSparePartsMaster();
+        }else{
+            all = partsInventoryService.findAll();
+        }
         return all;
     }
     public List<SimplePartsItem> initSparePartsMaster() {
@@ -1232,10 +1237,7 @@ public void test1(){
     }
 
     public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
-        if(v2WorkOrderDetailReturnList == null){
-            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(woId);
-        }
-        return v2WorkOrderDetailReturnList;
+        return woService.getWorkOrderDetailReturn(woId);
     }
 
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
@@ -1336,6 +1338,8 @@ public void test1(){
 
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
+        logger.info("selectedWorkOrder"+selectedWorkOrder);
+        logger.info("multiLevelApprovalService"+multiLevelApprovalService);
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
@@ -1564,7 +1568,12 @@ public void test1(){
             RequestContext.getCurrentInstance().addCallbackParam("repairResult", true);
             valid = false;
         }
-
+        if(userContextService.isCountyArea() && !whetherCheckIn()){ //关单前县域租户备件必须签到
+            WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
+            valid = false;
+        };
 
        /* WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         hourRequired=  woc.getHourRequired();*/
@@ -1677,12 +1686,7 @@ public void test1(){
                     }
                 }
             }
-            if(!whetherCheckIn()){ //关单前县域租户备件必须签到
-                WebUtil.addErrorMessage(WebUtil.getMessage("NotSignedInTips"));
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                RequestContext.getCurrentInstance().addCallbackParam("approvalMust", true);
-                return;
-            };
+
         }
         woService.closeWorkOrder(selectedWorkOrder, comments, picList);
         cancel();
@@ -1923,6 +1927,17 @@ public void test1(){
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
             supplierName = itemDetail.getSupplier();
+        }
+        if(userContextService.isCountyArea()){//县域租户拼凑收货信息：“收货地址”、“收货人+联系方式”、”工程师姓名“、”工程师联系电话
+            UserAccount userAccount = userContextService.getLoginUser();
+            if(!userAccount.getId().equals(selectedWorkOrder.getAcceptStepOwnerId())){
+                userAccount = userDao.getById(selectedWorkOrder.getAcceptStepOwnerId());
+            }
+            OrgInfo orgInfo = orgDao.getByUid(userAccount.getSiteUID());
+            StringBuilder sb = new StringBuilder();
+            sb.append(orgInfo.getAddress()).append(",").append(orgInfo.getContactPerson()).append(",").append(orgInfo.getContactPhone())
+                    .append(",").append(userAccount.getLoginName()).append(",").append(userAccount.getTelephone());
+            itemDetail.setComment(sb.toString());
         }
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         nochange=false;

@@ -184,6 +184,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         isShow = false;
         orgName = null;
         orgNameEn = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
         OrgInfo org = new OrgInfo();
         org.setSiteId(tenantId);
 
@@ -207,6 +210,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgName = null;
         orgNameEn = null;
         hospitalUcmid = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
         if (selected == null) {
             return;
         }
@@ -234,6 +240,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         isShow = false;
         orgName = null;
         orgNameEn = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
         if (selected == null) {
             return;
         }
@@ -261,6 +270,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         isShow = false;
         orgName = null;
         orgNameEn = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
         if (selected == null) {
             return;
         }

@@ -3,7 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="preRenderView">
         <f:metadata>
@@ -248,7 +249,11 @@
                             <p:column headerText="备件总价">
                                 <h:outputText value="#{item.totalPrice}"/>
                             </p:column>
-
+                            <c:if test="#{userContextService.isCountyArea()}">
+                                <p:column headerText="收货信息">
+                                    <h:outputText value="#{item.addressInfo}"/>
+                                </p:column>
+                            </c:if>
                             <p:column headerText="#{msg.Actions}">
                                 <p:commandButton validateClient="true"
                                                  actionListener="#{simplePartsRequestEditController.deleteCurrentPartsLineItem(item)}"

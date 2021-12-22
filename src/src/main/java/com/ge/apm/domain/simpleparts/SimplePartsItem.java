@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "simple_parts_item")
@@ -23,6 +24,9 @@ public class SimplePartsItem implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "english_name")
+    private String englishName;
 
     @Column(name = "supplier")
     private String supplier;
@@ -44,6 +48,9 @@ public class SimplePartsItem implements Serializable {
 
     @Column(name = "category_name")
     private String categoryName;
+
+    @Column(name = "unit_price")
+    private BigDecimal unitPrice;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
