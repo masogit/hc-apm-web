@@ -6,10 +6,7 @@ import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.zkb.CopyByInvok;
-import com.ge.apm.service.zkb.ZkbContractAssetService;
-import com.ge.apm.service.zkb.ZkbIntegralService;
-import com.ge.apm.service.zkb.ZkbPartOrderService;
+import com.ge.apm.service.zkb.*;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -609,6 +606,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             i++;
         }
     }
+
+    public String quotaTips ="";
+    private ZkbContractQuotaLogService zkbContractQuotaLogService;
+    public void preSave(){
+        if(assetInfo == null){
+            return;
+        }
+        selected.setOrderType(orderType);
+        quotaTips = zkbPartOrderService.preSave(selected,selectedContract,assetInfo);
+
+    }
+
 
     /**
      * 保存方法
@@ -1237,6 +1246,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setSelectedContract(ZkbContract selectedContract) {
         this.selectedContract = selectedContract;
+    }
+
+    public String getQuotaTips() {
+        return quotaTips;
+    }
+
+    public void setQuotaTips(String quotaTips) {
+        this.quotaTips = quotaTips;
     }
 
     @Override
