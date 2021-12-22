@@ -302,14 +302,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Column(name="call_center_number") // 县域需求call center单号
     private String callCenterNumber;
-    public Integer getCoreMemberApproval() {
+
+    public Integer getIsCoreMemberApproval() {
         return isCoreMemberApproval;
     }
 
-    public void setCoreMemberApproval(Integer coreMemberApproval) {
-        isCoreMemberApproval = coreMemberApproval;
+    public void setIsCoreMemberApproval(Integer isCoreMemberApproval) {
+        this.isCoreMemberApproval = isCoreMemberApproval;
     }
-
     public Integer getCreateType() {
         return createType;
     }

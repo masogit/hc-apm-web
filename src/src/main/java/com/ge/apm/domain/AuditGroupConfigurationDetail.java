@@ -57,7 +57,7 @@ public class AuditGroupConfigurationDetail implements Serializable {
     @Column(name = "actual_audit_date")
     private Date actualAuditDate;
     /**
-     * 审批签名
+     * 审批签名(核心组)
      */
     @Column(name = "approver_signature")
     private String approverSignature;

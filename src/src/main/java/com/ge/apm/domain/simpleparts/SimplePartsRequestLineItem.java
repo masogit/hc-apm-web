@@ -198,6 +198,9 @@ public class SimplePartsRequestLineItem implements Serializable {
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUid;
 
+    @Column(name = "address_info")
+    private String addressInfo;
+
     //used by stock in or stock out
     @Transient
     private String partsWarehouseId;

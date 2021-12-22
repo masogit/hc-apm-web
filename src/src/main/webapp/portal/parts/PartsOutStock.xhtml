@@ -195,7 +195,11 @@
                             <p:column headerText="部分出库">
                                 <p:rowEditor  rendered="#{simplePartsRequestListController.renderPartsDetails(item.status,simplePartsRequestListController.selected.proposerStatus)}"/>
                             </p:column>
-
+                            <c:if test="#{userContextService.isCountyArea()}">
+                                <p:column headerText="收货信息">
+                                    <h:outputText value="#{item.addressInfo}"/>
+                                </p:column>
+                            </c:if>
                             <f:facet name="{Toolbar}">
                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
                                                  class="btn btn-sm btn-gray"
