@@ -442,10 +442,12 @@
                 </p:panelGrid>
             </p:fieldset>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm" action="#{zkbFePartOrderProbeController.saveAndToListPage}" style="float:left"/>
-                <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left">
+               <!-- <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left">
                     <p:confirm header="请确认剩余名额信息" message="#{zkbFePartOrderDetailController.confirmMessage}" icon="ui-icon-alert"/>
-                </p:commandButton>
-            <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="暂不订购" icon="ui-icon-close"  process="@this" action="#{zkbFePartOrderProbeController.supplierReject(param['zkbFePartOrderProbeEditForm:comment'])}" style="float:left"/>
+                </p:commandButton>-->
+                <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left"/>
+
+                <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="暂不订购" icon="ui-icon-close"  process="@this" action="#{zkbFePartOrderProbeController.supplierReject(param['zkbFePartOrderProbeEditForm:comment'])}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingCommercial')}" value="同意" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.commercialAccept()}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingCommercial')}" value="不同意" icon="ui-icon-close"  process="@this" action="#{zkbFePartOrderProbeController.commercialReject(param['zkbFePartOrderProbeEditForm:commercialComment'])}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  validateClient="true" action="#{zkbFePartOrderProbeController.fullApmInfo}" style="float:left"/>
