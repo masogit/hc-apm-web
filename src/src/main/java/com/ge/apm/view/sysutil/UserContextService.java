@@ -251,6 +251,22 @@ public class UserContextService implements Serializable {
     	return authContains(menuName)&&versionContains(menuName);
     }
 
+    public boolean accessContainsOfJiangNing(){
+        TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
+        List<TenantInfo> tenantIfos = tenantInfoRepository.getByName("南京市江宁医院");
+        if(tenantIfos == null || tenantIfos.size() == 0){
+            return false;
+        }
+        TenantInfo tf = tenantIfos.get(0);
+        String jiangNingUid = tf.getUid();
+        String currentTenantUid = userAccount.getTenantUID();
+        if(jiangNingUid.equals(currentTenantUid)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public boolean authContains(String menuName){
     	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()||userAccount.getIsGeOp()){
     		return true;

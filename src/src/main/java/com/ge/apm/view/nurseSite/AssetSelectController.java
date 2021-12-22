@@ -1,9 +1,6 @@
 package com.ge.apm.view.nurseSite;
 
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -139,6 +136,33 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 			this.listCheckOrgInfo.clear();
 		}
 		listCheckOrgInfo.add(selectedDept);
+        this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
+
+        //sort assets by selected for edit view
+        List<AssetInfo> assetsWithoutSelected = this.loadAssets4EditView().stream()
+                .filter(t -> !this.selectedAssetUids.getOrDefault(t.getUid(), Boolean.FALSE))
+                .collect(Collectors.toList());
+        this.assets4Maintain = new ArrayList<>();
+        this.assets4Maintain.addAll(assetsWithoutSelected);
+        this.assets5Maintain = new ArrayList<>(this.selectedAssets);
+    }
+
+    public void loadData4EditJN(NurseSiteMaintainConfigJN config) {
+        this.is4Edit = Boolean.TRUE;
+        this.orgTree = assetSelectService.loadOrgTree();
+        this.selectedOrg = assetSelectService.loadSelectedOrg();
+
+        this.selectedAssets = assetSelectService.loadSelectedAssetByConfig(config.getId()).stream().collect(Collectors.toSet());
+        this.selectedAssets.stream().forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
+        OrgInfo selectedDept = assetSelectService.getOrgInfoByUid(config.getClinicalDeptUID());
+        this.selectedOrg = assetSelectService.getOrgInfoByUid(selectedDept.getParentUID());
+        if (this.listCheckOrgInfo == null) {
+            this.listCheckOrgInfo = new ArrayList<OrgInfo>();
+        }
+        else{
+            this.listCheckOrgInfo.clear();
+        }
+        listCheckOrgInfo.add(selectedDept);
         this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
 
         //sort assets by selected for edit view
