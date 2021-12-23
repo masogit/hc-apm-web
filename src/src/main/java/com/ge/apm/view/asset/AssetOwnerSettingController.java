@@ -19,10 +19,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -197,18 +195,23 @@ public class AssetOwnerSettingController {
             selectedOrg = orgInfo;
             if(selectedOrg.getOrgLevel()==0 && selectedOrg.getOrgType()!=4){
                 queryAsset.setTenantUID(selectedOrg.getUid());
+                clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(), 0);
             }
             if(selectedOrg.getOrgLevel()==1 && selectedOrg.getOrgType()!=4){
                 queryAsset.setInstitutionUID(selectedOrg.getUid());
+                clinicalDeptList = assetInfoService. getClinicalDeptList(selectedOrg.getUid(),1);
             }
             if(selectedOrg.getOrgLevel()==2 && selectedOrg.getOrgType()!=4){
                 queryAsset.setHospitalUID(selectedOrg.getUid());
+                clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(),2);
             }
             if(selectedOrg.getOrgLevel()==3 && selectedOrg.getOrgType()!=4){
                 queryAsset.setSiteUID(selectedOrg.getUid());
+                clinicalDeptList =  assetInfoService.getClinicalDeptList(selectedOrg.getUid(),3);
             }
             if(selectedOrg.getOrgType()==4){
                 queryAsset.setClinicalDeptUID(selectedOrg.getUid());
+                clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(),4);
             }
         }
         getQueryAssetsList();
