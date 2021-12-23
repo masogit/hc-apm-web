@@ -99,7 +99,7 @@
                         <p:column headerText="备件总价" sortBy="#{item.totalPrice}">
                             <h:outputText value="#{item.totalPrice}"/>
                         </p:column>
-                        <c:if test="#{userContextService.countyArea()}">
+                        <c:if test="#{userContextService.isCountyArea()}">
                             <p:column headerText="收货信息" sortBy="#{item.addressInfo}" filterBy="#{item.addressInfo}"
                                       filterMatchMode="LIKE">
                                 <h:outputText value="#{item.addressInfo}"/>
@@ -121,7 +121,7 @@
                             <p:column headerText="出库人">
                                 <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
-                            <c:if test="#{userContextService.countyArea()}">
+                            <c:if test="#{userContextService.isCountyArea()}">
                                 <p:column headerText="运单号" >
                                     <h:outputText value="#{item.transportNo }"/>
                                 </p:column>
@@ -147,7 +147,7 @@
                             <p:column headerText="入库人">
                                 <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
-                            <c:if test="#{userContextService.countyArea()}">
+                            <c:if test="#{userContextService.isCountyArea()}">
                                 <p:column headerText="入库类型" >
                                     <h:outputText value="#{simplePartsTransactionController.switchStorageType(item.storageType)}"/>
                                 </p:column>
