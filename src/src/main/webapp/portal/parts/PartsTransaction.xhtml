@@ -99,12 +99,12 @@
                         <p:column headerText="备件总价" sortBy="#{item.totalPrice}">
                             <h:outputText value="#{item.totalPrice}"/>
                         </p:column>
-
-                        <p:column headerText="收货信息" sortBy="#{item.addressInfo}" filterBy="#{item.addressInfo}"
-                                  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.addressInfo}"/>
-                        </p:column>
-
+                        <c:if test="#{userContextService.countyArea()}">
+                            <p:column headerText="收货信息" sortBy="#{item.addressInfo}" filterBy="#{item.addressInfo}"
+                                      filterMatchMode="LIKE">
+                                <h:outputText value="#{item.addressInfo}"/>
+                            </p:column>
+                        </c:if>
                         <c:if test="#{simplePartsTransactionController.queryIndex == 1}">
                             <p:column headerText="出库仓库">
                                 <h:outputText
@@ -121,14 +121,15 @@
                             <p:column headerText="出库人">
                                 <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
+                            <c:if test="#{userContextService.countyArea()}">
+                                <p:column headerText="运单号" >
+                                    <h:outputText value="#{item.transportNo }"/>
+                                </p:column>
 
-                            <p:column headerText="运单号" >
-                                <h:outputText value="#{item.transportNo }"/>
-                            </p:column>
-
-                            <p:column headerText="运输公司">
-                                <h:outputText value="#{item.transportCompany}"/>
-                            </p:column>
+                                <p:column headerText="运输公司">
+                                    <h:outputText value="#{item.transportCompany}"/>
+                                </p:column>
+                            </c:if>
                         </c:if>
                         <c:if test="#{simplePartsTransactionController.queryIndex == 0}">
                             <p:column headerText="入库仓库">
@@ -146,14 +147,15 @@
                             <p:column headerText="入库人">
                                 <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
+                            <c:if test="#{userContextService.countyArea()}">
+                                <p:column headerText="入库类型" >
+                                    <h:outputText value="#{simplePartsTransactionController.switchStorageType(item.storageType)}"/>
+                                </p:column>
 
-                            <p:column headerText="入库类型" >
-                                <h:outputText value="#{simplePartsTransactionController.switchStorageType(item.storageType)}"/>
-                            </p:column>
-
-                            <p:column headerText="备注">
-                                <h:outputText value="#{item.comments}"/>
-                            </p:column>
+                                <p:column headerText="备注">
+                                    <h:outputText value="#{item.comments}"/>
+                                </p:column>
+                            </c:if>
                         </c:if>
                         <p:column headerText="院区" sortBy="#{item.siteUID}">
                             <h:outputText value="#{simplePartsTransactionController.switchSiteName(item.siteUID)}"/>
