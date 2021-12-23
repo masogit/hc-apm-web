@@ -1357,6 +1357,8 @@ public class NurseSiteMaintainJNService {
 				deleteNurseSiteMaintainConfigItem(list);
 			}
 			if (listCheckAssets != null && listCheckAssets.size() > 0) {
+				List<String> uids = listCheckAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+				nurseSiteMaintainConfigJNItemRepository.deleteByAssetUids(uids);
 				list = new ArrayList<NurseSiteMaintainConfigJNItem>();
 				for (int i = 0; i < listCheckAssets.size(); ++i) {
 					NurseSiteMaintainConfigJNItem obj = new NurseSiteMaintainConfigJNItem();
