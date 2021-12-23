@@ -200,6 +200,10 @@ public class SimplePartsRequestService {
             partsTransaction.setRequestType(partsRequest.getType());
             partsTransaction.setTransactionType(SimplePartsConstant.TRANSACTION_TYPE_IN_STOCK);
 
+            partsTransaction.setComments(item.getComments());//备注
+            partsTransaction.setStorageType(item.getStorageType());//入库类型
+            partsTransaction.setAddressInfo(item.getAddressInfo());//地址信息
+
             SimplePartsTransactionService.addCurrentOrgInfo(partsTransaction);
 
             partsTransactionRepository.save(partsTransaction);
@@ -294,6 +298,10 @@ public class SimplePartsRequestService {
             partsTransaction.setPartsLocatorId(item.getPartsLocatorId());
             partsTransaction.setRequestType(partsRequest.getType());
             partsTransaction.setTransactionType(SimplePartsConstant.TRANSACTION_TYPE_OUT_STOCK);
+
+            partsTransaction.setTransportNo(item.getTransportNo()); //运单号
+            partsTransaction.setTransportCompany(item.getTransportCompany());   //运输公司
+            partsTransaction.setAddressInfo(item.getAddressInfo());//地址信息
 
             SimplePartsTransactionService.addCurrentOrgInfo(partsTransaction);
             partsTransactionRepository.save(partsTransaction);

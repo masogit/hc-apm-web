@@ -1610,12 +1610,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      */
     public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType,String token){
         try {
-            HashMap<String, Object> emailWrapperMap = new HashMap<>();
+            HashMap<String, String> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
             emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
-            emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
+
             String url = "";
             if(StringUtils.isEmpty(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
@@ -1645,15 +1645,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
         if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
-            ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrder.getCurrentStep())) {
-            HashMap<String, Object> emailWrapperMap = null;
+                ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrder.getCurrentStep())) {
+            HashMap<String, String> emailWrapperMap = null;
             try {
                 emailWrapperMap = new HashMap<>();
                 emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
                 emailWrapperMap.put("systemId", zkbPartOrder.getId());
                 emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
                 emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
-                emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
                 String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
                 //String token = UserContextService.getAccessToken();
                 HttpHeaders header = createHttpHeaders(token);
@@ -1712,9 +1711,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     public void sendEmailForProbeLetter(ZkbPartOrder zkbPartOrder){
         try {
-            HashMap<String, Object> emailWrapperMap = new HashMap<>();
+            HashMap<String, String> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
-            emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_PROBE_LETTER_EMAIL);
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
@@ -1759,6 +1757,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
         return false;
     }
+
 
     public boolean uploadFile(FileUploadEvent event, ZkbPartOrder zkbPartOrder){
         V2_BlobObject v2_blobObject = blobService.uploadFile(event);
