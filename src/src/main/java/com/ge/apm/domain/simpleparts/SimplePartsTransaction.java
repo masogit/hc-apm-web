@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -161,5 +162,45 @@ public class SimplePartsTransaction implements Serializable {
      */
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUid;
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 收货信息
+     */
+    @Column(name = "address_info")
+    private String addressInfo;
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 备注
+     */
+    @Column(name = "comments")
+    @Size(max = 2000)
+    private String comments;
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 入库类型
+     * @description 新货入库newgoods   虚拟入库virtual   好还入库Okay
+     */
+    @Column(name = "storage_type")
+    private String storageType;
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 运单号
+     */
+    @Column(name = "transport_no")
+    private String transportNo;
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 运输公司
+     */
+
+    @Column(name = "transport_company")
+    private String transportCompany;
 
 }

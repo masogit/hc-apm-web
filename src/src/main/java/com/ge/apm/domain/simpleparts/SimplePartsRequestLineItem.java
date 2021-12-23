@@ -212,6 +212,40 @@ public class SimplePartsRequestLineItem implements Serializable {
     @Transient
     private SimplePartsItem partsItem;
 
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 备注
+     */
+    @Transient
+    private String comments;
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 入库类型
+     * @description 新货入库newgoods   虚拟入库virtual   好还入库Okay
+     */
+    @Transient
+    private String storageType;
+
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 运单号
+     */
+    @Transient
+    private String transportNo;
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 运输公司
+     */
+    @Transient
+    private String transportCompany;
+
+
     @Transient
     private SimplePartsItemValue partsItemValue;
 
