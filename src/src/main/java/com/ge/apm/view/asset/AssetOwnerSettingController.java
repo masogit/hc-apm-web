@@ -252,7 +252,22 @@ public class AssetOwnerSettingController {
 
     public List<OrgInfo> getClinicalDeptList() {
         //return acServie.getClinicalDeptList(queryAsset.getSiteUID());
-        return assetInfoService.getClinicalDeptList(currentUser.getSiteUID());
+        if(currentUser.getOrgLevel()==0){
+            return assetInfoService.getClinicalDeptList(currentUser.getTenantUID(),0);
+        }
+        if(currentUser.getOrgLevel()==1){
+            return assetInfoService.getClinicalDeptList(currentUser.getInstitutionUID(),1);
+        }
+        if(currentUser.getOrgLevel()==2){
+            return assetInfoService.getClinicalDeptList(currentUser.getHospitalUID(),2);
+        }
+        if(currentUser.getOrgLevel()==3){
+            return assetInfoService.getClinicalDeptList(currentUser.getSiteUID(),3);
+        }
+        if(currentUser.getOrgType()==4){
+            return assetInfoService.getClinicalDeptList(currentUser.getClinicalDeptUID(),4);
+        }
+        return null;
     }
 
     public List<UserAccount> getOwnerList() {
