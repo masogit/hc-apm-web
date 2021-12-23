@@ -2046,6 +2046,8 @@ public void test1(){
         vwd.setPartsType(null);
         selectedObjectMap = new HashMap();
         itemDetail= vwd;
+        itemDetail.setPartUseType(null);
+        saveCountyAreaAddressInfo();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
     }
     //保存一个备件
@@ -2815,10 +2817,10 @@ public void test1(){
             AssetInfo assetInfo = selectedWorkOrder.getAssetInfo();
             OrgInfo orgInfo = orgDao.getByUid(assetInfo.getHospitalUID());
             StringBuilder sb = new StringBuilder();
-            sb.append("收货地址：").append(orgInfo.getAddress()==null?"":orgInfo.getAddress()).append(",")
-                    .append("收货人：").append(orgInfo.getContactPerson()==null?"":orgInfo.getContactPerson()).append(",")
-                    .append("联系方式：").append(orgInfo.getContactPhone()==null?"":orgInfo.getContactPhone()).append(",")
-                    .append("工程师姓名：").append(userAccount.getName()==null?"":userAccount.getName()).append(",")
+            sb.append("收货地址：").append(orgInfo.getAddress()==null?"":orgInfo.getAddress()).append("，")
+                    .append("收货人：").append(orgInfo.getContactPerson()==null?"":orgInfo.getContactPerson()).append("，")
+                    .append("联系方式：").append(orgInfo.getContactPhone()==null?"":orgInfo.getContactPhone()).append("，")
+                    .append("工程师姓名：").append(userAccount.getName()==null?"":userAccount.getName()).append("，")
                     .append("联系电话：").append(userAccount.getTelephone()==null?"":userAccount.getTelephone());
             itemDetail.setComment(sb.toString());
         }
