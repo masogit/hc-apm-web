@@ -115,6 +115,10 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
            return i18nDao.getByTypeAndKey(SimplePartsConstant.I18N_REQUEST_TYPE,String.valueOf(requestType));
     }
 
+    public String switchStorageType(String storageType){
+        return i18nDao.getByTypeAndKey(SimplePartsConstant.I18N_STORAGE_TYPE,storageType);
+    }
+
     public String switchSiteName(String siteUID){
         return orgInfoDao.findNameByUID(siteUID);
     }
