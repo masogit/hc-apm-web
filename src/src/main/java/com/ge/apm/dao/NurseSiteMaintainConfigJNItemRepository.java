@@ -43,6 +43,11 @@ public interface NurseSiteMaintainConfigJNItemRepository extends GenericReposito
 	@Query(value="delete from nurse_site_maintain_config_item_jn o where o.asset_uid=?1",nativeQuery=true)
 	public void deleteByAssetUid(String assetUid);
 
+	@Transactional
+	@Modifying
+	@Query(value="delete from nurse_site_maintain_config_item_jn o where o.asset_uid in (?1)",nativeQuery=true)
+	public void deleteByAssetUids(List<String> assetUid);
+
 	@Query(value="select o.* from nurse_site_maintain_config_item_jn o where o.asset_uid=?1",nativeQuery=true)
 	public List<NurseSiteMaintainConfigJNItem> findByAssetUid(String assetUid);
 }
