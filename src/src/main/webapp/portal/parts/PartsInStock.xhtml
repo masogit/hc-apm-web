@@ -201,23 +201,23 @@
                                 <p:column headerText="收货信息">
                                     <h:outputText value="#{item.addressInfo}"/>
                                 </p:column>
-                            </c:if>
-                            <p:column headerText="入库类型">
-                                <h:panelGroup>
-                                    <p:selectOneMenu id="storageType" value="#{item.storageType}" >
-                                        <p:ajax event="itemSelect"  update="sparePartsBuyIngForm "/>
-                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                        <f:selectItems value="#{fieldMsg.getFieldValueList('storage_type')}" var="sitem" itemLabel="#{sitem.value}" itemValue="#{sitem.msgKey}"/>
-                                    </p:selectOneMenu>
+                                <p:column headerText="入库类型">
+                                    <h:panelGroup>
+                                        <p:selectOneMenu id="storageType" value="#{item.storageType}" >
+                                            <p:ajax event="itemSelect"  update="sparePartsBuyIngForm "/>
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('storage_type')}" var="sitem" itemLabel="#{sitem.value}" itemValue="#{sitem.msgKey}"/>
+                                        </p:selectOneMenu>
+                                        <span style="color: red;">*</span>
+                                    </h:panelGroup>
+                                </p:column>
+                                <p:column headerText="备注">
+                                    <p:inputText id="comments" value="#{item.comments}" >
+                                        <p:ajax event="change"  update="sparePartsBuyIngForm "/>
+                                    </p:inputText>
                                     <span style="color: red;">*</span>
-                                </h:panelGroup>
-                            </p:column>
-                            <p:column headerText="备注">
-                                <p:inputText id="comments" value="#{item.comments}" >
-                                    <p:ajax event="change"  update="sparePartsBuyIngForm "/>
-                                </p:inputText>
-                                <span style="color: red;">*</span>
-                            </p:column>
+                                </p:column>
+                            </c:if>
                             <p:column headerText="部分入库">
                                 <p:rowEditor  rendered="#{simplePartsRequestListController.renderPartsDetails(item.status,simplePartsRequestListController.selected.proposerStatus)}" />
                             </p:column>
