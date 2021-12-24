@@ -618,6 +618,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "running_status")
     private Integer runningStatus;
 
+    //1- 正常可借用， 2-入库待保洁
+    @Column(name = "shared_status")
+    private Integer sharedStatus;
+
     @Transient
     private int lineNum;
 
@@ -2378,5 +2382,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setAssetQuality(Integer assetQuality) {
         this.assetQuality = assetQuality;
+    }
+
+    public Integer getSharedStatus() {
+        return sharedStatus;
+    }
+
+    public void setSharedStatus(Integer sharedStatus) {
+        this.sharedStatus = sharedStatus;
     }
 }

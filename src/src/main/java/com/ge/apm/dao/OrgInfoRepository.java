@@ -122,15 +122,15 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc(String siteUID, Integer orgType);
 
-    @Query(value = "select o.* from org_info o where o.tenant_uid=?1 ", nativeQuery = true)
+    @Query(value = "select o.* from org_info o where o.tenant_uid=?1 and o.org_type=4 ", nativeQuery = true)
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc1(String siteUID);
-    @Query(value = "select o.* from org_info o where o.institution_uid=?1 ", nativeQuery = true)
+    @Query(value = "select o.* from org_info o where o.institution_uid=?1 and o.org_type=4", nativeQuery = true)
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc2(String siteUID);
-    @Query(value = "select o.* from org_info o where o.hospital_uid=?1 ", nativeQuery = true)
+    @Query(value = "select o.* from org_info o where o.hospital_uid=?1 and o.org_type=4", nativeQuery = true)
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc3(String siteUID);
-    @Query(value = "select o.* from org_info o where o.site_uid=?1 ", nativeQuery = true)
+    @Query(value = "select o.* from org_info o where o.site_uid=?1 and o.org_type=4", nativeQuery = true)
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc4(String siteUID);
-    @Query(value = "select o.* from org_info o where o.uid=?1 ", nativeQuery = true)
+    @Query(value = "select o.* from org_info o where o.uid=?1 and o.org_type=4", nativeQuery = true)
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc5(String siteUID);
 
     public List<OrgInfo> findBySiteUIDAndOrgTypeIn(String siteUID, Integer[] orgTypes);
