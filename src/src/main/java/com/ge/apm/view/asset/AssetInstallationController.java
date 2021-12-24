@@ -190,8 +190,18 @@ public class AssetInstallationController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
 
-        deptInfoList = uaaService.getClinicalDeptListBySiteUID(arrivalListItem.getArrivalList().getSiteUID());
-        attachList = aiService.getPicList(arrivalListItem.getArrivalList().getId());
+        ArrivalList arrivalList = arrivalListItem.getArrivalList();
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(arrivalList.getSiteUID());
+        String contractNum = arrivalList.getContractNum();
+        supplierService = WebUtil.getBean(SupplierService.class);
+        if(activeSupplier() && contractNum != null){
+            Set<String> ids = new HashSet<>();
+            ids.add(arrivalList.getId());
+            ids.add(contractNum);
+            attachList = aiService.getPartPictures(ids);
+        }else{
+            attachList = aiService.getPicList(arrivalList.getId());
+        }
         attachList.addAll(aiService.getPicList(arrivalListItem.getId()));
         initGbTree();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -200,7 +210,6 @@ public class AssetInstallationController {
             parentAssetInfo = assetDao.findById(arrivalListItem.getParentAssetId());
         }
         getParentAssetList();
-        supplierService = WebUtil.getBean(SupplierService.class);
     }
 
     private void initOwner() {

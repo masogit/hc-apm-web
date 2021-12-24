@@ -192,6 +192,27 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
+
+                            <c:if test="#{userContextService.isCountyArea()}">
+                                <p:column headerText="收货信息">
+                                    <h:outputText value="#{item.addressInfo}"/>
+                                </p:column>
+
+                                <p:column headerText="运输公司">
+                                    <p:inputText id="transportCompany" value="#{item.transportCompany}" >
+                                        <p:ajax event="change"  update="sparePartsOutForm "/>
+                                    </p:inputText>
+                                    <span style="color: red;">*</span>
+                                </p:column>
+
+                                <p:column headerText="运单号">
+                                    <p:inputText id="transportNo" value="#{item.transportNo}" >
+                                        <p:ajax event="change"  update="sparePartsOutForm "/>
+                                    </p:inputText>
+                                    <span style="color: red;">*</span>
+                                </p:column>
+
+                            </c:if>
                             <p:column headerText="部分出库">
                                 <p:rowEditor  rendered="#{simplePartsRequestListController.renderPartsDetails(item.status,simplePartsRequestListController.selected.proposerStatus)}"/>
                             </p:column>

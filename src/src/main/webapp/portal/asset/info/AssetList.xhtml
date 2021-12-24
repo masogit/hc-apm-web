@@ -694,6 +694,17 @@
                                     <h:outputText value="#{assetInfoListController.selectCreatedBy(item.createdBy)}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'assetQuality' and assetInfoListController.countyArea}">
+                                <p:column id="assetQuality" headerText="#{msg.assetQuality}" sortBy="#{item.assetQuality}" filterBy="#{item.assetQuality}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetQuality', item.assetQuality)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetQuality')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">

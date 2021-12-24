@@ -487,16 +487,9 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                 <p:dataList id="accessoryList" value="#{assetInstallationController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <c:choose>
-                                        <c:when test="#{userContextService.activeSupplier()}">
-                                            <f:facet name="header">临床验收确认</f:facet>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
-                                        </c:otherwise>
-                                    </c:choose>
+                                    <f:facet name="header">临床验收确认</f:facet>
                                     <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                    <h:panelGroup rendered="#{assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />

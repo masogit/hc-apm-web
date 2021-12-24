@@ -70,6 +70,7 @@ public class AssetFileImportBaseService {
     public List<I18nMessage> capitalSource2List = FieldValueMessageController.getFieldValueList("capitalSource2", siteId);
     public List<I18nMessage> deviceStatusList = FieldValueMessageController.getFieldValueList("deviceStatus", siteId);
     public List<I18nMessage> proprietaryClassList = FieldValueMessageController.getFieldValueList("proprietaryClass", siteId);
+    public List<I18nMessage> assetQualityList = FieldValueMessageController.getFieldValueList("assetQuality", siteId);
 
     @Autowired
     protected AssetInfoRepository assetDao;
@@ -632,19 +633,16 @@ public class AssetFileImportBaseService {
                 if((!StringUtils.isEmpty(assetDeptName) && !assetDeptName.equals(asset.getAssetDeptName()) )|| (!StringUtils.isEmpty(clinicalDeptName) && !clinicalDeptName.equals(asset.getClinicalDeptName()))){
                     if(asset.getSharedAssetTypeUid() != null){
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备已绑定调剂名称,不能修改科室");
                     }
 
                     if(!assetInfoBulkEditCheckService.verifyForMaintain(assets)){
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备有未完成的保养工单,不能修改科室");
                     }
 
                     if(!assetInfoBulkEditCheckService.verifyForInventory(assets)){
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备有未盘点的工单,不能修改科室");
                     }
                     for(AssetInfo as:assets){
@@ -660,7 +658,6 @@ public class AssetFileImportBaseService {
                                 continue;
                             }else{
                                 item.put("status", ImportStatus.CheckFail);
-                                result.add(Boolean.FALSE);
                                 AssetRow.addErrMessage(item, "错误: 设备有未完成的维修工单,不能修改科室");
                             }
                         }
@@ -670,7 +667,6 @@ public class AssetFileImportBaseService {
                     Optional<String> optionalResult = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchImport(assets);
                     if (optionalResult.isPresent()) {
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备有未完成的日常检查工单,不能修改科室");
                     }
                 }
@@ -756,6 +752,13 @@ public class AssetFileImportBaseService {
                     AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("medicalApparatusClassification") + "编码不存在");
                     continue;
                 }
+            }
+            // 县域租户添加设备性质字段，且必填
+            if (newAsset.getAssetQuality() == null && userContextService.isCountyArea()) {
+                item.put("status", ImportStatus.CheckFail);
+                result.add(Boolean.FALSE);
+                AssetRow.addErrMessage(item, "错误: 设备性质是必须的");
+                continue;
             }
 
         }

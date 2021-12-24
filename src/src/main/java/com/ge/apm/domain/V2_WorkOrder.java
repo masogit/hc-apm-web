@@ -297,15 +297,19 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     private Integer orderCount;
     @Transient
     private BigDecimal totalPriceToBigDecimal;
+    @Column(name="sieble_number") // 县域需求字段sieble单号
+    private String siebleNumber;
 
-    public Integer getCoreMemberApproval() {
+    @Column(name="call_center_number") // 县域需求call center单号
+    private String callCenterNumber;
+
+    public Integer getIsCoreMemberApproval() {
         return isCoreMemberApproval;
     }
 
-    public void setCoreMemberApproval(Integer coreMemberApproval) {
-        isCoreMemberApproval = coreMemberApproval;
+    public void setIsCoreMemberApproval(Integer isCoreMemberApproval) {
+        this.isCoreMemberApproval = isCoreMemberApproval;
     }
-
     public Integer getCreateType() {
         return createType;
     }
@@ -920,5 +924,21 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setOrderCount(Integer orderCount) {
         this.orderCount = orderCount;
+    }
+
+    public String getSiebleNumber() {
+        return siebleNumber;
+    }
+
+    public void setSiebleNumber(String siebleNumber) {
+        this.siebleNumber = siebleNumber;
+    }
+
+    public String getCallCenterNumber() {
+        return callCenterNumber;
+    }
+
+    public void setCallCenterNumber(String callCenterNumber) {
+        this.callCenterNumber = callCenterNumber;
     }
 }

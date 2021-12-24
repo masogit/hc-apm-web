@@ -6,10 +6,7 @@ import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.zkb.CopyByInvok;
-import com.ge.apm.service.zkb.ZkbContractAssetService;
-import com.ge.apm.service.zkb.ZkbIntegralService;
-import com.ge.apm.service.zkb.ZkbPartOrderService;
+import com.ge.apm.service.zkb.*;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -610,6 +607,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public String quotaTips ="";
+    private ZkbContractQuotaLogService zkbContractQuotaLogService;
+    public void preSave(){
+        if(assetInfo == null){
+            return;
+        }
+        selected.setOrderType(orderType);
+        quotaTips = zkbPartOrderService.preSave(selected,selectedContract,assetInfo);
+
+    }
+
+
     /**
      * 保存方法
      */
@@ -865,8 +874,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             this.selected.setQty(0);
             if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 this.selected.setCatNum(1);
-            }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && assetInfo.getAssetGroup().equals(2)){
-                //this.selected.setArtificialType("3");
+            }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
                 if(assetInfo == null || StringUtils.isEmpty(assetInfo.getUid()) || selectedContract == null){
                     this.selected.setArtificialType(CopyByInvok.NORMAL_THREE);
                 }else{
@@ -882,7 +890,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
                     }
                 }
-                
             }
         }
         calcRemainQty();
@@ -1239,6 +1246,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setSelectedContract(ZkbContract selectedContract) {
         this.selectedContract = selectedContract;
+    }
+
+    public String getQuotaTips() {
+        return quotaTips;
+    }
+
+    public void setQuotaTips(String quotaTips) {
+        this.quotaTips = quotaTips;
     }
 
     @Override
