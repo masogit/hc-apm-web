@@ -149,7 +149,12 @@
                             </h:panelGroup>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.artificialType eq '1'}">
-                            <label class="label">是否需要SSA Key*</label>
+                            <c:if test="#{zkbPartOrderAuditController.selected.artificialType eq '1'}">
+                                <label class="label" >是否需要SSA Key*</label>
+                            </c:if>
+                            <c:if test="#{!(zkbPartOrderAuditController.selected.artificialType eq '1')}">
+                                <label class="label" >是否需要Dongle*</label>
+                            </c:if>
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.ssaKeyFlag}" required="true" requiredMessage="是否需要SSA Key #{msg.ValidationRequire}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>

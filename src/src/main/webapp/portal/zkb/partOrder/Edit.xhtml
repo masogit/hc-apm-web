@@ -159,7 +159,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup id="ArtificialGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.artificialType eq '1'}">
+                        <h:panelGroup id="ArtificialGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
                             <c:if test="#{zkbPartOrderEditController.artificialType eq '1'}">
                                 <label class="label" >是否需要SSA Key*</label>
                             </c:if>
