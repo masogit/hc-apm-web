@@ -1194,7 +1194,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                 return "该申请不扣任何名额";
             }
-            if(CopyByInvok.NORMAL_ONE.equals(zkbPartOrder.getArtificialType()) && CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
                 return "该申请不扣任何名额";
             }
             if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
@@ -1333,7 +1333,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                 return;
             }
-            if(CopyByInvok.NORMAL_ONE.equals(zkbPartOrder.getArtificialType()) && CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
                 return;
             }
             if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
@@ -1464,7 +1464,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                 return;
             }
-            if(CopyByInvok.NORMAL_ONE.equals(zkbPartOrder.getArtificialType()) && CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
                 return;
             }
             if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
