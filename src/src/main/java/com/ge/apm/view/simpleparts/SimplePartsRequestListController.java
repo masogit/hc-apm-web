@@ -340,15 +340,15 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
                 WebUtil.addWarnMessage("申购单备件信息,须指定仓位");
                 return null;
             }
-
-            if(StringUtils.isEmpty(partsRequestLineItem.getStorageType())){
-                WebUtil.addWarnMessage("申购单备件信息,须指定入库类型");
-                return null;
-            }
-
-            if(StringUtils.isEmpty(partsRequestLineItem.getComments())){
-                WebUtil.addWarnMessage("申购单备件信息,须填写备注");
-                return null;
+            if(userContextService.isCountyArea()){
+                if(StringUtils.isEmpty(partsRequestLineItem.getStorageType())){
+                    WebUtil.addWarnMessage("申购单备件信息,须指定入库类型");
+                    return null;
+                }
+                if(StringUtils.isEmpty(partsRequestLineItem.getComments())){
+                    WebUtil.addWarnMessage("申购单备件信息,须填写备注");
+                    return null;
+                }
             }
         }
 
@@ -385,13 +385,15 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
                 WebUtil.addWarnMessage("申领单备件信息,须指定仓位");
                 return null;
             }
-            if(StringUtils.isEmpty(partsRequestLineItem.getTransportCompany())){
-                WebUtil.addWarnMessage("申领单备件信息,须指定运输公司");
-                return null;
-            }
-            if(StringUtils.isEmpty(partsRequestLineItem.getTransportNo())){
-                WebUtil.addWarnMessage("申领单备件信息,须指定运单号");
-                return null;
+            if(userContextService.isCountyArea()) {
+                if (StringUtils.isEmpty(partsRequestLineItem.getTransportCompany())) {
+                    WebUtil.addWarnMessage("申领单备件信息,须指定运输公司");
+                    return null;
+                }
+                if (StringUtils.isEmpty(partsRequestLineItem.getTransportNo())) {
+                    WebUtil.addWarnMessage("申领单备件信息,须指定运单号");
+                    return null;
+                }
             }
         }
 
@@ -455,13 +457,15 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
 
         SimplePartsRequest partsRequest = partsRequestRepository.findById(partsRequestLineItem.getPartsRequestId());
         if(partsRequest.getType() == 1){
-            if(StringUtils.isEmpty(partsRequestLineItem.getTransportNo())){
-                WebUtil.addWarnMessage("请填写运单号");
-                return;
-            }
-            if(StringUtils.isEmpty(partsRequestLineItem.getTransportCompany())){
-                WebUtil.addWarnMessage("请填写运输公司");
-                return;
+            if(userContextService.isCountyArea()) {
+                if (StringUtils.isEmpty(partsRequestLineItem.getTransportNo())) {
+                    WebUtil.addWarnMessage("请填写运单号");
+                    return;
+                }
+                if (StringUtils.isEmpty(partsRequestLineItem.getTransportCompany())) {
+                    WebUtil.addWarnMessage("请填写运输公司");
+                    return;
+                }
             }
             if (partsRequestLineItem.getNotTransactionQty() == null || partsRequestLineItem.getNotTransactionQty() == 0){
                 partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
@@ -486,13 +490,15 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
                 return;
             }
         }else{
-            if(StringUtils.isEmpty(partsRequestLineItem.getStorageType())){
-                WebUtil.addWarnMessage("入库类型未选择");
-                return;
-            }
-            if(StringUtils.isEmpty(partsRequestLineItem.getComments())){
-                WebUtil.addWarnMessage("请填写备注");
-                return;
+            if(userContextService.isCountyArea()) {
+                if (StringUtils.isEmpty(partsRequestLineItem.getStorageType())) {
+                    WebUtil.addWarnMessage("入库类型未选择");
+                    return;
+                }
+                if (StringUtils.isEmpty(partsRequestLineItem.getComments())) {
+                    WebUtil.addWarnMessage("请填写备注");
+                    return;
+                }
             }
             if (partsRequestLineItem.getNotTransactionQty() == null || partsRequestLineItem.getNotTransactionQty() == 0){
                 partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
