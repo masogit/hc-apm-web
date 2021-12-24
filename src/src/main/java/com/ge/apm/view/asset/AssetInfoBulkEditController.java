@@ -643,23 +643,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     //重新获取资产状态枚举
     public void updateAssetStatusList() {
         assetStatusList = i18nDao.getByMsgTypeAndSiteId("assetStatus", ApmConstant.DEFAULT_SITE_ID);
-//        assetStatusList.stream().forEach(status ->{
-//            if(status.getMsgKey().equals("4")){
-//                status.setEditable(hasScrappedAuthority());
-//            }else{
-//                status.setEditable(true);
-//            }
-//        });
-        // 过滤'可正常使用'状态(县域)
-        assetStatusList=assetStatusList.stream().filter(s->!"6".equals(s.getMsgKey()))
-                .map(s->{
-                    if(s.getMsgKey().equals("4")){
-                        s.setEditable(hasScrappedAuthority());
-                    }else{
-                        s.setEditable(true);
-                    }
-                    return s;
-                }).collect(Collectors.toList());
+        assetStatusList.stream().forEach(status ->{
+            if(status.getMsgKey().equals("4")){
+                status.setEditable(hasScrappedAuthority());
+            }else{
+                status.setEditable(true);
+            }
+        });
     }
     //判断待报废按钮是否禁用
     public boolean hasScrappedAuthority() {

@@ -68,9 +68,6 @@
                                 <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(1).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(1).msgKey}" itemDisabled="true"/>
                                 <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(2).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(2).msgKey}" />
                                 <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(3).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(3).msgKey}" itemDisabled="#{!assetInfoEditController.hasScrappedAuthority()}"/>
-                                <c:if test="#{userContextService.countyArea}">
-                                    <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(5).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(3).msgKey}" itemDisabled="true"/>
-                                </c:if>
                             </p:selectOneRadio>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -185,7 +182,11 @@
                                     <p:column headerText="#{msg.arrival}">
                                         <h:outputText value="#{item.arrived?msg.Arrived:msg.NonArrived}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
                                     </p:column>
-
+                                    <c:if test="#{userContextService.countyArea}">
+                                        <p:column headerText="#{msg.partUseType}">
+                                            <h:outputText value="#{fieldMsg.fieldValue('partUseType', item.partUseType)}" />
+                                        </p:column>
+                                    </c:if>
                                     <p:column headerText="#{msg.Actions}"><!--操作-->
                                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditAccDetail('new')}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
                                         <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareEditAccDetail(item)}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id ne '000'}" />

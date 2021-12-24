@@ -182,6 +182,40 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
      */
     @Column(name = "detail_review_signature")
     private String detailReviewSignature;
+    /**
+     * 审批签名(医工组)
+     */
+    @Column(name = "medical_worker_approver_signature")
+    private String medicalWorkerApproverSignature;
+
+    /**
+     * 审批签名(核心组)
+     */
+    @Transient
+    private List<String> approverSignatureList;
+
+    public String getMedicalWorkerApproverSignature() {
+        return medicalWorkerApproverSignature;
+    }
+
+    public void setMedicalWorkerApproverSignature(String medicalWorkerApproverSignature) {
+        this.medicalWorkerApproverSignature = medicalWorkerApproverSignature;
+    }
+
+    public List<String> getApproverSignatureList() {
+        return approverSignatureList;
+    }
+
+    public void setApproverSignatureList(List<String> approverSignatureList) {
+        this.approverSignatureList = approverSignatureList;
+    }
+
+
+    /**
+     * 县域用件类型 “1保内用件”，“2保外用件”
+     */
+    @Column(name = "part_use_type")
+    private String partUseType;
 
     public String getPartsSignature() {
         return partsSignature;
@@ -509,6 +543,14 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
 
     public void setDetailReviewSignature(String detailReviewSignature) {
         this.detailReviewSignature = detailReviewSignature;
+    }
+
+    public String getPartUseType() {
+        return partUseType;
+    }
+
+    public void setPartUseType(String partUseType) {
+        this.partUseType = partUseType;
     }
 
     @Override

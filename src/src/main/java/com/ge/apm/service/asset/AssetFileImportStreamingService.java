@@ -218,6 +218,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("QRCode")), "setQrCode", true);
                 assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("ProprietaryClass")), "setProprietaryClass", proprietaryClassList, map, null);
 
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetQuality")), "setAssetQuality", assetQualityList, map, null);
+
                 if (crossSite) {
                     SiteOrgWithDeptOrg siteOrgWithDeptOrg = supportingService.findSiteOrgInAssetExcelRow(rowMap, orgNamesUriCache);
                     supportingService.markDefautValue(siteOrgWithDeptOrg.getSiteOrg(), asset, now, false);

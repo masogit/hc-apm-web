@@ -488,9 +488,24 @@
                 </p:fieldset>
                 <p:outputLabel id="saveTips" style="color: red" value="#{zkbPartOrderEditController.saveTips}"/><br/>
                 <p:commandButton validateClient="true" value="#{msg.Submit}" action="#{zkbPartOrderEditController.saveEntity}" update=":growl" icon="ui-icon-check" />
+                <!--<p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true"  update=":growl :zkbConfirmDlg" actionListener="#{zkbPartOrderEditController.preSave}" oncomplete="PF('zkbConfirmDlg').show()" />-->
+
                 <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderEditController.backList}" />
             </h:form>
             <ui:include src="PartOrderItem.xhtml"/>
+            <p:dialog id="zkbConfirmDlg" widgetVar="zkbConfirmDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="确认" height="150">
+                <h:form id="zkbConfirmForm">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label style="color: red">#{zkbPartOrderEditController.quotaTips}</label>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{zkbContractEditController.saveEntity}" oncomplete="PF('zkbConfirmDlg').hide()" update=":growl" icon="ui-icon-check" />
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfirmDlg').hide()"/>
+                </h:form>
+
+            </p:dialog>
         </div>
     </ui:define>
 </ui:composition>

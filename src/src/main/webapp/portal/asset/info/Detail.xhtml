@@ -200,11 +200,8 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.status}</label>
                                     <p:selectOneRadio id="status"  label="#{msg.status}" value="#{assetInfoController.selected.status}" disabled="true">
-                                        <c:forEach items="#{fieldMsg.getFieldValueList('assetStatus')}" var="item">
-                                            <c:if test="#{item.msgKey != '6'}">
-                                                <f:selectItem  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                            </c:if>
-                                        </c:forEach>                                    </p:selectOneRadio>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneRadio>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.deviceStatus}</label>

@@ -141,11 +141,11 @@
                         </h:panelGroup >
                         <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
                             <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isAutoEnabled}">
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isAutoEnabled}" >
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
+                        <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}" >
                             <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isTakeOrderEnabled}">
                                 <p:ajax process="@this" />
@@ -153,7 +153,7 @@
                         </h:panelGroup >
                         <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
                             <label class = "label">#{msg.ManuallySendWorkers}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isManualEnabled}">
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isManualEnabled}" >
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
@@ -533,7 +533,12 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">是否启用院间借调</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableSiteToSiteAllocation}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
 
                     </p:panelGrid>
                 </p:fieldset>
