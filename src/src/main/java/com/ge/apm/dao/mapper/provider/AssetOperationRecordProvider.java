@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class AssetOperationRecordProvider {
-	private static final String selectStr = "select a.id as id,a.asset_info_name as assetInfoName,a.asset_info_function_type as assetInfoFunctionType,a.asset_info_depart_num as assetInfoDepartNum,a.serial_num as serialNum,a.asset_info_clinical_dept_name as assetInfoClinicalDeptName,a.hospitalNumber as hospitalNumber,a.operationName as operationName,a.operation_by_name as operationByName,a.create_date as createDate";
+	private static final String selectStr = "select a.id as id,a.asset_info_name as assetInfoName,a.asset_info_function_type as assetInfoFunctionType,a.asset_info_depart_num as assetInfoDepartNum,a.serial_num as serialNum,a.asset_info_clinical_dept_name as assetInfoClinicalDeptName,a.hospital_number as hospitalNumber,a.operation_name as operationName,a.operation_by_name as operationByName,a.create_date as createDate";
 	private static final String tableStr = " from (((asset_operation_record a join asset_info b on a.asset_info_uid= b.uid and b.is_deleted='f' and b.is_valid='t' and b.status!=4) join org_info c on b.site_uid=c.uid) join user_account d on a.operation_by=d.uid) where 1=1";
 	public String getAll(Map<String, Object> param) {
 		StringBuilder sb = new StringBuilder();
@@ -149,9 +149,12 @@ public class AssetOperationRecordProvider {
 			sb.append("(d.name like '%" + value + "%' or ");
 			sb.append("d.name_py_code like '%" + value + "%') and ");
 		}
+		else if (tempColumn.equals("operationName")) {
+			sb.append("a.operation_name like '%" + value + "%' and ");
+		}
 
 		else if (tempColumn.equals("hospitalNumber")) {
-            sb.append("a.hospitalNumber like '%" + value + "%' and ");
+            sb.append("a.hospital_number like '%" + value + "%' and ");
         }
 		
 		// assetInfo
