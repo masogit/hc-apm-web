@@ -118,8 +118,8 @@
                        <p:menuitem id="um701" value="#{msg.DailyCheck}" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.accessContains('nurseSite.maintain')}"/>
                        <p:menuitem id="um705" value="日常检查项设置" outcome="/portal/nurseSite/maintainConfigCheckItem.xhtml" rendered="#{userContextService.accessContains('nurseSite.config')}"/>
                        <p:menuitem id="um702" value="#{msg.DailyCheckSettings}" outcome="/portal/nurseSite/maintainConfig.xhtml" rendered="#{userContextService.accessContains('nurseSite.config')}"/>
-                       <p:menuitem id="um706"  value="#{msg.UseRegistrationCheckSettings}" outcome="/portal/nurseSite/maintainConfigJN.xhtml" rendered="#{userContextService.accessContains('nurseSite.config') and userContextService.accessContainsOfJiangNing()}"/>
-                       <p:menuitem id="um703" value="#{msg.DailyCheckReport}" outcome="/portal/nurseSite/maintainExportMain.xhtml" rendered="#{userContextService.accessContains('nurseSite.report')}"/>
+                        <p:menuitem id="um703" value="#{msg.DailyCheckReport}" outcome="/portal/nurseSite/maintainExportMain.xhtml" rendered="#{userContextService.accessContains('nurseSite.report')}"/>
+                        <p:menuitem id="um706"  value="#{msg.UseRegistrationCheckSettings}" outcome="/portal/nurseSite/maintainConfigJN.xhtml" rendered="#{userContextService.accessContains('nurseSite.config') and userContextService.accessContainsOfJiangNing()}"/>
                        <p:menuitem id="um704" value="#{msg.StartupAndShutdownRegistration}" outcome="/portal/nurseSite/assetOptRecordList.xhtml" rendered="#{userContextService.accessContains('nurseSite.optRecord') and !userContextService.accessContainsOfJiangNing()}"/>
                        <p:menuitem  id="um707" value="#{msg.UseRegistration}" outcome="/portal/nurseSite/assetOptRecordList2.xhtml" rendered="#{userContextService.accessContains('nurseSite.optRecord') and userContextService.accessContainsOfJiangNing()}"/>
             </p:submenu>
