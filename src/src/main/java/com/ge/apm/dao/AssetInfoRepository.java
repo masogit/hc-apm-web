@@ -164,6 +164,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value="select o.* from asset_info o where o.uid in (select b.asset_uid from nurse_site_maintain_config_item b where b.parent_id=?1) order by o.name_py_code asc",nativeQuery=true)
     public List<AssetInfo> findAssetByMaintainConfigParentId(String configParentId);
 
+    @Query(value="select o.* from asset_info o where o.uid in (select b.asset_uid from nurse_site_maintain_config_item_jn b where b.parent_id=?1) order by o.name_py_code asc",nativeQuery=true)
+    public List<AssetInfo> findAssetByMaintainConfigJNParentId(String configParentId);
+
     @Query("select w.deptForSharedAsset from WorkflowConfig w where w.siteUID = :siteUID")
     public List<String> getOrgId(@Param("siteUID") String siteUID);
 

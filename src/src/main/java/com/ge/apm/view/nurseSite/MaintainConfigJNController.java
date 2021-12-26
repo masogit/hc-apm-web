@@ -81,7 +81,7 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
   	private List<Integer> listAssetGroup;
   	private boolean isCreate=false;
   	private SearchController searchController;
-  	private AssetSelectController assetSelectController;
+  	private AssetSelectJNController assetSelectJNController;
   	private UserAuth customRoleAuth;
 
 	//选定的院区
@@ -96,8 +96,8 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 		tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         searchController = WebUtil.getBean(SearchController.class);
         searchController.setCallingController(this);
-        assetSelectController = WebUtil.getBean(AssetSelectController.class);
-        assetSelectController.setCallingController(this);
+		assetSelectJNController = WebUtil.getBean(AssetSelectJNController.class);
+		assetSelectJNController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainJNService = WebUtil.getBean(NurseSiteMaintainJNService.class);
         nurseSiteMaintainJNService.init();
@@ -210,7 +210,7 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 		initValues();
 		loadMaintainConfig(this.selected);
 		//TODO
-        assetSelectController.loadData4Create();
+		assetSelectJNController.loadData4Create();
         loadWholeCheckItem(currentUser.getSiteUID());
 	}
 	
@@ -223,7 +223,7 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 		loadMaintainConfig(this.selected);
 		setDefaultValueForAssetList();
 		//TODO
-        assetSelectController.loadData4EditJN(this.selected);
+		assetSelectJNController.loadData4Edit(this.selected);
         loadWholeCheckItem(currentUser.getSiteUID());
         loadSelectedCheckItem();
 	}
