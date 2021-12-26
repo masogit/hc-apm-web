@@ -3,12 +3,10 @@ package com.ge.apm.view.nurseSite;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.I18nMessageRepository;
-//import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigJNRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainJNService;
-//import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
@@ -45,7 +43,7 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
     private UserAccount currentUser;
     private NurseSiteMaintainJNService nurseSiteMaintainJNService;
     private NurseSiteMaintainConfigJNRepository dao;
-    private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
+    private List<NurseSiteMaintainConfigJN> listNurseSiteMaintainConfig;
     private List<MaintainDataPair> listStrNurseSiteMaintainConfig;
     private List<NurseSiteMaintainConfigJN> listSelected;
     //config
@@ -409,24 +407,24 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 		availableAssets=new DualListModel<AssetInfo>(checkListAssets, listCheckAssets);
 	}
 	
-	public boolean saveMaintainConfig(NurseSiteMaintainConfigJN nurseSiteMaintainConfig,boolean isSave) {
+	public boolean saveMaintainConfig(NurseSiteMaintainConfigJN nurseSiteMaintainConfigjn,boolean isSave) {
 		Date currentDate=new Date();
-		if(nurseSiteMaintainConfig.getId()==null){
+		if(nurseSiteMaintainConfigjn.getId()==null){
 //			nurseSiteMaintainConfig.setTenantUID(currentUser.getTenantUID());
 //			nurseSiteMaintainConfig.setInstitutionUID(currentUser.getInstitutionUID());
 //			nurseSiteMaintainConfig.setHospitalUID(currentUser.getHospitalUID());
 //			nurseSiteMaintainConfig.setSiteUID(currentUser.getSiteUID());
-			nurseSiteMaintainConfig.setCreateBy(currentUser);
-			nurseSiteMaintainConfig.setCreateByUid(currentUser.getUid());
-			nurseSiteMaintainConfig.setCreateDate(currentDate);
-			nurseSiteMaintainConfig.setModifyBy(currentUser);
-			nurseSiteMaintainConfig.setModifyByUid(currentUser.getUid());
-			nurseSiteMaintainConfig.setModifyDate(currentDate);
+			nurseSiteMaintainConfigjn.setCreateBy(currentUser);
+			nurseSiteMaintainConfigjn.setCreateByUid(currentUser.getUid());
+			nurseSiteMaintainConfigjn.setCreateDate(currentDate);
+			nurseSiteMaintainConfigjn.setModifyBy(currentUser);
+			nurseSiteMaintainConfigjn.setModifyByUid(currentUser.getUid());
+			nurseSiteMaintainConfigjn.setModifyDate(currentDate);
 		}
 		else{
-			nurseSiteMaintainConfig.setModifyBy(currentUser);
-			nurseSiteMaintainConfig.setModifyByUid(currentUser.getUid());
-			nurseSiteMaintainConfig.setModifyDate(currentDate);
+			nurseSiteMaintainConfigjn.setModifyBy(currentUser);
+			nurseSiteMaintainConfigjn.setModifyByUid(currentUser.getUid());
+			nurseSiteMaintainConfigjn.setModifyDate(currentDate);
 		}
 		//1:day,2:week,3:month,4:year
 //		Integer type=nurseSiteMaintainConfig.getType();
@@ -473,12 +471,13 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 			}
 		}
 //		nurseSiteMaintainJNService.saveSelectedCheckItem(listSelectedCheckItems,jsonArray);
-		nurseSiteMaintainConfig.setCheckItemsDetail(jsonArray.toJSONString());
+		nurseSiteMaintainConfigjn.setCheckItemsDetail(jsonArray.toJSONString());
 		if(isSave){
-			nurseSiteMaintainJNService.createMaintainConfig(nurseSiteMaintainConfig, currentUser,listCheckAssets);
+			nurseSiteMaintainJNService.createMaintainConfig(nurseSiteMaintainConfigjn, currentUser,listCheckAssets);
 		}
 		else{
-			nurseSiteMaintainJNService.updateMaintainConfig(nurseSiteMaintainConfig,currentUser, listCheckAssets);
+			nurseSiteMaintainJNService.updateMaintainConfig(nurseSiteMaintainConfigjn,currentUser, listCheckAssets);
+
 		}
 		return true;
 	}
@@ -645,11 +644,11 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 		this.checkListAssets = checkListAssets;
 	}
 
-	public List<NurseSiteMaintainConfig> getListNurseSiteMaintainConfig() {
+	public List<NurseSiteMaintainConfigJN> getListNurseSiteMaintainConfig() {
 		return listNurseSiteMaintainConfig;
 	}
 
-	public void setListNurseSiteMaintainConfig(List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig) {
+	public void setListNurseSiteMaintainConfig(List<NurseSiteMaintainConfigJN> listNurseSiteMaintainConfig) {
 		this.listNurseSiteMaintainConfig = listNurseSiteMaintainConfig;
 	}
 

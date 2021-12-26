@@ -1341,7 +1341,7 @@ public class NurseSiteMaintainJNService {
 	@Transactional
 	public boolean updateMaintainConfig(NurseSiteMaintainConfigJN tempConfig, UserAccount currentUser, List<AssetInfo> listCheckAssets) {
 		save(tempConfig);
-		saveConfigChildren(tempConfig, listCheckAssets);
+		saveConfigChildrenForUpdate(tempConfig, listCheckAssets);
 		if (tempConfig.getApplyDirectly()) {
 //			updateUnCheckedMaintainData(tempConfig, currentUser, 0, listCheckAssets);
 			addBatchJob("update",tempConfig, null, null, currentUser.getUid(),null);
@@ -1358,8 +1358,50 @@ public class NurseSiteMaintainJNService {
 			}
 			if (listCheckAssets != null && listCheckAssets.size() > 0) {
 				List<String> uids = listCheckAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList());
-				nurseSiteMaintainConfigJNItemRepository.deleteByAssetUids(uids);
+				if(uids.size()>0){
+					nurseSiteMaintainConfigJNItemRepository.deleteByAssetUids(uids);
+				}
 				list = new ArrayList<NurseSiteMaintainConfigJNItem>();
+				for (int i = 0; i < listCheckAssets.size(); ++i) {
+					NurseSiteMaintainConfigJNItem obj = new NurseSiteMaintainConfigJNItem();
+					obj.setAssetUid(listCheckAssets.get(i).getUid());
+					obj.setCreateBy(tempConfig.getCreateBy());
+					obj.setCreateByUid(tempConfig.getCreateByUid());
+					obj.setCreateDate(tempConfig.getCreateDate());
+					obj.setHospitalUID(tempConfig.getHospitalUID());
+					obj.setInstitutionUID(tempConfig.getInstitutionUID());
+					obj.setClinicalDeptName(tempConfig.getClinicalDeptName());
+					obj.setClinicalDeptUID(tempConfig.getClinicalDeptUID());
+					obj.setModifyBy(tempConfig.getModifyBy());
+					obj.setModifyByUid(tempConfig.getModifyByUid());
+					obj.setModifyDate(tempConfig.getModifyDate());
+					obj.setParentId(tempConfig.getId());
+					obj.setSiteUID(tempConfig.getSiteUID());
+					obj.setTenantUID(tempConfig.getTenantUID());
+					obj.setType(tempConfig.getType());
+					obj.setTypeValue(tempConfig.getTypeValue());
+					list.add(obj);
+				}
+			}
+			if (list != null && list.size() > 0) {
+				saveNurseSiteMaintainConfigItem(list);
+			}
+		}
+		return true;
+	}
+
+	public boolean saveConfigChildrenForUpdate(NurseSiteMaintainConfigJN tempConfig, List<AssetInfo> listCheckAssets) {
+		String parentId = tempConfig.getId();
+		if (StringUtils.isNotEmpty(parentId)) {
+			List<NurseSiteMaintainConfigJNItem> list = findByParentId(parentId);
+//			if (list != null) {
+//				deleteNurseSiteMaintainConfigItem(list);
+//			}
+			List<String> uids = listCheckAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+			if(uids.size()>0){
+				nurseSiteMaintainConfigJNItemRepository.deleteByAssetUids(uids);
+			}
+			if (listCheckAssets != null && listCheckAssets.size() > 0) {
 				for (int i = 0; i < listCheckAssets.size(); ++i) {
 					NurseSiteMaintainConfigJNItem obj = new NurseSiteMaintainConfigJNItem();
 					obj.setAssetUid(listCheckAssets.get(i).getUid());

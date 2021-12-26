@@ -65,6 +65,7 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
 
 	@Override
 	protected List<AssetOperationRecord> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
+		sortField="createDate";
 		if (this.searchFilters == null) {
 			this.searchFilters = new HashSet<SearchFilter>();
 		}
