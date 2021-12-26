@@ -45,7 +45,10 @@
 							<h:outputText value="#{item.operationByName}">
 							</h:outputText>
 						</p:column>
-						<p:column headerText="登记时间" sortBy="#{item.createDate}"  filterMatchMode="GTE">
+						<p:column headerText="登记时间" sortBy="#{item.createDate}"  filterBy="#{item.createDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filtercreateDate" widgetVar="varFiltercreateDate" />
+							</f:facet>
 							<h:outputText value="#{item.createDate}" >
 								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
 							</h:outputText>
@@ -72,5 +75,19 @@
 				</h:form>
 			</div>
 		</div>
+		<p:overlayPanel widgetVar="panelFiltercreateDate" for="optRecordListForm:datalist:filtercreateDate" dismissable="false">
+			<h:panelGrid columns="2">
+				<p:outputLabel value="#{msg.From}" />
+				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_endDate" pattern="MM/dd/yyyy  HH:mm:ss" showOn="button" showButtonPanel="false" navigator="true" mask="true"
+							size="12" locale="zh" />
+				<p:outputLabel value="#{msg.To}" />
+				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_endDate" pattern="MM/dd/yyyy  HH:mm:ss" showOn="button" showButtonPanel="false" navigator="true" mask="true"
+							size="12" locale="zh" />
+			</h:panelGrid>
+			<p:commandButton
+					onclick="setDateFilter('varDataList','varFiltercreateDate','varStartTimeFrom_endDate','varStartTimeTo_endDate'); PF('panelFiltercreateDate').hide();"
+					title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+			<p:commandButton onclick="PF('panelFiltercreateDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+		</p:overlayPanel>
 	</ui:define>
 </ui:composition>
