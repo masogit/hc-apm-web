@@ -14,7 +14,7 @@ import java.util.Date;
  * Created by 503248590 on 2021/12/21.
  */
 @Entity
-@Table(name = "nurse_site_maintain_config_jn",indexes = {@Index(columnList = "id"),@Index(columnList = "asset_uid")})
+@Table(name = "nurse_site_maintain_config_jn",indexes = {@Index(columnList = "id")})
 public class NurseSiteMaintainConfigJN implements Serializable,Cloneable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainConfigJN.class);
 	private static final long serialVersionUID = 1L;
