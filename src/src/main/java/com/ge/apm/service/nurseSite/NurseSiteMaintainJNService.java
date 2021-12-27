@@ -1394,9 +1394,14 @@ public class NurseSiteMaintainJNService {
 		String parentId = tempConfig.getId();
 		if (StringUtils.isNotEmpty(parentId)) {
 			List<NurseSiteMaintainConfigJNItem> list = findByParentId(parentId);
-//			if (list != null) {
+			if (list != null) {
+				for(NurseSiteMaintainConfigJNItem delItem : list){
+					if(delItem.getId() != null){
+						nurseSiteMaintainConfigJNItemRepository.deleteById(delItem.getId());
+					}
+				}
 //				deleteNurseSiteMaintainConfigItem(list);
-//			}
+			}
 			List<String> uids = listCheckAssets.stream().map(AssetInfo::getUid).collect(Collectors.toList());
 			if(uids.size()>0){
 				nurseSiteMaintainConfigJNItemRepository.deleteByAssetUids(uids);
