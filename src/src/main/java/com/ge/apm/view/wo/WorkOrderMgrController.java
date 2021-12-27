@@ -898,16 +898,18 @@ public void test1(){
                 if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
                     List<UserAccount> userAccountList = new ArrayList<>();
                     AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
-                    String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
-                    List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
-                    if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
-                        for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
-                            AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
-                            List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                            UserAccount account = userDao.getByUid(userUids.get(0));
-                            userAccountList.add(account);
-                        }
+                    if(auditGroupConfiguration!=null){
+                        String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+                        List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+                        if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                            for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                                AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                                List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                                UserAccount account = userDao.getByUid(userUids.get(0));
+                                userAccountList.add(account);
+                            }
 
+                        }
                     }
                     if (userAccountList.contains(userAccount)){
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1));
@@ -2328,16 +2330,18 @@ public void test1(){
         if (hospitalNameBoolean){
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getSiteUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
-            String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
-            List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
-            if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
-                for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
-                    AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
-                    List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                    UserAccount userAccount = userDao.getByUid(userUids.get(0));
-                    uaList.add(userAccount);
-                }
+            if(auditGroupConfiguration!=null){
+                String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+                List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+                if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                    for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                        AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                        List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                        UserAccount userAccount = userDao.getByUid(userUids.get(0));
+                        uaList.add(userAccount);
+                    }
 
+                }
             }
         }else {
             uaList= woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
