@@ -631,10 +631,15 @@ public class AssetFileImportBaseService {
             logger.info("判断科室是否修改");
             if(asset != null){//
                 logger.info("assetDeptNameNew"+assetDeptName);
-                logger.info("assetDeptNameOld"+asset.getAssetDeptName());
                 logger.info("clinicalDeptNameNew"+clinicalDeptName);
                 logger.info("clinicalDeptNameOld"+asset.getClinicalDeptName());
-                if((!StringUtils.isEmpty(assetDeptName) && !assetDeptName.equals(asset.getAssetDeptName()) )|| (!StringUtils.isEmpty(clinicalDeptName) && !clinicalDeptName.equals(asset.getClinicalDeptName()))){
+                OrgInfo orgInfo = orgDao.findByUid(asset.getAssetDeptUID());
+                String assetDeptNameOld = null;
+                if(orgInfo!=null){
+                    assetDeptNameOld=orgInfo.getName();
+                }
+                logger.info("assetDeptNameOld"+assetDeptNameOld);
+                if((!StringUtils.isEmpty(assetDeptName) && !assetDeptName.equals(assetDeptNameOld) )|| (!StringUtils.isEmpty(clinicalDeptName) && !clinicalDeptName.equals(asset.getClinicalDeptName()))){
                     logger.info("判断科室已经修改");
                     if(asset.getSharedAssetTypeUid() != null){
                         item.put("status", ImportStatus.CheckFail);
