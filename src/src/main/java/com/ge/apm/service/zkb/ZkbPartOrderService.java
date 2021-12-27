@@ -1326,6 +1326,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         zkbContractCatRepository.save(zkbContractCat);
                     }
                 }
+
             }
             //endregion
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
