@@ -157,6 +157,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     private ZkbContractAssetService zkbContractAssetService;
 
+    /**
+     *  提示信息confirm message
+     */
+    private String confirmMessage;
 
     @Override
     protected void init() {
@@ -236,6 +240,34 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         this.selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnList);
         this.orderAnnotationChange();
+        this.confirmMessage =this.genConfirmMessage();
+    }
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
+     */
+    public String genConfirmMessage(){
+        String confirmMessage = new String();
+        ZkbContract zct = this.contractList.get(0);
+        ZkbFePartOrder zfpo = this.selected;
+        if("SpareParts".equals(this.selected.getOrderType())){//备件
+            if(ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){//高端机不扣名额
+                confirmMessage += "本次申请不扣除名额！";
+            }else {
+                int applyCount = this.getApplyCount();
+                if("DI".equals(zct.getContractType())
+                        ||"PCB".equals(zct.getContractType())
+                        ||"PCB MVS".equals(zct.getContractType())) {
+                    confirmMessage += "本次扣除备件+人工+保养名额:"+applyCount+"\n";
+                }else if("CCS".equals(zct.getContractType())
+                        ||"Biomed".equals(zct.getContractType())) {
+                    confirmMessage += "本次扣除备件名额:"+applyCount+"\n";
+                }
+            }
+        }
+        return confirmMessage.toString();
     }
 
     /**
