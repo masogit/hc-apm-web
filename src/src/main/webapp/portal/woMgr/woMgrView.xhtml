@@ -350,9 +350,9 @@
                                 </p:dataTable>
                             </h:panelGroup>
 
-                            <h:panelGroup rendered="#{userContextService.isCountyArea() and not empty workOrderMgrController.getWorkOrderDetailReturn(woItem.id)}">
+                            <h:panelGroup rendered="#{userContextService.isCountyArea() and not empty workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}">
                                 <label class="label" >县域租户备件归还</label>
-                                <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturn(woItem.id)}"
+                                <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}"
                                              var="item"  lazy="false" paginator="false" rowKey="#{item.id}" rows="100" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.accessory}">
                                         <h:outputText value="#{item.partName}"/>

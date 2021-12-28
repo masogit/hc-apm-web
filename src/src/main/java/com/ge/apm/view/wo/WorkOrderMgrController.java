@@ -1252,6 +1252,10 @@ public void test1(){
         return v2WorkOrderDetailReturnList;
     }
 
+    public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturnView(String woId) {
+        return  woService.getWorkOrderDetailReturn(woId);
+    }
+
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return woService.getWorkOrderCoworker(woId);
     }
