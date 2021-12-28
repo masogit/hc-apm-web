@@ -1885,7 +1885,7 @@ public void test1(){
         if(currentStatus==2){ //选择停机状态
              needConfirmTime=true;
         }
-        if(currentStatus==3){//选择 限制功能使用
+        if(currentStatus==3 || currentStatus==1){//选择 限制功能使用 或可正常使用
             needConfirmTime=false;
         }
 
