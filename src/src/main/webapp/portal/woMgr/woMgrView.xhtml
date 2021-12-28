@@ -352,6 +352,7 @@
 
                             <h:panelGroup rendered="#{userContextService.isCountyArea() and not empty workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}">
                                 <label class="label" >县域租户备件归还</label>
+
                                 <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}"
                                              var="item"  lazy="false" paginator="false" rowKey="#{item.id}" rows="100" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.accessory}">
