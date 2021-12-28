@@ -148,7 +148,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.artificialType eq '1'}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial'}">
                             <c:if test="#{zkbPartOrderAuditController.selected.artificialType eq '1'}">
                                 <label class="label" >是否需要SSA Key*</label>
                             </c:if>
@@ -691,6 +691,9 @@
                             </p:commandLink>-->
                             <p:commandButton immediate="false" process="@this" value="下单信息修改" action="#{zkbPartOrderAuditController.prepareModify('OrderPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" update=":zkbPartOrderModifyDlg" />
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
+                            <p:commandButton immediate="false" process="@this" value="申请信息修改" action="#{zkbPartOrderAuditController.preModifyApply()}" oncomplete="PF('zkbModifyApplyDlg').show()" update=":zkbModifyApplyDlg" />
+                        </h:panelGroup>
                     </p:panelGrid>
 
                     <p:dataTable id="zkbOrderDatalist" value="#{zkbPartOrderAuditController.selected.zkbPartOrderItems}" var="item"
@@ -1027,7 +1030,29 @@
                 </h:form>
 
             </p:dialog>
+            <p:dialog id="zkbModifyApplyDlg" widgetVar="zkbModifyApplyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="修改申请信息" height="300">
+                <h:form id="zkbModifyApplyForm">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
+                            <c:if test="#{zkbPartOrderAuditController.selected.artificialType eq '1'}">
+                                <label class="label" >是否需要SSA Key*</label>
+                            </c:if>
+                            <c:if test="#{!(zkbPartOrderAuditController.selected.artificialType eq '1')}">
+                                <label class="label" >是否需要Dongle*</label>
+                            </c:if>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.modifySsaKey}" required="true" requiredMessage="是否需要SSA Key #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.saveModifyApply}" oncomplete="PF('zkbModifyApplyDlg').hide()" update="zkbPartOrderEditForm :zkbModifyApplyForm :growl" icon="ui-icon-check" />
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbModifyApplyDlg').hide()"/>
+                </h:form>
 
+            </p:dialog>
         </div>
 
     </ui:define>
