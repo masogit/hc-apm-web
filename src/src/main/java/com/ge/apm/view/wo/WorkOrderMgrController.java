@@ -1245,9 +1245,6 @@ public void test1(){
     }
 
     public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
-        if(v2WorkOrderDetailReturnList == null){
-            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(woId);
-        }
         return v2WorkOrderDetailReturnList;
     }
 
@@ -1324,6 +1321,9 @@ public void test1(){
         attachList = new ArrayList<V2_BlobObject>();
         equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
         takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
+        if(userContextService.isCountyArea()){
+            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(woId);
+        }
     }
     public void prepareEditCloseOrder(String woId) {
         prepareAct(woId);
