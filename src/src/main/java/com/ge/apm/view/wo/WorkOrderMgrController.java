@@ -1155,6 +1155,7 @@ public void test1(){
         selectedAsset = null;
 //      requestAssetUid = null;
         locationName = null;
+        v2WorkOrderDetailReturnList = null;
     }
 
     public void onSelectWorkOrder() {
