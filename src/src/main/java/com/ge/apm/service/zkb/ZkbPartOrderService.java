@@ -1004,6 +1004,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void batchesReturnNext(ZkbPartOrder zkbPartOrder,List<ZkbPartOrderReturn> currentZkbPartOrderReturns,UserAccount userAccount){
         //第一步，先归还非坏还的数量
        /* int v = 0;
@@ -1101,6 +1102,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void saveModifyApply(ZkbPartOrder zkbPartOrder){
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
+        zkbPartOrderRepository.save(zkbPartOrder);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public void orderCancelNext(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
         String oldStep = zkbPartOrder.getCurrentStep();
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
@@ -1222,7 +1232,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
         return "";
     }
-
 
 
     public void subApplyQty(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty,UserAccount userAccount,boolean acceptFlag){
