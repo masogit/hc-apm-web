@@ -265,7 +265,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                         ||"Biomed".equals(zct.getContractType())) {
                     confirmMessage += "本次扣除备件名额:"+applyCount+"\n";
                 }
-            }  
+            }
         }
         return confirmMessage.toString();
     }
