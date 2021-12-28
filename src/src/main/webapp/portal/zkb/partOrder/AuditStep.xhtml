@@ -1047,11 +1047,11 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.saveModifyApply}" oncomplete="PF('zkbModifyApplyDlg').hide()" update="zkbPartOrderEditForm :zkbModifyApplyForm :growl" icon="ui-icon-check" />
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbModifyApplyDlg').hide()"/>
                 </h:form>
 
-                <br/>
-                <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.saveModifyApply}" oncomplete="PF('zkbModifyApplyDlg').hide()" update="zkbPartOrderEditForm :zkbModifyApplyForm" icon="ui-icon-check" />
-                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbModifyApplyDlg').hide()"/>
             </p:dialog>
         </div>
 
