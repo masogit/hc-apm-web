@@ -89,6 +89,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String modifyType="";
     private String modifyTitle="";
     private String str = "";
+    private String modifySsaKey;
 
     @Override
     protected void init() {
@@ -998,17 +999,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
-    private String modifySsaKey;
 
     public void preModifyApply(){
         modifySsaKey = selected.getSsaKeyFlag();
-        modifySsaKey = "f";
     }
 
     public void saveModifyApply(){
         selected.setSsaKeyFlag(modifySsaKey);
         zkbPartOrderService.saveModifyApply(selected);
         selected = zkbPartOrderRepository.findById(selected.getId());
+        if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+            whetherDeductEdit = true;
+            selected.setWhetherDeduct(CopyByInvok.F);
+        }else {
+            whetherDeductEdit = false;
+        }
     }
 
     public String dialogComplete(){
