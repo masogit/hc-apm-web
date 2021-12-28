@@ -1245,6 +1245,9 @@ public void test1(){
     }
 
     public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
+        if(v2WorkOrderDetailReturnList == null){
+            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(woId);
+        }
         return v2WorkOrderDetailReturnList;
     }
 
