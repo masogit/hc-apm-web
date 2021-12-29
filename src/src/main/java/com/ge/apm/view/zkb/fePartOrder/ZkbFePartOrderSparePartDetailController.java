@@ -1046,4 +1046,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         return qty;
     }
+
+    public String getConfirmMessage() {
+        return confirmMessage;
+    }
+
+    public void setConfirmMessage(String confirmMessage) {
+        this.confirmMessage = confirmMessage;
+    }
 }
