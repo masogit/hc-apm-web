@@ -1006,7 +1006,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void saveModifyApply(){
         selected.setSsaKeyFlag(modifySsaKey);
-        zkbPartOrderService.saveModifyApply(selected);
+        zkbPartOrderService.saveModifyApply(selected,currentUser);
         selected = zkbPartOrderRepository.findById(selected.getId());
         if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
             whetherDeductEdit = true;
