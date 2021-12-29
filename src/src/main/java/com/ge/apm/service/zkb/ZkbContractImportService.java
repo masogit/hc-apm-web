@@ -160,12 +160,10 @@ public class ZkbContractImportService {
 
         int row = 0;
         try {
-            Map<String, String> tenantInfoMap =getTenantInfoMap();
             for (Map<String, Object> item : importContractMapList) {
                 ++row;
-                if(checkData(item, importContractMapList,tenantInfoMap)) {
+                if(checkData(item, importContractMapList)) {
                     ZkbContractVO contractInfoVO = (ZkbContractVO)item.get("contractInfoVO");
-                    contractInfoVO.setTenantUID(tenantInfoMap.get(contractInfoVO.getAgentName()));
                     importOneContract(contractInfoVO,currentUser);
                 }
 
@@ -282,7 +280,7 @@ public class ZkbContractImportService {
 
     }
 
-    public boolean checkData(Map<String, Object> item, List<Map<String, Object>> importContractMapList,Map<String, String> tenantInfoMap) {
+    public boolean checkData(Map<String, Object> item, List<Map<String, Object>> importContractMapList) {
 
         boolean isValidateData = true;
         ZkbContractVO contractInfoVO = (ZkbContractVO)item.get("contractInfoVO");
@@ -362,10 +360,18 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTenantUIDEmpty"));
             isValidateData = false;
         }else{
-            if(!tenantInfoMap.containsKey(contractInfoVO.getAgentName())){
+            List<TenantInfo> tenantInfoList = tenantInfoDao.findByNameAndType(contractInfoVO.getAgentName(),3);
+            if(tenantInfoList == null || tenantInfoList.size() == 0){
                 item.put("status", ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTenantUIDExist"));
                 isValidateData = false;
+            }else if(tenantInfoList.size() > 1) {
+                item.put("status", ImportStatus.Failure);
+                ZkbContractRow.addErrMessage(item, WebUtil.getMessage("该代理商名称存在多条数据！"));
+                isValidateData = false;
+            }else{
+                TenantInfo tenantInfo = tenantInfoList.get(0);
+                contractInfoVO.setTenantUID(tenantInfo.getUid());
             }
         }
         if(StringUtils.isEmpty(contractInfoVO.getQuotaDeductType())){
