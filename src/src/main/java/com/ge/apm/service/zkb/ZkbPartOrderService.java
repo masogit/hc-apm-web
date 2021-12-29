@@ -1004,6 +1004,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void batchesReturnNext(ZkbPartOrder zkbPartOrder,List<ZkbPartOrderReturn> currentZkbPartOrderReturns,UserAccount userAccount){
         //第一步，先归还非坏还的数量
        /* int v = 0;
@@ -1101,6 +1102,45 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void saveModifyApply(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
+        ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findById(zkbPartOrder.getId());
+        Integer qty = null;
+        if(!oldZkbPartOrder.getSsaKeyFlag().equals(zkbPartOrder.getSsaKeyFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+                qty = 0 - zkbPartOrder.getQty();
+            }else{
+                qty = zkbPartOrder.getQty();
+            }
+        }
+
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
+        zkbPartOrderRepository.save(zkbPartOrder);
+        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+        if(qty != null && !CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
+            String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderDeduct.toString();
+            if(qty > 0){
+                opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderDeduct.toString();
+            }else {
+                opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString();
+            }
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
+                zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
+                zkbContractRepository.save(zkbContract);
+                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+            }else{
+                zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) - qty);
+                zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + qty);
+                zkbContractRepository.save(zkbContract);
+                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+            }
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public void orderCancelNext(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
         String oldStep = zkbPartOrder.getCurrentStep();
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
@@ -1149,23 +1189,23 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 return "该申请不扣任何名额！";
             } else {
                 if (ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
-                    return "当前合同剩余备件名额为"+zkbContract.getSpareQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个备件名额！";
+                    return "当前合同剩余备件名额为"+zkbContract.getSpareQuota()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个备件名额！";
                 } else {
-                    return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+";此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
+                    return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
                 }
             }
         } else if (ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             if (ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType()) || StringUtils.isEmpty(zkbContract.getQuotaDeductType())) {
                 if (StringUtils.isEmpty(zkbPartOrder.getHighCatFlag())) {
-                    return "当前合同剩余探头名额为"+zkbContract.getProbeQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头名额！";
+                    return "当前合同剩余探头名额为"+zkbContract.getProbeQuota()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个探头名额！";
                 } else if (CopyByInvok.F.equals(zkbPartOrder.getHighCatFlag())) {
-                    return "当前合同剩余探头名额为"+zkbContract.getProbeQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头名额！";
+                    return "当前合同剩余探头名额为"+zkbContract.getProbeQuota()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个探头名额！";
                 } else if (CopyByInvok.T.equals(zkbPartOrder.getHighCatFlag())) {
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
                     if (zkbContractCat != null) {
                         if (CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
                             //扣除名额，同时将cat设置不可用
-                            return "当前合同剩余探头名额为"+zkbContract.getProbeQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头名额以及扣除SN编号:"+zkbContractCat.getSnNo()+"！";
+                            return "当前合同剩余探头名额为"+zkbContract.getProbeQuota()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个探头名额以及扣除SN编号:"+zkbContractCat.getSnNo()+"！";
                         } else {
                             return "该申请扣除SN编号:"+zkbContractCat.getSnNo()+"！";
                         }
@@ -1173,16 +1213,16 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
                 if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                    return "当前合同剩余探头任意名额为"+zkbContract.getProbeQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头任意名额！";
+                    return "当前合同剩余探头任意名额为"+zkbContract.getProbeQuota()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个探头任意名额！";
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                    return "当前合同剩余探头普通名额为"+zkbContract.getProbeQuotaNormal()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头普通名额！";
+                    return "当前合同剩余探头普通名额为"+zkbContract.getProbeQuotaNormal()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个探头普通名额！";
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                    return "当前合同剩余探头特殊名额为"+zkbContract.getProbeQuotaSpecial()+";此次申请扣除"+ zkbPartOrder.getQty() +"个探头特殊名额！";
+                    return "当前合同剩余探头特殊名额为"+zkbContract.getProbeQuotaSpecial()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个探头特殊名额！";
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
                     if(zkbContractCat != null){
                         if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
-                            return "当前合同剩余探头普通名额为"+zkbContract.getProbeQuotaNormal()+";此次申请扣除"+ zkbPartOrder.getQty() +"个普通名额以及扣除SN编号:"+zkbContractCat.getSnNo()+"！";
+                            return "当前合同剩余探头普通名额为"+zkbContract.getProbeQuotaNormal()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个普通名额以及扣除SN编号:"+zkbContractCat.getSnNo()+"！";
                         }else {
                             return "该申请扣除SN编号:"+zkbContractCat.getSnNo()+"！";
                         }
@@ -1194,7 +1234,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                 return "该申请不扣任何名额";
             }
-            if(CopyByInvok.NORMAL_ONE.equals(zkbPartOrder.getArtificialType()) && CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
                 return "该申请不扣任何名额";
             }
             if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
@@ -1203,10 +1243,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }else{
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     //人工名额
-                    return "当前合同剩余人工名额为"+zkbContract.getGeArtificialSupportTimes()+";此次申请扣除"+ zkbPartOrder.getQty() +"个人工名额！";
+                    return "当前合同剩余人工名额为"+zkbContract.getGeArtificialSupportTimes()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个人工名额！";
                 }else{
                     //联合名额
-                    return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+";此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
+                    return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
                 }
             }
             //endregion
@@ -1214,15 +1254,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) ||
                     ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                 //备件名额
-                return "当前合同剩余备件名额为"+zkbContract.getSpareQuota()+";此次申请扣除"+ zkbPartOrder.getQty() +"个备件名额！";
+                return "当前合同剩余备件名额为"+zkbContract.getSpareQuota()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个备件名额！";
             }else{
                 //联合名额
-                return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+";此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
+                return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
             }
         }
         return "";
     }
-
 
 
     public void subApplyQty(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty,UserAccount userAccount,boolean acceptFlag){
@@ -1326,6 +1365,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         zkbContractCatRepository.save(zkbContractCat);
                     }
                 }
+
             }
             //endregion
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
@@ -1333,7 +1373,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                 return;
             }
-            if(CopyByInvok.NORMAL_ONE.equals(zkbPartOrder.getArtificialType()) && CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
                 return;
             }
             if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
@@ -1464,7 +1504,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                 return;
             }
-            if(CopyByInvok.NORMAL_ONE.equals(zkbPartOrder.getArtificialType()) && CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
                 return;
             }
             if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
@@ -1610,12 +1650,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      */
     public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType,String token){
         try {
-            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
             emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
-
+            emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
             String url = "";
             if(StringUtils.isEmpty(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
@@ -1646,13 +1686,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
         if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
                 ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrder.getCurrentStep())) {
-            HashMap<String, String> emailWrapperMap = null;
+            HashMap<String, Object> emailWrapperMap = null;
             try {
                 emailWrapperMap = new HashMap<>();
                 emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
                 emailWrapperMap.put("systemId", zkbPartOrder.getId());
                 emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
                 emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
+                emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
+
                 String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
                 //String token = UserContextService.getAccessToken();
                 HttpHeaders header = createHttpHeaders(token);
@@ -1711,8 +1753,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     public void sendEmailForProbeLetter(ZkbPartOrder zkbPartOrder){
         try {
-            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
+            emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
+
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_PROBE_LETTER_EMAIL);
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);

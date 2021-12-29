@@ -3,6 +3,7 @@ package com.ge.apm.view.zkb;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.zkb.CopyByInvok;
+import com.ge.apm.service.zkb.ZkbIntegralService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -88,6 +89,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String modifyType="";
     private String modifyTitle="";
     private String str = "";
+    private String modifySsaKey;
 
     @Override
     protected void init() {
@@ -277,8 +279,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             selected.setWhetherDeduct(CopyByInvok.T);
                         }
                     }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
-                        if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
-                            WebUtil.addErrorMessage("代理商申请SSA Key维修派工。","");
+                        if(CopyByInvok.NORMAL_ONE.equals(selected.getArtificialType())){
+                            if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                                WebUtil.addErrorMessage("代理商申请SSA Key维修派工。","");
+                            }
+                        }else{
+                            if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                                WebUtil.addErrorMessage("代理商申请Dongle维修派工。","");
+                            }
                         }
                     }
                 }
@@ -989,6 +997,23 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
+    }
+
+
+    public void preModifyApply(){
+        modifySsaKey = selected.getSsaKeyFlag();
+    }
+
+    public void saveModifyApply(){
+        selected.setSsaKeyFlag(modifySsaKey);
+        zkbPartOrderService.saveModifyApply(selected,currentUser);
+        selected = zkbPartOrderRepository.findById(selected.getId());
+        if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+            whetherDeductEdit = true;
+            selected.setWhetherDeduct(CopyByInvok.F);
+        }else {
+            whetherDeductEdit = false;
+        }
     }
 
     public String dialogComplete(){
@@ -1737,6 +1762,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setTrainTips(String trainTips) {
         this.trainTips = trainTips;
+    }
+
+    public String getModifySsaKey() {
+        return modifySsaKey;
+    }
+
+    public void setModifySsaKey(String modifySsaKey) {
+        this.modifySsaKey = modifySsaKey;
     }
 
     @Override
