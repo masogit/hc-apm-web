@@ -190,14 +190,14 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                 if ("DI".equals(zct.getContractType())
                         || "PCB".equals(zct.getContractType())
                         || "PCB MVS".equals(zct.getContractType())) {
-                    confirmMessage += "本次扣除备件+人工+保养名额:1"+";";
+                    confirmMessage += "本次扣除备件+人工+保养名额：1"+"；";
                     String spareArtificail = zct.getSpareArtificail()!= null?zct.getSpareArtificail().toString():"0";
-                    confirmMessage += "备件+人工+保养剩余名额:"+spareArtificail;
+                    confirmMessage += "备件+人工+保养剩余名额："+spareArtificail;
                 } else if ("CCS".equals(zct.getContractType())
                         || "Biomed".equals(zct.getContractType())) {
-                    confirmMessage += "本次扣除人工支持名额:1"+";";
+                    confirmMessage += "本次扣除人工支持名额：1"+"；";
                     String geArtificialSupportTimes = zct.getGeArtificialSupportTimes()!= null?zct.getGeArtificialSupportTimes().toString():"0";
-                    confirmMessage += "人工支持剩余次数:"+geArtificialSupportTimes;
+                    confirmMessage += "人工支持剩余次数："+geArtificialSupportTimes;
                 }
             }
         }

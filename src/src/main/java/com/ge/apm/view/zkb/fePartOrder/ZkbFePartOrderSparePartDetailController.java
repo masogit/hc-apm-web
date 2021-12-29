@@ -259,14 +259,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 if("DI".equals(zct.getContractType())
                         ||"PCB".equals(zct.getContractType())
                         ||"PCB MVS".equals(zct.getContractType())) {
-                    confirmMessage += "本次扣除备件+人工+保养名额:"+applyCount+";";
+                    confirmMessage += "本次扣除备件+人工+保养名额："+applyCount+"；";
                     String spareArtificail = zct.getSpareArtificail()!= null?zct.getSpareArtificail().toString():"0";
-                    confirmMessage += "备件+人工+保养剩余名额:"+spareArtificail;
+                    confirmMessage += "备件+人工+保养剩余名额："+spareArtificail;
                 }else if("CCS".equals(zct.getContractType())
                         ||"Biomed".equals(zct.getContractType())) {
-                    confirmMessage += "本次扣除备件名额:"+applyCount+";";
+                    confirmMessage += "本次扣除备件名额："+applyCount+"；";
                     String spareQuota = zct.getSpareQuota()!= null?zct.getSpareQuota().toString():"0";
-                    confirmMessage += "备件剩余名额:"+spareQuota;
+                    confirmMessage += "备件剩余名额："+spareQuota;
                 }
             }
         }
