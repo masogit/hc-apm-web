@@ -251,7 +251,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     public String genConfirmMessage(){
         String confirmMessage = new String();
         ZkbContract zct = this.contractList.get(0);
-        ZkbFePartOrder zfpo = this.selected;
         if("SpareParts".equals(this.selected.getOrderType())){//备件
             if(ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){//高端机不扣名额
                 confirmMessage += "本次申请不扣除名额！";
@@ -260,10 +259,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 if("DI".equals(zct.getContractType())
                         ||"PCB".equals(zct.getContractType())
                         ||"PCB MVS".equals(zct.getContractType())) {
-                    confirmMessage += "本次扣除备件+人工+保养名额:"+applyCount+"\n";
+                    confirmMessage += "本次扣除备件+人工+保养名额："+applyCount+"；";
+                    String spareArtificail = zct.getSpareArtificail()!= null?zct.getSpareArtificail().toString():"0";
+                    confirmMessage += "备件+人工+保养剩余名额："+spareArtificail;
                 }else if("CCS".equals(zct.getContractType())
                         ||"Biomed".equals(zct.getContractType())) {
-                    confirmMessage += "本次扣除备件名额:"+applyCount+"\n";
+                    confirmMessage += "本次扣除备件名额："+applyCount+"；";
+                    String spareQuota = zct.getSpareQuota()!= null?zct.getSpareQuota().toString():"0";
+                    confirmMessage += "备件剩余名额："+spareQuota;
                 }
             }
         }
@@ -1042,5 +1045,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             }
         }
         return qty;
+    }
+
+    public String getConfirmMessage() {
+        return confirmMessage;
+    }
+
+    public void setConfirmMessage(String confirmMessage) {
+        this.confirmMessage = confirmMessage;
     }
 }
