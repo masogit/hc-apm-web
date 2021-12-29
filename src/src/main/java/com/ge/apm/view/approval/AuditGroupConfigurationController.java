@@ -71,7 +71,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     public void buildApproveUserList() {
         approveUserList = new ArrayList<>();
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        String siteUID = userAccount.getSiteUID();
+        String hospitalUID = userAccount.getHospitalUID();
         List<SysRole> sysRoles = roleDao.getByNameIn(Arrays.asList("AssetHead"));//医学工程处主任
         List<Integer> sysRoleIdS = new ArrayList<>();
         if(sysRoles!=null && !sysRoles.isEmpty()){
@@ -80,7 +80,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
             }
         }
         List<Integer> userIds = userRoleDao.findByRoleIds(sysRoleIdS);
-        approveUserList = userAccountDao.getUserAccounts(userIds, siteUID);
+        approveUserList = userAccountDao.getUserAccounts(userIds, hospitalUID);
     }
     @Override
     protected Page<AuditGroupConfiguration> loadData(PageRequest pageRequest) {
@@ -112,6 +112,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     public void preEdit() {
         operateType = ApprovalConstant.OPERATE_TYPE_EDIT;
         nodesList.clear();
+        approveExistUserList.clear();
         String groupMemberItem = selected.getGroupMemberItem();
         if (null != groupMemberItem) {
             List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>(){
@@ -121,7 +122,9 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
                     List<String> userUids = node.getUserUids();
                     List<UserAccount> users = new ArrayList();
                     userUids.stream().forEach(useruid -> {
-                        users.add(userAccountDao.getByUid(useruid));
+                        UserAccount userAccount = userAccountDao.getByUid(useruid);
+                        users.add(userAccount);
+                        approveExistUserList.add(userAccount);
                     });
                     node.setApproveUsers(users);
                 node.setNodeId(i + 1);
@@ -196,7 +199,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
         selected.setGroupMemberItem(nodes);
         selected.setCreatedBy(userAccount.getName());
         selected.setCreatedDate(new Date());
-        selected.setHierOrgUid(userAccount.getSiteUID());
+        selected.setHierOrgUid(userAccount.getHospitalUID());
         super.save();
     }
     public String getName(List<UserAccount> approveUsers){

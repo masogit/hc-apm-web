@@ -164,8 +164,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value= "update user_account set active_time= now(),is_active=true where id = ?1",nativeQuery=true)
     public void activeSingleUser(Integer userId);
 
-    @Query(value="select * from user_account where  site_uid = ?2 and id in ?1",nativeQuery = true)
-    List<UserAccount> getUserAccounts(List<Integer> id,String siteUID );
+    @Query(value="select * from user_account where  hospital_uid = ?2 and id in ?1",nativeQuery = true)
+    List<UserAccount> getUserAccounts(List<Integer> id,String hospitalUID );
 
     @Transactional
     @Modifying
