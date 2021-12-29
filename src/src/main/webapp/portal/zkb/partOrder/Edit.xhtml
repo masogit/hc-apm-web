@@ -487,8 +487,8 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <p:outputLabel id="saveTips" style="color: red" value="#{zkbPartOrderEditController.saveTips}"/><br/>
-                <p:commandButton validateClient="true" value="#{msg.Submit}" action="#{zkbPartOrderEditController.saveEntity}" update=":growl" icon="ui-icon-check" />
-                <!--<p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true"  update=":growl :zkbConfirmDlg" actionListener="#{zkbPartOrderEditController.preSave}" oncomplete="PF('zkbConfirmDlg').show()" />-->
+                <!--<p:commandButton validateClient="true" value="#{msg.Submit}" action="#{zkbPartOrderEditController.saveEntity}" update=":growl" icon="ui-icon-check" />-->
+                <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true"  update=":growl :zkbConfirmDlg" actionListener="#{zkbPartOrderEditController.preSave}" oncomplete="PF('zkbConfirmDlg').show()" />
 
                 <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderEditController.backList}" />
             </h:form>
@@ -501,8 +501,11 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{zkbContractEditController.saveEntity}" oncomplete="PF('zkbConfirmDlg').hide()" update=":growl" icon="ui-icon-check" />
-                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfirmDlg').hide()"/>
+                    <div style="text-align: center">
+                        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderEditController.saveEntity}" oncomplete="PF('zkbConfirmDlg').hide()" update=":growl" icon="ui-icon-check" />
+                        <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfirmDlg').hide()" style="margin-left: 30px"/>
+                    </div>
+
                 </h:form>
 
             </p:dialog>

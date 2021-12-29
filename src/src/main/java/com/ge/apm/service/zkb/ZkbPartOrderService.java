@@ -1103,11 +1103,41 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveModifyApply(ZkbPartOrder zkbPartOrder){
+    public void saveModifyApply(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
+        ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findById(zkbPartOrder.getId());
+        Integer qty = null;
+        if(!oldZkbPartOrder.getSsaKeyFlag().equals(zkbPartOrder.getSsaKeyFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+                qty = 0 - zkbPartOrder.getQty();
+            }else{
+                qty = zkbPartOrder.getQty();
+            }
+        }
+
         Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
         dataFlag++;
         zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrderRepository.save(zkbPartOrder);
+        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+        if(qty != null){
+            String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderDeduct.toString();
+            if(qty > 0){
+                opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderDeduct.toString();
+            }else {
+                opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString();
+            }
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
+                zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
+                zkbContractRepository.save(zkbContract);
+                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+            }else{
+                zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) - qty);
+                zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + qty);
+                zkbContractRepository.save(zkbContract);
+                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+            }
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -1620,12 +1650,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      */
     public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType,String token){
         try {
-            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
             emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
-
+            emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
             String url = "";
             if(StringUtils.isEmpty(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
@@ -1656,13 +1686,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
         if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
                 ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrder.getCurrentStep())) {
-            HashMap<String, String> emailWrapperMap = null;
+            HashMap<String, Object> emailWrapperMap = null;
             try {
                 emailWrapperMap = new HashMap<>();
                 emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
                 emailWrapperMap.put("systemId", zkbPartOrder.getId());
                 emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
                 emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
+                emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
+
                 String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
                 //String token = UserContextService.getAccessToken();
                 HttpHeaders header = createHttpHeaders(token);
@@ -1721,8 +1753,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     public void sendEmailForProbeLetter(ZkbPartOrder zkbPartOrder){
         try {
-            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            HashMap<String, Object> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("systemId", zkbPartOrder.getId());
+            emailWrapperMap.put("zkbPartOrder", zkbPartOrder);
+
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_PROBE_LETTER_EMAIL);
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
