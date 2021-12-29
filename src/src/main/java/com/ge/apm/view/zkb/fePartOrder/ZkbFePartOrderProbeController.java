@@ -294,33 +294,33 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 this.zkbFePartOrderService.calDeductQtyByOld(this.selected);
                 if("t".equals(this.selected.getHighCatFlag())){//是否高值   是高值  FourInOne 扣名额  其他不扣名额
                     if("FourInOne".equals(this.selected.getContractCatSnNo())){
-                        confirmMessage += "本次扣除名额："+this.selected.getQty()+"；";
-                        confirmMessage += "探头剩余名额："+probeQuota;
+                        confirmMessage += "本次扣除"+this.selected.getQty()+"个探头名额；";
+                        confirmMessage += "探头剩余名额为"+probeQuota+"。";
                     }else{
                         confirmMessage += "本次申请不扣除名额！";
                     }
                 }else{
-                    confirmMessage += "本次扣除名额:"+this.selected.getQty()+"；";
-                    confirmMessage += "探头剩余名额:"+probeQuota;
+                    confirmMessage += "本次扣除"+this.selected.getQty()+"个探头名额；";
+                    confirmMessage += "探头剩余名额为"+probeQuota+"。";
                 }
             }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zct.getQuotaDeductType())){
                 this.zkbFePartOrderService.calDeductQtyByNew(this.selected);
                 if("High".equals(this.selected.getZkbPoProbeQuotaType())){//高值  FourInOne 扣普通  其他不扣
                     if("FourInOne".equals(this.selected.getContractCatSnNo())){
-                        confirmMessage += "本次扣除名额："+this.selected.getQty()+"；";
-                        confirmMessage += "探头普通剩余名额："+probeQuotaNormal;
+                        confirmMessage += "本次扣除"+this.selected.getQty()+"个探头普通名额；";
+                        confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
                     }else{
                         confirmMessage += "本次申请不扣除名额！";
                     }
                 }else if("Any".equals(this.selected.getZkbPoProbeQuotaType())){
-                    confirmMessage += "本次扣除名额："+this.selected.getQty();
-                    confirmMessage += "探头任意剩余名额："+probeQuota+"；";
+                    confirmMessage += "本次扣除"+this.selected.getQty()+"个探头任意名额；";
+                    confirmMessage += "探头任意剩余名额为"+probeQuota+"。";
                 }else if("Special".equals(this.selected.getZkbPoProbeQuotaType())){
-                    confirmMessage += "本次扣除名额："+this.selected.getQty()+"；";
-                    confirmMessage += "探头特殊剩余名额："+probeQuotaSpecial;
+                    confirmMessage += "本次扣除"+this.selected.getQty()+"；";
+                    confirmMessage += "探头特殊剩余名额为"+probeQuotaSpecial+"。";
                 }else if("Normal".equals(this.selected.getZkbPoProbeQuotaType())){
-                    confirmMessage += "本次扣除名额："+this.selected.getQty()+"；";
-                    confirmMessage += "探头普通剩余名额："+probeQuotaNormal;
+                    confirmMessage += "本次扣除"+this.selected.getQty()+"；";
+                    confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
                 }
             }
         }
