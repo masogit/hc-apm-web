@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import java.text.ParseException;
@@ -649,6 +650,7 @@ public class ZkbContractImportService {
             zkbContractAssetRow.setFieldStringValue("KA","setKa");
             zkbContractAssetRow.setFieldStringValue("维修类型","setRepairForm");
             zkbContractAssetRow.setFieldStringValue("是否代理商自身原因未完成培训","setTrainReasonFlag");
+            zkbContractAssetRow.setFieldStringValue("是否由GE FE提供年度1次现场保养","setSupportMaintainFlag");
             zkbContractAssetRow.setFieldStringValue("ID","setId");
             map.put("zkbContractAssetVO", zkbContractAssetVO);
             map.put("rowData", rowMap);
@@ -736,6 +738,11 @@ public class ZkbContractImportService {
                         }
                     }
                 }
+                if(zkbContractAssetVO.getSupportMaintainFlag() == null){
+                   /* isValidateData = false;
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractAssetRow.addErrMessage(item, "是否由GE FE提供年度1次现场保养不能为空！");*/
+                }
             }
         }
 
@@ -792,6 +799,9 @@ public class ZkbContractImportService {
                     newZkbContractAsset.setTrainReasonFlag(getTrainReasonFlagFromCh(zkbContractAssetVO.getTrainReasonFlag()));
                 }else {
                     newZkbContractAsset.setTrainReasonFlag("empty");
+                }
+                if(StringUtils.isNotBlank(zkbContractAssetVO.getSupportMaintainFlag())){
+                    newZkbContractAsset.setSupportMaintainFlag(getTrainReasonFlagFromCh(zkbContractAssetVO.getSupportMaintainFlag()));
                 }
                 newZkbContractAsset.setSubRegion(zkbContractAssetVO.getSubRegion());
                 newZkbContractAsset.setModality(zkbContractAssetVO.getModality());
