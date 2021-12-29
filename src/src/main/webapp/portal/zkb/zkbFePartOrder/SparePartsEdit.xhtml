@@ -326,7 +326,7 @@
             </p:fieldset>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.saveAndToListPage}" style="float:left"/>
                <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left">
-                    <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderDetailController.confirmMessage}" icon="ui-icon-alert"/>
+                    <p:confirm header="请确认扣除名额信息"  message="#{zkbFePartOrderDetailController.confirmMessage}" icon="ui-icon-alert"/>
                 </p:commandButton>
 <!--
                 <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left"/>
