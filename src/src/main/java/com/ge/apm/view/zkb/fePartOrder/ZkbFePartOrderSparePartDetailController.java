@@ -240,7 +240,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         this.selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnList);
         this.orderAnnotationChange();
-        this.confirmMessage =this.genConfirmMessage();
     }
 
     /**
@@ -1048,6 +1047,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     }
 
     public String getConfirmMessage() {
+        this.confirmMessage =this.genConfirmMessage();
         return confirmMessage;
     }
 
