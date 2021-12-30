@@ -270,6 +270,11 @@
                     </h:panelGroup>
                 </p:panelGrid>
                 </p:fieldset>
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <h:outputText  style="color: red;font-size: 14px;" value="#{zkbFePartOrderProbeController.thisDeductionMessage}" />
+                    </h:panelGroup>
+                </p:panelGrid>
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.zkbFePartOrder_newProbe}*</label>
@@ -290,7 +295,6 @@
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <h:outputText  style="color: red;font-size: 20px;" value="#{zkbFePartOrderProbeController.thisDeductionMessage}" />
                         <label class="label">#{msg.zkbFePartOrder_comment}</label>
                         <p:inputTextarea id="comment" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}"  value="#{zkbFePartOrderProbeController.selected.comment}" rows="2" cols="20">
                         </p:inputTextarea>

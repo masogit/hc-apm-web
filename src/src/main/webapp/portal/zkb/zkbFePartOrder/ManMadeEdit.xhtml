@@ -136,6 +136,11 @@
                         </h:panelGroup>
                     </p:fieldset>
                     <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingAssignment')}">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <h:outputText  style="color: red;font-size: 14px;" value="#{zkbFePartOrderDetailController.thisDeductionMessage}" />
+                            </h:panelGroup>
+                        </p:panelGrid>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingAssignment')}">
                                 <label class="label">#{msg.zkbFePartOrder_tenantAssignUser}*：</label>
@@ -147,7 +152,6 @@
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <h:outputText  style="color: red;font-size: 20px;" value="#{zkbFePartOrderDetailController.thisDeductionMessage}" />
                                 <label class="label">#{msg.zkbFePartOrder_comment}</label>
                                 <p:inputTextarea disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingAssignment')}" id="comment" required="true" requiredMessage="#{msg.zkbFePartOrder_comment} #{msg.ValidationRequire}" value="#{zkbFePartOrderDetailController.selected.comment}" rows="2" cols="20">
                                 </p:inputTextarea>
