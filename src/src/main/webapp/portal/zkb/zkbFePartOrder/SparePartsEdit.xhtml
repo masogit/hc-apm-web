@@ -212,6 +212,13 @@
             </p:fieldset>
 
             <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingAssignment')}">
+
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <h:outputText id="thisDeductionMessage" style="color: red;font-size: 14px;" value="#{zkbFePartOrderSparePartDetailController.genThisDeductionMessage()}" />
+                    </h:panelGroup>
+                </p:panelGrid>
+
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingAssignment')}">
                         <label class="label">#{msg.zkbFePartOrder_tenantAssignUser}*：</label>
@@ -223,7 +230,6 @@
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <h:outputText id="thisDeductionMessage" style="color: red;font-size: 20px;" value="#{zkbFePartOrderSparePartDetailController.genThisDeductionMessage()}" />
                         <label class="label">#{msg.zkbFePartOrder_comment}</label>
                         <p:inputTextarea  id="comment" required="true" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" requiredMessage="#{msg.zkbFePartOrder_comment} #{msg.ValidationRequire}" value="#{zkbFePartOrderSparePartDetailController.selected.comment}" rows="2" cols="20">
                         </p:inputTextarea>
