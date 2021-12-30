@@ -897,7 +897,7 @@ public void test1(){
                 TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
                 if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
                     List<UserAccount> userAccountList = new ArrayList<>();
-                    AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
+                    AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
                     if(auditGroupConfiguration!=null){
                         String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
                         List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
@@ -912,7 +912,9 @@ public void test1(){
                         }
                     }
                     if (userAccountList.contains(userAccount)){
-                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1));
+                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1,"1*approve+"));
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId(),"1*approve+9*"));
+                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0,"1*approve+9*"));
                     }else {
                         searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0));
@@ -1082,15 +1084,21 @@ public void test1(){
             searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (!this.hasFilterOnField("siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            UserAccount userAccount = userContextService.getCurrentUserAccount();
+            String tenantUID = userAccount.getTenantUID();
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+            }else {
+                List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            }
         }
     }
 
@@ -2340,7 +2348,7 @@ public void test1(){
         List<UserAccount> uaList=new ArrayList<>();
         if (hospitalNameBoolean){
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getSiteUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
+            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getHospitalUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
             if(auditGroupConfiguration!=null){
                 String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
                 List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
@@ -2353,6 +2361,9 @@ public void test1(){
                     }
 
                 }
+            }else {
+                WebUtil.addErrorMessage("未配置医工分组,请先配置!");
+                return uaList;
             }
         }else {
             uaList= woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
