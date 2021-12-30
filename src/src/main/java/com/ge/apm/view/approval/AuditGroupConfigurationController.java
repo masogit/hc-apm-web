@@ -184,7 +184,7 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     //保存配置
     public void save() {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        AuditGroupConfiguration groupName = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), selected.getGroupName());
+        AuditGroupConfiguration groupName = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getHospitalUID(), selected.getGroupName());
         if(groupName!=null){
             if(!groupName.getId().equals(selected.getId())){
                 WebUtil.addWarnMessage(selected.getGroupName()+"已经存在,不能重复添加");
