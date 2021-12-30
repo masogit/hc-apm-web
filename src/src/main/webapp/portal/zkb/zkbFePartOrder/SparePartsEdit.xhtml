@@ -223,6 +223,7 @@
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <h:outputText id="thisDeductionMessage" style="color: red;font-size: 20px;" value="#{zkbFePartOrderSparePartDetailController.genThisDeductionMessage()}" />
                         <label class="label">#{msg.zkbFePartOrder_comment}</label>
                         <p:inputTextarea  id="comment" required="true" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" requiredMessage="#{msg.zkbFePartOrder_comment} #{msg.ValidationRequire}" value="#{zkbFePartOrderSparePartDetailController.selected.comment}" rows="2" cols="20">
                         </p:inputTextarea>
@@ -326,7 +327,7 @@
             </p:fieldset>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.saveAndToListPage}" style="float:left"/>
                <p:commandButton id="waitingAssignment" rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left">
-                    <p:confirm header="请确认扣除名额信息"  message="#{zkbFePartOrderSparePartDetailController.getConfirmMessage()}" icon="ui-icon-alert"/>
+                    <p:confirm header="请确认扣除名额信息"  message="#{zkbFePartOrderSparePartDetailController.genConfirmMessage()}" icon="ui-icon-alert"/>
                 </p:commandButton>
 <!--
                 <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left"/>

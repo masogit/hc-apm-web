@@ -103,6 +103,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      *  提示信息confirm message
      */
     private String confirmMessage;
+
+    /**
+     *  代理商确认本次扣除信息
+     */
+    private String thisDeductionMessage;
     @Override
     protected void init() {
         super.init();
@@ -186,16 +191,19 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         if("ManMade".equals(this.selected.getOrderType())){//人工  新逻辑扣减     //  旧逻辑扣联合名额
             if("false".equals(this.selected.getSubtractTotalStatus())){
                 confirmMessage += "本次申请不扣除名额！";
+                thisDeductionMessage = "本次申请不扣除名额！";
             }else{
                 if ("DI".equals(zct.getContractType())
                         || "PCB".equals(zct.getContractType())
                         || "PCB MVS".equals(zct.getContractType())) {
-                    confirmMessage += "本次扣除1个备件+人工+保养名额"+"；";
+                    confirmMessage += "本次扣除1个备件+人工+保养名额；";
+                    thisDeductionMessage = "本次扣除1个备件+人工+保养名额。";
                     String spareArtificail = zct.getSpareArtificail()!= null?zct.getSpareArtificail().toString():"0";
                     confirmMessage += "备件+人工+保养剩余名额为"+spareArtificail+"。";
                 } else if ("CCS".equals(zct.getContractType())
                         || "Biomed".equals(zct.getContractType())) {
-                    confirmMessage += "本次扣除1个人工支持名额"+"；";
+                    confirmMessage += "本次扣除1个人工支持名额；";
+                    thisDeductionMessage = "本次扣除1个人工支持名额。";
                     String geArtificialSupportTimes = zct.getGeArtificialSupportTimes()!= null?zct.getGeArtificialSupportTimes().toString():"0";
                     confirmMessage += "人工支持剩余名额为"+geArtificialSupportTimes+"。";
                 }
@@ -402,5 +410,13 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 
     public void setConfirmMessage(String confirmMessage) {
         this.confirmMessage = confirmMessage;
+    }
+
+    public String getThisDeductionMessage() {
+        return thisDeductionMessage;
+    }
+
+    public void setThisDeductionMessage(String thisDeductionMessage) {
+        this.thisDeductionMessage = thisDeductionMessage;
     }
 }

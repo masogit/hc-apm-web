@@ -290,6 +290,7 @@
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <h:outputText  style="color: red;font-size: 20px;" value="#{zkbFePartOrderProbeController.thisDeductionMessage}" />
                         <label class="label">#{msg.zkbFePartOrder_comment}</label>
                         <p:inputTextarea id="comment" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}"  value="#{zkbFePartOrderProbeController.selected.comment}" rows="2" cols="20">
                         </p:inputTextarea>
@@ -304,7 +305,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.currentStep.equals('WaitingCommercial')}">
                             <label class="label">#{msg.zkbFePartOrder_commercialAssignDate}*：</label>
-                            <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderProbeController.selected.commercialAssignDate}"
+                            <p:calendar readonly="true  " disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderProbeController.selected.commercialAssignDate}"
                                         showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
