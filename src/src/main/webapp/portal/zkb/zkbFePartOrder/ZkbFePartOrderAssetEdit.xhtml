@@ -34,7 +34,7 @@
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbFePartOrderSparePartDetailController.saveZkbFePartOrderAssetInfoTemp()}" update=":growl :zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList  zkbFePartOrderSparePartsEditForm:waitingAssignment"
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbFePartOrderSparePartDetailController.saveZkbFePartOrderAssetInfoTemp()}" update=":growl :zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList  zkbFePartOrderSparePartsEditForm:waitingAssignment  zkbFePartOrderSparePartsEditForm:thisDeductionMessage "
                  icon="ui-icon-check" oncomplete="PF('zkbFePartOrderAssetInfoEditDlg').hide()" />
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbFePartOrderAssetInfoEditDlg').hide()"/>
         </h:form>

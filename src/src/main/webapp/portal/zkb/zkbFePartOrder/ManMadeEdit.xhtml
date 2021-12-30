@@ -147,6 +147,7 @@
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <h:outputText  style="color: red;font-size: 20px;" value="#{zkbFePartOrderDetailController.thisDeductionMessage}" />
                                 <label class="label">#{msg.zkbFePartOrder_comment}</label>
                                 <p:inputTextarea disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingAssignment')}" id="comment" required="true" requiredMessage="#{msg.zkbFePartOrder_comment} #{msg.ValidationRequire}" value="#{zkbFePartOrderDetailController.selected.comment}" rows="2" cols="20">
                                 </p:inputTextarea>

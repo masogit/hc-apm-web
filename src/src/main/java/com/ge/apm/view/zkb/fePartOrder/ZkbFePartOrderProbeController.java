@@ -195,6 +195,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     private String confirmMessage;
 
+    /**
+     *  代理商确认本次扣除信息
+     */
+    private String thisDeductionMessage;
+
     @Override
     protected void init() {
         super.init();
@@ -295,12 +300,15 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 if("t".equals(this.selected.getHighCatFlag())){//是否高值   是高值  FourInOne 扣名额  其他不扣名额
                     if("FourInOne".equals(this.selected.getContractCatSnNo())){
                         confirmMessage += "本次扣除"+this.selected.getQty()+"个探头名额；";
+                        thisDeductionMessage = "本次扣除"+this.selected.getQty()+"个探头名额。";
                         confirmMessage += "探头剩余名额为"+probeQuota+"。";
                     }else{
                         confirmMessage += "本次申请不扣除名额！";
+                        thisDeductionMessage = "本次申请不扣除名额！";
                     }
                 }else{
                     confirmMessage += "本次扣除"+this.selected.getQty()+"个探头名额；";
+                    thisDeductionMessage = "本次扣除"+this.selected.getQty()+"个探头名额。";
                     confirmMessage += "探头剩余名额为"+probeQuota+"。";
                 }
             }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zct.getQuotaDeductType())){
@@ -308,18 +316,23 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 if("High".equals(this.selected.getZkbPoProbeQuotaType())){//高值  FourInOne 扣普通  其他不扣
                     if("FourInOne".equals(this.selected.getContractCatSnNo())){
                         confirmMessage += "本次扣除"+this.selected.getQty()+"个探头普通名额；";
+                        thisDeductionMessage = "本次扣除"+this.selected.getQty()+"个探头普通名额。";
                         confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
                     }else{
                         confirmMessage += "本次申请不扣除名额！";
+                        thisDeductionMessage = "本次申请不扣除名额！";
                     }
                 }else if("Any".equals(this.selected.getZkbPoProbeQuotaType())){
                     confirmMessage += "本次扣除"+this.selected.getQty()+"个探头任意名额；";
+                    thisDeductionMessage = "本次扣除"+this.selected.getQty()+"个探头任意名额。";
                     confirmMessage += "探头任意剩余名额为"+probeQuota+"。";
                 }else if("Special".equals(this.selected.getZkbPoProbeQuotaType())){
-                    confirmMessage += "本次扣除"+this.selected.getQty()+"；";
+                    confirmMessage += "本次扣除"+this.selected.getQty()+"个探头特殊名额；";
+                    thisDeductionMessage = "本次扣除"+this.selected.getQty()+"个探头特殊名额。";
                     confirmMessage += "探头特殊剩余名额为"+probeQuotaSpecial+"。";
                 }else if("Normal".equals(this.selected.getZkbPoProbeQuotaType())){
-                    confirmMessage += "本次扣除"+this.selected.getQty()+"；";
+                    confirmMessage += "本次扣除"+this.selected.getQty()+"个探头普通名额；";
+                    thisDeductionMessage = "本次扣除"+this.selected.getQty()+"个探头普通名额。";
                     confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
                 }
             }
@@ -990,5 +1003,13 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     public void setConfirmMessage(String confirmMessage) {
         this.confirmMessage = confirmMessage;
+    }
+
+    public String getThisDeductionMessage() {
+        return thisDeductionMessage;
+    }
+
+    public void setThisDeductionMessage(String thisDeductionMessage) {
+        this.thisDeductionMessage = thisDeductionMessage;
     }
 }
