@@ -612,6 +612,39 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }
         selected.setOrderType(orderType);
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+            boolean onlineEngineFlag= false;
+            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType()) && !ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
+                onlineEngineFlag = true;
+            }
+            if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selectedContract.getQuotaDeductType()) && CopyByInvok.F.equals(selected.getHighCatFlag())){
+                onlineEngineFlag = true;
+            }
+            if(onlineEngineFlag){
+                this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+            }
+            if(this.selected.getOnlineEngine() != null){
+                if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
+                    ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
+                    this.selected.setOnlineEngine(backUp);
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                }else{
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                }
+            }
+        }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            this.selected.setArtificialType(artificialType);
+        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+            if(this.selected.getOnlineEngine() != null){
+                if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
+                    ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
+                    this.selected.setOnlineEngine(backUp);
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                }else{
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                }
+            }
+        }
         quotaTips = zkbPartOrderService.preSave(selected,selectedContract,assetInfo);
 
     }
@@ -812,44 +845,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return "";
         }
 
-        this.selected.setOrderType(orderType);
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
         }
         selected.setDataFlag(0);
-        if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-            boolean onlineEngineFlag= false;
-            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType()) && !ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
-                onlineEngineFlag = true;
-            }
-            if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType()) && CopyByInvok.F.equals(selected.getHighCatFlag())){
-                onlineEngineFlag = true;
-            }
-            if(onlineEngineFlag){
-                this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
-            }
-            if(this.selected.getOnlineEngine() != null){
-                if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
-                    ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
-                    this.selected.setOnlineEngine(backUp);
-                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
-                }else{
-                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
-                }
-            }
-        }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-            this.selected.setArtificialType(artificialType);
-        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
-            if(this.selected.getOnlineEngine() != null){
-                if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
-                    ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
-                    this.selected.setOnlineEngine(backUp);
-                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
-                }else{
-                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
-                }
-            }
-        }
+
         HashMap m = selectedWorkFlow;
         selected = zkbPartOrderService.create(m.get("id").toString(),m.get("assetId").toString(),zkbContract,this.selected,currentUser,selectionTenantInfo,m.get("srNum").toString());
         zkbPartOrderService.saveUploadFile(v2_blobObjectList,this.selected.getId());
