@@ -272,7 +272,7 @@
                 </p:fieldset>
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <h:outputText id="thisDeductionMessage"  style="color: red;font-size: 14px;" value="#{zkbFePartOrderProbeController.genThisDeductionMessage()}" />
+                        <h:outputText id="thisDeductionMessage"  style="color: red;font-size: 14px;" value="#{zkbFePartOrderProbeController.genConfirmMessage('messageTwo')}" />
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -449,7 +449,7 @@
             </p:fieldset>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm" action="#{zkbFePartOrderProbeController.saveAndToListPage}" style="float:left"/>
                 <p:commandButton id="confirmMessage" rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left">
-                    <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderProbeController.genConfirmMessage()}" icon="ui-icon-alert"/>
+                    <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderProbeController.genConfirmMessage('messageOne')}" icon="ui-icon-alert"/>
                 </p:commandButton>
 <!--
                 <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left"/>
