@@ -254,24 +254,37 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
      */
     public String genConfirmMessage(){
+
+        Integer beforeAdjustQty = this.zkbFePartOrderAssetInfoRepository.fetchQty(this.selected.getId());
+        List<ZkbFePartOrderAssetInfo> afterAdjustAssetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
+        Integer adjustApplyCount = new Integer(0);
+        adjustApplyCount = afterAdjustAssetInfoList.stream().mapToInt(ZkbFePartOrderAssetInfo ::getAssetQty).sum();
         String confirmMessage = new String();
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if("SpareParts".equals(this.selected.getOrderType())){//备件
             if(ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){//高端机不扣名额
                 confirmMessage += "本次申请不扣除名额！";
             }else {
-                int applyCount = this.getApplyCount();
+                int applyCount = new Integer(0);
+                int curApplyCount = this.getApplyCount();
+
                 if("DI".equals(zkbContract.getContractType())
                         ||"PCB".equals(zkbContract.getContractType())
                         ||"PCB MVS".equals(zkbContract.getContractType())) {
-                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() - applyCount);
-                    confirmMessage += "本次扣除"+applyCount+"个备件+人工+保养名额；";
+                    if(adjustApplyCount<beforeAdjustQty){
+                        applyCount = beforeAdjustQty-adjustApplyCount;
+                        zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() - applyCount);
+                    }
+                    confirmMessage += "本次扣除"+curApplyCount+"个备件+人工+保养名额；";
                     String spareArtificail = zkbContract.getSpareArtificail()!= null?zkbContract.getSpareArtificail().toString():"0";
                     confirmMessage += "备件+人工+保养剩余名额为"+spareArtificail+"。";
                 }else if("CCS".equals(zkbContract.getContractType())
                         ||"Biomed".equals(zkbContract.getContractType())) {
-                    zkbContract.setSpareQuota(zkbContract.getSpareQuota() - applyCount);
-                    confirmMessage += "本次扣除"+applyCount+"个备件名额；";
+                    if(adjustApplyCount<beforeAdjustQty){
+                        applyCount = beforeAdjustQty-adjustApplyCount;
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota() - applyCount);
+                    }
+                    confirmMessage += "本次扣除"+curApplyCount+"个备件名额；";
                     String spareQuota = zkbContract.getSpareQuota()!= null?zkbContract.getSpareQuota().toString():"0";
                     confirmMessage += "备件剩余名额为"+spareQuota+"。";
                 }
