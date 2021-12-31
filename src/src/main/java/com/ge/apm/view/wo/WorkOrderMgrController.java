@@ -1088,6 +1088,8 @@ public void test1(){
             String tenantUID = userAccount.getTenantUID();
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
             if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+                String hospitalUID = UserContextService.getCurrentUserAccount().getHospitalUID();
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
             }else {
                 List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
