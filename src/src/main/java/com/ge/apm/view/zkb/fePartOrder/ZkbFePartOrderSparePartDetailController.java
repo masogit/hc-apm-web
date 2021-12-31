@@ -273,7 +273,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                         ||"PCB MVS".equals(zkbContract.getContractType())) {
                     if(adjustApplyCount<beforeAdjustQty){
                         applyCount = beforeAdjustQty-adjustApplyCount;
-                        zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() - applyCount);
+                        zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + applyCount);
                     }
                     confirmMessage += "本次扣除"+curApplyCount+"个备件+人工+保养名额；";
                     String spareArtificail = zkbContract.getSpareArtificail()!= null?zkbContract.getSpareArtificail().toString():"0";
@@ -282,7 +282,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                         ||"Biomed".equals(zkbContract.getContractType())) {
                     if(adjustApplyCount<beforeAdjustQty){
                         applyCount = beforeAdjustQty-adjustApplyCount;
-                        zkbContract.setSpareQuota(zkbContract.getSpareQuota() - applyCount);
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota() + applyCount);
                     }
                     confirmMessage += "本次扣除"+curApplyCount+"个备件名额；";
                     String spareQuota = zkbContract.getSpareQuota()!= null?zkbContract.getSpareQuota().toString():"0";
