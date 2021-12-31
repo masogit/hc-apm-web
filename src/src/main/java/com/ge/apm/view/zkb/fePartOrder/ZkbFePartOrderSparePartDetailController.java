@@ -561,7 +561,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 }
             }
         }
-        if(adjustApplyCount<beforeAdjustQty)
+        if(adjustApplyCount<beforeAdjustQty&&!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))//高端机不扣名额
         {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
             this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,beforeAdjustQty-adjustApplyCount,this.currentUser,this.selected,this.i18Map.get("TenantAccept"));
