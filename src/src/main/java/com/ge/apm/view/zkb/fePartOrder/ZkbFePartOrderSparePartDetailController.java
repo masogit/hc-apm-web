@@ -267,25 +267,24 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             }else {
                 int applyCount = new Integer(0);
                 int curApplyCount = this.getApplyCount();
-
                 if("DI".equals(zkbContract.getContractType())
                         ||"PCB".equals(zkbContract.getContractType())
                         ||"PCB MVS".equals(zkbContract.getContractType())) {
+                    Integer spareArtificail = zkbContract.getSpareArtificail()!= null?zkbContract.getSpareArtificail():new Integer(0);
                     if(adjustApplyCount<beforeAdjustQty){
                         applyCount = beforeAdjustQty-adjustApplyCount;
-                        zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + applyCount);
+                        spareArtificail = spareArtificail + applyCount;
                     }
                     confirmMessage += "本次扣除"+curApplyCount+"个备件+人工+保养名额；";
-                    String spareArtificail = zkbContract.getSpareArtificail()!= null?zkbContract.getSpareArtificail().toString():"0";
                     confirmMessage += "备件+人工+保养剩余名额为"+spareArtificail+"。";
                 }else if("CCS".equals(zkbContract.getContractType())
                         ||"Biomed".equals(zkbContract.getContractType())) {
+                    Integer spareQuota = zkbContract.getSpareQuota()!= null?zkbContract.getSpareQuota():new Integer(0);
                     if(adjustApplyCount<beforeAdjustQty){
                         applyCount = beforeAdjustQty-adjustApplyCount;
-                        zkbContract.setSpareQuota(zkbContract.getSpareQuota() + applyCount);
+                        spareQuota =spareQuota + applyCount;
                     }
                     confirmMessage += "本次扣除"+curApplyCount+"个备件名额；";
-                    String spareQuota = zkbContract.getSpareQuota()!= null?zkbContract.getSpareQuota().toString():"0";
                     confirmMessage += "备件剩余名额为"+spareQuota+"。";
                 }
             }

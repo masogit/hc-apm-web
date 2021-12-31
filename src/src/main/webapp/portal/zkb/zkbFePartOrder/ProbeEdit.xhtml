@@ -272,14 +272,15 @@
                 </p:fieldset>
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <h:outputText  style="color: red;font-size: 14px;" value="#{zkbFePartOrderProbeController.thisDeductionMessage}" />
+                        <h:outputText id="thisDeductionMessage"  style="color: red;font-size: 14px;" value="#{zkbFePartOrderProbeController.genThisDeductionMessage()}" />
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.zkbFePartOrder_newProbe}*</label>
                         <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" required="true" requiredMessage="#{msg.zkbFePartOrder_newProbe} #{msg.ValidationRequire}" value="#{zkbFePartOrderProbeController.selected.newCatFlag}" >
-                            <p:ajax event="change" update="managementFieldset" />
+                            <p:ajax event="change" update="managementFieldset confirmMessage thisDeductionMessage" />
+
                             <f:selectItem  itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
@@ -447,8 +448,8 @@
                 </p:panelGrid>
             </p:fieldset>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderProbeController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderProbeEditForm" action="#{zkbFePartOrderProbeController.saveAndToListPage}" style="float:left"/>
-                <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left">
-                    <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderProbeController.confirmMessage}" icon="ui-icon-alert"/>
+                <p:commandButton id="confirmMessage" rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left">
+                    <p:confirm header="请确认扣除名额信息" message="#{zkbFePartOrderProbeController.genConfirmMessage()}" icon="ui-icon-alert"/>
                 </p:commandButton>
 <!--
                 <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.supplierAccept()}" style="float:left"/>
