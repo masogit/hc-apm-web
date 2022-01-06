@@ -253,6 +253,17 @@ public class WorkflowConfig implements Serializable {
     //是否启用院间借调
     @Column(name = "enable_site_to_site_allocation")
     private Boolean enableSiteToSiteAllocation;
+    //是否启用小型物联网设备(急救类)服务
+    @Column(name = "is_io_tenabled")
+    private Boolean isiotenabled;
+
+    public Boolean getIsiotenabled() {
+        return isiotenabled;
+    }
+
+    public void setIsiotenabled(Boolean isiotenabled) {
+        this.isiotenabled = isiotenabled;
+    }
 
     public Boolean getWhethertoenableunattended() {
         if(whethertoenableunattended ==null){
