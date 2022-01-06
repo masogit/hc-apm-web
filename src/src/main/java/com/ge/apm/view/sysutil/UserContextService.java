@@ -204,6 +204,20 @@ public class UserContextService implements Serializable {
         OrgInfo org = WebUtil.getBean(OrgInfoRepository.class).getByUid(getCurrentUserAccount().getOrgInfoUID());
         return  null == org.getOrgType() ? false : 4 == org.getOrgType();
     }
+    /**
+     * 判断当前登录是
+     * 该租户已开启了无人值守服务
+     * 该租户已开启了小型物联网设备(急救类)服务
+     * @return boolean
+     */
+    public boolean accessContain(){
+        WorkflowConfig bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).getBySiteUID(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID.getWhethertoenableunattended()==true && bySiteUID.getIsiotenabled()==true){
+            return true;
+        }
+        return false;
+    }
+
 
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {

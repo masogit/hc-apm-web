@@ -545,7 +545,12 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">是否启用小型物联网设备(急救类)服务</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isiotenabled}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 
