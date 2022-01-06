@@ -142,6 +142,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "wo_spare_parts_sign")
     private Boolean woSparePartsSign ; // 新增备件是否需要签名
 
+    @Column(name = "is_jump_to_work_bench_after_orders")
+    private Boolean isJumpToWorkBenchAfterOrders ; // 接单后是否跳转至工作台
+
     @Column(name = "is_mobile_phone_file_review")
     private Boolean isMobilePhoneFileReview ; // 手机建档是否需要审核
 
@@ -356,6 +359,10 @@ public class WorkflowConfig implements Serializable {
     public void setWoSparePartsSign(Boolean woSparePartsSign) {
         this.woSparePartsSign = woSparePartsSign;
     }
+
+    public Boolean getIsJumpToWorkBenchAfterOrders() { return isJumpToWorkBenchAfterOrders; }
+
+    public void setIsJumpToWorkBenchAfterOrders(Boolean jumpToWorkBenchAfterOrders) { isJumpToWorkBenchAfterOrders = jumpToWorkBenchAfterOrders; }
 
     public Boolean getIsMobilePhoneFileReview() {
         return isMobilePhoneFileReview == null ? false : isMobilePhoneFileReview;
