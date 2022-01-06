@@ -363,6 +363,28 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "other_clinical_dept_head_weight")
     private Integer otherClinicalDeptHeadWeight = 1;//院区下的其他科室主任
 
+    @Column(name = "external_expenses")
+    private Boolean externalExpenses ; // 外修费用
+
+    @Column(name = "other_expenses")
+    private Boolean otherExpenses ; // 其他费用
+
+    public Boolean getExternalExpenses() {
+        return externalExpenses == null ? false : externalExpenses;
+    }
+
+    public Boolean getOtherExpenses() {
+        return otherExpenses == null ? false : otherExpenses;
+    }
+
+    public void setExternalExpenses(Boolean externalExpenses) {
+        this.externalExpenses = externalExpenses;
+    }
+
+    public void setOtherExpenses(Boolean otherExpenses) {
+        this.otherExpenses = otherExpenses;
+    }
+
     public Boolean getWoSparePartsSign() {
         return woSparePartsSign;
     }
