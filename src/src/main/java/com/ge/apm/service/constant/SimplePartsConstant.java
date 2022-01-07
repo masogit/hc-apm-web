@@ -129,6 +129,8 @@ public interface SimplePartsConstant {
     public static final String WX_MESSAGE_PARTS_STOCK_IN_OR_OUT="【备件出入库提醒】";
 
     String I18N_REQUEST_TYPE = "simplePartsRequestType";
+
+    String I18N_STORAGE_TYPE = "storage_type";
 }
 
 

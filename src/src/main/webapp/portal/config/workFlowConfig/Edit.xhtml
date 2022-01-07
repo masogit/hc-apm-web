@@ -141,11 +141,11 @@
                         </h:panelGroup >
                         <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
                             <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isAutoEnabled}">
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isAutoEnabled}" >
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
+                        <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}" >
                             <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isTakeOrderEnabled}">
                                 <p:ajax process="@this" />
@@ -153,7 +153,7 @@
                         </h:panelGroup >
                         <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
                             <label class = "label">#{msg.ManuallySendWorkers}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isManualEnabled}">
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isManualEnabled}" >
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
@@ -273,6 +273,12 @@
                         <h:panelGroup >
                             <label class = "label">设备直接验收(接收)</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.woDirectReception}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">新增备件是否需要签名</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.woSparePartsSign}">
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
@@ -511,6 +517,29 @@
                             <label class="label">调剂设备安全基准</label>
                             <p:inputNumber value="#{workflowConfigController.selected.sharedAssetSafetyThreshold}" minValue="0.0" decimalPlaces="1"/>
                         </h:panelGroup>
+
+<!--                        //新增字段-->
+                        <h:panelGroup>
+                            <label class="label">出库状态检查间隔（分钟）</label>
+                            <p:inputNumber value="#{workflowConfigController.selected.outboundstatuscheckinterval}" minValue="0.0" decimalPlaces="1"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">预约状态锁定时长（分钟）</label>
+                            <p:inputNumber value="#{workflowConfigController.selected.appointmentstatuslockedtime}" minValue="0.0" decimalPlaces="1"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否启用无人值守</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.whethertoenableunattended}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否启用院间借调</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableSiteToSiteAllocation}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+
                     </p:panelGrid>
                 </p:fieldset>
 
@@ -657,7 +686,18 @@
                             <label class="label">是否支持手动更改开关机时间</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableUpdateSwitchingTime}"/>
                         </h:panelGroup >
-
+                        <h:panelGroup >
+                            <label class = "label">手机建档是否需要审核</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isMobilePhoneFileReview}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">护理人员扫码是否跳转至台账</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isNursingStaffCodeLedger}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
                 <!-- <p:spacer/> -->

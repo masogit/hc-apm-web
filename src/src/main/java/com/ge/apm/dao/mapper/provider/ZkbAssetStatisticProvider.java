@@ -143,18 +143,18 @@ public class ZkbAssetStatisticProvider {
                 " qr_code_info.reason AS reason," +
                 " qr_code_info.can_not_past_qr_code," +
                 " qr_code_info.reason_date,"+
-                " qr_code_info.qr_code_count_state,qr_code_info.ib_qr_code_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date,ib_qr_code.is_qr_code AS ibQrCodeTemporary"+
+                " qr_code_info.qr_code_count_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date," +
+                " case when ib_qr_code.is_qr_code=true then 'Y' end as ib_qr_code_state," +
+                " case when ib_qr_code.ge_upload_flag='t' then 'Y' when ib_qr_code.ge_upload_flag='f' then 'N' end as ge_flag"+
                 " FROM" +
                 " zkb_contract ac" +
-                " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
+                " INNER JOIN zkb_contract_asset zca ON zca.contract_id=ac.id" +
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
                 " INNER JOIN asset_info ai ON ai.uid= zca.asset_id AND ai.is_deleted=false AND ai.is_valid=true" +
-                " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
+                " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.asset_uid = ai.uid " +
                 " LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code on ib_qr_code.asset_uid = ai.uid " +
                 " WHERE" +
-                " ac.contract_no is not null AND ai.system_id is not null" +
-                " AND to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date" +
-                " AND (qr_code_info.qr_code_count_state is null OR qr_code_info.qr_code_count_state='N') "
+                " to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date"
         );
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
         String filter = buildFilter_loadAllAsset(searchFilterList);

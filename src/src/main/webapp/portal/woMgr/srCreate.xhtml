@@ -56,8 +56,11 @@
                             <label class="label">#{msg.status}</label>
                             <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
                                 <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
+<!--                                <f:selectItems value="#{workOrderMgrController.initStatus('2','3')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-
+                                <c:if test="#{userContextService.countyArea}">
+                                    <f:selectItem  itemLabel="可正常使用" itemValue="1"/>
+                                </c:if>
                             </p:selectOneRadio>
                             <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.newServiceRequest.confirmedDownTime}" showOn="button" 
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
@@ -76,6 +79,15 @@
                             <p:inputText value="#{workOrderMgrController.newServiceRequest.customerPosition}" maxlength="256" required="true" requiredMessage="医院客户职务 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
 
+                        <h:panelGroup rendered="#{userContextService.countyArea}">
+                            <label class="label">#{msg.siebleNumber}</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.siebleNumber}" maxlength="12"  requiredMessage="sieble单号 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{userContextService.countyArea}">
+                            <label class="label">#{msg.callCenterNumber}</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.callCenterNumber}" maxlength="12" requiredMessage="呼叫中心单号 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
 
                     </p:panelGrid>
                     

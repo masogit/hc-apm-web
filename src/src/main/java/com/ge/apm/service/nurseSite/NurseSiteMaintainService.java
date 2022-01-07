@@ -900,9 +900,9 @@ public class NurseSiteMaintainService {
             for (NurseSiteMaintainData nurseSiteMaintainDataNew : listData){
                 for (NurseSiteMaintainData nurseSiteMaintainDataOld : list){
                     if(nurseSiteMaintainDataNew.getId().equals(nurseSiteMaintainDataOld.getId())){
-                        Boolean checkValueNew = nurseSiteMaintainDataNew.getCheckValue()!= null ?nurseSiteMaintainDataNew.getCheckValue() :false;
-                        Boolean checkValueOld = nurseSiteMaintainDataOld.getCheckValue() !=null ?nurseSiteMaintainDataOld.getCheckValue() :false;
-                        if(checkValueNew != checkValueOld){
+                        Boolean checkValueNew = nurseSiteMaintainDataNew.getCheckValue();
+                        Boolean checkValueOld = nurseSiteMaintainDataOld.getCheckValue();
+                        if(checkValueNew != null && !checkValueNew.equals(checkValueOld)){
                             tempItem.setUpdateByUid(user.getUid());
                         }
                     }
@@ -1160,6 +1160,10 @@ public class NurseSiteMaintainService {
 		tempNurseSiteMaintain.setName(nurseSiteMaintainConfig.getName());
 		tempNurseSiteMaintain.setConfigId(nurseSiteMaintainConfig.getId());
 		return tempNurseSiteMaintain;
+	}
+
+	public List<NurseSiteMaintain> checkAgain(String name , Date currDate){
+		return nurseSiteMaintainRepository.checkAgain(name,currDate);
 	}
 
 	public NurseSiteMaintain createMaintain(Date date, UserAccount currentUser, NurseSiteMaintainConfig nurseSiteMaintainConfig, List<AssetInfo> listCheckAssets,

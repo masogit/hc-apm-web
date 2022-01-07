@@ -1,9 +1,6 @@
 package com.ge.apm.view.nurseSite;
 
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;

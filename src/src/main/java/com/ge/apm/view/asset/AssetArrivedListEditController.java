@@ -112,6 +112,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     @Setter
     private String newSupplierType;
 
+    private UserContextService userContextService;
+
     @Override
     protected void init() {
 
@@ -137,7 +139,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         currentUser=UserContextService.getCurrentUserAccount();
         configService = WebUtil.getBean(ConfigService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
-
+        userContextService = WebUtil.getBean(UserContextService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
 
@@ -174,13 +176,20 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
             initEasyInstallItem();
             this.changeFunctionGroup();
-            attachList = aiService.getPicList(selected.getId());
+            if(activeSupplier() && selected.getContractNum() != null){
+                Set<String> ids = new HashSet<>();
+                ids.add(selected.getId());
+                ids.add(selected.getContractNum());
+                attachList = aiService.getPartPictures(ids);
+            }else{
+                attachList = aiService.getPicList(selected.getId());
+            }
 //            if (ArrivalList.ProcessType.Easy.toString().equals(selected.getProcessType())) {
 //                initEasyInstallItem();
 //                this.changeFunctionGroup();
 //
 //            }
-            if(activeSupplier() && null == selected.getBoxInstallationDate()) {
+            if(null == selected.getBoxInstallationDate()) {
                 selected.setBoxInstallationDate(selected.getArrivalDate());
             }
             prepareEdit();
@@ -190,7 +199,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         suppliersList = aiService.getSupplierListBySiteUid(currentUser.getSiteUID());
         maintainerList = aiService.getOnlyMaintainListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
         manueList=aiService.getOnlyManuListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 
         needInstorageCheck = userContextService.needInstorageCheck();
     }
@@ -269,6 +277,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         selected = dao.findById(selected.getId());
         if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
             contractService.contractItemArrival(arrivalItemList);
+        }
+        if(userContextService.activeSupplier() && selected.getContractNum() != null){
+            Set<String> ids = new HashSet<>();
+            ids.add(selected.getId());
+            ids.add(selected.getContractNum());
+            attachList = aiService.getPartPictures(ids);
         }
     }
 
@@ -515,6 +529,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalList);
             blobObject.setBoUuid(selected.getId());
+            if(activeSupplier()){//已激活的供应商：使用合同号作为BoUuid
+                blobObject.setBoUuid(selected.getContractNum());
+            }
             blobObject.setBoSubType(type);
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));

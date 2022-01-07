@@ -555,7 +555,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         list.add(item);
         return list;
     }
-
     /**
      * @param zkbContract    合同信息
      * @param type           1.把剩余名额移入申请名额 2.把申请名额移入已使用名额 3.把申请名额移入剩余名额
@@ -640,6 +639,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + qty);
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - qty);
                     break;
+                case 5://好还变坏还，已使用名额+ qty，剩余名额- qty，坏变好走第3步骤
+                    opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse() + qty);
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() - qty);
+                    break;
             }
         } else if ("CCS".equals(zkbContract.getContractType())
                 || "Biomed".equals(zkbContract.getContractType())) {
@@ -662,6 +666,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
                     zkbContract.setSpareQuota(zkbContract.getSpareQuota() + qty);
                     zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply() - qty);
+                    break;
+                case 5://好还变坏还，已使用名额+ qty，剩余名额- qty，坏变好走第3步骤
+                    opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
+                    zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse() + qty);
+                    zkbContract.setSpareQuota(zkbContract.getSpareQuota() - qty);
                     break;
             }
         }
@@ -895,7 +904,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public ZkbFePartOrder calDeductQtyByNew(ZkbFePartOrder zkbFePartOrder) {
         zkbFePartOrder.setQty(1);
         if ("High".equals(zkbFePartOrder.getZkbPoProbeQuotaType())) {
-            if (ZkbFePartOrderProbeController.four_in_one.equals(zkbFePartOrder.getContractCatId())) {
+            if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(zkbFePartOrder.getContractCatSnNo())) {
                 zkbFePartOrder.setQty(4);
             } else {
                 zkbFePartOrder.setQty(0);
@@ -913,7 +922,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public ZkbFePartOrder calDeductQtyByOld(ZkbFePartOrder zkbFePartOrder) {
         zkbFePartOrder.setQty(0);
         if (ZkbFePartOrderService.testStatusTrueValue.equals(zkbFePartOrder.getHighCatFlag())) {
-            if (ZkbFePartOrderProbeController.four_in_one.equals(zkbFePartOrder.getContractCatId())) {
+            if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(zkbFePartOrder.getContractCatSnNo())) {
                 zkbFePartOrder.setQty(4);
             }
         } else {
@@ -1017,6 +1026,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())) {
             right = true;
         } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())) {
+            right = true;
+        }else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Reviewer.toString())) {
             right = true;
         }
         return right;
@@ -1566,8 +1577,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             zkbFePartOrderRow.setFieldStringValue(WebUtil.getMessage("zkbFePartOrder_assetNo"), "setAssetNo");
             zkbFePartOrderRow.setFieldStringValue(WebUtil.getMessage("zkbFePartOrder_orderNoa"), "setOrderNo");
             zkbFePartOrderRow.setFieldStringValue(WebUtil.getMessage("zkbFePartOrder_returnType"), "setReturnType");
-            zkbFePartOrderRow.setFieldStringValue("归还备注", "setGeAdminComment");
             zkbFePartOrderRow.setFieldIntegerValue("归还数量", "setQty");
+            zkbFePartOrderRow.setFieldStringValue("归还备注", "setGeAdminComment");
             if (zkbFePartOrderVO.isSparePartNull()) {
                 break;
             }
@@ -1793,7 +1804,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             if (zkbFePartOrder.getQty() != null && zkbFePartOrder.getQty() > 0) {
                 this.moveProbe(5, zkbContract, zkbFePartOrder.getQty(), showZkbPoProbeQuotaType, zkbFePartOrder.getZkbPoProbeQuotaType(), userAccount, zkbFePartOrder, true, i18Map.get("GEAdminAccept"));
             }
-            if (StringUtils.isNotBlank(zkbFePartOrder.getContractCatId()) && !ZkbFePartOrderProbeController.four_in_one.equals(zkbFePartOrder.getContractCatId())) {
+            if (StringUtils.isNotBlank(zkbFePartOrder.getContractCatId())) {
                 this.updateZkbContractCat(userAccount, true, zkbFePartOrder.getContractCatId());
             }
         }

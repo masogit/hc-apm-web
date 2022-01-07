@@ -46,6 +46,7 @@
         <jackson.version>2.9.10</jackson.version>
         <surefire.version>2.19.1</surefire.version>
         <log4j.version>2.15.0</log4j.version>
+        <log4j.version>2.17.0</log4j.version>
 
         <!-- deepoove poi-tl version -->
         <poi-tl.version>1.2.0</poi-tl.version>

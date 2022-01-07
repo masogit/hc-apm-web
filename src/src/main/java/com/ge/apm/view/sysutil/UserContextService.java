@@ -8,6 +8,7 @@ import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.google.common.base.Strings;
@@ -248,6 +249,22 @@ public class UserContextService implements Serializable {
 
     public boolean accessContains(String menuName){
     	return authContains(menuName)&&versionContains(menuName);
+    }
+
+    public boolean accessContainsOfJiangNing(){
+        TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
+        List<TenantInfo> tenantIfos = tenantInfoRepository.getByName("南京市江宁医院");
+        if(tenantIfos == null || tenantIfos.size() == 0){
+            return false;
+        }
+        TenantInfo tf = tenantIfos.get(0);
+        String jiangNingUid = tf.getUid();
+        String currentTenantUid = userAccount.getTenantUID();
+        if(jiangNingUid.equals(currentTenantUid)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public boolean authContains(String menuName){
@@ -1241,12 +1258,35 @@ public class UserContextService implements Serializable {
             return false;
         }
     }
+    /***
+     *  判断是否是北京积水潭医院
+     * @param tenantName
+     * @return
+     */
+    public static Boolean isHospitalName(String tenantName){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        TenantInfo currentTenantInfo = userContextService.getTenantInfo();
+        if(currentTenantInfo == null){
+            return Boolean.FALSE;
+        }
+        if(StringUtils.isBlank(tenantName)){
+            //tenantName为空则验证下面租户
+            if(WorkOrderConstant.DESIGNATED_USER.equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }else{
+            if(tenantName.equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
 
 
 
     /**
      * 验证租户名称
-     * @param tenantName 非必填，如不填将默认验证指定的租户名称
+     * @param tenantName 非必填，如不填将验证方法中指定的租户是否为当前登录用户所属租户
      * @return
      */
     public static Boolean hasCurrentTenantName(String tenantName){
@@ -1255,13 +1295,14 @@ public class UserContextService implements Serializable {
         if(currentTenantInfo == null){
             return Boolean.FALSE;
         }
+        String name = currentTenantInfo.getName().trim();
         if(StringUtils.isBlank(tenantName)){
             //tenantName为空则验证下面租户
-            if("云南省阜外心血管病医院".equals(currentTenantInfo.getName().trim())){
+            if("云南省阜外心血管病医院".equals(name)){
                 return Boolean.TRUE;
             }
         }else{
-            if(tenantName.equals(currentTenantInfo.getName().trim())){
+            if(tenantName.equals(name)){
                 return Boolean.TRUE;
             }
         }
@@ -1324,5 +1365,17 @@ public class UserContextService implements Serializable {
     public I18nMessage getByMsgTypeAndMsgKey(String msgType, String msgKey) {
         I18nMessageRepository msgRepo = WebUtil.getBean(I18nMessageRepository.class);
         return msgRepo.getByMsgTypeAndMsgKey(msgType, msgKey);
+    }
+
+    /**
+     * 是否是县域租户
+     * @return
+     */
+    public boolean isCountyArea(){
+        TenantInfo tenantInfo = getTenantInfo();
+        if(tenantInfo.getType() != null && tenantInfo.getType() == 6){
+            return true;
+        }
+        return false;
     }
 }

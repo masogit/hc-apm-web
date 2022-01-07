@@ -185,7 +185,10 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     Map<String, String> map = null;
 
     private Map<String, String> i18Map;
-
+    /**
+     * 按钮待办是否显示
+     */
+    private boolean showPendingStatusBtn = true;
     /**
      * 初始化数据
      */
@@ -210,6 +213,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             fourHundredsTeam = true;
         } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString())) {
             fourHundredsTeam = true;
+        }else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Reviewer.toString())) {
+            showPendingStatusBtn = false;
         }
         if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())) {
             this.geAdmin = true;
@@ -276,12 +281,13 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      * @param searchFilters
      * @return
      */
-    private void getSearchFilterByUserConfig(List<SearchFilter> searchFilters) {
+    private void getSearchFilterByUserConfig(List<SearchFilter> searchFilters) {//判断是否是审阅人  这几个权限如果是yes 就是可以查看否则不可以
         if (!(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Commercial.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString())
-                || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))) {
+                || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())
+                || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Reviewer.toString()))) {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, NO_STEP));
             return;
         }
@@ -343,7 +349,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Commercial.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString())
-                || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))) {
+                || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())
+                || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Reviewer.toString()))) {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, NO_STEP));
             return;
         }
@@ -507,6 +514,14 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
 
     public StreamedContent getExportFile() {
         return exportFile;
+    }
+
+    public boolean isShowPendingStatusBtn() {
+        return showPendingStatusBtn;
+    }
+
+    public void setShowPendingStatusBtn(boolean showPendingStatusBtn) {
+        this.showPendingStatusBtn = showPendingStatusBtn;
     }
 
     public void setExportFile(StreamedContent exportFile) {

@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="设备开关机记录" />
+			</div>
+			<div class="ui-g-12 card ">
+				<h:form id="optRecordListForm" rendered="#{(not empty assetOperationRecordController)}">
+					<ui:include src="/portal/asset/searchDiv.xhtml"/>
+					<p:dataTable id="datalist" value="#{assetOperationRecordController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+								 selection="#{assetOperationRecordController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
+								 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+								 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+								 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{assetOperationRecordController.customRoleAuth.authSearch}">
+
+						<!-- <p:ajax event="rowSelect" update="createButton editButton deleteButton" /> -->
+						<p:ajax event="filter" listener="#{assetOperationRecordController.onFilter}" />
+
+						<p:column headerText="设备名称" filterBy="#{item.assetInfoName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfoName}" />
+						</p:column>
+						<p:column headerText="设备型号" filterBy="#{item.assetInfofunctionType}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfofunctionType}" />
+						</p:column>
+						<p:column headerText="设备编号" filterBy="#{item.assetInfodepartNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfodepartNum}" />
+						</p:column>
+						<p:column headerText="制造商序列号" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.serialNum}" />
+						</p:column>
+						<p:column headerText="所属科室" filterBy="#{item.assetInfoclinicalDeptName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.assetInfoclinicalDeptName}" />
+						</p:column>
+						<p:column headerText="住院号" filterBy="#{item.hospitalNumber}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.hospitalNumber}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="检查项" filterBy="#{item.operationName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.operationName}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="检查人" filterBy="#{item.operationByName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.operationByName}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="登记时间" sortBy="#{item.createDate}"  filterBy="#{item.createDate}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filtercreateDate" widgetVar="varFiltercreateDate" />
+							</f:facet>
+							<h:outputText value="#{item.createDate}" >
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+							</h:outputText>
+						</p:column>
+
+
+						<f:facet name="{Toolbar}">
+							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel" rendered="#{assetOperationRecordController.customRoleAuth.authExport}">
+								<p:dataExporter type="xlsx" target="datalist" fileName="assetOperationRecord"/>
+							</p:commandButton>
+							<!-- <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+                                actionListener="#{assetOptRecordController.prepareCreate}" update=":optRecordCreateDlg"
+                                oncomplete="PF('optRecordCreateDialog').show()" onclick="NurseSiteMaintain.on()"/>
+                            <p:commandButton id="editButton" actionListener="#{assetOptRecordController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+                                update=":optRecordEditDlg" oncomplete="PF('optRecordEditDialog').show()"
+                                disabled="#{empty assetOptRecordController.selected.id}" onclick="NurseSiteMaintain.on()"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
+                                actionListener="#{assetOptRecordController.delete}" update=":optRecordListForm:datalist"
+                                disabled="#{empty assetOptRecordController.selected.id}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                            </p:commandButton> -->
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</div>
+		</div>
+		<p:overlayPanel widgetVar="panelFiltercreateDate" for="optRecordListForm:datalist:filtercreateDate" dismissable="false">
+			<h:panelGrid columns="2">
+				<p:outputLabel value="#{msg.From}" />
+				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_endDate" pattern="MM/dd/yyyy  HH:mm:ss" showOn="button" showButtonPanel="false" navigator="true" mask="true"
+							size="12" locale="zh" />
+				<p:outputLabel value="#{msg.To}" />
+				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_endDate" pattern="MM/dd/yyyy  HH:mm:ss" showOn="button" showButtonPanel="false" navigator="true" mask="true"
+							size="12" locale="zh" />
+			</h:panelGrid>
+			<p:commandButton
+					onclick="setDateFilter('varDataList','varFiltercreateDate','varStartTimeFrom_endDate','varStartTimeTo_endDate'); PF('panelFiltercreateDate').hide();"
+					title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+			<p:commandButton onclick="PF('panelFiltercreateDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+		</p:overlayPanel>
+	</ui:define>
+</ui:composition>

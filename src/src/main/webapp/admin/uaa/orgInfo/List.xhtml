@@ -100,7 +100,20 @@
                                         <label class="label">#{msg.nameEn}</label>
                                         <p:inputText id="nameEn" value="#{orgInfoController.orgNameEn}" />
                                     </h:panelGroup>
-                                    <br/>
+                                    <h:panelGroup rendered="#{orgInfoController.countyArea}">
+                                        <label class="label">#{msg.address}</label>
+                                        <p:inputText id="address" value="#{orgInfoController.address}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{orgInfoController.countyArea}">
+                                        <label class="label">#{msg.contactPerson}</label>
+                                        <p:inputText id="contactPerson" value="#{orgInfoController.contactPerson}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{orgInfoController.countyArea}">
+                                        <label class="label">#{msg.contactPhone}</label>
+                                        <p:inputText id="contactPhone" value="#{orgInfoController.contactPhone}" validatorMessage="联系电话格式错误">
+                                            <f:validateRegex pattern="(^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$)|(^0\d{2,3}-?\d{7,8}$)" />
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <h:panelGroup rendered="#{orgInfoController.isShow}">
                                         <label class="label">#{msg.hospitalUcmid}</label>
                                         <p:inputText id="hospitalUcmid" value="#{orgInfoController.hospitalUcmid}" required="false" requiredMessage="#{msg.hospitalUcmid} #{msg.ValidationRequire}">
@@ -109,7 +122,7 @@
                                     </h:panelGroup>
                                     <br/>
                                     <p:spacer></p:spacer>
-                                    <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
+                                    <p:commandButton style="width: 90px;margin-top: -10px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
 
                                 </p:panelGrid>
 

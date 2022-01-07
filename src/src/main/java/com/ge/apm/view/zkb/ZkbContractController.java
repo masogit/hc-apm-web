@@ -100,6 +100,10 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     @Override
     public void delete() {
+        if(!zkbContractService.checkForDelete(selected)){
+            WebUtil.addSuccessMessage("合同已存在业务数据，不能删除！");
+            return;
+        }
         zkbContractService.deleteContract(this.selected,this.reason,currentUser);
         this.selected= null;
         this.reason="";
@@ -129,6 +133,30 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         }else{
             return "";
         }
+    }
+
+    public String qtyRender(String type, String contractType, String value){
+        if(userContextService.isZkbUser()) {
+            if(ZkbContract.ContractType.DI.toString().equals(contractType)){
+                if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
+                    ZkbContractQuotaLog.OrderTypeEnum.Probe.toString().equals(type) ||
+                    ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
+                ){
+                    return "-";
+                }
+            }else if(ZkbContract.ContractType.Biomed.toString().equals(contractType) || ZkbContract.ContractType.CCS.toString().equals(contractType)){
+                if(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString().equals(type)){
+                    return "-";
+                }
+            }else if(ZkbContract.ContractType.PCB.toString().equals(contractType) || "PCB MVS".equals(contractType)){
+                if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
+                    ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
+                ){
+                    return "-";
+                }
+            }
+        }
+        return value;
     }
 
 

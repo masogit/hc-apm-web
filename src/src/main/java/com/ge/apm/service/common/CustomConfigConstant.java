@@ -25,7 +25,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality");
     }
 
     //只读字段
@@ -179,6 +179,10 @@ public class CustomConfigConstant {
         allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
         allFields.put("installStatus", WebUtil.getMessage("installStatus"));
         allFields.put("geibTable_installedTime", WebUtil.getMessage("geibTable_installedTime"));
+        allFields.put("powerOnThreshold", WebUtil.getMessage("powerOnThreshold"));
+        allFields.put("rfId", WebUtil.getMessage("rfId"));
+        allFields.put("rfGroup", WebUtil.getMessage("rfGroup"));
+        allFields.put("assetQuality", WebUtil.getMessage("assetQuality"));
         return allFields;
     }
 
@@ -191,7 +195,7 @@ public class CustomConfigConstant {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
                 "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
-                "maitanance", "maitananceTel", "nationalStandardCode");
+                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality");
     }
 
     public static List<String> getAssetsDetailpageDetailFields() {
@@ -207,7 +211,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
-                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID");
+                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID","assetQuality");
     }
 
     public static List<String> getAssetsEditpageCodesFields() {

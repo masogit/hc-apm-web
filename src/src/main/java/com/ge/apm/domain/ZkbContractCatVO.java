@@ -46,6 +46,7 @@ public class ZkbContractCatVO extends ZkbContractCat{
         String str = "";
 
         str += (this.getSnNo() != null ? this.getSnNo().toString() : "");
+        str += (this.getContractNo() != null ? this.getContractNo().toString() : "");
         return str.hashCode();
     }
 }

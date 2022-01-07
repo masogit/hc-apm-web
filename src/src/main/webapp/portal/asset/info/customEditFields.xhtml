@@ -385,6 +385,35 @@
         </h:panelGroup>
     </c:if>
 
+
+
+<!--    電流閾值-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'powerOnThreshold')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.powerOnThreshold}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['powerOnThreshold'].required? '*':''}</span></label>
+            <p:inputText  id="powerOnThreshold" value="#{assetInfoEditController.selected.powerOnThreshold}" required="#{assetInfoEditController.customConfig.assetFields['powerOnThreshold'].required}"
+                          readonly="#{!assetInfoEditController.needEdit('powerOnThreshold')}" />
+        </h:panelGroup>
+    </c:if>
+    <!--    射频码-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'rfId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.rfId}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['rfId'].required? '*':''}</span></label>
+            <p:inputText  id="rfId" value="#{assetInfoEditController.selected.rfId}" required="#{assetInfoEditController.customConfig.assetFields['rfId'].required}"
+                          readonly="#{!assetInfoEditController.needEdit('rfId')}" />
+        </h:panelGroup>
+    </c:if>
+    <!--    射频码分组-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'rfGroup')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.rfGroup}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['rfGroup'].required? '*':''}</span></label>
+            <p:inputText  id="rfGroup" value="#{assetInfoEditController.selected.rfGroup}" required="#{assetInfoEditController.customConfig.assetFields['rfGroup'].required}"
+                          readonly="#{!assetInfoEditController.needEdit('rfGroup')}" />
+        </h:panelGroup>
+    </c:if>
+
+
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'parentAssetId')}" >
         <h:panelGroup>
             <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required? '*':''}</span></label>
@@ -851,6 +880,14 @@
         <h:panelGroup>
             <label class="label">#{msg.creatorUID}</label>
             <p:autoComplete id="createdBy" value="#{assetInfoEditController.selectCreatedBy(assetInfoEditController.selected.createdBy)}"  readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetQuality') and assetInfoEditController.countyArea}" ><!--设备性质-->
+        <h:panelGroup>
+            <label class="label">#{msg.assetQuality}</label>
+            <p:selectOneMenu id="assetQuality" value="#{assetInfoEditController.selected.assetQuality}" requiredMessage="#{msg.assetQuality} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetQuality')}">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetQuality')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
 </ui:composition>

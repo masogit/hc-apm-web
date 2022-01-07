@@ -54,6 +54,20 @@ public class ZkbAssetQrCodeFromIb {
     @Column(name = "update_date")
     private Date updateDate;
 
+    /**
+     * t:是 f：否  空值表示不确定
+     */
+    @Column(name = "ge_upload_flag")
+    private String geUploadFlag;
+
+    public String getGeUploadFlag() {
+        return geUploadFlag;
+    }
+
+    public void setGeUploadFlag(String geUploadFlag) {
+        this.geUploadFlag = geUploadFlag;
+    }
+
     public Date getCreatedDate() {
         return createdDate;
     }
