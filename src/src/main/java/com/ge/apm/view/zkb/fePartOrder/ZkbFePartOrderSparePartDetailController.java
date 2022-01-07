@@ -157,15 +157,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     private ZkbContractAssetService zkbContractAssetService;
 
-    /**
-     *  提示信息confirm message
-     */
-    private String confirmMessage;
-
-    /**
-     *  代理商确认本次扣除信息
-     */
-    private String thisDeductionMessage;
+    public static final String MESSAGE_TYPE = "messageOne";
 
     @Override
     protected void init() {
@@ -245,7 +237,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         this.selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnList);
         this.orderAnnotationChange();
-        this.genConfirmMessage();
     }
 
     /**
@@ -253,17 +244,19 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      * @date 2021/12/21
      * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
      */
-    public String genConfirmMessage(){
-
+    public String genConfirmMessage(String typeArge){
         Integer beforeAdjustQty = this.zkbFePartOrderAssetInfoRepository.fetchQty(this.selected.getId());
         List<ZkbFePartOrderAssetInfo> afterAdjustAssetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
         Integer adjustApplyCount = new Integer(0);
         adjustApplyCount = afterAdjustAssetInfoList.stream().mapToInt(ZkbFePartOrderAssetInfo ::getAssetQty).sum();
         String confirmMessage = new String();
+        String thisDeductionMessage = new String();
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if("SpareParts".equals(this.selected.getOrderType())){//备件
             if(ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){//高端机不扣名额
                 confirmMessage += "本次申请不扣除名额！";
+                thisDeductionMessage = "本次申请不扣除名额！";
+
             }else {
                 int applyCount = new Integer(0);
                 int curApplyCount = this.getApplyCount();
@@ -277,6 +270,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                     }
                     confirmMessage += "本次扣除"+curApplyCount+"个备件+人工+保养名额；";
                     confirmMessage += "备件+人工+保养剩余名额为"+spareArtificail+"。";
+                    thisDeductionMessage = "本次扣除"+curApplyCount+"个备件+人工+保养名额。";
                 }else if("CCS".equals(zkbContract.getContractType())
                         ||"Biomed".equals(zkbContract.getContractType())) {
                     Integer spareQuota = zkbContract.getSpareQuota()!= null?zkbContract.getSpareQuota():new Integer(0);
@@ -286,39 +280,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                     }
                     confirmMessage += "本次扣除"+curApplyCount+"个备件名额；";
                     confirmMessage += "备件剩余名额为"+spareQuota+"。";
+                    thisDeductionMessage = "本次扣除"+curApplyCount+"个备件名额。";
                 }
             }
         }
-        return confirmMessage.toString();
+        return ZkbFePartOrderSparePartDetailController.MESSAGE_TYPE.equals(typeArge)?confirmMessage:thisDeductionMessage;
     }
 
-    /**
-     * @autor by lyj 503277717
-     * @date 2021/12/21
-     * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
-     */
-    public String genThisDeductionMessage(){
-        thisDeductionMessage = new String();
-        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        if("SpareParts".equals(this.selected.getOrderType())){//备件
-            if(ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){//高端机不扣名额
-                thisDeductionMessage = "本次申请不扣除名额！";
-            }else {
-                int applyCount = this.getApplyCount();
-                if("DI".equals(zkbContract.getContractType())
-                        ||"PCB".equals(zkbContract.getContractType())
-                        ||"PCB MVS".equals(zkbContract.getContractType())) {
-                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() - applyCount);
-                    thisDeductionMessage = "本次扣除"+applyCount+"个备件+人工+保养名额。";
-                }else if("CCS".equals(zkbContract.getContractType())
-                        ||"Biomed".equals(zkbContract.getContractType())) {
-                    zkbContract.setSpareQuota(zkbContract.getSpareQuota() - applyCount);
-                    thisDeductionMessage = "本次扣除"+applyCount+"个备件名额。";
-                }
-            }
-        }
-        return thisDeductionMessage.toString();
-    }
+
     /**
      * 根据systemId 和 报修单号查询
      * @param systemId systemid
@@ -1093,19 +1062,4 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         return qty;
     }
 
-    public String getConfirmMessage() {
-        return confirmMessage;
-    }
-
-    public void setConfirmMessage(String confirmMessage) {
-        this.confirmMessage = confirmMessage;
-    }
-
-    public String getThisDeductionMessage() {
-        return thisDeductionMessage;
-    }
-
-    public void setThisDeductionMessage(String thisDeductionMessage) {
-        this.thisDeductionMessage = thisDeductionMessage;
-    }
 }
