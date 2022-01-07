@@ -18,6 +18,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -38,7 +40,8 @@ import java.util.stream.Collectors;
 @ManagedBean(name = "userContextService")
 @SessionScoped
 public class UserContextService implements Serializable {
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
     public static final Integer INTERNATIONAL_VERSION = 1;
@@ -211,11 +214,15 @@ public class UserContextService implements Serializable {
      * @return boolean
      */
     public boolean accessContain(){
-        WorkflowConfig bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).getBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (bySiteUID.getWhethertoenableunattended()==true && bySiteUID.getIsiotenabled()==true){
-            return true;
+        WorkflowConfig bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).getfins(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID!=null){
+            if (bySiteUID.getWhethertoenableunattended()==true && bySiteUID.getIsiotenabled()==true){
+                return true;
+            }
+            return false;
         }
         return false;
+
     }
 
 
