@@ -504,7 +504,7 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 	}
 
 	public Boolean isJiangNing(){
-		List<TenantInfo> tenantIfos = tenantInfoDao.getByName("南京市江宁医院");
+		List<TenantInfo> tenantIfos = tenantInfoDao.findByCustomTenant("2");
 		TenantInfo tf = tenantIfos.get(0);
 		String jiangNingUid = tf.getUid();
 		String currentTenantUid = currentUser.getTenantUID();
