@@ -267,7 +267,7 @@ public class UserContextService implements Serializable {
 
     public boolean accessContainsOfJiangNing(){
         TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
-        List<TenantInfo> tenantIfos = tenantInfoRepository.getByName("南京市江宁医院");
+        List<TenantInfo> tenantIfos = tenantInfoRepository.findByCustomTenant("2");
         if(tenantIfos == null || tenantIfos.size() == 0){
             return false;
         }
