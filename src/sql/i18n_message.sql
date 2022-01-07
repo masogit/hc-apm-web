@@ -947,6 +947,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('transaction','4','培训','Training',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('transaction','5','巡查回访','Inspection and Visit',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('transaction','7','论证','Argument',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('transaction','9','手术转播','Surgical Broadcast',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','authoritiesIsBlank','盘点权限不能为空!','Authorities cannot be null!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','assetAdjust.cost','设备计费情况','Equipment Charging',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','assetAdjust.stock','设备库存情况','Equipment Inventory',NULL,-1);
@@ -1562,6 +1563,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantType','0','普通租户','Ordinary Tenant',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantType','1','代理商租户','Agent Tenant',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantType','5','供应商租户','Supplier Tenant',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantType','6','县域租户','County Area Tenant',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','tenantType','租户类型','Tenant Type',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetStatus','1','正常','Normal',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('deviceStatus','0','正常','Normal',NULL,-1);
@@ -3149,7 +3151,9 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DailyCheck', '日常检查', 'Daily Check', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DailyCheckSettings', '日常检查设置', 'Daily Check Settings', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DailyCheckReport', '日常检查报表', 'Daily Check Report', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UseRegistrationCheckSettings', '使用登记检查设置', 'Use registration check settings', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'StartupAndShutdownRegistration', '开关机登记', 'Startup/Shutdown Registration', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UseRegistration', '使用登记', 'Use registration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BigScreenForEquipmentManagement', '设备管理大屏', 'Big Screen for Equipment Management', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DepartmentTransactionManagement', '科务管理', 'Department Transaction Management', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CTBulbTubePrediction', 'CT球管预测', 'CT Bulb Tube Prediction', NULL, '-1');
@@ -3419,6 +3423,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractAssetType','highMachine','超声高端机','highMachine',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractAssetType','lowMachine','超声低端机','lowMachine',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractAssetType','empty','N/A','N/A',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractAssetType','depot','depot','N/A',NULL,-1);
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractModifyType','OC','OC','OC',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractModifyType','NextYearBalance','次年结余','Next Year Balance',NULL,-1);
@@ -3610,6 +3615,16 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_zkbPoReturnType','Short Life','Short Life','Short Life',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_zkbPoReturnType','cancel','cancel','cancel',NULL,-1);
 
+-- 县域租户，备件归还类型
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('partReturnType','1','原备件好还','Good Parts Return',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('partReturnType','2','原备件坏还','Bad Parts Return',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('partReturnType','3','更换后坏还','Return Bad Parts After Replacement',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','returnNum','归还数量','Return Quantity',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','returnType','归还类型','Return Type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','returnTime','归还时间','Return Time',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','countyAreaPartReturnError','关单前县域租户备件必须全部归还','All spare parts must be returned',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','selectedReturnTypeError','未选择退货类型','No return type selected',NULL,-1);
+
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbUrgentType','t','紧急','urgent',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbUrgentType','f','不紧急','not urgent',NULL,-1);
 
@@ -3631,6 +3646,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoArtificialType','1','放射类','Radiology',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoArtificialType','2','超声高端机','Ultrasonic high-end machine',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoArtificialType','3','超声低端机','Ultrasonic low-end machine',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoArtificialType','depot','超声Depot产品','超声Depot产品',NULL,-1);
 
 
 
@@ -3774,6 +3790,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'partsCategoryMgr', '备件分类管理', 'Parts grouping', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'partsCategoryEdit', '备件分类编辑', 'Parts Grouping Edit', NULL, '-1');
 
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PartsEnglishName', '备件英文名称', 'Parts english name', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PartsItemCode', '备件号', 'Parts item code', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PartsUnitPrice', '标价', 'Parts Unit Price', NULL, '-1');
+
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'addChildNode', '新增子节点', 'Add child node', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CreateTopLevelNode', '创建顶层节点', 'Create top level node', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'namePath', '节点路径', 'name Path', NULL, '-1');
@@ -3848,7 +3869,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_systemIdError', '错误：SYSTEM ID不存在', '错误：SYSTEM ID不存在', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_loginNameError', '错误：账号不能重复', '错误：账号不能重复', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_loginNameNotExist', '错误：账号不存在', '错误：账号不存在', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_loginNameNotExist', 'APM用户不存在，请先在用户管理中创建用户', 'APM用户不存在，请先在用户管理中创建用户', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_emailError', '错误：邮箱必填', '错误：邮箱必填', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_configTypeError', '错误：类型值不对', '错误：类型值不对', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbKeyUserConfig_assetTypeError', '错误：资产值不对', '错误：资产值不对', NULL, '-1');
@@ -4097,7 +4118,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_assetTypeDi','XR','XR','XR',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_artificialType','High','超声高端机','High level machine',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_artificialType','Low','超声低端机','Low level machine',NULL,-1);
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_artificialType','Depot','超声Depot产品','超声Depot产品',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_partQualityIssue','Boot Up Issue','Boot Up Issue','Boot Up Issue',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_partQualityIssue','Cosmetic Issue','Cosmetic Issue','Cosmetic Issue',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_partQualityIssue','Disassembled','Disassembled','Disassembled',NULL,-1);
@@ -4284,7 +4305,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','logoutTime','登出时间','logout time',NULL,-1);
 --2021-05-24  end
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','unattended','IoT设备使用概览','unattended',NULL,-1);
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaOpType','ContractAdd','合同新增','ContractAdd',NULL,-1);
@@ -4311,7 +4332,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetRepair', '设备维修', 'assetRepair', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetMaintain', '设备保养', 'assetMaintain', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('auditGroupName', 'coreGroupMembers', '核心组成员', 'coreGroupMembers', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('auditGroupName', 'medicalTeamLeaderGroup', '医工组长分组', 'medicalTeamLeaderGroup', NULL, '-1');
     -- end
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'auditGroupConfiguration', '审核分组配置', 'auditGroupConfiguration', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaDeductType','Null','N/A','Null',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaDeductType','New','新逻辑扣减','New',NULL,-1);
@@ -4381,3 +4406,54 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('wechatCard', 'adverseEvents_supplement', '不良事件产品信息维护', 'adverseEvents supplement', NULL, -1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','adverseEvents_supplement','不良事件产品信息维护','adverseEvents supplement',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventsSupplementCard','adverseEvents_supplement.filled','待填写','To be filled',NULL,-1);
+
+-- 调剂名称设置页面新增字段
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','SwappedEquipmentNo','调剂编号','accounting Department',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','powerOnThreshold','开机电流阈值','start powerOnThreshold',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfGroup','射频码分组','rfGroup',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfId','射频码','rfId',NULL,-1);
+
+-- 探头信息维护 （是否有效isVaild）
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_isVaild', 'N', '无效', 'efficient', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_isVaild','Y','有效','invalid',NULL,-1);
+-- 探头信息维护 （价值类型valueType）
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType', 'HighValue', '高值', 'HighValue', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType','NormalValue','普通','NormalValue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType','SpecialValue','特殊','SpecialValue',NULL,-1);
+-- 探头信息维护
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZkbPartOrderCat','探头信息','ZkbPartOrderCat',NULL,-1);
+
+-- 无人值守
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WhetherToEnableUnattended', '是否启用无人值守', 'Whether To Enable Unattended', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AppointmentStatusLockedTime', '预约状态锁定时长', 'Appointment Status Locked Time', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'OutboundStatusCheckInterval', '出库状态检查间隔', 'Out bound Status Check Interval', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfGroup','射频码分组','rfGroup',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','rfId','射频码','rfId',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','powerOnThreshold','开机电流阈值','start powerOnThreshold',NULL,-1);
+      INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','currentId','电流ID','currentId',NULL,-1);
+
+--YHAAO-14128  加一个管理租户用户到APM中  审阅人
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType', 'Reviewer', '审阅人', 'Reviewer', null, -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoStepsRole', 'Reviewer', '审阅人', 'Reviewer', null, -1);
+-- 设备档案-基本信息添加新字段-设备性质
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetQuality','设备性质','Asset Quality',NULL,-1);
+-- 设备性质code值
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetQuality','1','GE全程支持的GE设备','GE equipment supported by GE',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetQuality','2','GE全程支持的非GE设备','Non-GE equipment supported by GE',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetQuality','3','GE远程支持/县域场地支持的设备','GE Remote Support/County Site Support Equipment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetQuality','4','县域全程支持的设备','Equipment supported throughout the county Site',NULL,-1);
+
+
+-- 县域租户工单为签到提示
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','NotSignedInTips','维修工单未签到','Not Signed In',NULL,-1);
+-- 县域租户工单添加新字段
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','siebleNumber','sieble单号','Sieble Number',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','callCenterNumber','呼叫中心单号','Call Center Number',NULL,-1);
+--县域租户用件类型
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','partUseType','用件类型','Part use type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('partUseType','1','保内用件','Parts under warranty',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('partUseType','2','保外用件','Out-of-warranty parts',NULL,-1);
+--入库类型
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('storage_type', 'newgoods', '新货入库', 'newgoods', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('storage_type','virtual','虚拟入库','virtual',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('storage_type','okay','好还入库','okay',NULL,-1);

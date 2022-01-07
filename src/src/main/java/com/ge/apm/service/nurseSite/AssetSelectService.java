@@ -95,6 +95,11 @@ public class AssetSelectService {
         return assetInfoList;
     }
 
+    public List<AssetInfo> loadSelectedAssetByConfigJN(String configParentId) {
+        List<AssetInfo> assetInfoList = assetInfoRepository.findAssetByMaintainConfigJNParentId(configParentId);
+        return assetInfoList;
+    }
+
     public OrgInfo getOrgInfoByUid(String uid) {
         return orgInfoRepository.findByUid(uid);
     }

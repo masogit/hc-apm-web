@@ -548,6 +548,20 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "UCMID")
     private String UCMID;
 
+
+    //射频码
+    @Column(name = "rf_id")
+    private String rfId;
+    //射频码分组
+    @Column(name = "rf_group")
+    private String rfGroup;
+    //开机电流阈值
+    @Column(name = "power_on_threshold")
+    private Double powerOnThreshold;
+    //电源ID
+    @Column(name = "current_id")
+    private String currentId;
+
     @Size(max = 256)
     @Column(name = "one_qr_code")
     private String oneQrCode;
@@ -595,6 +609,18 @@ public class AssetInfo implements ChineseName,Serializable {
     // 年保养次数
     @Column(name = "annual_maintenance_times")
     private Integer annualMaintenanceTimes;
+
+    // 设备性质
+    @Column(name = "asset_quality")
+    private Integer assetQuality;
+
+    //无人值守设备状态  0:关机  1:待机 2:在用
+    @Column(name = "running_status")
+    private Integer runningStatus;
+
+    //1- 正常可借用， 2-入库待保洁
+    @Column(name = "shared_status")
+    private Integer sharedStatus;
 
     @Transient
     private int lineNum;
@@ -653,6 +679,20 @@ public class AssetInfo implements ChineseName,Serializable {
     private String dashboardPage;
     @Transient
     private List<String> tags = new ArrayList<>();
+
+    @Transient
+    private String sharedAssetSwapIndex;
+
+    public String getSharedAssetSwapIndexId() {
+        return sharedAssetSwapIndexId;
+    }
+
+    public void setSharedAssetSwapIndexId(String sharedAssetSwapIndexId) {
+        this.sharedAssetSwapIndexId = sharedAssetSwapIndexId;
+    }
+
+    @Transient
+    private String sharedAssetSwapIndexId;
 
     public String getDashboardPage() {
         return dashboardPage;
@@ -2229,6 +2269,30 @@ public class AssetInfo implements ChineseName,Serializable {
         }
     }
 
+    public Double getPowerOnThreshold() {
+        return powerOnThreshold;
+    }
+
+    public void setPowerOnThreshold(Double powerOnThreshold) {
+        this.powerOnThreshold = powerOnThreshold;
+    }
+
+    public String getRfId() {
+        return rfId;
+    }
+
+    public void setRfId(String rfId) {
+        this.rfId = rfId;
+    }
+
+    public String getRfGroup() {
+        return rfGroup;
+    }
+
+    public void setRfGroup(String rfGroup) {
+        this.rfGroup = rfGroup;
+    }
+
     public String getUCMID() {
       return UCMID;
     }
@@ -2299,5 +2363,32 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setAnnualMaintenanceTimes(Integer annualMaintenanceTimes) {
         this.annualMaintenanceTimes = annualMaintenanceTimes;
+    }
+    public String getSharedAssetSwapIndex() { return sharedAssetSwapIndex; }
+
+    public void setSharedAssetSwapIndex(String sharedAssetSwapIndex) { this.sharedAssetSwapIndex = sharedAssetSwapIndex; }
+
+    public Integer getRunningStatus() {
+        return runningStatus;
+    }
+
+    public void setRunningStatus(Integer runningStatus) {
+        this.runningStatus = runningStatus;
+    }
+
+    public Integer getAssetQuality() {
+        return assetQuality;
+    }
+
+    public void setAssetQuality(Integer assetQuality) {
+        this.assetQuality = assetQuality;
+    }
+
+    public Integer getSharedStatus() {
+        return sharedStatus;
+    }
+
+    public void setSharedStatus(Integer sharedStatus) {
+        this.sharedStatus = sharedStatus;
     }
 }

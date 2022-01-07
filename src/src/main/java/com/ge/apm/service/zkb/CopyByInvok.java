@@ -19,11 +19,12 @@ public class CopyByInvok {
     public static String F = "f";
     public static String NORMAL_Y = "Y";
     public static String NORMAL_N = "N";
-    public static String FOUR_TO_ONE = "fourToOne";
+    public static String FOUR_TO_ONE = "FourInOne";
     public static String NORMAL_ONE = "1";
     public static String NORMAL_ZERO = "0";
     public static String NORMAL_TWO = "2";
     public static String NORMAL_THREE = "3";
+    public static String NORMAL_DEPOT = "depot";
 
     public static <T> T translateField(Object souce, Class<T> target) throws Exception {
         T tarObj = target.newInstance();

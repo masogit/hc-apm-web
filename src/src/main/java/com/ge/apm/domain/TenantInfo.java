@@ -95,7 +95,7 @@ public class TenantInfo implements Serializable {
     private Integer passwordLifeTime; //密码有效天数
     
     @Column(name = "type")
-    private Integer type = 0;//0、普通租户，1、代理商租户 2、临时租户 3,zkb租户 4, ztb租户
+    private Integer type = 0;//0、普通租户，1、代理商租户 2、临时租户 3,zkb租户 4, ztb租户 6, 县域租户
 
     @Column(name = "is_insulate")
     private Boolean isInsulate;
@@ -166,6 +166,17 @@ public class TenantInfo implements Serializable {
 
     @Column(name = "custom_tenant")
     private String customTenant;//有定制化需求的租户可以使用该字段作为租户标识 1、仁济
+
+    @Column(name="is_enables_adverse_events" )
+    private Boolean isEnablesAdverseEvents; // 控制不良事件相关微信卡片是否显示 （true/false 默认false不显示）
+
+    public Boolean getIsEnablesAdverseEvents() {
+        return isEnablesAdverseEvents==null?Boolean.FALSE:isEnablesAdverseEvents;
+    }
+
+    public void setIsEnablesAdverseEvents(Boolean isEnablesAdverseEvents) {
+        this.isEnablesAdverseEvents = isEnablesAdverseEvents;
+    }
 
     public String getCustomTenant() {
         return customTenant;

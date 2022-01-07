@@ -17,6 +17,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.ArrivalSupplierReportService;
 import com.ge.apm.service.asset.SupplierService;
@@ -55,6 +57,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 public class AssetArrivedListController extends GenericCRUDUUIDController<ArrivalList> {
 
     private ArrivalListRepository dao = null;
+    private TenantInfoRepository tenantInfoDao = null;
 
     private ArrivalSupplierReportService arrivalSupplierReportService;
     private AssetInstallationService aiService;
@@ -73,6 +76,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListRepository.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         arrivalSupplierReportService = WebUtil.getBean(ArrivalSupplierReportService.class);
@@ -256,12 +260,35 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     private void doExportToPdf(Map<String, Object> info) {
         try {
             String woXml = getWoXml(info);
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            String tenantUid = currentUserAccount.getTenantUID();
+            List<TenantInfo> tanentIfos = tenantInfoDao.getByName("浙江大学医学院附属邵逸夫医院");
+            String tanentInfoUid = tanentIfos.get(0).getUid();
+            File xsl = null;
+            if(tenantUid.equals(tanentInfoUid)){
+                 xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+                    getResource("../../portal/pdf/arrivalItem2.xsl").getPath());
+            }else{
+                 xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+                        getResource("../../portal/pdf/arrivalItem.xsl").getPath());
+            }
 
-            File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
-                    getResource("../../portal/pdf/arrivalItem.xsl").getPath());
 
+//
+//            File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+//                    getResource("../../portal/pdf/arrivalItem.xsl").getPath());
+//
             File conf = new File(WorkOrderReportExportController.class.getClassLoader().
                     getResource("../../portal/pdf/fop.xml").getPath());
+//            String path1 = WorkOrderReportExportController.class.getClassLoader().getResource("").getPath();
+//            path1 = path1.substring(1);
+//            String path2 = path1+"report/pdf/arrivalItem.xsl";
+//            File xsl = new File(path2);
+//
+//            String path3 = WorkOrderReportExportController.class.getClassLoader().getResource("").getPath();
+//            path3 = path3.substring(1);
+//            String path4 = path3+"report/pdf/fop.xml";
+//            File conf = new File(path4);
 
             FopFactory fopFactory = FopFactory.newInstance(conf);
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();

@@ -5,19 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
@@ -29,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * Created by 503035627 on 2018/3/7.
  */
 @Entity
-@Table(name = "nurse_site_maintain_config_item")
+@Table(name = "nurse_site_maintain_config_item",indexes = {@Index(columnList = "parent_id"),@Index(columnList = "asset_uid")})
 public class NurseSiteMaintainConfigItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;

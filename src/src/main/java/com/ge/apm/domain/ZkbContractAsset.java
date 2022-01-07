@@ -17,7 +17,7 @@ public class ZkbContractAsset {
     private static final long serialVersionUID = 1L;
 
     public enum AssetTypeEnum{
-        highMachine,lowMachine,empty
+        highMachine,lowMachine,empty,depot
     }
 
     @Id
@@ -75,6 +75,20 @@ public class ZkbContractAsset {
      */
     @Column(name = "train_reason_flag")
     private String trainReasonFlag;
+
+    /**
+     * t f
+     */
+    @Column(name = "support_maintain_flag")
+    private String supportMaintainFlag;
+
+    public String getSupportMaintainFlag() {
+        return supportMaintainFlag;
+    }
+
+    public void setSupportMaintainFlag(String supportMaintainFlag) {
+        this.supportMaintainFlag = supportMaintainFlag;
+    }
 
     public String getTrainReasonFlag() {
         return trainReasonFlag;

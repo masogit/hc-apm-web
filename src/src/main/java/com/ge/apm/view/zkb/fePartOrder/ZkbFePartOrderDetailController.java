@@ -98,6 +98,16 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     private Map<String, String> i18Map;
 
     private ZkbContractAssetService zkbContractAssetService;
+
+    /**
+     *  提示信息confirm message
+     */
+    private String confirmMessage;
+
+    /**
+     *  代理商确认本次扣除信息
+     */
+    private String thisDeductionMessage;
     @Override
     protected void init() {
         super.init();
@@ -166,6 +176,40 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         super.prepareEdit();
         this.selected = this.zkbFePartOrderRepository.findById(this.id);
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
+        this.confirmMessage =this.genConfirmMessage();
+    }
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
+     */
+    public String genConfirmMessage(){
+        String confirmMessage = new String();
+        ZkbContract zct = this.contractList.get(0);
+        ZkbFePartOrder zfpo = this.selected;
+        if("ManMade".equals(this.selected.getOrderType())){//人工  新逻辑扣减     //  旧逻辑扣联合名额
+            if("false".equals(this.selected.getSubtractTotalStatus())){
+                confirmMessage += "本次申请不扣除名额！";
+                thisDeductionMessage = "本次申请不扣除名额！";
+            }else{
+                if ("DI".equals(zct.getContractType())
+                        || "PCB".equals(zct.getContractType())
+                        || "PCB MVS".equals(zct.getContractType())) {
+                    confirmMessage += "本次扣除1个备件+人工+保养名额；";
+                    thisDeductionMessage = "本次扣除1个备件+人工+保养名额。";
+                    String spareArtificail = zct.getSpareArtificail()!= null?zct.getSpareArtificail().toString():"0";
+                    confirmMessage += "备件+人工+保养剩余名额为"+spareArtificail+"。";
+                } else if ("CCS".equals(zct.getContractType())
+                        || "Biomed".equals(zct.getContractType())) {
+                    confirmMessage += "本次扣除1个人工支持名额；";
+                    thisDeductionMessage = "本次扣除1个人工支持名额。";
+                    String geArtificialSupportTimes = zct.getGeArtificialSupportTimes()!= null?zct.getGeArtificialSupportTimes().toString():"0";
+                    confirmMessage += "人工支持剩余名额为"+geArtificialSupportTimes+"。";
+                }
+            }
+        }
+        return confirmMessage.toString();
     }
 
     /**
@@ -185,7 +229,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             this.contractError = true;
             return;
         }
-        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         Boolean fiveNineNine = zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             contractError = true;
@@ -359,5 +402,21 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 
     public void setContractError(Boolean contractError) {
         this.contractError = contractError;
+    }
+
+    public String getConfirmMessage() {
+        return confirmMessage;
+    }
+
+    public void setConfirmMessage(String confirmMessage) {
+        this.confirmMessage = confirmMessage;
+    }
+
+    public String getThisDeductionMessage() {
+        return thisDeductionMessage;
+    }
+
+    public void setThisDeductionMessage(String thisDeductionMessage) {
+        this.thisDeductionMessage = thisDeductionMessage;
     }
 }

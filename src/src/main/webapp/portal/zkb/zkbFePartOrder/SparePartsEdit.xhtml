@@ -212,6 +212,13 @@
             </p:fieldset>
 
             <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingAssignment')}">
+
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <h:outputText id="thisDeductionMessage" style="color: red;font-size: 14px;" value="#{zkbFePartOrderSparePartDetailController.genThisDeductionMessage()}" />
+                    </h:panelGroup>
+                </p:panelGrid>
+
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingAssignment')}">
                         <label class="label">#{msg.zkbFePartOrder_tenantAssignUser}*：</label>
@@ -258,9 +265,9 @@
                         <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoDate}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
-<!--                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.hasOrderModifyRight()}">-->
-<!--                        <p:commandButton process="@this" icon="ui-icon-pencil" value="下单信息修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>-->
-<!--                    </h:panelGroup>-->
+                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.hasOrderModifyRight()}">
+                        <p:commandButton process="@this" icon="ui-icon-pencil" value="下单信息修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>
+                    </h:panelGroup>
                 </p:panelGrid>
                 <p:dataTable id="zkbFePartOrderAssetInfoList_APM" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item"
                              widgetVar="zkbFePartOrderAssetInfoList_APM" selectionMode="single"
@@ -287,9 +294,9 @@
                 </p:dataTable>
             </p:fieldset>
             <p:fieldset id="geAdminFieldset" legend="FE归还信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
-<!--                <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.hasOrderReturnModifyRight()}">-->
-<!--                    <p:commandButton process="@this" icon="ui-icon-pencil" value="FE归还信息修改" update="growl zkbPartOrderRetrunModifyDlg"  oncomplete="PF('zkbPartOrderRetrunModifyDlg').show()"/>-->
-<!--                </h:panelGroup>-->
+                <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.hasOrderReturnModifyRight()}">
+                    <p:commandButton process="@this" icon="ui-icon-pencil" value="FE归还信息修改" update="growl zkbPartOrderRetrunModifyDlg"  oncomplete="PF('zkbPartOrderRetrunModifyDlg').show()"/>
+                </h:panelGroup>
                 <p:dataTable id="zkbFePartOrderReturnList" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderReturnList}" var="item"
                              widgetVar="zkbFePartOrderReturnList" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn}"
                              lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
@@ -325,8 +332,13 @@
                 </p:dataTable>
             </p:fieldset>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{msg.submit}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.saveAndToListPage}" style="float:left"/>
-            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left"/>
-            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="暂不订购" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.supplierReject}" style="float:left"/>
+               <p:commandButton id="waitingAssignment" rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left">
+                    <p:confirm header="请确认扣除名额信息"  message="#{zkbFePartOrderSparePartDetailController.genConfirmMessage()}" icon="ui-icon-alert"/>
+                </p:commandButton>
+<!--
+                <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="同意订购" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left"/>
+-->
+                <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="暂不订购" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.supplierReject}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" value="同意" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.commercialAccept(param['zkbFePartOrderSparePartsEditForm:commercialComment'])}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" value="不同意" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.commercialReject}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderSparePartsEditForm"  validateClient="true" action="#{zkbFePartOrderSparePartDetailController.fullApmInfo}" style="float:left"/>

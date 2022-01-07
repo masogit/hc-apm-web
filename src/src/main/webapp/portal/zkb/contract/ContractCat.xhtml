@@ -6,13 +6,22 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="zkbContractCatEditDlg" widgetVar="zkbContractCatEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="高值探头操作"  width="300" height="430">
-
+    <p:dialog id="zkbContractCatEditDlg" widgetVar="zkbContractCatEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="高值探头操作"  width="450" height="500">
         <h:form id="zkbContractCatEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                 <h:panelGroup>
                     <label class="label">sn编号*</label>
-                    <p:inputText required="true" requiredMessage="sn编号 不能为空" value="#{zkbContractEditController.zkbContractCatSelected.snNo}" />
+                    <p:panelGrid columns="2" layout="grid">
+                        <h:panelGroup >
+                            <p:inputText id="snNo" disabled="#{zkbContractEditController.fourInOneFlag}"  required="true" requiredMessage="sn编号不能为空" value="#{zkbContractEditController.zkbContractCatSelected.snNo}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:selectBooleanCheckbox value="#{zkbContractEditController.fourInOneFlag}" itemLabel="是否选择四合一" style="float: left">
+                                <p:ajax update="snNo" listener="#{zkbContractEditController.fourInOneFlagChange}"/>
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:outputLabel style="color: red;font-weight:bold;margin-left: 15px;" value="四合一请勾选单选框"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">状态*</label>
@@ -28,11 +37,12 @@
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbContractEditController.saveCat}" update=":growl :zkbContractEditForm:zkbContractCatDatalist"
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbContractEditController.saveCat}" update=":growl :zkbContractEditForm:zkbContractCatDatalist :zkbContractCatEditDlg"
                  icon="ui-icon-check" oncomplete="PF('zkbContractCatEditDlg').hide()" />
-            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbContractCatEditDlg').hide()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbContractCatEditDlg').hide()"  />
         </h:form>
     </p:dialog>
     
 </ui:composition>
 </html>
+

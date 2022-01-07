@@ -139,6 +139,15 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "wo_direct_reception")
     private Boolean woDirectReception ; // 设备直接验收(接收)
 
+    @Column(name = "wo_spare_parts_sign")
+    private Boolean woSparePartsSign ; // 新增备件是否需要签名
+
+    @Column(name = "is_mobile_phone_file_review")
+    private Boolean isMobilePhoneFileReview ; // 手机建档是否需要审核
+
+    @Column(name = "is_nursing_staff_code_ledger")
+    private Boolean isNursingStaffCodeLedger ; // 护理人员扫码是否跳转至台账
+
     @Column(name = "is_pm_take_order_enabled")
     private Boolean isPmTakeOrderEnabled; //是否允许抢单
 
@@ -229,6 +238,29 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "measure_dispatch_user_name2")
     private String measureDispatchUserName2;
 
+    //出库状态检查间隔
+    @Column(name = "outbound_status_check_interval")
+    private Integer outboundstatuscheckinterval ;
+    //预约状态锁定时长
+    @Column(name = "appointment_status_locked_time")
+    private Integer appointmentstatuslockedtime ;
+    //是否启用无人值守
+    @Column(name = "whether_to_enable_unattended ")
+    private Boolean whethertoenableunattended;
+    //是否启用院间借调
+    @Column(name = "enable_site_to_site_allocation")
+    private Boolean enableSiteToSiteAllocation;
+
+    public Boolean getWhethertoenableunattended() {
+        if(whethertoenableunattended ==null){
+            return false;
+        }
+        return whethertoenableunattended;
+    }
+
+    public void setWhethertoenableunattended(Boolean whethertoenableunattended) {
+        this.whethertoenableunattended = whethertoenableunattended;
+    }
 
     /***
      * 调剂相关
@@ -316,6 +348,49 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "other_clinical_dept_head_weight")
     private Integer otherClinicalDeptHeadWeight = 1;//院区下的其他科室主任
+
+    public Boolean getWoSparePartsSign() {
+        return woSparePartsSign;
+    }
+
+    public void setWoSparePartsSign(Boolean woSparePartsSign) {
+        this.woSparePartsSign = woSparePartsSign;
+    }
+
+    public Boolean getIsMobilePhoneFileReview() {
+        return isMobilePhoneFileReview == null ? false : isMobilePhoneFileReview;
+    }
+
+    public void setIsMobilePhoneFileReview(Boolean isMobilePhoneFileReview) {
+        this.isMobilePhoneFileReview = isMobilePhoneFileReview;
+    }
+
+
+    public Boolean getIsNursingStaffCodeLedger() {
+        return isNursingStaffCodeLedger == null ? false : isNursingStaffCodeLedger;
+    }
+
+    public void setIsNursingStaffCodeLedger(Boolean isNursingStaffCodeLedger) {
+        this.isNursingStaffCodeLedger = isNursingStaffCodeLedger;
+    }
+
+
+    public Integer getOutboundstatuscheckinterval() {
+        return outboundstatuscheckinterval;
+    }
+
+    public void setOutboundstatuscheckinterval(Integer outboundstatuscheckinterval) {
+        this.outboundstatuscheckinterval = outboundstatuscheckinterval;
+    }
+
+    public Integer getAppointmentstatuslockedtime() {
+        return appointmentstatuslockedtime;
+    }
+
+    public void setAppointmentstatuslockedtime(Integer appointmentstatuslockedtime) {
+        this.appointmentstatuslockedtime = appointmentstatuslockedtime;
+    }
+
 
     public Boolean getWoDirectReception() {
         return woDirectReception == null ? false : woDirectReception;
@@ -1236,6 +1311,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setEnableUpdateSwitchingTime(Boolean enableUpdateSwitchingTime) {
         this.enableUpdateSwitchingTime = enableUpdateSwitchingTime;
+    }
+
+    public Boolean getEnableSiteToSiteAllocation() {
+        return enableSiteToSiteAllocation;
+    }
+
+    public void setEnableSiteToSiteAllocation(Boolean enableSiteToSiteAllocation) {
+        this.enableSiteToSiteAllocation = enableSiteToSiteAllocation;
     }
 
     /**
