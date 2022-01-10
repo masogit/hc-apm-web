@@ -52,6 +52,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     BlobObjectRepository blobObjectRepository;
 
     /**
+     * 设备
+     */
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
+    /**
      * 归还数量
      */
     @Autowired
@@ -285,6 +290,30 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 最大导入行数
      */
     public static final int EXCEL_FE_PART_ORDER_IMPORT_MAX_ROW = 10000;
+
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2022/1/7
+    */
+    public boolean checkAsset(String sysId) {
+        AssetInfo assetInfo = assetInfoRepository.getBySystemIdNoCondition(sysId);
+        if (assetInfo==null) {
+            return false;
+        }
+        boolean checkResult = true;
+        if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
+            checkResult = false;
+        }
+        if(!assetInfo.getIsValid()){
+            checkResult = false;
+        }
+        if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
+            checkResult = false;
+        }
+        return checkResult;
+    }
+
 
     /**
      * 给申请单添加单号和索引
