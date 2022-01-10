@@ -138,7 +138,28 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbContractLogRepository.save(zkbContractLog);
     }
 
-
+    /**
+     * @autor by lyj 503277717
+     * @date 2022/1/7
+     * 检验设备是否报废
+     */
+    public boolean checkAsset(String sysId) {
+        AssetInfo assetInfo = assetInfoRepository.getBySystemIdNoCondition(sysId);
+        if (assetInfo==null) {
+            return false;
+        }
+        boolean checkResult = true;
+        if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
+            checkResult = false;
+        }
+        if(!assetInfo.getIsValid()){
+            checkResult = false;
+        }
+        if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
+            checkResult = false;
+        }
+        return checkResult;
+    }
     public List<HashMap<String, Object>> getQueryWorkFlowList(V2_WorkOrder v2_workOrder,String tenantUID){
         List<HashMap<String, Object>> v2_listHashMap = new ArrayList<>();
         List<SearchFilter> assetFilters = new ArrayList<>();

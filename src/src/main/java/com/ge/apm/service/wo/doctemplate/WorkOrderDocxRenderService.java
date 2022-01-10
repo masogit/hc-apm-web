@@ -121,6 +121,16 @@ public class WorkOrderDocxRenderService {
 
         mapESign(source, target, "signature", "signature_title", "审核人签名： ");
         mapESign(source, target, "ack_signature", "ack_signature_title", "验收人签名： ");
+        if (source.containsKey("auditSignatureList")) {
+           List<String> auditSignatures= (List)source.get("auditSignatureList");
+           if (auditSignatures!=null && !auditSignatures.isEmpty()){
+               for (String storageId:auditSignatures){
+                   if (storageId!=null){
+                       mapESignSignature(storageId, target,"auditSignatureList", "audit_signature_title", "备件审核签名： ");
+                   }
+               }
+           }
+        }
 
         putWorkOrderStep(target, (String) source.get("woId"));
         putServiceRequestMessage(target, (String) source.get("woId"));
@@ -144,6 +154,16 @@ public class WorkOrderDocxRenderService {
             target.put(eSignTitleKey, "");
         }
     }
+    private void mapESignSignature(String storageId,Map<String, Object> target, String key, String eSignTitleKey, String eSignTitleValue) {
+        byte[] blob = getBlobSignature( storageId);
+        if (blob != null) {
+            target.put(key, new PictureRenderData(100, 75, "mock.png", blob));
+            target.put(eSignTitleKey, eSignTitleValue);
+        } else {
+            target.put(key, EMPTY_PICTURE);
+            target.put(eSignTitleKey, "");
+        }
+    }
 
     private byte[] getBlob(Map<String, Object> map, String key) {
         if (map.containsKey(key)) {
@@ -154,6 +174,16 @@ public class WorkOrderDocxRenderService {
                 } catch (IOException ignore) {
                     //ignore
                 }
+            }
+        }
+        return null;
+    }
+    private byte[] getBlobSignature(String storageId) {
+        if (StringUtils.isNotEmpty(storageId)) {
+            try (InputStream stream = blobService.getBlobObjectByStorageId(storageId).getStream();) {
+                return IOUtils.toByteArray(stream);
+            } catch (IOException ignore) {
+                //ignore
             }
         }
         return null;

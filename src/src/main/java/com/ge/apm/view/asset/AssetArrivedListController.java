@@ -262,7 +262,8 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             String woXml = getWoXml(info);
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             String tenantUid = currentUserAccount.getTenantUID();
-            List<TenantInfo> tanentIfos = tenantInfoDao.getByName("浙江大学医学院附属邵逸夫医院");
+//            List<TenantInfo> tanentIfos = tenantInfoDao.getByName("浙江大学医学院附属邵逸夫医院");
+            List<TenantInfo> tanentIfos = tenantInfoDao.findByCustomTenant("3");
             String tanentInfoUid = tanentIfos.get(0).getUid();
             File xsl = null;
             if(tenantUid.equals(tanentInfoUid)){

@@ -142,6 +142,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "wo_spare_parts_sign")
     private Boolean woSparePartsSign ; // 新增备件是否需要签名
 
+    @Column(name = "is_jump_to_work_bench_after_orders")
+    private Boolean isJumpToWorkBenchAfterOrders ; // 接单后是否跳转至工作台
+
     @Column(name = "is_mobile_phone_file_review")
     private Boolean isMobilePhoneFileReview ; // 手机建档是否需要审核
 
@@ -250,6 +253,17 @@ public class WorkflowConfig implements Serializable {
     //是否启用院间借调
     @Column(name = "enable_site_to_site_allocation")
     private Boolean enableSiteToSiteAllocation;
+    //是否启用小型物联网设备(急救类)服务
+    @Column(name = "is_io_tenabled")
+    private Boolean isiotenabled;
+
+    public Boolean getIsiotenabled() {
+        return isiotenabled;
+    }
+
+    public void setIsiotenabled(Boolean isiotenabled) {
+        this.isiotenabled = isiotenabled;
+    }
 
     public Boolean getWhethertoenableunattended() {
         if(whethertoenableunattended ==null){
@@ -349,6 +363,28 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "other_clinical_dept_head_weight")
     private Integer otherClinicalDeptHeadWeight = 1;//院区下的其他科室主任
 
+    @Column(name = "external_expenses")
+    private Boolean externalExpenses ; // 外修费用
+
+    @Column(name = "other_expenses")
+    private Boolean otherExpenses ; // 其他费用
+
+    public Boolean getExternalExpenses() {
+        return externalExpenses == null ? false : externalExpenses;
+    }
+
+    public Boolean getOtherExpenses() {
+        return otherExpenses == null ? false : otherExpenses;
+    }
+
+    public void setExternalExpenses(Boolean externalExpenses) {
+        this.externalExpenses = externalExpenses;
+    }
+
+    public void setOtherExpenses(Boolean otherExpenses) {
+        this.otherExpenses = otherExpenses;
+    }
+
     public Boolean getWoSparePartsSign() {
         return woSparePartsSign;
     }
@@ -356,6 +392,10 @@ public class WorkflowConfig implements Serializable {
     public void setWoSparePartsSign(Boolean woSparePartsSign) {
         this.woSparePartsSign = woSparePartsSign;
     }
+
+    public Boolean getIsJumpToWorkBenchAfterOrders() { return isJumpToWorkBenchAfterOrders; }
+
+    public void setIsJumpToWorkBenchAfterOrders(Boolean jumpToWorkBenchAfterOrders) { isJumpToWorkBenchAfterOrders = jumpToWorkBenchAfterOrders; }
 
     public Boolean getIsMobilePhoneFileReview() {
         return isMobilePhoneFileReview == null ? false : isMobilePhoneFileReview;

@@ -18,6 +18,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -38,7 +40,8 @@ import java.util.stream.Collectors;
 @ManagedBean(name = "userContextService")
 @SessionScoped
 public class UserContextService implements Serializable {
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
     public static final Integer INTERNATIONAL_VERSION = 1;
@@ -204,6 +207,24 @@ public class UserContextService implements Serializable {
         OrgInfo org = WebUtil.getBean(OrgInfoRepository.class).getByUid(getCurrentUserAccount().getOrgInfoUID());
         return  null == org.getOrgType() ? false : 4 == org.getOrgType();
     }
+    /**
+     * 判断当前登录是
+     * 该租户已开启了无人值守服务
+     * 该租户已开启了小型物联网设备(急救类)服务
+     * @return boolean
+     */
+    public boolean accessContain(){
+        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID!=null){
+            if (bySiteUID.get(0).getWhethertoenableunattended()==true && bySiteUID.get(0).getIsiotenabled()==true){
+                return true;
+            }
+            return false;
+        }
+        return false;
+
+    }
+
 
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
@@ -253,7 +274,7 @@ public class UserContextService implements Serializable {
 
     public boolean accessContainsOfJiangNing(){
         TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
-        List<TenantInfo> tenantIfos = tenantInfoRepository.getByName("南京市江宁医院");
+        List<TenantInfo> tenantIfos = tenantInfoRepository.findByCustomTenant("2");
         if(tenantIfos == null || tenantIfos.size() == 0){
             return false;
         }

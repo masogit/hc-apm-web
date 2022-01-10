@@ -282,6 +282,24 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">接单后是否跳转至工作台</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isJumpToWorkBenchAfterOrders}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">#{msg.ExternalExpenses_xlsx}</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.externalExpenses}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">#{msg.OtherExpenses_xlsx}</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.otherExpenses}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 
@@ -539,7 +557,12 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">是否启用小型物联网设备(急救类)服务</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isiotenabled}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 
