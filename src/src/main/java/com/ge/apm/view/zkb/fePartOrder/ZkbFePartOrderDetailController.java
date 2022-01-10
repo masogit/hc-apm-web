@@ -2,10 +2,7 @@ package com.ge.apm.view.zkb.fePartOrder;
 
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbContract;
-import com.ge.apm.domain.ZkbFePartOrder;
-import com.ge.apm.domain.ZkbFePartOrderUserConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.zkb.ZkbContractAssetService;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
@@ -20,7 +17,6 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -223,6 +219,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.zkbFePartOrderService.fullInfoBySystemId(this.selected, systemId);
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.contractError = false;
+        //验证设备状态
+        if (!zkbFePartOrderService.checkAsset(systemId)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("设备已报废，不能继续申请！",""));
+            return;
+        }
+
         //未匹配到合同
         if (CollectionUtils.isEmpty(this.contractList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_notFindContractError"));
@@ -234,6 +236,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             contractError = true;
         }
     }
+
 
     public String backList() {
         return this.zkbFePartOrderService.backList(this.queryStatus);
