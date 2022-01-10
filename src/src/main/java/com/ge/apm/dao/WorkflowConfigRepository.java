@@ -55,6 +55,6 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
     @Query(value="select * from workflow_config where generate_method = 1 and prefix is not null and tenant_uid = ?1",nativeQuery = true)
     List<WorkflowConfig> findAllPrefixByTenantUID(String tenantUID);
 
-    @Query(value="SELECT  wo.* FROM asset_info as ai INNER JOIN workflow_config as wo ON ai.uid = wo.site_uid where ai.site_uid = ?1 ",nativeQuery = true)
-    WorkflowConfig getfins(String siteUID);
+//    @Query(value="select * from workflow_config where site_uid = ?1",nativeQuery = true)
+//    List<WorkflowConfig> findBySiteUID(String siteUID);
 }
