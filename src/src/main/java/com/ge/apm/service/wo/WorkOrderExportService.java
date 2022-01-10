@@ -78,7 +78,8 @@ public class WorkOrderExportService {
     private WorkOrderReportMapper worDao;
     @Autowired
     private ServiceRequestApiService serviceRequestApiService;
-
+    @Autowired
+    private MultiLevelApprovalRepository multiLevelApprovalRepository;
 
     public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg,OrgInfo clinicalDepte){
         String token = UserContextService.getAccessToken();
@@ -374,6 +375,16 @@ public class WorkOrderExportService {
             }
             if(workOrderExportPojo.getAckSignature() != null){
                 workOrderMap.put("ack_signature", workOrderExportPojo.getAckSignature());
+            }
+            if(workOrderExportPojo.getId()!=null){
+                List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(workOrderExportPojo.getId());
+                if (multiLevelApprovals!=null && !multiLevelApprovals.isEmpty()){
+                    List<String> list = new ArrayList<>();
+                    for (MultiLevelApproval multiLevelApproval:multiLevelApprovals){
+                        list.add(multiLevelApproval.getAuditSignature());
+                    }
+                    workOrderMap.put("auditSignatureList",list );
+                }
             }
 
             this.putPartsData(workOrderExportPojo ,workOrderMap);
