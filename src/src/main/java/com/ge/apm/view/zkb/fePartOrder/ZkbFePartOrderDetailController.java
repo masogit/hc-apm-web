@@ -220,8 +220,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.contractError = false;
         //验证设备状态
-        if (!zkbFePartOrderService.checkAsset(systemId)) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("设备已报废，不能继续申请！",""));
+        if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
+            WebUtil.addErrorMessage(WebUtil.getMessage(zkbFePartOrderService.checkAsset(systemId),""));
             return;
         }
 
