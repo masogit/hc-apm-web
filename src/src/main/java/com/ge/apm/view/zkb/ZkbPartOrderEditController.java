@@ -232,8 +232,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }
         //验证设备状态
-        if (!zkbPartOrderService.checkAsset(queryWorkFlow.getAssetInfo().getSystemId())) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("设备已报废，不能继续申请！",""));
+        if (StringUtils.isNotBlank(zkbPartOrderService.checkAsset(queryWorkFlow.getAssetInfo().getSystemId()))) {
+            WebUtil.addErrorMessage(WebUtil.getMessage(zkbPartOrderService.checkAsset(queryWorkFlow.getAssetInfo().getSystemId()),""));
             return;
         }
         v2_listHashMap = zkbPartOrderService.getQueryWorkFlowList(queryWorkFlow,selectionTenantInfo);
