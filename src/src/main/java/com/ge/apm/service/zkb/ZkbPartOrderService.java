@@ -143,22 +143,23 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      * @date 2022/1/7
      * 检验设备是否报废
      */
-    public boolean checkAsset(String sysId) {
+    /**
+     * @autor by lyj 503277717
+     * @date 2022/1/7
+     */
+    public String checkAsset(String sysId) {
         AssetInfo assetInfo = assetInfoRepository.getBySystemIdNoCondition(sysId);
         if (assetInfo==null) {
-            return false;
+            return "设备不存在！";
         }
-        boolean checkResult = true;
         if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
-            checkResult = false;
+            return "设备已删除，不能继续申请！！";
+
         }
         if(!assetInfo.getIsValid()){
-            checkResult = false;
+            return "设备已报废，不能继续申请！！";
         }
-        if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
-            checkResult = false;
-        }
-        return checkResult;
+        return "";
     }
     public List<HashMap<String, Object>> getQueryWorkFlowList(V2_WorkOrder v2_workOrder,String tenantUID){
         List<HashMap<String, Object>> v2_listHashMap = new ArrayList<>();
