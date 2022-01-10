@@ -1414,8 +1414,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     zkbIntegralService.deductScore(zkbPartOrder.getTenantUID(),zkbPartOrder.getQty(),userAccount,ZkbIntegralRecord.RecordType.QuotaDeduct.toString());
                 }
             }else{
-                V2_WorkOrder v2_workOrder = v2_workOrderRepository.findById(zkbPartOrder.getWorkOrderId());
-                if(v2_workOrder.getIntExtType() != null && v2_workOrder.getIntExtType() == 1){ //内修
+                AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                if("1".equals(assetInfo.getRepairForm())){ //内修
                     if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                         zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
                         zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
@@ -1427,7 +1427,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         zkbContractRepository.save(zkbContract);
                         zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                     }
-                }else if(v2_workOrder.getIntExtType() != null && v2_workOrder.getIntExtType() == 2){ //外修
+                }else if("2".equals(assetInfo.getRepairForm())){ //外修
                     if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     }else{
                         zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) - qty);
@@ -1552,8 +1552,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
                 //zkbIntegralService.deductScore(zkbPartOrder.getTenantUID(),zkbPartOrder.getQty(),userAccount,ZkbIntegralRecord.RecordType.QuotaReturn.toString());
             }else{
-                V2_WorkOrder v2_workOrder = v2_workOrderRepository.findById(zkbPartOrder.getWorkOrderId());
-                if(v2_workOrder.getIntExtType() != null && v2_workOrder.getIntExtType() == 1){ //内修
+                AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                if("1".equals(assetInfo.getRepairForm())){ //内修
                     if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                         zkbContract.setGeArtificialSupportTimesUse((zkbContract.getGeArtificialSupportTimesUse() == null ? 0 : zkbContract.getGeArtificialSupportTimesUse()) + qty);
                         zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) - qty);
@@ -1567,7 +1567,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                             zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                         }
                     }
-                }else if(v2_workOrder.getIntExtType() != null && v2_workOrder.getIntExtType() == 2){
+                }else if("2".equals(assetInfo.getRepairForm())){
                     if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
 
                     }else{
