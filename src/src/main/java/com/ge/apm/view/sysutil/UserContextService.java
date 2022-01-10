@@ -214,9 +214,9 @@ public class UserContextService implements Serializable {
      * @return boolean
      */
     public boolean accessContain(){
-        WorkflowConfig bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).getfins(getCurrentUserAccount().getSiteUID());
+        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
         if (bySiteUID!=null){
-            if (bySiteUID.getWhethertoenableunattended()==true && bySiteUID.getIsiotenabled()==true){
+            if (bySiteUID.get(0).getWhethertoenableunattended()==true && bySiteUID.get(0).getIsiotenabled()==true){
                 return true;
             }
             return false;
