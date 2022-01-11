@@ -196,7 +196,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.zkbFePartOrder_fourHundredComment}</label>
-                                        <p:inputTextarea disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}"  value="#{zkbFePartOrderDetailController.selected.remark}"  rows="2" cols="20" >
+                                        <p:inputTextarea id="fourHundredComment"  disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}"  value="#{zkbFePartOrderDetailController.selected.remark}"  rows="2" cols="20" >
                                         </p:inputTextarea>
                                     </h:panelGroup>
                         </p:panelGrid>
@@ -210,7 +210,8 @@
                         <p:commandButton value="暂不派工" icon="ui-icon-close" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingAssignment')}" update=":growl :zkbFePartOrderEditForm" action="#{zkbFePartOrderDetailController.supplierReject}" style="float:left"/>
                     <p:commandButton value="同意" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingCommercial')}" process="@this"  action="#{zkbFePartOrderDetailController.commercialAccept(param['zkbFePartOrderEditForm:commercialComment'])}" style="float:left"/>
                     <p:commandButton value="不同意" icon="ui-icon-close" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingCommercial')}" update=":growl :zkbFePartOrderEditForm" action="#{zkbFePartOrderDetailController.commercialReject}" style="float:left"/>
-                    <p:commandButton value="#{msg.submit}" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" update=":growl :zkbFePartOrderEditForm"  validateClient="true" action="#{zkbFePartOrderDetailController.fullApmInfo}" style="float:left"/>
+                    <p:commandButton value="#{msg.submit}" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" update=":growl :zkbFePartOrderEditForm "  validateClient="true" action="#{zkbFePartOrderDetailController.fullApmInfo}" style="float:left"/>
+                    <p:commandButton value="拒绝" icon="ui-icon-close" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" process="fourHundredComment, @this" update=":growl :zkbFePartOrderEditForm "  validateClient="true" action="#{zkbFePartOrderDetailController.rejectApmInfo}" style="float:left"/>
                     <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbFePartOrderDetailController.backList}" />
                     </h:panelGroup>
                 </h:form>

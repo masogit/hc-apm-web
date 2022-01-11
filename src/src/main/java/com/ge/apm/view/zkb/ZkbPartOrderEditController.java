@@ -213,6 +213,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void getQueryWorkFlowList(){
+        v2_listHashMap = new ArrayList<>();
         if(StringUtils.isEmpty(orderType)){
             WebUtil.addErrorMessage("请输入订单类型","");
             return;
@@ -233,7 +234,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         //验证设备状态
         if (StringUtils.isNotBlank(zkbPartOrderService.checkAsset(queryWorkFlow.getAssetInfo().getSystemId()))) {
-            WebUtil.addErrorMessage(WebUtil.getMessage(zkbPartOrderService.checkAsset(queryWorkFlow.getAssetInfo().getSystemId()),""));
+            WebUtil.addErrorMessage(zkbPartOrderService.checkAsset(queryWorkFlow.getAssetInfo().getSystemId()),"");
             return;
         }
         v2_listHashMap = zkbPartOrderService.getQueryWorkFlowList(queryWorkFlow,selectionTenantInfo);
