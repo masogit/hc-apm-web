@@ -304,10 +304,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(assetInfos.size()>1){
             return "该SystemId存在多条设备!";
         }
-        if(!assetInfo.getIsValid()){
+        /*if(!assetInfo.getIsValid()){
             return "设备已报废，不能继续申请！！";
-        }
-
+        }*/
         return "";
     }
 
