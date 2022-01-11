@@ -213,6 +213,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void getQueryWorkFlowList(){
+        v2_listHashMap = new ArrayList<>();
         if(StringUtils.isEmpty(orderType)){
             WebUtil.addErrorMessage("请输入订单类型","");
             return;
