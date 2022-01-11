@@ -9,9 +9,12 @@ import com.ge.apm.domain.ServiceRequestMsg;
 import com.ge.apm.domain.V2_WorkOrderCoworker;
 import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.wo.WorkOrderExportService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
@@ -26,8 +29,7 @@ import java.util.*;
 @Component
 public class WorkOrderDocxRenderService {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorkOrderDocxRenderService.class);
-
+    private final Logger log = LoggerFactory.getLogger(WorkOrderExportService.class);
     private static final PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, ".jpg", new byte[0]);
 
 
@@ -123,9 +125,11 @@ public class WorkOrderDocxRenderService {
         mapESign(source, target, "ack_signature", "ack_signature_title", "验收人签名： ");
         if (source.containsKey("auditSignatureList")) {
            List<String> auditSignatures= (List)source.get("auditSignatureList");
+            log.info("auditSignatures:{}",auditSignatures.size());
            if (auditSignatures!=null && !auditSignatures.isEmpty()){
                for (String storageId:auditSignatures){
                    if (storageId!=null){
+                       log.info("storageId{}",storageId);
                        mapESignSignature(storageId, target,"auditSignatureList", "audit_signature_title", "备件审核签名： ");
                    }
                }
@@ -156,6 +160,7 @@ public class WorkOrderDocxRenderService {
     }
     private void mapESignSignature(String storageId,Map<String, Object> target, String key, String eSignTitleKey, String eSignTitleValue) {
         byte[] blob = getBlobSignature( storageId);
+        log.info("blob{}",blob.length);
         if (blob != null) {
             target.put(key, new PictureRenderData(100, 75, "mock.png", blob));
             target.put(eSignTitleKey, eSignTitleValue);

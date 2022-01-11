@@ -18,6 +18,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -53,7 +55,7 @@ public class WorkOrderExportService {
     private static final String I18N_REPAIR_RESULT = "repairResult";
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+    private final Logger log = LoggerFactory.getLogger(WorkOrderExportService.class);
     @Autowired
     ServiceRequestRepository serviceRequestDao;
     @Autowired
@@ -382,7 +384,9 @@ public class WorkOrderExportService {
                     List<String> list = new ArrayList<>();
                     for (MultiLevelApproval multiLevelApproval:multiLevelApprovals){
                         list.add(multiLevelApproval.getAuditSignature());
+                        log.info("audit_signature:{}",multiLevelApproval.getAuditSignature());
                     }
+                    log.info("auditSignatureList:{}",list.size());
                     workOrderMap.put("auditSignatureList",list );
                 }
             }
