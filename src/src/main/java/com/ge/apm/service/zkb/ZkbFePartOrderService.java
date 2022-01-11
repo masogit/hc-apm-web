@@ -297,13 +297,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @date 2022/1/7
     */
     public String checkAsset(String sysId) {
-        AssetInfo assetInfo = assetInfoRepository.getBySystemIdNoCondition(sysId);
-        if (assetInfo==null) {
+        List<AssetInfo> assetInfos = assetInfoRepository.getBySystemIdNoConditionGefe(sysId);
+        if (CollectionUtils.isEmpty(assetInfos)) {
             return "设备不存在！";
         }
-        if(assetInfo.getIsDeleted() != null && assetInfo.getIsDeleted()){
-            return "设备已删除，不能继续申请！！";
-
+        if(assetInfos.size()>1){
+            return "该SystemId存在多条设备!";
         }
         if(!assetInfo.getIsValid()){
             return "设备已报废，不能继续申请！！";
