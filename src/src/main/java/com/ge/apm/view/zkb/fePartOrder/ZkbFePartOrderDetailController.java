@@ -374,6 +374,23 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     }
 
     /**
+     * 400团队拒绝
+     *
+     * @return
+     */
+    public String rejectApmInfo() {
+        if(this.selected!=null&&StringUtils.isBlank(this.selected.getRemark())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("请填写400审批备注！"));
+            return "";
+        }
+        ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 4, this.selected, this.currentUser, this.i18Map.get("FourHundredsReject"));
+        Date date = new Date();
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString(),
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_WECHART);
+    }
+
+    /**
      * 判断当前用户在当前节点是否有编辑权限
      *
      * @return
