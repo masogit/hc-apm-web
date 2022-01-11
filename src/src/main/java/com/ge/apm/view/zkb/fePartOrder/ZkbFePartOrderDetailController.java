@@ -221,7 +221,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.contractError = false;
         //验证设备状态
         if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
-            WebUtil.addErrorMessage(WebUtil.getMessage(zkbFePartOrderService.checkAsset(systemId),""));
+            WebUtil.addErrorMessage(zkbFePartOrderService.checkAsset(systemId),"");
             return;
         }
 
@@ -370,6 +370,23 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 2, this.selected, this.currentUser, this.i18Map.get("FourHundredsAccept"));
         Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_WECHART);
+    }
+
+    /**
+     * 400团队拒绝
+     *
+     * @return
+     */
+    public String rejectApmInfo() {
+        if(this.selected!=null&&StringUtils.isBlank(this.selected.getRemark())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("请填写400审批备注！"));
+            return "";
+        }
+        ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 4, this.selected, this.currentUser, this.i18Map.get("FourHundredsReject"));
+        Date date = new Date();
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_WECHART);
     }
 

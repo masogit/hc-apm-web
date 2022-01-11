@@ -602,10 +602,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() + 1);
                     break;
                 case 2:
-                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - 1);
-                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse() + 1);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - 1);//备件/人工/保养申请名额
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse() + 1);//备件/人工/保养已使用名额
                     break;
                 case 3:
+                case 4:
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + 1);
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - 1);
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
@@ -620,10 +621,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply() + 1);
                     break;
                 case 2:
-                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply() - 1);
-                    zkbContract.setGeArtificialSupportTimesUse(zkbContract.getGeArtificialSupportTimesUse() + 1);
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply() - 1);//GE人工支持申请次数
+                    zkbContract.setGeArtificialSupportTimesUse(zkbContract.getGeArtificialSupportTimesUse() + 1);//GE人工支持使用次数
                     break;
                 case 3:
+                case 4:
                     zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes() + 1);
                     zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply() - 1);
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
