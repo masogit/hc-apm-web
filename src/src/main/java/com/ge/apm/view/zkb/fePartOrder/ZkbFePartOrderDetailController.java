@@ -389,10 +389,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      * @return
      */
     public String rejectApmInfo() {
-        if(this.selected!=null&&StringUtils.isBlank(this.selected.getRemark())){
-            WebUtil.addErrorMessage(WebUtil.getMessage("请填写400审批备注！"));
-            return "";
-        }
         this.selected.setFullApmInfoUser(this.userName);
         this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());

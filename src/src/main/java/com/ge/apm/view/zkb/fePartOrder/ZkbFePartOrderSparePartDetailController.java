@@ -639,10 +639,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      * @return
      */
     public String fullApmRejectInfo(){
-        if(this.selected!=null&&StringUtils.isBlank(this.selected.getRemark())){
-            WebUtil.addErrorMessage(WebUtil.getMessage("请填写400下单备注！"));
-            return "";
-        }
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfo = this.selected.getZkbFePartOrderAssetInfoList();
         for(ZkbFePartOrderAssetInfo item:zkbFePartOrderAssetInfo){
