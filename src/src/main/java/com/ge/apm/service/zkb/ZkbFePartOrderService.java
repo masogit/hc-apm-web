@@ -662,6 +662,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + qty);
                     break;
                 case 4:
+                case 6:
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + qty);
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - qty);
@@ -689,9 +690,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse() - qty);
                     zkbContract.setSpareQuota(zkbContract.getSpareQuota() + qty);
                     break;
-                case 4:
+                case 4://代理商拒绝
+                case 6://400团队拒绝
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
-                    zkbContract.setSpareQuota(zkbContract.getSpareQuota() + qty);
+                    zkbContract.setSpareQuota(zkbContract.getSpareQuota() + qty);//拒绝备件剩余名额加回去
                     zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply() - qty);
                     break;
                 case 5://好还变坏还，已使用名额+ qty，剩余名额- qty，坏变好走第3步骤

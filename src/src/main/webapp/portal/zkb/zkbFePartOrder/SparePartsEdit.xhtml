@@ -268,11 +268,16 @@
                     <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.hasOrderModifyRight()}">
                         <p:commandButton process="@this" icon="ui-icon-pencil" value="下单信息修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>
                     </h:panelGroup>
+                    <h:panelGroup >
+                        <label class="label">下单备注：</label>
+                        <p:inputTextarea id="fourHundredComment"  disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}"  value="#{zkbFePartOrderSparePartDetailController.selected.remark}"  rows="2" cols="20" >
+                        </p:inputTextarea>
+                    </h:panelGroup>
                 </p:panelGrid>
                 <p:dataTable id="zkbFePartOrderAssetInfoList_APM" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item"
                              widgetVar="zkbFePartOrderAssetInfoList_APM" selectionMode="single"
                              lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
-                             paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                             paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}" rendered="#{zkbFePartOrderSparePartDetailController.fourHundredStatus()}">
                     <p:column headerText="#{msg.zkbFePartOrder_assetNo}">
                         <h:outputText value="#{item.assetNo}"/>
                     </p:column>
@@ -289,7 +294,7 @@
                         <p:inputText  disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.price}"  />
                     </p:column>
                     <p:column headerText="#{msg.zkbFePartOrder_spareParts}">
-                        <p:inputTextarea disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.sparePart}"  />
+                        <p:inputTextarea  disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.sparePart}"  />
                     </p:column>
                 </p:dataTable>
             </p:fieldset>
@@ -342,7 +347,8 @@
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" value="同意" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.commercialAccept(param['zkbFePartOrderSparePartsEditForm:commercialComment'])}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" value="不同意" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.commercialReject}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderSparePartsEditForm"  validateClient="true" action="#{zkbFePartOrderSparePartDetailController.fullApmInfo}" style="float:left"/>
-            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderSparePartsEditForm"  validateClient="true" action="#{zkbFePartOrderSparePartDetailController.geAdminReturn}" style="float:left"/>
+                <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" process="fourHundredComment,@this" value="拒绝" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm"  validateClient="true" action="#{zkbFePartOrderSparePartDetailController.fullApmRejectInfo}" style="float:left"/>
+                <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderSparePartsEditForm"  validateClient="true" action="#{zkbFePartOrderSparePartDetailController.geAdminReturn}" style="float:left"/>
             <p:commandButton  immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbFePartOrderSparePartDetailController.backList}" />
             </h:form>
         </h:panelGroup>
