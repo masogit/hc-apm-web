@@ -216,13 +216,11 @@ public class UserContextService implements Serializable {
      */
     public boolean accessContain(){
         List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
-        if (usname.size()==1) {
             for (String s : usname) {
                 if (s.equals("OpWorker")) {
                     return false;
                 }
             }
-        }
         List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
         if (bySiteUID!=null&&bySiteUID.size()!=0){
             if (bySiteUID.get(0).getWhethertoenableunattended()!=null && bySiteUID.get(0).getIsiotenabled()!=null){
@@ -238,13 +236,11 @@ public class UserContextService implements Serializable {
     }
     public boolean byOpWorker(){
         List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
-        if (usname.size()==1) {
             for (String s : usname) {
                 if (s.equals("OpWorker")) {
                     return false;
                 }
             }
-        }
         return true;
     }
     //add MVSAdmin,MVSFE
@@ -935,13 +931,11 @@ public class UserContextService implements Serializable {
         UserAccount currentUser = getLoginUser();
         TenantInfo currentTenantInfo = userContextService.getCurrentUserTenantInfo();
         List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
-        if (usname.size()==1) {
             for (String s : usname) {
                 if (s.equals("OpWorker")) {
                     return false;
                 }
             }
-        }
         int siteId = currentUser.getSiteId();
         if (siteId == 46 || BooleanUtils.isTrue(currentTenantInfo.getHaveIbDevice())) {
             return true;
