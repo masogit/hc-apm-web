@@ -138,17 +138,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbContractLogRepository.save(zkbContractLog);
     }
 
-    /**
-     * @autor by lyj 503277717
-     * @date 2022/1/7
-     * 检验设备是否报废
-     */
-    /**
-     * @autor by lyj 503277717
-     * @date 2022/1/7
-     */
-    public String checkAsset(String sysId) {
-        AssetInfo assetInfo = assetInfoRepository.getBySystemIdNoCondition(sysId);
+    public String checkAsset(AssetInfo assetInfo) {
         if (assetInfo==null) {
             return "设备不存在！";
         }
