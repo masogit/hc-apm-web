@@ -6,6 +6,8 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.context.LocaleHolder;
@@ -23,6 +25,7 @@ import java.util.Optional;
 
 @Component
 public class WorkOrderExportTemplateService {
+    private final Logger log = LoggerFactory.getLogger(WorkOrderExportTemplateService.class);
 
     @Autowired
     private WorkOrderExportTemplateRepository templateRepository;
@@ -43,6 +46,7 @@ public class WorkOrderExportTemplateService {
         WorkOrderExportTemplate template = getPrioritizedTemplate(templates, uids);
 
         if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
+            log.info("模板StorageId: {template.getStorageId()}");
             templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
         }
         if (templateBytes == null) {
@@ -53,6 +57,7 @@ public class WorkOrderExportTemplateService {
             } else {
                 fileName = "template_en.docx";
             }
+            log.info("fileName: {}",fileName);
             templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/"+fileName));
         }
         return templateBytes;
