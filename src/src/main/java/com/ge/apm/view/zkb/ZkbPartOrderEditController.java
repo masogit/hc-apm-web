@@ -232,11 +232,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             WebUtil.addErrorMessage("查询有误，请输入条件","");
             return;
         }
-        //验证设备状态
-        if (StringUtils.isNotBlank(zkbPartOrderService.checkAsset(queryWorkFlow.getAssetInfo().getSystemId()))) {
-            WebUtil.addErrorMessage(zkbPartOrderService.checkAsset(queryWorkFlow.getAssetInfo().getSystemId()),"");
-            return;
-        }
         v2_listHashMap = zkbPartOrderService.getQueryWorkFlowList(queryWorkFlow,selectionTenantInfo);
         contractList = new ArrayList<>();
     }
@@ -250,6 +245,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selectedWorkFlow = (HashMap<String, Object>) event.getObject();
         assetInfo = assetInfoRepository.findByUid(String.valueOf(selectedWorkFlow.get("assetId")));
         selected.setProductNumber(assetInfo.getFunctionType());
+        //验证设备状态
+        if (StringUtils.isNotBlank(zkbPartOrderService.checkAsset(assetInfo))) {
+            WebUtil.addErrorMessage(zkbPartOrderService.checkAsset(assetInfo),"");
+            return;
+        }
 
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             if(assetInfo.getAssetGroup() == null || assetInfo.getAssetGroup() != 2){
