@@ -802,6 +802,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     }
                     break;
                 case 4:
+                case 6://400拒绝
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
                     if (ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType)) {
                         orderType = ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString();
@@ -866,6 +867,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setProbeQuotaUse(zkbContract.getProbeQuotaUse() + qty);
                     break;
                 case 4:
+                case 6://400拒绝
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
                     //探头剩余名额+1，探头申请名额-1
                     zkbContract.setProbeQuota(zkbContract.getProbeQuota() + qty);
