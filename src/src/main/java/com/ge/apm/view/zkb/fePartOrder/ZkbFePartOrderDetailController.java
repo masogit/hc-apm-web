@@ -224,12 +224,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdError"));
             return;
         }
+        this.zkbFePartOrderService.fullInfoBySystemId(this.selected, systemId);
         //验证设备状态
         if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
             WebUtil.addErrorMessage(zkbFePartOrderService.checkAsset(systemId),"");
             return;
         }
-        this.zkbFePartOrderService.fullInfoBySystemId(this.selected, systemId);
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.contractError = false;
 
