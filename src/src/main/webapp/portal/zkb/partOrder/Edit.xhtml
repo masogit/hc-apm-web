@@ -32,8 +32,8 @@
                     </h:panelGroup>
 
                     <h:panelGroup id="maintainFlagGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
-                        <label class="label">是否保养*</label>
-                        <p:selectOneMenu id="maintainFlag" value="#{zkbPartOrderEditController.maintainFlag}" required="true" requiredMessage="是否保养 #{msg.ValidationRequire}">
+                        <label class="label">保养申请*</label>
+                        <p:selectOneMenu id="maintainFlag" value="#{zkbPartOrderEditController.maintainFlag}" required="true" requiredMessage="保养申请 #{msg.ValidationRequire}">
                             <p:ajax event="change" update="zkbPartOrderEditForm zkbHeadEditForm" listener="#{zkbPartOrderEditController.orderTypeChange}"  />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="是" itemValue="t"/>
@@ -63,7 +63,7 @@
                                  lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
                                  paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
 
-                        <p:ajax event="rowSelect"  listener="#{zkbPartOrderEditController.workFlowSelected}" update="zkbContractDatalist zkbPartOrderEditForm zkbwkEditForm"/>
+                        <p:ajax event="rowSelect"  listener="#{zkbPartOrderEditController.workFlowSelected}" update="zkbPartOrderEditForm zkbContractDatalist"/>
 
                         <p:column headerText="设备名称">
                             <h:outputText value="#{item.name}"/>
@@ -78,16 +78,13 @@
                         </f:facet>
                     </p:dataTable>
                 </p:fieldset>
-
             </h:form>
             <p:fieldset id="zkbContractFieldset" legend="合同信息" >
                 <p:dataTable id="zkbContractDatalist" value="#{zkbPartOrderEditController.contractList}" var="item"
-                             widgetVar="zkbWkDatalist" selectionMode="single" disabledSelection="true"
-                             lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
+                             widgetVar="zkbContractDatalist" selectionMode="single"
+                             rowKey="#{item.id}"  sortBy="#{item.id}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-
                     <!--<p:ajax event="rowSelect" update="" listener="#{zkbPartOrderEditController.workFlowSelected}" />-->
-
                     <p:column headerText="#{msg.zkbContact_tenant}">
                         <h:outputText value="#{zkbContractController.getTenantInfo(item.tenantUID).name}"/>
                     </p:column>
