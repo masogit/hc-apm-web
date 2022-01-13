@@ -2282,7 +2282,7 @@ public void test1(){
                 v2_workOrder_detail.setApproved(true);
             }else{
                 v2_workOrder_detail.setApproved(false);
-                approvedDetailsNew.add(v2_workOrder_detail);
+//                approvedDetailsNew.add(v2_workOrder_detail);
             }
         }
 
