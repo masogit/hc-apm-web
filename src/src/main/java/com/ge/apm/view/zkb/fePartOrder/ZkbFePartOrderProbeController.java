@@ -250,6 +250,14 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         return this.zkbFePartOrderService.checkContractDate(this.contractList);
     }
 
+    public Boolean fourHundredStatus() {
+        Boolean fourHundredStatus = true;
+        if(ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString().equals(this.selected.getStatus())){
+            fourHundredStatus = false;
+        }
+        return fourHundredStatus;
+    }
+
     @Override
     public void prepareEdit() {
         super.prepareEdit();
@@ -706,61 +714,15 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * 400团队拒绝
      * @return
      */
-    public String fullApmReject()
-    {
-        Date date = new Date();
+    public String fullApmReject(){
         this.selected.setFullApmInfoUser(this.userName);
         this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0){
-            if("t".equals(this.selected.getSecondNewCatFlag()))
-            {
-                if(this.selected.getDoubleQty()!=null&&this.selected.getDoubleQty())
-                {
-                    this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("FourHundredsAccept"));
-                }else
-                {
-                    Boolean firstSave = true;
-                    Boolean secondSave = false;
-                    zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-                    if(!ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType()))
-                    {
-                        secondSave=true;
-                        firstSave=false;
-                    }
-                    if(secondSave)
-                    {
-                        calcRemainQty();
-                        if(this.selected.getRemainQty()<0)
-                        {
-                            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
-                            return "";
-                        }
-                    }
-                    this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,firstSave,this.i18Map.get("FourHundredsAccept"));
-                    if(secondSave)
-                    {
-                        this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,secondSave,this.i18Map.get("FourHundredsAccept"));
-                        this.selected.setQty(this.getSelected().getQty()*2);
-                        this.selected.setDoubleQty(true);
-                    }
-                }
-            }else
-            {
-                if(this.selected.getDoubleQty()!=null&&this.selected.getDoubleQty())
-                {
-                    this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty()/2,showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("FourHundredsAccept"));
-                    this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty()/2,showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("FourHundredsAccept"));
-                    this.selected.setQty(this.selected.getQty()/2);
-                    this.selected.setDoubleQty(false);
-                }else
-                {
-                    this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("FourHundredsAccept"));
-                }
-            }
+            this.zkbFePartOrderService.moveProbe(6,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("FourHundredsReject"));
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(),new Date(),null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
     }
     /**
      * admin归还
