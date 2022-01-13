@@ -131,7 +131,7 @@ public class WorkOrderDocxRenderService {
                    String storageId = auditSignatures.get(i);
                    if (storageId !=null){
                        log.info("storageId:{}",storageId);
-                       mapESignSignature(storageId, target,"auditSignatureList", "audit_signature_title"+i, "备件审核签名： ");
+                       mapESignSignature(storageId, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
                    }
                }
            }
