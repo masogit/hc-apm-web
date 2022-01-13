@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
  * @author : 503189362
@@ -81,6 +82,17 @@ public class ZkbContractAsset {
      */
     @Column(name = "support_maintain_flag")
     private String supportMaintainFlag;
+
+    @Column(name = "last_support_maintain_date")
+    private Date lastSupportMaintainDate;
+
+    public Date getLastSupportMaintainDate() {
+        return lastSupportMaintainDate;
+    }
+
+    public void setLastSupportMaintainDate(Date lastSupportMaintainDate) {
+        this.lastSupportMaintainDate = lastSupportMaintainDate;
+    }
 
     public String getSupportMaintainFlag() {
         return supportMaintainFlag;
