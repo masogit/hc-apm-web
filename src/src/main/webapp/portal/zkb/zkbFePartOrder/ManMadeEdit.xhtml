@@ -178,25 +178,34 @@
                         </p:fieldset>
                     <p:fieldset id="orderedFieldset" legend="派工信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingApm')}">
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                    <h:panelGroup >
-                                        <label class="label">#{msg.zkbFePartOrder_sr}*</label>
-                                        <p:inputText disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderDetailController.selected.sr}"  required="true" requiredMessage="#{msg.zkbFePartOrder_sr} #{msg.ValidationRequire}"/>
+                                    <h:panelGroup rendered="#{!zkbFePartOrderDetailController.fourHundredStatus()}">
+                                        <label class="label">400审批人*</label>
+                                        <p:inputText readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.fullApmInfoUser}"  />
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{!zkbFePartOrderDetailController.fourHundredStatus()}">
+                                        <label class="label">400审批时间*</label>
+                                        <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderDetailController.selected.fullApmInfoDate}"
+                                                    showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()}">
+                                        <label class="label">#{msg.zkbFePartOrder_sr}*</label>
+                                        <p:inputText disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}"  value="#{zkbFePartOrderDetailController.selected.sr}"  required="true" requiredMessage="#{msg.zkbFePartOrder_sr} #{msg.ValidationRequire}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()}">
                                         <label class="label">#{msg.zkbFePartOrder_act}*</label>
                                         <p:inputText disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()}">
                                         <label class="label">#{msg.zkbFePartOrder_geEngineerName}*</label>
                                         <p:inputText disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderDetailController.selected.geEngineerName}"  required="true" requiredMessage="#{msg.zkbFePartOrder_geEngineerName} #{msg.ValidationRequire}" />
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()}">
                                         <label class="label">#{msg.zkbFePartOrder_geEngineerPhone}*</label>
                                         <p:inputText disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderDetailController.selected.geEngineerPhone}"  required="true" requiredMessage="#{msg.zkbFePartOrder_geEngineerPhone} #{msg.ValidationRequire}" />
                                     </h:panelGroup>
-                                    <h:panelGroup>
-                                        <label class="label">#{msg.zkbFePartOrder_fourHundredComment}</label>
-                                        <p:inputTextarea id="fourHundredComment"  disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}"  value="#{zkbFePartOrderDetailController.selected.remark}"  rows="2" cols="20" >
+                                    <h:panelGroup >
+                                        <label class="label" >#{zkbFePartOrderDetailController.fourHundredStatus()?msg.zkbFePartOrder_fourHundredComment:"拒绝原因*"}</label>
+                                        <p:inputTextarea disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}"  value="#{zkbFePartOrderDetailController.selected.remark}"  rows="2" cols="20" >
                                         </p:inputTextarea>
                                     </h:panelGroup>
                         </p:panelGrid>
@@ -211,9 +220,27 @@
                     <p:commandButton value="同意" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingCommercial')}" process="@this"  action="#{zkbFePartOrderDetailController.commercialAccept(param['zkbFePartOrderEditForm:commercialComment'])}" style="float:left"/>
                     <p:commandButton value="不同意" icon="ui-icon-close" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingCommercial')}" update=":growl :zkbFePartOrderEditForm" action="#{zkbFePartOrderDetailController.commercialReject}" style="float:left"/>
                     <p:commandButton value="#{msg.submit}" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" update=":growl :zkbFePartOrderEditForm "  validateClient="true" action="#{zkbFePartOrderDetailController.fullApmInfo}" style="float:left"/>
-                    <p:commandButton value="拒绝" icon="ui-icon-close" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" process="fourHundredComment, @this" update=":growl :zkbFePartOrderEditForm "  validateClient="true" action="#{zkbFePartOrderDetailController.rejectApmInfo}" style="float:left"/>
+                        <p:commandButton immediate="false" process="@this" value="拒绝" update=":growl :zkbCancelReasonDlg" oncomplete="PF('zkbCancelReasonDlg').show()" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingApm')}"/>
+<!--
+                        <p:commandButton value="拒绝" icon="ui-icon-close"  process="@this" update=":growl :zkbFePartOrderEditForm "  validateClient="true" action="#{zkbFePartOrderDetailController.rejectApmInfo}" style="float:left"/>
+-->
                     <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbFePartOrderDetailController.backList}" />
                     </h:panelGroup>
                 </h:form>
+
+                <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
+                    <h:form id="zkbConfigForm">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <label class="label">拒绝原因</label>
+                                <p:inputTextarea rows="10" cols="50" value="#{zkbFePartOrderDetailController.selected.remark}" required="true" requiredMessage="原因不能为空">
+                                </p:inputTextarea>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <br/>
+                        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbFePartOrderDetailController.rejectApmInfo}" oncomplete="PF('zkbCancelReasonDlg').hide()" update=":growl" icon="ui-icon-check" />
+                        <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCancelReasonDlg').hide()"/>
+                    </h:form>
+                </p:dialog>
 </ui:composition>
 </html>
