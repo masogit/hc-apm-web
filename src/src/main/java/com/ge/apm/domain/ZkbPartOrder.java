@@ -576,6 +576,17 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "ssa_key_flag")
     private String ssaKeyFlag;
 
+    @Column(name = "maintain_flag")
+    private String maintainFlag;
+
+    public String getMaintainFlag() {
+        return maintainFlag;
+    }
+
+    public void setMaintainFlag(String maintainFlag) {
+        this.maintainFlag = maintainFlag;
+    }
+
     public String getSsaKeyFlag() {
         return ssaKeyFlag;
     }

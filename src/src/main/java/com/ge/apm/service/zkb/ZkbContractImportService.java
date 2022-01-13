@@ -745,9 +745,9 @@ public class ZkbContractImportService {
                     }
                 }
                 if(zkbContractAssetVO.getSupportMaintainFlag() == null){
-                   /* isValidateData = false;
+                    isValidateData = false;
                     item.put("status", ImportStatus.Failure);
-                    ZkbContractAssetRow.addErrMessage(item, "是否由GE FE提供年度1次现场保养不能为空！");*/
+                    ZkbContractAssetRow.addErrMessage(item, "是否由GE FE提供年度1次现场保养不能为空！");
                 }
             }
         }
