@@ -127,10 +127,11 @@ public class WorkOrderDocxRenderService {
            List<String> auditSignatures= (List)source.get("auditSignatureList");
             log.info("auditSignatures:{}",auditSignatures.size());
            if (auditSignatures!=null && !auditSignatures.isEmpty()){
-               for (String storageId:auditSignatures){
-                   if (storageId!=null){
-                       log.info("storageId{}",storageId);
-                       mapESignSignature(storageId, target,"auditSignatureList", "audit_signature_title", "备件审核签名： ");
+               for (int i = 0; i < auditSignatures.size(); i++) {
+                   String storageId = auditSignatures.get(i);
+                   if (storageId !=null){
+                       log.info("storageId:{}",storageId);
+                       mapESignSignature(storageId, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
                    }
                }
            }
@@ -160,7 +161,6 @@ public class WorkOrderDocxRenderService {
     }
     private void mapESignSignature(String storageId,Map<String, Object> target, String key, String eSignTitleKey, String eSignTitleValue) {
         byte[] blob = getBlobSignature( storageId);
-        log.info("blob{}",blob.length);
         if (blob != null) {
             target.put(key, new PictureRenderData(100, 75, "mock.png", blob));
             target.put(eSignTitleKey, eSignTitleValue);

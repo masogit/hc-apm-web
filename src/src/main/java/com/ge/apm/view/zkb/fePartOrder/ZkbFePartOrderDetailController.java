@@ -175,6 +175,14 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.confirmMessage =this.genConfirmMessage();
     }
 
+
+    public Boolean fourHundredStatus() {
+        Boolean fourHundredStatus = true;
+        if(ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString().equals(this.selected.getStatus())){
+            fourHundredStatus = false;
+        }
+        return fourHundredStatus;
+    }
     /**
      * @autor by lyj 503277717
      * @date 2021/12/21
@@ -216,14 +224,15 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdError"));
             return;
         }
-        this.zkbFePartOrderService.fullInfoBySystemId(this.selected, systemId);
-        this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
-        this.contractError = false;
         //验证设备状态
         if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
             WebUtil.addErrorMessage(zkbFePartOrderService.checkAsset(systemId),"");
             return;
         }
+        this.zkbFePartOrderService.fullInfoBySystemId(this.selected, systemId);
+        this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
+        this.contractError = false;
+
 
         //未匹配到合同
         if (CollectionUtils.isEmpty(this.contractList)) {
@@ -365,7 +374,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      * @return
      */
     public String fullApmInfo() {
-
+        this.selected.setFullApmInfoUser(this.userName);
+        this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 2, this.selected, this.currentUser, this.i18Map.get("FourHundredsAccept"));
         Date date = new Date();
@@ -379,10 +389,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      * @return
      */
     public String rejectApmInfo() {
-        if(this.selected!=null&&StringUtils.isBlank(this.selected.getRemark())){
-            WebUtil.addErrorMessage(WebUtil.getMessage("请填写400审批备注！"));
-            return "";
-        }
+        this.selected.setFullApmInfoUser(this.userName);
+        this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 4, this.selected, this.currentUser, this.i18Map.get("FourHundredsReject"));
         Date date = new Date();
@@ -439,4 +447,5 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public void setThisDeductionMessage(String thisDeductionMessage) {
         this.thisDeductionMessage = thisDeductionMessage;
     }
+
 }
