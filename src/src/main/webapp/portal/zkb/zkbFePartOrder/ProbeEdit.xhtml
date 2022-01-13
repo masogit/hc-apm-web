@@ -322,22 +322,22 @@
                 </p:fieldset>
             <p:fieldset id="apmFieldset" legend="400下单" rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingApm')}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup >
+                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()}">
                         <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
                         <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.orderNo}"  required="true" requiredMessage="#{msg.zkbFePartOrder_orderNoa} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{!zkbFePartOrderProbeController.configTypeMap.containsKey('Supplier')}" >
+                    <h:panelGroup rendered="#{(!zkbFePartOrderProbeController.configTypeMap.containsKey('Supplier')) and (zkbFePartOrderDetailController.fourHundredStatus())}" >
                         <label class="label">#{msg.zkbFePartOrder_assetPrice}*</label>
                         <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.price}"  required="true" requiredMessage="#{msg.zkbFePartOrder_assetPrice} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()}">
                         <label class="label">#{msg.zkbFePartOrder_newProbe}*</label>
                         <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.secondNewCatFlag}" required="true" requiredMessage="#{msg.zkbFePartOrder_newProbe} #{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()}">
                         <c:choose>
                             <c:when test="#{zkbFePartOrderProbeController.selected.needLetterFlag eq 't' and 'f' eq zkbFePartOrderProbeController.selected.hasUploadLetter}">
                                 <label class="label" style="color: red!important;font-weight:100;font-size :xx-large ">#{msg.zkbFePartOrder_needProbeLetter}*</label>
@@ -356,8 +356,8 @@
                             </c:otherwise>
                         </c:choose>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.zkbFePartOrder_remark}</label>
+                    <h:panelGroup >
+                        <label class="label">#{zkbFePartOrderDetailController.fourHundredStatus()?msg.zkbFePartOrder_remark:"拒绝原因*:"}</label>
                         <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.apmComment}" rows="2" cols="20">
                         </p:inputTextarea>
                     </h:panelGroup>
@@ -459,11 +459,28 @@
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingCommercial')}" value="同意" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.commercialAccept()}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingCommercial')}" value="不同意" icon="ui-icon-close"  process="@this" action="#{zkbFePartOrderProbeController.commercialReject(param['zkbFePartOrderProbeEditForm:commercialComment'])}" style="float:left"/>
             <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  validateClient="true" action="#{zkbFePartOrderProbeController.fullApmInfo}" style="float:left"/>
-            <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  validateClient="true" action="#{zkbFePartOrderProbeController.geAdminReturn}" style="float:left"/>
+                <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" immediate="false" process="@this" value="拒绝" update=":growl :zkbCancelReasonPbDlg" oncomplete="PF('zkbCancelReasonPbDlg').show()" icon="ui-icon-check"   />
+                <p:commandButton rendered="#{zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" value="#{msg.submit}" icon="ui-icon-check"  update=":growl :zkbFePartOrderProbeEditForm"  validateClient="true" action="#{zkbFePartOrderProbeController.geAdminReturn}" style="float:left"/>
             <p:commandButton  immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbFePartOrderProbeController.backList}" />
             </h:form>
         </h:panelGroup>
     </h:panelGroup>
+
+    <p:dialog id="zkbCancelReasonPbDlg" widgetVar="zkbCancelReasonPbDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
+        <h:form id="zkbConfigPbForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <label class="label">拒绝原因</label>
+                    <p:inputTextarea rows="10" cols="50" value="#{zkbFePartOrderProbeController.selected.apmComment}" required="true" requiredMessage="原因不能为空">
+                    </p:inputTextarea>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbFePartOrderProbeController.fullApmReject}" oncomplete="PF('zkbCancelReasonPbDlg').hide()" update=":growl" icon="ui-icon-check" />
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCancelReasonPbDlg').hide()"/>
+        </h:form>
+    </p:dialog>
+
     <p:fieldset style="display: none"  rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingGEAdmin')}">
     </p:fieldset>
 </ui:composition>

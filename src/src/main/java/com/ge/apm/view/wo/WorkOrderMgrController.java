@@ -1369,8 +1369,6 @@ public void test1(){
     public void prepareCompleteOrder(String woid) {
         approveFlag =false;
         selectedWorkOrder = dao.findById(woid);
-        logger.info("selectedWorkOrder"+selectedWorkOrder);
-        logger.info("multiLevelApprovalService"+multiLevelApprovalService);
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
@@ -2284,7 +2282,7 @@ public void test1(){
                 v2_workOrder_detail.setApproved(true);
             }else{
                 v2_workOrder_detail.setApproved(false);
-                approvedDetailsNew.add(v2_workOrder_detail);
+//                approvedDetailsNew.add(v2_workOrder_detail);
             }
         }
 
