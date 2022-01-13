@@ -418,6 +418,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      */
     @Transactional(rollbackFor = Exception.class)
     public ZkbPartOrder create(String workOrderId, String assetId,ZkbContract zkbContract,ZkbPartOrder zkbPartOrder,UserAccount userAccount,String tenantUid,String srNum){
+
         zkbPartOrder.setWorkOrderId(workOrderId);
         zkbPartOrder.setAssetId(assetId);
         zkbPartOrder.setContractId(zkbContract.getId());
@@ -1258,9 +1259,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         } else if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             //region  人工
             if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
-                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
-                boolean b = checkDeductMaintain(zkbContract,zkbContractAsset);
-                if(b){
+                if(CopyByInvok.F.equals(zkbPartOrder.getMaintainFirstFlag())){
                     return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
                 }else {
                     return "该申请不扣任何名额！";
@@ -1413,24 +1412,20 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             //region  人工
             if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
-                boolean b = checkDeductMaintain(zkbContract,zkbContractAsset);
-                if(b){
+                if(CopyByInvok.F.equals(zkbPartOrder.getMaintainFirstFlag()) || CopyByInvok.F.equals(zkbContractAsset.getSupportMaintainFlag())){
                     zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) - qty);
                     zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + qty);
                     zkbContractRepository.save(zkbContract);
                     zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                 }
                 if(qty > 0){
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    String s = sdf.format(new Date());
-                    Date date = null;
-                    try {
-                        date = sdf.parse(s);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                    saveContractAsset(zkbContract,zkbContractAsset);
+                }else{
+                    if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFirstFlag())){
+                        zkbContractAsset.setMaintainStartDate(null);
+                        zkbContractAsset.setMaintainEndDate(null);
+                        zkbContractAssetRepository.save(zkbContractAsset);
                     }
-                    zkbContractAsset.setLastSupportMaintainDate(date);
-                    zkbContractAssetRepository.save(zkbContractAsset);
                 }
             }else{
                 if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
@@ -1488,6 +1483,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
     }
+
+
 
     public void subUseQty(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty,UserAccount userAccount) {
         String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderDeduct.toString();
@@ -1579,9 +1576,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbContractRepository.save(zkbContract);
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
-                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
-                boolean b = checkDeductMaintain(zkbContract,zkbContractAsset);
-                if(b){
+                if(CopyByInvok.F.equals(zkbPartOrder.getMaintainFirstFlag())){
                     zkbContract.setSpareArtificailUse((zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse()) + qty);
                     zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) - qty);
                     zkbContractRepository.save(zkbContract);
@@ -2299,24 +2294,55 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
     //endregion
 
-    public boolean checkDeductMaintain(ZkbContract zkbcontract, ZkbContractAsset zkbContractAsset){
-        if("t".equals(zkbContractAsset.getSupportMaintainFlag())){
-            if(zkbContractAsset.getLastSupportMaintainDate() == null){
-                return false;
+    public boolean checkDeductMaintain(ZkbContractAsset zkbContractAsset){
+
+        if(zkbContractAsset.getMaintainStartDate() == null && zkbContractAsset.getMaintainEndDate() == null){
+            return false;
+        }else{
+            boolean flag = true;
+            Date now = new Date();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String nowStr = format.format(now);
+            try {
+                now = format.parse(nowStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if(now.getTime() >= zkbContractAsset.getMaintainStartDate().getTime() && now.getTime() <= zkbContractAsset.getMaintainEndDate().getTime()){
+                flag = false;
             }else{
-                Date startDate = zkbcontract.getStartDate();
-                boolean flag = true;
+                flag = true;
+            }
+            return flag;
+        }
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void saveContractAsset(ZkbContract zkbContract, ZkbContractAsset zkbContractAsset){
+        if(zkbContractAsset.getMaintainStartDate() != null && zkbContractAsset.getMaintainEndDate() != null){
+            Date now = new Date();
+            if(now.getTime() >= zkbContractAsset.getMaintainStartDate().getTime() && now.getTime() <= zkbContractAsset.getMaintainEndDate().getTime()){
+                return;
+            }else{
+                Date startDate = zkbContractAsset.getMaintainStartDate();
+                Date endDate =zkbContractAsset.getMaintainEndDate();
                 while (true){
                     Calendar specialDate = Calendar.getInstance();
                     specialDate.setTime(startDate);
                     specialDate.add(Calendar.YEAR, 1);
-                    Date newStartDate = specialDate.getTime();
-                    specialDate.add(Calendar.DAY_OF_YEAR, -1);
-                    Date endDate = specialDate.getTime();
-                    if(endDate.getTime() > zkbcontract.getEndDate().getTime()){
-                        endDate = zkbcontract.getEndDate();
+                    startDate = specialDate.getTime();
+
+                    specialDate.setTime(endDate);
+                    specialDate.add(Calendar.YEAR, 1);
+                    endDate = specialDate.getTime();
+
+                    if(startDate.getTime() > zkbContract.getEndDate().getTime()){
+                        break;
                     }
-                    Date now = new Date();
+                    if(endDate.getTime() > zkbContract.getEndDate().getTime()){
+                        endDate = zkbContract.getEndDate();
+                    }
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                     String nowStr = format.format(now);
                     try {
@@ -2324,20 +2350,48 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    if(now.getTime() >= startDate.getTime() && now.getTime() < endDate.getTime()){
-                        if(zkbContractAsset.getLastSupportMaintainDate().getTime() >= startDate.getTime() && zkbContractAsset.getLastSupportMaintainDate().getTime() < endDate.getTime()){
-                            flag = true;
-                        }else{
-                            flag = false;
-                        }
+                    if(now.getTime() >= startDate.getTime() && now.getTime() <= endDate.getTime()){
+                        zkbContractAsset.setMaintainStartDate(startDate);
+                        zkbContractAsset.setMaintainEndDate(endDate);
+                        zkbContractAssetRepository.save(zkbContractAsset);
                         break;
                     }
-                    startDate = newStartDate;
+                    if(startDate.getTime() >= endDate.getTime()){
+                        break;
+                    }
                 }
-                return flag;
             }
         }else{
-            return true;
+            Date startDate = zkbContract.getStartDate();
+            while (true){
+                Calendar specialDate = Calendar.getInstance();
+                specialDate.setTime(startDate);
+                specialDate.add(Calendar.YEAR, 1);
+                Date newStartDate = specialDate.getTime();
+                specialDate.add(Calendar.DAY_OF_YEAR, -1);
+                Date endDate = specialDate.getTime();
+                if(endDate.getTime() > zkbContract.getEndDate().getTime()){
+                    endDate = zkbContract.getEndDate();
+                }
+                Date now = new Date();
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                String nowStr = format.format(now);
+                try {
+                    now = format.parse(nowStr);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if(now.getTime() >= startDate.getTime() && now.getTime() <= endDate.getTime()){
+                    zkbContractAsset.setMaintainStartDate(startDate);
+                    zkbContractAsset.setMaintainEndDate(endDate);
+                    zkbContractAssetRepository.save(zkbContractAsset);
+                    break;
+                }
+                startDate = newStartDate;
+                if(startDate.getTime() >= endDate.getTime()){
+                    break;
+                }
+            }
         }
     }
 

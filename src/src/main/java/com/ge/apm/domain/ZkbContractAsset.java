@@ -83,8 +83,30 @@ public class ZkbContractAsset {
     @Column(name = "support_maintain_flag")
     private String supportMaintainFlag;
 
+    @Column(name = "maintain_start_date")
+    private Date maintainStartDate;
+
+    @Column(name = "maintain_end_date")
+    private Date maintainEndDate;
+
     @Column(name = "last_support_maintain_date")
     private Date lastSupportMaintainDate;
+
+    public Date getMaintainStartDate() {
+        return maintainStartDate;
+    }
+
+    public void setMaintainStartDate(Date maintainStartDate) {
+        this.maintainStartDate = maintainStartDate;
+    }
+
+    public Date getMaintainEndDate() {
+        return maintainEndDate;
+    }
+
+    public void setMaintainEndDate(Date maintainEndDate) {
+        this.maintainEndDate = maintainEndDate;
+    }
 
     public Date getLastSupportMaintainDate() {
         return lastSupportMaintainDate;
