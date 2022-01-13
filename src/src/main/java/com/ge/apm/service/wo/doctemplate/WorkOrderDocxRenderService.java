@@ -127,11 +127,17 @@ public class WorkOrderDocxRenderService {
            List<String> auditSignatures= (List)source.get("auditSignatureList");
             log.info("auditSignatures:{}",auditSignatures.size());
            if (auditSignatures!=null && !auditSignatures.isEmpty()){
-               for (int i = 0; i < auditSignatures.size(); i++) {
+               int size = auditSignatures.size();
+               for (int i = 0; i < size; i++) {
                    String storageId = auditSignatures.get(i);
                    if (storageId !=null){
                        log.info("storageId:{}",storageId);
                        mapESignSignature(storageId, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
+                   }
+               }
+               if(size<5){
+                   for (int i = size; i < 5; i++) {
+                       mapESignSignature(null, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
                    }
                }
            }
