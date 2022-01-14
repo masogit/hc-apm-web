@@ -971,7 +971,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         subUseQty(zkbContract, zkbPartOrder, qty,userAccount);
                     }else {
                         //不扣除名额，那么申请中-1，剩余+1
-                        subApplyQty(zkbContract,zkbPartOrder, (0- qty),userAccount,false);
+                        if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag()) && CopyByInvok.T.equals(zkbPartOrder.getMaintainFirstFlag())){
+
+                        }else{
+                            subApplyQty(zkbContract,zkbPartOrder, (0- qty),userAccount,false);
+                        }
                     }
                 /*}else{
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
