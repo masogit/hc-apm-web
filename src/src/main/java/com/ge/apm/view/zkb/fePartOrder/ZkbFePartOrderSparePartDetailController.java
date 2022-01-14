@@ -301,6 +301,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
             WebUtil.addErrorMessage(zkbFePartOrderService.checkAsset(systemId),"");
+            this.sparePartsZkbFePartOrderList = null;
             return;
         }
         this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,null,null);
@@ -554,7 +555,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public String supplierReject()
     {
-        Date date = new Date();
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
         int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
@@ -566,7 +566,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             updateContractAssetApplyNum(ZkbFePartOrder.workFlowStatus.TenantReject.toString(),zkbContract);
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(),new Date(),new Date(),GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
 
     /**
