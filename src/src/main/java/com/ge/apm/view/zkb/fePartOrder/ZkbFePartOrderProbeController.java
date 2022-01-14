@@ -457,8 +457,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * 提交
      * @return
      */
-    public String saveAndToListPage()
-    {
+    public String saveAndToListPage() {
+        if (CollectionUtils.isEmpty(this.sparePartsZkbFePartOrderList)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("工单不能为空！"));
+            return "";
+        }
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             return "";
