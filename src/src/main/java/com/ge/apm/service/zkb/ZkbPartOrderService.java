@@ -970,8 +970,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     if("t".equals(zkbPartOrder.getWhetherDeduct())){
                         subUseQty(zkbContract, zkbPartOrder, qty,userAccount);
                     }else {
-                        //不扣除名额，那么申请中-1，剩余+1
-                        subApplyQty(zkbContract,zkbPartOrder, (0- qty),userAccount,false);
+                        if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag()) && CopyByInvok.T.equals(zkbPartOrder.getMaintainFirstFlag())){
+                            return;
+                        }else{
+                            //不扣除名额，那么申请中-1，剩余+1
+                            subApplyQty(zkbContract,zkbPartOrder, (0- qty),userAccount,false);
+                        }
                     }
                 /*}else{
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
@@ -1203,7 +1207,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderStepRepository.save(newZkbPartOrderStep);
 
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-        subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
+        if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag()) && CopyByInvok.T.equals(zkbPartOrder.getMaintainFirstFlag())){
+            return;
+        }else{
+            subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
+        }
     }
 
     @Autowired
@@ -1576,7 +1584,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbContractRepository.save(zkbContract);
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
-                if(CopyByInvok.F.equals(zkbPartOrder.getMaintainFirstFlag())){
+                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
+                if(CopyByInvok.F.equals(zkbPartOrder.getMaintainFirstFlag()) || CopyByInvok.F.equals(zkbContractAsset.getSupportMaintainFlag())){
                     zkbContract.setSpareArtificailUse((zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse()) + qty);
                     zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) - qty);
                     zkbContractRepository.save(zkbContract);
