@@ -935,6 +935,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("rfGroup"), assetInfo.getRfGroup());
         map.put(getMessage("powerOnThreshold"), assetInfo.getPowerOnThreshold());
         map.put(getMessage("assetQuality"), this.getAssetQualityAsString());
+        map.put(getMessage("currentId"), assetInfo.getCurrentId());
         return map;
 
     }
