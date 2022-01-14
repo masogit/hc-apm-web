@@ -509,7 +509,7 @@
                     </p:panelGrid>
                     <br/>
                     <div style="text-align: center">
-                        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderEditController.saveEntity}" oncomplete="PF('zkbConfirmDlg').hide()" update=":growl" icon="ui-icon-check" />
+                        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderEditController.saveData}" oncomplete="PF('zkbConfirmDlg').hide()" update=":growl" icon="ui-icon-check" />
                         <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfirmDlg').hide()" style="margin-left: 30px"/>
                     </div>
 
