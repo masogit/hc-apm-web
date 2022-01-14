@@ -25,11 +25,12 @@ public class ZkbFePartOrder {
      * CommercialAccept Commercial审批通过
      * CommercialReject Commercial拒绝
      * FourHundredsAccept:400回填
+     * FourHundredsAccept:400拒绝
      * GEAdminAccept GEAdmin 全部归还
      * GEAdminAcceptPart GEAdmin 部分归还
      */
     public enum workFlowStatus {
-        Requested, TenantAccept, TenantReject, CommercialAccept, CommercialReject, FourHundredsAccept, GEAdminAccept, GEAdminAcceptPart
+        Requested, TenantAccept, TenantReject, CommercialAccept, CommercialReject, FourHundredsAccept, FourHundredsReject, GEAdminAccept, GEAdminAcceptPart
     }
 
     /**
@@ -44,10 +45,11 @@ public class ZkbFePartOrder {
     /**
      * WaitingAssignment:待租户审批
      * WaitingApm:待400团队回填APM
+     * 400团队 拒绝
      * Complete:完成
      */
     public enum workFlowSteps {
-        Requested, WaitingAssignment, WaitingCommercial, WaitingApm, WaitingGEAdmin, Complete
+        Requested, WaitingAssignment, WaitingCommercial, WaitingApm,WaitingGEAdmin, Complete
     }
 
     public enum zkbPoProbeQuotaType {

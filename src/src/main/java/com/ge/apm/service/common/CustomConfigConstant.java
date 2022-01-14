@@ -182,6 +182,7 @@ public class CustomConfigConstant {
         allFields.put("powerOnThreshold", WebUtil.getMessage("powerOnThreshold"));
         allFields.put("rfId", WebUtil.getMessage("rfId"));
         allFields.put("rfGroup", WebUtil.getMessage("rfGroup"));
+        allFields.put("currentId", WebUtil.getMessage("currentId"));
         allFields.put("assetQuality", WebUtil.getMessage("assetQuality"));
         return allFields;
     }

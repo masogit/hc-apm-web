@@ -694,6 +694,14 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     private String sharedAssetSwapIndexId;
 
+    public String getCurrentId() {
+        return currentId;
+    }
+
+    public void setCurrentId(String currentId) {
+        this.currentId = currentId;
+    }
+
     public String getDashboardPage() {
         return dashboardPage;
     }
