@@ -674,7 +674,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     /**
      * 保存方法
      */
-    public String saveEntity(){
+    public String saveData(){
         boolean flag = true;
         String errorLog = "";
         if(StringUtils.isEmpty(this.orderType)){
@@ -713,7 +713,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                //flag=false;
+                flag=false;
                 errorLog += "附件不能为空！";
             }
         }else{
