@@ -264,6 +264,9 @@ public class ZkbContractService {
             if(StringUtils.isNotEmpty(zkbContractAsset.getTrainReasonFlag())){
                 zkbContractAssetDataMap.put("是否代理商自身原因未完成培训", WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAsset.getTrainReasonFlag()));
             }
+            if(StringUtils.isNotEmpty(zkbContractAsset.getSupportMaintainFlag())){
+                zkbContractAssetDataMap.put("是否由GE FE提供年度1次现场保养", WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAsset.getSupportMaintainFlag()));
+            }
             zkbContractAssetDataMap.put("备注", zkbContractAsset.getAssetInfo().getComments());
             zkbContractAssetDataMap.put("ID", zkbContractAsset.getId());
             zkbContractAssetDataList.add(zkbContractAssetDataMap);

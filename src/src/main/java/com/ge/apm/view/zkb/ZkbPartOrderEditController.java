@@ -904,7 +904,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selected.setScoreFlag(CopyByInvok.F);
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             this.selected.setQty(1);
+            if(StringUtils.isEmpty(maintainFlag)){
+                maintainFlag = CopyByInvok.F;
+            }
         }else{
+            maintainFlag = "";
             this.selected.setQty(0);
             if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 this.selected.setCatNum(1);

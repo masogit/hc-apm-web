@@ -2309,9 +2309,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 e.printStackTrace();
             }
             if(now.getTime() >= zkbContractAsset.getMaintainStartDate().getTime() && now.getTime() <= zkbContractAsset.getMaintainEndDate().getTime()){
-                flag = false;
-            }else{
                 flag = true;
+            }else{
+                flag = false;
             }
             return flag;
         }
@@ -2388,7 +2388,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     break;
                 }
                 startDate = newStartDate;
-                if(startDate.getTime() >= endDate.getTime()){
+
+                if(newStartDate.getTime() >= zkbContract.getEndDate().getTime()){
                     break;
                 }
             }
