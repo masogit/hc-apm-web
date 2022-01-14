@@ -421,8 +421,11 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         this.selectZkbFePartOrderReturn = null;
     }
 
-    public String saveAndToListPage()
-    {
+    public String saveAndToListPage(){
+        if (CollectionUtils.isEmpty(this.sparePartsZkbFePartOrderList)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("工单不能为空！"));
+            return "";
+        }
         if(CollectionUtils.isEmpty(this.selected.getZkbFePartOrderAssetInfoList()))
         {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_sparePartListError"));
