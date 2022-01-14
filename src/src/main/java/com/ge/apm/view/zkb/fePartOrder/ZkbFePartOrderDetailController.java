@@ -225,15 +225,15 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return;
         }
         this.zkbFePartOrderService.fullInfoBySystemId(this.selected, systemId);
-        //验证设备状态
+
+        this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
+        this.contractError = false;
+
+//验证设备状态
         if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
             WebUtil.addErrorMessage(zkbFePartOrderService.checkAsset(systemId),"");
             return;
         }
-        this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
-        this.contractError = false;
-
-
         //未匹配到合同
         if (CollectionUtils.isEmpty(this.contractList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_notFindContractError"));
@@ -378,9 +378,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 2, this.selected, this.currentUser, this.i18Map.get("FourHundredsAccept"));
-        Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_WECHART);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
     }
 
     /**
@@ -393,9 +392,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 4, this.selected, this.currentUser, this.i18Map.get("FourHundredsReject"));
-        Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_WECHART);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
     }
 
     /**
