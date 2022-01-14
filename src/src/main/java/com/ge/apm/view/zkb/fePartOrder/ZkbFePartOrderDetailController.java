@@ -2,10 +2,7 @@ package com.ge.apm.view.zkb.fePartOrder;
 
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbContract;
-import com.ge.apm.domain.ZkbFePartOrder;
-import com.ge.apm.domain.ZkbFePartOrderUserConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.zkb.ZkbContractAssetService;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
@@ -20,7 +17,6 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -103,6 +99,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      *  提示信息confirm message
      */
     private String confirmMessage;
+
+    /**
+     *  代理商确认本次扣除信息
+     */
+    private String thisDeductionMessage;
     @Override
     protected void init() {
         super.init();
@@ -174,28 +175,43 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.confirmMessage =this.genConfirmMessage();
     }
 
+
+    public Boolean fourHundredStatus() {
+        Boolean fourHundredStatus = true;
+        if(ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString().equals(this.selected.getStatus())){
+            fourHundredStatus = false;
+        }
+        return fourHundredStatus;
+    }
     /**
      * @autor by lyj 503277717
      * @date 2021/12/21
      * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
-    */
-
+     */
     public String genConfirmMessage(){
         String confirmMessage = new String();
         ZkbContract zct = this.contractList.get(0);
-        if("ManMade".equals(this.selected.getOrderType())){//人工
-            String geArtificialSupportTimes = zct.getGeArtificialSupportTimes()!= null?zct.getGeArtificialSupportTimes().toString():"0";
-            confirmMessage += "人工支持剩余次数:"+geArtificialSupportTimes;
-        }else if("Probe".equals(this.selected.getOrderType())){//探头
-            String probeQuota = zct.getProbeQuota()!=null?zct.getProbeQuota().toString():"0";
-            String probeQuotaNormal = zct.getProbeQuotaNormal()!=null?zct.getProbeQuotaNormal().toString():"0";
-            String probeQuotaSpecial = zct.getProbeQuotaSpecial()!=null?zct.getProbeQuotaSpecial().toString():"0";
-            confirmMessage += "探头任意剩余名额:"+probeQuota+"\n";
-            confirmMessage += "探头普通剩余名额:"+probeQuotaNormal+"\n";
-            confirmMessage += "探头特殊剩余名额:"+probeQuotaSpecial;
-        }else if("SpareParts".equals(this.selected.getOrderType())){//备件
-            String spareQuota = zct.getSpareQuota()!=null?zct.getSpareQuota().toString():"0";
-            confirmMessage += "备件剩余名额:"+spareQuota;
+        ZkbFePartOrder zfpo = this.selected;
+        if("ManMade".equals(this.selected.getOrderType())){//人工  新逻辑扣减     //  旧逻辑扣联合名额
+            if("false".equals(this.selected.getSubtractTotalStatus())){
+                confirmMessage += "本次申请不扣除名额！";
+                thisDeductionMessage = "本次申请不扣除名额！";
+            }else{
+                if ("DI".equals(zct.getContractType())
+                        || "PCB".equals(zct.getContractType())
+                        || "PCB MVS".equals(zct.getContractType())) {
+                    confirmMessage += "本次扣除1个备件+人工+保养名额；";
+                    thisDeductionMessage = "本次扣除1个备件+人工+保养名额。";
+                    String spareArtificail = zct.getSpareArtificail()!= null?zct.getSpareArtificail().toString():"0";
+                    confirmMessage += "备件+人工+保养剩余名额为"+spareArtificail+"。";
+                } else if ("CCS".equals(zct.getContractType())
+                        || "Biomed".equals(zct.getContractType())) {
+                    confirmMessage += "本次扣除1个人工支持名额；";
+                    thisDeductionMessage = "本次扣除1个人工支持名额。";
+                    String geArtificialSupportTimes = zct.getGeArtificialSupportTimes()!= null?zct.getGeArtificialSupportTimes().toString():"0";
+                    confirmMessage += "人工支持剩余名额为"+geArtificialSupportTimes+"。";
+                }
+            }
         }
         return confirmMessage.toString();
     }
@@ -209,8 +225,15 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return;
         }
         this.zkbFePartOrderService.fullInfoBySystemId(this.selected, systemId);
+
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.contractError = false;
+
+//验证设备状态
+        if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
+            WebUtil.addErrorMessage(zkbFePartOrderService.checkAsset(systemId),"");
+            return;
+        }
         //未匹配到合同
         if (CollectionUtils.isEmpty(this.contractList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_notFindContractError"));
@@ -222,6 +245,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             contractError = true;
         }
     }
+
 
     public String backList() {
         return this.zkbFePartOrderService.backList(this.queryStatus);
@@ -350,12 +374,26 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      * @return
      */
     public String fullApmInfo() {
-
+        this.selected.setFullApmInfoUser(this.userName);
+        this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 2, this.selected, this.currentUser, this.i18Map.get("FourHundredsAccept"));
-        Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_WECHART);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
+    }
+
+    /**
+     * 400团队拒绝
+     *
+     * @return
+     */
+    public String rejectApmInfo() {
+        this.selected.setFullApmInfoUser(this.userName);
+        this.selected.setFullApmInfoDate(new Date());
+        ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 4, this.selected, this.currentUser, this.i18Map.get("FourHundredsReject"));
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString(),
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
     }
 
     /**
@@ -399,4 +437,13 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public void setConfirmMessage(String confirmMessage) {
         this.confirmMessage = confirmMessage;
     }
+
+    public String getThisDeductionMessage() {
+        return thisDeductionMessage;
+    }
+
+    public void setThisDeductionMessage(String thisDeductionMessage) {
+        this.thisDeductionMessage = thisDeductionMessage;
+    }
+
 }

@@ -252,6 +252,7 @@ public class ZkbContractService {
             zkbContractAssetDataMap.put("Sys ID", zkbContractAsset.getAssetInfo().getSystemId());
             zkbContractAssetDataMap.put("科室", zkbContractAsset.getAssetInfo().getClinicalDeptName());
             zkbContractAssetDataMap.put("设备名称", zkbContractAsset.getAssetInfo().getName());
+            zkbContractAssetDataMap.put("设备分类", WebUtil.getFieldValueMessage("assetGroup", zkbContractAsset.getAssetInfo().getAssetGroup()!=null?zkbContractAsset.getAssetInfo().getAssetGroup().toString():""));
             String rfValue = zkbContractAsset.getAssetInfo().getRepairForm() ==null ? "" : String.valueOf(zkbContractAsset.getAssetInfo().getRepairForm());
             zkbContractAssetDataMap.put("维修类型", WebUtil.getFieldValueMessage("repairForm",rfValue));
             if(zkbContractAsset.getAssetInfo() != null){
@@ -262,6 +263,9 @@ public class ZkbContractService {
             }
             if(StringUtils.isNotEmpty(zkbContractAsset.getTrainReasonFlag())){
                 zkbContractAssetDataMap.put("是否代理商自身原因未完成培训", WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAsset.getTrainReasonFlag()));
+            }
+            if(StringUtils.isNotEmpty(zkbContractAsset.getSupportMaintainFlag())){
+                zkbContractAssetDataMap.put("是否由GE FE提供年度1次现场保养", WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAsset.getSupportMaintainFlag()));
             }
             zkbContractAssetDataMap.put("备注", zkbContractAsset.getAssetInfo().getComments());
             zkbContractAssetDataMap.put("ID", zkbContractAsset.getId());

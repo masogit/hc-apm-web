@@ -412,7 +412,14 @@
         </h:panelGroup>
     </c:if>
 
-
+    <!--    电流ID-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'currentId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.currentId}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['currentId'].required? '*':''}</span></label>
+            <p:inputText  id="currentId" value="#{assetInfoEditController.selected.currentId}" required="#{assetInfoEditController.customConfig.assetFields['currentId'].required}"
+                          readonly="#{!assetInfoEditController.needEdit('currentId')}" />
+        </h:panelGroup>
+    </c:if>
 
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'parentAssetId')}" >
         <h:panelGroup>
