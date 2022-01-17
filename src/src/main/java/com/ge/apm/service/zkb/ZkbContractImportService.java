@@ -817,7 +817,7 @@ public class ZkbContractImportService {
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser,null);
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
                     Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
-                    AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
+                    AssetInfo assetInfo = assetInfoRepository.findByUid(newZkbContractAsset.getAssetId());
                     if(assetInfo != null && repairForm != null){
                         if(!repairForm.equals(assetInfo.getRepairForm())){
                             assetInfo.setRepairForm(repairForm);
