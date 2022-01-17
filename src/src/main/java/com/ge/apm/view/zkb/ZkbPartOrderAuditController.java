@@ -291,6 +291,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                                 whetherDeductEdit = true;
                                 selected.setWhetherDeduct(CopyByInvok.T);
                             }
+                            if(selected.getAssetInfo().getRepairForm() != null && selected.getAssetInfo().getRepairForm() == 2){
+                                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                                    whetherDeductEdit = true;
+                                    selected.setWhetherDeduct(CopyByInvok.F);
+                                }else{
+                                    selected.setWhetherDeduct(CopyByInvok.T);
+                                }
+                            }else{
+                                selected.setWhetherDeduct(CopyByInvok.T);
+                            }
                         }
                     }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         if(CopyByInvok.NORMAL_ONE.equals(selected.getArtificialType())){
