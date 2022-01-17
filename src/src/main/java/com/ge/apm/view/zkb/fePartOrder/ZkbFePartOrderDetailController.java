@@ -232,6 +232,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 //验证设备状态
         if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
             WebUtil.addErrorMessage(zkbFePartOrderService.checkAsset(systemId),"");
+            this.contractList = null;
+            this.contractError = true;
             return;
         }
         //未匹配到合同
