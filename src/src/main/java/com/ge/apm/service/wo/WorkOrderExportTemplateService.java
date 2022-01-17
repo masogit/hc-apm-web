@@ -46,7 +46,6 @@ public class WorkOrderExportTemplateService {
         WorkOrderExportTemplate template = getPrioritizedTemplate(templates, uids);
 
         if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
-            log.info("模板StorageId: {template.getStorageId()}");
             templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
         }
         if (templateBytes == null) {
@@ -57,7 +56,6 @@ public class WorkOrderExportTemplateService {
             } else {
                 fileName = "template_en.docx";
             }
-            log.info("fileName: {}",fileName);
             templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/"+fileName));
         }
         return templateBytes;
