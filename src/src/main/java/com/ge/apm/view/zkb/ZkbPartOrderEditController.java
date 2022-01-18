@@ -832,7 +832,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(CopyByInvok.T.equals(maintainFlag)){
-                if(CopyByInvok.F.equals(selected.getMaintainFirstFlag())){
+                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
+                if(CopyByInvok.F.equals(selected.getMaintainFirstFlag()) || CopyByInvok.F.equals(zkbContractAsset.getSupportMaintainFlag())){
                     Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
                     if(contractCount - selected.getQty() < 0){
                         reLog = "备件+人工+保养剩余名额不足，请检查！";
