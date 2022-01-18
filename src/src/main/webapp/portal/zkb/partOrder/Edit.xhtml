@@ -57,7 +57,7 @@
                             <label class="label">报修单号</label>
                             <p:inputText id="assetName" value="#{zkbPartOrderEditController.queryWorkFlow.serviceRequest.srNum}" maxlength="100" required="false"/>
                         </h:panelGroup>
-                        <p:commandButton validateClient="false"  actionListener="#{zkbPartOrderEditController.getQueryWorkFlowList()}" value="#{msg.Search}" update="zkbwkEditForm"/>
+                        <p:commandButton validateClient="false"  actionListener="#{zkbPartOrderEditController.getQueryWorkFlowList()}" value="#{msg.Search}" update="zkbwkEditForm zkbContractDatalist zkbPartOrderEditForm"/>
                     </p:panelGrid>
                     <p:dataTable id="zkbWkDatalist" value="#{zkbPartOrderEditController.v2_listHashMap}" var="item"
                                  widgetVar="zkbWkDatalist" selectionMode="single" selection="#{zkbPartOrderEditController.selectedWorkFlow}"
