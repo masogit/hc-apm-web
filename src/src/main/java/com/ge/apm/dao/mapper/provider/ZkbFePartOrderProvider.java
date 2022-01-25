@@ -14,7 +14,7 @@ import java.util.Map;
 public class ZkbFePartOrderProvider {
 
     private static final String dateFormat = "yyyyMMdd";
-  
+
     /**
      * 查出设备信息
      * @param param 过滤条件
@@ -125,6 +125,39 @@ public class ZkbFePartOrderProvider {
                 "  AND T.is_valid = TRUE\n" +
                 "  AND T.is_deleted = FALSE\n" +
                 "  and exists(select 1 from tenant_info ttt WHERE ttT.type = '3' AND ttt.uid = t.tenant_uid)");
+        return sb.toString();
+    }
+
+    /**
+     * 查出设备信息
+     * @param param 过滤条件
+     * @return
+     */
+    public String loadAssetInfoForHisData(Map<String,String> param){
+        String systemId = param.get("systemId");//设备system id
+        String contractId = param.get("contractId");
+        String tenantUid = param.get("tenantUid");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n" +
+                "SELECT TT.name as comments,\n" +
+                "                       t.qr_code,\n" +
+                "                       t.uid,\n" +
+                "                       t.name,\n" +
+                "                      t.depart_num,\n" +
+                "                  t.clinical_dept_name,\n" +
+                "                       t.function_type,\n" +
+                "                       t.system_id,\n" +
+                "                       t.asset_group,\n" +
+                "                       t.repair_form\n" +
+                "                FROM asset_info T\n" +
+                "                    INNER JOIN zkb_contract_asset zca ON zca.asset_id = t.uid\n" +
+                "                    LEFT JOIN tenant_info TT ON TT.uid = T.tenant_uid\n" +
+                "                WHERE T.system_id = '"+systemId+"'\n" +
+                "                  and zca.contract_id ='"+contractId+"'\n" +
+                "                  and t.tenant_uid = '"+tenantUid+"'\n" +
+                "                  AND T.is_valid = TRUE\n" +
+                "                  AND T.is_deleted = FALSE\n" +
+                "                limit 1");
         return sb.toString();
     }
 
