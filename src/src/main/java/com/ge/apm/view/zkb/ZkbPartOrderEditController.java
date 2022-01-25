@@ -1,9 +1,6 @@
 package com.ge.apm.view.zkb;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.ZkbContractAssetRepository;
-import com.ge.apm.dao.ZkbPartOrderRepository;
-import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.*;
@@ -70,6 +67,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private ZkbContractAssetRepository zkbContractAssetRepository;
     private ZkbContractAssetService zkbContractAssetService;
     private String maintainFlag;
+    private List<I18nMessage> exchangeTypeList = new ArrayList<>();
+    private I18nMessageRepository i18nMessageRepository;
 
     @Override
     protected void init() {
@@ -79,6 +78,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         userContextService = WebUtil.getBean(UserContextService.class);
         zkbIntegralService = WebUtil.getBean(ZkbIntegralService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
         zkbContractAssetRepository = WebUtil.getBean(ZkbContractAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
@@ -239,7 +239,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void workFlowSelected(SelectEvent event){
-        if(v2_listHashMap ==null || v2_listHashMap.get(0) ==null || event.getObject() == null ){
+        if(v2_listHashMap ==null || v2_listHashMap.size() == 0 || v2_listHashMap.get(0) ==null || event.getObject() == null ){
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "未查询出合同数据！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
             return;
@@ -431,11 +431,28 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 //如果是备件机型默认超神低端机
                 //selected.setArtificialType("3");
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-                scoreFlagChange();
+                editCurrentScoreFlag();
             }
         }
         calcRemainQty();
 
+    }
+
+    public void editCurrentScoreFlag(){
+        //积分不够不能申请
+        currentScore = zkbIntegralService.queryScoreFlag(selectionTenantInfo);
+        currentScoreText = "当前积分："+ currentScore;
+        if(currentScore < ZkbIntegralService.unitScore){
+            currentScoreFlag = true;
+        }else{
+            currentScoreFlag = false;
+        }
+
+        //校验
+        if(currentScoreFlag){
+            boolean r = zkbPartOrderService.checkScoreFlagValid(selected,selectedContract);
+            currentScoreFlag = !r;
+        }
     }
 
     private boolean showProblemOrderNumber = false;
@@ -456,6 +473,19 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return "休假中";
         }
         return "";
+    }
+
+    public boolean scoreFlagRender(){
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            if(CopyByInvok.T.equals(maintainFlag)){
+                return true;
+            }else{
+                if(!CopyByInvok.NORMAL_TWO.equals(artificialType)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void prepareItemCreate(){
@@ -902,8 +932,25 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void orderTypeChange(){
-        selected.setScoreFlag(CopyByInvok.F);
+        v2_listHashMap = new ArrayList<>();
+        contractList = new ArrayList<>();
+        assetInfo  = new AssetInfo();
+        selectedContract = new ZkbContract();
+        selected = new ZkbPartOrder();
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            selected.setScoreFlag(CopyByInvok.F);
+            if(StringUtils.isEmpty(maintainFlag)){
+                maintainFlag = CopyByInvok.F;
+            }
+
+            if(StringUtils.isNotEmpty(artificialType)){
+                if(queryWorkFlow.getAssetInfo() != null && (StringUtils.isNotEmpty(queryWorkFlow.getAssetInfo().getSystemId()) || StringUtils.isNotEmpty(queryWorkFlow.getServiceRequest().getSrNum()))) {
+                    getQueryWorkFlowList();
+                }
+            }
+
+        }
+        /*if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             this.selected.setQty(1);
             if(StringUtils.isEmpty(maintainFlag)){
                 maintainFlag = CopyByInvok.F;
@@ -931,25 +978,31 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }
-        calcRemainQty();
+        calcRemainQty();*/
     }
 
     public void scoreFlagChange(){
+        if(CopyByInvok.T.equals(selected.getScoreFlag())){
+            exchangeTypeList = i18nMessageRepository.findI18nByType("zkbExchangeType");
+            if(CopyByInvok.T.equals(maintainFlag)){
+                for(I18nMessage i : exchangeTypeList){
+                    if("artificial".equals(i.getMsgKey())){
+                        exchangeTypeList.remove(i);
+                        break;
+                    }
+                }
+            }
+        }else{
+            exchangeTypeList = new ArrayList<>();
+        }
+    }
+
+    public void ssaKeyFlagChange(){
         if("t".equals(selected.getSsaKeyFlag())){
             currentScoreFlag = true;
             currentScoreText = "";
             selected.setScoreFlag(CopyByInvok.F);
             return;
-        }
-        currentScore = zkbIntegralService.queryScoreFlag(selectionTenantInfo);
-        currentScoreText = "当前积分："+ currentScore;
-        boolean r = true;
-        if(currentScore < selected.getQty() * ZkbIntegralService.unitScore){
-            currentScoreFlag = true;
-            /*FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "积分不够", "");
-            FacesContext.getCurrentInstance().addMessage(null, message);*/
-        }else{
-            currentScoreFlag = false;
         }
     }
 
@@ -1301,6 +1354,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setMaintainFlag(String maintainFlag) {
         this.maintainFlag = maintainFlag;
+    }
+
+    public List<I18nMessage> getExchangeTypeList() {
+        return exchangeTypeList;
+    }
+
+    public void setExchangeTypeList(List<I18nMessage> exchangeTypeList) {
+        this.exchangeTypeList = exchangeTypeList;
     }
 
     @Override
