@@ -1350,15 +1350,20 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         } else if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             //region  人工
             if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
-                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), assetInfo.getUid());
-                if(CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
-                    if(CopyByInvok.F.equals(zkbPartOrder.getMaintainFirstFlag())){
-                        return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
-                    }else {
-                        return "该申请不扣任何名额！";
-                    }
+                if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
+                    //扣除积分
+                    return "该申请扣除积分:"+ zkbPartOrder.getQty() * 200;
                 }else{
-                    return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
+                    ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), assetInfo.getUid());
+                    if(CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                        if(CopyByInvok.F.equals(zkbPartOrder.getMaintainFirstFlag())){
+                            return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
+                        }else {
+                            return "该申请不扣任何名额！";
+                        }
+                    }else{
+                        return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
+                    }
                 }
             }else{
                 if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
