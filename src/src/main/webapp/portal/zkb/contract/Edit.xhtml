@@ -40,6 +40,7 @@
                         <h:panelGroup>
                             <label class="label">是否ZKB 599方案*</label>
                             <p:selectOneMenu  value="#{zkbContractEditController.selected.fiveNineNineFlag}" required="true" requiredMessage="是否ZKB 599合同 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="firstYearFlagGroup linkContractNoGroup"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemValue="Y" itemLabel="是"/>
                                 <f:selectItem itemValue="N" itemLabel="否"/>
@@ -56,13 +57,13 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_startDate}*</label>
-                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.contractStartDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_endDate}*
                             </label>
-                            <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.contractEndDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">名额扣除类型*</label>
@@ -249,18 +250,23 @@
                             <label class="label">#{msg.zkbContract_remark}</label>
                             <p:inputText id="remark" value="#{zkbContractEditController.selected.remark}" />
                         </h:panelGroup>
-                       <!-- <h:panelGroup>
-                            <label class="label">实际开始时间</label>
-                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <h:panelGroup id="firstYearFlagGroup">
+                            <h:panelGroup rendered="#{zkbContractEditController.selected.fiveNineNineFlag eq 'Y'}">
+                                <label class="label">是否599方案第一年</label>
+                                <p:selectOneMenu value="#{zkbContractEditController.selected.firstYearFlag}" required="true" requiredMessage="是否599方案第一年 #{msg.ValidationRequire}" >
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItem itemLabel="是" itemValue="t"/>
+                                    <f:selectItem itemLabel="否" itemValue="f"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">实际结束时间</label>
-                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <h:panelGroup id="linkContractNoGroup">
+                            <h:panelGroup rendered="#{zkbContractEditController.selected.fiveNineNineFlag eq 'Y'}">
+                                <label class="label">关联合同号</label>
+                                <p:inputText id="linkContractNo" value="#{zkbContractEditController.selected.linkContractNo}" />
+                            </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">599计数年</label>
-                            <p:inputText value="#{zkbContractEditController.selected.yearCount}" />
-                        </h:panelGroup>-->
+
                     </p:panelGrid>
 
 
