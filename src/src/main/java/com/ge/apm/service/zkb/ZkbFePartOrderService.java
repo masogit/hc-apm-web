@@ -386,9 +386,59 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param systemId       设备system id
      * @return
      */
-    public ZkbFePartOrder fullInfoBySystemId(ZkbFePartOrder zkbFePartOrder, String systemId) {
+    public List<AssetInfo> fullInfoBySystemId(ZkbFePartOrder zkbFePartOrder, String systemId) {
+        zkbFePartOrder.setSystemId(systemId);
+        List<AssetInfo> listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoBySysId(systemId);
+        return CollectionUtils.isNotEmpty(listAssetInfo)?listAssetInfo:new ArrayList<AssetInfo>();
+    }
+
+    /**
+     * 根据UID获取相关信息
+     *
+     * @param UID
+     * @param UID       设备system id
+     * @return
+     */
+    public List<AssetInfo> fullInfoByUID(String UID) {
+        List<AssetInfo> listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoByUid(UID);
+        return CollectionUtils.isNotEmpty(listAssetInfo)?listAssetInfo:new ArrayList<AssetInfo>();
+    }
+
+    /**
+     * 点击sysid 后的方法
+     * @param zkbFePartOrder
+     * @param assetInfo
+     * @return
+     */
+    public List<ZkbFePartOrder> fullInfoBySystemIdBuildData(ZkbFePartOrder zkbFePartOrder,AssetInfo assetInfo) {
+        List<ZkbFePartOrder> list = this.zkbFePartOrderMapper.loadAssetInfoBuildByUid(assetInfo.getUid());
+        if (CollectionUtils.isEmpty(list)||list.size()>1) {
+            zkbFePartOrder.setContractId(null);
+            zkbFePartOrder.setFunctionType(null);
+            zkbFePartOrder.setContractId(null);
+            zkbFePartOrder.setHospitalName(null);
+            zkbFePartOrder.setTenantUid(null);
+            zkbFePartOrder.setSubtractTotalStatus(null);
+            zkbFePartOrder.setAssetType(null);
+            return list;
+        }
+        ZkbFePartOrder item = list.get(0);
+        zkbFePartOrder.setContractId(item.getContractId());
+        zkbFePartOrder.setFunctionType(item.getFunctionType());
+        zkbFePartOrder.setHospitalName(item.getHospitalName());
+        zkbFePartOrder.setTenantUid(item.getTenantUid());
+        zkbFePartOrder.setAssetType(item.getAssetType());
+        zkbFePartOrder.setAssetInfoId(assetInfo.getUid());
+        if (assetTypeHighMachineValue.equals(zkbFePartOrder.getAssetType())) {
+            zkbFePartOrder.setSubtractTotalStatus("false");
+        }
+        return list;
+    }
+    /*public ZkbFePartOrder fullInfoBySystemId(ZkbFePartOrder zkbFePartOrder, String systemId) {
         zkbFePartOrder.setSystemId(systemId);
         List<ZkbFePartOrder> list = this.zkbFePartOrderMapper.loadAssetInfo(systemId);
+        List<AssetInfo> listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoBySysId(systemId);
+
         if (CollectionUtils.isEmpty(list)) {
             zkbFePartOrder.setContractId(null);
             zkbFePartOrder.setFunctionType(null);
@@ -410,7 +460,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             zkbFePartOrder.setSubtractTotalStatus("false");
         }
         return zkbFePartOrder;
-    }
+    }*/
 
     /**
      * 检查合同和systemId是否一致

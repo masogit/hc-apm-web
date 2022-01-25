@@ -294,7 +294,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      * @param systemId systemid
      * @param sr 报修单号
      */
-    public void getSparePartsZkbFePartOrder(String systemId,String sr) {
+   /* public void getSparePartsZkbFePartOrder(String systemId,String sr) {
         if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr)){
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
             return;
@@ -305,8 +305,17 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             return;
         }
         this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,null,null);
-    }
+    }*/
 
+    public void getSparePartsZkbFePartOrder(String systemId,String sr)
+    {
+        if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
+            return;
+        }
+        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,null,null);
+    }
     /**
      * 选择单据
      */
