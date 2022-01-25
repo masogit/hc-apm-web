@@ -534,35 +534,9 @@ public class ZkbContractService {
             }else{
                 quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),currentUser);
             }
-            if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag())){
-                zkbContract.setStartDate(zkbContract.getContractStartDate());
-                int year = zkbContract.getYearCount() == null ? 1 :  zkbContract.getYearCount();
-                if(zkbContract.getYearCount() == null){
-                    zkbContract.setYearCount(1);
-                }
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(zkbContract.getContractStartDate());
-                cal.add(Calendar.YEAR, year);
-                cal.add(Calendar.DATE, -1);
-                zkbContract.setEndDate(cal.getTime());
-            }else{
-                zkbContract.setStartDate(zkbContract.getContractStartDate());
-                zkbContract.setEndDate(zkbContract.getContractEndDate());
-            }
+
             zkbContract = contractRepository.save(zkbContract);
         }else {
-            if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag())){
-                zkbContract.setYearCount(1);
-                zkbContract.setStartDate(zkbContract.getContractStartDate());
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(zkbContract.getContractStartDate());
-                cal.add(Calendar.YEAR, 1);
-                cal.add(Calendar.DATE, -1);
-                zkbContract.setEndDate(cal.getTime());
-            }else{
-                zkbContract.setStartDate(zkbContract.getContractStartDate());
-                zkbContract.setEndDate(zkbContract.getContractEndDate());
-            }
             zkbContract = contractRepository.save(zkbContract);
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbContract.class.getSimpleName(),currentUser,null);

@@ -296,7 +296,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
                 if(ZkbContract.YOrNEnum.Y.toString().equals(selectedContract.getFiveNineNineFlag()) && ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
-                    if(selectedContract.getYearCount() == 1 && (zkbContractAsset.getApplyNum() == null || zkbContractAsset.getApplyNum() == 0)){
+                    if(CopyByInvok.T.equals(selectedContract.getFirstYearFlag()) && (zkbContractAsset.getApplyNum() == null || zkbContractAsset.getApplyNum() == 0)){
                         Boolean r = zkbContractAssetService.checkHalfAsset(selectedContract.getId(),assetInfo.getUid());
                         if(r == null){
                             WebUtil.addErrorMessage("合同中没有高端机设备！","");
@@ -544,6 +544,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if("Create".equals(this.actionItemName)){
             if(this.selected == null){
                 this.selected = new ZkbPartOrder();
+                selected.setRequestDate(new Date());
+                selected.setRequestUser(currentUser.getName());
+                selected.setRequestPhone(currentUser.getTelephone());
             }
             if(this.selected.getZkbPartOrderItems() ==null){
                 this.selected.setZkbPartOrderItems(new ArrayList<>());
@@ -964,6 +967,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         assetInfo  = new AssetInfo();
         selectedContract = new ZkbContract();
         selected = new ZkbPartOrder();
+        selected.setRequestDate(new Date());
+        selected.setRequestUser(currentUser.getName());
+        selected.setRequestPhone(currentUser.getTelephone());
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             selected.setScoreFlag(CopyByInvok.F);
             if(StringUtils.isEmpty(maintainFlag)){

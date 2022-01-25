@@ -321,6 +321,28 @@ public class ZkbContract implements ChineseName, Serializable {
     @Column(name = "renew_flag")
     private String renewFlag;
 
+    @Column(name = "first_year_flag")
+    private String firstYearFlag;
+
+    @Column(name = "link_contract_no")
+    private String linkContractNo;
+
+    public String getFirstYearFlag() {
+        return firstYearFlag;
+    }
+
+    public void setFirstYearFlag(String firstYearFlag) {
+        this.firstYearFlag = firstYearFlag;
+    }
+
+    public String getLinkContractNo() {
+        return linkContractNo;
+    }
+
+    public void setLinkContractNo(String linkContractNo) {
+        this.linkContractNo = linkContractNo;
+    }
+
     public Date getContractStartDate() {
         return contractStartDate;
     }
