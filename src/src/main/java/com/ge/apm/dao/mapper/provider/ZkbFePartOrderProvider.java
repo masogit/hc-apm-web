@@ -14,7 +14,7 @@ import java.util.Map;
 public class ZkbFePartOrderProvider {
 
     private static final String dateFormat = "yyyyMMdd";
-
+  
     /**
      * 查出设备信息
      * @param param 过滤条件
