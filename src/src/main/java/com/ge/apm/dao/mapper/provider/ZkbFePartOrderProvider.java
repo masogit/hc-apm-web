@@ -14,7 +14,7 @@ import java.util.Map;
 public class ZkbFePartOrderProvider {
 
     private static final String dateFormat = "yyyyMMdd";
-
+  
     /**
      * 查出设备信息
      * @param param 过滤条件
@@ -42,6 +42,92 @@ public class ZkbFePartOrderProvider {
                 " limit 1");
         return sb.toString();
     }
+
+    /**
+     * 查出设备信息
+     * @param param 过滤条件
+     * @return
+     */
+    public String loadAssetInfoBuildByUid(Map<String,String> param){
+        String uid = param.get("uid");//设备system id
+        StringBuilder sb = new StringBuilder();
+        sb.append(" SELECT  ai.system_id, " +
+                " ai.function_type, " +
+                " ac.ID AS contract_id, " +
+                " ai.tenant_uid, "+
+                " ai.clinical_dept_name AS hospital_name, " +
+                " zca.asset_type AS asset_type," +
+                " ac.end_date " +
+                " FROM " +
+                " zkb_contract ac " +
+                " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id " +
+                " INNER JOIN asset_info ai ON ai.uid = zca.asset_id " +
+                " WHERE " +
+                " ai.uid = '"+uid+"' " +
+                " AND now() between ac.start_date and ac.end_date");
+        return sb.toString();
+    }
+
+
+
+
+    /**
+     * 查出设备信息
+     * @param param 过滤条件
+     * @return
+     */
+    public String loadAssetInfoBySysId(Map<String,String> param){
+        String systemId = param.get("systemId");//设备system id
+        String currentDate = this.getDateStr();
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT TT.name as comments,\n" +
+                "       t.qr_code,\n" +
+                "       t.uid,\n" +
+                "       t.name,\n" +
+                "       t.depart_num,\n" +
+                "       t.clinical_dept_name,\n" +
+                "       t.function_type,\n" +
+                "       t.system_id,\n" +
+                "       t.asset_group,\n" +
+                "       t.repair_form\n" +
+                "FROM asset_info T\n" +
+                "         LEFT JOIN tenant_info TT ON TT.uid = T.tenant_uid\n" +
+                "WHERE T.system_id = '"+systemId+"'\n" +
+                "  AND T.is_valid = TRUE\n" +
+                "  AND T.is_deleted = FALSE\n" +
+                "  and exists(select 1 from tenant_info ttt WHERE ttT.type = '3' AND ttt.uid = t.tenant_uid)");
+        return sb.toString();
+    }
+
+
+    /**
+     * 查出设备信息
+     * @param param 过滤条件
+     * @return
+     */
+    public String loadAssetInfoByUid(Map<String,String> param){
+        String uid = param.get("uid");//设备system id
+        String currentDate = this.getDateStr();
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT TT.name as comments,\n" +
+                "       t.qr_code,\n" +
+                "       t.uid,\n" +
+                "       t.name,\n" +
+                "       t.depart_num,\n" +
+                "       t.clinical_dept_name,\n" +
+                "       t.function_type,\n" +
+                "       t.system_id,\n" +
+                "       t.asset_group,\n" +
+                "       t.repair_form\n" +
+                "FROM asset_info T\n" +
+                "         LEFT JOIN tenant_info TT ON TT.uid = T.tenant_uid\n" +
+                "WHERE T.uid = '"+uid+"'\n" +
+                "  AND T.is_valid = TRUE\n" +
+                "  AND T.is_deleted = FALSE\n" +
+                "  and exists(select 1 from tenant_info ttt WHERE ttT.type = '3' AND ttt.uid = t.tenant_uid)");
+        return sb.toString();
+    }
+
 
     private String getDateStr()
     {
