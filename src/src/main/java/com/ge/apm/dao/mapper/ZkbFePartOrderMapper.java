@@ -30,6 +30,13 @@ public interface ZkbFePartOrderMapper {
      */
     @SelectProvider(type = ZkbFePartOrderProvider.class,method="loadAssetInfoByUid")
     List<AssetInfo> loadAssetInfoByUid(@Param("uid") String uid);
+    /**
+     * 根据SYSTEM ID 和 contract_id tenant_uid 获取设备信息
+     */
+    @SelectProvider(type = ZkbFePartOrderProvider.class,method="loadAssetInfoForHisData")
+    List<AssetInfo> loadAssetInfoForHisData(@Param("systemId") String systemId,@Param("contractId") String contractId,@Param("tenantUid") String tenantUid);
+
+
 
     /**
      * 根据systemId和用户tenantUID获取设备信息

@@ -199,7 +199,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         super.prepareEdit();
         this.selected = this.zkbFePartOrderRepository.findById(this.id);
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
-        this.zkbAssetInfoList = this.zkbFePartOrderService.fullInfoByUID(this.selected.getAssetInfoId());
+        this.zkbAssetInfoList = this.zkbFePartOrderService.initAssetInfo(this.selected);
         this.zkbAssetInfoList.stream().forEach(e -> e.setAssetGroupName(WebUtil.getFieldValueMessage("assetGroup",  e.getAssetGroup()!=null? e.getAssetGroup().toString():"")));
         this.confirmMessage =this.genConfirmMessage();
     }
