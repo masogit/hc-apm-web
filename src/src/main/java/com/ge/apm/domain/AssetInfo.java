@@ -678,6 +678,8 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     private String dashboardPage;
     @Transient
+    private String assetGroupName;//设备分类名称
+    @Transient
     private List<String> tags = new ArrayList<>();
 
     @Transient
@@ -2398,5 +2400,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setSharedStatus(Integer sharedStatus) {
         this.sharedStatus = sharedStatus;
+    }
+
+    public String getAssetGroupName() {
+        return assetGroupName;
+    }
+
+    public void setAssetGroupName(String assetGroupName) {
+        this.assetGroupName = assetGroupName;
     }
 }
