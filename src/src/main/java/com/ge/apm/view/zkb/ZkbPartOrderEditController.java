@@ -476,7 +476,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
 
         //校验
-        if(currentScoreFlag){
+        if(!currentScoreFlag){
             boolean r = zkbPartOrderService.checkScoreFlagValid(selected,selectedContract);
             currentScoreFlag = !r;
         }
