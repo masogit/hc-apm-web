@@ -395,12 +395,18 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     /**
      * 根据UID获取相关信息
      *
-     * @param UID
-     * @param UID       设备system id
+     * @param zkbFePartOrder
+     * @param zkbFePartOrder
      * @return
      */
-    public List<AssetInfo> fullInfoByUID(String UID) {
-        List<AssetInfo> listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoByUid(UID);
+    public List<AssetInfo> initAssetInfo(ZkbFePartOrder zkbFePartOrder) {
+        List<AssetInfo> listAssetInfo = new ArrayList<AssetInfo>();
+        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetInfoId())){
+            listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoByUid(zkbFePartOrder.getAssetInfoId());
+        }else{
+            listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoForHisData(zkbFePartOrder.getSystemId(),zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
+
+        }
         return CollectionUtils.isNotEmpty(listAssetInfo)?listAssetInfo:new ArrayList<AssetInfo>();
     }
 
@@ -468,7 +474,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbFePartOrder 人工申请主表信息
      * @return
      */
-    public Boolean checkSystemIdAndContract(ZkbFePartOrder zkbFePartOrder) {
+    /*public Boolean checkSystemIdAndContract(ZkbFePartOrder zkbFePartOrder) {
         List<ZkbFePartOrder> list = this.zkbFePartOrderMapper.loadAssetInfo(zkbFePartOrder.getSystemId());
         if (CollectionUtils.isEmpty(list)) {
             return false;
@@ -478,7 +484,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return false;
         }
         return true;
-    }
+    }*/
 
     /**
      * 根据ID发送消息
