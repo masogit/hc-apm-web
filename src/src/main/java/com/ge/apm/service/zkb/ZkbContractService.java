@@ -392,7 +392,7 @@ public class ZkbContractService {
             errorLog += WebUtil.getMessage("ErrorContractNoIsExist")+",";
         }
 
-        if(zkbContract.getContractStartDate().compareTo(zkbContract.getContractEndDate()) > 0){
+        if(zkbContract.getStartDate().compareTo(zkbContract.getEndDate()) > 0){
             flag = false;
             errorLog += "开始时间不能大于结束时间,";
         }
