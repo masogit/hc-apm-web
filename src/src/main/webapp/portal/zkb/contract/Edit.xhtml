@@ -252,11 +252,11 @@
                         </h:panelGroup>
                         <h:panelGroup id="firstYearFlagGroup">
                             <h:panelGroup rendered="#{zkbContractEditController.selected.fiveNineNineFlag eq 'Y'}">
-                                <label class="label">是否599方案第一年</label>
+                                <label class="label">599合同年份</label>
                                 <p:selectOneMenu value="#{zkbContractEditController.selected.firstYearFlag}" required="true" requiredMessage="是否599方案第一年 #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItem itemLabel="是" itemValue="t"/>
-                                    <f:selectItem itemLabel="否" itemValue="f"/>
+                                    <f:selectItem itemLabel="599合同第一年" itemValue="t"/>
+                                    <f:selectItem itemLabel="599合同第2和3年" itemValue="f"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
