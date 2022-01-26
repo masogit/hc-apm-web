@@ -495,7 +495,7 @@ public class ZkbContractService {
             }
         }
         if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag())){
-            try {
+            /*try {
                 int n = CopyByInvok.getBetweenYear(zkbContract.getContractStartDate(),zkbContract.getContractEndDate());
                 if(n <= 2){
                     flag = false;
@@ -503,7 +503,7 @@ public class ZkbContractService {
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
-            }
+            }*/
 
         }
         if (errorLog.length()>0){
