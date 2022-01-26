@@ -344,11 +344,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return "";
         }
         //检查合同号和systemId是否一致
-        Boolean consist = this.zkbFePartOrderService.checkSystemIdAndContract(this.selected);
+        /*Boolean consist = this.zkbFePartOrderService.checkSystemIdAndContract(this.selected);
         if (!consist) {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSystemIdError"));
             return "";
-        }
+        }*/
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){

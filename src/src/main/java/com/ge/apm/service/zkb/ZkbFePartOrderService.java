@@ -474,7 +474,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbFePartOrder 人工申请主表信息
      * @return
      */
-    public Boolean checkSystemIdAndContract(ZkbFePartOrder zkbFePartOrder) {
+    /*public Boolean checkSystemIdAndContract(ZkbFePartOrder zkbFePartOrder) {
         List<ZkbFePartOrder> list = this.zkbFePartOrderMapper.loadAssetInfo(zkbFePartOrder.getSystemId());
         if (CollectionUtils.isEmpty(list)) {
             return false;
@@ -484,7 +484,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return false;
         }
         return true;
-    }
+    }*/
 
     /**
      * 根据ID发送消息
