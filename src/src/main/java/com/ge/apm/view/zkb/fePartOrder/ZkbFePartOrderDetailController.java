@@ -199,7 +199,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         super.prepareEdit();
         this.selected = this.zkbFePartOrderRepository.findById(this.id);
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
-        this.zkbAssetInfoList = this.zkbFePartOrderService.fullInfoByUID(this.selected.getAssetInfoId());
+        this.zkbAssetInfoList = this.zkbFePartOrderService.initAssetInfo(this.selected);
         this.zkbAssetInfoList.stream().forEach(e -> e.setAssetGroupName(WebUtil.getFieldValueMessage("assetGroup",  e.getAssetGroup()!=null? e.getAssetGroup().toString():"")));
         this.confirmMessage =this.genConfirmMessage();
     }
@@ -344,11 +344,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return "";
         }
         //检查合同号和systemId是否一致
-        Boolean consist = this.zkbFePartOrderService.checkSystemIdAndContract(this.selected);
+        /*Boolean consist = this.zkbFePartOrderService.checkSystemIdAndContract(this.selected);
         if (!consist) {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSystemIdError"));
             return "";
-        }
+        }*/
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
