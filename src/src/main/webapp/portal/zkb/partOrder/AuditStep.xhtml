@@ -169,7 +169,7 @@
                                 <f:selectItem itemLabel="否" itemValue="f"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.maintainFlag != 't' and !(zkbPartOrderAuditController.selected.artificialType eq '2')}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.scoreFlagRender()}">
                             <label class="label">是否使用积分抵扣*</label>
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.scoreFlag}" required="true" requiredMessage="是否使用积分抵扣 #{msg.ValidationRequire}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>

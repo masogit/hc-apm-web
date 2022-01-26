@@ -345,7 +345,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             try {
                 fDate = simpleDateFormat.parse(simpleDateFormat.format(nowDate));
                 suxDate = DateUtils.addMonths(fDate, -3);
-                suxDate = DateUtils.addDays(fDate, 1);
+                suxDate = DateUtils.addDays(suxDate, 1);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -355,6 +355,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Parts.toString()));
                 filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ, zkbContract.getId()));
                 filters.add(new SearchFilter("orderedDate", SearchFilter.Operator.GT, suxDate));
+                filters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Ordered.toString()));
                 List<ZkbPartOrder> threeMonthList = zkbPartOrderRepository.findBySearchFilter(filters);
                 if(threeMonthList != null && threeMonthList.size() > 0){
                     flag = false;
