@@ -74,7 +74,8 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     private String oneSearchStr;
 
     private Date varWarrantyDateTo = null;
-
+    private AssetHistoryService assetHistoryService;
+    private AssetLifecyleService assetLifecyleService;
     private String warrantyFormatTime = null;
     private String manufactDateFormatTime = null;
     private String installDateFormatTime = null;
@@ -122,6 +123,8 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         aiMgrService = WebUtil.getBean(AssetInfoMgrService.class);
+        assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
+        assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -380,6 +383,26 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
         return resultList;
     }
+
+    public void batchProcessToUndo() {
+        Map<String, Boolean> map = this.selectedMap;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (!entry.getValue()) {
+                continue;
+            }
+            String assetUid = entry.getKey();
+            AssetInfo assetInfo = dao.getByUid(assetUid);
+            int originStatus = assetInfo.getStatus();
+            AssetInfo oldAssetInfo = assetHistoryService.depCopy(assetInfo);
+            assetInfo.setStatus(1);
+            assetInfo.setIsValid(true);
+            assetInfo.setTerminateDate(null);
+            assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo);
+            dao.save(assetInfo);
+            assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
+        }
+    }
+
 
     public String getParentAssetNameByAssetId(int assetId) {
         AssetInfo ai = dao.findById(assetId);
