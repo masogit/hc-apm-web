@@ -858,6 +858,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public String rejectNext(){
         zkbPartOrderService.auditNext(this.selected,false,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        zkbPartOrderService.sendMessage(zkbPartOrder,UserContextService.getAccessToken());
+        zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
