@@ -91,11 +91,11 @@ public class ZkbContractAssetService {
         boolean flag = true;
         String messageKey = null;
         if("Y".equals(zkbContract.getFiveNineNineFlag())) {
-            Integer yearCount = zkbContract.getYearCount();
+            /*Integer yearCount = zkbContract.getYearCount();
             if(yearCount == null || yearCount < 1){
                 messageKey = "zkbFePartOrder_599contractYearCountError";
                 return false;
-            }
+            }*/
             String format = "yyyy-MM-dd";
             if(reportDate == null){
                 reportDate = new Date();
@@ -107,7 +107,7 @@ public class ZkbContractAssetService {
                 messageKey = "zkbFePartOrder_599contractSupportTimesCannotBeZero";
                 flag = false;
             }else if(ZkbFePartOrderService.highArtificialTypeValue.equals(ArtificialType) &&
-                    ZkbFePartOrder.OrderType.SpareParts.toString().equals(orderType) && yearCount == 1){
+                    ZkbFePartOrder.OrderType.SpareParts.toString().equals(orderType) && CopyByInvok.T.equals(zkbContract.getFirstYearFlag())){
                 //高端机备件申请时第一年进行总数的50%验证
                 if(assetUid != null){
                     Boolean halfAsset = checkHalfAsset(zkbContract.getId(),assetUid);
