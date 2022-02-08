@@ -52,6 +52,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     BlobObjectRepository blobObjectRepository;
 
     /**
+     * 设备
+     */
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
+    /**
      * 归还数量
      */
     @Autowired
@@ -285,6 +290,26 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 最大导入行数
      */
     public static final int EXCEL_FE_PART_ORDER_IMPORT_MAX_ROW = 10000;
+
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2022/1/7
+    */
+    public String checkAsset(String sysId) {
+        List<AssetInfo> assetInfos = assetInfoRepository.getBySystemIdNoConditionGefe(sysId);
+        if (CollectionUtils.isEmpty(assetInfos)) {
+            return "设备不存在！";
+        }
+        if(assetInfos.size()>1){
+            return "该SystemId存在多条设备!";
+        }
+        /*if(!assetInfo.getIsValid()){
+            return "设备已报废，不能继续申请！！";
+        }*/
+        return "";
+    }
+
 
     /**
      * 给申请单添加单号和索引
@@ -575,10 +600,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() + 1);
                     break;
                 case 2:
-                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - 1);
-                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse() + 1);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - 1);//备件/人工/保养申请名额
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse() + 1);//备件/人工/保养已使用名额
                     break;
                 case 3:
+                case 4:
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + 1);
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - 1);
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
@@ -593,10 +619,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply() + 1);
                     break;
                 case 2:
-                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply() - 1);
-                    zkbContract.setGeArtificialSupportTimesUse(zkbContract.getGeArtificialSupportTimesUse() + 1);
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply() - 1);//GE人工支持申请次数
+                    zkbContract.setGeArtificialSupportTimesUse(zkbContract.getGeArtificialSupportTimesUse() + 1);//GE人工支持使用次数
                     break;
                 case 3:
+                case 4:
                     zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes() + 1);
                     zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply() - 1);
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
@@ -635,6 +662,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + qty);
                     break;
                 case 4:
+                case 6:
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() + qty);
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - qty);
@@ -662,9 +690,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse() - qty);
                     zkbContract.setSpareQuota(zkbContract.getSpareQuota() + qty);
                     break;
-                case 4:
+                case 4://代理商拒绝
+                case 6://400团队拒绝
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
-                    zkbContract.setSpareQuota(zkbContract.getSpareQuota() + qty);
+                    zkbContract.setSpareQuota(zkbContract.getSpareQuota() + qty);//拒绝备件剩余名额加回去
                     zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply() - qty);
                     break;
                 case 5://好还变坏还，已使用名额+ qty，剩余名额- qty，坏变好走第3步骤
@@ -773,6 +802,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     }
                     break;
                 case 4:
+                case 6://400拒绝
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
                     if (ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType)) {
                         orderType = ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString();
@@ -837,6 +867,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setProbeQuotaUse(zkbContract.getProbeQuotaUse() + qty);
                     break;
                 case 4:
+                case 6://400拒绝
                     opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderReturn.toString();
                     //探头剩余名额+1，探头申请名额-1
                     zkbContract.setProbeQuota(zkbContract.getProbeQuota() + qty);

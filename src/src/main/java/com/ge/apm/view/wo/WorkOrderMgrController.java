@@ -139,6 +139,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String stepFileter;
     //for details form
     private List<V2_WorkOrder_Detail> accessoryList;
+    private Boolean approveFlag = false;
     private List<V2_WorkOrderCoworker> coWorkerList;
 
     private V2_WorkOrder_Detail itemDetail;
@@ -1366,9 +1367,8 @@ public void test1(){
 
 
     public void prepareCompleteOrder(String woid) {
+        approveFlag =false;
         selectedWorkOrder = dao.findById(woid);
-        logger.info("selectedWorkOrder"+selectedWorkOrder);
-        logger.info("multiLevelApprovalService"+multiLevelApprovalService);
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
@@ -2124,7 +2124,11 @@ public void test1(){
         saveItem();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         cancelWorkdetail();
-
+        for (V2_WorkOrder_Detail v2_workOrder_detail :accessoryList){
+            if(v2_workOrder_detail.getApproved()==null || !v2_workOrder_detail.getApproved()){
+                approveFlag =true;
+            }
+        }
         System.out.println(accessoryList);
     }
     public void updateAccessPrice(){
@@ -2278,7 +2282,7 @@ public void test1(){
                 v2_workOrder_detail.setApproved(true);
             }else{
                 v2_workOrder_detail.setApproved(false);
-                approvedDetailsNew.add(v2_workOrder_detail);
+//                approvedDetailsNew.add(v2_workOrder_detail);
             }
         }
 
@@ -2470,6 +2474,11 @@ public void test1(){
     public List<V2_WorkOrder_Detail> getAccessoryList() {
         if (accessoryList == null) {
             return null;
+        }
+        for (V2_WorkOrder_Detail v2_workOrder_detail :accessoryList){
+            if(v2_workOrder_detail.getApproved()==null || !v2_workOrder_detail.getApproved()){
+                approveFlag =true;
+            }
         }
         V2_WorkOrder_Detail emptyDetail = new V2_WorkOrder_Detail();
         emptyDetail.setId("000");
@@ -2681,6 +2690,14 @@ public void test1(){
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    public Boolean getApproveFlag() {
+        return approveFlag;
+    }
+
+    public void setApproveFlag(Boolean approveFlag) {
+        this.approveFlag = approveFlag;
     }
 
     public OrgInfo getSelectSite() {

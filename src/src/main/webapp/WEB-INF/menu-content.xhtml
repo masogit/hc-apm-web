@@ -62,6 +62,11 @@
                 <p:menuitem id="um900" value="#{msg.SwappedEquipmentConfiguration}" outcome="/portal/SharedAssetType/List.xhtml" rendered="#{userContextService.accessContains('assetAdjust.config')}"/>
                 <p:menuitem id="um909" value="#{msg.SwappedEquipmentNameSettings}" outcome="/portal/SharedAssetType/AssetToShare.xhtml" rendered="#{userContextService.accessContains('assetAdjust.nameConfig')}"/>
             </p:submenu>
+
+            <p:submenu id="SiteToSiteAllocation" label="科室借调" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('AssetStaff,ClinicalStaff,NursingStaff,DeptHead') and userContextService.enableSiteToSiteAllocation()}">
+                <p:menuitem id="mirage_SiteToSiteAllocation_stats" rendered="#{userContextService.hasAnyRole('AssetStaff,ClinicalStaff,NursingStaff,DeptHead') and userContextService.enableSiteToSiteAllocation()}"  value="科室借调情况" outcome="/portal/mirage/mirage.xhtml?route=/siteToSiteAllocation"    />
+            </p:submenu>
+
             <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('install')}">
                 <p:menuitem value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.accessContains('install.list')}"/>
                 <p:menuitem value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.accessContains('install.store')}"/>
@@ -218,7 +223,7 @@
                 <p:menuitem id="item003" value="#{msg.loginHistoryRecord}" outcome="/portal/historyInfo/loginList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin,ITAdmin')}"/>
             </p:submenu>
 
-            <p:menuitem value="设备数据概览" icon="fa fa-bar-chart" outcome="/portal/nine.xhtml"/>
+            <p:menuitem value="设备数据概览" icon="fa fa-bar-chart"  rendered="#{userContextService.byOpWorker()}" outcome="/portal/nine.xhtml"/>
 
             <p:submenu id="um24_supplier" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('supplierMaintain')}">
                 <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/supplier/pmSupplierOrderListAll.xhtml" rendered="#{userContextService.accessContains('supplierMaintain.workbench')}"/>
@@ -235,7 +240,7 @@
                 <p:menuitem id="mirage_AssetBindSupplier" rendered="#{userContextService.accessContains('supplierManagement.assetBindSupplier')}" value="供应商设备绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplier"    />
                 <p:menuitem id="mirage_AssetBindSupplierFE" rendered="#{userContextService.accessContains('supplierManagement.assetBindSupplierFE')}" value="维修工程师绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplierFE"    />
             </p:submenu>
-<!--            <p:menuitem id="unattended" value="#{msg.unattended}" icon="fa fa-bar-chart" rendered="#{userContextService.accessContains('supplierManagement.assetBindSupplierFE')}" outcome="/portal/iframe/dispensingCenter.xhtml"/>-->
+            <p:menuitem id="unattended" value="#{msg.unattended}" icon="fa fa-bar-chart" rendered="#{userContextService.accessContain()}" outcome="/portal/iframe/dispensingCenter.xhtml"/>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
             <p:menuitem id="logout" value="#{msg.Logout}" icon="&#xe8ac;" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>

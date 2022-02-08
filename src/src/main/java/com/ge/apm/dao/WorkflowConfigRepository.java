@@ -30,7 +30,7 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
     
     @Query(value="select * from workflow_config w where w.site_UID=:uid order by w.id desc limit 1",nativeQuery = true)
     public WorkflowConfig getBySiteUID(@Param("uid")String site_uid);
-    
+
 	public List<WorkflowConfig> findBySiteUID(String institutionUID);
     public List<WorkflowConfig> findByHospitalUID(String hospitalId);
     public List<WorkflowConfig> findByInstitutionUID(String institutionId);
@@ -54,4 +54,7 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
 
     @Query(value="select * from workflow_config where generate_method = 1 and prefix is not null and tenant_uid = ?1",nativeQuery = true)
     List<WorkflowConfig> findAllPrefixByTenantUID(String tenantUID);
+
+//    @Query(value="select * from workflow_config where site_uid = ?1",nativeQuery = true)
+//    List<WorkflowConfig> findBySiteUID(String siteUID);
 }

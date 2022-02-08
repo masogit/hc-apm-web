@@ -29,7 +29,7 @@ import java.util.*;
  * @author 212547631
  */
 @Entity
-@Table(name = "asset_info")
+@Table(name = "asset_info",indexes = {@Index(columnList = "asset_dept_uid"),@Index(columnList = "shared_asset_type")})
 public class AssetInfo implements ChineseName,Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -693,6 +693,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private String sharedAssetSwapIndexId;
+
+    public String getCurrentId() {
+        return currentId;
+    }
+
+    public void setCurrentId(String currentId) {
+        this.currentId = currentId;
+    }
 
     public String getDashboardPage() {
         return dashboardPage;

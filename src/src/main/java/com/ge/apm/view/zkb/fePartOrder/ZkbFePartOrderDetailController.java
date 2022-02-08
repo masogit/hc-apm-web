@@ -2,10 +2,7 @@ package com.ge.apm.view.zkb.fePartOrder;
 
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbContract;
-import com.ge.apm.domain.ZkbFePartOrder;
-import com.ge.apm.domain.ZkbFePartOrderUserConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.zkb.ZkbContractAssetService;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
@@ -20,7 +17,6 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -179,6 +175,14 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.confirmMessage =this.genConfirmMessage();
     }
 
+
+    public Boolean fourHundredStatus() {
+        Boolean fourHundredStatus = true;
+        if(ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString().equals(this.selected.getStatus())){
+            fourHundredStatus = false;
+        }
+        return fourHundredStatus;
+    }
     /**
      * @autor by lyj 503277717
      * @date 2021/12/21
@@ -221,8 +225,17 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return;
         }
         this.zkbFePartOrderService.fullInfoBySystemId(this.selected, systemId);
+
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.contractError = false;
+
+//验证设备状态
+        if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
+            WebUtil.addErrorMessage(zkbFePartOrderService.checkAsset(systemId),"");
+            this.contractList = null;
+            this.contractError = true;
+            return;
+        }
         //未匹配到合同
         if (CollectionUtils.isEmpty(this.contractList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_notFindContractError"));
@@ -234,6 +247,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             contractError = true;
         }
     }
+
 
     public String backList() {
         return this.zkbFePartOrderService.backList(this.queryStatus);
@@ -362,12 +376,26 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      * @return
      */
     public String fullApmInfo() {
-
+        this.selected.setFullApmInfoUser(this.userName);
+        this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 2, this.selected, this.currentUser, this.i18Map.get("FourHundredsAccept"));
-        Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_WECHART);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
+    }
+
+    /**
+     * 400团队拒绝
+     *
+     * @return
+     */
+    public String rejectApmInfo() {
+        this.selected.setFullApmInfoUser(this.userName);
+        this.selected.setFullApmInfoDate(new Date());
+        ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract, 4, this.selected, this.currentUser, this.i18Map.get("FourHundredsReject"));
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString(),
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
     }
 
     /**
@@ -419,4 +447,5 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public void setThisDeductionMessage(String thisDeductionMessage) {
         this.thisDeductionMessage = thisDeductionMessage;
     }
+
 }

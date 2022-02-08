@@ -745,9 +745,9 @@ public class ZkbContractImportService {
                     }
                 }
                 if(zkbContractAssetVO.getSupportMaintainFlag() == null){
-                   /* isValidateData = false;
+                    isValidateData = false;
                     item.put("status", ImportStatus.Failure);
-                    ZkbContractAssetRow.addErrMessage(item, "是否由GE FE提供年度1次现场保养不能为空！");*/
+                    ZkbContractAssetRow.addErrMessage(item, "是否由GE FE提供年度1次现场保养不能为空！");
                 }
             }
         }
@@ -817,7 +817,7 @@ public class ZkbContractImportService {
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser,null);
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
                     Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
-                    AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
+                    AssetInfo assetInfo = assetInfoRepository.findByUid(newZkbContractAsset.getAssetId());
                     if(assetInfo != null && repairForm != null){
                         if(!repairForm.equals(assetInfo.getRepairForm())){
                             assetInfo.setRepairForm(repairForm);

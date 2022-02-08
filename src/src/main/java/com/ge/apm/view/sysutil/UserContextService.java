@@ -18,10 +18,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
+import webapp.framework.web.service.UserContextUtil;
 
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
@@ -38,7 +41,8 @@ import java.util.stream.Collectors;
 @ManagedBean(name = "userContextService")
 @SessionScoped
 public class UserContextService implements Serializable {
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
     public static final Integer INTERNATIONAL_VERSION = 1;
@@ -204,7 +208,51 @@ public class UserContextService implements Serializable {
         OrgInfo org = WebUtil.getBean(OrgInfoRepository.class).getByUid(getCurrentUserAccount().getOrgInfoUID());
         return  null == org.getOrgType() ? false : 4 == org.getOrgType();
     }
+    /**
+     * 判断当前登录是
+     * 该租户已开启了无人值守服务
+     * 该租户已开启了小型物联网设备(急救类)服务
+     * @return boolean
+     */
+    public boolean accessContain(){
+        List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
+            for (String s : usname) {
+                if (s.equals("OpWorker")) {
+                    return false;
+                }
+            }
+        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID!=null&&bySiteUID.size()!=0){
+            if (bySiteUID.get(0).getWhethertoenableunattended()!=null && bySiteUID.get(0).getIsiotenabled()!=null){
+                if (bySiteUID.get(0).getWhethertoenableunattended()==true && bySiteUID.get(0).getIsiotenabled()==true){
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+        return false;
 
+    }
+
+    public boolean enableSiteToSiteAllocation() {
+        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID == null || bySiteUID.isEmpty()) {
+            return false;
+        }
+        WorkflowConfig workflowConfig = bySiteUID.get(0);
+        return workflowConfig.getEnableSiteToSiteAllocation() != null && workflowConfig.getEnableSiteToSiteAllocation();
+    }
+
+    public boolean byOpWorker(){
+        List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
+            for (String s : usname) {
+                if (s.equals("OpWorker")) {
+                    return false;
+                }
+            }
+        return true;
+    }
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
@@ -253,7 +301,7 @@ public class UserContextService implements Serializable {
 
     public boolean accessContainsOfJiangNing(){
         TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
-        List<TenantInfo> tenantIfos = tenantInfoRepository.getByName("南京市江宁医院");
+        List<TenantInfo> tenantIfos = tenantInfoRepository.findByCustomTenant("2");
         if(tenantIfos == null || tenantIfos.size() == 0){
             return false;
         }
@@ -892,12 +940,19 @@ public class UserContextService implements Serializable {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount currentUser = getLoginUser();
         TenantInfo currentTenantInfo = userContextService.getCurrentUserTenantInfo();
+        List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
+            for (String s : usname) {
+                if (s.equals("OpWorker")) {
+                    return false;
+                }
+            }
         int siteId = currentUser.getSiteId();
         if (siteId == 46 || BooleanUtils.isTrue(currentTenantInfo.getHaveIbDevice())) {
             return true;
         }
         return false;
     }
+
 
     public boolean isHaveIbDeviceUser() {
         return tenant.getHaveIbDevice() == null ? false : tenant.getHaveIbDevice();
