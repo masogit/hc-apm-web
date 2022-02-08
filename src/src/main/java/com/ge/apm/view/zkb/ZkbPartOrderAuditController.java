@@ -270,13 +270,37 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Artificial.toString())){
                 if(canEditFlag){
                     if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
-                        if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                        if(CopyByInvok.T.equals(selected.getMaintainFlag())){
                             whetherDeductEdit = true;
-                            selected.setWhetherDeduct(CopyByInvok.F);
-                        }
-                        if(CopyByInvok.T.equals(selected.getScoreFlag())){
-                            whetherDeductEdit = true;
-                            selected.setWhetherDeduct(CopyByInvok.T);
+                            ZkbContractAsset zkbContractAsset = zkbPartOrderService.getZkbContractAssetRepository().findFirstByContractIdAndAssetId(selected.getContractId(),selected.getAssetId());
+                            if(CopyByInvok.F.equals(zkbContractAsset.getSupportMaintainFlag())){
+                                selected.setWhetherDeduct(CopyByInvok.T);
+                            }else{
+                                if(CopyByInvok.T.equals(selected.getMaintainFirstFlag())){
+                                    selected.setWhetherDeduct(CopyByInvok.F);
+                                }else{
+                                    selected.setWhetherDeduct(CopyByInvok.T);
+                                }
+                            }
+                        }else{
+                            if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                                whetherDeductEdit = true;
+                                selected.setWhetherDeduct(CopyByInvok.F);
+                            }
+                            if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                                whetherDeductEdit = true;
+                                selected.setWhetherDeduct(CopyByInvok.T);
+                            }
+                            if(selected.getAssetInfo().getRepairForm() != null && selected.getAssetInfo().getRepairForm() == 2){
+                                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                                    whetherDeductEdit = true;
+                                    selected.setWhetherDeduct(CopyByInvok.F);
+                                }else{
+                                    selected.setWhetherDeduct(CopyByInvok.T);
+                                }
+                            }else{
+                                selected.setWhetherDeduct(CopyByInvok.T);
+                            }
                         }
                     }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         if(CopyByInvok.NORMAL_ONE.equals(selected.getArtificialType())){
@@ -292,8 +316,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
                 if(isChoseAdmin || isOrder){
                     ZkbContractAsset zkbContractAsset = zkbPartOrderService.getZkbContractAssetRepository().findFirstByContractIdAndAssetId(selected.getContractId(),selected.getAssetId());
-                    if(zkbContractAsset != null && CopyByInvok.T.equals(zkbContractAsset.getTrainReasonFlag())){
-                        trainTips = "由于代理商个人原因未在规定时间内完成培训，无免费人工";
+                    if(CopyByInvok.T.equals(selected.getMaintainFlag())){
+                        if(CopyByInvok.T.equals(selected.getMaintainFirstFlag())){
+                            trainTips = "该设备享有每年一次免费保养，此次保养为第一次保养，不需要扣除名额。";
+                        }
+                    }else{
+                        if(zkbContractAsset != null && CopyByInvok.T.equals(zkbContractAsset.getTrainReasonFlag())){
+                            trainTips = "由于代理商个人原因未在规定时间内完成培训，无免费人工";
+                        }
                     }
                 }
             }

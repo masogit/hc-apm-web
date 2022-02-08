@@ -29,6 +29,12 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select 1 from AssetInfo o where o.systemId=?1")
     public Integer checkExistsBySystemId(String systemId);
 
+    @Query(value="select o.* from asset_info o where o.system_id=?1 and o.is_deleted = false and o.is_valid = true",nativeQuery=true)
+    public List<AssetInfo> getBySystemIdNoConditionGefe(String systemId);
+
+    @Query(value="select o.* from asset_info o where o.system_id=?1 limit 1",nativeQuery=true)
+    public AssetInfo getBySystemIdNoCondition(String systemId);
+
     @Query(value="select o.* from asset_info o where o.system_id=?1 and o.is_deleted = false and o.is_valid = true limit 1",nativeQuery=true)
     public AssetInfo getBySystemId(String systemId);
 

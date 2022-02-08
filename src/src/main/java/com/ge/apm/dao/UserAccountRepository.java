@@ -250,4 +250,6 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     UserAccount findByLoginName(String loginName);
 
+    @Query(value= "SELECT sys_role.NAME FROM user_role INNER JOIN user_account ON user_role.user_id = user_account.id INNER JOIN sys_role ON user_role.role_id = sys_role.id WHERE user_account.ID =?1",nativeQuery=true)
+    List<String> findUsname(Integer id);
 }

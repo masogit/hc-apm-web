@@ -1,6 +1,7 @@
 package com.ge.apm.domain.pure;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by 212605082 on 2018/11/20.
@@ -156,6 +157,16 @@ public class WorkOrderExportPojo {
     //是否是MVS工单
     private Boolean isMVSWorkOrder;
 
+    //多级审核签名
+    private List<String> auditSignatureList;
+
+    public List<String> getAuditSignatureList() {
+        return auditSignatureList;
+    }
+
+    public void setAuditSignatureList(List<String> auditSignatureList) {
+        this.auditSignatureList = auditSignatureList;
+    }
     public Integer getSubStatus() { return subStatus; }
 
     public void setSubStatus(Integer subStatus) { this.subStatus = subStatus; }

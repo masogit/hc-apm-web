@@ -181,6 +181,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     public static final String FOUR_IN_ONE = "FourInOne";
 
+    public static final String MESSAGE_TYPE = "messageOne";
+
     /**
      * PDF上传列表
      */
@@ -189,16 +191,6 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     private Map<String,String> i18Map;
 
     private ZkbContractAssetService zkbContractAssetService;
-
-    /**
-     *  提示信息confirm message
-     */
-    private String confirmMessage;
-
-    /**
-     *  代理商确认本次扣除信息
-     */
-    private String thisDeductionMessage;
 
     @Override
     protected void init() {
@@ -258,6 +250,14 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         return this.zkbFePartOrderService.checkContractDate(this.contractList);
     }
 
+    public Boolean fourHundredStatus() {
+        Boolean fourHundredStatus = true;
+        if(ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString().equals(this.selected.getStatus())){
+            fourHundredStatus = false;
+        }
+        return fourHundredStatus;
+    }
+
     @Override
     public void prepareEdit() {
         super.prepareEdit();
@@ -279,163 +279,115 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.orderAnnotationChange();
         initHighList(item.getId(),true);
         this.initBlobObjectList(this.selected.getId());
-
-        this.confirmMessage =this.genConfirmMessage();
     }
+
+
 
     /**
      * @autor by lyj 503277717
      * @date 2021/12/21
      * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
      */
-    public String genConfirmMessage(){
+    public String genConfirmMessage(String type){
         String confirmMessage = new String();
-        ZkbContract zct = this.contractList.get(0);
-        int qyt = 0;
-        if("Probe".equals(this.selected.getOrderType())){//探头
-            Integer probeQuota = zct.getProbeQuota()!=null?zct.getProbeQuota():new Integer(0);
-            Integer probeQuotaNormal = zct.getProbeQuotaNormal()!=null?zct.getProbeQuotaNormal():new Integer(0);
-            Integer probeQuotaSpecial = zct.getProbeQuotaSpecial()!=null?zct.getProbeQuotaSpecial():new Integer(0);
-            if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zct.getQuotaDeductType())){//旧
-                if (ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getHighCatFlag())) {
-                    if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(this.selected.getContractCatSnNo())) {
-                        qyt = 4;
-                    }
-                } else {
-                    if (ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())) {
-                        qyt =1 ;
-                    } else if (ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())) {
-                        qyt =2 ;
-                    }
-                }
-                int multiplyFlag = 1;
-                if(ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())){
-                    multiplyFlag=2;
-                    probeQuota = probeQuota - qyt;
-                }
-                if("t".equals(this.selected.getHighCatFlag())){//是否高值   是高值  FourInOne 扣名额  其他不扣名额
-                    if("FourInOne".equals(this.selected.getContractCatSnNo())){
-                        confirmMessage += "本次扣除"+qyt*multiplyFlag+"个探头名额；";
-                        confirmMessage += "探头剩余名额为"+probeQuota+"。";
-                    }else{
-                        confirmMessage += "本次申请不扣除名额！";
-                    }
-                }else{
-                    confirmMessage += "本次扣除"+qyt*multiplyFlag+"个探头名额；";
-                    confirmMessage += "探头剩余名额为"+probeQuota+"。";
-                }
-            }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zct.getQuotaDeductType())){
-
-                qyt = 1;
-                if ("High".equals(this.selected.getZkbPoProbeQuotaType())) {
-                    if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(this.selected.getContractCatSnNo())) {
-                        qyt = 4;
-                    } else {
-                        qyt = 0;
-                    }
-                }
-                if("High".equals(this.selected.getZkbPoProbeQuotaType())){//高值  FourInOne 扣普通  其他不扣
-                    if("FourInOne".equals(this.selected.getContractCatSnNo())){
-                        confirmMessage += "本次扣除"+qyt+"个探头普通名额；";
-                        confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
-                    }else{
-                        confirmMessage += "本次申请不扣除名额！";
-                    }
-                }else if("Any".equals(this.selected.getZkbPoProbeQuotaType())){
-                    confirmMessage += "本次扣除"+qyt+"个探头任意名额；";
-                    confirmMessage += "探头任意剩余名额为"+probeQuota+"。";
-                }else if("Special".equals(this.selected.getZkbPoProbeQuotaType())){
-                    confirmMessage += "本次扣除"+qyt+"个探头特殊名额；";
-                    confirmMessage += "探头特殊剩余名额为"+probeQuotaSpecial+"。";
-                }else if("Normal".equals(this.selected.getZkbPoProbeQuotaType())){
-                    confirmMessage += "本次扣除"+qyt+"个探头普通名额；";
-                    confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
-                }
-            }
-        }
-        return confirmMessage.toString();
-    }
-
-
-
-    /**
-     * @autor by lyj 503277717
-     * @date 2021/12/21
-     * KB - ZKB FE 申请与GE FE审批需要弹窗显示剩余名额
-     */
-    public String genThisDeductionMessage(){
-        int qyt = 0;
-
         String thisDeductionMessage = new String();
         ZkbContract zct = this.contractList.get(0);
-        if("Probe".equals(this.selected.getOrderType())){//探头
-            Integer probeQuota = zct.getProbeQuota()!=null?zct.getProbeQuota():new Integer(0);
-            Integer probeQuotaNormal = zct.getProbeQuotaNormal()!=null?zct.getProbeQuotaNormal():new Integer(0);
-            Integer probeQuotaSpecial = zct.getProbeQuotaSpecial()!=null?zct.getProbeQuotaSpecial():new Integer(0);
-            if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zct.getQuotaDeductType())){//旧
-                if (ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getHighCatFlag())) {
-                    if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(this.selected.getContractCatSnNo())) {
-                        qyt = 4;
-                    }
-                } else {
-                    if (ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())) {
-                        qyt =1 ;
-                    } else if (ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())) {
-                        qyt =2 ;
-                    }
-                }
-                int multiplyFlag = 1;
-                if(ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())){
-                    multiplyFlag=2;
-                    probeQuota = probeQuota - qyt;
-                }
-                if("t".equals(this.selected.getHighCatFlag())){//是否高值   是高值  FourInOne 扣名额  其他不扣名额
-                    if("FourInOne".equals(this.selected.getContractCatSnNo())){
-                        thisDeductionMessage = "本次扣除"+qyt*multiplyFlag+"个探头名额。";
-                    }else{
-                        thisDeductionMessage = "本次申请不扣除名额！";
-                    }
+        int qyt = this.handerQty(zct);
+        Integer probeQuota = zct.getProbeQuota()!=null?zct.getProbeQuota():new Integer(0);
+        Integer probeQuotaNormal = zct.getProbeQuotaNormal()!=null?zct.getProbeQuotaNormal():new Integer(0);
+        Integer probeQuotaSpecial = zct.getProbeQuotaSpecial()!=null?zct.getProbeQuotaSpecial():new Integer(0);
+        if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zct.getQuotaDeductType())){//旧
+            int multiplyFlag = 1;
+            if(ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())){
+                multiplyFlag=2;
+                probeQuota = probeQuota - qyt;
+            }
+            if("t".equals(this.selected.getHighCatFlag())){//是否高值   是高值  FourInOne 扣名额  其他不扣名额
+                if(ZkbFePartOrderProbeController.FOUR_IN_ONE.equals(this.selected.getContractCatSnNo())){
+                    confirmMessage += "本次扣除"+qyt*multiplyFlag+"个探头名额；";
+                    thisDeductionMessage = "本次扣除"+qyt*multiplyFlag+"个探头名额；";
+                    confirmMessage += "探头剩余名额为"+probeQuota+"。";
                 }else{
-                    thisDeductionMessage = "本次扣除"+qyt*multiplyFlag+"个探头名额。";
+                    confirmMessage += "本次申请不扣除名额！";
+                    thisDeductionMessage = "本次申请不扣除名额！";
                 }
-            }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zct.getQuotaDeductType())){
-                //this.zkbFePartOrderService.calDeductQtyByNew(this.selected);
-                qyt = 1;
-                if ("High".equals(this.selected.getZkbPoProbeQuotaType())) {
-                    if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(this.selected.getContractCatSnNo())) {
-                        qyt = 4;
-                    } else {
-                        qyt = 0;
-                    }
+            }else{
+                confirmMessage += "本次扣除"+qyt*multiplyFlag+"个探头名额；";
+                thisDeductionMessage = "本次扣除"+qyt*multiplyFlag+"个探头名额；";
+                confirmMessage += "探头剩余名额为"+probeQuota+"。";
+            }
+        }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zct.getQuotaDeductType())){
+            if("High".equals(this.selected.getZkbPoProbeQuotaType())){//高值  FourInOne 扣普通  其他不扣
+                if("FourInOne".equals(this.selected.getContractCatSnNo())){
+                    confirmMessage += "本次扣除"+qyt+"个探头普通名额；";
+                    thisDeductionMessage = "本次扣除"+qyt+"个探头普通名额；";
+                    confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
+                }else{
+                    confirmMessage += "本次申请不扣除名额！";
+                    thisDeductionMessage = "本次申请不扣除名额！";
                 }
-                if("High".equals(this.selected.getZkbPoProbeQuotaType())){//高值  FourInOne 扣普通  其他不扣
-                    if("FourInOne".equals(this.selected.getContractCatSnNo())){
-                        thisDeductionMessage = "本次扣除"+qyt+"个探头普通名额。";
-                    }else{
-                        thisDeductionMessage = "本次申请不扣除名额！";
-                    }
-                }else if("Any".equals(this.selected.getZkbPoProbeQuotaType())){
-                    thisDeductionMessage = "本次扣除"+qyt+"个探头任意名额。";
-                }else if("Special".equals(this.selected.getZkbPoProbeQuotaType())){
-                    thisDeductionMessage = "本次扣除"+qyt+"个探头特殊名额。";
-                }else if("Normal".equals(this.selected.getZkbPoProbeQuotaType())){
-                    thisDeductionMessage = "本次扣除"+qyt+"个探头普通名额。";
+            }else if("Any".equals(this.selected.getZkbPoProbeQuotaType())){
+                confirmMessage += "本次扣除"+qyt+"个探头任意名额；";
+                thisDeductionMessage = "本次扣除"+qyt+"个探头任意名额；";
+                confirmMessage += "探头任意剩余名额为"+probeQuota+"。";
+            }else if("Special".equals(this.selected.getZkbPoProbeQuotaType())){
+                confirmMessage += "本次扣除"+qyt+"个探头特殊名额；";
+                thisDeductionMessage = "本次扣除"+qyt+"个探头特殊名额；";
+                confirmMessage += "探头特殊剩余名额为"+probeQuotaSpecial+"。";
+            }else if("Normal".equals(this.selected.getZkbPoProbeQuotaType())){
+                confirmMessage += "本次扣除"+qyt+"个探头普通名额；";
+                thisDeductionMessage = "本次扣除"+qyt+"个探头普通名额；";
+                confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
+            }
+        }
+        return ZkbFePartOrderProbeController.MESSAGE_TYPE.equals(type)?confirmMessage:thisDeductionMessage;
+    }
+
+
+    public Integer handerQty(ZkbContract zct){
+        int qyt = 0 ;
+        if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zct.getQuotaDeductType())) {//旧
+            if (ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getHighCatFlag())) {
+                if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(this.selected.getContractCatSnNo())) {
+                    qyt = 4;
+                }
+            } else {
+                if (ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())) {
+                    qyt = 1;
+                } else if (ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())) {
+                    qyt = 2;
+                }
+            }
+        }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zct.getQuotaDeductType())) {
+            qyt = 1;
+            if ("High".equals(this.selected.getZkbPoProbeQuotaType())) {
+                if (ZkbFePartOrderProbeController.FOUR_IN_ONE.equalsIgnoreCase(this.selected.getContractCatSnNo())) {
+                    qyt = 4;
+                } else {
+                    qyt = 0;
                 }
             }
         }
-        return thisDeductionMessage.toString();
+        return qyt;
     }
+
+
+
 
     /**
      * 查询
      * @param systemId system id
      * @param sr sr
      */
-    public void getSparePartsZkbFePartOrder(String systemId,String sr)
-    {
-        if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr))
-        {
+    public void getSparePartsZkbFePartOrder(String systemId,String sr){
+        if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr)){
              WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
+            return;
+        }
+        //验证设备状态
+        if (StringUtils.isNotBlank(zkbFePartOrderService.checkAsset(systemId))) {
+            WebUtil.addErrorMessage(zkbFePartOrderService.checkAsset(systemId),"");
+            this.sparePartsZkbFePartOrderList = null;
             return;
         }
         this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,ZkbFePartOrderService.assetGroup,ZkbFePartOrder.OrderType.Probe.toString());
@@ -505,8 +457,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * 提交
      * @return
      */
-    public String saveAndToListPage()
-    {
+    public String saveAndToListPage() {
+        if (CollectionUtils.isEmpty(this.sparePartsZkbFePartOrderList)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("工单不能为空！"));
+            return "";
+        }
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             return "";
@@ -632,7 +587,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     }
 
     /**
-     * 供应商拒绝同意
+     * 供应商拒绝
      * @return
      */
     public String supplierReject(String comment)
@@ -642,7 +597,6 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             WebUtil.addErrorMessage(WebUtil.getMessage("代理商审批备注不能为空"));
             return "";
         }
-        Date date = new Date();
         this.selected.setComment(comment);
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
@@ -655,7 +609,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(),new Date(),new Date(),GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
 
     /**
@@ -759,9 +713,25 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
     }
 
-
     /**
-     * 400团队同意
+     * 400团队拒绝
+     * @return
+     */
+    public String fullApmReject(){
+        this.selected.setFullApmInfoUser(this.userName);
+        this.selected.setFullApmInfoDate(new Date());
+        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        if(this.selected.getQty()>0){
+            this.zkbFePartOrderService.moveProbe(6,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("FourHundredsReject"));
+        }
+        if (StringUtils.isNotBlank(selected.getContractCatId())) {
+            this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
+        }
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString(),
+                ZkbFePartOrder.workFlowSteps.Complete.toString(),new Date(),null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
+    }
+    /**
+     * admin归还
      * @return
      */
     public String geAdminReturn()
@@ -1083,19 +1053,4 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         }
     }
 
-    public String getConfirmMessage() {
-        return confirmMessage;
-    }
-
-    public void setConfirmMessage(String confirmMessage) {
-        this.confirmMessage = confirmMessage;
-    }
-
-    public String getThisDeductionMessage() {
-        return thisDeductionMessage;
-    }
-
-    public void setThisDeductionMessage(String thisDeductionMessage) {
-        this.thisDeductionMessage = thisDeductionMessage;
-    }
 }
