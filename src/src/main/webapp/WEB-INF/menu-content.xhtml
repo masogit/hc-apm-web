@@ -223,7 +223,8 @@
                 <p:menuitem id="item003" value="#{msg.loginHistoryRecord}" outcome="/portal/historyInfo/loginList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin,ITAdmin')}"/>
             </p:submenu>
 
-            <p:menuitem value="设备数据概览" icon="fa fa-bar-chart"  rendered="#{userContextService.byOpWorker()}" outcome="/portal/nine.xhtml"/>
+<!--            <p:menuitem value="设备数据概览" icon="fa fa-bar-chart"  rendered="#{userContextService.byOpWorker()}" outcome="/portal/nine.xhtml"/>-->
+            <p:menuitem value="设备数据概览" icon="fa fa-bar-chart"  rendered="#{userContextService.accessContains('deviceDataPreview')}" outcome="/portal/nine.xhtml"/>
 
             <p:submenu id="um24_supplier" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('supplierMaintain')}">
                 <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/supplier/pmSupplierOrderListAll.xhtml" rendered="#{userContextService.accessContains('supplierMaintain.workbench')}"/>
