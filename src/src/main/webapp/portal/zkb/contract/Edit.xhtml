@@ -373,9 +373,9 @@
                             <p:column headerText="结束日期" >
                                 <h:outputText value="#{zkbContractAssetItem.maintainEndDate}" />
                             </p:column>-->
-                           <!-- <p:column headerText="申请数量" >
+                           <p:column headerText="申请数量" >
                                 <h:outputText value="#{zkbContractAssetItem.applyNum}" />
-                            </p:column>-->
+                            </p:column>
                             <f:facet name="{Toolbar}">
                                 <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.operateFlag}"/>
                                 <p:commandButton immediate="false"  process="@this" id="editAssetButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareAssetEdit}" update=":growl :zkbContractAssetModifyDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbContractAssetModifyDlg').show()" rendered="#{zkbContractEditController.operateFlag}"/>
