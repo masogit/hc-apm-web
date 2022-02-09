@@ -168,6 +168,122 @@ public class MeasuringService {
         }
     }
 
+
+    public MeasuringCertificateDetail operateMeasuringAndAssetInfo_For_ShaoYiFu(MeasuringCertificateDetail measuringCertificateDetail) {
+        boolean flag = false;
+        AssetInfo tempAssetInfo = null;
+        String errorInfo = "";
+        List<AssetInfo> tempAssetInfoList = null;
+
+        if(null != measuringCertificateDetail.getFinanceNo()){
+            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                //开始匹配sn号
+                tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+                if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                    errorInfo += "[资产编号不能匹配到设备]";
+                }
+
+            }else{
+                if(tempAssetInfoList.size() == 1){
+                    flag = true;
+                }else{
+                    errorInfo += "[资产编号匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                }
+            }
+        }else if(null != measuringCertificateDetail.getAssetSN() && !flag){
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()) {
+                if(null != measuringCertificateDetail.getAssetSN() && !flag){
+                    tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+                    if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                        errorInfo += "[设备序列号SN不能匹配到资产设备]";
+                    }else{
+                        if(tempAssetInfoList.size() == 1){
+                            flag = true;
+                        }else{
+                            errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                        }
+                    }
+                }
+            }
+        }
+
+        if(flag){
+            if(tempAssetInfoList.size() == 1){
+                tempAssetInfo = tempAssetInfoList.get(0);
+            }
+        }
+
+        if(tempAssetInfo != null){
+            List<MeasuringCertificateDetail> mcdList = null;
+            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
+
+            if(measuringCertificateDetail.getCertificateNo() != null){
+                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
+            }
+
+            if(mcdList == null || mcdList.isEmpty()){
+                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
+            }
+
+            //如果查询到具体的计量记录,做更新操作，否则新增计量记录
+            if(mcdList != null && !mcdList.isEmpty()) {
+                MeasuringCertificateDetail tempMcd = mcdList.get(0);
+                measuringCertificateDetail.setId(tempMcd.getId());
+            }
+
+            measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
+            measuringCertificateDetailDao.save(measuringCertificateDetail);
+
+            //目标设备的所有计量记录
+            List<MeasuringCertificateDetail> allMcdList = measuringCertificateDetailDao.findByAssetUIDAndTenantUIDOrderByCheckDateDesc(tempAssetInfo.getUid(), measuringCertificateDetail.getTenantUID());
+            if(allMcdList != null && !allMcdList.isEmpty()){
+                //目标设备的所有计量记录中计量日期最大的记录
+                MeasuringCertificateDetail maxMcd = allMcdList.get(0);
+
+                if(measuringCertificateDetail.getCheckDate().before(maxMcd.getCheckDate())){
+
+                    needUpdateAssetMcd = maxMcd;
+
+                }
+            }
+
+            Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
+            Date checkDate = needUpdateAssetMcd.getCheckDate();
+            if(UserContextService.hasCurrentTenantName("")){
+                if(checkDate != null && nextMeteringDate == null && tempAssetInfo.getMeasuringItemCategory() != null){
+                    MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndSiteUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getSiteUID());
+                    Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
+                    if(measureCycle != null && measureCycle > 0){//云南省阜外心血管病医院 下次计量日期=上次计量日期+周期（月）
+                        nextMeteringDate = DateUtil.addMonth(checkDate,measureCycle);
+                    }
+                }
+            }
+
+            //更新设备台账
+            tempAssetInfo.setNextMeteringDate(nextMeteringDate);
+            tempAssetInfo.setLastMeteringDate(checkDate);
+            tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
+            if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
+                tempAssetInfo.setUsageStatus(2);//停用
+                tempAssetInfo.setStatus(5);
+            }
+
+            tempAssetInfo.setMeasuringType(needUpdateAssetMcd.getType());
+
+            assetInfoDao.save(tempAssetInfo);
+
+        }
+
+        if(!flag){
+            measuringCertificateDetail.setErrorInfo(errorInfo);
+            return measuringCertificateDetail;
+        }else{
+            return null;
+        }
+    }
+
+
     private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum, String siteUID){
         List<AssetInfo> tempAssetInfoList = null;
 
@@ -333,13 +449,31 @@ public class MeasuringService {
                     tempMCDList.add(detail);
                     continue;
                 }
-
-                if(operateMeasuringAndAssetInfo(detail) != null){
-                    tempMCDList.add(detail);
+                //如果是邵逸夫医院
+                if(isShaoYiFu()){
+                    if(operateMeasuringAndAssetInfo_For_ShaoYiFu(detail) != null){
+                        tempMCDList.add(detail);
+                    }
+                }else{
+                    //除邵逸夫其他的医院逻辑(其他的医院逻辑不变)
+                    if(operateMeasuringAndAssetInfo(detail) != null){
+                        tempMCDList.add(detail);
+                    }
                 }
             }
         //}
         return tempMCDList;
+    }
+
+
+    //判断是否是邵逸夫医院 正式测试时将伪代码删除
+    public Boolean isShaoYiFu(){
+//        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+//        if("3".equals(tenantInfo.getCustomTenant())){
+//            return Boolean.TRUE;
+//        }
+//        return Boolean.FALSE;
+        return true;
     }
 
     private HSSFSheet handleSheet(HSSFSheet sheet) {
