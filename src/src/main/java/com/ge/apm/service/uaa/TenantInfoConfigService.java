@@ -161,6 +161,10 @@ public class TenantInfoConfigService {
 			//默认不勾选 菜单
 			defaultNotSelectedMenu(tempItem);
 			String key = tempItem.getKey();
+			//数据设备概览默认被选中
+			if(key.equals("deviceDataPreview")){
+				tempItem.setValue(true);
+			}
 			if (edition.equals(VERSION_COMMON)) {
 				//默认不勾选”质控评审“菜单
 				if (key.equals("audit")) {
