@@ -927,11 +927,20 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
 
-        if("manufacturer".equals(newSupplierType)){
+/*        if("manufacturer".equals(newSupplierType)){
             manueList.add(newSupplier);
         }else if("supplier".equals(newSupplierType)){
             suppliersList.add(newSupplier);
         }else if("maintainer".equals(newSupplierType)){
+            maintainerList.add(newSupplier);
+        }*/
+        if(newSupplier.getManufacturerT()){
+            manueList.add(newSupplier);
+        }
+        if(newSupplier.getSupplierT()){
+            suppliersList.add(newSupplier);
+        }
+        if(newSupplier.getMaintainerT()){
             maintainerList.add(newSupplier);
         }
 //        supplierList.add(newSupplier);
