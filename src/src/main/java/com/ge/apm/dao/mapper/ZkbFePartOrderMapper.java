@@ -4,6 +4,7 @@ import com.ge.apm.dao.mapper.provider.ZkbFePartOrderProvider;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.ZkbFePartOrder;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import webapp.framework.dao.SearchFilter;
 
@@ -81,4 +82,17 @@ public interface ZkbFePartOrderMapper {
      */
     @SelectProvider(type = ZkbFePartOrderProvider.class, method = "batchExport")
     List<ZkbFePartOrder> batchExport(@Param("testLogin")String testLogin,@Param("tenantUid")String tenantUid);
+
+
+    /**
+     * 校验合同中设备是否有效
+     * @param contractId
+     * @param systemId
+     * @return
+     */
+    @Select("select count(t.asset_id) from zkb_contract_asset t where t.contract_id =#{contractId}" +
+            "and exists(select 1 from asset_info ai where ai.uid = t.asset_id and ai.system_id=#{systemId})")
+    int checkAssetInfoInContract(@Param("contractId") String contractId,@Param("systemId") String systemId);
+
+
 }

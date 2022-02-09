@@ -271,7 +271,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             this.contractList = null;
             return;
         }
-        this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
+        this.contractList = this.zkbFePartOrderService.loadZkbContractInfoWithCheck(this.selected.getContractId(),this.selected.getSystemId());
         this.contractError = false;
         //未匹配到合同
         if (CollectionUtils.isEmpty(this.contractList)) {

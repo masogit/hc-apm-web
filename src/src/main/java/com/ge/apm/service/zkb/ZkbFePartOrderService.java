@@ -636,6 +636,21 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         list.add(item);
         return list;
     }
+
+    /**
+     * 加载合同信息
+     */
+    public List<ZkbContract> loadZkbContractInfoWithCheck(String contractId,String systemId) {
+        List<ZkbContract> list = new ArrayList<>();
+        if (StringUtils.isBlank(contractId)) {
+            return list;
+        }
+        ZkbContract item = this.zkbContractRepository.findById(contractId);
+        int i =  this.zkbFePartOrderMapper.checkAssetInfoInContract(contractId,systemId);
+        if(i==1)
+            list.add(item);
+        return list;
+    }
     /**
      * @param zkbContract    合同信息
      * @param type           1.把剩余名额移入申请名额 2.把申请名额移入已使用名额 3.把申请名额移入剩余名额
