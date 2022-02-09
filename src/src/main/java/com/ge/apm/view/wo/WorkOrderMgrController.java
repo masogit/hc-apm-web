@@ -1088,7 +1088,7 @@ public void test1(){
             UserAccount userAccount = userContextService.getCurrentUserAccount();
             String tenantUID = userAccount.getTenantUID();
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
-            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10) {
                 String hospitalUID = UserContextService.getCurrentUserAccount().getHospitalUID();
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
             }else {
