@@ -401,8 +401,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      */
     public List<AssetInfo> initAssetInfo(ZkbFePartOrder zkbFePartOrder) {
         List<AssetInfo> listAssetInfo = new ArrayList<AssetInfo>();
-        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetInfoId())){
-            listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoByUid(zkbFePartOrder.getAssetInfoId());
+        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetId())){
+            listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoByUid(zkbFePartOrder.getAssetId());
         }else{
             listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoForHisData(zkbFePartOrder.getSystemId(),zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
 
@@ -434,7 +434,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         zkbFePartOrder.setHospitalName(item.getHospitalName());
         zkbFePartOrder.setTenantUid(item.getTenantUid());
         zkbFePartOrder.setAssetType(item.getAssetType());
-        zkbFePartOrder.setAssetInfoId(assetInfo.getUid());
+        zkbFePartOrder.setAssetId(assetInfo.getUid());
         if (assetTypeHighMachineValue.equals(zkbFePartOrder.getAssetType())) {
             zkbFePartOrder.setSubtractTotalStatus("false");
         }
