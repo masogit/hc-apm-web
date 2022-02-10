@@ -1276,7 +1276,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
 
     /**
      * 选择单据
-     *
+     * 构建数据数据  如果设备类型未  超声的 化默认是高端
      * @param selected             当前流程数据
      * @param selectZkbFePartOrder 选择的流程
      * @return
