@@ -40,6 +40,15 @@
                             <f:selectItem itemLabel="否" itemValue="f"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">是否为补录*</label>
+                        <p:selectOneMenu value="#{zkbPartOrderEditController.supplementFlag}" required="true" requiredMessage="是否为补录 #{msg.ValidationRequire}">
+                            <p:ajax event="change" update="zkbPartOrderEditForm" />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItem itemLabel="是" itemValue="t"/>
+                            <f:selectItem itemLabel="否" itemValue="f"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                 </p:panelGrid>
             </h:form>
         </div>
@@ -343,7 +352,10 @@
                             <!--<p:inputText id="faultDescription" value="#{zkbPartOrderEditController.selected.faultDescription}" required="true" requiredMessage="#{msg.zkbPartOrder_faultDescription} #{msg.ValidationRequire}" >
                             </p:inputText>-->
                             <p:inputTextarea value="#{zkbPartOrderEditController.selected.faultDescription}" maxlength="255" required="true" requiredMessage="#{msg.zkbPartOrder_faultDescription} #{msg.ValidationRequire}"/>
-
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.supplementFlag eq 't' and !(zkbPartOrderEditController.orderType eq 'Probe')}">
+                            <label class="label">Sr#*</label>
+                            <p:inputText value="#{zkbPartOrderEditController.selected.srNo}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid  rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
