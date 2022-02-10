@@ -175,7 +175,7 @@ public class MeasuringService {
         String errorInfo = "";
         List<AssetInfo> tempAssetInfoList = null;
 
-        if(null != measuringCertificateDetail.getFinanceNo()){
+        if(null != measuringCertificateDetail.getFinanceNo() && !"".equals(measuringCertificateDetail.getFinanceNo())){
             tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
                 //开始匹配sn号
@@ -191,7 +191,7 @@ public class MeasuringService {
                     errorInfo += "[资产编号匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
                 }
             }
-        }else if(null != measuringCertificateDetail.getAssetSN() && !flag){
+        }else if(null != measuringCertificateDetail.getAssetSN() && !flag && !"".equals(measuringCertificateDetail.getAssetSN())){
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()) {
                 if(null != measuringCertificateDetail.getAssetSN() && !flag){
                     tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
@@ -206,6 +206,8 @@ public class MeasuringService {
                     }
                 }
             }
+        }else{
+            errorInfo += "[(设备序列号SN)和(资产编号)不能同时为空]";
         }
 
         if(flag){
