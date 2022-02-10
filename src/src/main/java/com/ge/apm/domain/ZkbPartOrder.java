@@ -586,6 +586,17 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "exchange_type")
     private String exchangeType;
 
+    @Column(name = "supplement_flag")
+    private String supplementFlag;
+
+    public String getSupplementFlag() {
+        return supplementFlag;
+    }
+
+    public void setSupplementFlag(String supplementFlag) {
+        this.supplementFlag = supplementFlag;
+    }
+
     public String getExchangeType() {
         return exchangeType;
     }

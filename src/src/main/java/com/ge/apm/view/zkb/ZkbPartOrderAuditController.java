@@ -337,6 +337,18 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showCatListFlag = "1";
                 }
             }
+            if(canEditFlag && CopyByInvok.T.equals(selected.getSupplementFlag())){
+                boolean f = false;
+                if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
+                    f = true;
+                }
+                if(!ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
+                    f = true;
+                }
+                if(f){
+                    WebUtil.addErrorMessage("该申请为补单申请，请勿重复下单。","");
+                }
+            }
         }
     }
 
