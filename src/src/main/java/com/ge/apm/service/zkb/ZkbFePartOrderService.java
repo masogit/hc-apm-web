@@ -1284,6 +1284,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public ZkbFePartOrder selectedWorkFlow(ZkbFePartOrder selected, ZkbFePartOrder selectZkbFePartOrder) {
         selected.setFatherPartOrderNo(selectZkbFePartOrder.getPartOrderNo());
         selected.setSystemId(selectZkbFePartOrder.getSystemId());
+        selected.setAssetId(selectZkbFePartOrder.getAssetId());
         selected.setContractId(selectZkbFePartOrder.getContractId());
         selected.setPhenomenon(selectZkbFePartOrder.getPhenomenon());
         selected.setFunctionType(selectZkbFePartOrder.getFunctionType());

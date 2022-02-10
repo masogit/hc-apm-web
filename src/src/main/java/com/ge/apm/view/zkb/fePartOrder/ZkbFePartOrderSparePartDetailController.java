@@ -326,7 +326,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfoWithCheck(this.selectZkbFePartOrder.getContractId(),this.selected.getSystemId());
 
         ZkbContract zkbContract =  contractList.get(0);
+        /**
+         * 需要兼容历史数据
+         */
         AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
+        if(StringUtils.isNotBlank(this.selected.getAssetId())){
+            assetInfo = assetInfoRepository.getByUid(this.selected.getAssetId());;
+        }
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(zkbContract,selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),assetInfo.getUid());
         if(!fiveNineNine){
             this.selected.setFatherPartOrderNo(null);
@@ -444,7 +450,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        /**
+         * 需要兼容历史数据
+         */
         AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
+        if(StringUtils.isNotBlank(this.selected.getAssetId())){
+            assetInfo = assetInfoRepository.getByUid(this.selected.getAssetId());
+        }
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(zkbContract,selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),assetInfo.getUid());
         if(!fiveNineNine){
             return "";
