@@ -3,6 +3,7 @@ package com.ge.apm.view.zkb.fePartOrder;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbContractAssetService;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -881,8 +882,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     public void updateContractAssetApplyNum(String status,ZkbContract zkbContract){
         if(zkbContract == null){
             zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());;
-        }
-        if("Y".equals(zkbContract.getFiveNineNineFlag()) && 1 == zkbContract.getYearCount()) {
+        }//
+        logger.info("ZkbFePartOrderSparePartDetailController：FiveNineNineFlag"+zkbContract.getFiveNineNineFlag());
+
+        if("Y".equals(zkbContract.getFiveNineNineFlag()) && CopyByInvok.T.equals(zkbContract.getFirstYearFlag())) {
             AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
             if(assetInfo != null){
                 if(status.equals(ZkbFePartOrder.workFlowSteps.Requested.toString())){
