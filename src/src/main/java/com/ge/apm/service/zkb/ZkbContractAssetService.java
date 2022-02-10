@@ -112,7 +112,7 @@ public class ZkbContractAssetService {
                 if(assetUid != null){
                     Boolean halfAsset = checkHalfAsset(zkbContract.getId(),assetUid);
                     if(null == halfAsset){
-                        messageKey = "zkbFePartOrder_599contractHighMachineNull";
+                        messageKey = "zkbFePartOrder_599contractHighMachineNull";//合同中没有高端机设备
                         flag = false;
                     }else if(!halfAsset){
                         messageKey = "zkbFePartOrder_599contractSupportTimesCannotBeZero";
