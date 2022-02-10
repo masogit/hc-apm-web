@@ -67,6 +67,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private ZkbContractAssetRepository zkbContractAssetRepository;
     private ZkbContractAssetService zkbContractAssetService;
     private String maintainFlag;
+    private String supplementFlag = CopyByInvok.F;;
     private List<I18nMessage> exchangeTypeList = new ArrayList<>();
     private I18nMessageRepository i18nMessageRepository;
 
@@ -680,6 +681,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }
         selected.setOrderType(orderType);
+        selected.setSupplementFlag(supplementFlag);
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             boolean onlineEngineFlag= false;
             if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType()) && !ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
@@ -1398,6 +1400,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setExchangeTypeList(List<I18nMessage> exchangeTypeList) {
         this.exchangeTypeList = exchangeTypeList;
+    }
+
+    public String getSupplementFlag() {
+        return supplementFlag;
+    }
+
+    public void setSupplementFlag(String supplementFlag) {
+        this.supplementFlag = supplementFlag;
     }
 
     @Override
