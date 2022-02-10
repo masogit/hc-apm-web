@@ -401,8 +401,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      */
     public List<AssetInfo> initAssetInfo(ZkbFePartOrder zkbFePartOrder) {
         List<AssetInfo> listAssetInfo = new ArrayList<AssetInfo>();
-        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetInfoId())){
-            listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoByUid(zkbFePartOrder.getAssetInfoId());
+        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetId())){
+            listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoByUid(zkbFePartOrder.getAssetId());
         }else{
             listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoForHisData(zkbFePartOrder.getSystemId(),zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
 
@@ -434,7 +434,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         zkbFePartOrder.setHospitalName(item.getHospitalName());
         zkbFePartOrder.setTenantUid(item.getTenantUid());
         zkbFePartOrder.setAssetType(item.getAssetType());
-        zkbFePartOrder.setAssetInfoId(assetInfo.getUid());
+        zkbFePartOrder.setAssetId(assetInfo.getUid());
         if (assetTypeHighMachineValue.equals(zkbFePartOrder.getAssetType())) {
             zkbFePartOrder.setSubtractTotalStatus("false");
         }
@@ -634,6 +634,21 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         ZkbContract item = this.zkbContractRepository.findById(contractId);
         list.add(item);
+        return list;
+    }
+
+    /**
+     * 加载合同信息
+     */
+    public List<ZkbContract> loadZkbContractInfoWithCheck(String contractId,String systemId) {
+        List<ZkbContract> list = new ArrayList<>();
+        if (StringUtils.isBlank(contractId)) {
+            return list;
+        }
+        ZkbContract item = this.zkbContractRepository.findById(contractId);
+        int i =  this.zkbFePartOrderMapper.checkAssetInfoInContract(contractId,systemId);
+        if(i==1)
+            list.add(item);
         return list;
     }
     /**
@@ -1269,6 +1284,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public ZkbFePartOrder selectedWorkFlow(ZkbFePartOrder selected, ZkbFePartOrder selectZkbFePartOrder) {
         selected.setFatherPartOrderNo(selectZkbFePartOrder.getPartOrderNo());
         selected.setSystemId(selectZkbFePartOrder.getSystemId());
+        selected.setAssetId(selectZkbFePartOrder.getAssetId());
         selected.setContractId(selectZkbFePartOrder.getContractId());
         selected.setPhenomenon(selectZkbFePartOrder.getPhenomenon());
         selected.setFunctionType(selectZkbFePartOrder.getFunctionType());
