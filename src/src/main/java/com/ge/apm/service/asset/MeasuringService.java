@@ -3,10 +3,8 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.dao.MeasuringTypeConfigRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.MeasuringCertificateDetail;
-import com.ge.apm.domain.MeasuringTypeConfig;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -60,6 +58,9 @@ public class MeasuringService {
     private AssetInfoRepository assetInfoDao;
     @Autowired
     private MeasuringTypeConfigRepository measuringTypeConfigDao;
+
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -468,14 +469,13 @@ public class MeasuringService {
     }
 
 
-    //判断是否是邵逸夫医院 正式测试时将伪代码删除
+    //判断是否是邵逸夫医院
     public Boolean isShaoYiFu(){
-//        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
-//        if("3".equals(tenantInfo.getCustomTenant())){
-//            return Boolean.TRUE;
-//        }
-//        return Boolean.FALSE;
-        return true;
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+        if("3".equals(tenantInfo.getCustomTenant())){
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
     private HSSFSheet handleSheet(HSSFSheet sheet) {
