@@ -196,7 +196,30 @@
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.itemNum}" />
                             </h:panelGroup>
 
-                            <h:panelGroup>
+                            <h:panelGroup id = "hospitalId">
+                                <label class="label">#{msg.hospitalId}*</label>
+                                <p:inputText id="selectedUserOrgName" value="#{assetInstallationController.selectedObjectMap['selectedOrg']}" readonly="true" class="SiteUIDChange"/>
+                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                                <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                    <c:if test="#{assetInfoEditController.isSelect46Account}">
+                                        <p:inputText id="assetEditTreeNodeNameFilter" class="treeNodeNameFilter" value="#{assetInfoEditController.treeNodeNameFilter}"/>
+                                        <p:commandButton partialSubmit="true" icon="ui-icon-search" process="@this" update="@this" actionListener="#{assetInfoEditController.filterTreeNode()}" value="#{msg.Search2}"/>
+                                    </c:if>
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.orgTree}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update="ItemEditDlgForm:hospitalId ItemEditDlgForm:clinicalDeptName"
+                                                    listener="#{assetInstallationController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+
+                            <h:panelGroup id = "clinicalDeptName">
                                 <label class="label">#{msg.clinicalDeptName}*</label>
                                 <p:autoComplete dropdown="true" value="#{assetInstallationController.deptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInstallationController.autoCompleteDept}">
                                     <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="@(.clinicalOwnerName) @(.parentAssetList)" />
