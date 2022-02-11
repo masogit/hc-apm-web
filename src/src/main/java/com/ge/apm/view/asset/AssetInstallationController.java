@@ -108,6 +108,10 @@ public class AssetInstallationController {
     @Setter
     private UserAccount useOwner;
     private AutoCompleteService autoCompleteService;
+    @Getter @Setter
+    private Map<String, Object> selectedObjectMap = new HashMap();
+    @Getter
+    private TreeNode orgTree;
 //    private String currentQrCode;
 
     private ConfigService configService;
@@ -141,6 +145,7 @@ public class AssetInstallationController {
     private CustomConfigObject customConfig;
 
     private SupplierService supplierService;
+    private OrgInfoRepository orgInfoRepository;
 
     @PostConstruct
     protected void init() {
@@ -163,7 +168,7 @@ public class AssetInstallationController {
         uaaService = WebUtil.getBean(UaaService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         assetInstallationReportService = WebUtil.getBean(AssetInstallationReportService.class);
-
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
@@ -210,6 +215,15 @@ public class AssetInstallationController {
             parentAssetInfo = assetDao.findById(arrivalListItem.getParentAssetId());
         }
         getParentAssetList();
+        selectedObjectMap.put("selectedOrg", orgInfoRepository.findByUid(arrivalList.getSiteUID()));
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        selectedObjectMap.put("selectedOrg", orgInfo);
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(orgInfo.getUid());
+        clearClinicalDept();
     }
 
     private void initOwner() {
@@ -933,6 +947,11 @@ public class AssetInstallationController {
             getClinicalOwnerList();
             parentAssetList = getParentAssetList();
         }
+    }
+
+    public void clearClinicalDept() {
+        deptName = null;
+        arrivalListItem.setClinicalDeptUID(null);
     }
 
     public void onParentAssetInfoChange() {
