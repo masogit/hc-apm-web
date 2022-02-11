@@ -180,11 +180,12 @@ public class MeasuringService {
             tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
                 //开始匹配sn号
-                tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+                tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
                 if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
                     errorInfo += "[资产编号不能匹配到设备]";
+                }else{
+                    flag = true;
                 }
-
             }else{
                 if(tempAssetInfoList.size() == 1){
                     flag = true;
