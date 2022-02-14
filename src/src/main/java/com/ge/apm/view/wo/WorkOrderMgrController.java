@@ -1000,25 +1000,25 @@ public void test1(){
             }else{
                 bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
             }
+            UserAccount userAccount = userContextService.getCurrentUserAccount();
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+            List<V2_WorkOrder> workOrderList = new ArrayList<>();
+            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+                List<V2_WorkOrder> v2_workOrders = dao.findBySearchFilter(this.searchFilters);
+                if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
+                    for (V2_WorkOrder v2_workOrder :v2_workOrders) {
+                        if (getSign(v2_workOrder.getId(), userAccount)) {
+                            workOrderList.add(v2_workOrder);
+                        }
+                    }
+                    int size = workOrderList.size();
+                    workOrderList= this.pageNum(workOrderList, pageRequest);
+                    bySearchFilter = new PageImpl<V2_WorkOrder>(workOrderList, pageRequest, size);
+                }
+            }
         } catch (Exception e) {
             LOGGER.error("load data occur exception,{}", e.getMessage());
             throw e;
-        }
-        UserAccount userAccount = userContextService.getCurrentUserAccount();
-        TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
-        List<V2_WorkOrder> workOrderList = new ArrayList<>();
-        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
-            List<V2_WorkOrder> v2_workOrders = bySearchFilter.getContent();
-            if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
-                for (V2_WorkOrder v2_workOrder :v2_workOrders) {
-                    if (getSign(v2_workOrder.getId(), userAccount)) {
-                        workOrderList.add(v2_workOrder);
-                    }
-                }
-                int size = workOrderList.size();
-                workOrderList= this.pageNum(workOrderList, pageRequest);
-                bySearchFilter = new PageImpl<V2_WorkOrder>(workOrderList, pageRequest, size);
-            }
         }
         return   bySearchFilter;
     }
@@ -1088,7 +1088,7 @@ public void test1(){
             UserAccount userAccount = userContextService.getCurrentUserAccount();
             String tenantUID = userAccount.getTenantUID();
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
-            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10) {
                 String hospitalUID = UserContextService.getCurrentUserAccount().getHospitalUID();
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
             }else {
