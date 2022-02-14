@@ -43,7 +43,7 @@
                     <h:panelGroup>
                         <label class="label">是否为补录*</label>
                         <p:selectOneMenu value="#{zkbPartOrderEditController.supplementFlag}" required="true" requiredMessage="是否为补录 #{msg.ValidationRequire}">
-                            <p:ajax event="change" update="zkbPartOrderEditForm" />
+                            <p:ajax event="change" update="zkbPartOrderEditForm" listener="#{zkbPartOrderEditController.supplementFlagChange}"  />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="是" itemValue="t"/>
                             <f:selectItem itemLabel="否" itemValue="f"/>
