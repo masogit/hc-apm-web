@@ -147,6 +147,8 @@ public class AssetInstallationController {
     private SupplierService supplierService;
     private OrgInfoRepository orgInfoRepository;
 
+    private ArrivalList arrivalList;
+
     @PostConstruct
     protected void init() {
         aiService = WebUtil.getBean(AssetInstallationService.class);
@@ -195,7 +197,7 @@ public class AssetInstallationController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
 
-        ArrivalList arrivalList = arrivalListItem.getArrivalList();
+        arrivalList = arrivalListItem.getArrivalList();
         deptInfoList = uaaService.getClinicalDeptListBySiteUID(arrivalList.getSiteUID());
         String contractNum = arrivalList.getContractNum();
         supplierService = WebUtil.getBean(SupplierService.class);
@@ -222,6 +224,10 @@ public class AssetInstallationController {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
         selectedObjectMap.put("selectedOrg", orgInfo);
+        arrivalList.setTenantUID(orgInfo.getTenantUID());
+        arrivalList.setInstitutionUID(orgInfo.getInstitutionUID());
+        arrivalList.setHospitalUID(orgInfo.getHospitalUID());
+        arrivalList.setSiteUID(orgInfo.getSiteUID());
         deptInfoList = uaaService.getClinicalDeptListBySiteUID(orgInfo.getUid());
         clearClinicalDept();
     }
@@ -287,7 +293,7 @@ public class AssetInstallationController {
     }
 
     public String finishInstall() {
-
+        arrivalListDao.save(arrivalList);//由于更新了院区，所以要重新保存一下，供定时任务获取
         Boolean isValidate = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
