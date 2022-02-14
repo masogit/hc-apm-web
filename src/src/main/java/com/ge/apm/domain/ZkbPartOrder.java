@@ -6,8 +6,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
-import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
-
 /**
  * @author : 503189362
  * @date : 2020/6/22
@@ -581,6 +579,31 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "maintain_first_flag")
     private String maintainFirstFlag;
+
+    /**
+     * 兑换类型 artificial application
+     */
+    @Column(name = "exchange_type")
+    private String exchangeType;
+
+    @Column(name = "supplement_flag")
+    private String supplementFlag;
+
+    public String getSupplementFlag() {
+        return supplementFlag;
+    }
+
+    public void setSupplementFlag(String supplementFlag) {
+        this.supplementFlag = supplementFlag;
+    }
+
+    public String getExchangeType() {
+        return exchangeType;
+    }
+
+    public void setExchangeType(String exchangeType) {
+        this.exchangeType = exchangeType;
+    }
 
     public String getMaintainFirstFlag() {
         return maintainFirstFlag;

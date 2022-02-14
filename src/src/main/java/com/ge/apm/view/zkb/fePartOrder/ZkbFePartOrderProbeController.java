@@ -379,7 +379,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * @param systemId system id
      * @param sr sr
      */
-    public void getSparePartsZkbFePartOrder(String systemId,String sr){
+   /* public void getSparePartsZkbFePartOrder(String systemId,String sr){
         if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr)){
              WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
             return;
@@ -391,14 +391,24 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             return;
         }
         this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,ZkbFePartOrderService.assetGroup,ZkbFePartOrder.OrderType.Probe.toString());
+    }*/
+    public void getSparePartsZkbFePartOrder(String systemId,String sr)
+    {
+        if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
+            return;
+        }
+        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,ZkbFePartOrderService.assetGroup,ZkbFePartOrder.OrderType.Probe.toString());
     }
+
 
     /**
      * 选择单据
      */
     public void selectedWorkFlow()
     {
-        this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selectZkbFePartOrder.getContractId());
+        this.contractList=this.zkbFePartOrderService.loadZkbContractInfoWithCheck(this.selectZkbFePartOrder.getContractId(),this.selectZkbFePartOrder.getSystemId());
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             this.selected.setFatherPartOrderNo(null);
@@ -457,8 +467,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * 提交
      * @return
      */
-    public String saveAndToListPage()
-    {
+    public String saveAndToListPage() {
+        if (CollectionUtils.isEmpty(this.sparePartsZkbFePartOrderList)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("工单不能为空！"));
+            return "";
+        }
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             return "";

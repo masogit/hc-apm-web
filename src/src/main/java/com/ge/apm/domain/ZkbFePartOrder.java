@@ -136,6 +136,11 @@ public class ZkbFePartOrder {
      */
     @Column(name = "system_id")
     private String systemId;
+    /**
+     * 设备Uid
+     */
+    @Column(name = "asset_id")
+    private String assetId;
 
     /**
      * 当前位置
@@ -214,6 +219,7 @@ public class ZkbFePartOrder {
      */
     @Column(name = "contract_id")
     private String contractId;
+
 
     /**
      * 派工信息SR#
@@ -1341,5 +1347,13 @@ public class ZkbFePartOrder {
 
     public void setContractCatSnNo(String contractCatSnNo) {
         this.contractCatSnNo = contractCatSnNo;
+    }
+
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 }
