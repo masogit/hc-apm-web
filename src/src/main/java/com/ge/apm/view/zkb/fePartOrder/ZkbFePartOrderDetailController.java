@@ -265,17 +265,18 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      * 选择设备
      */
     public void selectedWorkFlow() {
+        this.contractError = false;
         List<ZkbFePartOrder> list = this.zkbFePartOrderService.fullInfoBySystemIdBuildData(this.selected, this.zkbAssetInfo);
         if (list.size()>1) {
             WebUtil.addErrorMessage("当前设备存在多条有效期内的合同！");
             this.contractList = null;
+            this.contractError = true;
             return;
         }
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfoWithCheck(this.selected.getContractId(),this.selected.getSystemId());
-        this.contractError = false;
         //未匹配到合同
         if (CollectionUtils.isEmpty(this.contractList)) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_notFindContractError"));
+            WebUtil.addErrorMessage("未查询出合同数据！","");
             this.contractError = true;
             return;
         }
@@ -540,4 +541,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public void setZkbAssetInfo(AssetInfo zkbAssetInfo) {
         this.zkbAssetInfo = zkbAssetInfo;
     }
+
+
 }
