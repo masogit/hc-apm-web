@@ -1019,6 +1019,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         calcRemainQty();*/
     }
 
+    public void supplementFlagChange(){
+        if(CopyByInvok.F.equals(supplementFlag)){
+            selected.setSrNo("");
+        }
+    }
+
     public void scoreFlagChange(){
         if(CopyByInvok.T.equals(selected.getScoreFlag())){
             exchangeTypeList = i18nMessageRepository.findI18nByType("zkbExchangeType");
