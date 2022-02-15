@@ -125,7 +125,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{'2'.equals(zkbFePartOrderSparePartDetailController.selected.assetGroup)}">
                             <label class="label">#{msg.zkbFePartOrder_artificialType}*</label>
-                            <p:selectOneMenu id="artificialType" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')||'highMachine' eq zkbFePartOrderSparePartDetailController.selected.assetType}" value="#{zkbFePartOrderSparePartDetailController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbFePartOrder_artificialType} #{msg.ValidationRequire}">
+                            <p:selectOneMenu id="artificialType" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')||true}" value="#{zkbFePartOrderSparePartDetailController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbFePartOrder_artificialType} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_artificialType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                             </p:selectOneMenu>
