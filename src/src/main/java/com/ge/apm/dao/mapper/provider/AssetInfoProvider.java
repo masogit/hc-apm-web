@@ -50,7 +50,7 @@ public class AssetInfoProvider {
 		String systemId = param.get("systemId");//设备system id
 		String contractId = param.get("contractId");//合同ID
 		StringBuilder sb = new StringBuilder();
-		sb.append(" SELECT ai.asset_group,ai.function_type,zca.asset_type from zkb_contract ac INNER JOIN zkb_contract_asset zca on ac.id = zca.contract_id");
+		sb.append(" SELECT ai.uid,ai.asset_group,ai.function_type,zca.asset_type from zkb_contract ac INNER JOIN zkb_contract_asset zca on ac.id = zca.contract_id");
 		sb.append(" INNER JOIN asset_info ai on ai.uid = zca.asset_id and is_deleted = 'false' ");
 		sb.append(" where ac.id = '"+contractId+"'");
 		sb.append(" and ai.system_id = '"+systemId+"'");
