@@ -868,7 +868,18 @@ public class AssetInfo implements ChineseName,Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name="asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Set<AssetTags> assetTags;
-    
+
+    @Column(name = "last_check_company")
+    private String lastCheckCompany;
+
+    public String getLastCheckCompany() {
+        return lastCheckCompany;
+    }
+
+    public void setLastCheckCompany(String lastCheckCompany) {
+        this.lastCheckCompany = lastCheckCompany;
+    }
+
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;
 	}
