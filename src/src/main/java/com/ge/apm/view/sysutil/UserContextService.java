@@ -1,7 +1,9 @@
 package com.ge.apm.view.sysutil;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
@@ -314,7 +316,29 @@ public class UserContextService implements Serializable {
             return false;
         }
     }
+    public boolean getUserAccountApprove(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccountRepository userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        userAccount = userContextService.getLoginUser();
+        AuditGroupConfigurationRepository auditGroupConfigurationRepository=WebUtil.getBean(AuditGroupConfigurationRepository.class);
+        AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
+        if(auditGroupConfiguration!=null){
+            String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+            List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+            if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                    AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                    List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                    UserAccount user = userAccountRepository.getByUid(userUids.get(0));
+                    if (userAccount.getUid().equals(user.getUid())){
+                        return true;
+                    }
+                }
 
+            }
+        }
+        return false;
+    }
     public boolean authContains(String menuName){
     	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()||userAccount.getIsGeOp()){
     		return true;
@@ -1055,7 +1079,12 @@ public class UserContextService implements Serializable {
     public boolean isYiMaiYangGuangTenant() {
         TenantInfo tenantInfo = getTenantInfo();
         //这期上线，暂时写死，下个版本改成动态配置
-        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
+        if("齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName()) || "南阳张仲景医院".equals(tenantInfo.getName()) || "洛阳仁大医院".equals(tenantInfo.getName())){
+            return true;
+        }else{
+            return false;
+        }
+//        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
