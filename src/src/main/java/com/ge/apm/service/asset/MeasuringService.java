@@ -150,6 +150,8 @@ public class MeasuringService {
             tempAssetInfo.setNextMeteringDate(nextMeteringDate);
             tempAssetInfo.setLastMeteringDate(checkDate);
             tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
+            // 上次检测单位
+            tempAssetInfo.setLastCheckCompany(needUpdateAssetMcd.getCheckCompany());
             if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
                 tempAssetInfo.setUsageStatus(2);//停用
                 tempAssetInfo.setStatus(5);
