@@ -327,20 +327,6 @@ public class ZkbContractImportService {
             item.put("status", ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, "是否ZKB 599方案不能为空！");
             isValidateData = false;
-        }else{
-            if("是".equals(contractInfoVO.getFiveNineNineFlag()) && contractInfoVO.getContractStartDate() != null && contractInfoVO.getContractEndDate() != null){
-                try {
-                    int n = CopyByInvok.getBetweenYear(contractInfoVO.getContractStartDate(),contractInfoVO.getContractEndDate());
-                    if(n < 3){
-                        item.put("status", ImportStatus.Failure);
-                        ZkbContractRow.addErrMessage(item, "ZKB 599方案的合同有效期不能小于3年！");
-                        isValidateData = false;
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-            }
         }
 
         if(contractInfoVO.getContractStartDate() == null){
