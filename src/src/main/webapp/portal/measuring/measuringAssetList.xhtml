@@ -74,6 +74,9 @@
                     <p:column headerText="计量种别" filterBy="#{item.measuringType}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.measuringType}"/>
                     </p:column>
+                    <p:column headerText="上次检测单位" filterBy="#{item.lastCheckCompany}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.lastCheckCompany}"/>
+                    </p:column>
                     <p:column headerText="最后计量日期" sortBy="#{item.lastMeteringDate}" filterBy="#{item.lastMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterLastMeteringDate" widgetVar="varFilterLastMeteringDate" />
