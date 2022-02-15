@@ -1,5 +1,5 @@
 -- 运营人员角色 OpWorker
-INSERT INTO sys_role("name", role_desc, home_page) VALUES( 'OpWorker', '运营人员', '/homeOpWorker.xhtml');
+-- INSERT INTO sys_role("name", role_desc, home_page) VALUES( 'OpWorker', '运营人员', '/homeOpWorker.xhtml');
 -- 浙江大学医学院附属邵逸夫医院
 UPDATE tenant_info SET custom_tenant = '3' WHERE name = '浙江大学医学院附属邵逸夫医院';
 
