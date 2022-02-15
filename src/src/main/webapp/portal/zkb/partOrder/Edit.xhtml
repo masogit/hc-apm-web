@@ -353,7 +353,7 @@
                             </p:inputText>-->
                             <p:inputTextarea value="#{zkbPartOrderEditController.selected.faultDescription}" maxlength="255" required="true" requiredMessage="#{msg.zkbPartOrder_faultDescription} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.supplementFlag eq 't' and !(zkbPartOrderEditController.orderType eq 'Probe')}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.supplementFlag eq 't' }">
                             <label class="label">Sr#*</label>
                             <p:inputText value="#{zkbPartOrderEditController.selected.srNo}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}" />
                         </h:panelGroup>
