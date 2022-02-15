@@ -134,6 +134,7 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("备件+人工+保养已使用名额", "setSpareArtificailUse");
             contractRow.setFieldStringValue("是否ZKB 599方案", "setFiveNineNineFlag");
             contractRow.setFieldStringValue("备注", "setRemark");
+            contractRow.setFieldStringValue("公司编码", "setCompanyCode");
 
             if(contractInfoVO.isNull()){
                 break;

@@ -140,6 +140,7 @@ public class ZkbContractService {
                     zkbContractDataMap.put("是否ZKB 599方案","否");
                 }
             }
+            zkbContractDataMap.put("公司编码", zkbContract.getCompanyCode());
 
             zkbContractDataList.add(zkbContractDataMap);
             //处理合同课程数据
