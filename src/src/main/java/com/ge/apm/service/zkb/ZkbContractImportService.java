@@ -744,10 +744,42 @@ public class ZkbContractImportService {
                         }
                     }
                 }
-                if(zkbContractAssetVO.getSupportMaintainFlag() == null){
+                if(StringUtils.isEmpty(zkbContractAssetVO.getSupportMaintainFlag())){
                     isValidateData = false;
                     item.put("status", ImportStatus.Failure);
                     ZkbContractAssetRow.addErrMessage(item, "是否由GE FE提供年度1次现场保养不能为空！");
+                }else{
+                    if(StringUtils.isEmpty(getTrainReasonFlagFromCh(zkbContractAssetVO.getSupportMaintainFlag()))){
+                        isValidateData = false;
+                        item.put("status", ImportStatus.Failure);
+                        ZkbContractAssetRow.addErrMessage(item, "是否由GE FE提供年度1次现场保养只能选择是或否！");
+                    }else{
+                        zkbContractAssetVO.setSupportMaintainFlag(getTrainReasonFlagFromCh(zkbContractAssetVO.getSupportMaintainFlag()));
+                    }
+                }
+
+                if(StringUtils.isEmpty(zkbContractAssetVO.getTrainReasonFlag())){
+                    isValidateData = false;
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractAssetRow.addErrMessage(item, "是否代理商自身原因未完成培训不能为空！");
+                }else{
+                    if(StringUtils.isEmpty(getTrainReasonFlagFromCh(zkbContractAssetVO.getTrainReasonFlag()))){
+                        isValidateData = false;
+                        item.put("status", ImportStatus.Failure);
+                        ZkbContractAssetRow.addErrMessage(item, "是否代理商自身原因未完成培训取值范围有误！");
+                    }
+                }
+
+                if(StringUtils.isEmpty(zkbContractAssetVO.getAssetType())){
+                    isValidateData = false;
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractAssetRow.addErrMessage(item, "高低端机不能为空！");
+                }else{
+                    if(StringUtils.isEmpty(getHighLowAssetFromCh(zkbContractAssetVO.getAssetType()))){
+                        isValidateData = false;
+                        item.put("status", ImportStatus.Failure);
+                        ZkbContractAssetRow.addErrMessage(item, "高低端机取值范围有误！");
+                    }
                 }
             }
         }
@@ -780,6 +812,7 @@ public class ZkbContractImportService {
                 }else {
                     zkbContractAsset.setTrainReasonFlag("empty");
                 }
+                zkbContractAsset.setSupportMaintainFlag(zkbContractAssetVO.getSupportMaintainFlag());
                 zkbContractAssetRepository.save(zkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetEdit","",zkbContractAssetVO.getQrCode(),"导入设备编辑",currentUser,null);
 
@@ -807,7 +840,7 @@ public class ZkbContractImportService {
                     newZkbContractAsset.setTrainReasonFlag("empty");
                 }
                 if(StringUtils.isNotBlank(zkbContractAssetVO.getSupportMaintainFlag())){
-                    newZkbContractAsset.setSupportMaintainFlag(getTrainReasonFlagFromCh(zkbContractAssetVO.getSupportMaintainFlag()));
+                    newZkbContractAsset.setSupportMaintainFlag(zkbContractAssetVO.getSupportMaintainFlag());
                 }
                 newZkbContractAsset.setSubRegion(zkbContractAssetVO.getSubRegion());
                 newZkbContractAsset.setModality(zkbContractAssetVO.getModality());
