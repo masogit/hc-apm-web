@@ -1079,7 +1079,12 @@ public class UserContextService implements Serializable {
     public boolean isYiMaiYangGuangTenant() {
         TenantInfo tenantInfo = getTenantInfo();
         //这期上线，暂时写死，下个版本改成动态配置
-        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
+        if("齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName()) || "南阳张仲景医院".equals(tenantInfo.getName()) || "洛阳仁大医院".equals(tenantInfo.getName())){
+            return true;
+        }else{
+            return false;
+        }
+//        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
