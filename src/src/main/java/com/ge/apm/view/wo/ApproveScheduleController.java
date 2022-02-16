@@ -18,6 +18,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
 import java.util.List;
 
 @ManagedBean
@@ -47,13 +48,10 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
 
     @Override
     protected Page<ApproveSchedule> loadData(PageRequest pageRequest) {
-
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
-    }
-    @Override
-    public void onFilter(FilterEvent event) {
-        selected = null;
-        super.onFilter(event);
     }
     public void onRowSelect(SelectEvent event) {
         if (null == event.getObject()) {
