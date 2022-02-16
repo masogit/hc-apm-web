@@ -18,39 +18,43 @@
                 <p:outputLabel class="pageTitle" value="核心组审核进度查看"/>
             </div>
             <div class="ui-g-12 card">
+                <h:form id="UserAccountListForm">
+                    <p:dataTable id="approvalList" value="#{approveScheduleController.lazyModel}"
+                                 var="item"
+                                 widgetVar="approvalList"
+                                 lazy="true" paginator="true" paginatorPosition="both"
+                                 paginatorAlwaysVisible="true"
+                                 selectionMode="single" selection="#{approveScheduleController.selected}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                 sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
 
-                <p:dataTable id="approvalList" value="#{approveScheduleController.lazyModel}"
-                             var="item"
-                             widgetVar="approvalList"
-                             lazy="true" paginator="true" paginatorPosition="bottom"
-                             paginatorAlwaysVisible="true"
-                             selectionMode="single" selection="#{approveScheduleController.selected}"
-                             rowKey="#{item.id}" sortMode="single" sortOrder="descending"
-                             sortBy="#{item.createdDate}"
-                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
-                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                             rows="20" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="20,50,100,500">
 
-                    <p:ajax event="rowSelect" listener="#{approveScheduleController.onRowSelect}" update="ItemDetailViewForm"/>
+                        <p:ajax event="filter" listener="#{approveScheduleController.onFilter}" />
+                        <p:ajax event="rowSelect" listener="#{approveScheduleController.onRowSelect}" update=":ItemDetailViewForm"/>
 
-                    <p:column headerText="工单号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.srNum}"/>
-                    </p:column>
-                    <p:column headerText="备件提交人" sortBy="#{item.partsBy}" filterBy="#{item.partsBy}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.partsBy}"/>
-                    </p:column>
-                    <p:column headerText="备件总金额" sortBy="#{item.partsBy}">
-                        <h:outputText value="#{item.partsPrice}"/>
-                    </p:column>
-                    <p:column headerText="总审批进度" sortBy="#{item.partsBy}">
-                        <h:outputText  value="#{approveScheduleController.getApproveStatusName(item.approveStatus)}"/>
-                    </p:column>
+                        <p:column headerText="工单号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.srNum}"/>
+                        </p:column>
+                        <p:column headerText="备件提交人" sortBy="#{item.partsBy}" filterBy="#{item.partsBy}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.partsBy}"/>
+                        </p:column>
+                        <p:column headerText="备件总金额" sortBy="#{item.partsPrice}">
+                            <h:outputText value="#{item.partsPrice}"/>
+                        </p:column>
+                        <p:column headerText="总审批进度" sortBy="#{item.approveStatus}">
+                            <h:outputText  value="#{approveScheduleController.getApproveStatusName(item.approveStatus)}"/>
+                        </p:column>
 
-                    <f:facet name="{Toolbar}">
-                    </f:facet>
-                </p:dataTable>
+                        <f:facet name="{Toolbar}">
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
                 <ui:include src="approveScheduleDetail.xhtml"/>
+
             </div>
         </div>
     </ui:define>
