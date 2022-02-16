@@ -2,6 +2,7 @@ package com.ge.apm.dao;
 
 
 import com.ge.apm.domain.ZkbIbCrossRelationShip;
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 /**
@@ -11,7 +12,8 @@ public interface ZkbIbCrossRelationShipRepository extends GenericRepositoryUUID<
 
 
 
-
+    @Query("delete from ZkbIbCrossRelationShip")
+    void deleteAllBatch();
 
 
 }
