@@ -42,15 +42,7 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">是否ZKB 599方案*</label>
-                            <p:selectOneMenu  value="#{zkbContractEditController.selected.fiveNineNineFlag}" required="true" requiredMessage="是否ZKB 599合同 #{msg.ValidationRequire}">
-                                <p:ajax event="change" update="firstYearFlagGroup linkContractNoGroup"/>
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItem itemValue="Y" itemLabel="是"/>
-                                <f:selectItem itemValue="N" itemLabel="否"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_contractType}*</label>
                             <p:selectOneMenu id="status" value="#{zkbContractEditController.selected.contractType}" required="true" requiredMessage="#{msg.zkbContract_contractType} #{msg.ValidationRequire}">
@@ -77,6 +69,22 @@
                                 <f:selectItems value="#{zkbContractEditController.quotaDeductTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{!(empty zkbContractEditController.selected.id)}">
+                            <label class="label">修改类型*</label>
+                            <p:selectOneMenu id="modifyType" value="#{zkbContractEditController.selected.modifyType}" required="true" requiredMessage="修改类型 #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractModifyType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否ZKB 599方案*</label>
+                            <p:selectOneMenu  value="#{zkbContractEditController.selected.fiveNineNineFlag}" required="true" requiredMessage="是否ZKB 599合同 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="firstYearFlagGroup linkContractNoGroup"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemValue="Y" itemLabel="是"/>
+                                <f:selectItem itemValue="N" itemLabel="否"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup id="firstYearFlagGroup">
                             <h:panelGroup rendered="#{zkbContractEditController.selected.fiveNineNineFlag eq 'Y'}">
                                 <label class="label">599合同年份*</label>
@@ -93,13 +101,7 @@
                                 <p:inputText id="linkContractNo" value="#{zkbContractEditController.selected.linkContractNo}" />
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!(empty zkbContractEditController.selected.id)}">
-                            <label class="label">修改类型*</label>
-                            <p:selectOneMenu id="modifyType" value="#{zkbContractEditController.selected.modifyType}" required="true" requiredMessage="修改类型 #{msg.ValidationRequire}" >
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractModifyType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
+
                         <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Spare')}">
                             <label class="label">#{msg.zkbContract_spareQuota_total}</label>
                             <p:spinner id="spareQuotaTotal" value="#{zkbContractEditController.selected.spareQuotaTotal}" min="0" max="1000"  />
