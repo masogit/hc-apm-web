@@ -33,7 +33,7 @@
                                  rowsPerPageTemplate="20,50,100,500">
 
 
-                        <p:ajax event="filter" listener="#{approveScheduleController.onFilter}" />
+                        <p:ajax event="filter" listener="#{approveScheduleController.onFilter}" update=":ItemDetailViewForm" />
                         <p:ajax event="rowSelect" listener="#{approveScheduleController.onRowSelect}" update=":ItemDetailViewForm"/>
 
                         <p:column headerText="工单号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
