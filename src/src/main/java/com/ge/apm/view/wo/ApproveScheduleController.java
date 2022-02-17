@@ -62,6 +62,11 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
         ApproveSchedule approveSchedule = (ApproveSchedule) event.getObject();
         selected=approveSchedule;
         auditGroupConfigurationDetails = auditGroupConfigurationDetailRepository.listAllByBusinessUid(approveSchedule.getBusinessUid());
+        if(auditGroupConfigurationDetails!=null && !auditGroupConfigurationDetails.isEmpty()){
+            for ( AuditGroupConfigurationDetail auditGroupConfigurationDetail :auditGroupConfigurationDetails) {
+                auditGroupConfigurationDetail.setSrNum(approveSchedule.getSrNum());
+            }
+        }
     }
     public String getUserName(String userUid){
         UserAccount userAccount = userAccountRepository.getByUid(userUid);
@@ -70,24 +75,5 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
         }
         return null;
     }
-
-    public String getAuditNodeStatus( Integer auditNodeStatus){
-        switch (auditNodeStatus){
-            case 0:return "未审核";
-            case 1:return "审核通过";
-            case 2:return "审核不通过";
-            default:return null;
-        }
-    }
-    public String getApproveStatusName( Integer approveStatus){
-        switch (approveStatus){
-            case 1:return "未审核";
-            case 2:return "审核通过";
-            case 3:return "审核不通过";
-            case 4:return "审核进行中";
-            default:return null;
-        }
-    }
-
 
 }
