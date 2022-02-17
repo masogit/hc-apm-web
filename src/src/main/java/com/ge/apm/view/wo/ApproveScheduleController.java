@@ -51,6 +51,7 @@ public class ApproveScheduleController extends GenericCRUDUUIDController<Approve
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
+        selected=null;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
     public void onRowSelect(SelectEvent event) {
