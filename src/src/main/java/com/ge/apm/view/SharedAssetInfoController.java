@@ -267,7 +267,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         if(whethertoenableunattended){
             String nullMsg = "请填写设备名称和调剂编号";
             //点击行修改按钮 设备表和调剂编号表同时做修改
-            if (this.selected.getSharedAssetTypeUid() == null || ind == null) {
+            if (this.selected.getSharedAssetTypeUid() != null && ind == null ||this.selected.getSharedAssetTypeUid() == null && ind != null ) {
                 WebUtil.addWarnMessage(nullMsg);
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             } else {
@@ -291,6 +291,9 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                 } else {
                     //已配置调剂名称
                     //查找除当前数据以外的数据
+                    if (ind==null){
+                        ind="";
+                    }
                     SharedAssetSwapIndex entity = sharedAssetSwapIndexDao.findNotData(ind, this.selected.getUid() , this.selected.getClinicalDeptUID());
                     if (entity == null) {
                         super.save();
