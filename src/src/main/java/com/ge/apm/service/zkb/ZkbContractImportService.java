@@ -135,6 +135,8 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("是否ZKB 599方案", "setFiveNineNineFlag");
             contractRow.setFieldStringValue("备注", "setRemark");
             contractRow.setFieldStringValue("公司编码", "setCompanyCode");
+            contractRow.setFieldStringValue("599合同年份", "setFirstYearFlag");
+            contractRow.setFieldStringValue("关联合同号", "setLinkContractNo");
 
             if(contractInfoVO.isNull()){
                 break;
@@ -328,6 +330,24 @@ public class ZkbContractImportService {
             item.put("status", ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, "是否ZKB 599方案不能为空！");
             isValidateData = false;
+        }else {
+            if(CopyByInvok.T.equals(contractInfoVO.getFiveNineNineFlag())){
+                if(StringUtils.isEmpty(contractInfoVO.getFirstYearFlag())){
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractRow.addErrMessage(item, "599合同年份不能为空！");
+                    isValidateData = false;
+                }else {
+                    if("599合同第一年".equals(contractInfoVO.getFirstYearFlag())){
+                        contractInfoVO.setFirstYearFlag(CopyByInvok.T);
+                    }else if("599合同第2和3年".equals(contractInfoVO.getFirstYearFlag())){
+                        contractInfoVO.setFirstYearFlag(CopyByInvok.F);
+                    }else{
+                        contractInfoVO.setFirstYearFlag("");
+                    }
+                }
+            }else{
+
+            }
         }
 
         if(contractInfoVO.getContractStartDate() == null){
