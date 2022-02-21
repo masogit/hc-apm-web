@@ -103,8 +103,8 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("区域","setRegion");
             contractRow.setFieldStringValue("代理商","setAgentName");
             contractRow.setFieldStringValue("合同类型", "setContractType");
-            contractRow.setFieldDateValue("合同开始日期", "setContractStartDate");
-            contractRow.setFieldDateValue("合同结束日期", "setContractEndDate");
+            contractRow.setFieldDateValue("合同开始日期", "setStartDate");
+            contractRow.setFieldDateValue("合同结束日期", "setEndDate");
             contractRow.setFieldStringValue("名额扣除类型", "setQuotaDeductType");
             contractRow.setFieldNumValue("IB数量", "setIbNumber");
             contractRow.setFieldNumValue("备件剩余名额", "setSpareQuota");
@@ -223,7 +223,7 @@ public class ZkbContractImportService {
 
             if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
                 if("是".equals(contractInfoVO.getFiveNineNineFlag())){
-                    zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
+                   /* zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
                     zkbContract.setYearCount(1);
                     zkbContract.setStartDate(zkbContract.getContractStartDate());
                     int year = zkbContract.getYearCount() == null ? 1 :  zkbContract.getYearCount();
@@ -234,12 +234,21 @@ public class ZkbContractImportService {
                     cal.setTime(zkbContract.getContractStartDate());
                     cal.add(Calendar.YEAR, year);
                     cal.add(Calendar.DATE, -1);
-                    zkbContract.setEndDate(cal.getTime());
+                    zkbContract.setEndDate(cal.getTime());*/
+                    if("599合同第一年".equals(contractInfoVO.getFirstYearFlag())){
+                        zkbContract.setFirstYearFlag(CopyByInvok.T);
+                    }else if("599合同第2和3年".equals(contractInfoVO.getFirstYearFlag())){
+                        zkbContract.setFirstYearFlag(CopyByInvok.F);
+                    }else{
+                        zkbContract.setFirstYearFlag("");
+                    }
                 }else{
-                    zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.N.toString());
+                    /*zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.N.toString());
                     zkbContract.setStartDate(zkbContract.getContractStartDate());
-                    zkbContract.setEndDate(zkbContract.getContractEndDate());
+                    zkbContract.setEndDate(zkbContract.getContractEndDate());*/
                 }
+                zkbContract.setLinkContractNo(contractInfoVO.getLinkContractNo());
+                zkbContract.setCompanyCode(contractInfoVO.getCompanyCode());
             }
             zkbContract.setLastModifiedBy(currentUser.getLoginName());
             zkbContract.setLastModifiedDate(new Date());
@@ -260,18 +269,25 @@ public class ZkbContractImportService {
             }
             if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
                 if("是".equals(contractInfoVO.getFiveNineNineFlag())){
-                    newZkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
+                    /*newZkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
                     newZkbContract.setYearCount(1);
                     newZkbContract.setStartDate(newZkbContract.getContractStartDate());
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(newZkbContract.getContractStartDate());
                     cal.add(Calendar.YEAR, 1);
                     cal.add(Calendar.DATE, -1);
-                    newZkbContract.setEndDate(cal.getTime());
+                    newZkbContract.setEndDate(cal.getTime());*/
+                    if("599合同第一年".equals(contractInfoVO.getFirstYearFlag())){
+                        newZkbContract.setFirstYearFlag(CopyByInvok.T);
+                    }else if("599合同第2和3年".equals(contractInfoVO.getFirstYearFlag())){
+                        newZkbContract.setFirstYearFlag(CopyByInvok.F);
+                    }else{
+                        newZkbContract.setFirstYearFlag("");
+                    }
                 }else{
-                    newZkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.N.toString());
+                   /* newZkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.N.toString());
                     newZkbContract.setStartDate(newZkbContract.getContractStartDate());
-                    newZkbContract.setEndDate(newZkbContract.getContractEndDate());
+                    newZkbContract.setEndDate(newZkbContract.getContractEndDate());*/
                 }
             }
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
@@ -337,13 +353,7 @@ public class ZkbContractImportService {
                     ZkbContractRow.addErrMessage(item, "599合同年份不能为空！");
                     isValidateData = false;
                 }else {
-                    if("599合同第一年".equals(contractInfoVO.getFirstYearFlag())){
-                        contractInfoVO.setFirstYearFlag(CopyByInvok.T);
-                    }else if("599合同第2和3年".equals(contractInfoVO.getFirstYearFlag())){
-                        contractInfoVO.setFirstYearFlag(CopyByInvok.F);
-                    }else{
-                        contractInfoVO.setFirstYearFlag("");
-                    }
+
                 }
             }else{
 
