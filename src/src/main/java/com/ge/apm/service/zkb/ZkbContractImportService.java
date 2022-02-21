@@ -360,13 +360,13 @@ public class ZkbContractImportService {
             }
         }
 
-        if(contractInfoVO.getContractStartDate() == null){
+        if(contractInfoVO.getStartDate() == null){
             item.put("status", ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorStartTimeIsEmpty"));
             isValidateData = false;
         }
 
-        if(contractInfoVO.getContractEndDate() == null ){
+        if(contractInfoVO.getEndDate() == null ){
             item.put("status", ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractEndTimeEmpty"));
             isValidateData = false;
