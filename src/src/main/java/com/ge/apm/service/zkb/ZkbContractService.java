@@ -140,7 +140,15 @@ public class ZkbContractService {
                     zkbContractDataMap.put("是否ZKB 599方案","否");
                 }
             }
+            if(StringUtils.isNotEmpty(zkbContract.getFirstYearFlag())){
+                if(CopyByInvok.T.equals(zkbContract.getFirstYearFlag())){
+                    zkbContractDataMap.put("599合同年份","599合同第一年");
+                }else if(CopyByInvok.F.equals(zkbContract.getFirstYearFlag())){
+                    zkbContractDataMap.put("599合同年份","599合同第2和3年");
+                }
+            }
             zkbContractDataMap.put("公司编码", zkbContract.getCompanyCode());
+            zkbContractDataMap.put("关联合同号", zkbContract.getLinkContractNo());
 
             zkbContractDataList.add(zkbContractDataMap);
             //处理合同课程数据
