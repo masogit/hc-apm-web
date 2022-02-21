@@ -6,6 +6,7 @@ import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
+import jdk.nashorn.internal.runtime.AllocationStrategy;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
@@ -647,6 +648,9 @@ public class AssetInfo implements ChineseName,Serializable {
     private Boolean canReturn;
 
     @Transient
+    private Boolean canEdit;
+
+    @Transient
     private OrgInfo clinicalDeptOrg;
 
     @Transient
@@ -695,6 +699,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private String sharedAssetSwapIndexId;
+
 
     public String getCurrentId() {
         return currentId;
@@ -923,6 +928,17 @@ public class AssetInfo implements ChineseName,Serializable {
     public Boolean getCanReturn() {
         Boolean rst = Boolean.FALSE;
         if(!this.clinicalDeptUID.equals(this.assetDeptUID)) {
+            rst = Boolean.TRUE;
+            if (this.sharedAssetReqDetail!=null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())){
+                rst = Boolean.FALSE;
+            }
+        }
+        return rst;
+    }
+    //
+    public Boolean getCanEdit() {
+        Boolean rst = Boolean.FALSE;
+        if (this.sharedAssetReqDetail!=null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())){
             rst = Boolean.TRUE;
         }
         return rst;
@@ -2177,7 +2193,12 @@ public class AssetInfo implements ChineseName,Serializable {
     public Map<String, Object> buildLeaseReqHeader() {
         Map<String, Object> reqHeader = new HashMap<>();
         reqHeader.put("clinicalDeptUID", this.getAssetDeptUID());
-        reqHeader.put("type", this.getSharedAssetReqDetail().getLeaseRequest().getType());
+        if (this.getSharedAssetReqDetail().getLeaseRequest()==null){
+            reqHeader.put("type", "2");
+        }
+        else {
+            reqHeader.put("type", this.getSharedAssetReqDetail().getLeaseRequest().getType());
+        }
         reqHeader.put("details", new LinkedList<Map<String, String>>());
         return reqHeader;
     }
