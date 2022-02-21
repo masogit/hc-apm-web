@@ -78,6 +78,12 @@ public class AuditGroupConfigurationDetail implements Serializable {
     private Date createdDate;
 
     /**
+     * 保修工单号
+     */
+    @Transient
+    private String srNum;
+
+    /**
      * 创建人
      */
     @CreatedBy
