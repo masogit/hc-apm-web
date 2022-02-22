@@ -66,8 +66,8 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
             e.printStackTrace();
         }
 
-        zkbIbCrossUserRepository.deleteAll();
-        zkbIbCrossRelationShipRepository.deleteAll();
+        zkbIbCrossUserRepository.deleteAllBatch();
+        zkbIbCrossRelationShipRepository.deleteAllBatch();
 
         List<String> tenantUidList = zkbContractRepository.queryByLastModifiedDate(d1,d2);
         List<ZkbIbCrossUser> zkbIbCrossUserList = new ArrayList<>();

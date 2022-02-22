@@ -326,6 +326,17 @@ public class ZkbContract implements ChineseName, Serializable {
     @Column(name = "link_contract_no")
     private String linkContractNo;
 
+    @Column(name = "company_code")
+    private String companyCode;
+
+    public String getCompanyCode() {
+        return companyCode;
+    }
+
+    public void setCompanyCode(String companyCode) {
+        this.companyCode = companyCode;
+    }
+
     public String getFirstYearFlag() {
         return firstYearFlag;
     }

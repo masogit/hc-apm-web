@@ -26,7 +26,7 @@
                                              selection="#{zkbFePartOrderDetailController.zkbAssetInfo}"
                                              lazy="false" paginator="true" rowKey="#{item.uid}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
                                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderDetailController.selectedWorkFlow}"  update="zkbFePartOrderEditForm:zkbContractDatalist zkbFePartOrderEditForm:zkbFiledSet" />
+                                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderDetailController.selectedWorkFlow}"  update="zkbFePartOrderEditForm zkbFePartOrderEditForm:zkbContractDatalist zkbFePartOrderEditForm:zkbFiledSet" />
                                     <p:column headerText="租户名称">
                                         <h:outputText value="#{item.comments}"/>
                                     </p:column>

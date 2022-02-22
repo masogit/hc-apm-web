@@ -138,9 +138,17 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     private static final String SPARE_PARTS_ORDER_PREFIX = "FEPO";
 
     /**
-     * 超声高端机
+     * GEFE超声高端机
      */
     public static String highArtificialTypeValue = "High";
+    /**
+     * GEFE超声低端机
+     */
+    public static String lowArtificialTypeValue = "Low";
+    /**
+     * GEFE depot超声高端机
+     */
+    public static String depotArtificialTypeValue = "Depot";
 
     /**
      * 超声类
@@ -262,6 +270,14 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 合同超声高端机
      */
     public static final String assetTypeHighMachineValue = "highMachine";
+    /**
+     * 合同超声低端机
+     */
+    public static final String assetTypeLowMachineValue = "lowMachine";
+    /**
+     * 合同超声depot
+     */
+    public static final String assetTypeDepot = "depot";
 
     public static final String testLoginNameStartWith = "test.";
 
@@ -1301,7 +1317,21 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             AssetInfo assetInfo = assetInfoList.get(0);
             selected.setArtificialType("");
             if (assetInfo.getAssetGroup() != null && "2".equals(assetInfo.getAssetGroup().toString())) {
-                selected.setArtificialType(highArtificialTypeValue);
+                Set<ZkbContractAsset> zkbContractAssetSet = zkbContract.getZkbContractAssets();
+                ZkbContractAsset zkbContractAsset = new ZkbContractAsset();
+                if(zkbContractAssetSet!=null){
+                    zkbContractAsset = zkbContractAssetSet.stream().filter(z -> z.getAssetId().equals(assetInfo.getUid())).findAny().orElse(new ZkbContractAsset()) ;
+                }
+
+                if(StringUtils.isNotBlank(zkbContractAsset.getAssetType())){
+                    if(assetTypeHighMachineValue.equals(zkbContractAsset.getAssetType())){
+                        selected.setArtificialType(highArtificialTypeValue);
+                    }else if(assetTypeLowMachineValue.equals(zkbContractAsset.getAssetType())){
+                        selected.setArtificialType(lowArtificialTypeValue);
+                    }else if(assetTypeDepot.equals(zkbContractAsset.getAssetType())){
+                        selected.setArtificialType(depotArtificialTypeValue);
+                    }
+                }
             }
             selected.setAssetGroup(assetInfo.getAssetGroup().toString());
             selected.setProductNumber(assetInfo.getFunctionType());

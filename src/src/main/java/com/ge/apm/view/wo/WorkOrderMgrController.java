@@ -1003,7 +1003,7 @@ public void test1(){
             UserAccount userAccount = userContextService.getCurrentUserAccount();
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
             List<V2_WorkOrder> workOrderList = new ArrayList<>();
-            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10){
                 List<V2_WorkOrder> v2_workOrders = dao.findBySearchFilter(this.searchFilters);
                 if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
                     for (V2_WorkOrder v2_workOrder :v2_workOrders) {
@@ -1317,12 +1317,28 @@ public void test1(){
         prepareAct(v2WorkOrder.getId());
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
-        approvedDetails.stream().forEach(item -> {
-            if (item.getApproved() == null) {
-                item.setApproved(false);
-            }
-            selectedMap.put(item.getId(), item.getApproved());
-        });
+        UserAccount userAccount = userContextService.getCurrentUserAccount();
+        String tenantUID = userAccount.getTenantUID();
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+            List<V2_WorkOrder_Detail> approvedDetailList = new ArrayList<>();
+            approvedDetails.stream().forEach(item -> {
+                if (item.getApproved() == null || !item.getApproved()) {
+                    item.setApproved(false);
+                    selectedMap.put(item.getId(), item.getApproved());
+                    approvedDetailList.add(item);
+                }
+            });
+            approvedDetails = new ArrayList<>();
+            approvedDetails.addAll(approvedDetailList);
+        }else {
+            approvedDetails.stream().forEach(item -> {
+                if (item.getApproved() == null) {
+                    item.setApproved(false);
+                }
+                selectedMap.put(item.getId(), item.getApproved());
+            });
+        }
     }
 
     public List<V2_WorkOrder_Detail> getNeedApprovalDetails() {
@@ -2275,7 +2291,7 @@ public void test1(){
 
         for (int i = 0; i < approvedDetails.size(); i++) {
             V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
-            if (selectedMap.get(v2_workOrder_detail.getId())) {
+            if (selectedMap!=null && selectedMap.get(v2_workOrder_detail.getId())) {
                 if (v2_workOrder_detail.getApproved() == null || !v2_workOrder_detail.getApproved()) {
                     approvedDetailsNew.add(v2_workOrder_detail);
                 }
