@@ -1003,7 +1003,7 @@ public void test1(){
             UserAccount userAccount = userContextService.getCurrentUserAccount();
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
             List<V2_WorkOrder> workOrderList = new ArrayList<>();
-            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10){
                 List<V2_WorkOrder> v2_workOrders = dao.findBySearchFilter(this.searchFilters);
                 if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
                     for (V2_WorkOrder v2_workOrder :v2_workOrders) {
