@@ -43,7 +43,7 @@
                     <h:panelGroup>
                         <label class="label">是否为补录*</label>
                         <p:selectOneMenu value="#{zkbPartOrderEditController.supplementFlag}" required="true" requiredMessage="是否为补录 #{msg.ValidationRequire}">
-                            <p:ajax event="change" update="zkbPartOrderEditForm" />
+                            <p:ajax event="change" update="zkbPartOrderEditForm" listener="#{zkbPartOrderEditController.supplementFlagChange}"  />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="是" itemValue="t"/>
                             <f:selectItem itemLabel="否" itemValue="f"/>
@@ -353,7 +353,7 @@
                             </p:inputText>-->
                             <p:inputTextarea value="#{zkbPartOrderEditController.selected.faultDescription}" maxlength="255" required="true" requiredMessage="#{msg.zkbPartOrder_faultDescription} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.supplementFlag eq 't' and !(zkbPartOrderEditController.orderType eq 'Probe')}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.supplementFlag eq 't' }">
                             <label class="label">Sr#*</label>
                             <p:inputText value="#{zkbPartOrderEditController.selected.srNo}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}" />
                         </h:panelGroup>

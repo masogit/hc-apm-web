@@ -51,6 +51,14 @@
                         <label class="label">报修单号</label>
                         <p:inputText  value="#{zkbPartOrderAuditController.selected.srNum}" disabled="true"/>
                     </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">是否为补录*</label>
+                        <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.supplementFlag}" disabled="true" >
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItem itemLabel="是" itemValue="t"/>
+                            <f:selectItem itemLabel="否" itemValue="f"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                 </p:panelGrid>
             </h:form>
             <p:fieldset id="zkbWorkFlowFieldset" legend="工单信息" >
@@ -327,9 +335,9 @@
                             <label class="label">故障描述*</label>
                             <p:inputTextarea id="faultDescription" value="#{zkbPartOrderAuditController.selected.faultDescription}" disabled="true" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.supplementFlag eq 't' and !(zkbPartOrderAuditController.selected.orderType eq 'Probe')}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.supplementFlag eq 't'}">
                             <label class="label">Sr#*</label>
-                            <p:inputText value="#{zkbPartOrderAuditController.selected.selected.srNo}"  disabled="true"/>
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}"  disabled="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid rendered="#{!(zkbPartOrderAuditController.orderType eq 'Artificial')}">

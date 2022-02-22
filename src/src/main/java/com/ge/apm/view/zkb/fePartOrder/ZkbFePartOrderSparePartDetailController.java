@@ -28,7 +28,10 @@ import java.util.*;
 @ManagedBean
 @ViewScoped
 public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDController<ZkbFePartOrder> {
-
+    /**
+     * 默认合同错误
+     */
+    private Boolean contractError = false;
     /**
      * 智康宝人工申请 service
      */
@@ -320,12 +323,16 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     /**
      * 选择单据
      */
-    public void selectedWorkFlow()
-    {
+    public void selectedWorkFlow() {
+        this.contractError = false;
         //设备类型为超声类默认是高端机
         this.selected = this.zkbFePartOrderService.selectedWorkFlow(this.selected,this.selectZkbFePartOrder);
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfoWithCheck(this.selectZkbFePartOrder.getContractId(),this.selected.getSystemId());
-
+        if (CollectionUtils.isEmpty(this.contractList)) {
+            WebUtil.addErrorMessage("未查询出合同数据！","");
+            this.contractError = true;
+            return;
+        }
         ZkbContract zkbContract =  contractList.get(0);
         /**
          * 需要兼容历史数据
@@ -851,8 +858,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public boolean checkFatherPartNo()
     {
-        if(StringUtils.isNotBlank(this.selected.getFatherPartOrderNo()))
-        {
+        if(StringUtils.isNotBlank(this.selected.getFatherPartOrderNo())&&!this.contractError) {
             return true;
         }
         return false;
@@ -1100,4 +1106,11 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         return qty;
     }
 
+    public Boolean getContractError() {
+        return contractError;
+    }
+
+    public void setContractError(Boolean contractError) {
+        this.contractError = contractError;
+    }
 }

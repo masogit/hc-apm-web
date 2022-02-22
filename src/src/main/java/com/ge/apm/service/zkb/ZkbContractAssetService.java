@@ -2,7 +2,6 @@ package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ZkbContractAssetRepository;
-import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.domain.ZkbContractAsset;
 import com.ge.apm.domain.ZkbFePartOrder;
@@ -13,6 +12,8 @@ import webapp.framework.web.WebUtil;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -87,6 +88,7 @@ public class ZkbContractAssetService {
      * @param assetUid 超声高端机在备件申请时不能为null
      * @return
      */
+
     public boolean checkFiveNineNineContract(ZkbContract zkbContract,Date reportDate, String ArtificialType,String orderType, String assetUid) {
         boolean flag = true;
         String messageKey = null;
@@ -103,8 +105,8 @@ public class ZkbContractAssetService {
             String dateStr = DateUtil.getFormatStrByDate(reportDate, format);
             Date reportDatetimp = DateUtil.getDateByFormatStr(dateStr, format);
             if (reportDatetimp.compareTo(zkbContract.getStartDate()) < 0 || reportDatetimp.compareTo(zkbContract.getEndDate()) > 0) {
-//                messageKey = "zkbFePartOrder_contractValidPeriodError";
-                messageKey = "zkbFePartOrder_599contractSupportTimesCannotBeZero";
+                messageKey = "zkbFePartOrder_contractValidPeriodError";
+           //     messageKey = "zkbFePartOrder_599contractSupportTimesCannotBeZero";
                 flag = false;
             }else if(ZkbFePartOrderService.highArtificialTypeValue.equals(ArtificialType) &&
                     ZkbFePartOrder.OrderType.SpareParts.toString().equals(orderType) && CopyByInvok.T.equals(zkbContract.getFirstYearFlag())){
