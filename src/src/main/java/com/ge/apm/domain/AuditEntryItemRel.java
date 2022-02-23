@@ -12,19 +12,13 @@ import java.io.Serializable;
  */
 @Entity
 @Data
-@Table(name = "audit_template")
-public class AuditEntryTemplateRel implements Serializable {
+@Table(name = "audit_entry_item_rel")
+public class AuditEntryItemRel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     private AuditEntryTemplatePK id;
-
-    /**
-     * 排序号
-     */
-    @Column(name = "order")
-    private Integer order;
 
     @Embeddable
     @EqualsAndHashCode
@@ -33,13 +27,13 @@ public class AuditEntryTemplateRel implements Serializable {
         /**
          * 模板uid
          */
-        @Column(name = "template_uid")
-        private String template_uid;
+        @Column(name = "item_uid")
+        private String itemUid;
 
         /**
          * 条款uid
          */
         @Column(name = "entry_uid")
-        private String entry_uid;
+        private String entryUid;
     }
 }
