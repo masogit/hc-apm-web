@@ -37,7 +37,7 @@ public class AuditEntryTemplateRel implements Serializable {
         private String templateUid;
 
         /**
-         * 条款uid
+         * 条款uid(系统或用户的条款uid)
          */
         @Column(name = "entry_uid")
         private String entryUid;
