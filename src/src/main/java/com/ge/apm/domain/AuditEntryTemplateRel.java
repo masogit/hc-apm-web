@@ -1,11 +1,10 @@
 package com.ge.apm.domain;
 
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  *
@@ -13,31 +12,34 @@ import java.util.Date;
  */
 @Entity
 @Data
-@Table(name = "audit_template")
-public class AuditTarget implements Serializable {
+@Table(name = "audit_entry_template_rel")
+public class AuditEntryTemplateRel implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
-    @Column(name = "uid")
-    private String uid;
+    private AuditEntryTemplatePK id;
 
     /**
-     * 系统标准uid
+     * 排序号
      */
-    @Column(name = "system_case_uid")
-    private String systemCaseUid;
+    @Column(name = "order")
+    private Integer order;
 
-    /**
-     * 目标(三甲、二甲...)
-     */
-    @Column(name = "target")
-    private Integer target;
+    @Embeddable
+    @EqualsAndHashCode
+    @Data
+    public static class AuditEntryTemplatePK implements Serializable {
+        /**
+         * 模板uid
+         */
+        @Column(name = "template_uid")
+        private String templateUid;
 
-    /**
-     * 目标分数
-     */
-    @Column(name = "score")
-    private Double score;
+        /**
+         * 条款uid
+         */
+        @Column(name = "entry_uid")
+        private String entryUid;
+    }
 }

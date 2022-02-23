@@ -4,7 +4,6 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -14,8 +13,8 @@ import java.util.Date;
  */
 @Entity
 @Data
-@Table(name = "audit_template")
-public class AuditTemplate implements Serializable {
+@Table(name = "audit_target")
+public class AuditTarget implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -25,50 +24,20 @@ public class AuditTemplate implements Serializable {
     private String uid;
 
     /**
-     * 模板名称
+     * 系统标准uid
      */
-    @Column(name = "name")
-    private String name;
+    @Column(name = "system_case_uid")
+    private String systemCaseUid;
 
     /**
-     * 章节编号
+     * 目标(三甲、二甲...)
      */
-    @Column(name = "mark")
-    private String mark;
+    @Column(name = "target")
+    private Integer target;
 
     /**
-     * 类型：1-用户 2-系统
+     * 目标分数
      */
-    @Column(name = "type")
-    private Integer type;
-
-    /**
-     * 文件名称
-     */
-    @Column(name = "file_name")
-    private String fileName;
-
-    /**
-     * 文件大小
-     */
-    @Column(name = "file_size")
-    private Long fileSize;
-
-    /**
-     * 文件uid
-     */
-    @Column(name = "object_uid")
-    private String objectUId;
-
-    /**
-     * 上传时间
-     */
-    @Column(name = "upload_time")
-    private Date uploadTime;
-
-    /**
-     * 上传人
-     */
-    @Column(name = "uploader")
-    private String uploader;
+    @Column(name = "score")
+    private Double score;
 }

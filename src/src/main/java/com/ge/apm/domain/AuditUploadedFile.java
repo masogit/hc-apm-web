@@ -13,8 +13,8 @@ import java.util.Date;
  */
 @Entity
 @Data
-@Table(name = "audit_template")
-public class AuditTarget implements Serializable {
+@Table(name = "audit_uploaded_file")
+public class AuditUploadedFile implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -24,20 +24,38 @@ public class AuditTarget implements Serializable {
     private String uid;
 
     /**
-     * 系统标准uid
+     * 条款uid
      */
-    @Column(name = "system_case_uid")
-    private String systemCaseUid;
+    @Column(name = "entry_uid")
+    private String entryUid;
 
     /**
-     * 目标(三甲、二甲...)
+     * 文件名称
      */
-    @Column(name = "target")
-    private Integer target;
+    @Column(name = "file_name")
+    private String fileName;
 
     /**
-     * 目标分数
+     * 文件大小
      */
-    @Column(name = "score")
-    private Double score;
+    @Column(name = "file_size")
+    private Long fileSize;
+
+    /**
+     * 文件uid
+     */
+    @Column(name = "object_uid")
+    private String objectUId;
+
+    /**
+     * 上传时间
+     */
+    @Column(name = "upload_time")
+    private Date uploadTime;
+
+    /**
+     * 上传人
+     */
+    @Column(name = "uploader")
+    private String uploader;
 }
