@@ -34,6 +34,6 @@ public class AuditEntryItemRel implements Serializable {
          * 条款uid
          */
         @Column(name = "entry_uid")
-        private String entryUid;
+        private String systemEntryUid;
     }
 }
