@@ -8,8 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- *
- * @author 212579464
+ * @author 503266962
  */
 @Entity
 @Data

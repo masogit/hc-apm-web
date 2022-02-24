@@ -7,8 +7,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 /**
- *
- * @author 212579464
+ * @author 503266962
  */
 @Entity
 @Data
@@ -18,12 +17,12 @@ public class AuditEntryItemRel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    private AuditEntryTemplatePK id;
+    private AuditEntryItemPK id;
 
     @Embeddable
     @EqualsAndHashCode
     @Data
-    public static class AuditEntryTemplatePK implements Serializable {
+    public static class AuditEntryItemPK implements Serializable {
         /**
          * 模板uid
          */
@@ -33,7 +32,7 @@ public class AuditEntryItemRel implements Serializable {
         /**
          * 条款uid
          */
-        @Column(name = "entry_uid")
+        @Column(name = "system_entry_uid")
         private String systemEntryUid;
     }
 }
