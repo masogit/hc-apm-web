@@ -11,7 +11,6 @@ import java.util.Date;
 /**
  * @author 503189829
  * @create 2022/2/23
- * @since 1.0.0
  */
 @Entity
 @Table(name = "audit_case")
