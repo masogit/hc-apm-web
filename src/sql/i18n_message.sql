@@ -4479,3 +4479,23 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ib-status','5','智爱养护IB','智爱养护IB',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ib-status','6','OWOC-防','OWOC-防',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ib-status','10','远程守护','远程守护',NULL,-1);
+
+--县域专用故障类别
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyArea', '1', '自然故障(设备老化/过度使用等)', 'Natural failure (equipment aging / overuse, etc.)', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyArea', '2', '人为故障(操作不当/校正失调等)', 'Human failure (improper operation / correction of maladjustment, etc.)', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyArea', '3', '环境故障(温湿度/灰尘/磁场干扰等)', 'Environmental failure (temperature and humidity / dust / magnetic field interference, etc.)', NULL, '-1');
+--原4 设计故障(设备软硬设计故障)分拆成两个类别“8 硬件故障”及“9 软件故障“，去掉6可规避故障和5其他两项
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyArea', '8', '硬件故障', 'Hardware malfunction', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyArea', '9', '软件故障', 'Software failure', NULL, '-1');
+--县域和旧故障类别合并，方便兼容历史数据的页面显示。
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '1', '自然故障(设备老化/过度使用等)', 'Natural failure (equipment aging / overuse, etc.)', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '2', '人为故障(操作不当/校正失调等)', 'Human failure (improper operation / correction of maladjustment, etc.)', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '3', '环境故障(温湿度/灰尘/磁场干扰等)', 'Environmental failure (temperature and humidity / dust / magnetic field interference, etc.)', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '4', '设计故障(设备软硬设计故障)', 'Design failure (equipment hardware and software design failure)', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '5', '其它', 'other', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '6', '可规避故障', 'Avoidable fault', NULL, '-1')
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '8', '硬件故障', 'Design failure (equipment hardware and software design failure)', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '9', '软件故障', 'other', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','countyAreaOrderType','开单类型','Order Type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('countyAreaOrderType', '1', '主动开单', 'Initiative Order', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('countyAreaOrderType', '2', '被动开单', 'Passive Order', NULL, '-1');

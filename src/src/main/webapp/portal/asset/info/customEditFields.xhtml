@@ -743,6 +743,10 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <h:panelGroup rendered="#{userContextService.countyArea}">
+        <label class="label">IB合同类别</label>
+        <p:inputText value="#{assetInfoEditController.selected.contractType}"/>
+    </h:panelGroup>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufactDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.manufactDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufactDate'].required? '*':''}</span></label>

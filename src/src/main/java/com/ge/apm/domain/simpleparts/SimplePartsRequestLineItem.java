@@ -245,6 +245,13 @@ public class SimplePartsRequestLineItem implements Serializable {
     @Transient
     private String transportCompany;
 
+    /**
+     * @author csh
+     * @createTime 2020/6/11 11:24
+     * @description 备件名称
+     */
+    @Transient
+    private String workOrderNo;
 
     @Transient
     private SimplePartsItemValue partsItemValue;

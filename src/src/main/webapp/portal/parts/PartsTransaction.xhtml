@@ -160,6 +160,14 @@
                         <p:column headerText="院区" sortBy="#{item.siteUID}">
                             <h:outputText value="#{simplePartsTransactionController.switchSiteName(item.siteUID)}"/>
                         </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="导出出库单" id="sparePartsOutStockExport" icon="ui-icon-file-download"
+                                             class="btn btn-sm btn-gray"
+                                             disabled="#{simplePartsTransactionController.queryIndex == 0}"
+                                             action="#{simplePartsTransactionController.exportReportDocx()}" rendered="#{userContextService.isCountyArea() and simplePartsTransactionController.queryIndex == 1}">
+                                <p:fileDownload value="#{simplePartsTransactionController.exportFile}"/>
+                            </p:commandButton>
+                        </f:facet>
                     </p:dataTable>
                     <p:remoteCommand name="rc2" update=":SparePartsInventoryListForm:datalist"/>
                 </h:form>

@@ -183,8 +183,15 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.caseType}</label>
-                                    <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(woItem.caseType)}"/>
-                                </h:panelGroup>
+                                    <c:choose>
+                                        <c:when test="#{userContextService.isCountyArea()}">
+                                            <p:outputLabel value="#{fieldMsg.fieldValue('faultTypeCountyAreaMore', woItem.caseType)}"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(woItem.caseType)}"/>
+                                        </c:otherwise>
+                                    </c:choose>
+                            </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.patProblems}</label>
                                     <p:outputLabel value="#{woItem.patProblems}" style="word-wrap: break-word;"/>
