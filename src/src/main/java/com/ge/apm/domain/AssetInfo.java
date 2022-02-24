@@ -623,6 +623,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "shared_status")
     private Integer sharedStatus;
 
+    //县域ib合同类别
+    @Column(name = "contract_type")
+    private String contractType;
+
     @Transient
     private int lineNum;
 
@@ -2440,5 +2444,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setAssetGroupName(String assetGroupName) {
         this.assetGroupName = assetGroupName;
+    }
+
+    public String getContractType() {
+        return contractType;
+    }
+
+    public void setContractType(String contractType) {
+        this.contractType = contractType;
     }
 }

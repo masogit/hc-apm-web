@@ -1,5 +1,7 @@
 package com.ge.apm.service.simpleparts;
 
+import com.deepoove.poi.XWPFTemplate;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsInventoryRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsRequestLineItemRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
@@ -11,19 +13,25 @@ import com.ge.apm.domain.pure.SimplePartsItemValue;
 import com.ge.apm.domain.simpleparts.*;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.context.FacesContext;
+import java.io.*;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.net.URLEncoder;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +72,9 @@ public class SimplePartsRequestService {
 
     @Autowired
     private SimplePartsCodeGenerationService partsCodeGenerationService;
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
 
     /**
      * @return void
@@ -402,5 +413,113 @@ public class SimplePartsRequestService {
         partsRequest.setHospitalUID(userAccountFromWorkOrder.getHospitalUID());
         partsRequest.setSiteUID(userAccountFromWorkOrder.getSiteUID());
         partsRequest.setClinicalDeptUID(userAccountFromWorkOrder.getClinicalDeptUID());
+    }
+
+    /**
+     * 组装需导出的数据
+     * @param simplePartsRequest
+     * @param simplePartsTransactions
+     * @return
+     */
+    public Map<String, Object> createReportData(SimplePartsRequest simplePartsRequest, List<SimplePartsTransaction> simplePartsTransactions){
+        Map<String, Object> reportData = new HashedMap();
+        UserAccount userAccount = userAccountRepository.getByLoginName(simplePartsRequest.getCreatedBy());
+        if(userAccount != null){
+            reportData.put("parts_proposer", userAccount.getName());//申领人
+        }
+        reportData.put("request_code",simplePartsRequest.getRequestCode());//申领单编号
+        reportData.put("reques_qry", simplePartsRequest.getRequestQty());//申领个数
+        reportData.put("total_price", simplePartsRequest.getTotalPrice());//申领总价
+        reportData.put("created_date", simplePartsRequest.getCreatedDate());//申领时间
+        //申领单时（1.已出库 2.未出库 ）
+        String statusMsg = Integer.toString(simplePartsRequest.getStatus());
+        if(statusMsg.equals("1")){
+            statusMsg = "已出库";
+        }else if(statusMsg.equals("2")){
+            statusMsg = "未出库";
+        }
+        reportData.put("status",statusMsg);//出入库状态
+        //出库单备件明细
+        List<Map<String, Object>> partsLineItemList = new ArrayList<>();
+        for (SimplePartsTransaction simplePartsTransaction : simplePartsTransactions) {
+            Map<String, Object> partsLineItemMap = new HashMap<>();
+            partsLineItemMap.put("asset_name", simplePartsTransaction.getName());//设备名称
+            partsLineItemMap.put("request_code", simplePartsTransaction.getRequestCode());//申领单编号
+            partsLineItemMap.put("work_order_no", simplePartsRequest.getMaintenanceWorkOrderNumber());//工单编号
+            partsLineItemMap.put("transaction_qty", simplePartsTransaction.getTransactionQty());//出库数量
+            partsLineItemMap.put("unit_price", simplePartsTransaction.getUnitPrice());//申领单价
+            partsLineItemMap.put("total_prices", simplePartsTransaction.getTotalPrice());//申领总价
+            SimplePartsWarehouse simplePartsWarehouse = partsWarehouseService.findWarehouseNameById(simplePartsTransaction.getPartsWarehouseId());
+            String warehouseName = null;
+            if(simplePartsWarehouse != null){
+                warehouseName = simplePartsWarehouse.getName();
+            }
+            partsLineItemMap.put("warehouse_name",warehouseName);//仓库
+            partsLineItemMap.put("transport_company", simplePartsTransaction.getTransportCompany());//运输公司
+            partsLineItemMap.put("transport_no", simplePartsTransaction.getTransportNo());//运单号
+            partsLineItemMap.put("address_info", simplePartsTransaction.getAddressInfo());//收货信息
+            partsLineItemList.add(partsLineItemMap);
+        }
+        reportData.put("parts_request_line_item_batch",partsLineItemList);
+
+        return reportData;
+    }
+
+    /**
+     * 构建导出模板
+     * @return
+     * @throws IOException
+     */
+    public byte[] buildReportTemplate() throws IOException {
+
+        return IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(REPORT_OUT_BOUND_ORDER));
+    }
+
+    public StreamedContent exportDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
+
+        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(this.renderDocx(data, templateBytes))), "application/msword", this.buildFileName(data, false));
+
+        return streamedContent;
+    }
+
+    private byte[] renderDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
+
+        byte[] bytes;
+        XWPFTemplate template = null;
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            InputStream inputStream = new ByteArrayInputStream(templateBytes);
+            template = XWPFTemplate.compile(inputStream);
+            template.registerPolicy("parts_request_line_item_batch", new SimplePartsRequestLineItemTableRenderPolicy());
+            template.render(data);
+            template.write(out);
+            bytes = out.toByteArray();
+        }finally {
+            if (template != null) {
+                template.close();
+            }
+        }
+        return bytes;
+    }
+    public static final String REPORT_OUT_BOUND_ORDER = "/portal/parts/template/outBoundOrderReportTemplate.docx";
+    public static final String OUT_BOUND_ORDER = "出库单";
+    private String buildFileName(Map<String, Object> data, boolean isEncoding){
+
+        String fileName = "-"+ data.get("request_code").toString() ;
+        if(isEncoding){
+            fileName = this.encoding(OUT_BOUND_ORDER) + fileName +".docx";
+        }else {
+            fileName = OUT_BOUND_ORDER + fileName +".docx";
+        }
+        return fileName;
+    }
+
+    private String encoding(String fileName) {
+        try {
+            return URLEncoder.encode(fileName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            //return original name if the encode is failed.
+            return fileName;
+        }
     }
 }
