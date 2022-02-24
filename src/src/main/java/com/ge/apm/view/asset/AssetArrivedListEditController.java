@@ -910,8 +910,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void updateIsEdit(){
-        selected.setIsEdit(true);
-        dao.updateIsEdit(selected.getId());
+        dao.updateIsEdit(selected.getIsEdit(),selected.getId());
     }
 
     public void saveNewSupplier() {
