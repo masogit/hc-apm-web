@@ -7,8 +7,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 /**
- *
- * @author 212579464
+ * @author 503266962
  */
 @Entity
 @Data
@@ -23,8 +22,8 @@ public class AuditEntryTemplateRel implements Serializable {
     /**
      * 排序号
      */
-    @Column(name = "order")
-    private Integer order;
+    @Column(name = "order_by")
+    private Integer orderBy;
 
     @Embeddable
     @EqualsAndHashCode
