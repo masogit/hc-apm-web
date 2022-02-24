@@ -55,8 +55,8 @@ public class AuditSystemEntry implements Serializable {
     /**
      * order
      */
-    @Column(name = "order")
-    private Integer order;
+    @Column(name = "order_by")
+    private Integer orderBy;
     /**
      * parent_uid
      */
