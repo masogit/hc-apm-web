@@ -76,6 +76,9 @@ public class SimplePartsRequestService {
     @Autowired
     private UserAccountRepository userAccountRepository;
 
+    public static final String REPORT_OUT_BOUND_ORDER = "/portal/parts/template/outBoundOrderReportTemplate.docx";
+    public static final String OUT_BOUND_ORDER = "出库单";
+
     /**
      * @return void
      * @throws
@@ -475,6 +478,7 @@ public class SimplePartsRequestService {
         return IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(REPORT_OUT_BOUND_ORDER));
     }
 
+    //导出一条记录
     public StreamedContent exportDocx(Map<String, Object> data, byte[] templateBytes) throws IOException {
 
         StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(this.renderDocx(data, templateBytes))), "application/msword", this.buildFileName(data, false));
@@ -501,8 +505,7 @@ public class SimplePartsRequestService {
         }
         return bytes;
     }
-    public static final String REPORT_OUT_BOUND_ORDER = "/portal/parts/template/outBoundOrderReportTemplate.docx";
-    public static final String OUT_BOUND_ORDER = "出库单";
+
     private String buildFileName(Map<String, Object> data, boolean isEncoding){
 
         String fileName = "-"+ data.get("request_code").toString() ;

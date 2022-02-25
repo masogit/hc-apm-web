@@ -15,6 +15,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -166,7 +167,7 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
                 exportFile = partsRequestService.exportDocx(data, templateBytes);
             }
         } catch (IOException e) {
-            java.util.logging.Logger.getLogger(SimplePartsRequestListController.class.getName()).log(Level.SEVERE, null, e);
+            java.util.logging.Logger.getLogger(SimplePartsTransactionController.class.getName()).log(Level.SEVERE, null, e);
             WebUtil.addErrorMessage("导出失败");
         }
     }
@@ -185,5 +186,11 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
 
     public void setQueryIndex(long queryIndex) {
         this.queryIndex = queryIndex;
+    }
+
+    @Override
+    public void onFilter(FilterEvent event) {
+        selected = null;
+        super.onFilter(event);
     }
 }
