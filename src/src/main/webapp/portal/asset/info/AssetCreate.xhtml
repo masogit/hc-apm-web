@@ -178,6 +178,10 @@
                                     <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageStatusFields}" var="fieldItem" >
                                         <ui:include src="customEditFields.xhtml"/>
                                     </c:forEach>
+                                    <h:panelGroup rendered="#{userContextService.countyArea}">
+                                        <label class="label">IB合同类别</label>
+                                        <p:inputText id="contractType" value="#{assetInfoEditController.selected.contractType}"/>
+                                    </h:panelGroup>
                                 </p:panelGrid>
                             </p:fieldset>
                             <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCatalogFields}">
