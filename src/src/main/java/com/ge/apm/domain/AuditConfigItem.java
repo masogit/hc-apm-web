@@ -44,7 +44,7 @@ public class AuditConfigItem implements Serializable {
     @Column(name = "content")
     private String content;
     /**
-     * mark
+     * 章节号
      */
     @Column(name = "mark")
     private String mark;

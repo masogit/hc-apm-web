@@ -17,22 +17,20 @@ public class AuditEntryItemRel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    private AuditEntryItemPK id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
 
-    @Embeddable
-    @EqualsAndHashCode
-    @Data
-    public static class AuditEntryItemPK implements Serializable {
-        /**
-         * 模板uid
-         */
-        @Column(name = "item_uid")
-        private String itemUid;
+    /**
+     * item uid
+     */
+    @Column(name = "item_uid")
+    private String itemUid;
 
-        /**
-         * 条款uid
-         */
-        @Column(name = "system_entry_uid")
-        private String systemEntryUid;
-    }
+    /**
+     * 条款uid
+     */
+    @Column(name = "system_entry_uid")
+    private String systemEntryUid;
 }
