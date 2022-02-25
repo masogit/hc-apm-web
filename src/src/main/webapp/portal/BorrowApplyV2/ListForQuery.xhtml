@@ -237,7 +237,7 @@
                                 <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
                             </p:column>
                             <p:column headerText="#{msg.riskGrade}" visible="false" exportable="true">
-                                <h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
+                                <h:outputText value="#{userContextService.useNewRiskGrade()? fieldMsg.fieldValue('riskGradeNew', item.riskGrade) : fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
                             </p:column>
                             <p:column headerText="#{msg.emergencyEquipment}" visible="false" exportable="true">
                                 <h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}"/>
