@@ -1307,6 +1307,11 @@ public class UserContextService implements Serializable {
         return cfgService.needScrappedControl();
     }
 
+    public boolean useNewRiskGrade(){
+        ConfigService cfgService = WebUtil.getBean(ConfigService.class);
+        return cfgService.useNewRiskGrade();
+    }
+
     public boolean hasScrappedAuthority(){
         AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
         return acService.hasScrappedAuthority();
