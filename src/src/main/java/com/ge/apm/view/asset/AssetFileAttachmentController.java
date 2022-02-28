@@ -10,6 +10,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.VlinkParserService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -19,17 +20,21 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StreamUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -88,6 +93,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     private String assetName;
 
+    protected FileDownloadService fileDownloadService;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(BlobObjectRepository.class);
@@ -109,6 +116,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
 
         this.selectedMap = new HashMap();
+        this.fileDownloadService=WebUtil.getBean(FileDownloadService.class);
         this.initBatchData();
     }
 
@@ -578,6 +586,23 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
         this.getQueryAssetsList();
         this.initOrgTree();
+    }
+
+
+    public void downloadDocument(String reportStorageId) {
+        try {
+            StreamedContent file = fileDownloadService.getFile(reportStorageId);
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            response.setHeader("Content-Disposition", "attachment;filename=" + file.getName());
+
+            StreamUtils.copy(file.getStream(), response.getOutputStream());
+
+            facesContext.responseComplete();
+            facesContext.renderResponse();
+        } catch (Exception e) {
+            WebUtil.addErrorMessage("Fail to download report.");
+        }
     }
 
     public boolean isCreatAction() {
