@@ -155,6 +155,10 @@
             </p:accordionPanel>
             <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{userContextService.isMVSRole()}">
                 <ui:include src="MvsViewFields.xhtml"/>
+                <h:panelGroup rendered="#{userContextService.countyArea}">
+                    <label class="label">IB合同类别</label>
+                    <p:inputText id="contractType" value="#{assetInfoDetailController.selected.contractType}"/>
+                </h:panelGroup>
             </p:fieldset>
 
             <h:form>
