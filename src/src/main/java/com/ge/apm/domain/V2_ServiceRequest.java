@@ -207,8 +207,8 @@ public class V2_ServiceRequest implements Serializable {
     @Transient
     private String callCenterNumber;
     /**县域 开单类型： 1主动开单、2被动开单**/
-    @Column(name="county_area_order_type")
-    private String countyAreaOrderType;
+    @Transient
+    private String orderType;
 
     public String getTenantUID() {
         return tenantUID;
@@ -562,12 +562,12 @@ public class V2_ServiceRequest implements Serializable {
         this.callCenterNumber = callCenterNumber;
     }
 
-    public String getCountyAreaOrderType() {
-        return countyAreaOrderType;
+    public String getOrderType() {
+        return orderType;
     }
 
-    public void setCountyAreaOrderType(String countyAreaOrderType) {
-        this.countyAreaOrderType = countyAreaOrderType;
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 
     @Override

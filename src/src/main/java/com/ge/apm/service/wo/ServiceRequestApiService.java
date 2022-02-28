@@ -196,7 +196,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setSupplierUid(asset.getSupplierNewUID());
         formData.setSiebleNumber(newServiceRequest.getSiebleNumber());
         formData.setCallCenterNumber(newServiceRequest.getCallCenterNumber());
-        formData.setCountyAreaOrderType(newServiceRequest.getCountyAreaOrderType());
+        formData.setOrderType(newServiceRequest.getOrderType());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
@@ -294,7 +294,7 @@ class ServiceRequestForm {
     String siebleNumber;
     String callCenterNumber;
     /**县域 开单类型： 1主动开单、2被动开单**/
-    String countyAreaOrderType;
+    String orderType;
     public String getSupplierUid() {
         return supplierUid;
     }
@@ -447,12 +447,12 @@ class ServiceRequestForm {
         this.callCenterNumber = callCenterNumber;
     }
 
-    public String getCountyAreaOrderType() {
-        return countyAreaOrderType;
+    public String getOrderType() {
+        return orderType;
     }
 
-    public void setCountyAreaOrderType(String countyAreaOrderType) {
-        this.countyAreaOrderType = countyAreaOrderType;
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 }
 
