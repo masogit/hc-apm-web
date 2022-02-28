@@ -102,7 +102,8 @@
                         <p:panel id="uploadImage" styleClass="ui-panelgrid-blank" style=" border: 0">
                             <p:dataList id="objectImages" value="#{assetFileAttachmentController.getBatchBlobObjectListByType(1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <!--<p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(fileitem.objectStorageId)}"/>
                                 <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="objectImages" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
@@ -115,7 +116,8 @@
                         <p:panel  styleClass="ui-panelgrid-blank" style=" border: 0">
                             <p:dataList id="ObjectUpload2" value="#{assetFileAttachmentController.getBatchBlobObjectListByType(2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <!--<p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(fileitem.objectStorageId)}"/>
                                 <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="ObjectUpload2" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
@@ -127,7 +129,8 @@
                         <p:panel  styleClass="ui-panelgrid-blank" style=" border: 0">
                             <p:dataList id="ObjectUpload3" value="#{assetFileAttachmentController.getBatchBlobObjectListByType(3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <!--<p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(fileitem.objectStorageId)}"/>
                                 <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="ObjectUpload3" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
@@ -140,7 +143,8 @@
                         <p:panel  styleClass="ui-panelgrid-blank" style=" border: 0">
                             <p:dataList id="ObjectUpload4" value="#{assetFileAttachmentController.getBatchBlobObjectListByType('Measuring')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 'Measuring')}</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <!--<p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(fileitem.objectStorageId)}"/>
                                 <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(fileitem.id)}" update="ObjectUpload4" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
