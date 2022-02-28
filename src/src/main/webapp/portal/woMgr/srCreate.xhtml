@@ -91,7 +91,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.countyAreaOrderType}</label>
-                                <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.countyAreaOrderType}" >
+                                <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.orderType}" >
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('countyAreaOrderType')}" var="item"
                                                    itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>

@@ -245,15 +245,22 @@
                                     <label class="label">#{msg.maintenanceValue}</label>
                                     <p:outputLabel value="#{woItem.maintenanceValue}"/>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{userContextService.countyArea}">
-                                    <label class="label">#{msg.siebleNumber}</label>
-                                    <p:outputLabel value="#{woItem.siebleNumber}" />
-                                </h:panelGroup>
+                                <c:if test="#{userContextService.countyArea}">
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.siebleNumber}</label>
+                                        <p:outputLabel value="#{woItem.siebleNumber}" />
+                                    </h:panelGroup>
 
-                                <h:panelGroup rendered="#{userContextService.countyArea}">
-                                    <label class="label">#{msg.callCenterNumber}</label>
-                                    <p:outputLabel value="#{woItem.callCenterNumber}" />
-                                </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.callCenterNumber}</label>
+                                        <p:outputLabel value="#{woItem.callCenterNumber}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.countyAreaOrderType}</label>
+                                        <p:outputLabel value="#{fieldMsg.fieldValue('countyAreaOrderType',woItem.orderType)}" rendered="#{not empty woItem.orderType}"/>
+                                    </h:panelGroup>
+                                </c:if>
                             </p:panelGrid>
 
 
