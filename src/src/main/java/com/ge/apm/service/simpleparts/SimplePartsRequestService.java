@@ -76,6 +76,9 @@ public class SimplePartsRequestService {
     public static final String REPORT_OUT_BOUND_ORDER = "/portal/parts/template/outBoundOrderReportTemplate.docx";
     public static final String OUT_BOUND_ORDER = "出库单";
 
+    @Autowired
+    private UserAccountRepository userAccountRepository;
+
     /**
      * @return void
      * @throws
@@ -425,7 +428,13 @@ public class SimplePartsRequestService {
         Map<String, Object> reportData = new HashedMap();
         reportData.put("request_code",simplePartsRequest.getRequestCode());//申领单编号
         reportData.put("created_date", simplePartsRequest.getCreatedDate());//需求时间
-
+        UserAccount userAccount = userAccountRepository.getByLoginName(simplePartsRequest.getCreatedBy());
+        String userName = null;
+        if(userAccount != null){
+            userName = userAccount.getName();
+        }
+        reportData.put("out_stock_person", userName);//出库人
+        reportData.put("out_stock_date", simplePartsRequest.getCreatedDate());//出库时间
         //出库单备件明细
         List<Map<String, Object>> partsLineItemList = new ArrayList<>();
         for (SimplePartsTransaction simplePartsTransaction : simplePartsTransactions) {
@@ -481,7 +490,6 @@ public class SimplePartsRequestService {
             partsLineItemList.add(partsLineItemMap);
         }
         reportData.put("parts_request_line_item_batch",partsLineItemList);
-
         return reportData;
     }
 
