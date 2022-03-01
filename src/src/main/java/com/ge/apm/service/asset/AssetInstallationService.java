@@ -5,22 +5,8 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.ArrivalListItemRepository;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.ContractInfoItemRepository;
-import com.ge.apm.dao.GbCodeRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.ContractInfoItem;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.GbCode;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -28,7 +14,6 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.google.common.base.Strings;
@@ -85,6 +70,8 @@ public class AssetInstallationService {
     private ContractInfoItemRepository contractItemDao;
     @Autowired
     private WechatSendMsgService wechatSendMsgService;
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
 
 
     public List<Supplier> getOnlySuplierListBySiteUid(String tenantUid) {
@@ -295,7 +282,13 @@ public class AssetInstallationService {
         if (null == itemList || itemList.isEmpty()) {
             return new Tuple2(true, "");
         }
-
+        //处理指定的租户对设备编号不验证
+        String currentTenantUid = UserContextService.getCurrentUserAccount().getTenantUID();
+        List<TenantInfo> tanentIfos = tenantInfoDao.findByCustomTenant("3");
+        String tanentInfoUid = tanentIfos.get(0).getUid();
+        if(tanentInfoUid.equals(currentTenantUid)){
+            return new Tuple2(true, "");
+        }
         if (itemList.size() > 1) {
             return new Tuple2(false, "设备编号已被分配");
         }
