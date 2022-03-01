@@ -90,7 +90,7 @@
                         <label class="label">#{msg.contractNo}</label>
                         <p:inputText value="#{workOrderMgrController.itemDetail.contractNum}"/>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{!userContextService.isCountyArea()}">
                         <label class="label">#{msg.Remark}</label>
                         <p:inputTextarea id="area" value="#{workOrderMgrController.itemDetail.comment}"/>
                     </h:panelGroup>
@@ -103,6 +103,12 @@
                                 <p:ajax listener="#{workOrderMgrController.orderSet}" event="change"></p:ajax>
                             </p:selectBooleanButton>
                         </p:column>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userContextService.isCountyArea()}">
+                    <h:panelGroup>
+                        <label class="label">#{msg.Remark}</label>
+                        <p:inputTextarea rows="1" cols="100" value="#{workOrderMgrController.itemDetail.comment}"/>
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>
@@ -189,7 +195,7 @@
                         <p:inputText value="#{workOrderMgrController.itemDetail.serialNum}"/>
                     </h:panelGroup>
 
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{!userContextService.isCountyArea()}">
                         <label class="label">#{msg.Remark}</label>
                         <p:inputTextarea id="areaView" value="#{workOrderMgrController.itemDetail.comment}"/>
                     </h:panelGroup>
@@ -212,7 +218,12 @@
                         </p:column>
                     </h:panelGroup>-->
                 </p:panelGrid>
-
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userContextService.isCountyArea()}">
+                    <h:panelGroup>
+                        <label class="label">#{msg.Remark}</label>
+                        <p:inputTextarea rows="1" cols="100" value="#{workOrderMgrController.itemDetail.comment}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
             </h:panelGroup>
         </h:form>
     </p:dialog>
