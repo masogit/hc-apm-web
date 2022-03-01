@@ -122,15 +122,14 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                 //修改数据后保刷新 分有搜寻时间 和无搜寻时间
                 if(startTime ==null){
                     depTranForTrans.setUserId(transactionStatis.getAuthorId()==null ? userContextService.getLoginUserId() : transactionStatis.getAuthorId());
-                    depTranForTrans.setStartTime(TimeUtils.getCurrentStartYYMM());
-                    depTranForTrans.setStartTime(TimeUtils.getCurrentEndYYMM());
-                    deptTranLogList=refreshLoadData(depTranForTrans);
+                    depTranForTrans.setStartTime(transactionStatis.getStartTime());
+                    depTranForTrans.setEndTime(transactionStatis.getEndTime());
                 }else{
-                    depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
-                    depTranForTrans.setEndTime(TimeUtils.getInputStartDate(endTime));
+                    depTranForTrans.setStartTime(transactionStatis.getStartTime());
+                    depTranForTrans.setEndTime(transactionStatis.getEndTime());
                     depTranForTrans.setUserId(transactionStatis.getAuthorId()==null ? userContextService.getLoginUserId() : transactionStatis.getAuthorId());
-                    deptTranLogList=refreshLoadData(depTranForTrans);
                 }
+                deptTranLogList=refreshLoadData(depTranForTrans);
             } else { //没有有外层查询条件
                 //修改数据后保刷新 分有搜寻时间 和无搜寻时间
                 if(startTime ==null){
