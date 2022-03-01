@@ -2,10 +2,7 @@ package com.ge.apm.service.simpleparts;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsInventoryRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsRequestLineItemRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsTransactionRepository;
+import com.ge.apm.dao.simpleparts.*;
 import com.ge.apm.dao.mapper.simpleparts.SimplePartsInventoryMapper;
 import com.ge.apm.dao.mapper.simpleparts.SimplePartsTransactionMapper;
 import com.ge.apm.domain.*;
@@ -74,7 +71,7 @@ public class SimplePartsRequestService {
     private SimplePartsCodeGenerationService partsCodeGenerationService;
 
     @Autowired
-    private UserAccountRepository userAccountRepository;
+    private SimplePartsItemRepository partsItemRepository;
 
     public static final String REPORT_OUT_BOUND_ORDER = "/portal/parts/template/outBoundOrderReportTemplate.docx";
     public static final String OUT_BOUND_ORDER = "出库单";
@@ -426,41 +423,61 @@ public class SimplePartsRequestService {
      */
     public Map<String, Object> createReportData(SimplePartsRequest simplePartsRequest, List<SimplePartsTransaction> simplePartsTransactions){
         Map<String, Object> reportData = new HashedMap();
-        UserAccount userAccount = userAccountRepository.getByLoginName(simplePartsRequest.getCreatedBy());
-        if(userAccount != null){
-            reportData.put("parts_proposer", userAccount.getName());//申领人
-        }
         reportData.put("request_code",simplePartsRequest.getRequestCode());//申领单编号
-        reportData.put("reques_qry", simplePartsRequest.getRequestQty());//申领个数
-        reportData.put("total_price", simplePartsRequest.getTotalPrice());//申领总价
-        reportData.put("created_date", simplePartsRequest.getCreatedDate());//申领时间
-        //申领单时（1.已出库 2.未出库 ）
-        String statusMsg = Integer.toString(simplePartsRequest.getStatus());
-        if(statusMsg.equals("1")){
-            statusMsg = "已出库";
-        }else if(statusMsg.equals("2")){
-            statusMsg = "未出库";
-        }
-        reportData.put("status",statusMsg);//出入库状态
+        reportData.put("created_date", simplePartsRequest.getCreatedDate());//需求时间
+
         //出库单备件明细
         List<Map<String, Object>> partsLineItemList = new ArrayList<>();
         for (SimplePartsTransaction simplePartsTransaction : simplePartsTransactions) {
             Map<String, Object> partsLineItemMap = new HashMap<>();
-            partsLineItemMap.put("asset_name", simplePartsTransaction.getName());//设备名称
-            partsLineItemMap.put("request_code", simplePartsTransaction.getRequestCode());//申领单编号
-            partsLineItemMap.put("work_order_no", simplePartsRequest.getMaintenanceWorkOrderNumber());//工单编号
+            String itemCode = null;
+            if(simplePartsTransaction.getPartsItemId() != null){
+                SimplePartsItem simplePartsItem = partsItemRepository.findById(simplePartsTransaction.getPartsItemId());
+                if(simplePartsItem != null){
+                    itemCode = simplePartsItem.getItemCode();
+                }
+            }
+            partsLineItemMap.put("item_code", itemCode);//料号，用备件号
             partsLineItemMap.put("transaction_qty", simplePartsTransaction.getTransactionQty());//出库数量
-            partsLineItemMap.put("unit_price", simplePartsTransaction.getUnitPrice());//申领单价
-            partsLineItemMap.put("total_prices", simplePartsTransaction.getTotalPrice());//申领总价
             SimplePartsWarehouse simplePartsWarehouse = partsWarehouseService.findWarehouseNameById(simplePartsTransaction.getPartsWarehouseId());
             String warehouseName = null;
             if(simplePartsWarehouse != null){
                 warehouseName = simplePartsWarehouse.getName();
             }
             partsLineItemMap.put("warehouse_name",warehouseName);//仓库
-            partsLineItemMap.put("transport_company", simplePartsTransaction.getTransportCompany());//运输公司
-            partsLineItemMap.put("transport_no", simplePartsTransaction.getTransportNo());//运单号
-            partsLineItemMap.put("address_info", simplePartsTransaction.getAddressInfo());//收货信息
+            String warehouseLocatorName = null;
+            if(simplePartsTransaction.getPartsLocatorId() != null){
+                SimplePartsWareHouseLocator simplePartsWarehouseLocator = partsWarehouseService.findWarehouseLocatorNameById(simplePartsTransaction.getPartsLocatorId());
+                if(simplePartsWarehouseLocator != null){
+                    warehouseLocatorName = simplePartsWarehouseLocator.getName();
+                }
+            }
+            partsLineItemMap.put("warehouse_locator_name",warehouseLocatorName);//库位
+            partsLineItemMap.put("comments", simplePartsTransaction.getComments());//备注
+            String addressInfo = simplePartsTransaction.getAddressInfo();
+            String address = null;
+            String contactPerson = null;
+            String contactPhone = null;
+            if(addressInfo != null){
+                String[] addressInfos = addressInfo.split("，");
+                for(String addressInfoTmp : addressInfos){
+                    if(addressInfoTmp.startsWith("收货地址：")){
+                        String[] addressArr = addressInfoTmp.split("：");
+                        address = addressArr.length > 1 ? addressArr[1] : address;
+                    }
+                    if(addressInfoTmp.startsWith("收货人：")){
+                        String[] contactPersonArr = addressInfoTmp.split("：");
+                        contactPerson = contactPersonArr.length > 1 ? contactPersonArr[1] : contactPerson;
+                    }
+                    if(addressInfoTmp.startsWith("联系方式：")){
+                        String[] contactPhoneArr = addressInfoTmp.split("：");
+                        contactPhone = contactPhoneArr.length > 1 ? contactPhoneArr[1] : contactPhone;
+                    }
+                }
+            }
+            reportData.put("address", address);//收货地址
+            reportData.put("contact_person", contactPerson);//收货人
+            reportData.put("contact_phone", contactPhone);//联系电话
             partsLineItemList.add(partsLineItemMap);
         }
         reportData.put("parts_request_line_item_batch",partsLineItemList);

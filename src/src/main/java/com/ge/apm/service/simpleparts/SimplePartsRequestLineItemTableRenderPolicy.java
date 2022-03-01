@@ -24,16 +24,11 @@ public class SimplePartsRequestLineItemTableRenderPolicy extends AbstractWoTable
             List<Map<String, Object>> lineItemList = (List) o;
             for (Map<String, Object> lineItem : lineItemList) {
                 XWPFTableRow row = addRow(table);
-                addCell(row, extractValue(lineItem, "asset_name"));
-                addCell(row, extractValue(lineItem, "request_code"));
-                addCell(row, extractValue(lineItem, "work_order_no"));
+                addCell(row, extractValue(lineItem, "item_code"));
                 addCell(row, extractValue(lineItem, "transaction_qty"));
-                addCell(row, extractValue(lineItem, "unit_price"));
-                addCell(row, extractValue(lineItem, "total_prices"));
                 addCell(row, extractValue(lineItem, "warehouse_name"));
-                addCell(row, extractValue(lineItem, "transport_company"));
-                addCell(row, extractValue(lineItem, "transport_no"));
-                addCell(row, extractValue(lineItem, "address_info"));
+                addCell(row, extractValue(lineItem, "warehouse_locator_name"));
+                addCell(row, extractValue(lineItem, "comments"));
             }
         }
         table.removeRow(1);
