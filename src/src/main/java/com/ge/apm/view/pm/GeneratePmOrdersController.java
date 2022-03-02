@@ -1,22 +1,20 @@
 package com.ge.apm.view.pm;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.AssetRuleModel;
+import com.ge.apm.domain.pure.AssetRuleModelList;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.pm.PmOrderRequestApiService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.OrgInfoComparator;
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
-import com.github.stuxuhai.jpinyin.PinyinFormat;
-import com.github.stuxuhai.jpinyin.PinyinHelper;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -27,17 +25,17 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSON;
-import com.ge.apm.domain.pure.AssetRuleModel;
-import com.ge.apm.domain.pure.AssetRuleModelList;
-import com.ge.apm.service.pm.PmOrderRequestApiService;
-import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -275,9 +273,36 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void addFilter(){
 		assetInfoList.clear();
 		assetInfoList = getAssetList();
+		filterAssetInfoList();
 		total = assetInfoList.size();
 	}
-
+	private void filterAssetInfoList(){
+		TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+		if(tempTenantInfo != null && "3".equals(tempTenantInfo.getCustomTenant())){
+			boolean generate = queryAsset.getGenerate();  //true:已生成过/false:为生成过
+			assetInfoList=assetInfoList.stream()
+					.filter(ai->{
+						Long countByAssetId = pmOrderRepository.findCountByAssetId(ai.getId(), level, pmType);
+						return generate? countByAssetId > 0:countByAssetId == 0;
+					})
+					.collect(Collectors.toList());
+		}
+	}
+	public String findCustomTenant(){
+		String customTenant="";
+		TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+		if(tempTenantInfo != null){
+			customTenant=tempTenantInfo.getCustomTenant();
+		}
+		return customTenant;
+	}
+	public void checkGenerate(){
+		// 页面 Generate 属性，清空数据列表
+	  if(assetInfoList.size() > 0) {
+		  assetInfoList.clear();
+		  this.total=0;
+	  }
+	}
 	public void addSelected(){
 
 	}
