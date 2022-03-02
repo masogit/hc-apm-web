@@ -109,7 +109,7 @@
             <!-- =================================启用集成工单时===============================-->
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workOrderMgrController.isEnableIntegrationWithWorkOrder()}">
                         <h:panelGroup>
-                            <label class="label">#{msg.PartType}</label>
+                            <label class="label">#{msg.PartType}*</label>
                             <p:selectOneMenu value="#{v2PmOrderController.itemDetail.partsType}" required="true" requiredMessage="备件类别不能为空！">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
