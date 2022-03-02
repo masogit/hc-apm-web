@@ -428,13 +428,6 @@ public class SimplePartsRequestService {
         Map<String, Object> reportData = new HashedMap();
         reportData.put("request_code",simplePartsRequest.getRequestCode());//申领单编号
         reportData.put("created_date", simplePartsRequest.getCreatedDate());//需求时间
-        UserAccount userAccount = userAccountRepository.getByLoginName(simplePartsRequest.getCreatedBy());
-        String userName = null;
-        if(userAccount != null){
-            userName = userAccount.getName();
-        }
-        reportData.put("out_stock_person", userName);//出库人
-        reportData.put("out_stock_date", simplePartsRequest.getCreatedDate());//出库时间
         //出库单备件明细
         List<Map<String, Object>> partsLineItemList = new ArrayList<>();
         for (SimplePartsTransaction simplePartsTransaction : simplePartsTransactions) {
@@ -487,6 +480,13 @@ public class SimplePartsRequestService {
             reportData.put("address", address);//收货地址
             reportData.put("contact_person", contactPerson);//收货人
             reportData.put("contact_phone", contactPhone);//联系电话
+            UserAccount userAccount = userAccountRepository.getByLoginName(simplePartsTransaction.getCreatedBy());
+            String userName = null;
+            if(userAccount != null){
+                userName = userAccount.getName();
+            }
+            reportData.put("out_stock_person", userName);//出库人
+            reportData.put("out_stock_date", simplePartsTransaction.getCreatedDate());//出库时间
             partsLineItemList.add(partsLineItemMap);
         }
         reportData.put("parts_request_line_item_batch",partsLineItemList);
