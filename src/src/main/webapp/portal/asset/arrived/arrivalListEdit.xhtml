@@ -483,11 +483,11 @@
                                                          src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
-                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                                <p:commandButton disabled="#{userContextService.activeSupplier() and assetArrivedListEditController.selected.status > 1}" actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                            <p:fileUpload disabled="#{userContextService.activeSupplier() and assetArrivedListEditController.selected.status > 1}" id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="accessoryList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <c:forEach items="#{assetArrivedListEditController.getAttachmentCategories()}" var="attachmentConfig">
@@ -520,7 +520,17 @@
                                     <p:dataList id="accessoryFinishedList" value="#{assetArrivedListEditController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                         <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
                                         <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                        <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
+                                            <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                 src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
+                                        <p:commandButton rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}" actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryFinishedList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                        </p:commandButton>
                                     </p:dataList>
+                                    <p:fileUpload rendered="#{userContextService.activeSupplier()}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                                  multiple="true"  sizeLimit="100000000"  update="accessoryFinishedList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                 </h:panelGroup>
                             </p:fieldset>
 
@@ -570,15 +580,13 @@
                                 </p:column>
 
                             </p:dataTable>
-                            <h:panelGrid columns="2" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.getInstalledCount() gt 0}" style="margin-bottom: 0px;">
-                                <h:panelGroup>
+                            <h:panelGroup >
+                                <h:panelGrid columns="2" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.getInstalledCount() gt 0}">
                                     <h:outputText class="label" style="color: black!important;font-size: 16px!important;" value="是否允许供应商编辑：" title="已完成或部分安装完成的到货单允许编辑修改信息"></h:outputText>
                                     <p:selectBooleanCheckbox value="#{assetArrivedListEditController.selected.isEdit}">
                                         <p:ajax listener="#{assetArrivedListEditController.updateIsEdit()}" process="@this" update=":AssetArrivalEditForm :growl"/>
                                     </p:selectBooleanCheckbox>
-                                </h:panelGroup>
-                            </h:panelGrid>
-                            <h:panelGroup >
+                                </h:panelGrid>
                                 <p:commandButton validateClient="true"  actionListener="#{assetArrivedListEditController.applyChange}" value="#{msg.Save}" update=":AssetArrivalEditForm  :growl" icon="ui-icon-check" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
                                 <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="arrivalList?faces-redirect=true" update="display,:AssetArrivalEditForm :growl"/>
                                 <p:commandButton validateClient="true" value="#{msg.Submit}"  actionListener="#{assetArrivedListEditController.submitArrivalList}" update=":AssetArrivalEditForm :growl" disabled="#{assetArrivedListEditController.selected.status ne 1}" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
