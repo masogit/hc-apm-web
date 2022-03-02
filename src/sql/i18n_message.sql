@@ -4497,7 +4497,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '4', '设计故障(设备软硬设计故障)', 'Design failure (equipment hardware and software design failure)', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '5', '其它', 'other', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '6', '可规避故障', 'Avoidable fault', NULL, '-1')
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '8', '硬件故障', 'Hardware malfunction', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '8', '硬件故障', 'Hardware malfunction', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('faultTypeCountyAreaMore', '9', '软件故障', 'Software failure', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','countyAreaOrderType','开单类型','Order Type',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('countyAreaOrderType', '1', '主动开单', 'Initiative Order', NULL, '-1');
