@@ -129,7 +129,7 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
                     depTranForTrans.setEndTime(TimeUtils.getInputStartDate(endTime));
                     depTranForTrans.setUserId(transactionStatis.getAuthorId()==null ? userContextService.getLoginUserId() : transactionStatis.getAuthorId());
                 }
-                deptTranLogList=refreshLoadData(depTranForTrans);
+                deptTranLogList=refreshLoadDataForSelectedItem(depTranForTrans);
             } else { //没有有外层查询条件
                 //修改数据后保刷新 分有搜寻时间 和无搜寻时间
                 if(startTime ==null){
