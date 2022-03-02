@@ -105,7 +105,17 @@
 								   <!--<p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />-->
 							   </p:inputText>
 						   </h:panelGroup>
-                       <h:panelGroup></h:panelGroup>
+						   <h:panelGroup  >
+							  <c:if test="#{generatePmOrdersController.findCustomTenant().equals('3')}">
+								   <label class="label">保养工单</label>
+								   <p:selectOneRadio  value="#{generatePmOrdersController.queryAsset.generate}" >
+									   <f:selectItem itemLabel="已生成过" itemValue="true"/>
+									   <f:selectItem itemLabel="未生成过" itemValue="false"/>
+									   <p:ajax update=":GeneratePmOrderForm:dataTable" process="@this"
+											   listener="#{generatePmOrdersController.checkGenerate}"/>
+								   </p:selectOneRadio>
+							  </c:if>
+						   </h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="#{msg.Search}" update=":GeneratePmOrderForm:dataTable"/>
