@@ -28,6 +28,7 @@ import javax.faces.context.FacesContext;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -427,7 +428,12 @@ public class SimplePartsRequestService {
     public Map<String, Object> createReportData(SimplePartsRequest simplePartsRequest, List<SimplePartsTransaction> simplePartsTransactions){
         Map<String, Object> reportData = new HashedMap();
         reportData.put("request_code",simplePartsRequest.getRequestCode());//申领单编号
-        reportData.put("created_date", simplePartsRequest.getCreatedDate());//需求时间
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = null;
+        if(simplePartsRequest.getCreatedDate() != null){
+            date = simpleDateFormat.format(simplePartsRequest.getCreatedDate());
+        }
+        reportData.put("created_date", date);//需求时间
         //出库单备件明细
         List<Map<String, Object>> partsLineItemList = new ArrayList<>();
         for (SimplePartsTransaction simplePartsTransaction : simplePartsTransactions) {
@@ -486,7 +492,11 @@ public class SimplePartsRequestService {
                 userName = userAccount.getName();
             }
             reportData.put("out_stock_person", userName);//出库人
-            reportData.put("out_stock_date", simplePartsTransaction.getCreatedDate());//出库时间
+            String outStockDate = null;
+            if(simplePartsTransaction.getCreatedDate() != null){
+                outStockDate = simpleDateFormat.format(simplePartsTransaction.getCreatedDate());
+            }
+            reportData.put("out_stock_date", outStockDate);//出库时间
             partsLineItemList.add(partsLineItemMap);
         }
         reportData.put("parts_request_line_item_batch",partsLineItemList);
