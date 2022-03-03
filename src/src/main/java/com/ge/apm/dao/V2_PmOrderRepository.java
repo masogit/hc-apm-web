@@ -128,4 +128,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 
 	@Query(value = "select count(asset_id) from v2_pm_order where asset_id= ?1 and  rule_level = ?2 and pm_type = ?3 ",nativeQuery = true)
 	Long findCountByAssetId(Integer id, Integer level, Integer pmType);
+
+	@Query(value = "select count(asset_id) from v2_pm_order where asset_id= ?1 and pm_type = ?2 ",nativeQuery = true)
+	Long findCountByAssetIdAndPmType(Integer id,Integer pmType);
 }
