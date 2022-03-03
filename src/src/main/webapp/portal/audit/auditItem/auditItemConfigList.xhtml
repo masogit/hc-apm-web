@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.AuditItemConfig}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                    <p:commandButton value="原文" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '1'}" actionListener="#{auditItemConfigController.searchByType('1')}" />
+                    <p:commandButton value="概要" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '2'}" actionListener="#{auditItemConfigController.searchByType('2')}" />
+                    <p:commandButton value="解读" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '3'}" actionListener="#{auditItemConfigController.searchByType('3')}" />
+                    <p:commandButton value="得分点" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '4'}" actionListener="#{auditItemConfigController.searchByType('4')}" />
+                    <p:commandButton value="失分点" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '5'}" actionListener="#{auditItemConfigController.searchByType('5')}" />
+                </h:panelGrid>
+                <h:form id="auditConfigItemListForm">
+                    <p:dataTable id="datalist" class="datalist" value="#{auditItemConfigController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{auditItemConfigController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="filter" listener="#{auditItemConfigController.onFilter}" />
+
+                        <p:column headerText="#{msg.ContentType}">
+                            <h:outputText value="#{fieldMsg.fieldValue('auditItemType', item.contentType)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Type}">
+                            <h:outputText value="#{item.type == 1 ? '文本' : '图片'}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Mark}" filterBy="#{item.mark}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.mark}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Content}" filterBy="#{item.content}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.content}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Operation}" exportable="false" width="120" id="operatorColumn">
+                            <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
+                                <p:commandLink id="editButton" title="#{msg.Edit}"  actionListener="#{auditItemConfigController.setSelected(item.id)}" update=":auditConfigItemEditDlg" oncomplete="PF('auditConfigItemEditDialog').show()">
+                                    <p:graphicImage name="icons/edit.png" style="width: 25px; height: 25px;"/>
+                                </p:commandLink>
+                                <p:commandLink id="deleteButton" title="#{msg.Delete}" actionListener="#{auditItemConfigController.deleteItem(item)}" update="datalist">
+                                    <p:graphicImage name="icons/delete.png" style="width: 25px; height: 25px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{auditItemConfigController.prepareCreate}" update=":auditConfigItemEditDlg" oncomplete="PF('auditConfigItemEditDialog').show()" />
+                            <!--<p:commandButton id="editButton" actionListener="#{auditItemConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":auditConfigItemEditDlg" oncomplete="PF('auditConfigItemEditDialog').show()" disabled="#{empty auditItemConfigController.selected.id}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{auditItemConfigController.delete}" update=":auditConfigItemListForm:datalist" disabled="#{empty auditItemConfigController.selected.id}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>-->
+                        </f:facet>
+
+                    </p:dataTable>
+
+                </h:form>
+
+                <ui:include src="auditItemConfigEdit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>
