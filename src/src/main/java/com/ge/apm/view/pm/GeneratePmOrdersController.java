@@ -230,6 +230,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 			}
+		}else{
+			List<String> uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
+			uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
+			assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 		}
 		if (!assetFilters.isEmpty()) {
 			List<SearchFilter> userFilter = getAssetFilter();
@@ -282,7 +286,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			boolean generate = queryAsset.getGenerate();  //true:已生成过/false:为生成过
 			assetInfoList=assetInfoList.stream()
 					.filter(ai->{
-						Long countByAssetId = pmOrderRepository.findCountByAssetId(ai.getId(), level, pmType);
+						Long countByAssetId;
+						if(level != null){
+							countByAssetId= pmOrderRepository.findCountByAssetId(ai.getId(), level, pmType);
+						}else{
+							countByAssetId= pmOrderRepository.findCountByAssetIdAndPmType(ai.getId(), pmType);
+						}
 						return generate? countByAssetId > 0:countByAssetId == 0;
 					})
 					.collect(Collectors.toList());
