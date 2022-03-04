@@ -1,12 +1,15 @@
 package com.ge.apm.domain;
 
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 503189829
@@ -20,18 +23,15 @@ public class AuditSystemEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
-
-    @Column(columnDefinition = "CHAR(32)")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @Column(name = "uid")
     private String uid;
     /**
      * case_uid
      */
     @Column(name = "case_uid")
-    private Integer caseUid;
+    private String caseUid;
     /**
      * name
      */
@@ -90,5 +90,14 @@ public class AuditSystemEntry implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
     private Date createTime;
+    @Transient
+    private List<AuditSystemEntry> children = new ArrayList<>();
+
+    public List<AuditSystemEntry> getChildren() {
+        return children;
+    }
+    public void setChildren(List<AuditSystemEntry> children) {
+        this.children = children;
+    }
 
 }

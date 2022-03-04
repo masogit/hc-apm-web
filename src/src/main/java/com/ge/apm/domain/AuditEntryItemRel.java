@@ -33,4 +33,10 @@ public class AuditEntryItemRel implements Serializable {
      */
     @Column(name = "system_entry_uid")
     private String systemEntryUid;
+
+    /**
+     * 排序号
+     */
+    @Column(name = "order_by")
+    private Integer orderBy;
 }

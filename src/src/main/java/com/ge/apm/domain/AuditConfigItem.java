@@ -1,6 +1,7 @@
 package com.ge.apm.domain;
 
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -21,12 +22,9 @@ public class AuditConfigItem implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
-
-    @Column(columnDefinition = "CHAR(32)")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @Column(name = "uid")
     private String uid;
     /**
      * 类型 :1文字(TEXT),2图片(PICTURE)
