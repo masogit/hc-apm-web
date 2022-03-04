@@ -45,7 +45,7 @@
                         </p:column>
                         <p:column headerText="#{msg.Operation}" exportable="false" width="120" id="operatorColumn">
                             <h:panelGroup>
-                                <p:commandLink id="editButton" title="#{msg.Edit}"  actionListener="#{auditItemConfigController.setSelected(item.id)}" update=":auditConfigItemEditDlg" oncomplete="PF('auditConfigItemEditDialog').show()">
+                                <p:commandLink id="editButton" title="#{msg.Edit}"  actionListener="#{auditItemConfigController.setSelected(item.uid)}" update=":auditConfigItemEditDlg" oncomplete="PF('auditConfigItemEditDialog').show()">
                                     <p:graphicImage name="icons/edit.png" style="width: 25px; height: 25px;"/>
                                 </p:commandLink>
                                 <p:commandLink id="deleteButton" title="#{msg.Delete}" actionListener="#{auditItemConfigController.deleteItem(item)}" update="datalist">
