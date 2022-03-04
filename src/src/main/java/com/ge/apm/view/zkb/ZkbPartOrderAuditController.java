@@ -1343,11 +1343,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 WebUtil.addErrorMessage("归还数量与申请不一致，请检查！");
                 return;
             }
-            zkbPartOrderService.submitCloseReturn(zkbPartOrderReturnModifyList,selected,currentUser);
+            boolean arg = zkbPartOrderService.submitCloseReturn(zkbPartOrderReturnModifyList,selected,currentUser);
+            if(arg){
+                WebUtil.addErrorMessage("名额不足，需400手动处理！");
+                return;
+            }
             zkbPartOrderReturnList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
 
-            zkbPartOrderService.probeModifyReturn(selected,currentUser);
+            boolean arg = zkbPartOrderService.probeModifyReturn(selected,currentUser);
+            if(arg){
+                WebUtil.addErrorMessage("名额不足，需400手动处理！");
+                return;
+            }
         }
 
     }
