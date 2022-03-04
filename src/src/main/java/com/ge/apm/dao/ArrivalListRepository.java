@@ -24,6 +24,7 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
 
     List<ArrivalList> findBySupplierId(Integer supplierId);
     ArrivalList findByName(String name);
+    List<ArrivalList> findByContractNumAndSiteUID(String contractNum,String siteUID);
 
     @Modifying
     @Transactional
