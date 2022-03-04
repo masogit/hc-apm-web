@@ -5,7 +5,6 @@ import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.domain.AuditConfigItem;
 import com.ge.apm.domain.V2_BlobObject;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,6 @@ public class AuditItemConfigService {
                 blobObject.setBoType(V2_BlobObject.BO_TYPE_AUDIT_CONFIG_ITEM);
                 blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
                 blobObject.setBoUuid(auditConfigItem.getUid());
-                blobObject.setBoId(auditConfigItem.getId());
                 attachList.add(blobObject);
             }
             blobDao.save(attachList);

@@ -2,7 +2,10 @@ package com.ge.apm.view.audit;
 
 import com.ge.apm.dao.AuditConfigItemRepository;
 import com.ge.apm.dao.AuditEntryItemRelRepository;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.AuditConfigItem;
+import com.ge.apm.domain.AuditEntryItemRel;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.audit.AuditItemConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -11,10 +14,11 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.dao.GenericRepository;
+import org.springframework.data.domain.Sort;
+import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.JpaCRUDController;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -29,7 +33,7 @@ import java.util.stream.Collectors;
  */
 @ManagedBean
 @ViewScoped
-public class AuditItemConfigController extends JpaCRUDController<AuditConfigItem> {
+public class AuditItemConfigController extends GenericCRUDUUIDController<AuditConfigItem> {
 
     private AuditConfigItemRepository dao;
     private AuditEntryItemRelRepository relDao;
@@ -52,7 +56,7 @@ public class AuditItemConfigController extends JpaCRUDController<AuditConfigItem
     }
 
     @Override
-    protected GenericRepository<AuditConfigItem> getDAO() {
+    protected GenericRepositoryUUID<AuditConfigItem> getDAO() {
         return dao;
     }
 
@@ -63,9 +67,10 @@ public class AuditItemConfigController extends JpaCRUDController<AuditConfigItem
             this.searchFilters = new ArrayList<>();
             this.searchFilters.add(new SearchFilter("contentType", SearchFilter.Operator.EQ, this.searchContentType));
         }
-
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        PageRequest page = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         List<SearchFilter> searchFilters = this.searchFilters;
-        Page<AuditConfigItem> list = dao.findBySearchFilter(searchFilters, pageRequest);
+        Page<AuditConfigItem> list = dao.findBySearchFilter(searchFilters, page);
         return list;
     }
 
@@ -86,9 +91,10 @@ public class AuditItemConfigController extends JpaCRUDController<AuditConfigItem
         super.prepareCreate();
     }
 
-    public void setSelected(Integer id) {
+    public void setSelected(String uid) {
         attachements = null;
-        super.setSelected(id);
+        AuditConfigItem auditConfigItem = dao.findById(uid);
+        super.setSelected(auditConfigItem);
         selectType = this.selected.getType().toString();
     }
 
@@ -120,10 +126,8 @@ public class AuditItemConfigController extends JpaCRUDController<AuditConfigItem
         }
 
         if(StringUtils.isBlank(this.selected.getUid())){
-            this.selected.setUid(UUID.randomUUID().toString().replace("-", ""));
             this.selected.setCreator(UserContextService.getCurrentUserAccount().getName());
             this.selected.setCreateTime(new Date());
-
         }
 
         auditItemConfigService.saveAuditConfigItem(this.selected, attachements);
@@ -150,7 +154,6 @@ public class AuditItemConfigController extends JpaCRUDController<AuditConfigItem
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             attachements.add(blobObject);
-            blobObject.setBoId(selected.getId());
             blobObject.setBoType(V2_BlobObject.BO_TYPE_AUDIT_CONFIG_ITEM);
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
             blobObject.setBoUuid(selected.getUid());
