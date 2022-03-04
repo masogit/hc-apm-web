@@ -70,4 +70,10 @@ public class AuditTemplate implements Serializable {
      */
     @Column(name = "uploader")
     private String uploader;
+
+    /**
+     * 文件id
+     */
+    @Column(name = "object_storage_id")
+    private String objectStorageId;
 }

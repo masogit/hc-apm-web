@@ -44,7 +44,7 @@
                             <h:outputText value="#{item.content}"/>
                         </p:column>
                         <p:column headerText="#{msg.Operation}" exportable="false" width="120" id="operatorColumn">
-                            <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
+                            <h:panelGroup>
                                 <p:commandLink id="editButton" title="#{msg.Edit}"  actionListener="#{auditItemConfigController.setSelected(item.id)}" update=":auditConfigItemEditDlg" oncomplete="PF('auditConfigItemEditDialog').show()">
                                     <p:graphicImage name="icons/edit.png" style="width: 25px; height: 25px;"/>
                                 </p:commandLink>
@@ -53,7 +53,6 @@
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
                             </h:panelGroup>
-
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{auditItemConfigController.prepareCreate}" update=":auditConfigItemEditDlg" oncomplete="PF('auditConfigItemEditDialog').show()" />
