@@ -56,6 +56,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="rowSelect" update="exportDocButton" />
                         <p:ajax event="filter" listener="#{simplePartsTransactionController.onFilter}"/>
                         <p:ajax event="page" oncomplete="rc2();"/>
                         <p:column headerText="备件名称" sortBy="#{item.name}" filterBy="#{item.name}"
@@ -115,7 +116,9 @@
                                         value="#{simplePartsTransactionController.getLocator(item.partsLocatorId)}"/>
                             </p:column>
                             <p:column headerText="出库时间" sortBy="#{item.createdDate}">
-                                <h:outputText value="#{item.createdDate}"/>
+                                <h:outputText value="#{item.createdDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
                             </p:column>
 
                             <p:column headerText="出库人">
@@ -141,7 +144,9 @@
                                         value="#{simplePartsTransactionController.getLocator(item.partsLocatorId)}"/>
                             </p:column>
                             <p:column headerText="入库时间" sortBy="#{item.createdDate}">
-                                <h:outputText value="#{item.createdDate}"/>
+                                <h:outputText value="#{item.createdDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
                             </p:column>
 
                             <p:column headerText="入库人">
@@ -160,6 +165,11 @@
                         <p:column headerText="院区" sortBy="#{item.siteUID}">
                             <h:outputText value="#{simplePartsTransactionController.switchSiteName(item.siteUID)}"/>
                         </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="exportDocButton" title="导出选中记录到DOC" icon="ui-icon-arrowstop-1-s" ajax="false" class="btn btn-sm btn-gray" actionListener="#{simplePartsTransactionController.exportReportDocx()}" update="datalist" disabled="#{empty simplePartsTransactionController.selected}" rendered="#{userContextService.isCountyArea() and simplePartsTransactionController.queryIndex == 1}">
+                                <p:fileDownload value="#{simplePartsTransactionController.exportFile}" />
+                            </p:commandButton>
+                        </f:facet>
                     </p:dataTable>
                     <p:remoteCommand name="rc2" update=":SparePartsInventoryListForm:datalist"/>
                 </h:form>

@@ -303,6 +303,10 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="call_center_number") // 县域需求call center单号
     private String callCenterNumber;
 
+    /**县域 开单类型： 1主动开单、2被动开单**/
+    @Column(name="order_type")
+    private String orderType;
+
     public Integer getIsCoreMemberApproval() {
         return isCoreMemberApproval;
     }
@@ -940,5 +944,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setCallCenterNumber(String callCenterNumber) {
         this.callCenterNumber = callCenterNumber;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 }

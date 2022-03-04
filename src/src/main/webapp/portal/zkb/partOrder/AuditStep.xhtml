@@ -723,6 +723,7 @@
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.selected.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.maintainFlag != 't'}">
                             <p:commandButton immediate="false" process="@this" value="申请信息修改" action="#{zkbPartOrderAuditController.preModifyApply()}" oncomplete="PF('zkbModifyApplyDlg').show()" update=":zkbModifyApplyDlg" />
                         </h:panelGroup>
+                        <p:commandButton immediate="true" process="@this" value="400取消派工" icon="ui-icon-cancel" action="#{zkbPartOrderAuditController.fourHundredCancel}" rendered="#{zkbPartOrderAuditController.showBtnFourHundredCancel}" />
                     </p:panelGrid>
 
                     <p:dataTable id="zkbOrderDatalist" value="#{zkbPartOrderAuditController.selected.zkbPartOrderItems}" var="item"

@@ -180,37 +180,35 @@ public class MeasuringService {
 
         if(null != measuringCertificateDetail.getFinanceNo() && !"".equals(measuringCertificateDetail.getFinanceNo())){
             tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+            if(tempAssetInfoList.size() == 1){
+                flag = true;
+            } else {
                 //开始匹配sn号
                 tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
                 if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
                     errorInfo += "[资产编号不能匹配到设备]";
-                }else{
-                    flag = true;
-                }
-            }else{
-                if(tempAssetInfoList.size() == 1){
+                }else if(tempAssetInfoList.size() == 1){
                     flag = true;
                 }else{
                     errorInfo += "[资产编号匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
                 }
             }
-        }else if(null != measuringCertificateDetail.getAssetSN() && !flag && !"".equals(measuringCertificateDetail.getAssetSN())){
-            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()) {
-                if(null != measuringCertificateDetail.getAssetSN() && !flag){
-                    tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
-                    if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                        errorInfo += "[设备序列号SN不能匹配到资产设备]";
-                    }else{
-                        if(tempAssetInfoList.size() == 1){
-                            flag = true;
-                        }else{
-                            errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
-                        }
-                    }
+        }
+        if(!flag && (null != measuringCertificateDetail.getAssetSN() && !"".equals(measuringCertificateDetail.getAssetSN()))){
+            tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                errorInfo += "[设备序列号SN不能匹配到资产设备]";
+            }else{
+                if(tempAssetInfoList.size() == 1){
+                    errorInfo = "";
+                    flag = true;
+                }else{
+                    errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
                 }
             }
-        }else{
+        }
+        else if ((null == measuringCertificateDetail.getFinanceNo() || "".equals(measuringCertificateDetail.getFinanceNo()))
+                && (null == measuringCertificateDetail.getAssetSN() || "".equals(measuringCertificateDetail.getAssetSN()))){
             errorInfo += "[(设备序列号SN)和(资产编号)不能同时为空]";
         }
 
