@@ -675,7 +675,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String quotaTips ="";
-    private ZkbContractQuotaLogService zkbContractQuotaLogService;
     public void preSave() throws ParseException {
         if(assetInfo == null){
             return;
