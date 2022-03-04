@@ -2139,8 +2139,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void submitCloseReturn(List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList,ZkbPartOrder zkbPartOrder,UserAccount currentUser){
-
+    public boolean submitCloseReturn(List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList,ZkbPartOrder zkbPartOrder,UserAccount currentUser){
+        boolean arg = false;
         List<ZkbPartOrderReturn> oldZkbPartOrderReturnList = zkbPartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
         List<ZkbPartOrderReturnHistory> zkbPartOrderReturnHistoryList = new ArrayList<>();
 
@@ -2182,6 +2182,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             nowBackTotal += r.getQty();
         }
         int ce =  nowBackTotal - oldBackTotal;
+        arg = (ce<0)?true:false;
+        if(arg)
+            return arg;
         //1.保存历史数据
         zkbPartOrderReturnHistoryRepository.save(zkbPartOrderReturnHistoryList);
 
@@ -2198,10 +2201,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(ce != 0){
             subReturnQty(zkbContract,zkbPartOrder,ce,currentUser);
         }
+        return arg;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void probeModifyReturn(ZkbPartOrder zkbPartOrder,UserAccount account){
+    public boolean probeModifyReturn(ZkbPartOrder zkbPartOrder,UserAccount account){
+        boolean arg = false;
         ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findById(zkbPartOrder.getId());
         int oldBackTotal = 0;
         if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(oldZkbPartOrder.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(oldZkbPartOrder.getReturnType())){
@@ -2212,12 +2217,16 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             nowBackTotal = zkbPartOrder.getQty();
         }
         int ce =  nowBackTotal - oldBackTotal;
+        arg = (ce<0)?true:false;
+        if(arg)
+            return arg;
         zkbPartOrderRepository.save(zkbPartOrder);
         //3.名额修改
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
         if(ce != 0){
             subReturnQty(zkbContract,zkbPartOrder,ce,account);
         }
+        return arg;
     }
 
     @Transactional(rollbackFor = Exception.class)
