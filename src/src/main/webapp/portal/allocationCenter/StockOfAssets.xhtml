@@ -131,6 +131,11 @@
                                              update="forceReturnAssetDialog"
                                              actionListener="#{sharedAssetStockController.prepareForceReturnAsset(asset)}"
                                              oncomplete="openForceReturnDialog(xhr, status, args)"/>
+                            <p:commandButton value="补录"
+                                             rendered="#{asset.canEdit}"
+                                             update="forceEditAssetDialog"
+                                             actionListener="#{sharedAssetStockController.prepareForceLeaseAsset(asset)}"
+                                             oncomplete="openForceEditDialog(xhr, status, args)"/>
                             <p:commandButton value="打印" ajax="false" 
                             				 actionListener="#{sharedAssetStockController.printVoucher(asset)}"  
                             				 rendered="#{sharedAssetStockController.validate301()}" >
@@ -151,6 +156,8 @@
 
         <ui:include src="forceLeaseAssetDialog.xhtml"/>
         <ui:include src="forceReturnAssetDialog.xhtml"/>
+        <ui:include src="forceEditAssetDialog.xhtml"/>
+
 
         <script>
             afterPageLoad = function () {
@@ -178,6 +185,15 @@
                     console.log(args.validationFailed);
                 } else {
                     PF('forceLeaseAssetDialog').show()
+                }
+            }
+
+            function openForceEditDialog(xhr, status, args) {
+                console.log("openForceLeaseDialog: " + args.validationFailed);
+                if (args.validationFailed) {
+                    console.log(args.validationFailed);
+                } else {
+                    PF('forceEditAssetDialog').show()
                 }
             }
 

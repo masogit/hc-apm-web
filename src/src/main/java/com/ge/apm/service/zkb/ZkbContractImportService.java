@@ -755,9 +755,9 @@ public class ZkbContractImportService {
                         if(!assetInfo.getIsValid()){
                             flag = false;
                         }
-                        if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
+                        /*if(assetInfo.getStatus() != null && assetInfo.getStatus() == 5){
                             flag = false;
-                        }
+                        }*/
 
                         if(!flag){
                             isValidateData = false;

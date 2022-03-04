@@ -516,6 +516,16 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
+    public void removeAttachmentByIdJiuYuan(String blobId) {
+        String msg = isEditFileJiuYuan();
+        if(msg != null){
+            WebUtil.addErrorMessage(msg);
+            return;
+        }
+        blobService.deleteBlobFileById(blobId);
+        attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
+
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
         if(selectedOrg==null) Collections.emptyList();
         return configService.getAttachmentCategories(configService.findConfigBySite(selectedOrg.getSiteUID()));
@@ -538,6 +548,15 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
+    }
+
+    public void handleFileUploadJiuYuan(FileUploadEvent event) {
+        String msg = isEditFileJiuYuan();
+        if(msg != null){
+            WebUtil.addErrorMessage(msg);
+            return;
+        }
+        handleFileUpload(event);
     }
 
     public List<V2_BlobObject> getAttachList(String type) {
@@ -910,8 +929,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void updateIsEdit(){
-        selected.setIsEdit(true);
-        dao.updateIsEdit(selected.getId());
+        dao.updateIsEdit(selected.getIsEdit(),selected.getId());
     }
 
     public void saveNewSupplier() {
@@ -982,4 +1000,21 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         dao.updateBatchSupplier(supplier.getName(),supplier.getId(),installCount,selectedIds);
     }
 
+    /**
+     * 验证九院文件是否可以编辑包括：（删除、上传）
+     * 注意条件：九院同院区下并且同合同号的所有到货单已完成安装才可以编辑文件。
+     * @return
+     */
+    public String isEditFileJiuYuan(){
+        String msg = null;
+        if(activeSupplier()){
+            List<ArrivalList> arrivalLists = dao.findByContractNumAndSiteUID(selected.getContractNum(),selected.getSiteUID());
+            for(ArrivalList arrivalList:arrivalLists){
+                if(arrivalList.getStatus() != 3){
+                    msg = "该合同号下有未安装完成的到货单："+ arrivalList.getName() +"，请全部完成后再上传或删除！";
+                }
+            }
+        }
+        return msg;
+    }
 }

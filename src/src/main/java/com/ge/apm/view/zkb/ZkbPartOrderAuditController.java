@@ -3,10 +3,10 @@ package com.ge.apm.view.zkb;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.zkb.CopyByInvok;
-import com.ge.apm.service.zkb.ZkbIntegralService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.RowEditEvent;
@@ -17,7 +17,6 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.swing.event.ChangeEvent;
 import java.util.*;
 
 /**
@@ -54,6 +53,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean isOrder = false;
     private boolean isUnOrder = false;
     private boolean whetherDeductEdit = false;
+    private boolean showBtnFourHundredCancel = false;
+
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
@@ -474,6 +475,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                     showOrder = true;
                     showBtn = "";
+                }else if(ZkbPartOrder.PartOrderStatus.FourHundredCancel.toString().equals(selected.getStatus())){
+                    showManage = true;
+                    if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
+                        showCommercial = true;
+                    }
+                    showOrder = true;
+                    showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
                     showManage = true;
                     if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
@@ -750,8 +758,18 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         List<ZkbPartOrderUserConfig> closeUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
         if(closeUserConfigs.size() > 0){
             isChoseAdmin = true;
-        }
+        }//只有人工申请允许该申请被取消
+
+
         List<ZkbPartOrderUserConfig> orderConfigs = zkbPartOrderUserConfigRepository.findByLoginName(currentUser.getLoginName());
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())&& CollectionUtils.isNotEmpty(orderConfigs)){
+            String oldStep = selected.getCurrentStep();
+            if(orderConfigs.stream().filter(m -> ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(m.getConfigType())).findAny().isPresent() &&
+                    oldStep.equals(ZkbPartOrderStep.PartOrderStep.Complete.toString()) &&
+                    !ZkbPartOrder.PartOrderStatus.FourHundredCancel.toString().equals(selected.getStatus()) ){
+                showBtnFourHundredCancel = true;
+            }
+        }
         for(ZkbPartOrderUserConfig c : orderConfigs){
             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                 if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(c.getConfigType()) && ZkbPartOrder.OrderType.Probe.toString().equals(c.getOrderType())){
@@ -1056,6 +1074,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
+    public String fourHundredCancel(){
+        zkbPartOrderService.fourHundredCancelNext(this.selected,currentUser);
+        ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
+    }
+
+
 
     public void preModifyApply(){
         modifySsaKey = selected.getSsaKeyFlag();
@@ -1317,11 +1343,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 WebUtil.addErrorMessage("归还数量与申请不一致，请检查！");
                 return;
             }
-            zkbPartOrderService.submitCloseReturn(zkbPartOrderReturnModifyList,selected,currentUser);
+            boolean arg = zkbPartOrderService.submitCloseReturn(zkbPartOrderReturnModifyList,selected,currentUser);
+            if(false){
+                WebUtil.addErrorMessage("名额不足，需400手动处理！");
+                return;
+            }
             zkbPartOrderReturnList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
 
-            zkbPartOrderService.probeModifyReturn(selected,currentUser);
+            boolean arg = zkbPartOrderService.probeModifyReturn(selected,currentUser);
+            if(false){
+                WebUtil.addErrorMessage("名额不足，需400手动处理！");
+                return;
+            }
         }
 
     }
@@ -1832,5 +1866,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {
         return zkbPartOrderService.getZkbPartOrderRepository();
+    }
+
+    public boolean isShowBtnFourHundredCancel() {
+        return showBtnFourHundredCancel;
+    }
+
+    public void setShowBtnFourHundredCancel(boolean showBtnFourHundredCancel) {
+        this.showBtnFourHundredCancel = showBtnFourHundredCancel;
     }
 }

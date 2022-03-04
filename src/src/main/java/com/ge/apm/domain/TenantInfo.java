@@ -165,7 +165,7 @@ public class TenantInfo implements Serializable {
     private Boolean isSupportMultiLanguage;//是否支持同租户多语言 0、不支持 1、支持
 
     @Column(name = "custom_tenant")
-    private String customTenant;//有定制化需求的租户可以使用该字段作为租户标识 1、仁济 2.南京市江宁医院 3.浙江大学医学院附属邵逸夫医院
+    private String customTenant;//有定制化需求的租户可以使用该字段作为租户标识 1、仁济 2.南京市江宁医院 3.浙江大学医学院附属邵逸夫医院 4.云南省阜外心血管病医院
 
     @Column(name="is_enables_adverse_events" )
     private Boolean isEnablesAdverseEvents; // 控制不良事件相关微信卡片是否显示 （true/false 默认false不显示）
