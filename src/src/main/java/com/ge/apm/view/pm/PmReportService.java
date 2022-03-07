@@ -46,6 +46,8 @@ public class PmReportService {
 
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String SIGNATURE_HOLDER = "审核人签名：";
+    private static final String ACK_SIGNATURE_HOLDER = "保养验收签名：";
+    private static final String WC_SIGNATURE_HOLDER = "保养完成签名：";
     private static final String MAINTENANCE_COMPLETION_SIGNATURE_TITLE = "保养完成签名：";
     private static final String ACCEPTANCE_SIGNATURE_TITLE = "验收签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
@@ -247,6 +249,26 @@ public class PmReportService {
             }
         }
 
+        //ack_signature
+        String ackSignatureStorageId = pmOrder.getAckSignature();
+        if (!Strings.isNullOrEmpty(ackSignatureStorageId)) {
+            byte[] ackSignatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(ackSignatureStorageId);
+            if (ackSignatureBytes != null) {
+                content.put(MaintenanceTemplate.Component.ACK_SIGNATURE_PLACE_HOLDER.toString(), ACK_SIGNATURE_HOLDER);
+                content.put(MaintenanceTemplate.Component.ACK_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", ackSignatureBytes));
+            }
+        }
+
+        //wc_signature
+        String wcSignatureStorageId = pmOrder.getWcSignature();
+        if (!Strings.isNullOrEmpty(wcSignatureStorageId)) {
+            byte[] wcSignatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(wcSignatureStorageId);
+            if (wcSignatureBytes != null) {
+                content.put(MaintenanceTemplate.Component.WC_SIGNATURE_PLACE_HOLDER.toString(), WC_SIGNATURE_HOLDER);
+                content.put(MaintenanceTemplate.Component.WC_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", wcSignatureBytes));
+            }
+        }
+
         //保养完成签名
         String wcSignature = pmOrder.getWcSignature();
         if (!Strings.isNullOrEmpty(wcSignature)) {
@@ -270,6 +292,16 @@ public class PmReportService {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
             content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+        }
+        if (!content.containsKey(MaintenanceTemplate.Component.ACK_SIGNATURE.toString())) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
+            content.put(MaintenanceTemplate.Component.ACK_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
+            content.put(MaintenanceTemplate.Component.ACK_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+        }
+        if (!content.containsKey(MaintenanceTemplate.Component.WC_SIGNATURE.toString())) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
+            content.put(MaintenanceTemplate.Component.WC_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
+            content.put(MaintenanceTemplate.Component.WC_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
         }
         if (!content.containsKey(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString())) {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
@@ -412,7 +444,6 @@ public class PmReportService {
         if (rule != null && !Strings.isNullOrEmpty(rule.getReportStorageId())) {
             // get template if the report storage is set.
             StreamedContent template = this.blobService.getBlobObjectByStorageId(rule.getReportStorageId());
-            InputStream blobInputStream = template.getStream();
             rawTemplate = template.getStream();
             //rawTemplate = this.pmOrderReportTemplateService.updateReportTemplateBySchemaId(blobInputStream, safetySchema, performanceSchema);
         } else {
