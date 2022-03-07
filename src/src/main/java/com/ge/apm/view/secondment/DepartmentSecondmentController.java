@@ -101,7 +101,7 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         XSSFRow header = sheet.getRow(0);
 
         XSSFCellStyle cellStyle = wb.createCellStyle();//XSSFColor.HSSFColorPredefined.GREEN.getIndex()
-        XSSFColor xssfColor = new XSSFColor(new Color(128, 128, 128));
+        XSSFColor xssfColor = new XSSFColor(new Color(212, 212, 212));
         cellStyle.setFillForegroundColor(xssfColor);
         cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
