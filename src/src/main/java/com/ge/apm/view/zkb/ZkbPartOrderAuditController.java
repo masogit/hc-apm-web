@@ -1345,14 +1345,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }
             boolean arg = zkbPartOrderService.submitCloseReturn(zkbPartOrderReturnModifyList,selected,currentUser);
             if(arg){
-                WebUtil.addErrorMessage("归还类型已修改，剩余名额不足，需400手动处理！");
+                WebUtil.addErrorMessage("归还类型已修改，剩余名额不足，需400手动处理！","");
              }
             zkbPartOrderReturnList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
 
             boolean arg = zkbPartOrderService.probeModifyReturn(selected,currentUser);
             if(arg){
-                WebUtil.addErrorMessage("归还类型已修改，剩余名额不足，需400手动处理！");
+                WebUtil.addErrorMessage("归还类型已修改，剩余名额不足，需400手动处理！","");
              }
         }
 
