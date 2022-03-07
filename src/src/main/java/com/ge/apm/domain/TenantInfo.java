@@ -111,8 +111,9 @@ public class TenantInfo implements Serializable {
     @Column(name = "active_user_id")
     private Integer activeUserId;
 
+    //0 means super admin ,1 means by tenant user, 2 ready to inactive , 3 freeze
     @Column(name = "active_type")
-    private Integer activeType;//0 means super admin ,1 means by tenant user
+    private Integer activeType;
     
     @Column(name="tenant_config",columnDefinition="text")
     private String tenantConfig;
