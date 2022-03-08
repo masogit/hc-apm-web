@@ -80,7 +80,7 @@
                         </p:column>
                         <p:column headerText="#{msg.download}" exportable="false">
                             <!--<p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}" rendered="#{'vlink' ne item.boSubType}">下载</p:link>-->
-                            <p:commandLink value="#{msg.download}" ajax="false" actionListener="#{assetFileAttachmentController.downLoadDocument(item.objectStorageId)}"/>
+                            <p:commandLink value="#{msg.download}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(item.objectStorageId)}"/>
                             <p:link href="#{item.extLink}" target="_blank" rendered="#{'vlink' eq item.boSubType}">打开</p:link>
                         </p:column>
                         <f:facet name="{Toolbar}">
