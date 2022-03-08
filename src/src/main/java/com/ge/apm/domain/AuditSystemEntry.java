@@ -43,6 +43,11 @@ public class AuditSystemEntry implements Serializable {
     @Column(name = "level")
     private Integer level;
     /**
+     * type 1条 2款 3指标
+     */
+    @Column(name = "type")
+    private Integer type;
+    /**
      * mark
      */
     @Column(name = "mark")
