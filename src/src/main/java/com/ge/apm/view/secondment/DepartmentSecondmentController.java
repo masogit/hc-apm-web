@@ -5,6 +5,7 @@ import com.ge.apm.domain.SiteToSiteAllocation;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.xssf.usermodel.*;
@@ -101,9 +102,13 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         XSSFRow header = sheet.getRow(0);
 
         XSSFCellStyle cellStyle = wb.createCellStyle();//XSSFColor.HSSFColorPredefined.GREEN.getIndex()
-        XSSFColor xssfColor = new XSSFColor(new Color(128, 128, 128));
+        XSSFColor xssfColor = new XSSFColor(new Color(212, 212, 212));
         cellStyle.setFillForegroundColor(xssfColor);
         cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        cellStyle.setBorderBottom(BorderStyle.THICK);
+        cellStyle.setBorderLeft(BorderStyle.THICK);
+        cellStyle.setBorderRight(BorderStyle.THICK);
+        cellStyle.setBorderTop(BorderStyle.THICK);
 
         for (int i = 0; i < header.getPhysicalNumberOfCells(); i++) {
            Cell cell = header.getCell(i);

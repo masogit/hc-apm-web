@@ -1233,7 +1233,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString();
             }
             V2_WorkOrder v2_workOrder = v2_workOrderRepository.findById(zkbPartOrder.getWorkOrderId());
-            if(v2_workOrder.getIntExtType() != null && v2_workOrder.getIntExtType() == 1){ //内修
+            if(v2_workOrder.getIntExtType() != null && v2_workOrder.getIntExtType() == 1){
+                //内修
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
                     zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
@@ -1245,7 +1246,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     zkbContractRepository.save(zkbContract);
                     zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                 }
-            }else if(v2_workOrder.getIntExtType() != null && v2_workOrder.getIntExtType() == 2){ //外修
+            }else if(v2_workOrder.getIntExtType() != null && v2_workOrder.getIntExtType() == 2){
+                //外修
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                 }else{
                     zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) - qty);
@@ -1407,13 +1409,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     //扣除积分
                     return "该申请扣除积分:"+ zkbPartOrder.getQty() * 200;
                 }else{
-                    if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1){ //内修
+                    if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1){
+                        //内修
                         if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                             return "当前合同剩余人工名额为"+zkbContract.getGeArtificialSupportTimes()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个人工名额！";
                         }else{
                             return "当前合同剩余联合名额为"+zkbContract.getSpareArtificail()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个联合名额！";
                         }
-                    }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2){ //外修
+                    }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2){
+                        //外修
                         if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                             return "该申请不扣任何名额";
                         }else{
@@ -1962,6 +1966,63 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     /**
+     * ZKB FE 当备件/探头/工具归还时需要选择是好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
+     * 。系统目前是自动扣除名额的。如果代理商的剩余名额已经为0时，系统不需要继续扣除名额变成负值，系统只需要提示400手动处理即可。
+     * 小于0 返回  true 否则 返回 false
+     */
+    public boolean checkRemaining(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty,UserAccount userAccount) {
+        boolean arg = false;
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())) {
+            ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
+            if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag()) && "highMachine".equals(zkbContractAsset.getAssetType())){
+            }else {
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())
+                        || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                    arg = (zkbContract.getSpareQuota() + qty)<0? true:arg;
+                 }else{
+                    zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) + qty);
+                    arg = (zkbContract.getSpareArtificail() + qty)<0? true:arg;
+                }
+            }
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
+            if(StringUtils.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())) {
+                if(StringUtils.isEmpty(zkbPartOrder.getHighCatFlag()) || CopyByInvok.F.equals(zkbPartOrder.getHighCatFlag())){
+                    arg = (zkbContract.getProbeQuota() + qty)<0? true:arg;
+                }else{
+                    if(StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())){
+                        ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                        if(zkbContractCat != null){
+                            if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
+                                arg = (zkbContract.getProbeQuota() + qty)<0? true:arg;
+                            }
+                        }
+                    }
+                }
+            }else{
+                if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                    arg = (zkbContract.getProbeQuota() + qty)<0? true:arg;
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                    arg = (zkbContract.getProbeQuotaNormal() + qty)<0? true:arg;
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                    arg = (zkbContract.getProbeQuotaSpecial() + qty)<0? true:arg;
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                    if(StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())) {
+                        ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                        if (zkbContractCat != null) {
+                            if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
+                                arg = (zkbContract.getProbeQuotaNormal() + qty)<0? true:arg;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return  arg;
+    }
+
+
+    /**
      * 发送邮件
      */
     public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType,String token){
@@ -2182,9 +2243,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             nowBackTotal += r.getQty();
         }
         int ce =  nowBackTotal - oldBackTotal;
-        arg = (ce<0)?true:false;
-        if(arg)
-            return arg;
         //1.保存历史数据
         zkbPartOrderReturnHistoryRepository.save(zkbPartOrderReturnHistoryList);
 
@@ -2196,10 +2254,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
         }
         zkbPartOrderReturnRepository.save(zkbPartOrderReturnModifyList);
-
         //3.名额修改
-        if(ce != 0){
-            subReturnQty(zkbContract,zkbPartOrder,ce,currentUser);
+        if(ce != 0 ){
+            //ZKB FE 当备件/探头/工具归还时需要选择是好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
+            // 。系统目前是自动扣除名额的。如果代理商的剩余名额已经为0时，系统不需要继续扣除名额变成负值，系统只需要提示400手动处理即可。
+            if(checkRemaining(zkbContract,zkbPartOrder,ce,currentUser)){
+                arg = true;
+            }else{
+                subReturnQty(zkbContract,zkbPartOrder,ce,currentUser);
+            }
         }
         return arg;
     }
@@ -2217,14 +2280,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             nowBackTotal = zkbPartOrder.getQty();
         }
         int ce =  nowBackTotal - oldBackTotal;
-        arg = (ce<0)?true:false;
-        if(arg)
-            return arg;
         zkbPartOrderRepository.save(zkbPartOrder);
         //3.名额修改
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-        if(ce != 0){
-            subReturnQty(zkbContract,zkbPartOrder,ce,account);
+        if(ce != 0 ){
+            //ZKB FE 当备件/探头/工具归还时需要选择是好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
+            // 。系统目前是自动扣除名额的。如果代理商的剩余名额已经为0时，系统不需要继续扣除名额变成负值，系统只需要提示400手动处理即可。
+            if (checkRemaining(zkbContract,zkbPartOrder,ce,account)){
+                arg = true;
+            }else{
+                subReturnQty(zkbContract,zkbPartOrder,ce,account);
+            }
         }
         return arg;
     }
