@@ -46,6 +46,10 @@
                             <h:outputText value="#{item.contractNo}"/>
                         </p:column>
 
+                        <p:column headerText="公司编码" filterBy="#{item.companyCode}"  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.companyCode}"/>
+                        </p:column>
+
                         <p:column headerText="#{msg.zkbContract_region}" filterBy="#{item.region}" filterMatchMode="EQ">
                             <h:outputText value="#{item.region}"/>
                             <f:facet name="filter">
