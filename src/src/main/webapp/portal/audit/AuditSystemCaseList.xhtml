@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:P="http://java.sun.com/jsf/html"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="省份版本配置列表"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="auditSystemCaseListForm">
+                    <p:dataTable id="datalist" value="#{auditSystemCaseEditController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{auditSystemCaseEditController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.uid}" sortMode="single" sortOrder="descending" sortBy="#{item.uid}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
+                        <p:ajax event="filter" listener="#{auditSystemCaseEditController.onFilter}"
+                                update="createButton"/>
+                        <p:column headerText="版本编号"   sortBy="#{item.version}" filterBy="#{item.version}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.version}"/>
+                        </p:column>
+
+                        <p:column headerText="省份" sortBy="#{item.zone}" filterBy="#{item.zone}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.zone}"/>
+                        </p:column>
+                        <p:column headerText="版本号" >
+                            <h:outputText value="#{item.version}"/>
+                        </p:column>
+                        <p:column headerText="条数量">
+                            <h:outputText value="#{item.stripNum}"/>
+                        </p:column>
+                        <p:column headerText="款数量"  >
+                            <h:outputText value="#{item.paymentNum}"/>
+                        </p:column>
+                        <p:column headerText="指标数量">
+                            <h:outputText value="#{item.targetNum}"/>
+                        </p:column>
+                        <p:column headerText="总分值" sortBy="#{item.status}">
+                            <h:outputText value=" "/>
+                        </p:column>
+                        <p:column headerText="状态" sortBy="#{item.status}" >
+                            <h:outputText value="#{auditSystemCaseEditController.getStatusName(item.status)}"/>
+                        </p:column>
+                        <p:column headerText="操作人" >
+                            <h:outputText value="#{item.creator}"/>
+                        </p:column>
+                        <p:column headerText="更新时间" sortBy="#{item.createTime}" >
+                            <h:outputText value="#{item.createTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{auditSystemCaseEditController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AuditSystemCaseEdit.xhtml?actionName=Create')}"/>
+
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                                             title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAction()}"  />
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                             title="#{msg.Delete}" update="datalist"
+                                             disabled="#{empty auditSystemCaseEditController.selected}"
+                                             actionListener="#{auditSystemCaseEditController.deleteAction()}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                           icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

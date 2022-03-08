@@ -40,7 +40,7 @@ public class AuditSystemCase implements Serializable {
     @Column(name = "judge_logic")
     private String judgeLogic;
     /**
-     * 状态 :1 草稿draft, 2文件file, 3 过期expired
+     * 状态 :1 草稿 2 发布
      */
     @Column(name = "status")
     private Integer status;
@@ -49,6 +49,15 @@ public class AuditSystemCase implements Serializable {
      */
     @Column(name = "type")
     private Integer type;
+
+    @Transient
+    private Integer stripNum;//条总数
+
+    @Transient
+    private Integer paymentNum;//款总数
+
+    @Transient
+    private Integer targetNum;//指标总数
     /**
      * 创建人
      */
@@ -63,4 +72,22 @@ public class AuditSystemCase implements Serializable {
     @Column(name = "create_time")
     private Date createTime;
 
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (uid != null ? uid.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof AuditSystemCase)) {
+            return false;
+        }
+        AuditSystemCase other = (AuditSystemCase) object;
+        if ((this.uid == null && other.uid != null) || (this.uid != null && !this.uid.equals(other.uid))) {
+            return false;
+        }
+        return true;
+    }
 }
