@@ -680,6 +680,9 @@ public class AssetInstallationController {
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalListItem);
             blobObject.setBoUuid(arrivalListItem.getId());
+//            if(activeSupplier()){//已激活的供应商：使用合同号作为BoUuid
+//                blobObject.setBoUuid(arrivalListItem.getArrivalList().getContractNum());
+//            }
             blobObject.setBoSubType(typeName);
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));

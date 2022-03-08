@@ -62,7 +62,11 @@ public class MaintenanceTemplate {
 
             this.content.put(Component.ACCESSORY_INFORMATION.toString(), Component.ACCESSORY_INFORMATION.value());
             this.content.put(Component.ACCESSORY_SIGNATURE.toString(), Component.ACCESSORY_SIGNATURE.value());
+            this.content.put(Component.ACK_SIGNATURE.toString(), Component.ACK_SIGNATURE.value());
+            this.content.put(Component.WC_SIGNATURE.toString(), Component.WC_SIGNATURE.value());
             this.content.put(Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.value());
+            this.content.put(Component.ACK_SIGNATURE_PLACE_HOLDER.toString(), Component.ACK_SIGNATURE_PLACE_HOLDER.value());
+            this.content.put(Component.WC_SIGNATURE_PLACE_HOLDER.toString(), Component.WC_SIGNATURE_PLACE_HOLDER.value());
             this.content.put(Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), Component.MAINTENANCE_COMPLETION_SIGNATURE.value());
             this.content.put(Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.value());
             this.content.put(Component.ACCEPTANCE_SIGNATURE.toString(), Component.ACCEPTANCE_SIGNATURE.value());
@@ -189,7 +193,11 @@ public class MaintenanceTemplate {
     public enum Component {
         ACCESSORY_INFORMATION("accessory_information", Widget.TABLE),
         ACCESSORY_SIGNATURE("accessory_signature", Widget.PICTURE),
+        WC_SIGNATURE("wc_signature", Widget.PICTURE),
+        ACK_SIGNATURE("ack_signature", Widget.PICTURE),
         ACCESSORY_SIGNATURE_PLACE_HOLDER("accessory_signature_place_holder", Widget.TEXT),
+        ACK_SIGNATURE_PLACE_HOLDER("ack_signature_place_holder", Widget.TEXT),
+        WC_SIGNATURE_PLACE_HOLDER("wc_signature_place_holder", Widget.TEXT),
         MAINTENANCE_COMPLETION_SIGNATURE("maintenance_completion_signature", Widget.PICTURE),
         MAINTENANCE_COMPLETION_SIGNATURE_TITLE("maintenance_completion_signature_title", Widget.TEXT),
         ACCEPTANCE_SIGNATURE("acceptance_signature", Widget.PICTURE),

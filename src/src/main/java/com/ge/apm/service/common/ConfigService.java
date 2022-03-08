@@ -202,4 +202,14 @@ public class ConfigService {
         }
         return false;
     }
+
+    //风险等级是否沿用高中低
+    public boolean useNewRiskGrade(){
+        Optional<WorkflowConfig> optWorkflowConfig = findInheritableWorkflowConfigByCurrentUser();
+        if(optWorkflowConfig.isPresent()){
+            WorkflowConfig workflowConfig = optWorkflowConfig.get();
+            return workflowConfig.getUseNewRiskGrade()==null ? false : workflowConfig.getUseNewRiskGrade();
+        }
+        return false;
+    }
 }

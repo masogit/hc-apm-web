@@ -79,16 +79,25 @@
                             <p:inputText value="#{workOrderMgrController.newServiceRequest.customerPosition}" maxlength="256" required="true" requiredMessage="医院客户职务 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
 
-                        <h:panelGroup rendered="#{userContextService.countyArea}">
-                            <label class="label">#{msg.siebleNumber}</label>
-                            <p:inputText value="#{workOrderMgrController.newServiceRequest.siebleNumber}" maxlength="12"  requiredMessage="sieble单号 #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
+                        <c:if test="#{userContextService.countyArea}">
+                            <h:panelGroup>
+                                <label class="label">#{msg.siebleNumber}</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.siebleNumber}" maxlength="12"  requiredMessage="sieble单号 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
 
-                        <h:panelGroup rendered="#{userContextService.countyArea}">
-                            <label class="label">#{msg.callCenterNumber}</label>
-                            <p:inputText value="#{workOrderMgrController.newServiceRequest.callCenterNumber}" maxlength="12" requiredMessage="呼叫中心单号 #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
-
+                            <h:panelGroup>
+                                <label class="label">#{msg.callCenterNumber}</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.callCenterNumber}" maxlength="12" requiredMessage="呼叫中心单号 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.countyAreaOrderType}</label>
+                                <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.orderType}" >
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('countyAreaOrderType')}" var="item"
+                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </c:if>
                     </p:panelGrid>
                     
                     <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">

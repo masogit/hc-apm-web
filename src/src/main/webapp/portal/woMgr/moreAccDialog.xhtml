@@ -4,7 +4,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 <ui:composition> <!--备件对话框 维修-->
     <p:dialog id="moreAccDialogDlg" class="moreAccDialogDlg" widgetVar="moreAccDialogDlg" modal="true" width="1250"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.accessory}">
         <h:form id="moreAccDialogForm" >
@@ -115,7 +115,7 @@
                             <p:ajax listener="#{workOrderMgrController.orderSet}" event="change"></p:ajax>
                         </p:selectBooleanButton>
                     </p:column>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{!userContextService.isCountyArea()}">
                         <label class="label">#{msg.Remark}</label>
                         <p:inputTextarea id="area1" value="#{workOrderMgrController.itemDetail.comment}"/>
                     </h:panelGroup>
@@ -123,8 +123,8 @@
         <!-- ==================================================================启用集成工单时==============================================-->
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workOrderMgrController.isEnableIntegrationWithWorkOrder()}">
                     <h:panelGroup>
-                        <label class="label">#{msg.PartType}</label>
-                        <p:selectOneMenu value="#{workOrderMgrController.itemDetail.partsType}">
+                        <label class="label">#{msg.PartType}*</label>
+                        <p:selectOneMenu value="#{workOrderMgrController.itemDetail.partsType}" required="true" requiredMessage="备件类别不能为空！">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             <p:ajax event="itemSelect"  update="moreAccDialogForm" listener="#{workOrderMgrController.changeStatus()}"/>
@@ -264,7 +264,7 @@
                             <p:ajax listener="#{workOrderMgrController.orderSet}" event="change"></p:ajax>
                         </p:selectBooleanButton>
                     </p:column>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{!userContextService.isCountyArea()}">
                         <label class="label">#{msg.Remark}</label>
                         <p:inputTextarea id="area" value="#{workOrderMgrController.itemDetail.comment}"/>
                     </h:panelGroup>
@@ -274,6 +274,12 @@
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('partUseType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneMenu>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userContextService.isCountyArea()}">
+                    <h:panelGroup>
+                        <label class="label">#{msg.Remark}</label>
+                        <p:inputTextarea rows="1" cols="100" value="#{workOrderMgrController.itemDetail.comment}"/>
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>

@@ -126,4 +126,9 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			" and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd') ) T", nativeQuery = true)
 	Integer fetchCount(String dateFormat, String date, String tenantUID);
 
+	@Query(value = "select count(asset_id) from v2_pm_order where asset_id= ?1 and  rule_level = ?2 and pm_type = ?3 ",nativeQuery = true)
+	Long findCountByAssetId(Integer id, Integer level, Integer pmType);
+
+	@Query(value = "select count(asset_id) from v2_pm_order where asset_id= ?1 and pm_type = ?2 ",nativeQuery = true)
+	Long findCountByAssetIdAndPmType(Integer id,Integer pmType);
 }

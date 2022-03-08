@@ -755,6 +755,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "parts_need_sign")
     private Boolean partsNeedSign; //备件审核是否需要签名
 
+    @Column(name = "use_new_risk_grade")
+    private Boolean useNewRiskGrade; //风险等级是否沿用高中低
+
     @Column(name = "ack_need_sign")
     private Boolean ackNeedSign; //验收是否需要签名
 
@@ -1066,6 +1069,10 @@ public class WorkflowConfig implements Serializable {
     public void setOrderReopenTimeframe(Integer orderReopenTimeframe) {
         this.orderReopenTimeframe = orderReopenTimeframe;
     }
+
+    public Boolean getUseNewRiskGrade() { return useNewRiskGrade; }
+
+    public void setUseNewRiskGrade(Boolean useNewRiskGrade) { this.useNewRiskGrade = useNewRiskGrade; }
 
     public Integer getMaxMessageCount() {
         return maxMessageCount;
