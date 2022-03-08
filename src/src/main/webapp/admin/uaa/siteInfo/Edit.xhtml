@@ -51,10 +51,6 @@
                             <label class="label">#{msg.location}</label>
                             <p:inputText id="location" value="#{tenantInfoController.selected.location}" />
                         </h:panelGroup>
-                        <!--<h:panelGroup rendered="true">
-                            <label class="label">#{msg.timeZone}</label>
-                            <p:inputText id="timeZone" value="#{tenantInfoController.selected.timeZone}" />
-                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.defaultLang}</label>
                             <p:selectOneMenu value="#{tenantInfoController.selected.defaultLang}">
@@ -63,27 +59,6 @@
                                 <!--<f:selectItem itemLabel="tw" itemValue="tw"/>-->
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <!--<h:panelGroup >
-                            <label class ="label">#{msg.habit}</label>
-                            <p:selectOneMenu value="#{tenantInfoController.selected.habit}"  >
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('habit')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>-->
-                        <!--<h:panelGroup >
-                            <label class ="label">#{msg.currency}</label>
-                            <p:selectOneMenu value="#{tenantInfoController.selected.currency}"  >
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('currency')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>-->
-
-                        <!--<h:panelGroup rendered="true">
-                            <label class="label">#{msg.manhourPrice}*</label>
-                            <p:inputText id="manhourPrice" value="#{tenantInfoController.selected.manhourPrice}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">&nbsp;</label>
-                            <p:selectBooleanCheckbox itemLabel="#{msg.isEnabled}" value="#{tenantInfoController.selected.isEnabled}" />
-                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.tenantType}</label>
                             <p:selectOneMenu value="#{tenantInfoController.selected.type}">
@@ -120,6 +95,15 @@
                             <label class="label">&nbsp;</label>
 <!--                            isEnablesAdverseEvents-->
                             <p:selectBooleanCheckbox itemLabel="是否开启不良事件上报" value="#{tenantInfoController.selected.isEnablesAdverseEvents}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">激活方式</label>
+                            <p:selectOneMenu value="#{tenantInfoController.selected.activeType}" >
+                                <f:selectItem itemLabel="管理员开通" itemValue="0" />
+                                <f:selectItem itemLabel="用户开通" itemValue="1" />
+                                <f:selectItem itemLabel="准备注销" itemValue="2" />
+                                <f:selectItem itemLabel="已注销" itemValue="3" />
+                            </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>

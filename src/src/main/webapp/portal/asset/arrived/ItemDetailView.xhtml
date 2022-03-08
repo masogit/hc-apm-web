@@ -63,6 +63,15 @@
                             <p:inputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.clinicalOwnerUid).name}" readonly="true" />
                         </h:panelGroup>
 
+                        <h:panelGroup rendered="#{assetArrivedItemsController.activeSupplier()}">
+                            <label class="label">使用人</label>
+                            <p:inputText value="#{assetArrivedItemsController.selected.usingPerson}" readonly="true" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{assetArrivedItemsController.activeSupplier()}">
+                            <label class="label">使用人电话</label>
+                            <p:inputText value="#{assetArrivedItemsController.selected.usingPersonTel}" readonly="true" />
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.maitanance}</label>
                             <p:inputText id="maitanance" value="#{assetArrivedItemsController.selected.maitanance}" readonly="true"/>
@@ -207,7 +216,7 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.riskGrade}</label>
-                            <p:inputText value="#{fieldMsg.fieldValue('riskGrade',assetArrivedItemsController.selected.riskGrade)}"  readonly="true"/>
+                            <p:inputText value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew',assetArrivedItemsController.selected.riskGrade) : fieldMsg.fieldValue('riskGrade',assetArrivedItemsController.selected.riskGrade)}"  readonly="true"/>
                         </h:panelGroup>
 
                         <h:panelGroup>

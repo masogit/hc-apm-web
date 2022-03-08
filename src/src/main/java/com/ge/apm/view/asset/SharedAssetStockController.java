@@ -30,6 +30,7 @@ import javax.xml.transform.stream.StreamSource;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
+import com.ge.apm.dao.SharedAssetRequestRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.RequestType;
 import org.apache.commons.collections.map.HashedMap;
@@ -80,6 +81,8 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
 //    private UserAccount user;
     @Autowired
     private AssetInfoRepository assetInfoRepository;
+    @Autowired
+    private SharedAssetRequestRepository sharedAssetRequestRepository;
 
     @Getter
     @Setter
@@ -121,6 +124,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         sharedAssetStockService = WebUtil.getBean(SharedAssetStockService.class);
         orgInfoRepository= WebUtil.getBean(OrgInfoRepository.class);
         assetInfoRepository= WebUtil.getBean(AssetInfoRepository.class);
+        sharedAssetRequestRepository=WebUtil.getBean(SharedAssetRequestRepository.class);
     }
 
     @Override
@@ -226,6 +230,10 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
         sharedAssetReqDetail.setClinicalDeptName(this.leaseDeptName);
         sharedAssetReqDetail.setClinicalDeptUid(orgInfo.getUid());
         asdDao.save(sharedAssetReqDetail);
+        SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(sharedAssetReqDetail.getBorrowId());
+        sharedAssetRequest.setClinicalDeptUid(orgInfo.getUid());
+        sharedAssetRequest.setClinicalDeptName(this.leaseDeptName);
+        sharedAssetRequestRepository.save(sharedAssetRequest);
     }
     public void forceReturnAsset() {
         if(this.selected != null) {
