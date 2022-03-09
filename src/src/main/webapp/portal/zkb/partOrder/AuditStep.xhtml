@@ -335,7 +335,7 @@
                             <label class="label">故障描述*</label>
                             <p:inputTextarea id="faultDescription" value="#{zkbPartOrderAuditController.selected.faultDescription}" disabled="true" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.supplementFlag eq 'f'}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.supplementFlag eq 't' and zkbPartOrderAuditController.selected.currentStep ne 'OrderPending'}">
                             <label class="label">Sr#*</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}"  disabled="true"/>
                         </h:panelGroup>
@@ -595,7 +595,7 @@
                             <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}"><!--备件-->
                                 <h:panelGroup >
                                     <label class="label">SR#*</label>
-                                    <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag) or zkbPartOrderAuditController.selected.supplementFlag eq 'f'}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}"/>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">Act#*</label>
@@ -657,7 +657,7 @@
                             <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Tool'}">
                             <h:panelGroup ><!--工具-->
                                 <label class="label">SR#</label>
-                                <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag) or zkbPartOrderAuditController.selected.supplementFlag eq 'f'}"/>
+                                <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">Act#*</label>
@@ -676,7 +676,7 @@
                             <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}"><!--人工-->
                                 <h:panelGroup >
                                     <label class="label">SR#*</label>
-                                    <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag) or zkbPartOrderAuditController.selected.supplementFlag eq 'f'}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}"/>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag) }" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">Act#*</label>
