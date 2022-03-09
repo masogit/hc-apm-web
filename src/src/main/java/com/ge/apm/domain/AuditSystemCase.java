@@ -40,7 +40,7 @@ public class AuditSystemCase implements Serializable {
     @Column(name = "judge_logic")
     private String judgeLogic;
     /**
-     * 状态 :1 草稿 2 发布
+     * 状态 :1 草稿 2 发布 3 过期
      */
     @Column(name = "status")
     private Integer status;
