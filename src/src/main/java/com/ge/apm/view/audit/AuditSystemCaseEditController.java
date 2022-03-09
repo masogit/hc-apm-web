@@ -71,6 +71,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         if (uid!=null){
             selected = dao.findByUid(uid);
         }
+        if (selected==null){
+            selected = new AuditSystemCase();
+        }
         buildOrdTree();
 
     }
@@ -235,6 +238,13 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             }
         }
     }
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        super.prepareCreate();
+        if(selected==null){
+            selected=new AuditSystemCase();
+        }
+    }
 
     public void preCreate()  {
         if (selected!=null){
@@ -310,8 +320,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
     public String getStatusName(int status){
         switch (status){
+            case 1 : return "草稿";
             case 2 : return "发布";
-            default: return "草稿";
+            default: return "过期";
         }
     }
 

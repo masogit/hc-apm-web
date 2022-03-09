@@ -13,9 +13,9 @@
 
             <div class="ui-g-12 card">
                 <h:form id="auditSystemCaseListForm">
-                    <p:dataTable id="datalist" value="#{auditSystemCaseEditController.lazyModel}" var="item"
+                    <p:dataTable id="datalist" value="#{auditSystemCaseListController.lazyModel}" var="item"
                                  widgetVar="varDataList"
-                                 selectionMode="single" selection="#{auditSystemCaseEditController.selected}"
+                                 selectionMode="single" selection="#{auditSystemCaseListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                                  rowKey="#{item.uid}" sortMode="single" sortOrder="descending" sortBy="#{item.uid}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -23,8 +23,8 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" update="createButton editButton deleteButton" listener="#{auditSystemCaseEditController.onSelectAuditSystemCase()}"/>
-                        <p:ajax event="filter" listener="#{auditSystemCaseEditController.onFilter}" update="createButton"/>
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton" listener="#{auditSystemCaseListController.onSelectAuditSystemCase()}"/>
+                        <p:ajax event="filter" listener="#{auditSystemCaseListController.onFilter}" update="createButton"/>
                         <p:column headerText="版本编号"   sortBy="#{item.version}" filterBy="#{item.version}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.version}"/>
                         </p:column>
@@ -48,7 +48,7 @@
                             <h:outputText value=" "/>
                         </p:column>
                         <p:column headerText="状态" sortBy="#{item.status}" >
-                            <h:outputText value="#{auditSystemCaseEditController.getStatusName(item.status)}"/>
+                            <h:outputText value="#{auditSystemCaseListController.getStatusName(item.status)}"/>
                         </p:column>
                         <p:column headerText="操作人" >
                             <h:outputText value="#{item.creator}"/>
@@ -59,14 +59,14 @@
                             </h:outputText>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{auditSystemCaseEditController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AuditSystemCaseEdit.xhtml?actionName=Create')}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{auditSystemCaseListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AuditSystemCaseEdit.xhtml?actionName=Create')}"/>
 
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
-                                             title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAction()}" disabled="#{empty auditSystemCaseEditController.selected}" />
+                                             title="#{msg.Edit}" actionListener="#{auditSystemCaseListController.editAction()}" disabled="#{empty auditSystemCaseListController.selected}" />
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
                                              title="#{msg.Delete}" update="datalist"
-                                             disabled="#{empty auditSystemCaseEditController.selected}"
-                                             actionListener="#{auditSystemCaseEditController.deleteAction()}">
+                                             disabled="#{empty auditSystemCaseListController.selected}"
+                                             actionListener="#{auditSystemCaseListController.deleteAction()}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                            icon="ui-icon-warning"/>
                             </p:commandButton>
