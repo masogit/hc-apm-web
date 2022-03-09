@@ -149,30 +149,30 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         return orgTree;
     }
     public void saveAuditSystemEntry() {
-        AuditSystemEntry auditSystemEntry = new AuditSystemEntry();
-        auditSystemEntry.setName(entryName);
-        auditSystemEntry.setMark(entryMark);
-        auditSystemEntry.setCaseUid(caseUid);
+        AuditSystemEntry date = new AuditSystemEntry();
+        date.setName(entryName);
+        date.setMark(entryMark);
+        date.setCaseUid(caseUid);
         if (caseLevel!=0){
             ++caseLevel;
-            if(caseLevel>3){
-                WebUtil.addErrorMessage("错误: 指标没有子节点,请重新配置");
+            if(auditSystemEntry.getType()==3){
+                WebUtil.addErrorMessage("错误: 指标没有子节点,不能配置");
                 return;
             }
-            auditSystemEntry.setLevel(caseLevel);
+            date.setLevel(caseLevel);
             if (entryType==null){
                entryType = caseLevel;
             }
-            auditSystemEntry.setType(entryType);
-            auditSystemEntry.setOrderBy(caseLevel);
+            date.setType(entryType);
+            date.setOrderBy(entryType);
         }else {
-            auditSystemEntry.setLevel(1);
-            auditSystemEntry.setOrderBy(1);
-            auditSystemEntry.setType(1);
+            date.setLevel(1);
+            date.setOrderBy(1);
+            date.setType(1);
             entryUid="1";
         }
-        auditSystemEntry.setParentUid(entryUid);
-        auditSystemEntryRepository.save(auditSystemEntry);
+        date.setParentUid(entryUid);
+        auditSystemEntryRepository.save(date);
         buildOrdTree();
     }
     public void saveAuditConfigItem() {
@@ -205,6 +205,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         caseLevel=0;
         entryUid = null;
         onSelectFlag=false;
+        entryType=null;
         TreeNode node = event.getTreeNode();
         auditSystemEntry = (AuditSystemEntry) node.getData();
         entryUid = auditSystemEntry.getUid();
