@@ -42,11 +42,11 @@
                         <div class="card" style="height:680px;">
                             <h:panelGroup>
                                 <p:inputText id="entryMarkName" value="#{auditSystemCaseEditController.entryMarkName}"/>
-                                <p:commandButton id = "adminListSearch" icon="ui-icon-location-searching" style="width: 90px;"   actionListener="#{auditSystemCaseEditController.filterNode()}" value="#{msg.Search2}"  update="orgTree"/>
-                                <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" update="orgTree"  disabled="#{empty auditSystemCaseController.selected}" actionListener="#{auditSystemCaseEditController.preDelete}"/>
+                                <p:commandButton id = "adminListSearch" icon="ui-icon-location-searching" style="width: 90px;"   actionListener="#{auditSystemCaseEditController.filterNode()}" value="#{msg.Search2}"  update="orgTree" disabled="#{empty auditSystemCaseEditController.selected}"/>
+                                <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" update="orgTree"  disabled="#{empty auditSystemCaseEditController.selected}" actionListener="#{auditSystemCaseEditController.preDelete}"/>
                             </h:panelGroup>
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"  title="#{msg.Create}"   update="MarkForm"  actionListener="#{auditSystemCaseEditController.preCreate()}"
-                                             oncomplete="PF('markDlg').show()"/>
+                                             disabled="#{empty auditSystemCaseEditController.selected}" oncomplete="PF('markDlg').show()"/>
 
                             <p:scrollPanel style="height:95%;border: 0" mode="native">
                                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;"  value="#{auditSystemCaseEditController.orgTree}"  var="node" selectionMode="single" selection="#{auditSystemCaseEditController.selectedNode}" highlight="true">
@@ -230,11 +230,11 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup id="content">
-                                <label class="label">#{msg.content}*</label>
+                                <label class="label">#{msg.mark}*</label>
                                 <p:selectOneMenu value="#{auditSystemCaseEditController.configItemUid}" required="true" requiredMessage="#{msg.content} #{msg.ValidationRequire}"
                                                    autoWidth="false" style="width: 50%;">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
-                                    <f:selectItems value="#{auditSystemCaseEditController.auditConfigItems}" var="entry" itemLabel="#{entry.content}"  itemValue="#{entry.uid}"/>
+                                    <f:selectItems value="#{auditSystemCaseEditController.auditConfigItems}" var="entry" itemLabel="#{entry.mark}"  itemValue="#{entry.uid}"/>
                                     <p:ajax process="@this" event="itemSelect" listener="#{auditSystemCaseEditController.setNothing()}"/>
                                     <p:ajax process="@this" listener="#{auditSystemCaseEditController.setNothing()}"/>
                                 </p:selectOneMenu>

@@ -23,9 +23,8 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
-                        <p:ajax event="filter" listener="#{auditSystemCaseEditController.onFilter}"
-                                update="createButton"/>
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton" listener="#{auditSystemCaseEditController.onSelectAuditSystemCase()}"/>
+                        <p:ajax event="filter" listener="#{auditSystemCaseEditController.onFilter}" update="createButton"/>
                         <p:column headerText="版本编号"   sortBy="#{item.version}" filterBy="#{item.version}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.version}"/>
                         </p:column>
@@ -63,7 +62,7 @@
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{auditSystemCaseEditController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AuditSystemCaseEdit.xhtml?actionName=Create')}"/>
 
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
-                                             title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAction()}"  />
+                                             title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAction()}" disabled="#{empty auditSystemCaseEditController.selected}" />
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
                                              title="#{msg.Delete}" update="datalist"
                                              disabled="#{empty auditSystemCaseEditController.selected}"

@@ -67,9 +67,6 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         auditConfigItemRepository = WebUtil.getBean(AuditConfigItemRepository.class);
         auditEntryItemRelRepository = WebUtil.getBean(AuditEntryItemRelRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        if(selected==null){
-            selected=new AuditSystemCase();
-        }
         String uid = WebUtil.getRequestParameter("uid");
         if (uid!=null){
             selected = dao.findByUid(uid);
@@ -297,10 +294,6 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         auditConfigItems.add(auditConfigItem);
     }
     public void editAction() {
-        if(selected.getUid()==null){
-            WebUtil.addErrorMessage("请选择数据!");
-            return ;
-        }
         String operation= "AuditSystemCaseEdit.xhtml?faces-redirect=true&uid=" + selected.getUid() ;
         WebUtil.navigateTo(operation);
     }
@@ -311,6 +304,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         String operation= "AuditSystemCaseList.xhtml?actionName=Create";
        return UrlEncryptController.encodeUrlParam(operation);
+    }
+    public AuditSystemCase onSelectAuditSystemCase() {
+        return selected;
     }
     public String getStatusName(int status){
         switch (status){
