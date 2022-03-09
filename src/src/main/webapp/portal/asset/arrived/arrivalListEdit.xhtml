@@ -529,7 +529,7 @@
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                         </p:commandButton>
                                     </p:dataList>
-                                    <p:fileUpload rendered="#{assetArrivedListEditController.activeSupplier()}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUploadJiuYuan}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                    <p:fileUpload id="jiuyuantypeasset4" rendered="#{assetArrivedListEditController.activeSupplier()}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUploadJiuYuan}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                   multiple="true"  sizeLimit="100000000"  update="accessoryFinishedList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                 </h:panelGroup>
                             </p:fieldset>
