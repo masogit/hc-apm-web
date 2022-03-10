@@ -10,23 +10,23 @@
             <h:form id="auditCaseForm">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">#{msg.tenant}*</label>
-                        <p:selectOneMenu value="#{auditUserCaseController.selectedTenantUid}" required="true" requiredMessage="#{msg.Site} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
+                        <label class="label">#{msg.tenant}</label>
+                        <p:selectOneMenu value="#{auditUserCaseController.selectedTenantUid}" autoWidth="false" style="width: 95%;">
                             <p:ajax event="change" update="site"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{auditUserCaseController.getAllTenant()}" var="entry" itemLabel="#{entry.name}" itemValue="#{entry.uid}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.Site}</label>
-                        <p:selectOneMenu id="site" value="#{auditUserCaseController.selected.siteUid}" required="true" requiredMessage="#{msg.Version} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
+                        <label class="label">#{msg.Site}*</label>
+                        <p:selectOneMenu id="site" value="#{auditUserCaseController.selected.siteUid}" required="true" requiredMessage="#{msg.Site} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{auditUserCaseController.getSiteByTenant()}" var="entry" itemLabel="#{entry.name}" itemValue="#{entry.uid}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.Version}*</label>
-                        <p:selectOneMenu value="#{auditUserCaseController.selected.systemCaseUid}" required="true" requiredMessage="#{msg.Version} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
+                        <p:selectOneMenu id="version" value="#{auditUserCaseController.selected.systemCaseUid}" required="true" requiredMessage="#{msg.Version} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
                             <p:ajax event="change" update="target"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.zone} - #{entry.version}" itemValue="#{entry.uid}"/>
@@ -53,7 +53,7 @@
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{auditUserCaseController.saveAuditCase}" update=":growl" icon="ui-icon-check"/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{auditUserCaseController.saveAuditCase}" update="auditCaseListForm:datalist :growl auditCaseEditDlg" icon="ui-icon-check"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('auditCaseEditDialog').hide()"/>
             </h:form>
         </p:dialog>
