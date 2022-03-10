@@ -13,11 +13,11 @@
 
             <div class="ui-g-12 card">
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                    <p:commandButton value="指引" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '1'}" actionListener="#{auditItemConfigController.searchByType('1')}" />
-                    <p:commandButton value="概述" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '2'}" actionListener="#{auditItemConfigController.searchByType('2')}" />
-                    <p:commandButton value="解读" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '3'}" actionListener="#{auditItemConfigController.searchByType('3')}" />
-                    <p:commandButton value="得分点" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '4'}" actionListener="#{auditItemConfigController.searchByType('4')}" />
-                    <p:commandButton value="失分点" process="@this" update="@(.datalist) buttonSet" disabled="#{auditItemConfigController.searchContentType == '5'}" actionListener="#{auditItemConfigController.searchByType('5')}" />
+                    <ui:repeat var="item" value="#{auditItemConfigController.itemContentTypeList}" varStatus="status">
+                        <p:commandButton value="#{item.value}" process="@this" update="@(.datalist) buttonSet" style="margin-right: 10px;float: left"
+                                         disabled="#{auditItemConfigController.searchContentType == item.msgKey}"
+                                         actionListener="#{auditItemConfigController.searchByType(item.msgKey)}" />
+                    </ui:repeat>
                 </h:panelGrid>
                 <h:form id="auditConfigItemListForm">
                     <p:dataTable id="datalist" class="datalist" value="#{auditItemConfigController.lazyModel}" var="item" widgetVar="varDataList"

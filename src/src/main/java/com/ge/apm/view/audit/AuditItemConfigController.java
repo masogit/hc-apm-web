@@ -2,6 +2,7 @@ package com.ge.apm.view.audit;
 
 import com.ge.apm.dao.AuditConfigItemRepository;
 import com.ge.apm.dao.AuditEntryItemRelRepository;
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.AuditConfigItem;
 import com.ge.apm.domain.AuditEntryItemRel;
 import com.ge.apm.domain.I18nMessage;
@@ -37,6 +38,7 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
 
     private AuditConfigItemRepository dao;
     private AuditEntryItemRelRepository relDao;
+    private I18nMessageRepository i18nMessageRepository;
     private List<I18nMessage> itemContentTypeList;
     private List<V2_BlobObject> attachements;
 
@@ -51,8 +53,10 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
         this.filterBySite = false;
         dao = WebUtil.getBean(AuditConfigItemRepository.class);
         relDao = WebUtil.getBean(AuditEntryItemRelRepository.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         auditItemConfigService = WebUtil.getBean(AuditItemConfigService.class);
+        itemContentTypeList = i18nMessageRepository.getByMsgTypeOrderByMsgKey("auditItemType");
     }
 
     @Override

@@ -294,4 +294,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 //    @Query(value = "select * from org_info  where name= ?1 and site_uid =?2 ", nativeQuery = true)
      OrgInfo findByNameAndSiteUID(String Name, String siteUID);
+
+    @Query(value = "select o from OrgInfo o where o.tenantUID = ?1 and o.uid = o.siteUID")
+    List<OrgInfo> findAllSiteByTenantUid(String tenantUid);
 }
