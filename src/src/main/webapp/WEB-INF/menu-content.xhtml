@@ -199,6 +199,7 @@
                 <p:menuitem id="um508" value="#{msg.Accountdash}" url="/account-dashboard/#/" target="_blank" rendered="#{userContextService.accessContains('config.accountdash')}"/>
                 <p:menuitem id="um510" value="#{msg.AuditItemConfig}" outcome="/portal/audit/auditItem/auditItemConfigList.xhtml" rendered="#{userContextService.accessContains('config.customRole')}"/>
                 <p:menuitem id="um511" value="#{msg.AuditTemplate}" outcome="/portal/audit/auditTemplate/auditTemplateList.xhtml" rendered="#{userContextService.accessContains('config.customRole')}"/>
+                <p:menuitem id="um512" value="#{msg.AuditUserCase}" outcome="/portal/audit/auditUserCase/auditUserCaseList.xhtml" rendered="#{userContextService.accessContains('config.customRole')}"/>
             </p:submenu>
             <p:submenu id="um3000" label="#{msg.MVSEquipmentManagement}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin,MVSFE')}">
                 <p:menuitem id="um3001" value="#{msg.BasicInfo}" outcome="/portal/asset/info/AssetList"/>

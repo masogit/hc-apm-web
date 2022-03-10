@@ -29,7 +29,7 @@ public class AuditCase implements Serializable {
      * system_case_uid
      */
     @Column(name = "system_case_uid")
-    private Integer systemCaseUid;
+    private String systemCaseUid;
 
     @Column(name = "score")
     private Double score;
@@ -39,10 +39,10 @@ public class AuditCase implements Serializable {
     @Column(name = "process")
     private Double process;
     /**
-     * tenant_uid
+     * site_uid
      */
-    @Column(name = "tenant_uid")
-    private String tenantUid;
+    @Column(name = "site_uid")
+    private String siteUid;
     /**
      * 状态 :1 active, 2 archieve
      */
@@ -74,5 +74,22 @@ public class AuditCase implements Serializable {
     @Column(name = "create_time")
     private Date createTime;
 
+    /**
+     * 更新人
+     */
+    @CreatedBy
+    @Column(name = "updater", columnDefinition = "VARCHAR(60)")
+    private String updater;
+    /**
+     * 更新日期
+     */
+    @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "update_time")
+    private Date updateTime;
+
+    @OneToOne
+    @JoinColumn(name = "system_case_uid", insertable = false, updatable = false)
+    private AuditSystemCase auditSystemCase;
 
 }
