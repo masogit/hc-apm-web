@@ -120,6 +120,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
 
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        this.selectedTenantUid = null;
         super.prepareCreate();
     }
 
@@ -128,12 +129,16 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         super.setSelected(auditCase);
     }
 
-    public String saveAuditCase(){
-
+    public void saveAuditCase(){
         auditUserCaseService.saveUserCase(this.selected);
         this.selected=null;
-        WebUtil.addSuccessMessage("保存成功！");
-        return "auditUserCaseList?faces-redirect=true";
+    }
+
+    /**
+     * 用户版本回退
+     */
+    public void fallback(String caseUid){
+
     }
 
     public List<TenantInfo> getAllTenant(){
