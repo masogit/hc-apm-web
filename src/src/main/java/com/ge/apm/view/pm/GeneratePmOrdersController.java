@@ -229,6 +229,13 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				uids = relRuleAssetRepository.findRuleUid3ByLevelAndTenantUID(user.getTenantUID());
 				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
+			}else if(level == 4){
+				List<SearchFilter> searchFilters=new ArrayList<>();
+				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,user.getTenantUID()));
+				searchFilters.add(new SearchFilter("ruleUID4", SearchFilter.Operator.EQ,"4"));
+				List<RelRuleAsset> bySearchFilter = relRuleAssetRepository.findBySearchFilter(searchFilters);
+				uids = bySearchFilter.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
+				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 			}
 		}else{
 			List<String> uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
@@ -369,6 +376,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				rule = pmOrderRuleRepository.findPmOrderRuleLevel2(ai.getUid());
 			} else if (level == RULE_STATUS_LEVLE_3) {
 				rule = pmOrderRuleRepository.findPmOrderRuleLevel3(ai.getUid());
+			}else if(level == 4){
+				rule = pmOrderRuleRepository.findPmOrderRuleLevel4(ai.getUid());
 			}
 			if (rule == null) {
 				WebUtil.addErrorMessage("找不到该设备该级别的保养规则！");
@@ -404,6 +413,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 					rule = pmOrderRuleRepository.findPmOrderRuleLevel2(ai.getUid());
 				} else if (level == RULE_STATUS_LEVLE_3) {
 					rule = pmOrderRuleRepository.findPmOrderRuleLevel3(ai.getUid());
+				}else if(level == 4){
+					rule = pmOrderRuleRepository.findPmOrderRuleLevel4(ai.getUid());
 				}
 				if (rule == null) {
 					LOGGER.error("not find pmOrderRule by assetUid : {},level : {}", ai.getUid(), level);
