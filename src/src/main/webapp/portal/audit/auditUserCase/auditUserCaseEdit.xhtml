@@ -45,12 +45,12 @@
                                     showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"
                                     required="true" requiredMessage="#{msg.EnableTime} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <label class="label">#{msg.endTime}*</label>
                         <p:calendar timeZone="GMT+8"  id="endTime" pattern="yyyy/MM/dd" value="#{auditUserCaseController.selected.endTime}"
                                     showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"
                                     required="true" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"/>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{auditUserCaseController.saveAuditCase}" update="auditCaseListForm:datalist :growl auditCaseEditDlg" icon="ui-icon-check"/>

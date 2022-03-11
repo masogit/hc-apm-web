@@ -1,16 +1,13 @@
 package com.ge.apm.service.audit;
 
-import com.ge.apm.dao.AuditCaseRepository;
-import com.ge.apm.dao.AuditEntryRepository;
-import com.ge.apm.dao.AuditSystemEntryRepository;
-import com.ge.apm.domain.AuditCase;
-import com.ge.apm.domain.AuditEntry;
-import com.ge.apm.domain.AuditSystemEntry;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,7 +22,17 @@ public class AuditUserCaseService {
     private AuditEntryRepository auditEntryRepository;
     @Autowired
     private AuditSystemEntryRepository auditSystemEntryRepository;
+    @Autowired
+    private AuditEntryTemplateRelRepository auditEntryTemplateRelRepository;
+    @Autowired
+    private AuditTemplateRepository auditTemplateRepository;
+    @Autowired
+    private AuditUploadedFileRepository auditUploadedFileRepository;
+    @Autowired
+    private AuditResultRepository auditResultRepository;
 
+
+    @Transactional(rollbackFor = Exception.class)
     public void saveUserCase(AuditCase auditCase){
         // uid为空，说明是新增
         if(StringUtils.isEmpty(auditCase.getUid())){
@@ -54,5 +61,46 @@ public class AuditUserCaseService {
             }
             auditEntryRepository.save(auditEntryList);
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void initialize(String caseUid){
+        AuditCase auditCase = auditCaseRepository.findById(caseUid);
+        // 重新初始化case
+        auditCase.setScore(0.0);
+        auditCase.setStatus(1);
+        auditCase.setProcess(0.0);
+        auditCase.setUpdater(UserContextService.getCurrentUserAccount().getName());
+        auditCase.setUpdateTime(new Date());
+
+        // 初始化entry
+        List<AuditEntry> auditEntryList = auditEntryRepository.findByCaseUid(caseUid);
+
+        if(CollectionUtils.isNotEmpty(auditEntryList)){
+            for (AuditEntry auditEntry : auditEntryList) {
+                auditEntry.setScore(0.0);
+                auditEntry.setProcess(0.0);
+                auditEntry.setOwner(null);
+                auditEntry.setComments(null);
+                auditEntryRepository.save(auditEntry);
+
+                // 删除用户上传模板
+                List<AuditEntryTemplateRel> templateRelList = auditEntryTemplateRelRepository.findByEntryUid(auditEntry.getUid());
+                if(CollectionUtils.isNotEmpty(templateRelList)){
+                    for (AuditEntryTemplateRel auditEntryTemplateRel : templateRelList) {
+                        auditTemplateRepository.deleteUserTemplateByUid(auditEntryTemplateRel.getTemplateUid());
+                    }
+                }
+                auditEntryTemplateRelRepository.delete(templateRelList);
+
+                // 删除用户上传文件
+                auditUploadedFileRepository.deleteByEntryUid(auditEntry.getUid());
+
+                // 删除用户自评
+
+            }
+        }
+        // 删除结果记录
+        auditResultRepository.deleteByCaseUid(caseUid);
     }
 }

@@ -4537,9 +4537,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AuditUserCase','质控评审用户配置','Quality control review user config',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Target','目标','Target',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','tenant','租户','Tenant',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Fallback','回退','Fallback',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','FallbackConformation','回退确认','Fallback Conformation',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','FallbackConformationMsg','请务必确认是否执行回退，执行回退系统将回退页面至初始设置项，历史资料暂不留存！','Please be sure to confirm whether to perform a rollback, the implementation of the fallback system will be back to the initial settings of the page, the history data is not retained!',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Initialize','初始化','Initialize',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','InitializeConformation','初始化确认','Fallback Conformation',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','InitializeConformationMsg','请务必确认是否执行初始化，执行初始化系统将初始化页面至初始设置项，历史资料暂不留存！','Please be sure to confirm whether to perform initialization, the initialization system will initialize the page to the initial settings item, and the historical data will not be retained!',NULL,-1);
 -- 质控评审省份版本类型
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('VersionType','1','评审','Review',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('VersionType','2','质控','Quality control',NULL,-1);

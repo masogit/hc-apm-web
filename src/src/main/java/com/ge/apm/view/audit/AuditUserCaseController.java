@@ -137,8 +137,8 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     /**
      * 用户版本回退
      */
-    public void fallback(String caseUid){
-
+    public void initialize(String caseUid){
+        auditUserCaseService.initialize(caseUid);
     }
 
     public List<TenantInfo> getAllTenant(){
