@@ -18,7 +18,7 @@ public interface AuditSystemEntryRepository extends GenericRepository<AuditSyste
     @Query("select a from AuditSystemEntry a where (a.name like %?1% or a.mark like %?1%) and a.caseUid = ?2  order by a.createTime desc")
     List<AuditSystemEntry> findListByName(String name,String caseUid);
 
-    List<AuditSystemEntry> findByName(String name);
+    List<AuditSystemEntry> findByUid(String uid);
 
     List<AuditSystemEntry> findByCaseUid(String caseUid);
 
