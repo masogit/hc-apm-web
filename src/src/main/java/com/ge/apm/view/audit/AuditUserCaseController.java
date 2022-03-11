@@ -130,15 +130,25 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     }
 
     public void saveAuditCase(){
-        auditUserCaseService.saveUserCase(this.selected);
-        this.selected=null;
+        try {
+            auditUserCaseService.saveUserCase(this.selected);
+            this.selected=null;
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Success"));
+        }catch (Exception e){
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Failed"));
+        }
     }
 
     /**
      * 用户版本回退
      */
     public void initialize(String caseUid){
-        auditUserCaseService.initialize(caseUid);
+        try {
+            auditUserCaseService.initialize(caseUid);
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Initialize") + WebUtil.getMessage("Success"));
+        }catch (Exception e){
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Initialize") + WebUtil.getMessage("Failed"));
+        }
     }
 
     public List<TenantInfo> getAllTenant(){
