@@ -44,6 +44,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private String caseUid;
     private String entryUid;
     private String configItemUid;
+    private Double scoreStandard;
     private boolean onSelectFlag = true;
     private boolean entryFlag = false;
     private int caseLevel=0;
@@ -177,17 +178,21 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
     public void saveAuditConfigItem() {
         AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
-        if (caseLevel==1){
-            auditConfigItemStripList.add(auditConfigItem);
-        }else if(caseLevel==2){
-            auditConfigItemPaymentList.add(auditConfigItem);
-        }else {
-            auditConfigItemTargetList.add(auditConfigItem);
-        }
         AuditEntryItemRel auditEntryItemRel = new AuditEntryItemRel();
         auditEntryItemRel.setItemUid(auditConfigItem.getUid());
-        auditEntryItemRel.setSystemEntryUid(auditSystemEntry.getUid());
-        auditEntryItemRel.setOrderBy(auditConfigItem.getContentType());
+        if("1".equals(auditSystemEntry.getParentUid())){
+            auditEntryItemRel.setSystemEntryUid(auditSystemEntry.getUid());
+        }else {
+            auditEntryItemRel.setSystemEntryUid(auditSystemEntry.getParentUid());
+        }
+        if ( currentTabId == STRIP){
+            auditEntryItemRel.setOrderBy(1);
+        }else if(currentTabId == PAYMENT){
+            auditEntryItemRel.setOrderBy(2);
+        }else {
+            auditEntryItemRel.setOrderBy(3);
+        }
+
         auditEntryItemRelRepository.save(auditEntryItemRel);
     }
     public void delNode(AuditConfigItem auditConfigItem) {
@@ -272,20 +277,26 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         return auditConfigItems;
     }
     public List<AuditConfigItem> getStripList() {
-        auditConfigItems(auditConfigItemStripList);
+        auditConfigItems(auditConfigItemStripList,1);
        return auditConfigItemStripList;
     }
     public List<AuditConfigItem> getPaymentList() {
-        auditConfigItems(auditConfigItemPaymentList);
+        auditConfigItems(auditConfigItemPaymentList,2);
        return auditConfigItemPaymentList;
     }
     public List<AuditConfigItem> getTargetList() {
-        auditConfigItems(auditConfigItemTargetList);
+        auditConfigItems(auditConfigItemTargetList,3);
        return auditConfigItemTargetList;
     }
-    private void auditConfigItems(List<AuditConfigItem> auditConfigItems){
+    private void auditConfigItems(List<AuditConfigItem> auditConfigItems,Integer orderBy){
         if (auditSystemEntry!=null){
-        List<AuditConfigItem> auditConfigItemList = auditConfigItemRepository.entryAndContentList(auditSystemEntry.getUid());
+            String  systemEntryUid= null;
+            if("1".equals(auditSystemEntry.getParentUid())){
+                systemEntryUid=auditSystemEntry.getUid();
+            }else {
+                systemEntryUid=auditSystemEntry.getParentUid();
+            }
+        List<AuditConfigItem> auditConfigItemList = auditConfigItemRepository.entryAndContentList(systemEntryUid,orderBy);
         if(auditConfigItemList!=null && !auditConfigItemList.isEmpty()){
             for (AuditConfigItem auditConfigItem :auditConfigItemList){
                 if (!auditConfigItems.contains(auditConfigItem)){
@@ -446,6 +457,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public void setConfigItemUid(String configItemUid) {
         this.configItemUid = configItemUid;
+    }
+
+    public Double getScoreStandard() {
+        return scoreStandard;
+    }
+
+    public void setScoreStandard(Double scoreStandard) {
+        this.scoreStandard = scoreStandard;
     }
 
     public void setNothing(){}
