@@ -180,11 +180,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
         AuditEntryItemRel auditEntryItemRel = new AuditEntryItemRel();
         auditEntryItemRel.setItemUid(auditConfigItem.getUid());
-        if("1".equals(auditSystemEntry.getParentUid())){
-            auditEntryItemRel.setSystemEntryUid(auditSystemEntry.getUid());
-        }else {
-            auditEntryItemRel.setSystemEntryUid(auditSystemEntry.getParentUid());
-        }
+        auditEntryItemRel.setSystemEntryUid(auditSystemEntry.getUid());
         if ( currentTabId == STRIP){
             auditEntryItemRel.setOrderBy(1);
         }else if(currentTabId == PAYMENT){
@@ -277,27 +273,35 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         return auditConfigItems;
     }
     public List<AuditConfigItem> getStripList() {
+        auditConfigItemStripList= new ArrayList<>();
         auditConfigItems(auditConfigItemStripList,1);
        return auditConfigItemStripList;
     }
     public List<AuditConfigItem> getPaymentList() {
+        auditConfigItemPaymentList= new ArrayList<>();
         auditConfigItems(auditConfigItemPaymentList,2);
        return auditConfigItemPaymentList;
     }
     public List<AuditConfigItem> getTargetList() {
+        auditConfigItemTargetList= new ArrayList<>();
         auditConfigItems(auditConfigItemTargetList,3);
        return auditConfigItemTargetList;
     }
     private void auditConfigItems(List<AuditConfigItem> auditConfigItems,Integer orderBy){
         if (auditSystemEntry!=null){
-            String  systemEntryUid= null;
-            if("1".equals(auditSystemEntry.getParentUid())){
-                systemEntryUid=auditSystemEntry.getUid();
-            }else {
-                systemEntryUid=auditSystemEntry.getParentUid();
+            List<String> systemEntryUids = new ArrayList<>();
+            systemEntryUids.add(auditSystemEntry.getUid());
+            if(!"1".equals(auditSystemEntry.getParentUid())){
+                systemEntryUids.add(auditSystemEntry.getParentUid());
+                List<AuditSystemEntry> auditSystemEntryList = auditSystemEntryRepository.findByUid(auditSystemEntry.getParentUid());
+                if (auditSystemEntryList!=null && !auditSystemEntryList.isEmpty()){
+                    if(!"1".equals(auditSystemEntryList.get(0).getParentUid())){
+                        systemEntryUids.add(auditSystemEntryList.get(0).getParentUid());
+                    }
+                }
             }
-        List<AuditConfigItem> auditConfigItemList = auditConfigItemRepository.entryAndContentList(systemEntryUid,orderBy);
-        if(auditConfigItemList!=null && !auditConfigItemList.isEmpty()){
+            List<AuditConfigItem> auditConfigItemList = auditConfigItemRepository.entryAndContentList(systemEntryUids,orderBy);
+            if(auditConfigItemList!=null && !auditConfigItemList.isEmpty()){
             for (AuditConfigItem auditConfigItem :auditConfigItemList){
                 if (!auditConfigItems.contains(auditConfigItem)){
                     auditConfigItems.add(auditConfigItem);
