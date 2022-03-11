@@ -57,6 +57,12 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
         blobService = WebUtil.getBean(BlobFileService.class);
         auditItemConfigService = WebUtil.getBean(AuditItemConfigService.class);
         itemContentTypeList = i18nMessageRepository.getByMsgTypeOrderByMsgKey("auditItemType");
+
+        String contentType = WebUtil.getRequestParameter("contentType");
+        if(StringUtils.isNotBlank(contentType)){
+            this.searchContentType = contentType;
+        }
+
     }
 
     @Override
@@ -93,6 +99,7 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
         attachements = null;
         selectType = "1";
         super.prepareCreate();
+        this.selected.setContentType(Integer.parseInt(searchContentType));
     }
 
     public void setSelected(String uid) {
@@ -137,17 +144,14 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
         auditItemConfigService.saveAuditConfigItem(this.selected, attachements);
         this.selected=null;
         WebUtil.addSuccessMessage("保存成功！");
-        return "auditItemConfigList?faces-redirect=true";
+        return "auditItemConfigList?faces-redirect=true&contentType=" + this.searchContentType;
     }
 
     public void deleteItem(AuditConfigItem configItem){
-        List<SearchFilter> searchFilterList = new ArrayList<>();
-        searchFilterList.add(new SearchFilter("itemUid", SearchFilter.Operator.EQ, configItem.getUid()));
-
-        List<AuditEntryItemRel> list = relDao.findBySearchFilter(searchFilterList);
+        List<AuditEntryItemRel> list = relDao.findByItemUid(configItem.getUid());
 
         if(CollectionUtils.isNotEmpty(list)){
-            WebUtil.addErrorMessage("该记录有被其他评审配置引用，无法删除！");
+            WebUtil.addErrorMessage("内容被其他配置引用，无法删除！");
             return;
         }
 
