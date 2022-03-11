@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -40,6 +41,7 @@ public class AuditConfigItem implements Serializable {
      * 内容
      */
     @Column(name = "content")
+    @Size(max = 1000)
     private String content;
     /**
      * 章节号

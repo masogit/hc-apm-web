@@ -88,8 +88,8 @@
                         </p:column>
                         <p:column headerText="#{msg.Operation}" exportable="false" width="120" id="operatorColumn">
                             <h:panelGroup>
-                                <p:commandButton value="#{msg.Fallback}" process="@this" actionListener="#{auditUserCaseController.fallback(item.uid)}">
-                                    <p:confirm header="#{msg.FallbackConformation}" message="#{msg.FallbackConformationMsg}" icon="ui-icon-warning" />
+                                <p:commandButton value="#{msg.Initialize}" process="@this" actionListener="#{auditUserCaseController.initialize(item.uid)}" update="auditCaseListForm:datalist">
+                                    <p:confirm header="#{msg.InitializeConformation}" message="#{msg.InitializeConformationMsg}" icon="ui-icon-warning" />
                                 </p:commandButton>
                             </h:panelGroup>
                         </p:column>

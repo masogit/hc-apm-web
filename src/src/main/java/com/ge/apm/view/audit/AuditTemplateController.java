@@ -58,6 +58,13 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
     protected Page<AuditTemplate> loadData(PageRequest pageRequest) {
         Sort sort = new Sort(Sort.Direction.DESC, "uploadTime");
         PageRequest page = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
+        if(CollectionUtils.isEmpty(this.searchFilters)){
+            this.searchFilters = new ArrayList<>();
+            // 支持下系统模板，不查询用户上传的模板
+            removeFilterOnField("type");
+            this.searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, "1"));
+        }
+
         List<SearchFilter> searchFilters = this.searchFilters;
         Page<AuditTemplate> list = dao.findBySearchFilter(searchFilters, page);
         return list;
