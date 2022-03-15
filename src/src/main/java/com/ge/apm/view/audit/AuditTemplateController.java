@@ -1,10 +1,10 @@
 package com.ge.apm.view.audit;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.AuditEntryTemplateRelRepository;
+import com.ge.apm.dao.AuditEventRepository;
 import com.ge.apm.dao.AuditTemplateRepository;
-import com.ge.apm.domain.AuditEntryTemplateRel;
-import com.ge.apm.domain.AuditTemplate;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.audit.AuditTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -35,6 +35,7 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
 
     private AuditTemplateRepository dao;
     private AuditEntryTemplateRelRepository relDao;
+    private AuditEventRepository auditEventRepository;
     private V2_BlobObject fileObj;
 
     private BlobFileService blobService;
@@ -45,6 +46,7 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
         this.filterBySite = false;
         dao = WebUtil.getBean(AuditTemplateRepository.class);
         relDao = WebUtil.getBean(AuditEntryTemplateRelRepository.class);
+        auditEventRepository = WebUtil.getBean(AuditEventRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         auditTemplateService = WebUtil.getBean(AuditTemplateService.class);
     }
@@ -60,7 +62,7 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
         PageRequest page = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         if(CollectionUtils.isEmpty(this.searchFilters)){
             this.searchFilters = new ArrayList<>();
-            // 支持下系统模板，不查询用户上传的模板
+            // 只查询系统模板，不查询用户上传的模板
             removeFilterOnField("type");
             this.searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, "1"));
         }
@@ -77,7 +79,10 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
     }
 
     public void setSelected(String uid) {
-        fileObj = null;
+        List<V2_BlobObject> list = blobService.findBlobObjectsByBoUid(uid);
+        if(CollectionUtils.isNotEmpty(list)){
+            fileObj = list.get(0);
+        }
         AuditTemplate auditTemplate = dao.findById(uid);
         super.setSelected(auditTemplate);
     }
@@ -103,30 +108,44 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
             WebUtil.addErrorMessage("编号重复，无法提交！");
             return "";
         }
-
+        String eventType = "EDIT_TEMPLATE";
         if(StringUtils.isBlank(this.selected.getUid())){
             this.selected.setUploader(UserContextService.getCurrentUserAccount().getName());
             this.selected.setUploadTime(new Date());
             this.selected.setType(1);
+            eventType = "ADD_TEMPLATE";
         }
-        auditTemplateService.saveAuditTemplate(this.selected, this.fileObj);
-        this.selected=null;
-        WebUtil.addSuccessMessage("保存成功！");
-        return "auditTemplateList?faces-redirect=true";
+        try {
+            auditTemplateService.saveAuditTemplate(this.selected, this.fileObj);
+            createEvent(eventType, this.selected, "success");
+            this.selected=null;
+            WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
+            return "auditTemplateList?faces-redirect=true";
+        } catch (Exception e) {
+            createEvent(eventType, this.selected, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("Save") + WebUtil.getMessage("FAILED"));
+            return "";
+        }
+
     }
 
     public void deleteItem(AuditTemplate auditTemplate){
-        List<SearchFilter> searchFilterList = new ArrayList<>();
-        searchFilterList.add(new SearchFilter("templateUid", SearchFilter.Operator.EQ, auditTemplate.getUid()));
 
-        List<AuditEntryTemplateRel> list = relDao.findBySearchFilter(searchFilterList);
+        List<AuditEntryTemplateRel> list = relDao.findByTemplateUid(auditTemplate.getUid());
 
         if(CollectionUtils.isNotEmpty(list)){
             WebUtil.addErrorMessage("该模板被其他配置引用，无法删除！");
             return;
         }
 
-        dao.delete(auditTemplate);
+        try {
+            dao.delete(auditTemplate);
+            createEvent("DELETE_TEMPLATE", auditTemplate, "success");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
+        } catch (Exception e){
+            createEvent("DELETE_TEMPLATE", auditTemplate, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("Delete") + WebUtil.getMessage("FAILED"));
+        }
     }
 
     public void handleFileUpload(FileUploadEvent event) {
@@ -168,5 +187,16 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
 
     public void setFileObj(V2_BlobObject fileObj) {
         this.fileObj = fileObj;
+    }
+
+    private void createEvent(String eventType, AuditTemplate template, String result){
+        AuditEvent event = new AuditEvent();
+        event.setEventType(eventType);
+        event.setOperator(UserContextService.getCurrentUserAccount().getName());
+        event.setContent(JSON.toJSONString(template));
+        event.setEventObjectUid(template.getUid());
+        event.setResult(result);
+        event.setEventTime(new Date());
+        auditEventRepository.save(event);
     }
 }

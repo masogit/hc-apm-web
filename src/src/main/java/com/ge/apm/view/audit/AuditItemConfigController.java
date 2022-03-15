@@ -1,12 +1,11 @@
 package com.ge.apm.view.audit;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.AuditConfigItemRepository;
 import com.ge.apm.dao.AuditEntryItemRelRepository;
+import com.ge.apm.dao.AuditEventRepository;
 import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.domain.AuditConfigItem;
-import com.ge.apm.domain.AuditEntryItemRel;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.audit.AuditItemConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -39,6 +38,7 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
     private AuditConfigItemRepository dao;
     private AuditEntryItemRelRepository relDao;
     private I18nMessageRepository i18nMessageRepository;
+    private AuditEventRepository auditEventRepository;
     private List<I18nMessage> itemContentTypeList;
     private List<V2_BlobObject> attachements;
 
@@ -54,6 +54,7 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
         dao = WebUtil.getBean(AuditConfigItemRepository.class);
         relDao = WebUtil.getBean(AuditEntryItemRelRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+        auditEventRepository = WebUtil.getBean(AuditEventRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         auditItemConfigService = WebUtil.getBean(AuditItemConfigService.class);
         itemContentTypeList = i18nMessageRepository.getByMsgTypeOrderByMsgKey("auditItemType");
@@ -135,16 +136,26 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
             WebUtil.addErrorMessage("同类型下，编号重复，无法提交！");
             return "";
         }
-
+        String eventType = "EDIT_CONFIG_ITEM";
         if(StringUtils.isBlank(this.selected.getUid())){
             this.selected.setCreator(UserContextService.getCurrentUserAccount().getName());
             this.selected.setCreateTime(new Date());
+            eventType = "ADD_CONFIG_ITEM";
         }
 
-        auditItemConfigService.saveAuditConfigItem(this.selected, attachements);
-        this.selected=null;
-        WebUtil.addSuccessMessage("保存成功！");
-        return "auditItemConfigList?faces-redirect=true&contentType=" + this.searchContentType;
+        try {
+            auditItemConfigService.saveAuditConfigItem(this.selected, attachements);
+            createEvent(eventType, this.selected, "success");
+            this.selected=null;
+            WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
+            return "auditItemConfigList?faces-redirect=true&contentType=" + this.searchContentType;
+        } catch (Exception e){
+            createEvent(eventType, this.selected, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("Save") + WebUtil.getMessage("FAILED"));
+            return "";
+        }
+
+
     }
 
     public void deleteItem(AuditConfigItem configItem){
@@ -155,7 +166,15 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
             return;
         }
 
-        dao.delete(configItem);
+        try {
+            dao.delete(configItem);
+            createEvent("DELETE_CONFIG_ITEM", configItem, "success");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
+        } catch (Exception e){
+            createEvent("DELETE_CONFIG_ITEM", configItem, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("Delete") + WebUtil.getMessage("FAILED"));
+
+        }
     }
 
     public void handleFileUpload(FileUploadEvent event) {
@@ -207,5 +226,16 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
 
     public void setSelectType(String selectType) {
         this.selectType = selectType;
+    }
+
+    private void createEvent(String eventType, AuditConfigItem item, String result){
+        AuditEvent event = new AuditEvent();
+        event.setEventType(eventType);
+        event.setOperator(UserContextService.getCurrentUserAccount().getName());
+        event.setContent(JSON.toJSONString(item));
+        event.setEventObjectUid(item.getUid());
+        event.setResult(result);
+        event.setEventTime(new Date());
+        auditEventRepository.save(event);
     }
 }
