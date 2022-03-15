@@ -1,11 +1,7 @@
 package com.ge.apm.view.audit;
 
-import com.ge.apm.dao.AuditConfigItemRepository;
-import com.ge.apm.dao.AuditEntryItemRelRepository;
-import com.ge.apm.dao.AuditSystemCaseRepository;
-import com.ge.apm.dao.AuditSystemEntryRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.NodeSelectEvent;
@@ -34,17 +30,23 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private AuditSystemEntryRepository auditSystemEntryRepository;
     private AuditConfigItemRepository auditConfigItemRepository;
     private AuditEntryItemRelRepository auditEntryItemRelRepository;
-    private UaaService uaaService;
+    private AuditTargetRepository auditTargetRepository;
+    private AuditTemplateRepository auditTemplateRepository;
+    private AuditEntryTemplateRelRepository auditEntryTemplateRelRepository;
 
     private String retrieval;
     private String entryName;
     private String entryMark;
     private Integer entryType;
+    private Integer targetType;
+    private Double targetScore;
     private String entryMarkName;
     private String caseUid;
     private String entryUid;
     private String configItemUid;
-    private Double scoreStandard;
+    private String templateUid;
+    private Double paymentScoreStandard;
+    private Double targetScoreStandard;
     private boolean onSelectFlag = true;
     private boolean entryFlag = false;
     private int caseLevel=0;
@@ -56,7 +58,11 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private List<AuditConfigItem> auditConfigItemPaymentList=new ArrayList<>();
     private List<AuditConfigItem> auditConfigItemTargetList=new ArrayList<>();
     private List<AuditConfigItem> auditConfigItems=new ArrayList<>();
+    private List<AuditTarget> auditTargets=new ArrayList<>();
+    private List<AuditTemplate> auditTemplates=new ArrayList<>();
     private final AuditConfigItem auditConfigItem = new AuditConfigItem();
+    private final AuditTarget auditTarget = new AuditTarget();
+    private final AuditTemplate auditTemplate = new AuditTemplate();
     public static final String STRIP = "STRIP";//条
     public static final String PAYMENT = "PAYMENT";//款
     public static final String TARGET = "TARGET";//指标
@@ -67,10 +73,13 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         auditSystemEntryRepository = WebUtil.getBean(AuditSystemEntryRepository.class);
         auditConfigItemRepository = WebUtil.getBean(AuditConfigItemRepository.class);
         auditEntryItemRelRepository = WebUtil.getBean(AuditEntryItemRelRepository.class);
-        uaaService = WebUtil.getBean(UaaService.class);
+        auditTargetRepository = WebUtil.getBean(AuditTargetRepository.class);
+        auditTemplateRepository = WebUtil.getBean(AuditTemplateRepository.class);
+        auditEntryTemplateRelRepository = WebUtil.getBean(AuditEntryTemplateRelRepository.class);
         String uid = WebUtil.getRequestParameter("uid");
         if (uid!=null){
             selected = dao.findByUid(uid);
+            caseUid = selected.getUid();
         }
         if (selected==null){
             selected = new AuditSystemCase();
@@ -154,9 +163,17 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         date.setName(entryName);
         date.setMark(entryMark);
         date.setCaseUid(caseUid);
+        date.setScoreInit(0D);
+        Integer type=0;
+        if(auditSystemEntry!=null){
+            type= auditSystemEntry.getType();
+        }
+        auditSystemEntry=null;
         if (caseLevel!=0){
             ++caseLevel;
-            if(auditSystemEntry.getType()==3){
+            if(type==3){
+                caseLevel=0;
+                entryType=null;
                 WebUtil.addErrorMessage("错误: 指标没有子节点,不能配置");
                 return;
             }
@@ -175,6 +192,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         date.setParentUid(entryUid);
         auditSystemEntryRepository.save(date);
         buildOrdTree();
+        caseLevel=0;
+        entryType=null;
     }
     public void saveAuditConfigItem() {
         AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
@@ -185,14 +204,40 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             auditEntryItemRel.setOrderBy(1);
         }else if(currentTabId == PAYMENT){
             auditEntryItemRel.setOrderBy(2);
+            auditSystemEntry.setScoreStandard(paymentScoreStandard);
         }else {
+            auditSystemEntry.setScoreStandard(targetScoreStandard);
             auditEntryItemRel.setOrderBy(3);
         }
 
+        auditSystemEntryRepository.save(auditSystemEntry);
         auditEntryItemRelRepository.save(auditEntryItemRel);
     }
-    public void delNode(AuditConfigItem auditConfigItem) {
-         auditConfigItemRepository.delete(auditConfigItem);
+    public void saveAuditTemplate() {
+        AuditTemplate auditTemplate = auditTemplateRepository.findByUid(templateUid);
+        AuditEntryTemplateRel auditEntryTemplateRel = new AuditEntryTemplateRel();
+        auditEntryTemplateRel.setEntryUid(auditSystemEntry.getUid());
+        auditEntryTemplateRel.setTemplateUid(auditTemplate.getUid());
+        auditEntryTemplateRel.setOrderBy(3);
+        auditEntryTemplateRelRepository.save(auditEntryTemplateRel);
+    }
+    public void saveAuditTarget() {
+        AuditTarget auditTarget = new AuditTarget();
+        auditTarget.setScore(targetScore);
+        auditTarget.setSystemCaseUid(caseUid);
+        auditTarget.setTarget(targetType);
+        auditTargetRepository.save(auditTarget);
+    }
+
+    public void deleteAuditTarger(AuditTarget auditTarget){
+        auditTargetRepository.delete(auditTarget);
+    }
+    public void deleteTemplate(AuditTemplate auditTemplate){
+        auditEntryTemplateRelRepository.deleteByTemplateUid(auditTemplate.getUid());
+    }
+
+    public void deleteNode(AuditConfigItem auditConfigItem) {
+        auditEntryItemRelRepository.deleteByItemUid(auditConfigItem.getUid());
         if (caseLevel==1){
             auditConfigItemStripList.remove(auditConfigItem);
         }else if(caseLevel==2){
@@ -216,8 +261,10 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             currentTabId = STRIP;
         }else if(caseLevel==2){
             currentTabId = PAYMENT;
+            paymentScoreStandard=auditSystemEntry.getScoreStandard();
         }else {
             currentTabId = TARGET;
+            targetScoreStandard=auditSystemEntry.getScoreStandard();
         }
     }
     public void preDelete() {
@@ -264,6 +311,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             entryFlag =false;
         }
     }
+    public List<AuditTemplate> auditTemplates(){
+        return auditTemplateRepository.findByType(2);
+    }
     public List<AuditConfigItem> auditConfigItemList(){
         Integer contentTyp =1;
         if (entryType!=null){
@@ -272,22 +322,40 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         auditConfigItems = auditConfigItemRepository.findByContentType(contentTyp);
         return auditConfigItems;
     }
+    public List<AuditTarget> getTargetTypeList() {
+        auditTargets = auditTargetRepository.findBySystemCaseUid(caseUid);
+        if (auditTargets.contains(auditTarget)){
+            auditTargets.remove(auditTarget);
+        }
+        auditTarget.setUid("000");
+        auditTargets.add(auditTarget);
+        return auditTargets;
+    }
+    public List<AuditTemplate> getAuditTemplateList() {
+        auditTemplates = auditEntryTemplateRelRepository.entryAndTemplateList(entryUid,3);
+        if (auditTemplates.contains(auditTemplate)){
+            auditTemplates.remove(auditTemplate);
+        }
+        auditTemplate.setUid("000");
+        auditTemplates.add(auditTemplate);
+        return auditTemplates;
+    }
     public List<AuditConfigItem> getStripList() {
         auditConfigItemStripList= new ArrayList<>();
-        auditConfigItems(auditConfigItemStripList,1);
+        buildaAuditConfigItems(auditConfigItemStripList,1);
        return auditConfigItemStripList;
     }
     public List<AuditConfigItem> getPaymentList() {
         auditConfigItemPaymentList= new ArrayList<>();
-        auditConfigItems(auditConfigItemPaymentList,2);
+        buildaAuditConfigItems(auditConfigItemPaymentList,2);
        return auditConfigItemPaymentList;
     }
     public List<AuditConfigItem> getTargetList() {
         auditConfigItemTargetList= new ArrayList<>();
-        auditConfigItems(auditConfigItemTargetList,3);
+        buildaAuditConfigItems(auditConfigItemTargetList,3);
        return auditConfigItemTargetList;
     }
-    private void auditConfigItems(List<AuditConfigItem> auditConfigItems,Integer orderBy){
+    private void buildaAuditConfigItems(List<AuditConfigItem> auditConfigItems,Integer orderBy){
         if (auditSystemEntry!=null){
             List<String> systemEntryUids = new ArrayList<>();
             systemEntryUids.add(auditSystemEntry.getUid());
@@ -352,6 +420,11 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     public void onContent() {
         entryType = null;
         configItemUid = null;
+        templateUid=null;
+    }
+    public void onAuditTarget() {
+        targetScore = null;
+        targetType = null;
     }
     public void strip() {
         currentTabId = STRIP;
@@ -397,6 +470,30 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public void setEntryType(Integer entryType) {
         this.entryType = entryType;
+    }
+
+    public Integer getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(Integer targetType) {
+        this.targetType = targetType;
+    }
+
+    public Double getTargetScore() {
+        return targetScore;
+    }
+
+    public void setTargetScore(Double targetScore) {
+        this.targetScore = targetScore;
+    }
+
+    public Double getScore() {
+        return targetScore;
+    }
+
+    public void setScore(Double targetScore) {
+        this.targetScore = targetScore;
     }
 
     public String getEntryMarkName() {
@@ -463,13 +560,30 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         this.configItemUid = configItemUid;
     }
 
-    public Double getScoreStandard() {
-        return scoreStandard;
+    public String getTemplateUid() {
+        return templateUid;
     }
 
-    public void setScoreStandard(Double scoreStandard) {
-        this.scoreStandard = scoreStandard;
+    public void setTemplateUid(String templateUid) {
+        this.templateUid = templateUid;
     }
+
+    public Double getPaymentScoreStandard() {
+        return paymentScoreStandard;
+    }
+
+    public void setPaymentScoreStandard(Double paymentScoreStandard) {
+        this.paymentScoreStandard = paymentScoreStandard;
+    }
+
+    public Double getTargetScoreStandard() {
+        return targetScoreStandard;
+    }
+
+    public void setTargetScoreStandard(Double targetScoreStandard) {
+        this.targetScoreStandard = targetScoreStandard;
+    }
+
 
     public void setNothing(){}
 
