@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -35,18 +36,18 @@ public class AuditEvent implements Serializable {
     private Date eventTime;
 
     /**
-     * 操作
+     * 操作人
      */
     @Column(name = "operator")
     private String operator;
 
-    @Column(name = "tenant_uid")
-    private String tenantUid;
+    @Column(name = "site_uid")
+    private String siteUid;
 
     /**
      * 内容(json for needed data)
      */
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "VARCHAR(1000)")
     private String content;
 
     /**

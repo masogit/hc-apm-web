@@ -1,16 +1,15 @@
 package com.ge.apm.view.audit;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.audit.AuditTemplateService;
 import com.ge.apm.service.audit.AuditUserCaseService;
-import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,6 +21,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +39,8 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     private TenantInfoRepository tenantInfoRepository;
     private OrgInfoRepository orgInfoRepository;
     private AuditSystemEntryRepository auditSystemEntryRepository;
+    private AuditEventRepository auditEventRepository;
+    private AuditCaseRepository auditCaseRepository;
 
     private BlobFileService blobService;
     private AuditTemplateService auditTemplateService;
@@ -59,6 +61,8 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         auditSystemEntryRepository = WebUtil.getBean(AuditSystemEntryRepository.class);
+        auditEventRepository = WebUtil.getBean(AuditEventRepository.class);
+        auditCaseRepository = WebUtil.getBean(AuditCaseRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         auditTemplateService = WebUtil.getBean(AuditTemplateService.class);
         auditUserCaseService = WebUtil.getBean(AuditUserCaseService.class);
@@ -132,9 +136,11 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     public void saveAuditCase(){
         try {
             auditUserCaseService.saveUserCase(this.selected);
+            createEvent("ENABLE_TENANT_AUDIT", this.selected, "success");
             this.selected=null;
             WebUtil.addSuccessMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Success"));
         }catch (Exception e){
+            createEvent("ENABLE_TENANT_AUDIT", this.selected, "fail");
             WebUtil.addSuccessMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Failed"));
         }
     }
@@ -143,11 +149,14 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
      * 用户版本回退
      */
     public void initialize(String caseUid){
+        AuditCase auditCase = auditCaseRepository.findById(caseUid);
         try {
             auditUserCaseService.initialize(caseUid);
+            createEvent("INIT_TENANT_AUDIT", auditCase, "success");
             WebUtil.addSuccessMessage(WebUtil.getMessage("Initialize") + WebUtil.getMessage("Success"));
         }catch (Exception e){
-            WebUtil.addSuccessMessage(WebUtil.getMessage("Initialize") + WebUtil.getMessage("Failed"));
+            createEvent("INIT_TENANT_AUDIT", auditCase, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("Initialize") + WebUtil.getMessage("Failed"));
         }
     }
 
@@ -233,5 +242,17 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
 
     public void setSelectedOrg(OrgInfo selectedOrg) {
         this.selectedOrg = selectedOrg;
+    }
+
+    private void createEvent(String eventType, AuditCase auditCase, String result){
+        AuditEvent event = new AuditEvent();
+        event.setEventType(eventType);
+        event.setOperator(UserContextService.getCurrentUserAccount().getName());
+        event.setContent(JSON.toJSONString(auditCase));
+        event.setEventObjectUid(auditCase.getUid());
+        event.setResult(result);
+        event.setEventTime(new Date());
+        event.setSiteUid(auditCase.getSiteUid());
+        auditEventRepository.save(event);
     }
 }

@@ -30,6 +30,8 @@ public class AuditUserCaseService {
     private AuditUploadedFileRepository auditUploadedFileRepository;
     @Autowired
     private AuditResultRepository auditResultRepository;
+    @Autowired
+    private AuditSelfEvaluationRepository auditSelfEvaluationRepository;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -95,12 +97,11 @@ public class AuditUserCaseService {
 
                 // 删除用户上传文件
                 auditUploadedFileRepository.deleteByEntryUid(auditEntry.getUid());
-
-                // 删除用户自评
-
             }
         }
         // 删除结果记录
         auditResultRepository.deleteByCaseUid(caseUid);
+        // 删除用户自评
+        auditSelfEvaluationRepository.deleteByCaseUid(caseUid);
     }
 }
