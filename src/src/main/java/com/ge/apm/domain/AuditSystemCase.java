@@ -35,6 +35,11 @@ public class AuditSystemCase implements Serializable {
     @Column(name = "zone")
     private String zone;
     /**
+     * 评审要求
+     */
+    @Column(name = "rating_requirements")
+    private String ratingRequirements;
+    /**
      * 枚举已知算法
      */
     @Column(name = "judge_logic")
