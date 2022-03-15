@@ -63,6 +63,9 @@ public class AuditSystemCase implements Serializable {
 
     @Transient
     private Integer targetNum;//指标总数
+
+    @Transient
+    private Double scoreNum;//总分值
     /**
      * 创建人
      */
