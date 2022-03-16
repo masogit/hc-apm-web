@@ -312,7 +312,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
     }
     public List<AuditTemplate> auditTemplates(){
-        return auditTemplateRepository.findByType(2);
+        return auditTemplateRepository.findByType(1);
     }
     public List<AuditConfigItem> auditConfigItemList(){
         Integer contentTyp =1;
