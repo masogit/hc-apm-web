@@ -20,6 +20,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -102,12 +103,16 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
             Integer stripNum=0;//条总数
             Integer paymentNum=0;//款总数
             Integer targetNum=0;//指标总数
+            Double scoreNum=0D;//总分值
             List<AuditSystemEntry> auditSystemEntries = auditSystemEntryRepository.findByCaseUid(auditSystemCase.getUid());
             if (auditSystemEntries!=null && !auditSystemEntries.isEmpty()){
                 for (AuditSystemEntry auditSystemEntry : auditSystemEntries){
                     if (auditSystemEntry.getType()==1){
                         stripNum++;
                     }else if(auditSystemEntry.getType()==2){
+                        BigDecimal score = new BigDecimal(scoreNum);
+                        BigDecimal scoreStandard = new BigDecimal(auditSystemEntry.getScoreStandard()==null ? 0D :auditSystemEntry.getScoreStandard());
+                        scoreNum=score.add(scoreStandard).doubleValue();
                         paymentNum++;
                     }else {
                         targetNum++;
@@ -117,6 +122,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
             auditSystemCase.setStripNum(stripNum);
             auditSystemCase.setPaymentNum(paymentNum);
             auditSystemCase.setTargetNum(targetNum);
+            auditSystemCase.setScoreNum(scoreNum);
         }
 
         return pageList;

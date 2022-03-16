@@ -70,7 +70,7 @@
                             <h:outputText value="#{item.auditSystemCase.targetNum}"/>
                         </p:column>
                         <p:column headerText="总分值" sortBy="#{item.score}">
-                            <h:outputText value="#{item.score}"/>
+                            <h:outputText value="#{item.auditSystemCase.scoreNum}"/>
                         </p:column>
                         <p:column headerText="评分方式">
                             <h:outputText value="#{fieldMsg.fieldValue('Scoring', item.auditSystemCase.judgeLogic)}"/>
