@@ -37,7 +37,8 @@
                             <h:outputText value="#{auditTemplateController.fileSizeTransfer(item.fileSize)}"/>
                         </p:column>-->
                         <p:column headerText="#{msg.download}" exportable="false">
-                            <p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">下载</p:link>
+                            <!--<p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">下载</p:link>-->
+                            <p:commandLink value="#{msg.download}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(item.objectStorageId)}"/>
                         </p:column>
                         <p:column headerText="#{msg.Operation}" exportable="false" width="120" id="operatorColumn">
                             <h:panelGroup>
