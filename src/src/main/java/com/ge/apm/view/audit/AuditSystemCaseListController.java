@@ -92,11 +92,18 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
     }
 
     public void deleteAction() {
-        if(selected.getUid()==null){
-            WebUtil.addErrorMessage("请选择数据!");
+        if(selected.getStatus()==1){
+            dao.delete(selected);
+        }else {
+            if(selected.getStatus()==2){
+                WebUtil.addErrorMessage("发布状态数据不能删除!");
+            }else {
+                WebUtil.addErrorMessage("过期状态数据不能删除!");
+            }
+
             return ;
         }
-        dao.delete(selected);
+
     }
     public void listAction(AuditSystemCase auditSystemCase) {
         if(auditSystemCase.getUid()!=null){

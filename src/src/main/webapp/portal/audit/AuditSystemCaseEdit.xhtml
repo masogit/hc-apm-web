@@ -16,6 +16,13 @@
                     <div class="ui-g-18 ui-lg-12">
                         <div class="card" >
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 100%" rendered="true">
+                                <h:panelGroup >
+                                    <label class="label" >类型</label>
+                                    <p:selectOneMenu value="#{auditSystemCaseEditController.selected.type}" style="width: 60%">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('VersionType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">年份</label>
                                     <p:inputText id="version" value="#{auditSystemCaseEditController.selected.version}" style="width: 60%"/>

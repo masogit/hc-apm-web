@@ -50,6 +50,9 @@
                         <p:column headerText="状态" sortBy="#{item.status}" >
                             <h:outputText value="#{auditSystemCaseListController.getStatusName(item.status)}"/>
                         </p:column>
+                        <p:column headerText="类型" sortBy="#{item.type}">
+                            <h:outputText value="#{fieldMsg.fieldValue('VersionType', item.type)}"/>
+                        </p:column>
                         <p:column headerText="操作人" >
                             <h:outputText value="#{item.creator}"/>
                         </p:column>
@@ -58,9 +61,12 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.Actions}" style="width: 100px" >
-                            <p:commandButton  value="过期"  actionListener="#{auditSystemCaseListController.listAction(item)}"  disabled="#{item.status eq 3}"
-                                              update="auditSystemCaseListForm" rendered="true" />
+                        <p:column headerText="#{msg.Actions}" style="width: 120px" >
+                            <p:commandButton  value="过  期 "  actionListener="#{auditSystemCaseListController.listAction(item)}"
+                                              update="auditSystemCaseListForm" rendered="#{item.status eq 2}"/>
+                            <br/> <br/>
+                            <p:commandButton  value="创建副本"  actionListener="#{auditSystemCaseListController.listAction(item)}"
+                                              update="auditSystemCaseListForm" rendered="false" />
                         </p:column>
 
                         <f:facet name="{Toolbar}">
