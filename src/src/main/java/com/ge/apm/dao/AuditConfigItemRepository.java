@@ -17,4 +17,8 @@ public interface AuditConfigItemRepository extends GenericRepositoryUUID<AuditCo
 
     @Query(value = "SELECT c FROM AuditConfigItem c WHERE c.uid in (SELECT r.itemUid FROM  AuditEntryItemRel r WHERE r.systemEntryUid in ?1 and r.orderBy=?2)")
     public List<AuditConfigItem> entryAndContentList(List<String> systemEntryUids,Integer orderBy);
+
+    @Query(value = "SELECT c FROM AuditConfigItem c WHERE c.uid in (SELECT r.itemUid FROM  AuditEntryItemRel r WHERE r.systemEntryUid = ?1)")
+    public List<AuditConfigItem> AuditConfigItemtList(String systemEntryUid);
+
 }
