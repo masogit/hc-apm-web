@@ -14,6 +14,8 @@ import java.util.List;
 public interface AuditEntryItemRelRepository extends GenericRepository<AuditEntryItemRel> {
 
     List<AuditEntryItemRel> findByItemUid(String itemUid);
+    List<AuditEntryItemRel> findByItemUidAndSystemEntryUidAndOrderBy(String itemUid,String systemEntryUid,Integer orderBy);
+
     @Transactional
     @Modifying
     public void deleteByItemUid(String itemUid);

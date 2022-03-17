@@ -58,9 +58,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private List<AuditConfigItem> auditConfigItemPaymentList=new ArrayList<>();
     private List<AuditConfigItem> auditConfigItemTargetList=new ArrayList<>();
     private List<AuditConfigItem> auditConfigItems=new ArrayList<>();
-    private List<AuditTarget> auditTargets=new ArrayList<>();
     private List<AuditTemplate> auditTemplates=new ArrayList<>();
-    private final AuditConfigItem auditConfigItem = new AuditConfigItem();
+    private  AuditConfigItem auditConfigItemSelected = new AuditConfigItem();
     private  AuditTarget auditTargetSelected = new AuditTarget();
     private final AuditTemplate auditTemplate = new AuditTemplate();
     public static final String STRIP = "STRIP";//条
@@ -200,18 +199,27 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         AuditEntryItemRel auditEntryItemRel = new AuditEntryItemRel();
         auditEntryItemRel.setItemUid(auditConfigItem.getUid());
         auditEntryItemRel.setSystemEntryUid(auditSystemEntry.getUid());
+        Integer orderBy;
         if ( currentTabId == STRIP){
-            auditEntryItemRel.setOrderBy(1);
+            orderBy=1;
         }else if(currentTabId == PAYMENT){
-            auditEntryItemRel.setOrderBy(2);
+            orderBy=2;
             auditSystemEntry.setScoreStandard(paymentScoreStandard);
         }else {
+            orderBy=2;
             auditSystemEntry.setScoreStandard(targetScoreStandard);
-            auditEntryItemRel.setOrderBy(3);
+        }
+        auditEntryItemRel.setOrderBy(orderBy);
+        if(auditConfigItemSelected!=null){
+            List<AuditEntryItemRel> list = auditEntryItemRelRepository.findByItemUidAndSystemEntryUidAndOrderBy(auditConfigItemSelected.getUid(), auditSystemEntry.getUid(), orderBy);
+            if (list!=null && !list.isEmpty()){
+                auditEntryItemRelRepository.delete(list);
+            }
         }
 
         auditSystemEntryRepository.save(auditSystemEntry);
         auditEntryItemRelRepository.save(auditEntryItemRel);
+        auditConfigItemSelected=new AuditConfigItem();
     }
     public void saveAuditTemplate() {
         AuditTemplate auditTemplate = auditTemplateRepository.findByUid(templateUid);
@@ -233,6 +241,11 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     public void editAuditTarger(AuditTarget auditTarget){
         if(auditTarget!=null){
             auditTargetSelected=auditTarget ;
+        }
+    }
+    public void editAuditConfigItem(AuditConfigItem auditConfigItem){
+        if(auditConfigItem!=null){
+            auditConfigItemSelected=auditConfigItem ;
         }
     }
     public void deleteTemplate(AuditTemplate auditTemplate){
@@ -327,7 +340,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
     public List<AuditTarget> getTargetTypeList() {
         AuditTarget auditTarget = new AuditTarget();
-        auditTargets = auditTargetRepository.findBySystemCaseUid(caseUid);
+        List<AuditTarget> auditTargets = auditTargetRepository.findBySystemCaseUid(caseUid);
         if (auditTargets.contains(auditTarget)){
             auditTargets.remove(auditTarget);
         }
@@ -385,6 +398,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         if(auditConfigItems==null){
             auditConfigItems =new ArrayList<>();
         }
+        AuditConfigItem auditConfigItem = new AuditConfigItem();
         if (auditConfigItems.contains(auditConfigItem)){
             auditConfigItems.remove(auditConfigItem);
         }
@@ -422,6 +436,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         dao.delete(selected);
     }
     public void onContent() {
+        auditConfigItemSelected=new AuditConfigItem();
         entryType = null;
         configItemUid = null;
         templateUid=null;
@@ -603,4 +618,11 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         return auditTargetSelected;
     }
 
+    public AuditConfigItem getAuditConfigItemSelected() {
+        return auditConfigItemSelected;
+    }
+
+    public void setAuditConfigItemSelected(AuditConfigItem auditConfigItemSelected) {
+        this.auditConfigItemSelected = auditConfigItemSelected;
+    }
 }

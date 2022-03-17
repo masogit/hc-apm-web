@@ -72,13 +72,12 @@
                                                          oncomplete="PF('auditTargetDlg').show()" rendered="#{empty item.target}"
                                                          actionListener="#{auditSystemCaseEditController.onAuditTarget()}"
                                                          update="auditTargetDlg" disabled="#{empty auditSystemCaseEditController.selected.uid}"/>
+                                        <p:commandButton icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('auditTargetDlg').show()"
+                                                         title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditTarger(item)}"
+                                                         rendered="#{not empty item.target}"  update="auditTargetDlg"/>
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
                                                          actionListener="#{auditSystemCaseEditController.deleteAuditTarger(item)}" rendered="#{not empty item.target}"
                                                          update="targetForm">
-                                            <p:commandButton id="editButton" icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('auditTargetDlg').show()"
-                                                             title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditTarger(item)}"
-                                                             rendered="#{not empty item.target}"  update="auditTargetDlg"/>
-
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                                        icon="ui-icon-alert"/>
                                         </p:commandButton>
@@ -149,6 +148,9 @@
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                                        icon="ui-icon-alert"/>
                                         </p:commandButton>
+                                        <p:commandButton  icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('contentDlg').show()"
+                                                         title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditConfigItem(item)}"
+                                                         rendered="#{not empty item.mark}"  update="contentDlg"/>
                                     </p:column>
                                 </p:dataTable>
 
@@ -314,17 +316,17 @@
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 80%" rendered="true">
                             <h:panelGroup>
                                 <label class="label">#{msg.ContentType}*</label>
-                                <p:selectOneMenu value="#{auditSystemCaseEditController.entryType}" required="true"  requiredMessage="#{msg.ContentType} #{msg.ValidationRequire}" autoWidth="false" style="width: 50%;">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"  noSelectionOption="true" />
+                                <p:selectOneMenu value="#{auditSystemCaseEditController.entryType}"   requiredMessage="#{msg.ContentType} #{msg.ValidationRequire}" autoWidth="false" style="width: 50%;">
+                                    <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? fieldMsg.fieldValue('auditItemType',auditSystemCaseEditController.auditConfigItemSelected.contentType) : msg.SelectOneMessage}" itemValue="#{null}"  noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('auditItemType')}"  var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}" />
                                     <p:ajax process="@this" listener="#{auditSystemCaseEditController.auditConfigItemList()}" update="content"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup id="content">
                                 <label class="label">#{msg.mark}*</label>
-                                <p:selectOneMenu value="#{auditSystemCaseEditController.configItemUid}" required="true" requiredMessage="#{msg.content} #{msg.ValidationRequire}"
+                                <p:selectOneMenu value="#{auditSystemCaseEditController.configItemUid}"   requiredMessage="#{msg.content} #{msg.ValidationRequire}"
                                                    autoWidth="false" style="width: 50%;">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
+                                    <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? auditSystemCaseEditController.auditConfigItemSelected.mark : msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
                                     <f:selectItems value="#{auditSystemCaseEditController.auditConfigItemList()}" var="entry" itemLabel="#{entry.mark}"  itemValue="#{entry.uid}"/>
                                     <p:ajax process="@this" event="itemSelect" listener="#{auditSystemCaseEditController.setNothing()}"/>
                                     <p:ajax process="@this" listener="#{auditSystemCaseEditController.setNothing()}"/>
