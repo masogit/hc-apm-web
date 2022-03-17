@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="head">
+        <h:outputScript name="js/main.js"/>
+
+        <style type="text/css">
+            .ui-chkbox .ui-chkbox-box .ui-icon-check {
+                color: gray!important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="科室借调情况"/>
+                </div>
+                <div class="ui-g-12 card">
+                    <h:form id="searchForm">
+                        <h:panelGrid id="searchPanel" columns="2">
+                            <p:inputText id="searchText" value="#{departmentSecondmentController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}" maxlength="100" style="width: 450px">
+                                <p:ajax event="keyup" delay="1200" update=":IouListForm searchButtons" />
+                            </p:inputText>
+                            <h:panelGroup id='searchButtons'>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":IouListForm :searchForm"  rendered="#{empty departmentSecondmentController.oneSearchStr}"/>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":IouListForm :searchForm" actionListener="#{departmentSecondmentController.setOneSearchStr('')}" rendered="#{not empty departmentSecondmentController.oneSearchStr}"/>
+                            </h:panelGroup>
+
+                        </h:panelGrid>
+                    </h:form>
+                    <h:form id="IouListForm">
+
+                        <p:dataTable id="datalist" value="#{departmentSecondmentController.lazyModel}" var="item" widgetVar="varDataList"
+                                     selectionMode="single" selection="#{departmentSecondmentController.selected}"
+                                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.borrowedAt}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="20,50,100,500">
+
+                            <p:ajax event="filter" listener="#{departmentSecondmentController.onFilter}" update=""/>
+                            <!--sharedId-->
+                            <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+
+                                <h:outputText value="#{item.assetName}"/>
+                            </p:column>
+
+                            <p:column headerText="设备编号" sortBy="#{item.assetDeptNum}" filterBy="#{item.assetDeptNum}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.assetDeptNum}"/>
+                            </p:column>
+                            <p:column headerText="序列号" sortBy="#{item.assetSerialNum}" filterBy="#{item.assetSerialNum}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.assetSerialNum}"/>
+                            </p:column>
+                            <p:column headerText="二维码" filterBy="#{item.assetQrCode}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.assetQrCode}" />
+                            </p:column>
+                            <p:column headerText="借出科室"  filterBy="#{item.outDeptName}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.outDeptName}" />
+                            </p:column>
+                            <p:column headerText="借出人"   filterBy="#{item.lenderName}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.lenderName}"/>
+                            </p:column>
+                            <p:column headerText="借用科室"   filterBy="#{item.inDeptName}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.inDeptName}"/>
+                            </p:column>
+                            <p:column headerText="借用人"  filterBy="#{item.borrowerName}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.borrowerName}"/>
+                            </p:column>
+                            <p:column headerText="借出时间" sortBy="#{item.borrowedAt}" filterBy="#{item.borrowedAt}" filterMatchMode="EQ">
+                                <f:facet name="filter">
+                                    <p:calendar id="cal1" effect="fold" value="#{departmentSecondmentController.filterBeginTime}"
+                                                onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.borrowedAt}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"  />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="归还受理人" filterBy="#{item.receiverName}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.receiverName}"/>
+                            </p:column>
+                            <p:column headerText="归还人" filterBy="#{item.returnerName}" filterMatchMode="LIKE">
+                                <h:outputText value="#{item.returnerName}"/>
+                            </p:column>
+                            <p:column headerText="归还时间" sortBy="#{item.returnAt}" filterBy="#{item.returnAt}" filterMatchMode="EQ">
+                                <f:facet name="filter">
+                                    <p:calendar id="cal12" effect="fold" value="#{departmentSecondmentController.returnAtTime}"
+                                                onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
+                                </f:facet>
+                                <h:outputText value="#{item.returnAt}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"  />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="借用时长">
+                                <h:outputText value="#{item.duration}">
+                                    <f:convertNumber pattern="0.00"/>
+                                </h:outputText>
+                            </p:column>
+                            <f:facet name="{Toolbar}">
+<!--                                <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" actionListener="#{departmentSecondmentController.fileName()}" />-->
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentSecondmentController.fileName}"
+                                                    postProcessor="#{departmentSecondmentController.postProcessXLS}"/>
+                                </p:commandButton>
+<!--                                <p:commandButton title="导出当前页" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" ajax="false">-->
+<!--                                    <p:dataExporter type="xlsx" target="datalist" fileName="#{departmentSecondmentController.fileName}"-->
+<!--                                                    postProcessor="#{departmentSecondmentController.postProcessXLS}" pageOnly="true"/>-->
+<!--                                </p:commandButton>-->
+                            </f:facet>
+                        </p:dataTable>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+        <script>
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+
+            function openSwapTypeViewWindow(xhr, status, args) {
+                this.location.href = args.url;
+            }
+
+            $(function () {
+                //解决两个时间选择样式问题
+                var removeUiDatepickerDivClipRect = function (i) {
+                    if(i &lt; 20){
+                        i++;
+                        $("#ui-datepicker-div").css("clip","");
+                        setTimeout(function (){removeUiDatepickerDivClipRect(i)}, 50);
+                    }
+                }
+                $("#IouListForm\\:datalist\\:cal1_input").click(function (){removeUiDatepickerDivClipRect(1);});
+                $("#IouListForm\\:datalist\\:cal2_input").click(function (){removeUiDatepickerDivClipRect(1);});
+            })
+            function getDate(){
+                return Date.now();
+            }
+        </script>
+    </ui:define>
+
+</ui:composition>
+</html>

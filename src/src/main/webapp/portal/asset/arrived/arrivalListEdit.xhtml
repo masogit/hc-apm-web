@@ -322,7 +322,7 @@
                                             <label class="label">#{msg.riskGrade}<span style="color:red">#{(assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['riskGrade'].arrivalRequired)? '*':''}</span></label>
                                             <p:selectOneMenu id="riskGrade" value="#{assetArrivedListEditController.easyInstallItem.riskGrade}" required="#{assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['riskGrade'].arrivalRequired}" requiredMessage="#{msg.riskGrade}#{msg.ValidationRequire}">
                                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                                <f:selectItems value="#{userContextService.useNewRiskGrade()? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                             </p:selectOneMenu>
                                         </h:panelGroup>
 
@@ -483,11 +483,11 @@
                                                          src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
-                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                                <p:commandButton disabled="#{userContextService.activeSupplier()}" actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                            <p:fileUpload disabled="#{userContextService.activeSupplier()}" id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="accessoryList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <c:forEach items="#{assetArrivedListEditController.getAttachmentCategories()}" var="attachmentConfig">
@@ -495,7 +495,7 @@
                                                 <p:dataList id="#{attachmentConfig.boType.concat('List')}" value="#{assetArrivedListEditController.getAttachList(attachmentConfig.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                     <f:facet name="header">#{attachmentConfig.label}</f:facet>
                                                     <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                         <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                              src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
@@ -520,7 +520,17 @@
                                     <p:dataList id="accessoryFinishedList" value="#{assetArrivedListEditController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                         <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
                                         <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                        <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
+                                            <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                 src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
+                                        <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentByIdJiuYuan(fileitem.id)}" update="accessoryFinishedList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                        </p:commandButton>
                                     </p:dataList>
+                                    <p:fileUpload id="jiuyuantypeasset4" rendered="#{assetArrivedListEditController.activeSupplier()}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUploadJiuYuan}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                                  multiple="true"  sizeLimit="100000000"  update="accessoryFinishedList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                 </h:panelGroup>
                             </p:fieldset>
 
@@ -571,14 +581,16 @@
 
                             </p:dataTable>
                             <h:panelGroup >
+                                <h:panelGrid columns="2" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.getInstalledCount() gt 0}">
+                                    <h:outputText class="label" style="color: black!important;font-size: 16px!important;" value="是否允许供应商编辑：" title="已完成或部分安装完成的到货单允许编辑修改信息"></h:outputText>
+                                    <p:selectBooleanCheckbox value="#{assetArrivedListEditController.selected.isEdit}">
+                                        <p:ajax listener="#{assetArrivedListEditController.updateIsEdit()}" process="@this" update=":AssetArrivalEditForm :growl"/>
+                                    </p:selectBooleanCheckbox>
+                                </h:panelGrid>
                                 <p:commandButton validateClient="true"  actionListener="#{assetArrivedListEditController.applyChange}" value="#{msg.Save}" update=":AssetArrivalEditForm  :growl" icon="ui-icon-check" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
                                 <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="arrivalList?faces-redirect=true" update="display,:AssetArrivalEditForm :growl"/>
                                 <p:commandButton validateClient="true" value="#{msg.Submit}"  actionListener="#{assetArrivedListEditController.submitArrivalList}" update=":AssetArrivalEditForm :growl" disabled="#{assetArrivedListEditController.selected.status ne 1}" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
-                                <p:commandButton validateClient="true" value="允许供应商编辑" style="" title="已完成或部分安装完成的允许编辑修改信息"  action="#{assetArrivedListEditController.updateIsEdit}" update=":AssetArrivalEditForm :growl" disabled="#{not empty assetArrivedListEditController.selected.isEdit}" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.getInstalledCount() gt 0}">
-                                    <p:confirm header="允许编辑" message="点击按钮后会置灰，待供应商在小程序上修改信息提交后复原" icon="ui-icon-warning"/>
-                                </p:commandButton>
                             </h:panelGroup>
-
                         </h:panelGroup>
                     </p:fieldset>
                 </h:form>
@@ -617,7 +629,7 @@
             </h:form>
         </p:dialog>
         <script type="text/javascript">
-            var arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm:arrivalListAttachment'),{
+            var arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm'),{
                 // url:'data-original',
                 show: function() {
                     arrivalListImg.update();

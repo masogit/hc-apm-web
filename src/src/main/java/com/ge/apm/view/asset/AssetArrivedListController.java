@@ -1,28 +1,23 @@
 package com.ge.apm.view.asset;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.xml.XMLConstants;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.stream.StreamSource;
-
+import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.ArrivalList;
+import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.ArrivalSupplierReportService;
+import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.wo.Map2XmlConverter;
+import com.ge.apm.view.wo.WorkOrderReportExportController;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.mapper.DefaultMapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -34,23 +29,24 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.dao.ArrivalListRepository;
-import com.ge.apm.domain.ArrivalList;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.service.asset.AssetInstallationService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.view.wo.Map2XmlConverter;
-import com.ge.apm.view.wo.WorkOrderReportExportController;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.mapper.DefaultMapper;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -86,7 +82,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         this.selectedMap = new HashMap();
         String encodeStr = WebUtil.getRequestParameter("str");
         String statusFlagStr = null;
-        if(encodeStr != null){
+        if (encodeStr != null) {
             supplierUserBind = (String) UrlEncryptController.getValueFromMap(encodeStr, "supplierUserBind");
         }
     }
@@ -109,29 +105,31 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
-        if(activeSupplier()){
-            if(supplierUserBind != null){
+        if (activeSupplier()) {
+            if (supplierUserBind != null) {
                 removeFilterOnField("supplierUserId");
-                searchFilters.add(new SearchFilter("supplierUserId", supplierUserBind.equals("1")?SearchFilter.Operator.IsNull:SearchFilter.Operator.IsNotNull, null));
+                searchFilters.add(new SearchFilter("supplierUserId", supplierUserBind.equals("1") ? SearchFilter.Operator.IsNull : SearchFilter.Operator.IsNotNull, null));
             }
-            if(statusFlag != null){
-                if(statusFlag < 3){
+            if (statusFlag != null && statusFlag != 4) {
+                if (statusFlag < 3) {
                     List<String> idList = null;
                     List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
-                    if(statusFlag == 1){
+                    if (statusFlag == 1) {
                         idList = dao.getArrivalListNotFinishedIds(orgUidList);
-                    }else if(statusFlag == 2){
+                    } else if (statusFlag == 2) {
                         idList = dao.getArrivalListPartiallyFinishedIds(orgUidList);
                     }
                     removeFilterOnField("id");
                     searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN, idList));
                 }
                 removeFilterOnField("status");
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusFlag==1? Arrays.asList(1,2):Arrays.asList(statusFlag)));
+                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusFlag == 1 ? Arrays.asList(1, 2) : Arrays.asList(statusFlag)));
+            } else {
+                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));
             }
         }
 
-        Page<ArrivalList> result=dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<ArrivalList> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = result.getContent();
         setCanDeleted(result);
         return result;
@@ -140,17 +138,18 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     /**
      * 1、页面未选择下拉框status值时默认将column里status的等于2的进行判断，最终返回(1或2)
      * 2、当选择下拉框status值为1时则将column里status赋值为1。
+     *
      * @param id
      * @param status
      * @return
      */
-    public String getArrivalListStatus(String id,String status){
-        if(statusFlag != null){
-            if(statusFlag == 1){
+    public String getArrivalListStatus(String id, String status) {
+        if (statusFlag != null) {
+            if (statusFlag == 1) {
                 status = "1";
             }
-        }else{
-            if(status.equals("2")){
+        } else {
+            if (status.equals("2")) {
                 List<ArrivalListItem> arrivalListItem = aiService.getListItem(id);
                 int installNum = arrivalListItem.stream().filter(item -> ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus())
                         || ArrivalListItem.INSTALL_STATUS_INSTORAGE.equals(item.getInstallStatus())).collect(Collectors.toList()).size();
@@ -161,43 +160,39 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         return FieldValueMessageController.fieldValue("arrivalListStatus", status);
     }
 
-    private void setCanDeleted(Page<ArrivalList> result){
-    	if(result!=null){
-    		for(ArrivalList arrivalList: result){
-        		Integer status=arrivalList.getStatus();
-        		if(status!=null){
-        			if(status==1){
-        				arrivalList.setCannotDeleted(false);
-        			}
-        			else if(status==2){
-        				List<ArrivalListItem> items = aiService.getListItem(arrivalList.getId());
-        				if(items!=null){
-        					boolean installed=false;
-            				for(ArrivalListItem item: items){
-            					if(item.getInstallStatus()!=null && (!item.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW))){
-            						installed=true;
-            						break;
-            					}
-            				}
-            				if(installed){
-            					arrivalList.setCannotDeleted(true);
-            				}
-            				else{
-            					if(UserContextService.checkRole("AssetHead")){
-            						arrivalList.setCannotDeleted(false);
-            					}
-            					else{
-            						arrivalList.setCannotDeleted(true);
-            					}
-            				}
-        				}
-        			}
-        			else{
-        				arrivalList.setCannotDeleted(true);
-        			}
-        		}
-        	}
-    	}
+    private void setCanDeleted(Page<ArrivalList> result) {
+        if (result != null) {
+            for (ArrivalList arrivalList : result) {
+                Integer status = arrivalList.getStatus();
+                if (status != null) {
+                    if (status == 1) {
+                        arrivalList.setCannotDeleted(false);
+                    } else if (status == 2) {
+                        List<ArrivalListItem> items = aiService.getListItem(arrivalList.getId());
+                        if (items != null) {
+                            boolean installed = false;
+                            for (ArrivalListItem item : items) {
+                                if (item.getInstallStatus() != null && (!item.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW))) {
+                                    installed = true;
+                                    break;
+                                }
+                            }
+                            if (installed) {
+                                arrivalList.setCannotDeleted(true);
+                            } else {
+                                if (UserContextService.checkRole("AssetHead")) {
+                                    arrivalList.setCannotDeleted(false);
+                                } else {
+                                    arrivalList.setCannotDeleted(true);
+                                }
+                            }
+                        }
+                    } else {
+                        arrivalList.setCannotDeleted(true);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -213,32 +208,31 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             dao.delete(selected);
             this.selected = null;
         } else {
-        	if(selected.isCannotDeleted()==false){
-        		deleteArrivalList();
-        	}
-        	else{
-        		WebUtil.addErrorMessage("到货清单已经提交,不能删除");
-        	}
+            if (selected.isCannotDeleted() == false) {
+                deleteArrivalList();
+            } else {
+                WebUtil.addErrorMessage("到货清单已经提交,不能删除");
+            }
         }
     }
-    
+
     @Transactional
-    public void deleteArrivalList(){
-    	//delete phone and others
-    	aiService.deleteBlobObject(this.selected.getId());
-    	//delete items and qrCode
-    	aiService.deleteListItem(this.selected.getId(),this.selected.getSiteUID());
-    	//delete list obj
-    	dao.delete(selected);
-		this.selected=null;
+    public void deleteArrivalList() {
+        //delete phone and others
+        aiService.deleteBlobObject(this.selected.getId());
+        //delete items and qrCode
+        aiService.deleteListItem(this.selected.getId(), this.selected.getSiteUID());
+        //delete list obj
+        dao.delete(selected);
+        this.selected = null;
     }
 
     public String createAction() {
         return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Create");
     }
-    
+
     public String saveAsAction() {
-        return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Create".concat(selected==null?"":"&copyFrom=".concat(selected.getId())));
+        return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Create".concat(selected == null ? "" : "&copyFrom=".concat(selected.getId())));
     }
 
     public String editAction() {
@@ -266,11 +260,11 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             List<TenantInfo> tanentIfos = tenantInfoDao.findByCustomTenant("3");
             String tanentInfoUid = tanentIfos.get(0).getUid();
             File xsl = null;
-            if(tenantUid.equals(tanentInfoUid)){
-                 xsl = new File(WorkOrderReportExportController.class.getClassLoader().
-                    getResource("../../portal/pdf/arrivalItem2.xsl").getPath());
-            }else{
-                 xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+            if (tenantUid.equals(tanentInfoUid)) {
+                xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+                        getResource("../../portal/pdf/arrivalItem2.xsl").getPath());
+            } else {
+                xsl = new File(WorkOrderReportExportController.class.getClassLoader().
                         getResource("../../portal/pdf/arrivalItem.xsl").getPath());
             }
 
@@ -319,27 +313,27 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         return xStream.toXML(data);
     }
 
-    private void sortArrivalList(List<ArrivalListItem> items)
-    {
-    	Collections.sort(items, new Comparator<ArrivalListItem>(){
-			/*  
-             * 返回负数表示：o1 小于o2，  
-             * 返回0 表示：o1和o2相等，  
-             * 返回正数表示：o1大于o2。  
-             */  
-			public int compare(ArrivalListItem o1, ArrivalListItem o2) {
-				//按序号升序排序  
-	            if(o1.getItemNum() > o2.getItemNum()){  
-	                return 1;  
-	            }  
-	            if(o1.getItemNum() == o2.getItemNum()){  
-	                return 0;  
-	            }  
-	            return -1;
-			}  
-		});
-        
+    private void sortArrivalList(List<ArrivalListItem> items) {
+        Collections.sort(items, new Comparator<ArrivalListItem>() {
+            /*
+             * 返回负数表示：o1 小于o2，
+             * 返回0 表示：o1和o2相等，
+             * 返回正数表示：o1大于o2。
+             */
+            public int compare(ArrivalListItem o1, ArrivalListItem o2) {
+                //按序号升序排序
+                if (o1.getItemNum() > o2.getItemNum()) {
+                    return 1;
+                }
+                if (o1.getItemNum() == o2.getItemNum()) {
+                    return 0;
+                }
+                return -1;
+            }
+        });
+
     }
+
     private void getDetails(String itemId, Map<String, Object> info) {
         List<Map<String, Object>> details = new ArrayList<Map<String, Object>>();
         List<ArrivalListItem> items = aiService.getListItem(itemId);
@@ -349,8 +343,8 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             detail.put("序号", item.getItemNum());
             detail.put("使用科室",
                     aiService.getOrgInfoByUid(item.getClinicalDeptUID()) != null
-                    ? aiService.getOrgInfoByUid(item.getClinicalDeptUID()).getName()
-                    : null);
+                            ? aiService.getOrgInfoByUid(item.getClinicalDeptUID()).getName()
+                            : null);
             detail.put("制造商序列号", item.getSerialNum());
             detail.put("SystemID", item.getSystemId());
             detail.put("资产编号", item.getFinancingNum());
@@ -363,18 +357,16 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             detail.put("质保日期", item.getFactoryWarrantyDate());
             details.add(detail);
         }
-        if(items.size() < 11)
-        {
-        	for(int i = 0; i < 11-items.size(); i++)
-        	{
-        		Map<String, Object> detail = new HashedMap();
-        		detail.put("序号", "");
-        		detail.put("使用科室", "");
-        		detail.put("制造商序列号", "");
-        		detail.put("资产编号", "");
-        		details.add(detail);
-        	}
-        	
+        if (items.size() < 11) {
+            for (int i = 0; i < 11 - items.size(); i++) {
+                Map<String, Object> detail = new HashedMap();
+                detail.put("序号", "");
+                detail.put("使用科室", "");
+                detail.put("制造商序列号", "");
+                detail.put("资产编号", "");
+                details.add(detail);
+            }
+
         }
         info.put("到货条目", details);
     }
@@ -448,10 +440,10 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         }
     }
 
-    public String getSupplierUserName(Integer userId){
-        if(userId != null){
+    public String getSupplierUserName(Integer userId) {
+        if (userId != null) {
             UserAccount userAccount = uaaService.getUserById(userId);
-            if(userAccount != null){
+            if (userAccount != null) {
                 return userAccount.getName();
             }
         }
@@ -486,7 +478,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         this.exportDoc = exportDoc;
     }
 
-    public boolean activeSupplier(){
+    public boolean activeSupplier() {
         return supplierService.activeSupplier();
     }
 

@@ -2,6 +2,8 @@ package com.ge.apm.domain;
 
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -46,6 +48,11 @@ public class AuditGroupConfigurationDetail implements Serializable {
     @Column(name = "delete_flag")
     private Integer deleteFlag;
     /**
+     * 审核批次
+     */
+    @Column(name = "approve_num")
+    private Integer approveNum;
+    /**
      * 审批人UID
      */
     @Column(name = "actual_audit_uid")
@@ -62,6 +69,26 @@ public class AuditGroupConfigurationDetail implements Serializable {
     @Column(name = "approver_signature")
     private String approverSignature;
 
+    /**
+     * 创建日期
+     */
+    @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    /**
+     * 保修工单号
+     */
+    @Transient
+    private String srNum;
+
+    /**
+     * 创建人
+     */
+    @CreatedBy
+    @Column(name = "created_by", columnDefinition = "VARCHAR(60)")
+    private String createdBy;
     @Override
     public int hashCode() {
         int hash = 0;

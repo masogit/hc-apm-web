@@ -232,7 +232,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			}else if(level == 4){
 				List<SearchFilter> searchFilters=new ArrayList<>();
 				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,user.getTenantUID()));
-				searchFilters.add(new SearchFilter("ruleUID4", SearchFilter.Operator.EQ,"4"));
+				searchFilters.add(new SearchFilter("ruleUID4", SearchFilter.Operator.IsNotNull,null));
 				List<RelRuleAsset> bySearchFilter = relRuleAssetRepository.findBySearchFilter(searchFilters);
 				uids = bySearchFilter.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));

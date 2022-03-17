@@ -138,9 +138,17 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     private static final String SPARE_PARTS_ORDER_PREFIX = "FEPO";
 
     /**
-     * 超声高端机
+     * GEFE超声高端机
      */
     public static String highArtificialTypeValue = "High";
+    /**
+     * GEFE超声低端机
+     */
+    public static String lowArtificialTypeValue = "Low";
+    /**
+     * GEFE depot超声高端机
+     */
+    public static String depotArtificialTypeValue = "Depot";
 
     /**
      * 超声类
@@ -262,6 +270,14 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 合同超声高端机
      */
     public static final String assetTypeHighMachineValue = "highMachine";
+    /**
+     * 合同超声低端机
+     */
+    public static final String assetTypeLowMachineValue = "lowMachine";
+    /**
+     * 合同超声depot
+     */
+    public static final String assetTypeDepot = "depot";
 
     public static final String testLoginNameStartWith = "test.";
 
@@ -386,9 +402,65 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param systemId       设备system id
      * @return
      */
-    public ZkbFePartOrder fullInfoBySystemId(ZkbFePartOrder zkbFePartOrder, String systemId) {
+    public List<AssetInfo> fullInfoBySystemId(ZkbFePartOrder zkbFePartOrder, String systemId) {
+        zkbFePartOrder.setSystemId(systemId);
+        List<AssetInfo> listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoBySysId(systemId);
+        return CollectionUtils.isNotEmpty(listAssetInfo)?listAssetInfo:new ArrayList<AssetInfo>();
+    }
+
+    /**
+     * 根据UID获取相关信息
+     *
+     * @param zkbFePartOrder
+     * @param zkbFePartOrder
+     * @return
+     */
+    public List<AssetInfo> initAssetInfo(ZkbFePartOrder zkbFePartOrder) {
+        List<AssetInfo> listAssetInfo = new ArrayList<AssetInfo>();
+        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetId())){
+            listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoByUid(zkbFePartOrder.getAssetId());
+        }else{
+            listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoForHisData(zkbFePartOrder.getSystemId(),zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
+
+        }
+        return CollectionUtils.isNotEmpty(listAssetInfo)?listAssetInfo:new ArrayList<AssetInfo>();
+    }
+
+    /**
+     * 点击sysid 后的方法
+     * @param zkbFePartOrder
+     * @param assetInfo
+     * @return
+     */
+    public List<ZkbFePartOrder> fullInfoBySystemIdBuildData(ZkbFePartOrder zkbFePartOrder,AssetInfo assetInfo) {
+        List<ZkbFePartOrder> list = this.zkbFePartOrderMapper.loadAssetInfoBuildByUid(assetInfo.getUid());
+        if (CollectionUtils.isEmpty(list)||list.size()>1) {
+            zkbFePartOrder.setContractId(null);
+            zkbFePartOrder.setFunctionType(null);
+            zkbFePartOrder.setContractId(null);
+            zkbFePartOrder.setHospitalName(null);
+            zkbFePartOrder.setTenantUid(null);
+            zkbFePartOrder.setSubtractTotalStatus(null);
+            zkbFePartOrder.setAssetType(null);
+            return list;
+        }
+        ZkbFePartOrder item = list.get(0);
+        zkbFePartOrder.setContractId(item.getContractId());
+        zkbFePartOrder.setFunctionType(item.getFunctionType());
+        zkbFePartOrder.setHospitalName(item.getHospitalName());
+        zkbFePartOrder.setTenantUid(item.getTenantUid());
+        zkbFePartOrder.setAssetType(item.getAssetType());
+        zkbFePartOrder.setAssetId(assetInfo.getUid());
+        if (assetTypeHighMachineValue.equals(zkbFePartOrder.getAssetType())) {
+            zkbFePartOrder.setSubtractTotalStatus("false");
+        }
+        return list;
+    }
+    /*public ZkbFePartOrder fullInfoBySystemId(ZkbFePartOrder zkbFePartOrder, String systemId) {
         zkbFePartOrder.setSystemId(systemId);
         List<ZkbFePartOrder> list = this.zkbFePartOrderMapper.loadAssetInfo(systemId);
+        List<AssetInfo> listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoBySysId(systemId);
+
         if (CollectionUtils.isEmpty(list)) {
             zkbFePartOrder.setContractId(null);
             zkbFePartOrder.setFunctionType(null);
@@ -410,7 +482,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             zkbFePartOrder.setSubtractTotalStatus("false");
         }
         return zkbFePartOrder;
-    }
+    }*/
 
     /**
      * 检查合同和systemId是否一致
@@ -418,7 +490,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbFePartOrder 人工申请主表信息
      * @return
      */
-    public Boolean checkSystemIdAndContract(ZkbFePartOrder zkbFePartOrder) {
+    /*public Boolean checkSystemIdAndContract(ZkbFePartOrder zkbFePartOrder) {
         List<ZkbFePartOrder> list = this.zkbFePartOrderMapper.loadAssetInfo(zkbFePartOrder.getSystemId());
         if (CollectionUtils.isEmpty(list)) {
             return false;
@@ -428,7 +500,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return false;
         }
         return true;
-    }
+    }*/
 
     /**
      * 根据ID发送消息
@@ -578,6 +650,21 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         ZkbContract item = this.zkbContractRepository.findById(contractId);
         list.add(item);
+        return list;
+    }
+
+    /**
+     * 加载合同信息
+     */
+    public List<ZkbContract> loadZkbContractInfoWithCheck(String contractId,String systemId) {
+        List<ZkbContract> list = new ArrayList<>();
+        if (StringUtils.isBlank(contractId)) {
+            return list;
+        }
+        ZkbContract item = this.zkbContractRepository.findById(contractId);
+        int i =  this.zkbFePartOrderMapper.checkAssetInfoInContract(contractId,systemId);
+        if(i==1)
+            list.add(item);
         return list;
     }
     /**
@@ -1205,7 +1292,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
 
     /**
      * 选择单据
-     *
+     * 构建数据数据  如果设备类型未  超声的 化默认是高端
      * @param selected             当前流程数据
      * @param selectZkbFePartOrder 选择的流程
      * @return
@@ -1213,6 +1300,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public ZkbFePartOrder selectedWorkFlow(ZkbFePartOrder selected, ZkbFePartOrder selectZkbFePartOrder) {
         selected.setFatherPartOrderNo(selectZkbFePartOrder.getPartOrderNo());
         selected.setSystemId(selectZkbFePartOrder.getSystemId());
+        selected.setAssetId(selectZkbFePartOrder.getAssetId());
         selected.setContractId(selectZkbFePartOrder.getContractId());
         selected.setPhenomenon(selectZkbFePartOrder.getPhenomenon());
         selected.setFunctionType(selectZkbFePartOrder.getFunctionType());
@@ -1229,7 +1317,21 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             AssetInfo assetInfo = assetInfoList.get(0);
             selected.setArtificialType("");
             if (assetInfo.getAssetGroup() != null && "2".equals(assetInfo.getAssetGroup().toString())) {
-                selected.setArtificialType(highArtificialTypeValue);
+                Set<ZkbContractAsset> zkbContractAssetSet = zkbContract.getZkbContractAssets();
+                ZkbContractAsset zkbContractAsset = new ZkbContractAsset();
+                if(zkbContractAssetSet!=null){
+                    zkbContractAsset = zkbContractAssetSet.stream().filter(z -> z.getAssetId().equals(assetInfo.getUid())).findAny().orElse(new ZkbContractAsset()) ;
+                }
+
+                if(StringUtils.isNotBlank(zkbContractAsset.getAssetType())){
+                    if(assetTypeHighMachineValue.equals(zkbContractAsset.getAssetType())){
+                        selected.setArtificialType(highArtificialTypeValue);
+                    }else if(assetTypeLowMachineValue.equals(zkbContractAsset.getAssetType())){
+                        selected.setArtificialType(lowArtificialTypeValue);
+                    }else if(assetTypeDepot.equals(zkbContractAsset.getAssetType())){
+                        selected.setArtificialType(depotArtificialTypeValue);
+                    }
+                }
             }
             selected.setAssetGroup(assetInfo.getAssetGroup().toString());
             selected.setProductNumber(assetInfo.getFunctionType());

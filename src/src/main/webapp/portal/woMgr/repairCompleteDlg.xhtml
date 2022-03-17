@@ -19,12 +19,18 @@
                             <label class="label">#{msg.recoveryTime}*</label>
                             <p:calendar timeZone="GMT+8" id="confirmedUpDate" pattern="yyyy/MM/dd HH:mm:ss" mask="true" value="#{workOrderMgrController.confirmedUpDate}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
-
                         <h:panelGroup>
                             <label class="label">#{msg.caseType}*</label>
                             <p:selectOneMenu id="caseType" value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="false" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <c:choose>
+                                    <c:when test="#{userContextService.isCountyArea()}">
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('faultTypeCountyArea')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </c:otherwise>
+                                </c:choose>
                             </p:selectOneMenu>
                         </h:panelGroup>
 

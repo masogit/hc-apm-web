@@ -24,6 +24,7 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
 
     List<ArrivalList> findBySupplierId(Integer supplierId);
     ArrivalList findByName(String name);
+    List<ArrivalList> findByContractNumAndSiteUID(String contractNum,String siteUID);
 
     @Modifying
     @Transactional
@@ -46,8 +47,8 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE arrival_list SET is_edit=true where id=?1", nativeQuery = true)
-    public void updateIsEdit(String id);
+    @Query(value = "UPDATE arrival_list SET is_edit=?1 where id=?2", nativeQuery = true)
+    public void updateIsEdit(Boolean isEdit,String id);
 
     @Modifying
     @Transactional

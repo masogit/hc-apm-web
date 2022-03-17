@@ -315,7 +315,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         else{
         	user.setPlainPassword(passwordPlain);
         }
-        if(user==null){
+        if(user==null || Boolean.TRUE.equals(user.getIsDeleted())){
             addErrorMessage(response, 401, "login_error");
             return;
         }

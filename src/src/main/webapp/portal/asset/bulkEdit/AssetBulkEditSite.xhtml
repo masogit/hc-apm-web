@@ -83,19 +83,38 @@
                                         var="asset" itemLabel="#{asset}" itemValue="#{asset}"
                                         showSourceFilter="false" showTargetFilter="false" responsive="true"
                                         filterMatchMode="contains" converter="assetInfoConverter" class="pickList">
-                                <f:facet name="sourceCaption">待选设备</f:facet>
-                                <f:facet name="targetCaption">已选设备</f:facet>
+                                <f:facet name="sourceCaption"><p  style="padding-bottom:-200px">待选设备
+                                    <br/>
+                                    <br/>
+                                    <span style="width:18%;float: left">#{msg.EquipmentName}</span>
+                                    <span style="width:20%;float: left">#{msg.financingNum}</span>
+                                    <span style="width:18%;float: left">#{msg.serialNum}</span>
+                                    <span style="width:21%;float: left">#{msg.departNum}</span>
+                                    <span style="width:21%;float: left">#{msg.qrCode}</span></p>
+                                </f:facet>
+                                <f:facet name="targetCaption"><p  style="padding-bottom:-200px">已选设备
+                                    <br/>
+                                    <br/>
+                                    <span style="width:18%;float: left">#{msg.EquipmentName}</span>
+                                    <span style="width:20%;float: left">#{msg.financingNum}</span>
+                                    <span style="width:18%;float: left">#{msg.serialNum}</span>
+                                    <span style="width:21%;float: left">#{msg.departNum}</span>
+                                    <span style="width:23%;float: left">#{msg.qrCode}</span></p>
+                                </f:facet>
                                 <p:ajax event="transfer" listener="#{assetInfoBulkEditController.onTransfer}" update="btnBulkEditSite pickList"/>
-                                <p:column style="width:30%;">
+                                <p:column style="width:18%; left: auto;">
                                     <h:outputText value="#{asset.name}" />
                                 </p:column>
-                                <p:column style="width:20%;">
+                                <p:column style="width:20%;left: auto;" >
                                     <h:outputText value="#{asset.financingNum}" />
                                 </p:column>
-                                <p:column style="width:30%;">
+                                <p:column style="width:18%;left: auto;" >
+                                    <h:outputText value="#{asset.serialNum}" />
+                                </p:column>
+                                <p:column style="width:21%;left: auto;" >
                                     <h:outputText value="#{asset.departNum}" />
                                 </p:column>
-                                <p:column style="width:20%;">
+                                <p:column style="width:23%;left: auto;" >
                                     <h:outputText value="#{asset.qrCode}" />
                                 </p:column>
                             </p:pickList>

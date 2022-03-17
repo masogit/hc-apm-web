@@ -63,8 +63,8 @@
                 <p:menuitem id="um909" value="#{msg.SwappedEquipmentNameSettings}" outcome="/portal/SharedAssetType/AssetToShare.xhtml" rendered="#{userContextService.accessContains('assetAdjust.nameConfig')}"/>
             </p:submenu>
 
-            <p:submenu id="SiteToSiteAllocation" label="科室借调" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('AssetStaff,ClinicalStaff,NursingStaff,DeptHead') and userContextService.enableSiteToSiteAllocation()}">
-                <p:menuitem id="mirage_SiteToSiteAllocation_stats" rendered="#{userContextService.hasAnyRole('AssetStaff,ClinicalStaff,NursingStaff,DeptHead') and userContextService.enableSiteToSiteAllocation()}"  value="科室借调情况" outcome="/portal/mirage/mirage.xhtml?route=/siteToSiteAllocation"    />
+            <p:submenu id="SiteToSiteAllocation" label="科室借调" icon="fa fa-folder-open-o"  rendered="#{userContextService.hasAnyRole('AssetStaff,ClinicalStaff,NursingStaff,DeptHead') and userContextService.enableSiteToSiteAllocation()}">
+                <p:menuitem id="mirage_SiteToSiteAllocation_stats"   value="科室借调情况" outcome="/portal/secondment/departmentSecondment.xhtml"  rendered="#{userContextService.hasAnyRole('AssetStaff,ClinicalStaff,NursingStaff,DeptHead') and userContextService.enableSiteToSiteAllocation()}"   />
             </p:submenu>
 
             <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('install')}">
@@ -79,6 +79,7 @@
 
                <!-- <p:menuitem  value="维修工作台" outcome="/portal/woMgr/woMgrList.xhtml"/>-->
                 <p:menuitem value="#{msg.RepairWorkbench}" outcome="/portal/woMgr/workOrderList.xhtml" rendered="#{userContextService.accessContains('repair.workbench')}"/>
+                <p:menuitem id="um221" value="核心组审核进度查看" outcome="/portal/approval/approveSchedule.xhtml" rendered="#{userContextService.getUserAccountApprove()}"/>
                 <p:menuitem id="um12" value="#{msg.MyRepairWorkorder}" outcome="/portal/sr/processList.xhtml" rendered="false"/>
                 <p:menuitem id="um11" value="#{msg.MyWorkOrder}" rendered="false" outcome="/portal/wo/myWoList.xhtml"/>
                 <p:menuitem id="um13" value="#{msg.EquipmentRepairStatistics}" outcome="/portal/wo/assetWorkOrder.xhtml" rendered="#{userContextService.accessContains('repair.count')}"/>
@@ -222,8 +223,7 @@
                 <p:menuitem id="item002" value="#{msg.assetModifyRecord}" outcome="/portal/historyInfo/assetList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin,ITAdmin')}"/>
                 <p:menuitem id="item003" value="#{msg.loginHistoryRecord}" outcome="/portal/historyInfo/loginList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin,ITAdmin')}"/>
             </p:submenu>
-
-            <p:menuitem value="设备数据概览" icon="fa fa-bar-chart"  rendered="#{userContextService.byOpWorker()}" outcome="/portal/nine.xhtml"/>
+            <p:menuitem value="设备数据概览" icon="fa fa-bar-chart"  rendered="#{userContextService.accessContains('deviceDataPreview')}" outcome="/portal/nine.xhtml"/>
 
             <p:submenu id="um24_supplier" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('supplierMaintain')}">
                 <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/supplier/pmSupplierOrderListAll.xhtml" rendered="#{userContextService.accessContains('supplierMaintain.workbench')}"/>
