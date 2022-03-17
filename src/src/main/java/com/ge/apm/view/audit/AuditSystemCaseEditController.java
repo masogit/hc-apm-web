@@ -361,10 +361,10 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             systemEntryUids.add(auditSystemEntry.getUid());
             if(!"1".equals(auditSystemEntry.getParentUid())){
                 systemEntryUids.add(auditSystemEntry.getParentUid());
-                List<AuditSystemEntry> auditSystemEntryList = auditSystemEntryRepository.findByUid(auditSystemEntry.getParentUid());
-                if (auditSystemEntryList!=null && !auditSystemEntryList.isEmpty()){
-                    if(!"1".equals(auditSystemEntryList.get(0).getParentUid())){
-                        systemEntryUids.add(auditSystemEntryList.get(0).getParentUid());
+                 AuditSystemEntry data = auditSystemEntryRepository.findByUid(auditSystemEntry.getParentUid());
+                if (data!=null){
+                    if(!"1".equals(data.getParentUid())){
+                        systemEntryUids.add(data.getParentUid());
                     }
                 }
             }

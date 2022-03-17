@@ -22,6 +22,9 @@ public interface AuditEntryTemplateRelRepository extends GenericRepositoryUUID<A
     @Query(value = "SELECT c FROM AuditTemplate c WHERE c.uid in (SELECT r.templateUid FROM  AuditEntryTemplateRel r WHERE r.entryUid = ?1 and r.orderBy=?2)")
     public List<AuditTemplate> entryAndTemplateList( String entryUid, Integer orderBy);
 
+    @Query(value = "SELECT c FROM AuditTemplate c WHERE c.uid in (SELECT r.templateUid FROM  AuditEntryTemplateRel r WHERE r.entryUid = ?1)")
+    public List<AuditTemplate> auditTemplateList( String entryUid);
+
     List<AuditEntryTemplateRel> findByTemplateUid(String templateUid);
 
 }

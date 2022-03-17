@@ -1,11 +1,12 @@
 package com.ge.apm.view.audit;
 
-import com.ge.apm.dao.AuditSystemCaseRepository;
-import com.ge.apm.dao.AuditSystemEntryRepository;
-import com.ge.apm.domain.AuditSystemCase;
-import com.ge.apm.domain.AuditSystemEntry;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import com.ge.apm.view.sysutil.UserContextService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -13,6 +14,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,11 +28,19 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
 
     private AuditSystemCaseRepository dao;
     private AuditSystemEntryRepository auditSystemEntryRepository;
+    private AuditConfigItemRepository auditConfigItemRepository;
+    private AuditTargetRepository auditTargetRepository;
+    private AuditEntryTemplateRelRepository auditEntryTemplateRelRepository;
+    private AuditEntryItemRelRepository auditEntryItemRelRepository;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(AuditSystemCaseRepository.class);
         auditSystemEntryRepository = WebUtil.getBean(AuditSystemEntryRepository.class);
+        auditConfigItemRepository = WebUtil.getBean(AuditConfigItemRepository.class);
+        auditTargetRepository = WebUtil.getBean(AuditTargetRepository.class);
+        auditEntryTemplateRelRepository = WebUtil.getBean(AuditEntryTemplateRelRepository.class);
+        auditEntryItemRelRepository = WebUtil.getBean(AuditEntryItemRelRepository.class);
 
     }
 
@@ -75,7 +85,82 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
 
         return searchFilter;
     }
+    public void onCreateCopy(AuditSystemCase auditSystemCase) {
+        if (selected == null) {
+            selected = auditSystemCase;
+        }
+    }
+    @Transactional
+    public void createCopy() {
+        if(selected==null){
+            return;
+        }
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        String accountName = userAccount.getName();
+        AuditSystemCase AuditSystemCaseNew = new AuditSystemCase();
+        BeanUtils.copyProperties(selected,AuditSystemCaseNew);
+        AuditSystemCaseNew.setUid(null);
+        AuditSystemCaseNew.setCreator(accountName);
+        AuditSystemCaseNew.setCreateTime(new Date());
+        AuditSystemCaseNew= dao.save(AuditSystemCaseNew);
 
+        String caseUid = AuditSystemCaseNew.getUid();
+        List<AuditTarget> auditTargetList = auditTargetRepository.findBySystemCaseUid(selected.getUid());
+        if (auditTargetList!=null && !auditTargetList.isEmpty()){
+            for (AuditTarget auditTarget :auditTargetList){
+                auditTarget.setSystemCaseUid(caseUid);
+                auditTarget.setUid(null);
+                auditTargetRepository.save(auditTarget);
+            }
+        }
+
+        List<AuditSystemEntry> auditSystemEntries = auditSystemEntryRepository.findByCaseUidAndParentUid(selected.getUid(),"1");
+        setEntry(auditSystemEntries,caseUid,"1",accountName);
+        String operation= "AuditSystemCaseEdit.xhtml?faces-redirect=true&uid=" + caseUid ;
+        WebUtil.navigateTo(operation);
+    }
+    private void setEntry(List<AuditSystemEntry> auditSystemEntries,String caseUid,String parentUid,String accountName){
+        if(auditSystemEntries!=null && !auditSystemEntries.isEmpty()){
+            for (AuditSystemEntry auditSystemEntry : auditSystemEntries){
+                List<AuditSystemEntry> systemEntries = auditSystemEntryRepository.findByParentUid(auditSystemEntry.getUid());
+                AuditSystemEntry data = setData(auditSystemEntry, caseUid, parentUid, accountName);
+                setEntry(systemEntries,caseUid,data.getUid(),accountName);
+            }
+        }
+    }
+    private AuditSystemEntry setData(AuditSystemEntry auditSystemEntry,String caseUid,String parentUid,String accountName){
+        if (auditSystemEntry.getUid()==null){
+            return null ;
+        }
+         List<AuditConfigItem> auditConfigItemList = auditConfigItemRepository.AuditConfigItemtList(auditSystemEntry.getUid());
+        List<AuditTemplate> auditTemplateList = auditEntryTemplateRelRepository.auditTemplateList(auditSystemEntry.getUid());
+        auditSystemEntry.setCaseUid(caseUid);
+        auditSystemEntry.setUid(null);
+        auditSystemEntry.setParentUid(parentUid);
+        auditSystemEntry.setCreateTime(new Date());
+        auditSystemEntry.setCreator(accountName);
+        AuditSystemEntry systemEntry = auditSystemEntryRepository.save(auditSystemEntry);
+        if (auditConfigItemList!=null && !auditConfigItemList.isEmpty()){
+            for (AuditConfigItem auditConfigItem:auditConfigItemList){
+                AuditEntryItemRel auditEntryItemRel = new AuditEntryItemRel();
+                auditEntryItemRel.setItemUid(auditConfigItem.getUid());
+                auditEntryItemRel.setSystemEntryUid(systemEntry.getUid());
+                auditEntryItemRel.setOrderBy(systemEntry.getOrderBy());
+                auditEntryItemRelRepository.save(auditEntryItemRel);
+            }
+        }
+        if (auditTemplateList!=null && !auditTemplateList.isEmpty()){
+            for (AuditTemplate auditTemplate:auditTemplateList){
+                AuditEntryTemplateRel auditEntryTemplateRel = new AuditEntryTemplateRel();
+                auditEntryTemplateRel.setEntryUid(systemEntry.getUid());
+                auditEntryTemplateRel.setTemplateUid(auditTemplate.getUid());
+                auditEntryTemplateRel.setOrderBy(3);
+                auditEntryTemplateRelRepository.save(auditEntryTemplateRel);
+            }
+        }
+
+        return systemEntry;
+    }
     public void editAction() {
         String operation= "AuditSystemCaseEdit.xhtml?faces-redirect=true&uid=" + selected.getUid() ;
         WebUtil.navigateTo(operation);

@@ -69,11 +69,11 @@
 
                                     <p:column headerText="操作">
                                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"
-                                                         oncomplete="PF('auditTargetDlg').show()" rendered="#{empty item.score}"
+                                                         oncomplete="PF('auditTargetDlg').show()" rendered="#{empty item.target}"
                                                          actionListener="#{auditSystemCaseEditController.onAuditTarget()}"
                                                          update="auditTargetDlg" disabled="#{empty auditSystemCaseEditController.selected.uid}"/>
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
-                                                         actionListener="#{auditSystemCaseEditController.deleteAuditTarger(item)}" rendered="#{not empty item.score}"
+                                                         actionListener="#{auditSystemCaseEditController.deleteAuditTarger(item)}" rendered="#{not empty item.target}"
                                                          update="targetForm">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                                        icon="ui-icon-alert"/>
