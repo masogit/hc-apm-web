@@ -61,7 +61,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private List<AuditTarget> auditTargets=new ArrayList<>();
     private List<AuditTemplate> auditTemplates=new ArrayList<>();
     private final AuditConfigItem auditConfigItem = new AuditConfigItem();
-    private final AuditTarget auditTarget = new AuditTarget();
+    private  AuditTarget auditTargetSelected = new AuditTarget();
     private final AuditTemplate auditTemplate = new AuditTemplate();
     public static final String STRIP = "STRIP";//条
     public static final String PAYMENT = "PAYMENT";//款
@@ -222,15 +222,18 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         auditEntryTemplateRelRepository.save(auditEntryTemplateRel);
     }
     public void saveAuditTarget() {
-        AuditTarget auditTarget = new AuditTarget();
-        auditTarget.setScore(targetScore);
-        auditTarget.setSystemCaseUid(caseUid);
-        auditTarget.setTarget(targetType);
-        auditTargetRepository.save(auditTarget);
+        auditTargetSelected.setSystemCaseUid(caseUid);
+        auditTargetRepository.save(auditTargetSelected);
+        auditTargetSelected=new AuditTarget();
     }
 
     public void deleteAuditTarger(AuditTarget auditTarget){
         auditTargetRepository.delete(auditTarget);
+    }
+    public void editAuditTarger(AuditTarget auditTarget){
+        if(auditTarget!=null){
+            auditTargetSelected=auditTarget ;
+        }
     }
     public void deleteTemplate(AuditTemplate auditTemplate){
         auditEntryTemplateRelRepository.deleteByTemplateUid(auditTemplate.getUid());
@@ -323,6 +326,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         return auditConfigItems;
     }
     public List<AuditTarget> getTargetTypeList() {
+        AuditTarget auditTarget = new AuditTarget();
         auditTargets = auditTargetRepository.findBySystemCaseUid(caseUid);
         if (auditTargets.contains(auditTarget)){
             auditTargets.remove(auditTarget);
@@ -594,4 +598,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     public void setAuditConfigItems(List<AuditConfigItem> auditConfigItems) {
         this.auditConfigItems = auditConfigItems;
     }
+
+    public AuditTarget getAuditTargetSelected() {
+        return auditTargetSelected;
+    }
+
 }
