@@ -1,7 +1,9 @@
 package com.ge.apm.view.sysutil;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
@@ -18,13 +20,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
-import webapp.framework.web.service.UserContextUtil;
 
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
@@ -41,31 +40,21 @@ import java.util.stream.Collectors;
 @ManagedBean(name = "userContextService")
 @SessionScoped
 public class UserContextService implements Serializable {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+
+
+
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
     public static final Integer INTERNATIONAL_VERSION = 1;
-    public static List<String> internationalList;
-    {
-        internationalList = Lists.newArrayList("asset","repair","maintain","config");
-    }
+    public static List<String> internationalList= Lists.newArrayList("asset","repair","maintain","config");
 
-//    public static final String MVS_ADMIN="MVSAdmin";
-//    private static final String MVS_FE="MVSFE";
 
     private TenantInfo tenant = null;
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
     private Boolean activeSupplierFlag = null;
-//    private List<RoleMsgInfo> roleMsgInfoList = null;
-//    private  ZkbContractRepository zkbContractRepository;
 
-//    @PostConstruct
-//    public void init(){
-//        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
-//    }
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
@@ -314,7 +303,29 @@ public class UserContextService implements Serializable {
             return false;
         }
     }
+    public boolean getUserAccountApprove(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccountRepository userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        userAccount = userContextService.getLoginUser();
+        AuditGroupConfigurationRepository auditGroupConfigurationRepository=WebUtil.getBean(AuditGroupConfigurationRepository.class);
+        AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
+        if(auditGroupConfiguration!=null){
+            String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+            List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+            if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                    AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                    List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                    UserAccount user = userAccountRepository.getByUid(userUids.get(0));
+                    if (userAccount.getUid().equals(user.getUid())){
+                        return true;
+                    }
+                }
 
+            }
+        }
+        return false;
+    }
     public boolean authContains(String menuName){
     	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()||userAccount.getIsGeOp()){
     		return true;
@@ -1055,7 +1066,12 @@ public class UserContextService implements Serializable {
     public boolean isYiMaiYangGuangTenant() {
         TenantInfo tenantInfo = getTenantInfo();
         //这期上线，暂时写死，下个版本改成动态配置
-        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
+        if("齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName()) || "南阳市张仲景医院有限公司".equals(tenantInfo.getName()) || "洛阳仁大医院有限公司".equals(tenantInfo.getName())){
+            return true;
+        }else{
+            return false;
+        }
+//        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
@@ -1276,6 +1292,11 @@ public class UserContextService implements Serializable {
     public boolean needScrappedControl(){
         ConfigService cfgService = WebUtil.getBean(ConfigService.class);
         return cfgService.needScrappedControl();
+    }
+
+    public boolean useNewRiskGrade(){
+        ConfigService cfgService = WebUtil.getBean(ConfigService.class);
+        return cfgService.useNewRiskGrade();
     }
 
     public boolean hasScrappedAuthority(){

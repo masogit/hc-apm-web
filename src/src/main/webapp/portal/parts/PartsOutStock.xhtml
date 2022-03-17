@@ -178,41 +178,58 @@
                                     <span style="color: red;">*</span>
                                 </h:panelGroup>
                             </p:column>
+                            <c:choose>
+                                <c:when test="#{userContextService.isCountyArea()}">
+                                    <p:column headerText="本次出库数量">
+                                        <p:cellEditor>
+                                            <f:facet name="output">
+                                                <h:outputText value="#{item.notTransactionQty}"
+                                                />
+                                            </f:facet>
+                                            <f:facet name="input">
+                                                <p:inputNumber value="#{item.notTransactionQty}" padControl="false"
+                                                               onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
+                                                </p:inputNumber>
+                                            </f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+                                    <p:column headerText="收货信息">
+                                        <h:outputText value="#{item.addressInfo}"/>
+                                    </p:column>
 
-                            <p:column headerText="部分出库数量">
-                                <p:cellEditor>
-                                    <f:facet name="output">
-                                        <h:outputText value="#{item.notTransactionQty}"
-                                        />
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputNumber id="notTransactionQty" value="#{item.notTransactionQty}" padControl="false"
-                                                       onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
-                                        </p:inputNumber>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
+                                    <p:column headerText="运输公司">
+                                        <p:inputText id="transportCompany" value="#{item.transportCompany}" >
+                                            <p:ajax event="change"  update="sparePartsOutForm "/>
+                                        </p:inputText>
+                                        <span style="color: red;">*</span>
+                                    </p:column>
 
-                            <c:if test="#{userContextService.isCountyArea()}">
-                                <p:column headerText="收货信息">
-                                    <h:outputText value="#{item.addressInfo}"/>
-                                </p:column>
-
-                                <p:column headerText="运输公司">
-                                    <p:inputText id="transportCompany" value="#{item.transportCompany}" >
-                                        <p:ajax event="change"  update="sparePartsOutForm "/>
-                                    </p:inputText>
-                                    <span style="color: red;">*</span>
-                                </p:column>
-
-                                <p:column headerText="运单号">
-                                    <p:inputText id="transportNo" value="#{item.transportNo}" >
-                                        <p:ajax event="change"  update="sparePartsOutForm "/>
-                                    </p:inputText>
-                                    <span style="color: red;">*</span>
-                                </p:column>
-
-                            </c:if>
+                                    <p:column headerText="运单号">
+                                        <p:inputText id="transportNo" value="#{item.transportNo}" >
+                                            <p:ajax event="change"  update="sparePartsOutForm "/>
+                                        </p:inputText>
+                                        <span style="color: red;">*</span>
+                                    </p:column>
+                                    <p:column headerText="工单编号">
+                                        <h:outputText value="#{item.workOrderNo}"/>
+                                    </p:column>
+                                </c:when>
+                                <c:otherwise>
+                                    <p:column headerText="部分出库数量">
+                                        <p:cellEditor>
+                                            <f:facet name="output">
+                                                <h:outputText value="#{item.notTransactionQty}"
+                                                />
+                                            </f:facet>
+                                            <f:facet name="input">
+                                                <p:inputNumber id="notTransactionQty" value="#{item.notTransactionQty}" padControl="false"
+                                                               onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
+                                                </p:inputNumber>
+                                            </f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+                                </c:otherwise>
+                            </c:choose>
                             <p:column headerText="部分出库">
                                 <p:rowEditor  rendered="#{simplePartsRequestListController.renderPartsDetails(item.status,simplePartsRequestListController.selected.proposerStatus)}"/>
                             </p:column>

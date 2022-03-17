@@ -29,7 +29,12 @@
                             <label class="label">#{msg.zkbContract_contractNo}*</label>
                             <p:inputText id="contractNo" value="#{zkbContractEditController.selected.contractNo}" required="true" requiredMessage="#{msg.zkbContract_contractNo} #{msg.ValidationRequire}" />
                         </h:panelGroup>
-
+                        <h:panelGroup >
+                            <h:panelGroup>
+                                <label class="label">公司编码</label>
+                                <p:inputText id="companyCode" value="#{zkbContractEditController.selected.companyCode}"  />
+                            </h:panelGroup>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
                             <p:selectOneMenu id="region" value="#{zkbContractEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}">
@@ -37,14 +42,7 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">是否ZKB 599方案*</label>
-                            <p:selectOneMenu  value="#{zkbContractEditController.selected.fiveNineNineFlag}" required="true" requiredMessage="是否ZKB 599合同 #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItem itemValue="Y" itemLabel="是"/>
-                                <f:selectItem itemValue="N" itemLabel="否"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_contractType}*</label>
                             <p:selectOneMenu id="status" value="#{zkbContractEditController.selected.contractType}" required="true" requiredMessage="#{msg.zkbContract_contractType} #{msg.ValidationRequire}">
@@ -56,13 +54,13 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_startDate}*</label>
-                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.contractStartDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_endDate}*
                             </label>
-                            <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.contractEndDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">名额扣除类型*</label>
@@ -70,6 +68,38 @@
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{zkbContractEditController.quotaDeductTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!(empty zkbContractEditController.selected.id)}">
+                            <label class="label">修改类型*</label>
+                            <p:selectOneMenu id="modifyType" value="#{zkbContractEditController.selected.modifyType}" required="true" requiredMessage="修改类型 #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractModifyType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否ZKB 599方案*</label>
+                            <p:selectOneMenu  value="#{zkbContractEditController.selected.fiveNineNineFlag}" required="true" requiredMessage="是否ZKB 599合同 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="firstYearFlagGroup linkContractNoGroup"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemValue="Y" itemLabel="是"/>
+                                <f:selectItem itemValue="N" itemLabel="否"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup id="firstYearFlagGroup">
+                            <h:panelGroup rendered="#{zkbContractEditController.selected.fiveNineNineFlag eq 'Y'}">
+                                <label class="label">599合同年份*</label>
+                                <p:selectOneMenu value="#{zkbContractEditController.selected.firstYearFlag}" required="true" requiredMessage="是否599方案第一年 #{msg.ValidationRequire}" >
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItem itemLabel="599合同第一年" itemValue="t"/>
+                                    <f:selectItem itemLabel="599合同第2和3年" itemValue="f"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                        <h:panelGroup id="linkContractNoGroup">
+                            <h:panelGroup rendered="#{zkbContractEditController.selected.fiveNineNineFlag eq 'Y'}">
+                                <label class="label">关联合同号</label>
+                                <p:inputText id="linkContractNo" value="#{zkbContractEditController.selected.linkContractNo}" />
+                            </h:panelGroup>
                         </h:panelGroup>
 
                         <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Spare')}">
@@ -238,29 +268,13 @@
                             <label class="label">#{msg.zkbContract_adminAddress}</label>
                             <p:inputText id="address" value="#{zkbContractEditController.selected.adminAddress}" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!(empty zkbContractEditController.selected.id)}">
-                            <label class="label">修改类型*</label>
-                            <p:selectOneMenu id="modifyType" value="#{zkbContractEditController.selected.modifyType}" required="true" requiredMessage="修改类型 #{msg.ValidationRequire}" >
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractModifyType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_remark}</label>
                             <p:inputText id="remark" value="#{zkbContractEditController.selected.remark}" />
                         </h:panelGroup>
-                       <!-- <h:panelGroup>
-                            <label class="label">实际开始时间</label>
-                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">实际结束时间</label>
-                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">599计数年</label>
-                            <p:inputText value="#{zkbContractEditController.selected.yearCount}" />
-                        </h:panelGroup>-->
+
+
                     </p:panelGrid>
 
 
@@ -367,7 +381,7 @@
                             <p:column headerText="结束日期" >
                                 <h:outputText value="#{zkbContractAssetItem.maintainEndDate}" />
                             </p:column>-->
-                           <!-- <p:column headerText="申请数量" >
+                           <!--<p:column headerText="申请数量" >
                                 <h:outputText value="#{zkbContractAssetItem.applyNum}" />
                             </p:column>-->
                             <f:facet name="{Toolbar}">

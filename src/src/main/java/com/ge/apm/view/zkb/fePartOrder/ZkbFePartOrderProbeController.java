@@ -33,7 +33,10 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<ZkbFePartOrder> {
-
+    /**
+     * 默认合同错误
+     */
+    private Boolean contractError = false;
     /**
      * 智康宝人工申请 service service
      */
@@ -379,7 +382,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * @param systemId system id
      * @param sr sr
      */
-    public void getSparePartsZkbFePartOrder(String systemId,String sr){
+   /* public void getSparePartsZkbFePartOrder(String systemId,String sr){
         if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr)){
              WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
             return;
@@ -391,14 +394,30 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             return;
         }
         this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,ZkbFePartOrderService.assetGroup,ZkbFePartOrder.OrderType.Probe.toString());
+    }*/
+    public void getSparePartsZkbFePartOrder(String systemId,String sr)
+    {
+        if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
+            return;
+        }
+        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,ZkbFePartOrderService.assetGroup,ZkbFePartOrder.OrderType.Probe.toString());
     }
+
 
     /**
      * 选择单据
      */
-    public void selectedWorkFlow()
-    {
-        this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selectZkbFePartOrder.getContractId());
+    public void selectedWorkFlow() {
+        this.contractError = false;
+        this.contractList=this.zkbFePartOrderService.loadZkbContractInfoWithCheck(this.selectZkbFePartOrder.getContractId(),this.selectZkbFePartOrder.getSystemId());
+        //未匹配到合同
+        if (CollectionUtils.isEmpty(this.contractList)) {
+            WebUtil.addErrorMessage("未查询出合同数据！","");
+            this.contractError = true;
+            return;
+        }
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             this.selected.setFatherPartOrderNo(null);
@@ -845,8 +864,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     public boolean checkFatherPartNo()
     {
-        if(StringUtils.isNotBlank(this.selected.getFatherPartOrderNo()))
-        {
+        if(StringUtils.isNotBlank(this.selected.getFatherPartOrderNo())&&!this.contractError) {
             return true;
         }
         return false;
@@ -1053,4 +1071,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         }
     }
 
+    public Boolean getContractError() {
+        return contractError;
+    }
+
+    public void setContractError(Boolean contractError) {
+        this.contractError = contractError;
+    }
 }

@@ -1,5 +1,6 @@
 package com.ge.apm.view.uaa;
 
+import ca.uhn.hl7v2.model.v24.datatype.ST;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
@@ -211,6 +212,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     private boolean isSelect46Account;
+
+
+
+    private Boolean confirmDestroy=false;
 
 
     @Override
@@ -1614,5 +1619,30 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
             uaaService.expendedTreeNode(orgTree, "ALL", -1, -1);
         }
+    }
+
+    public void destroyTenant(){
+        this.dao.deleteTenantUser(loginUser.getTenantUID());
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+        tenantInfo.setActiveType(3);
+        tenantInfoRepository.save(tenantInfo);
+        final List<UserAccount> tenantUsers = dao.findByTenantUID(loginUser.getTenantUID()).stream()
+                .filter(i-> !Strings.isNullOrEmpty(i.getWeChatId()))
+                .collect(Collectors.toList());
+        dao.save(tenantUsers);
+        logout();
+    }
+
+    public Boolean enableDestroyTenant() {
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+        return 2==tenantInfo.getActiveType();
+    }
+
+    public Boolean getConfirmDestroy() {
+        return confirmDestroy;
+    }
+
+    public void setConfirmDestroy(Boolean confirmDestroy) {
+        this.confirmDestroy = confirmDestroy;
     }
 }

@@ -291,4 +291,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     @Query(value = "select o.uid from org_info o where o.org_type=4 and o.site_uid in (?1) ", nativeQuery = true)
     public List<String> findClinicalUidBySiteUid(Set<String> orgUid);
+
+//    @Query(value = "select * from org_info  where name= ?1 and site_uid =?2 ", nativeQuery = true)
+     OrgInfo findByNameAndSiteUID(String Name, String siteUID);
 }
