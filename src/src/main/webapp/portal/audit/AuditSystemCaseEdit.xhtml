@@ -25,7 +25,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">年份</label>
-                                    <p:inputText id="version" value="#{auditSystemCaseEditController.selected.version}" style="width: 60%"/>
+                                    <p:inputText id="version" value="#{auditSystemCaseEditController.selected.version}" style="width: 60%" required="true"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">地区</label>
@@ -37,7 +37,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label" >计分方式</label>
-                                    <p:selectOneMenu value="#{auditSystemCaseEditController.selected.judgeLogic}" style="width: 60%">
+                                    <p:selectOneMenu value="#{auditSystemCaseEditController.selected.judgeLogic}" style="width: 60%" required="true">
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('Scoring')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                                     </p:selectOneMenu>
@@ -75,6 +75,10 @@
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
                                                          actionListener="#{auditSystemCaseEditController.deleteAuditTarger(item)}" rendered="#{not empty item.target}"
                                                          update="targetForm">
+                                            <p:commandButton id="editButton" icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('auditTargetDlg').show()"
+                                                             title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditTarger(item)}"
+                                                             rendered="#{not empty item.target}"  update="auditTargetDlg"/>
+
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                                        icon="ui-icon-alert"/>
                                         </p:commandButton>
@@ -273,7 +277,7 @@
                                     <label class="label" style="font-size: medium; font-weight: bold">层级编号</label>
                                     <p:inputText id="entryMark"
                                                  value="#{auditSystemCaseEditController.entryMark}" required="true"
-                                                 requiredMessage="层级名称不能为空">
+                                                 requiredMessage="层级编号不能为空">
                                         <p:ajax process="@this"/>
                                     </p:inputText>
                                 </h:panelGroup>
@@ -284,6 +288,14 @@
                                                  requiredMessage="层级名称不能为空">
                                         <p:ajax process="@this"/>
                                     </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{auditSystemCaseEditController.entryOrderBy eq 2}">
+                                    <label class="label">款分值</label>
+                                    <p:inputText id="paymentScoreStandard" value="#{auditSystemCaseEditController.paymentScoreStandard}" style="width: 60%"/>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{auditSystemCaseEditController.entryOrderBy eq 3}">
+                                    <label class="label">指标分值</label>
+                                    <p:inputText id="targetScoreStandard" value="#{auditSystemCaseEditController.targetScoreStandard}" style="width: 60%"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:fieldset>
@@ -318,14 +330,6 @@
                                     <p:ajax process="@this" listener="#{auditSystemCaseEditController.setNothing()}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{auditSystemCaseEditController.getPayment()}">
-                                <label class="label">款分值</label>
-                                <p:inputText id="paymentScoreStandard" value="#{auditSystemCaseEditController.paymentScoreStandard}" style="width: 60%"/>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{auditSystemCaseEditController.getTarget()}">
-                                <label class="label">指标分值</label>
-                                <p:inputText id="targetScoreStandard" value="#{auditSystemCaseEditController.targetScoreStandard}" style="width: 60%"/>
-                            </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup  >
                             <br/><br/><br/><br/><br/><br/><br/><br/>
@@ -342,14 +346,15 @@
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 80%" rendered="true">
                             <h:panelGroup>
                                 <label class="label">目标*</label>
-                                <p:selectOneMenu value="#{auditSystemCaseEditController.targetType}" required="true"  requiredMessage="目标 #{msg.ValidationRequire}" autoWidth="false" style="width: 50%;">
+                                <p:selectOneMenu value="#{auditSystemCaseEditController.auditTargetSelected.target}" required="true"  requiredMessage="目标 #{msg.ValidationRequire}" autoWidth="false" style="width: 50%;">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"  noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('targetType')}"  var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}" />
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">分值</label>
-                                <p:inputText id="targetScore" value="#{auditSystemCaseEditController.targetScore}" style="width: 60%"/>
+                                <p:inputText id="targetScore" value="#{auditSystemCaseEditController.auditTargetSelected.score}" style="width: 60%"
+                                             required="true"/>
                             </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup  >
