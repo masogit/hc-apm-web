@@ -37,6 +37,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private String retrieval;
     private String entryName;
     private String entryMark;
+    private Double entryScoreStandard;
     private Integer entryType;
     private Integer targetType;
     private Double targetScore;
@@ -60,6 +61,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private List<AuditConfigItem> auditConfigItems=new ArrayList<>();
     private List<AuditTemplate> auditTemplates=new ArrayList<>();
     private  AuditConfigItem auditConfigItemSelected = new AuditConfigItem();
+    private  AuditSystemEntry auditSystemEntrySelected = new AuditSystemEntry();
     private  AuditTarget auditTargetSelected = new AuditTarget();
     private final AuditTemplate auditTemplate = new AuditTemplate();
     public static final String STRIP = "STRIP";//条
@@ -159,40 +161,51 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
     public void saveAuditSystemEntry() {
         AuditSystemEntry date = new AuditSystemEntry();
+        Integer type=0;
+        if(auditSystemEntrySelected!=null&&auditSystemEntrySelected.getUid()!=null){
+            date=auditSystemEntrySelected;
+        }else {
+            if(auditSystemEntry!=null){
+                type= auditSystemEntry.getType();
+            }
+            auditSystemEntry=null;
+            if (caseLevel!=0){
+                ++caseLevel;
+                if(type==3){
+                    caseLevel=0;
+                    entryType=null;
+                    WebUtil.addErrorMessage("错误: 指标没有子节点,不能配置");
+                    return;
+                }
+
+                if (entryType==null){
+                    entryType = caseLevel;
+                }else if(entryType==3){
+                    caseLevel=3;
+                }
+                date.setLevel(caseLevel);
+                date.setType(entryType);
+                date.setOrderBy(entryType);
+            }else {
+                date.setLevel(1);
+                date.setOrderBy(1);
+                date.setType(1);
+                entryUid="1";
+            }
+            date.setParentUid(entryUid);
+            date.setCaseUid(caseUid);
+            date.setScoreInit(0D);
+        }
         date.setName(entryName);
         date.setMark(entryMark);
-        date.setCaseUid(caseUid);
-        date.setScoreInit(0D);
-        Integer type=0;
-        if(auditSystemEntry!=null){
-            type= auditSystemEntry.getType();
-        }
-        auditSystemEntry=null;
-        if (caseLevel!=0){
-            ++caseLevel;
-            if(type==3){
-                caseLevel=0;
-                entryType=null;
-                WebUtil.addErrorMessage("错误: 指标没有子节点,不能配置");
-                return;
-            }
-            date.setLevel(caseLevel);
-            if (entryType==null){
-               entryType = caseLevel;
-            }
-            date.setType(entryType);
-            date.setOrderBy(entryType);
-        }else {
-            date.setLevel(1);
-            date.setOrderBy(1);
-            date.setType(1);
-            entryUid="1";
-        }
-        date.setParentUid(entryUid);
+        date.setScoreStandard(entryScoreStandard);
+
+
         auditSystemEntryRepository.save(date);
         buildOrdTree();
         caseLevel=0;
         entryType=null;
+        entryScoreStandard=null;
     }
     public void saveAuditConfigItem() {
         AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
@@ -206,7 +219,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             orderBy=2;
             auditSystemEntry.setScoreStandard(paymentScoreStandard);
         }else {
-            orderBy=2;
+            orderBy=3;
             auditSystemEntry.setScoreStandard(targetScoreStandard);
         }
         auditEntryItemRel.setOrderBy(orderBy);
@@ -248,6 +261,15 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             auditConfigItemSelected=auditConfigItem ;
         }
     }
+    public void editAuditSystementry(){
+        if(auditSystemEntry!=null&&auditSystemEntry.getUid()!=null){
+            entryType=auditSystemEntry.getType();
+            entryMark=auditSystemEntry.getMark();
+            entryName=auditSystemEntry.getName();
+            entryScoreStandard=auditSystemEntry.getScoreStandard();
+            auditSystemEntrySelected=auditSystemEntry;
+        }
+    }
     public void deleteTemplate(AuditTemplate auditTemplate){
         auditEntryTemplateRelRepository.deleteByTemplateUid(auditTemplate.getUid());
     }
@@ -282,6 +304,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             currentTabId = TARGET;
             targetScoreStandard=auditSystemEntry.getScoreStandard();
         }
+        entryScoreStandard=null;
     }
     public void preDelete() {
         onSelectFlag=true;
@@ -326,6 +349,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }else{
             entryFlag =false;
         }
+        auditSystemEntrySelected=new AuditSystemEntry();
+        entryScoreStandard=null;
     }
     public List<AuditTemplate> auditTemplates(){
         return auditTemplateRepository.findByType(1);
@@ -523,6 +548,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         this.entryMarkName = entryMarkName;
     }
 
+    public Double getEntryScoreStandard() {
+        return entryScoreStandard;
+    }
+
+    public void setEntryScoreStandard(Double entryScoreStandard) {
+        this.entryScoreStandard = entryScoreStandard;
+    }
+
     public String getEntryName() {
         return entryName;
     }
@@ -608,6 +641,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public List<AuditConfigItem> getAuditConfigItems() {
         return auditConfigItems;
+    }
+
+    public int getCaseLevel() {
+        return caseLevel;
+    }
+
+    public void setCaseLevel(int caseLevel) {
+        this.caseLevel = caseLevel;
     }
 
     public void setAuditConfigItems(List<AuditConfigItem> auditConfigItems) {
