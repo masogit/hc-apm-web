@@ -55,48 +55,52 @@
                     </div>
                 </h:form>
                 <h:form id="targetForm"  >
-                        <div class="ui-g-18 ui-lg-12">
-                            <div class="card"  >
-                                <p:dataTable id="targetList" value="#{auditSystemCaseEditController.getTargetTypeList()}" var="item"
-                                             lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
-                                             emptyMessage="#{msg.noRecordFound}">
-                                    <p:column headerText="目标">
+                    <div class="ui-g-18 ui-lg-12">
+                        <div class="card"  >
+                            <p:dataTable id="targetList" value="#{auditSystemCaseEditController.getTargetTypeList()}" var="item"
+                                         lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
+                                         emptyMessage="#{msg.noRecordFound}">
+                                <p:column headerText="目标">
                                     <h:outputText value="#{fieldMsg.fieldValue('targetType',item.target)}"/>
-                                    </p:column>
-                                    <p:column headerText="目标分数">
-                                        <h:outputText value="#{item.score}"/>
-                                    </p:column>
+                                </p:column>
+                                <p:column headerText="目标分数">
+                                    <h:outputText value="#{item.score}"/>
+                                </p:column>
 
-                                    <p:column headerText="操作">
-                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"
-                                                         oncomplete="PF('auditTargetDlg').show()" rendered="#{empty item.target}"
-                                                         actionListener="#{auditSystemCaseEditController.onAuditTarget()}"
-                                                         update="auditTargetDlg" disabled="#{empty auditSystemCaseEditController.selected.uid}"/>
-                                        <p:commandButton icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('auditTargetDlg').show()"
-                                                         title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditTarger(item)}"
-                                                         rendered="#{not empty item.target}"  update="auditTargetDlg"/>
-                                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
-                                                         actionListener="#{auditSystemCaseEditController.deleteAuditTarger(item)}" rendered="#{not empty item.target}"
-                                                         update="targetForm">
-                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
-                                                       icon="ui-icon-alert"/>
-                                        </p:commandButton>
-                                    </p:column>
-                                </p:dataTable>
-                            </div>
+                                <p:column headerText="操作">
+                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"
+                                                     oncomplete="PF('auditTargetDlg').show()" rendered="#{empty item.target}"
+                                                     actionListener="#{auditSystemCaseEditController.onAuditTarget()}"
+                                                     update="auditTargetDlg" disabled="#{empty auditSystemCaseEditController.selected.uid}"/>
+                                    <p:commandButton icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('auditTargetDlg').show()"
+                                                     title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditTarger(item)}"
+                                                     rendered="#{not empty item.target}"  update="auditTargetDlg"/>
+                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
+                                                     actionListener="#{auditSystemCaseEditController.deleteAuditTarger(item)}" rendered="#{not empty item.target}"
+                                                     update="targetForm">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                                   icon="ui-icon-alert"/>
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
                         </div>
-                        <br/>
-                    </h:form>
+                    </div>
+                    <br/>
+                </h:form>
                 <h:form id="entryForm">
                     <div class="ui-g-12 ui-lg-4">
                         <div class="card" style="height:780px;">
                             <h:panelGroup>
                                 <p:inputText id="entryMarkName" value="#{auditSystemCaseEditController.entryMarkName}"/>
                                 <p:commandButton id = "adminListSearch" icon="ui-icon-location-searching" style="width: 90px;"   actionListener="#{auditSystemCaseEditController.filterNode()}" value="#{msg.Search2}"  update="entryTree" disabled="#{empty auditSystemCaseEditController.selected.uid}"/>
-                                <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" update="entryTree"  disabled="#{empty auditSystemCaseEditController.selected.uid}" actionListener="#{auditSystemCaseEditController.preDelete}"/>
+                                <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"  title="#{msg.Create}"   update="MarkForm"  actionListener="#{auditSystemCaseEditController.preCreate()}"
+                                                 disabled="#{empty auditSystemCaseEditController.selected.uid}" oncomplete="PF('markDlg').show()"/>
+                                <p:commandButton  icon="ui-icon-pencil"    class="btn btn-sm btn-gray" process="@this" oncomplete="PF('markDlg').show()" disabled="#{empty auditSystemCaseEditController.selected.uid}"
+                                                  title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditSystementry()}"
+                                                  update="markDlg"/>
+                                <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" update="entryTree"  disabled="#{empty auditSystemCaseEditController.selected.uid}"
+                                                 actionListener="#{auditSystemCaseEditController.preDelete}"/>
                             </h:panelGroup>
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"  title="#{msg.Create}"   update="MarkForm"  actionListener="#{auditSystemCaseEditController.preCreate()}"
-                                             disabled="#{empty auditSystemCaseEditController.selected.uid}" oncomplete="PF('markDlg').show()"/>
 
                             <p:scrollPanel style="height:95%;border: 0" mode="native">
                                 <p:tree id="entryTree" class="tree" style="width:98%;border:0;"  value="#{auditSystemCaseEditController.orgTree}"  var="node" selectionMode="single" selection="#{auditSystemCaseEditController.selectedNode}" highlight="true">
@@ -142,15 +146,15 @@
                                                          oncomplete="PF('contentDlg').show()" rendered="#{empty item.mark}"
                                                          actionListener="#{auditSystemCaseEditController.onContent()}"
                                                          update="contentDlg"/>
+                                        <p:commandButton  icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('contentDlg').show()"
+                                                          title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditConfigItem(item)}"
+                                                          rendered="#{not empty item.mark}"  update="contentDlg"/>
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
                                                          actionListener="#{auditSystemCaseEditController.deleteNode(item)}" rendered="#{not empty item.mark}"
                                                          update="stripList">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                                        icon="ui-icon-alert"/>
                                         </p:commandButton>
-                                        <p:commandButton  icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('contentDlg').show()"
-                                                         title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditConfigItem(item)}"
-                                                         rendered="#{not empty item.mark}"  update="contentDlg"/>
                                     </p:column>
                                 </p:dataTable>
 
@@ -158,7 +162,7 @@
                             </h:form>
                             <h:form id="paymentForm" rendered="#{auditSystemCaseEditController.getPayment()}">
                                 <h:panelGroup>
-                                        <h:outputText value="款分值 : #{auditSystemCaseEditController.paymentScoreStandard}"/>
+                                    <h:outputText value="款分值 : #{auditSystemCaseEditController.paymentScoreStandard}"/>
                                 </h:panelGroup>
                                 <br/>
                                 <br/>
@@ -180,6 +184,9 @@
                                                          oncomplete="PF('contentDlg').show()"
                                                          actionListener="#{auditSystemCaseEditController.onContent()}" rendered="#{empty item.mark}"
                                                          update="contentDlg"/>
+                                        <p:commandButton  icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('contentDlg').show()"
+                                                          title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditConfigItem(item)}"
+                                                          rendered="#{not empty item.mark}"  update="contentDlg"/>
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
                                                          actionListener="#{auditSystemCaseEditController.deleteNode(item)}" rendered="#{not empty item.mark}"
                                                          update="paymentList">
@@ -215,6 +222,9 @@
                                                          oncomplete="PF('contentDlg').show()" rendered="#{empty item.mark}"
                                                          actionListener="#{auditSystemCaseEditController.onContent()}"
                                                          update="contentDlg"/>
+                                        <p:commandButton  icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('contentDlg').show()"
+                                                          title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditConfigItem(item)}"
+                                                          rendered="#{not empty item.mark}"  update="contentDlg"/>
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
                                                          actionListener="#{auditSystemCaseEditController.deleteNode(item)}" rendered="#{not empty item.mark}"
                                                          update="argetList">
@@ -228,35 +238,35 @@
                             </h:form>
                             <h:form id="auditTemplateFrom" rendered="#{auditSystemCaseEditController.getTarget()}">
                                 <p> 模板配置 </p>
-                                    <p:dataTable id="auditTemplatList" value="#{auditSystemCaseEditController.getAuditTemplateList()}" var="item"
-                                                 lazy="false" paginator="false" rowKey="#{item.uid}" rows="1000"
-                                                 emptyMessage="#{msg.noRecordFound}">
-                                        <p:column headerText="#{msg.TemplateName}" >
-                                            <h:outputText value="#{item.name}"/>
-                                        </p:column>
-                                        <p:column headerText="#{msg.Mark}" >
-                                            <h:outputText value="#{item.mark}"/>
-                                        </p:column>
-                                        <p:column headerText="#{msg.FileName}" >
-                                            <h:outputText value="#{item.fileName}"/>
-                                        </p:column>
+                                <p:dataTable id="auditTemplatList" value="#{auditSystemCaseEditController.getAuditTemplateList()}" var="item"
+                                             lazy="false" paginator="false" rowKey="#{item.uid}" rows="1000"
+                                             emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="#{msg.TemplateName}" >
+                                        <h:outputText value="#{item.name}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.Mark}" >
+                                        <h:outputText value="#{item.mark}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.FileName}" >
+                                        <h:outputText value="#{item.fileName}"/>
+                                    </p:column>
 
-                                        <p:column headerText="操作">
-                                            <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"
-                                                             oncomplete="PF('auditTemplateDlg').show()" rendered="#{empty item.mark}"
-                                                             actionListener="#{auditSystemCaseEditController.onContent()}"
-                                                             update="auditTemplateDlg"/>
-                                            <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" rendered="#{not empty item.mark}"
-                                                             actionListener="#{auditSystemCaseEditController.deleteTemplate(item)}"
-                                                             update="auditTemplatList">
-                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
-                                                           icon="ui-icon-alert"/>
-                                            </p:commandButton>
-                                        </p:column>
-                                    </p:dataTable>
+                                    <p:column headerText="操作">
+                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"
+                                                         oncomplete="PF('auditTemplateDlg').show()" rendered="#{empty item.mark}"
+                                                         actionListener="#{auditSystemCaseEditController.onContent()}"
+                                                         update="auditTemplateDlg"/>
+                                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" rendered="#{not empty item.mark}"
+                                                         actionListener="#{auditSystemCaseEditController.deleteTemplate(item)}"
+                                                         update="auditTemplatList">
+                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                                       icon="ui-icon-alert"/>
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
 
-                                    <br/>
-                                </h:form>
+                                <br/>
+                            </h:form>
 
                         </div>
                     </div>
@@ -291,13 +301,9 @@
                                         <p:ajax process="@this"/>
                                     </p:inputText>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{auditSystemCaseEditController.entryOrderBy eq 2}">
-                                    <label class="label">款分值</label>
-                                    <p:inputText id="paymentScoreStandard" value="#{auditSystemCaseEditController.paymentScoreStandard}" style="width: 60%"/>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{auditSystemCaseEditController.entryOrderBy eq 3}">
-                                    <label class="label">指标分值</label>
-                                    <p:inputText id="targetScoreStandard" value="#{auditSystemCaseEditController.targetScoreStandard}" style="width: 60%"/>
+                                <h:panelGroup rendered="#{auditSystemCaseEditController.caseLevel ne 0}">
+                                    <label class="label">分值</label>
+                                    <p:inputText  value="#{auditSystemCaseEditController.entryScoreStandard}" style="width: 60%"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:fieldset>
@@ -325,7 +331,7 @@
                             <h:panelGroup id="content">
                                 <label class="label">#{msg.mark}*</label>
                                 <p:selectOneMenu value="#{auditSystemCaseEditController.configItemUid}"   requiredMessage="#{msg.content} #{msg.ValidationRequire}"
-                                                   autoWidth="false" style="width: 50%;">
+                                                 autoWidth="false" style="width: 50%;">
                                     <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? auditSystemCaseEditController.auditConfigItemSelected.mark : msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
                                     <f:selectItems value="#{auditSystemCaseEditController.auditConfigItemList()}" var="entry" itemLabel="#{entry.mark}"  itemValue="#{entry.uid}"/>
                                     <p:ajax process="@this" event="itemSelect" listener="#{auditSystemCaseEditController.setNothing()}"/>
