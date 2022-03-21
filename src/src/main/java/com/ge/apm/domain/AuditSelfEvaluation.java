@@ -21,7 +21,12 @@ public class AuditSelfEvaluation {
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(name = "uid")
     private String uid;
-
+    //批次
+    @Column(name = "batch_version")
+    private String batchVersion;
+    // 日期
+    @Column(name = "period")
+    private Date period;
     // 评分标准（扣分、累加分、折算分...）
     @Column(name = "standard_type")
     private Integer standardType;
