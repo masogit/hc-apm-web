@@ -181,7 +181,7 @@ public class AssetInfoBulkEditCheckService {
                 }
                 Set<NurseSiteMaintainData> maintainDataByParentIds = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainIds);
                 for (NurseSiteMaintainData nurseSiteMaintainData : maintainDataByParentIds) {
-                    Boolean checkValue = nurseSiteMaintainData.getCheckValue() != null ? nurseSiteMaintainData.getCheckValue() :false;
+                    Boolean checkValue = nurseSiteMaintainData.getCheckValue() != null ? true :false;
                     if(!checkValue){
                         return Optional.of("设备("+as.getName()+")当前有未完成的日常检查工单无法迁移 请先关闭工单！");
                     }
