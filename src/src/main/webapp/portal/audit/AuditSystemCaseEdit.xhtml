@@ -256,6 +256,9 @@
                                                          oncomplete="PF('auditTemplateDlg').show()" rendered="#{empty item.mark}"
                                                          actionListener="#{auditSystemCaseEditController.onContent()}"
                                                          update="auditTemplateDlg"/>
+                                        <p:commandButton  icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('auditTemplateDlg').show()"
+                                                          title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditTemplate(item)}"
+                                                          rendered="#{not empty item.mark}"  update="auditTemplateDlg"/>
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" rendered="#{not empty item.mark}"
                                                          actionListener="#{auditSystemCaseEditController.deleteTemplate(item)}"
                                                          update="auditTemplatList">
@@ -382,7 +385,8 @@
                                 <label class="label">#{msg.Mark}*</label>
                                 <p:selectOneMenu value="#{auditSystemCaseEditController.templateUid}" required="true" requiredMessage="#{msg.content} #{msg.ValidationRequire}"
                                                  autoWidth="false" style="width: 50%;">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
+                                    <f:selectItem itemLabel="#{auditSystemCaseEditController.auditTemplateSelected.uid !=null ? auditSystemCaseEditController.auditTemplateSelected.mark : msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
+
                                     <f:selectItems value="#{auditSystemCaseEditController.auditTemplates()}" var="template" itemLabel="#{template.mark}"  itemValue="#{template.uid}"/>
                                     <p:ajax process="@this" event="itemSelect" listener="#{auditSystemCaseEditController.setNothing()}"/>
                                     <p:ajax process="@this" listener="#{auditSystemCaseEditController.setNothing()}"/>
