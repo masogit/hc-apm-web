@@ -61,6 +61,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private List<AuditConfigItem> auditConfigItems=new ArrayList<>();
     private List<AuditTemplate> auditTemplates=new ArrayList<>();
     private  AuditConfigItem auditConfigItemSelected = new AuditConfigItem();
+    private AuditTemplate auditTemplateSelected = new AuditTemplate();
     private  AuditSystemEntry auditSystemEntrySelected = new AuditSystemEntry();
     private  AuditTarget auditTargetSelected = new AuditTarget();
     private final AuditTemplate auditTemplate = new AuditTemplate();
@@ -239,8 +240,15 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         AuditEntryTemplateRel auditEntryTemplateRel = new AuditEntryTemplateRel();
         auditEntryTemplateRel.setEntryUid(auditSystemEntry.getUid());
         auditEntryTemplateRel.setTemplateUid(auditTemplate.getUid());
-        auditEntryTemplateRel.setOrderBy(3);
+        auditEntryTemplateRel.setOrderBy(auditSystemEntry.getOrderBy());
         auditEntryTemplateRelRepository.save(auditEntryTemplateRel);
+        if(auditTemplateSelected!=null){
+            List<AuditEntryTemplateRel> list = auditEntryTemplateRelRepository.findByTemplateUidAndEntryUidAndOrderBy(auditTemplateSelected.getUid(), auditSystemEntry.getUid(), auditSystemEntry.getOrderBy());
+            if (list!=null && !list.isEmpty()){
+                auditEntryTemplateRelRepository.delete(list);
+            }
+        }
+        auditTemplateSelected=new AuditTemplate();
     }
     public void saveAuditTarget() {
         auditTargetSelected.setSystemCaseUid(caseUid);
@@ -254,6 +262,11 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     public void editAuditTarger(AuditTarget auditTarget){
         if(auditTarget!=null){
             auditTargetSelected=auditTarget ;
+        }
+    }
+    public void editAuditTemplate(AuditTemplate auditTemplate){
+        if(auditTemplate!=null){
+            auditTemplateSelected=auditTemplate ;
         }
     }
     public void editAuditConfigItem(AuditConfigItem auditConfigItem){
@@ -462,6 +475,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
     public void onContent() {
         auditConfigItemSelected=new AuditConfigItem();
+        auditTemplateSelected=new AuditTemplate();
         entryType = null;
         configItemUid = null;
         templateUid=null;
@@ -665,5 +679,13 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public void setAuditConfigItemSelected(AuditConfigItem auditConfigItemSelected) {
         this.auditConfigItemSelected = auditConfigItemSelected;
+    }
+
+    public AuditTemplate getAuditTemplateSelected() {
+        return auditTemplateSelected;
+    }
+
+    public void setAuditTemplateSelected(AuditTemplate auditTemplateSelected) {
+        this.auditTemplateSelected = auditTemplateSelected;
     }
 }

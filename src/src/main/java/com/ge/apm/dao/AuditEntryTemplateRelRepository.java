@@ -27,4 +27,6 @@ public interface AuditEntryTemplateRelRepository extends GenericRepositoryUUID<A
 
     List<AuditEntryTemplateRel> findByTemplateUid(String templateUid);
 
+    List<AuditEntryTemplateRel> findByTemplateUidAndEntryUidAndOrderBy(String templateUid, String entryUid, Integer orderBy);
+
 }
