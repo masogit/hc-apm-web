@@ -50,6 +50,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private Double targetScoreStandard;
     private boolean onSelectFlag = true;
     private boolean entryFlag = false;
+    private boolean entryScoreFlag = true;
+    private boolean orderByFlag = true;
     private int caseLevel=0;
     private Integer entryOrderBy =0;
     private TreeNode orgTree;
@@ -96,7 +98,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             uid= selected.getUid();
         }
         List<AuditSystemEntry> auditSystemEntryList =auditSystemEntryRepository.entryList(uid);
-        getOrgTreeNodes(auditSystemEntryList,"1");
+        buildEntryTreeNodes(auditSystemEntryList);
     }
     @Override
     protected GenericRepositoryUUID<AuditSystemCase> getDAO() {
@@ -129,7 +131,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
         return searchFilter;
     }
-    public TreeNode getOrgTreeNodes(List<AuditSystemEntry> auditSystemEntryList,String siteUID) {
+    public TreeNode buildEntryTreeNodes(List<AuditSystemEntry> auditSystemEntryList) {
         orgTree = new DefaultTreeNode("root", null, null);
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
         Map<String, TreeNode> parentTreeMap = new LinkedHashMap<>();
@@ -160,6 +162,48 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
         return orgTree;
     }
+    public TreeNode getEntryTreeNodes(List<AuditSystemEntry> auditSystemEntryList) {
+        orgTree = new DefaultTreeNode("root", null, null);
+        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
+        Map<String, TreeNode> parentTreeMap = new LinkedHashMap<>();
+        for (AuditSystemEntry auditSystemEntry : auditSystemEntryList) {
+            TreeNode node = new DefaultTreeNode("org", auditSystemEntry, null);
+            node.setRowKey("org_" + auditSystemEntry.getUid());
+            editData(auditSystemEntry,node,treeMap,parentTreeMap);
+        }
+        for (Map.Entry<String, TreeNode> nodeItem : treeMap.entrySet()) {
+            TreeNode node = nodeItem.getValue();
+            AuditSystemEntry auditSystemEntry = (AuditSystemEntry) node.getData();
+            if (auditSystemEntry.getParentUid() != null) {
+                TreeNode parentNode = treeMap.get(auditSystemEntry.getParentUid());
+                if (parentNode != null) {
+                    parentNode.getChildren().add(node);
+                }
+            }
+        }
+        for (Map.Entry<String, TreeNode> nodeItem : parentTreeMap.entrySet()) {
+            String parentUid = nodeItem.getKey();
+            if (treeMap.get(parentUid) != null) {
+                orgTree.getChildren().add(treeMap.get(parentUid));
+            }
+        }
+
+        return orgTree;
+    }
+    private void editData(AuditSystemEntry auditSystemEntry, TreeNode node ,Map<String, TreeNode> treeMap, Map<String, TreeNode> parentTreeMap ){
+        treeMap.put(auditSystemEntry.getUid(), node);
+        node.setExpanded(true);
+        if(auditSystemEntry.getLevel()==1){
+            parentTreeMap.put(auditSystemEntry.getUid(),node);
+        }else {
+            AuditSystemEntry entry = auditSystemEntryRepository.findByUid(auditSystemEntry.getParentUid());
+            if(entry!=null) {
+                TreeNode treeNode = new DefaultTreeNode("org", entry, null);
+                editData(entry,treeNode,treeMap,parentTreeMap);
+            }
+        }
+    }
+
     public void saveAuditSystemEntry() {
         AuditSystemEntry date = new AuditSystemEntry();
         Integer type=0;
@@ -281,6 +325,10 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             entryName=auditSystemEntry.getName();
             entryScoreStandard=auditSystemEntry.getScoreStandard();
             auditSystemEntrySelected=auditSystemEntry;
+            entryScoreFlag=true;
+            if(auditSystemEntry.getLevel()==1){
+                entryScoreFlag=false;
+            }
         }
     }
     public void deleteTemplate(AuditTemplate auditTemplate){
@@ -308,12 +356,19 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         entryUid = auditSystemEntry.getUid();
         caseLevel = auditSystemEntry.getLevel();
         entryOrderBy = auditSystemEntry.getOrderBy();
+        orderByFlag=true;
         if (caseLevel==1){
             currentTabId = STRIP;
         }else if(caseLevel==2){
             currentTabId = PAYMENT;
             paymentScoreStandard=auditSystemEntry.getScoreStandard();
         }else {
+            AuditSystemEntry entry = auditSystemEntryRepository.findByUid(auditSystemEntry.getParentUid());
+            if(entry!=null){
+                if(entry.getOrderBy()==1){
+                    orderByFlag=false;
+                }
+            }
             currentTabId = TARGET;
             targetScoreStandard=auditSystemEntry.getScoreStandard();
         }
@@ -359,8 +414,10 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         if (caseLevel==1){
             entryFlag =true;
+            entryScoreFlag=true;
         }else{
             entryFlag =false;
+            entryScoreFlag=true;
         }
         auditSystemEntrySelected=new AuditSystemEntry();
         entryScoreStandard=null;
@@ -455,16 +512,6 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         String operation= "AuditSystemCaseList.xhtml?actionName=Create";
        return UrlEncryptController.encodeUrlParam(operation);
     }
-    public AuditSystemCase onSelectAuditSystemCase() {
-        return selected;
-    }
-    public String getStatusName(int status){
-        switch (status){
-            case 1 : return "草稿";
-            case 2 : return "发布";
-            default: return "过期";
-        }
-    }
 
     public void deleteAction() {
         if(selected.getUid()==null){
@@ -511,7 +558,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         if (selected!=null){
             uid= selected.getUid();
         }
-        orgTree = getOrgTreeNodes(auditSystemEntryRepository.findListByName(entryMarkName,uid),"1");
+        orgTree = getEntryTreeNodes(auditSystemEntryRepository.findListByName(entryMarkName,uid));
     }
     public void saveSelectedOrg() {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
@@ -687,5 +734,21 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public void setAuditTemplateSelected(AuditTemplate auditTemplateSelected) {
         this.auditTemplateSelected = auditTemplateSelected;
+    }
+
+    public boolean isEntryScoreFlag() {
+        return entryScoreFlag;
+    }
+
+    public void setEntryScoreFlag(boolean entryScoreFlag) {
+        this.entryScoreFlag = entryScoreFlag;
+    }
+
+    public boolean isOrderByFlag() {
+        return orderByFlag;
+    }
+
+    public void setOrderByFlag(boolean orderByFlag) {
+        this.orderByFlag = orderByFlag;
     }
 }

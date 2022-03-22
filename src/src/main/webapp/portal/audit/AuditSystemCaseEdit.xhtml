@@ -123,7 +123,7 @@
                                 <p:commandButton value="条配置"   process="@this" update="editContentForm" disabled="#{auditSystemCaseEditController.getStrip()}" actionListener="#{auditSystemCaseEditController.strip}"
                                                  rendered="#{auditSystemCaseEditController.entryOrderBy eq 1 or auditSystemCaseEditController.entryOrderBy  eq 2 or auditSystemCaseEditController.entryOrderBy eq 3}"/>
                                 <p:commandButton value="款配置"     process="@this" update="editContentForm" disabled="#{auditSystemCaseEditController.getPayment()}" actionListener="#{auditSystemCaseEditController.payment}"
-                                                 rendered="#{auditSystemCaseEditController.entryOrderBy  eq 2 or auditSystemCaseEditController.entryOrderBy  eq 3}" />
+                                                 rendered="#{auditSystemCaseEditController.entryOrderBy  eq 2 or (auditSystemCaseEditController.entryOrderBy  eq 3 and auditSystemCaseEditController.orderByFlag)}" />
                                 <p:commandButton value="指标配置"   process="@this" update="editContentForm"  disabled="#{auditSystemCaseEditController.getTarget()}" actionListener="#{auditSystemCaseEditController.target}"
                                                  rendered="#{auditSystemCaseEditController.entryOrderBy eq 3}"/>
                             </h:panelGrid>
@@ -281,7 +281,7 @@
                         <p:fieldset id="basic" legend="基本信息">
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
-                                <h:panelGroup rendered="#{auditSystemCaseEditController.entryFlag}">
+                                <h:panelGroup rendered="#{auditSystemCaseEditController.entryFlag and auditSystemCaseEditController.entryScoreFlag}">
                                     <label class="label" >类型</label>
                                     <p:selectOneMenu value="#{auditSystemCaseEditController.entryType}">
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -304,7 +304,7 @@
                                         <p:ajax process="@this"/>
                                     </p:inputText>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{auditSystemCaseEditController.caseLevel ne 0}">
+                                <h:panelGroup rendered="#{auditSystemCaseEditController.entryScoreFlag}">
                                     <label class="label">分值</label>
                                     <p:inputText  value="#{auditSystemCaseEditController.entryScoreStandard}" style="width: 60%"/>
                                 </h:panelGroup>
