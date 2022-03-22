@@ -76,6 +76,13 @@
                 <label class="label">设备编号</label>
                 <p:inputText id="departNumInput" binding="#{departNumComponent}" value="#{assetSelectController.departNum}"/>
             </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">是否急救类设备</label>
+                <p:selectOneMenu id="emergencyEquipment" value="#{assetSelectController.emergencyEquipment}" disabled="false">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
 			<p:commandButton validateClient="true" value="查询"
 				update=":maintainConfigCreateForm:assets4maintain :maintainConfigCreateForm:saveButtonId :maintainConfigEditForm:assets4maintain :maintainConfigEditForm:saveButtonId"
 				action="#{assetSelectController.findAssets2Maintain}" />
