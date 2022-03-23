@@ -154,7 +154,7 @@ public class ArrivalList implements Serializable {
     @Column(name = "process_type")
     private String processType;
 
-    // 1:new 2:partial finished 3.finished
+    // 1:new 2:partial finished 3.finished 4.canceled
     @Basic(optional = false)
     @NotNull
     @Column(name = "status")

@@ -134,22 +134,23 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         String boSubType = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("boSubType")).map(item -> (String) item.value).findAny().orElse(""));
         String boName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("objectName")).map(item -> (String) item.value).findAny().orElse(""));
         String assetName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.name")).map(item -> (String) item.value).findAny().orElse(""));
-
+        String serialNum = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.serialNum")).map(item -> (String) item.value).findAny().orElse(""));
+        String qrCode = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.qrCode")).map(item -> (String) item.value).findAny().orElse(""));
         String functionTypeStr = searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.functionType")).map(item -> (String) item.value).findAny().orElse("");
         String functionType = "%like%".replace("like", functionTypeStr);
 
         Page<V2_BlobObject> blobObjectPage;
         if(UserContextService.hasCurrentTenantName("")){
             if (StringUtils.isEmpty(functionTypeStr)) {
-                blobObjectPage = dao.loadDataForPageForFunctionTypeYunNan(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+                blobObjectPage = dao.loadDataForPageForFunctionTypeYunNan(orgUidList, boSubType, boName, assetName, serialNum,qrCode, functionType, pageRequest);
             } else {
-                blobObjectPage = dao.loadDataForPageYunNan(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+                blobObjectPage = dao.loadDataForPageYunNan(orgUidList, boSubType, boName, assetName,serialNum ,qrCode,functionType, pageRequest);
             }
         }else{
             if (StringUtils.isEmpty(functionTypeStr)) {
-                blobObjectPage = dao.loadDataForPageForFunctionType(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+                blobObjectPage = dao.loadDataForPageForFunctionType(orgUidList, boSubType, boName ,assetName,serialNum,qrCode,functionType, pageRequest);
             } else {
-                blobObjectPage = dao.loadDataForPage(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+                blobObjectPage = dao.loadDataForPage(orgUidList, boSubType, boName, assetName,serialNum ,qrCode,functionType, pageRequest);
             }
         }
 

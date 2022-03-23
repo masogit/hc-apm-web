@@ -21,7 +21,7 @@
                     <p:tab title="#{msg.Import}" id="userAccountImport">
                         <ui:include src="ListImport.xhtml"/>
                     </p:tab>
-                    <p:tab title="注销" id="tenantDestroy">
+                    <p:tab title="注销" id="tenantDestroy" rendered="#{userAccountController.enableDestroyTenant()}">
                         <ui:include src="TenantDestroy.xhtml"/>
                     </p:tab>
                 </p:tabView>

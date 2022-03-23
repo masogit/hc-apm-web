@@ -24,9 +24,9 @@
 				<p:fieldset id="pmOrder" legend="#{msg.SearchAssets}">
                    <p:panelGrid id="param" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					   <h:panelGroup>
-						   <c:if test="#{!generatePmOrdersController.findCustomTenant().equals('3')}">
-						  	 <label class="label" >#{msg.ruleLevel}*</label>
-						   </c:if>
+
+						  	 <label class="label" >#{msg.ruleLevel}<c:if test="#{!generatePmOrdersController.findCustomTenant().equals('3')}">*</c:if></label>
+
 						   <p:selectOneMenu id="level" value="#{generatePmOrdersController.level}" required="#{!generatePmOrdersController.findCustomTenant().equals('3')}" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
 							   <p:ajax listener="#{generatePmOrdersController.addSelected()}" process="@this" />
 							   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>

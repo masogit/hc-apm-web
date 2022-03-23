@@ -1624,13 +1624,18 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void destroyTenant(){
         this.dao.deleteTenantUser(loginUser.getTenantUID());
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-        tenantInfo.setActiveType(4);
+        tenantInfo.setActiveType(3);
         tenantInfoRepository.save(tenantInfo);
         final List<UserAccount> tenantUsers = dao.findByTenantUID(loginUser.getTenantUID()).stream()
                 .filter(i-> !Strings.isNullOrEmpty(i.getWeChatId()))
                 .collect(Collectors.toList());
         dao.save(tenantUsers);
         logout();
+    }
+
+    public Boolean enableDestroyTenant() {
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+        return 2==tenantInfo.getActiveType();
     }
 
     public Boolean getConfirmDestroy() {
