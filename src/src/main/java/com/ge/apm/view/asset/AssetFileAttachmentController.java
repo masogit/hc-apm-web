@@ -141,17 +141,9 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
         Page<V2_BlobObject> blobObjectPage;
         if(UserContextService.hasCurrentTenantName("")){
-            if (StringUtils.isEmpty(functionTypeStr)) {
-                blobObjectPage = dao.loadDataForPageForFunctionTypeYunNan(orgUidList, boSubType, boName, assetName, serialNum,qrCode, functionType, pageRequest);
-            } else {
-                blobObjectPage = dao.loadDataForPageYunNan(orgUidList, boSubType, boName, assetName,serialNum ,qrCode,functionType, pageRequest);
-            }
+                blobObjectPage = dao.loadDataForPageYunNan(orgUidList, boSubType, boName, assetName, serialNum,qrCode, functionType,"%%", pageRequest);
         }else{
-            if (StringUtils.isEmpty(functionTypeStr)) {
-                blobObjectPage = dao.loadDataForPageForFunctionType(orgUidList, boSubType, boName ,assetName,serialNum,qrCode,functionType, pageRequest);
-            } else {
-                blobObjectPage = dao.loadDataForPage(orgUidList, boSubType, boName, assetName,serialNum ,qrCode,functionType, pageRequest);
-            }
+                blobObjectPage = dao.loadDataForPage(orgUidList, boSubType, boName ,assetName,serialNum,qrCode,functionType,"%%", pageRequest);
         }
 
         currentPageBlobObject = blobObjectPage.getContent();
