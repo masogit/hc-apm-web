@@ -40,6 +40,9 @@ public class ZkbEmailSendLog implements Serializable {
     @Column(name = "cc_email")//抄送人邮箱
     private String ccEmail;
 
+    @Column(name = "message_type")//消息类型  微信  邮件
+    private String messageType;
+
     @Column(name = "step")//步骤
     private String step;
 
@@ -127,6 +130,14 @@ public class ZkbEmailSendLog implements Serializable {
 
     public void setMailType(String mailType) {
         this.mailType = mailType;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
     @Override
