@@ -6,6 +6,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -77,34 +78,48 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
 
         if(tenantUidList !=null && tenantUidList.size() > 0){
             for(String tenantUid : tenantUidList){
-                List<ZkbContractAsset> zkbContractAssetList = zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUid,d1);
+                List<ZkbContractAsset> zkbContractAssetList = getContractAsset(tenantUid,d1,d2);
                 List<ZkbIbCrossUser> zkbIbCrossUsers = zkbIbCrossMapper.findUsersByTenantUid(tenantUid);
-                for(ZkbIbCrossUser u : zkbIbCrossUsers){
-                    if(userHashMap.containsKey(u.getLoginName())){
-                        continue;
+                if(zkbContractAssetList == null || zkbContractAssetList.size() ==0){
+                    for(ZkbIbCrossUser u : zkbIbCrossUsers) {
+                        if (userHashMap.containsKey(u.getLoginName())) {
+                            continue;
+                        }
+                        u.setLoginName("ZKB." + u.getLoginName());
+                        u.setUserId(Integer.parseInt(u.getId()));
+                        u.setId(null);
+                        u.setDeleted(true);
+                        userHashMap.put(u.getLoginName(), u);
+                        zkbIbCrossUserList.add(u);
                     }
-                    u.setLoginName("ZKB."+u.getLoginName());
-                    u.setUserId(Integer.parseInt(u.getId()));
-                    u.setId(null);
-                    userHashMap.put(u.getLoginName(),u);
-                    zkbIbCrossUserList.add(u);
+                }else{
+                    for(ZkbIbCrossUser u : zkbIbCrossUsers){
+                        if(userHashMap.containsKey(u.getLoginName())){
+                            continue;
+                        }
+                        u.setLoginName("ZKB."+u.getLoginName());
+                        u.setUserId(Integer.parseInt(u.getId()));
+                        u.setId(null);
+                        userHashMap.put(u.getLoginName(),u);
+                        zkbIbCrossUserList.add(u);
 
-                    for(ZkbContractAsset a : zkbContractAssetList){
-                        if(relationShipHashMap.containsKey(u.getLoginName()+"|"+a.getAssetId())){
-                            continue;
+                        for(ZkbContractAsset a : zkbContractAssetList){
+                            if(relationShipHashMap.containsKey(u.getLoginName()+"|"+a.getAssetId())){
+                                continue;
+                            }
+                            AssetInfo assetInfo = assetInfoRepository.findByUid(a.getAssetId());
+                            if(StringUtils.isEmpty(assetInfo.getSystemId())){
+                                continue;
+                            }else if(!assetInfo.getSystemId().startsWith("0824")){
+                                continue;
+                            }
+                            ZkbIbCrossRelationShip r = new ZkbIbCrossRelationShip();
+                            r.setLoginName(u.getLoginName());
+                            r.setSystemId(assetInfo.getSystemId());
+                            r.setQrCode(assetInfo.getQrCode());
+                            zkbIbCrossRelationShipList.add(r);
+                            relationShipHashMap.put(u.getLoginName()+"|"+a.getAssetId(),r);
                         }
-                        AssetInfo assetInfo = assetInfoRepository.findByUid(a.getAssetId());
-                        if(StringUtils.isEmpty(assetInfo.getSystemId())){
-                            continue;
-                        }else if(!assetInfo.getSystemId().startsWith("0824")){
-                            continue;
-                        }
-                        ZkbIbCrossRelationShip r = new ZkbIbCrossRelationShip();
-                        r.setLoginName(u.getLoginName());
-                        r.setSystemId(assetInfo.getSystemId());
-                        r.setQrCode(assetInfo.getQrCode());
-                        zkbIbCrossRelationShipList.add(r);
-                        relationShipHashMap.put(u.getLoginName()+"|"+a.getAssetId(),r);
                     }
                 }
             }
@@ -134,7 +149,7 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
                         }
                         zkbIbCrossUserList.add(u);
                         userHashMap.put(u.getLoginName(),u);
-                        List<ZkbContractAsset> assetList = zkbContractAssetRepository.findZkbContractAssetByTenantUID(u.getTenantUid(),d1);
+                        List<ZkbContractAsset> assetList = getContractAsset(u.getTenantUid(),d1,d2);
                         for(ZkbContractAsset a : assetList){
                             if(relationShipHashMap.containsKey(u.getLoginName()+"|"+a.getAssetId())){
                                 continue;
@@ -189,4 +204,28 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
             e.printStackTrace();
         }
     }
+
+    public List<ZkbContractAsset> getContractAsset(String tenantUid,Date currentDate,Date tomorrowDate){
+        List<ZkbContractAsset> zkbContractAssetList = zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUid,currentDate);
+        //快要过期的设备
+        List<ZkbContractAsset> removeList = zkbContractAssetRepository.findByEndDateAsset(tenantUid,currentDate);
+        //要新增的设备
+        List<ZkbContractAsset> addList = zkbContractAssetRepository.findByStartDateAsset(tenantUid,tomorrowDate);
+
+        HashMap<String, String> removeMap = new HashMap<>();
+        Iterator<ZkbContractAsset> iterator = zkbContractAssetList.iterator();
+        for(ZkbContractAsset s : removeList){
+            removeMap.put(s.getId(), s.getId());
+        }
+        while (iterator.hasNext()) {
+            ZkbContractAsset s = iterator.next();
+            if (removeMap.containsKey(s.getId())) {
+                iterator.remove();
+            }
+        }
+        zkbContractAssetList = IteratorUtils.toList(iterator);
+        zkbContractAssetList.addAll(addList);
+        return zkbContractAssetList;
+    }
+
 }
