@@ -199,7 +199,7 @@
                 <p:menuitem id="um461" value="#{msg.provinceVersionConfiguration}" outcome="/portal/audit/AuditSystemCaseList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
                 <p:menuitem id="um510" value="#{msg.AuditItemConfig}" outcome="/portal/audit/auditItem/auditItemConfigList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
                 <p:menuitem id="um511" value="#{msg.AuditTemplate}" outcome="/portal/audit/auditTemplate/auditTemplateList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
-                <p:menuitem id="um512" value="#{msg.AuditUserCase}" outcome="/portal/audit/auditUserCase/auditUserCaseList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
+                <p:menuitem id="um512" value="#{msg.AuditUserCase}" outcome="/portal/audit/auditUserCase/auditUserCaseList.xhtml" rendered="#{userContextService.hasAnyRole('PMAdministrator')}"/>
                 <p:menuitem id="um513" value="#{msg.AuditEvent}" outcome="/portal/audit/auditEvent/auditEventList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
             </p:submenu>
             <p:submenu id="um3000" label="#{msg.MVSEquipmentManagement}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin,MVSFE')}">
