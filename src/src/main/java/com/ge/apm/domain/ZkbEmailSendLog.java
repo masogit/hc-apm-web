@@ -58,7 +58,7 @@ public class ZkbEmailSendLog implements Serializable {
 
     @Column(name = "error_message")//错误信息
     @Size(max = 4000)
-
+    private String errorMessage;
 
     public String getPartOrderNo() {
         return partOrderNo;
@@ -68,7 +68,7 @@ public class ZkbEmailSendLog implements Serializable {
         this.partOrderNo = partOrderNo;
     }
 
-    private String errorMessage;
+
 
     public String getCcEmail() {
         return ccEmail;
