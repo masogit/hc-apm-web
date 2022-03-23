@@ -341,6 +341,9 @@ public class AssetOwnerSettingController {
     }
 
     public void saveChange() {
+//        if(queryAsset.getAssetGroup() == null || queryAsset.getAssetGroupSecondary() == null || deptOrg == null){
+//            WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssetsOneOfThree"));
+//        }
         if (targetAssets.isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
         } else if (!(isChanegeOwner || isChanegeOwner2)) {
