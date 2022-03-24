@@ -78,6 +78,11 @@ public class AuditSystemEntry implements Serializable {
     @Column(name = "score_standard")
     private Double scoreStandard;
     /**
+     * 原文
+     */
+    @Column(name = "source_text")
+    private String sourceText;
+    /**
      * 初始得分 (默认0)
      */
     @Column(name = "score_init")
