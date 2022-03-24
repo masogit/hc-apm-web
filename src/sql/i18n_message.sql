@@ -3289,6 +3289,7 @@
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PMPlanTime', '保养计划时间', 'PM Plan Time', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetSearchingConditions', '相关设备查询条件([所属院区]为必选条件，其它查询条件最少要填写或选择一个)', 'Relevant equipment query conditions (the hospital area to which it belongs) is a mandatory condition, other query conditions must be filled in or selected at least one)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetSearchingConditions2', '相关设备查询条件([所属院区]为必选条件，其它查询条件设备分类和所属科室最少要填写或选择一个)', 'Relevant equipment query conditions (the hospital area to which it belongs) is a mandatory condition, other query conditions must be filled in or selected at least one)', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'relationAsset', '相关设备', 'relationAsset', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'relationAttachment', '相关附件', 'relationAttachment', NULL, '-1');
 

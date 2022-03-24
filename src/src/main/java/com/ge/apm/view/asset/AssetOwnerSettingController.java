@@ -341,8 +341,8 @@ public class AssetOwnerSettingController {
     }
 
     public void saveChange() {
-        if(queryAsset.getAssetGroup() == null || queryAsset.getAssetGroupSecondary() == null || deptOrg == null){
-            WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssetsOneOfThree"));
+        if(queryAsset.getAssetGroup() == null && queryAsset.getAssetGroupSecondary() == null && deptOrg == null){
+            WebUtil.addErrorMessage(WebUtil.getMessage("设备分类，设备分类2级和所属科室三项必须选择其中至少一个"));
         }
         if (targetAssets.isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
