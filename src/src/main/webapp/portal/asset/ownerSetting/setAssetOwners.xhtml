@@ -38,7 +38,7 @@
 
 
                     <h:panelGroup >
-                        <label class="label">#{msg.assetGroup}*</label>
+                        <label class="label">#{msg.assetGroup}</label>
                         <p:selectOneMenu id="assetGroup" value="#{assetOwnerSettingController.queryAsset.assetGroup}">
                             <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList assetGroupSecondary" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
