@@ -37,6 +37,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private String retrieval;
     private String entryName;
     private String entryMark;
+    private String sourceText;
     private Double entryScoreStandard;
     private Integer entryType;
     private Integer targetType;
@@ -244,6 +245,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         date.setName(entryName);
         date.setMark(entryMark);
         date.setScoreStandard(entryScoreStandard);
+        date.setSourceText(sourceText);
 
 
         auditSystemEntryRepository.save(date);
@@ -251,6 +253,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         caseLevel=0;
         entryType=null;
         entryScoreStandard=null;
+        sourceText=null;
     }
     public void saveAuditConfigItem() {
         AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
@@ -324,6 +327,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             entryMark=auditSystemEntry.getMark();
             entryName=auditSystemEntry.getName();
             entryScoreStandard=auditSystemEntry.getScoreStandard();
+            sourceText=auditSystemEntry.getSourceText();
             auditSystemEntrySelected=auditSystemEntry;
             entryScoreFlag=true;
             if(auditSystemEntry.getLevel()==1){
@@ -373,6 +377,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             targetScoreStandard=auditSystemEntry.getScoreStandard();
         }
         entryScoreStandard=null;
+        sourceText=null;
     }
     public void preDelete() {
         onSelectFlag=true;
@@ -421,6 +426,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         auditSystemEntrySelected=new AuditSystemEntry();
         entryScoreStandard=null;
+        sourceText=null;
     }
     public List<AuditTemplate> auditTemplates(){
         return auditTemplateRepository.findByType(1);
@@ -609,6 +615,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         this.entryMarkName = entryMarkName;
     }
 
+    public String getSourceText() {
+        return sourceText;
+    }
+
+    public void setSourceText(String sourceText) {
+        this.sourceText = sourceText;
+    }
+
     public Double getEntryScoreStandard() {
         return entryScoreStandard;
     }
@@ -714,6 +728,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public void setAuditConfigItems(List<AuditConfigItem> auditConfigItems) {
         this.auditConfigItems = auditConfigItems;
+    }
+
+    public AuditSystemEntry getAuditSystemEntry() {
+        return auditSystemEntry;
+    }
+
+    public void setAuditSystemEntry(AuditSystemEntry auditSystemEntry) {
+        this.auditSystemEntry = auditSystemEntry;
     }
 
     public AuditTarget getAuditTargetSelected() {

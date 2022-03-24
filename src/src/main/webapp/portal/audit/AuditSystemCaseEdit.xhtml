@@ -31,10 +31,6 @@
                                     <label class="label">地区</label>
                                     <p:inputText id="zone" value="#{auditSystemCaseEditController.selected.zone}" style="width: 60%"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">评级要求</label>
-                                    <p:inputText id="ratingRequirements" value="#{auditSystemCaseEditController.selected.ratingRequirements}" style="width: 60%"/>
-                                </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label" >计分方式</label>
                                     <p:selectOneMenu value="#{auditSystemCaseEditController.selected.judgeLogic}" style="width: 60%" required="true">
@@ -42,6 +38,12 @@
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('Scoring')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                                     </p:selectOneMenu>
                                 </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">评级要求</label>
+                                    <p:inputTextarea rows="3" cols="50" id="ratingRequirements" value="#{auditSystemCaseEditController.selected.ratingRequirements}" style="width: 60%;"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <p:panelGrid>
                                 <h:panelGroup >
                                     <p:commandButton validateClient="true" actionListener="#{auditSystemCaseEditController.saveSelectedOrg()}" update="entryForm:adminListSearch entryForm:deleteButton entryForm:createButton targetForm"
                                                      value="#{msg.Save}"/>
@@ -89,7 +91,7 @@
                 </h:form>
                 <h:form id="entryForm">
                     <div class="ui-g-12 ui-lg-4">
-                        <div class="card" style="height:780px;">
+                        <div class="card" >
                             <h:panelGroup>
                                 <p:inputText id="entryMarkName" value="#{auditSystemCaseEditController.entryMarkName}"/>
                                 <p:commandButton id = "adminListSearch" icon="ui-icon-location-searching" style="width: 90px;"   actionListener="#{auditSystemCaseEditController.filterNode()}" value="#{msg.Search2}"  update="entryTree" disabled="#{empty auditSystemCaseEditController.selected.uid}"/>
@@ -117,7 +119,7 @@
                 </h:form>
                 <h:form id="editContentForm">
                     <div class="ui-g-12 ui-lg-8" >
-                        <div class="card" style="height:780px;">
+                        <div class="card"  >
 
                             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                                 <p:commandButton value="条配置"   process="@this" update="editContentForm" disabled="#{auditSystemCaseEditController.getStrip()}" actionListener="#{auditSystemCaseEditController.strip}"
@@ -128,6 +130,12 @@
                                                  rendered="#{auditSystemCaseEditController.entryOrderBy eq 3}"/>
                             </h:panelGrid>
                             <h:form id="stripForm" rendered="#{auditSystemCaseEditController.getStrip()}">
+                                <h:panelGroup>
+                                    <label style="color:red">原文 :  </label>
+                                    <h:outputText value=" #{auditSystemCaseEditController.auditSystemEntry.sourceText}"/>
+                                </h:panelGroup>
+                                <br/>
+                                <br/>
                                 <p:dataTable id="stripList" value="#{auditSystemCaseEditController.getStripList()}" var="item"
                                              lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
                                              emptyMessage="#{msg.noRecordFound}">
@@ -162,7 +170,14 @@
                             </h:form>
                             <h:form id="paymentForm" rendered="#{auditSystemCaseEditController.getPayment()}">
                                 <h:panelGroup>
-                                    <h:outputText value="款分值 : #{auditSystemCaseEditController.paymentScoreStandard}"/>
+                                    <label style="color:red">款分值 :  </label>
+                                    <h:outputText value="#{auditSystemCaseEditController.paymentScoreStandard}"/>
+                                </h:panelGroup>
+                                <br/>
+                                <br/>
+                                <h:panelGroup>
+                                    <label style="color:red">原文 :  </label>
+                                    <h:outputText value=" #{auditSystemCaseEditController.auditSystemEntry.sourceText}"/>
                                 </h:panelGroup>
                                 <br/>
                                 <br/>
@@ -200,7 +215,14 @@
                             </h:form>
                             <h:form id="argetForm" rendered="#{auditSystemCaseEditController.getTarget()}">
                                 <h:panelGroup>
-                                    <h:outputText value="指标分值 : #{auditSystemCaseEditController.targetScoreStandard}"/>
+                                    <label style="color:red">指标分值 :  </label>
+                                    <h:outputText value="#{auditSystemCaseEditController.targetScoreStandard}"/>
+                                </h:panelGroup>
+                                <br/>
+                                <br/>
+                                <h:panelGroup>
+                                    <label style="color:red">原文 :  </label>
+                                    <h:outputText value=" #{auditSystemCaseEditController.auditSystemEntry.sourceText}"/>
                                 </h:panelGroup>
                                 <br/>
                                 <br/>
@@ -279,7 +301,7 @@
                           height="600" appendTo="@(body)" header="新增层级">
                     <h:form id="MarkForm">
                         <p:fieldset id="basic" legend="基本信息">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.entryFlag and auditSystemCaseEditController.entryScoreFlag}">
                                     <label class="label" >类型</label>
@@ -307,6 +329,10 @@
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.entryScoreFlag}">
                                     <label class="label">分值</label>
                                     <p:inputText  value="#{auditSystemCaseEditController.entryScoreStandard}" style="width: 60%"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">原文</label>
+                                    <p:inputTextarea rows="3" cols="50" id="sourceText" value="#{auditSystemCaseEditController.sourceText}" style="width: 60%;"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:fieldset>
