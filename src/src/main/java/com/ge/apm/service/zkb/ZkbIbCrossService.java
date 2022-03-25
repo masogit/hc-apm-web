@@ -8,6 +8,7 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -212,6 +213,7 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
         //要新增的设备
         List<ZkbContractAsset> addList = zkbContractAssetRepository.findByStartDateAsset(tenantUid,tomorrowDate);
 
+        List<ZkbContractAsset> newList = new ArrayList<ZkbContractAsset>();
         HashMap<String, String> removeMap = new HashMap<>();
         Iterator<ZkbContractAsset> iterator = zkbContractAssetList.iterator();
         for(ZkbContractAsset s : removeList){
@@ -221,11 +223,19 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
             ZkbContractAsset s = iterator.next();
             if (removeMap.containsKey(s.getId())) {
                 iterator.remove();
+            }else {
+                newList.add(s);
             }
         }
-        zkbContractAssetList = IteratorUtils.toList(iterator);
-        zkbContractAssetList.addAll(addList);
+        newList.addAll(addList);
         return zkbContractAssetList;
+    }
+    public  <T> List<T> copyIterator(Iterator<T> iter) {
+        List<T> copy = new ArrayList<T>();
+        while (iter.hasNext()) {
+            copy.add(iter.next());
+        }
+        return copy;
     }
 
 }
