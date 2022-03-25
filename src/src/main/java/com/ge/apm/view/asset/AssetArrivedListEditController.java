@@ -524,7 +524,29 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 selected.setAgent(srcList.getAgent());
                 selected.setArrivalDate(srcList.getArrivalDate());
             }else{
+                selected.setContractNum("");
+                selected.setContractPrice(null);
+                selected.setAgent("");
+                selected.setArrivalDate(null);
                 selected.setMakerShortName(srcList.getMakerShortName());
+                String manufactureUid=srcList.getManufactureId();
+                if(StringUtils.isNotEmpty(manufactureUid)){
+                    Supplier manufacture=aiService.getSupplierById(Integer.valueOf(manufactureUid));
+                    if(manufacture!=null){
+                        this.selected.setManufacture(manufacture.getName());
+                        this.selected.setManufactureId(manufacture.getId().toString());
+                        this.manufacture=manufacture;
+                    }
+                }
+                Integer supplierId = srcList.getSupplierId();
+                if(supplierId != null ){
+                    Supplier supplier=aiService.getSupplierById(supplierId);
+                    if(supplier!=null){
+                        this.selected.setVendor(supplier.getName());
+                        this.selected.setSupplierId(supplier.getId());
+                        this.supplier=supplier;
+                    }
+                }
             }
         }
 
@@ -691,7 +713,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void finishChoseContractItem() {
-        if(copyFrom.equals("")){
+//        if(copyFrom.equals("")){
             ContractInfoItem selectedContractItem = contractItemList.stream().filter(item -> item.getId().equals(selectedContractItemId)).findAny().orElse(null);
             this.selected.setContractItemId(selectedContractItem.getId());
             this.selected.setAssetName(selectedContractItem.getContractAssetName());
@@ -732,63 +754,63 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 }
             }
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
-        }else{
-            ContractInfoItem selectedContractItem = contractItemList.stream().filter(item -> item.getId().equals(selectedContractItemId)).findAny().orElse(null);
-            this.selected.setContractItemId(selectedContractItem.getId());
-            this.selected.setAssetName(selectedContractItem.getContractAssetName());
-            this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
-            //ContractNum  合同号   contractPrice  合同价格  agent 经办人  ArrivalDate 到货日期
-            //Manufacture  制造商   Vendor  供应商    品牌/制造商简称  MakerShortName
-            //如果是邵逸夫医院，将制造商添加进去
-            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            String tenantUid = currentUserAccount.getTenantUID();
-            List<TenantInfo> tanentIfos = tenantInfoRepository.findByCustomTenant("3");
-            String tanentInfoUid = tanentIfos.get(0).getUid();
-            if(!tenantUid.equals(tanentInfoUid)){
-                this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
-                if(selectedContractItem.getContractAssetQuantity() != null && selectedContractItem.getContractAssetPrice() != null){
-                    this.selected.setContractPrice(selectedContractItem.getContractAssetQuantity() * selectedContractItem.getContractAssetPrice());
-                }else {
-                    this.selected.setContractPrice(0d);
-                }
-            }
-
-//        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
-            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
-            this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
-            this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
-            this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
-            this.selected.setTenantUID(selectedContractItem.getContractInfo().getTenantUID());
-            this.selected.setFunctionType(selectedContractItem.getPattern());
-            String manufactureUid=selectedContractItem.getManufacturer();
-            if(StringUtils.isNotEmpty(manufactureUid)){
-                Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
-                if(manufacture!=null){
-                    this.selected.setManufacture(manufacture.getName());
-                    this.selected.setManufactureId(manufacture.getId().toString());
-                    this.manufacture=manufacture;
-                }
-            }
-            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
-            this.selected.setOrigin(selectedContractItem.getProductionPlace());
-            String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
-            if(StringUtils.isNotEmpty(supplierUid)){
-                Supplier supplier=aiService.getSupplierByUid(supplierUid);
-                if(supplier!=null){
-                    this.selected.setVendor(supplier.getName());
-                    this.selected.setSupplierId(supplier.getId());
-                    this.supplier=supplier;
-                    //如果是邵逸夫医院，将制造商添加进去
-                    if(tenantUid.equals(tanentInfoUid)){
-                        this.selected.setManufacture(supplier.getSupplierCode());
-                        this.selected.setMakerShortName(supplier.getSupplierAbbreviation());
-                    }
-
-                    this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
-                }
-            }
-            selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
-        }
+//        }else{
+//            ContractInfoItem selectedContractItem = contractItemList.stream().filter(item -> item.getId().equals(selectedContractItemId)).findAny().orElse(null);
+//            this.selected.setContractItemId(selectedContractItem.getId());
+//            this.selected.setAssetName(selectedContractItem.getContractAssetName());
+//            this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+//            //ContractNum  合同号   contractPrice  合同价格  agent 经办人  ArrivalDate 到货日期
+//            //Manufacture  制造商   Vendor  供应商    品牌/制造商简称  MakerShortName
+//            //如果是邵逸夫医院，将制造商添加进去
+//            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+//            String tenantUid = currentUserAccount.getTenantUID();
+//            List<TenantInfo> tanentIfos = tenantInfoRepository.findByCustomTenant("3");
+//            String tanentInfoUid = tanentIfos.get(0).getUid();
+//            if(!tenantUid.equals(tanentInfoUid)){
+//                this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+//                if(selectedContractItem.getContractAssetQuantity() != null && selectedContractItem.getContractAssetPrice() != null){
+//                    this.selected.setContractPrice(selectedContractItem.getContractAssetQuantity() * selectedContractItem.getContractAssetPrice());
+//                }else {
+//                    this.selected.setContractPrice(0d);
+//                }
+//            }
+//
+////        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
+//            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+//            this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
+//            this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
+//            this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
+//            this.selected.setTenantUID(selectedContractItem.getContractInfo().getTenantUID());
+//            this.selected.setFunctionType(selectedContractItem.getPattern());
+//            String manufactureUid=selectedContractItem.getManufacturer();
+//            if(StringUtils.isNotEmpty(manufactureUid)){
+//                Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
+//                if(manufacture!=null){
+//                    this.selected.setManufacture(manufacture.getName());
+//                    this.selected.setManufactureId(manufacture.getId().toString());
+//                    this.manufacture=manufacture;
+//                }
+//            }
+//            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+//            this.selected.setOrigin(selectedContractItem.getProductionPlace());
+//            String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
+//            if(StringUtils.isNotEmpty(supplierUid)){
+//                Supplier supplier=aiService.getSupplierByUid(supplierUid);
+//                if(supplier!=null){
+//                    this.selected.setVendor(supplier.getName());
+//                    this.selected.setSupplierId(supplier.getId());
+//                    this.supplier=supplier;
+//                    //如果是邵逸夫医院，将制造商添加进去
+//                    if(tenantUid.equals(tanentInfoUid)){
+//                        this.selected.setManufacture(supplier.getSupplierCode());
+//                        this.selected.setMakerShortName(supplier.getSupplierAbbreviation());
+//                    }
+//
+//                    this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
+//                }
+//            }
+//            selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
+//        }
     }
 
     public void showImageZoom(String objectStorageId, String objctName){
