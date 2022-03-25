@@ -29,6 +29,9 @@ public class ZkbEmailSendLog implements Serializable {
     @Column(name = "work_order_id")//工单id
     private String workOrderId;
 
+    @Column(name = "part_order_no")//
+    private String partOrderNo;
+
     @Column(name = "send_time")  //发送时间
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -52,9 +55,20 @@ public class ZkbEmailSendLog implements Serializable {
     @Column(name = "has_exception")//是否异常
     private Boolean hasException;
 
+
     @Column(name = "error_message")//错误信息
     @Size(max = 4000)
     private String errorMessage;
+
+    public String getPartOrderNo() {
+        return partOrderNo;
+    }
+
+    public void setPartOrderNo(String partOrderNo) {
+        this.partOrderNo = partOrderNo;
+    }
+
+
 
     public String getCcEmail() {
         return ccEmail;
