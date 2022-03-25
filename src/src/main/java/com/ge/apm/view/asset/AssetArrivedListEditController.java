@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
@@ -19,10 +21,6 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
 import com.baomidou.mybatisplus.toolkit.StringUtils;
-import com.ge.apm.dao.ArrivalListItemRepository;
-import com.ge.apm.dao.ArrivalListRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -113,6 +111,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private String newSupplierType;
 
     private UserContextService userContextService;
+    private TenantInfoRepository tenantInfoRepository;
 
     @Override
     protected void init() {
@@ -122,6 +121,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         aiService = WebUtil.getBean(AssetInstallationService.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 //        orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -494,19 +494,31 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selected.setHospitalUID(srcList.getHospitalUID());
             selected.setAssetName(srcList.getAssetName());
             selected.setAssetGroup(srcList.getAssetGroup());
-            selected.setArrivalDate(srcList.getArrivalDate());
             selected.setFunctionType(srcList.getFunctionType());
+            //制造商
             selected.setManufacture(srcList.getManufacture());
             selected.setOrigin(srcList.getOrigin());
             selected.setInvoiceNum(srcList.getInvoiceNum());
-            selected.setContractNum(srcList.getContractNum());
-            selected.setContractPrice(srcList.getContractPrice());
+            //供应商
             selected.setVendor(srcList.getVendor());
-            selected.setAgent(srcList.getAgent());
             selected.setTenantUID(srcList.getTenantUID());
             selected.setInstitutionUID(srcList.getInstitutionUID());
             selected.setHospitalUID(srcList.getHospitalUID());
             selected.setSiteUID(srcList.getSiteUID());
+            //设置邵逸夫医院对哪些字段不可见 ContractNum  合同号   contractPrice  合同价格  agent 经办人  ArrivalDate 到货日期
+            //制造商、品牌/制造商简称、供应商
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            String tenantUid = currentUserAccount.getTenantUID();
+            List<TenantInfo> tanentIfos = tenantInfoRepository.findByCustomTenant("3");
+            String tanentInfoUid = tanentIfos.get(0).getUid();
+            if(!tenantUid.equals(tanentInfoUid)){
+                selected.setContractNum(srcList.getContractNum());
+                selected.setContractPrice(srcList.getContractPrice());
+                selected.setAgent(srcList.getAgent());
+                selected.setArrivalDate(srcList.getArrivalDate());
+            }else{
+                selected.setMakerShortName(srcList.getMakerShortName());
+            }
         }
 
     }
@@ -676,11 +688,22 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.selected.setContractItemId(selectedContractItem.getId());
         this.selected.setAssetName(selectedContractItem.getContractAssetName());
         this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
-        if(selectedContractItem.getContractAssetQuantity() != null && selectedContractItem.getContractAssetPrice() != null){
-            this.selected.setContractPrice(selectedContractItem.getContractAssetQuantity() * selectedContractItem.getContractAssetPrice());
-        }else {
-            this.selected.setContractPrice(0d);
+        //ContractNum  合同号   contractPrice  合同价格  agent 经办人  ArrivalDate 到货日期
+        //Manufacture  制造商   Vendor  供应商    品牌/制造商简称  MakerShortName
+        //如果是邵逸夫医院，将制造商添加进去
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        String tenantUid = currentUserAccount.getTenantUID();
+        List<TenantInfo> tanentIfos = tenantInfoRepository.findByCustomTenant("3");
+        String tanentInfoUid = tanentIfos.get(0).getUid();
+        if(!tenantUid.equals(tanentInfoUid)){
+            this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+            if(selectedContractItem.getContractAssetQuantity() != null && selectedContractItem.getContractAssetPrice() != null){
+                this.selected.setContractPrice(selectedContractItem.getContractAssetQuantity() * selectedContractItem.getContractAssetPrice());
+            }else {
+                this.selected.setContractPrice(0d);
+            }
         }
+
 //        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
         this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
@@ -698,7 +721,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
         }
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
-        this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
         this.selected.setOrigin(selectedContractItem.getProductionPlace());
         String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
         if(StringUtils.isNotEmpty(supplierUid)){
@@ -707,6 +729,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 this.selected.setVendor(supplier.getName());
                 this.selected.setSupplierId(supplier.getId());
                 this.supplier=supplier;
+                //如果是邵逸夫医院，将制造商添加进去
+                if(tenantUid.equals(tanentInfoUid)){
+                    this.selected.setManufacture(supplier.getSupplierCode());
+                    this.selected.setMakerShortName(supplier.getSupplierAbbreviation());
+                }
 
                 this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
             }
