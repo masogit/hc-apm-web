@@ -589,6 +589,38 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "supplement_flag")
     private String supplementFlag;
 
+    @Transient
+    private String regionalManagerName;//区域经理姓名
+    @Transient
+    private String regionalManagerEmail;//区域经理邮箱
+    @Transient
+    private String regionalManagerPhone;//区域经理电话
+
+
+    public String getRegionalManagerName() {
+        return regionalManagerName;
+    }
+
+    public void setRegionalManagerName(String regionalManagerName) {
+        this.regionalManagerName = regionalManagerName;
+    }
+
+    public String getRegionalManagerEmail() {
+        return regionalManagerEmail;
+    }
+
+    public void setRegionalManagerEmail(String regionalManagerEmail) {
+        this.regionalManagerEmail = regionalManagerEmail;
+    }
+
+    public String getRegionalManagerPhone() {
+        return regionalManagerPhone;
+    }
+
+    public void setRegionalManagerPhone(String regionalManagerPhone) {
+        this.regionalManagerPhone = regionalManagerPhone;
+    }
+
     public String getSupplementFlag() {
         return supplementFlag;
     }
