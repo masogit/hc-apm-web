@@ -436,6 +436,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 handleQtyByOrderType();
             }
         }
+        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegionAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getRegion(),ZkbPartOrder.DATA_TYPE_TEST);
+        Optional<ZkbPartOrderUserConfig>  zkbPartOrderUserConfig = zkbPartOrderUserConfigs.stream().findFirst();
+        if(zkbPartOrderUserConfig!=null&&zkbPartOrderUserConfig.get()!=null){
+            selected.setRegionalManagerEmail(zkbPartOrderUserConfig.get().getEmail());
+            selected.setRegionalManagerPhone(zkbPartOrderUserConfig.get().getPhone());
+            selected.setRegionalManagerName(zkbPartOrderUserConfig.get().getName());
+        }
         calcRemainQty();
     }
 
@@ -1185,6 +1192,16 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else{
             return false;
         }
+    }
+
+    public boolean isShowRegionalManager(){
+        boolean isShowRegionalManager = true;
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)) {
+            if("2".equals(artificialType)){
+                isShowRegionalManager = false;
+            }
+        }
+        return isShowRegionalManager;
     }
 
     public String backList(){
