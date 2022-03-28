@@ -2893,6 +2893,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'LifeCycleBeyond', '使用年限超过国家或厂家规定', 'Life cycle beyond that is specified by the country or manufacturer', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MainFunctionIsDamaged', '主要功能损坏，无法修复或维修成本过高', 'Main function is damaged, cannot be repaired or the maintenance cost is too high', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TheEquipmentIsDefective', '设备有缺陷，国家警示需强制报废', 'The equipment is defective and should be forcibly terminated according to the national warning', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AccessoriesOrConsumablesNotAvailable', '配件或耗材无法获取', 'Accessories or consumables not available', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UploadedFileTerminatedInBatch', '上传文件批量报废', 'Uploaded File Terminated in Batch', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetIDRequired', '文件中填入要批量报废的资产数据，资产编号必填', 'Fill in the file with the asset data to be terminated in batch with the asset ID required', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BasicInformation', '基本资料', 'Basic Information', NULL, '-1');
