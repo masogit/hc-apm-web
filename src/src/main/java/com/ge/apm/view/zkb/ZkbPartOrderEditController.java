@@ -436,7 +436,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 handleQtyByOrderType();
             }
         }
-        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegionAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getRegion(),ZkbPartOrder.DATA_TYPE_TEST);
+        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = new ArrayList<ZkbPartOrderUserConfig>();
+        if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
+            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegionAndLoginNameContains(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getRegion(),ZkbPartOrder.DATA_TYPE_TEST);
+        }else{
+            zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegionAndLoginNameIsNotContaining(ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), selected.getRegion(),ZkbPartOrder.DATA_TYPE_TEST);
+        }
         Optional<ZkbPartOrderUserConfig>  zkbPartOrderUserConfig = zkbPartOrderUserConfigs.stream().findFirst();
         if(zkbPartOrderUserConfig.isPresent()){
             selected.setRegionalManagerEmail(zkbPartOrderUserConfig.get().getEmail());
