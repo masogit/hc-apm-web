@@ -780,15 +780,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && !ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
             if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2 && selected.getOnlineEngine() == null){
-                //flag=false;
-                //errorLog += "在线工程师不能为空！";
+                flag=false;
+                errorLog += "在线工程师不能为空！";
             }
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-           /* if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
+            if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
                 flag=false;
                 errorLog += "附件不能为空！";
-            }*/
+            }
         }else{
             if("t".equals(selected.getScoreFlag())){
                 boolean r = zkbIntegralService.checkScoreFlag(selectionTenantInfo,selected.getQty());
@@ -1166,7 +1166,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void handleFileUpload(FileUploadEvent event){
-        /*V2_BlobObject v2_blobObject = blobService.uploadFile(event);
+        V2_BlobObject v2_blobObject = blobService.uploadFile(event);
         if (null != v2_blobObject) {
             //blobObject.setBoId(selected.getId());
             v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
@@ -1176,7 +1176,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
-        }*/
+        }
     }
     public void handleProveFileUpload(FileUploadEvent event){
         V2_BlobObject v2_blobObject = blobService.uploadFile(event);
