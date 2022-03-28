@@ -341,8 +341,8 @@ public class AssetOwnerSettingController {
     }
 
     public void saveChange() {
-        if(queryAsset.getAssetGroup() == null && queryAsset.getAssetGroupSecondary() == null && deptOrg == null){
-            WebUtil.addErrorMessage(WebUtil.getMessage("设备分类，设备分类2级和所属科室三项必须选择其中至少一个"));
+        if(queryAsset.getAssetGroup() == null && queryAsset.getAssetGroupSecondary() == null && deptOrg == null && ownerSearch == null && ownerSearch2 == null && ownerSearch3 == null ){
+            WebUtil.addErrorMessage(WebUtil.getMessage("相关设备查询条件([所属院区]为必选条件，其它查询条件最少要填写或选择一个)"));
         }
         if (targetAssets.isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
