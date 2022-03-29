@@ -129,13 +129,13 @@
 
                             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                                 <p:commandButton value="条配置"   process="@this" update="editContentForm" disabled="#{auditSystemCaseEditController.getStrip()}" actionListener="#{auditSystemCaseEditController.strip}"
-                                                 rendered="#{auditSystemCaseEditController.entryOrderBy eq 1 or auditSystemCaseEditController.entryOrderBy  eq 2 or auditSystemCaseEditController.entryOrderBy eq 3}"/>
+                                                 rendered="#{(auditSystemCaseEditController.entryOrderBy eq 1 or auditSystemCaseEditController.entryOrderBy  eq 2 or auditSystemCaseEditController.entryOrderBy eq 3) and auditSystemCaseEditController.selected.type==1}"/>
                                 <p:commandButton value="款配置"     process="@this" update="editContentForm" disabled="#{auditSystemCaseEditController.getPayment()}" actionListener="#{auditSystemCaseEditController.payment}"
-                                                 rendered="#{auditSystemCaseEditController.entryOrderBy  eq 2 or (auditSystemCaseEditController.entryOrderBy  eq 3 and auditSystemCaseEditController.orderByFlag)}" />
+                                                 rendered="#{(auditSystemCaseEditController.entryOrderBy  eq 2 or (auditSystemCaseEditController.entryOrderBy  eq 3 and auditSystemCaseEditController.orderByFlag)) and auditSystemCaseEditController.selected.type==1}" />
                                 <p:commandButton value="指标配置"   process="@this" update="editContentForm"  disabled="#{auditSystemCaseEditController.getTarget()}" actionListener="#{auditSystemCaseEditController.target}"
                                                  rendered="#{auditSystemCaseEditController.entryOrderBy eq 3}"/>
                             </h:panelGrid>
-                            <h:form id="stripForm" rendered="#{auditSystemCaseEditController.getStrip()}">
+                            <h:form id="stripForm" rendered="#{auditSystemCaseEditController.getStrip() and auditSystemCaseEditController.selected.type==1}">
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}" >
                                     <label style="color:red">原文 :  </label>
                                     <h:outputText value=" #{auditSystemCaseEditController.auditSystemEntry.sourceText}"/>
@@ -174,7 +174,7 @@
 
                                 <br/>
                             </h:form>
-                            <h:form id="paymentForm" rendered="#{auditSystemCaseEditController.getPayment()}">
+                            <h:form id="paymentForm" rendered="#{auditSystemCaseEditController.getPayment() and auditSystemCaseEditController.selected.type==1}">
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}" >
                                     <label style="color:red">款分值 :  </label>
                                     <h:outputText value="#{auditSystemCaseEditController.paymentScoreStandard}"/>
@@ -355,7 +355,7 @@
                           header="新增内容" width="600" height="600">
                     <h:form id="contentForm">
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 80%" rendered="true">
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}">
                                 <label class="label">#{msg.ContentType}*</label>
                                 <p:selectOneMenu value="#{auditSystemCaseEditController.entryType}"   requiredMessage="#{msg.ContentType} #{msg.ValidationRequire}" autoWidth="false" style="width: 50%;">
                                     <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? fieldMsg.fieldValue('auditItemType',auditSystemCaseEditController.auditConfigItemSelected.contentType) : msg.SelectOneMessage}" itemValue="#{null}"  noSelectionOption="true" />

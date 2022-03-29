@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class AuditSystemCaseEditController extends GenericCRUDUUIDController<AuditSystemCase> {
 
     private AuditSystemCaseRepository dao;
+    private AuditCaseRepository auditCaseRepository;
     private AuditSystemEntryRepository auditSystemEntryRepository;
     private AuditConfigItemRepository auditConfigItemRepository;
     private AuditEntryItemRelRepository auditEntryItemRelRepository;
@@ -91,6 +92,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     @Override
     protected void init() {
         dao = WebUtil.getBean(AuditSystemCaseRepository.class);
+        auditCaseRepository = WebUtil.getBean(AuditCaseRepository.class);
         auditSystemEntryRepository = WebUtil.getBean(AuditSystemEntryRepository.class);
         auditConfigItemRepository = WebUtil.getBean(AuditConfigItemRepository.class);
         auditEntryItemRelRepository = WebUtil.getBean(AuditEntryItemRelRepository.class);
@@ -473,6 +475,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         if (entryType!=null){
             contentTyp =entryType;
         }
+        if(selected.getType()!=null && selected.getType()==2){
+            contentTyp=3;//质控只有 解读
+        }
         auditConfigItems = auditConfigItemRepository.findByContentType(contentTyp);
         return auditConfigItems;
     }
@@ -552,6 +557,12 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             String eventType = "EDIT_SYSTEM_CASE";
             if (status==2){
                 eventType = "ENABLE_SYSTEM_CASE";
+            }else if(status==1) {
+                List<AuditCase> list = auditCaseRepository.findBySystemCaseUid(selected.getUid());
+                if (list!=null && !list.isEmpty()){
+                    WebUtil.addErrorMessage("数据被引用中,不能存为草稿!");
+                    return null;
+                }
             }
             try {
                 selected.setStatus(status);
@@ -732,7 +743,12 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         if (selected!=null){
             uid= selected.getUid();
         }
-        orgTree = getEntryTreeNodes(auditSystemEntryRepository.findListByName(entryMarkName,uid));
+        if(entryMarkName==null || "".equals(entryMarkName)){
+            this.buildOrdTree();
+        }else {
+            orgTree = getEntryTreeNodes(auditSystemEntryRepository.findListByName(entryMarkName,uid));
+        }
+
     }
     public void saveSelectedOrg() {
         if( this.typeChecking()){
