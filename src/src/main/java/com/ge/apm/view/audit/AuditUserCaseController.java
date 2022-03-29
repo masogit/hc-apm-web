@@ -182,7 +182,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     }
 
     public List<AuditSystemCase> getAllSystemCase(){
-        Iterable<AuditSystemCase> systemCases = caseDao.findAll();
+        Iterable<AuditSystemCase> systemCases = caseDao.findByStatus(2);
         if(systemCases != null){
             return Lists.newArrayList(systemCases);
         }
