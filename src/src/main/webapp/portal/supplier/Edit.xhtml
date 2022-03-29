@@ -36,6 +36,24 @@
                             <label class="label">#{msg.tel}</label>
                             <p:inputText id="tel" value="#{supplierController.selected.tel}" />
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{supplierController.activeSupplierCertificateManage()}">
+                            <label class="label">#{msg.ProductionLicenseExpireDate}</label>
+                            <p:calendar timeZone="GMT+8" id="productionLicenseExpireDate" pattern="yyyy/MM/dd"
+                                value="#{supplierController.selected.productionLicenseExpireDate}" required="false"
+                                showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{supplierController.activeSupplierCertificateManage()}">
+                            <label class="label">#{msg.BusinessLicenseExpireDate}</label>
+                            <p:calendar timeZone="GMT+8" id="businessLicenseExpireDate" pattern="yyyy/MM/dd"
+                                value="#{supplierController.selected.businessLicenseExpireDate}" required="false"
+                                showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{supplierController.activeSupplierCertificateManage()}">
+                            <label class="label">#{msg.RegistrationCertificateExpireDate}</label>
+                            <p:calendar timeZone="GMT+8" id="registrationCertificateExpireDate" pattern="yyyy/MM/dd"
+                                value="#{supplierController.selected.registrationCertificateExpireDate}" required="false"
+                                showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
