@@ -1,5 +1,6 @@
 package com.ge.apm.view.audit;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -27,6 +28,7 @@ import java.util.List;
 public class AuditSystemCaseListController extends GenericCRUDUUIDController<AuditSystemCase> {
 
     private AuditSystemCaseRepository dao;
+    private AuditEventRepository auditEventRepository;
     private AuditSystemEntryRepository auditSystemEntryRepository;
     private AuditConfigItemRepository auditConfigItemRepository;
     private AuditTargetRepository auditTargetRepository;
@@ -36,6 +38,7 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
     @Override
     protected void init() {
         dao = WebUtil.getBean(AuditSystemCaseRepository.class);
+        auditEventRepository = WebUtil.getBean(AuditEventRepository.class);
         auditSystemEntryRepository = WebUtil.getBean(AuditSystemEntryRepository.class);
         auditConfigItemRepository = WebUtil.getBean(AuditConfigItemRepository.class);
         auditTargetRepository = WebUtil.getBean(AuditTargetRepository.class);
@@ -102,8 +105,14 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
         AuditSystemCaseNew.setUid(null);
         AuditSystemCaseNew.setCreator(accountName);
         AuditSystemCaseNew.setCreateTime(new Date());
-        AuditSystemCaseNew= dao.save(AuditSystemCaseNew);
-
+        try {
+            AuditSystemCaseNew= dao.save(AuditSystemCaseNew);
+            createEventSysytemCase("ADD_SYSTEM_CASE", AuditSystemCaseNew, "success");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("saveSuccess"));
+        } catch (Exception e){
+            createEventSysytemCase("ADD_SYSTEM_CASE", AuditSystemCaseNew, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));
+        }
         String caseUid = AuditSystemCaseNew.getUid();
         List<AuditTarget> auditTargetList = auditTargetRepository.findBySystemCaseUid(selected.getUid());
         if (auditTargetList!=null && !auditTargetList.isEmpty()){
@@ -139,7 +148,15 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
         auditSystemEntry.setParentUid(parentUid);
         auditSystemEntry.setCreateTime(new Date());
         auditSystemEntry.setCreator(accountName);
-        AuditSystemEntry systemEntry = auditSystemEntryRepository.save(auditSystemEntry);
+        AuditSystemEntry systemEntry= new AuditSystemEntry();
+        try {
+            systemEntry = auditSystemEntryRepository.save(auditSystemEntry);
+            createEventSysytemEntry("ADD_SYSTEM_ENTRY", systemEntry, "success");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("saveSuccess"));
+        } catch (Exception e){
+            createEventSysytemEntry("ADD_SYSTEM_ENTRY", systemEntry, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));
+        }
         if (auditConfigItemList!=null && !auditConfigItemList.isEmpty()){
             for (AuditConfigItem auditConfigItem:auditConfigItemList){
                 AuditEntryItemRel auditEntryItemRel = new AuditEntryItemRel();
@@ -178,7 +195,14 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
 
     public void deleteAction() {
         if(selected.getStatus()==1){
-            dao.delete(selected);
+            try {
+                dao.delete(selected);
+                createEventSysytemCase("DELETE_SYSTEM_CASE", selected, "success");
+                WebUtil.addSuccessMessage(WebUtil.getMessage("deleteSuccess"));
+            } catch (Exception e){
+                createEventSysytemCase("DELETE_SYSTEM_CASE", selected, "fail");
+                WebUtil.addErrorMessage(WebUtil.getMessage("delete") + WebUtil.getMessage("FAILED"));
+            }
         }else {
             if(selected.getStatus()==2){
                 WebUtil.addErrorMessage("发布状态数据不能删除!");
@@ -191,10 +215,36 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
 
     }
     public void listAction(AuditSystemCase auditSystemCase) {
-        if(auditSystemCase.getUid()!=null){
-            auditSystemCase.setStatus(3);
-            dao.save(auditSystemCase);
+        try {
+            if(auditSystemCase.getUid()!=null){
+                auditSystemCase.setStatus(3);
+                dao.save(auditSystemCase);
+            }
+            createEventSysytemCase("EXPIRE_SYSTEM_CASE", auditSystemCase, "success");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("expireSuccess"));
+        } catch (Exception e){
+            createEventSysytemCase("EXPIRE_SYSTEM_CASE", auditSystemCase, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("expire") + WebUtil.getMessage("FAILED"));
         }
     }
-
+    private void createEventSysytemCase(String eventType, AuditSystemCase auditSystemCase, String result){
+        AuditEvent event = new AuditEvent();
+        event.setEventType(eventType);
+        event.setOperator(UserContextService.getCurrentUserAccount().getName());
+        event.setContent(JSON.toJSONString(auditSystemCase));
+        event.setEventObjectUid(auditSystemCase.getUid());
+        event.setResult(result);
+        event.setEventTime(new Date());
+        auditEventRepository.save(event);
+    }
+    private void createEventSysytemEntry(String eventType, AuditSystemEntry data, String result){
+        AuditEvent event = new AuditEvent();
+        event.setEventType(eventType);
+        event.setOperator(UserContextService.getCurrentUserAccount().getName());
+        event.setContent(JSON.toJSONString(data));
+        event.setEventObjectUid(data.getUid());
+        event.setResult(result);
+        event.setEventTime(new Date());
+        auditEventRepository.save(event);
+    }
 }

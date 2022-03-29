@@ -33,10 +33,11 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.Target}*</label>
-                        <p:selectOneMenu id="target" value="#{auditUserCaseController.selected.target}" required="true" requiredMessage="#{msg.Target} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
+                        <label class="label">#{msg.Target}</label>
+                        <p:selectOneMenu id="target" value="#{auditUserCaseController.selected.target}" required="false" autoWidth="false" style="width: 95%;">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{auditUserCaseController.getTarget()}" var="entry" itemLabel="#{entry.target} - #{entry.score}" itemValue="#{entry.target}"/>
+                            <f:selectItems value="#{auditUserCaseController.getTarget()}" var="entry"
+                                           itemLabel="#{fieldMsg.fieldValue('targetType',entry.target)} - #{entry.score}" itemValue="#{entry.target}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
