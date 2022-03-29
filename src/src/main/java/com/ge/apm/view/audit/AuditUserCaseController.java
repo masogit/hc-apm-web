@@ -142,11 +142,11 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     public void saveAuditCase(){
         try {
             auditUserCaseService.saveUserCase(this.selected);
-            createEvent("ENABLE_TENANT_AUDIT", this.selected, "success");
+            createEvent("ADD_CASE", this.selected, "success");
             this.selected=null;
             WebUtil.addSuccessMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Success"));
         }catch (Exception e){
-            createEvent("ENABLE_TENANT_AUDIT", this.selected, "fail");
+            createEvent("ADD_CASE", this.selected, "fail");
             WebUtil.addSuccessMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Failed"));
         }
     }
