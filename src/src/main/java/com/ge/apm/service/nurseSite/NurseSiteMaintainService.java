@@ -873,10 +873,10 @@ public class NurseSiteMaintainService {
 			}
 		}
 	}
-	private void updateMaintainItem(NurseSiteMaintain obj, Date date, UserAccount user) {
+	private boolean updateMaintainItem(NurseSiteMaintain obj, Date date, UserAccount user) {
 		List<NurseSiteMaintainItem> listItem = obj.getListNurseSiteMaintainItem();
 		if(listItem==null || listItem.size()==0){
-			return;
+			return false;
 		}
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
 		int itemStatus = 0;
@@ -894,20 +894,18 @@ public class NurseSiteMaintainService {
 			tempItem.setModifyDate(date);
 			List<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
-			ca.setTime(tempItem.getCheckDate());
-			ca.set(Calendar.DAY_OF_MONTH,1);
-			Date firstDayOfMonthByCheckDay = ca.getTime();
-			ca.setTime(sheculeDate);
-			ca.set(Calendar.DAY_OF_MONTH,1);
-			Date firstDayOfMonthByShecudleDate = ca.getTime();
-			boolean delayNextMonth =  firstDayOfMonthByCheckDay.getDay() > firstDayOfMonthByShecudleDate.getDay() ? true : false;
+			Calendar calendar1 = Calendar.getInstance();
+			Calendar calendar2 = Calendar.getInstance();
+			calendar1.setTime(tempItem.getCheckDate());
+			calendar2.setTime(sheculeDate);
+			boolean delayNextMonth =  calendar1.get(Calendar.MONTH)>calendar2.get(Calendar.MONTH) ? true : false;
 
 			if(delayNextMonth) {
 				UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 				if(userContextService.accessContainsOfJiangNing()) {  //江宁医院，delay到下个月，只有科长（医学工程处主任）才能补单
 					if(!userContextService.hasRole("AssetHead")) {
 						WebUtil.addErrorMessage("超过补单时间！");
-						return;
+						return false;
 					}
 				}
 			}
@@ -962,6 +960,7 @@ public class NurseSiteMaintainService {
 			}
 			tempItem.setStatus(itemStatus);
 		}
+		return true;
 	}
 	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
 	public void updateMaintain(NurseSiteMaintain obj, Date date, UserAccount user) {
@@ -1233,7 +1232,7 @@ public class NurseSiteMaintainService {
 	}
 
 	public boolean saveMaintain(NurseSiteMaintain tempNurseSiteMaintain,Date date,UserAccount user) {
-		updateMaintainItem(tempNurseSiteMaintain,date,user);
+		if(!updateMaintainItem(tempNurseSiteMaintain,date,user)) return false;
 		saveMaintainItem(tempNurseSiteMaintain);
 		updateMaintain(tempNurseSiteMaintain,date,user);
 		save(tempNurseSiteMaintain);
