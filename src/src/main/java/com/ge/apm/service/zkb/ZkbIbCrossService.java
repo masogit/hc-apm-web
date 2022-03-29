@@ -55,6 +55,11 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
     UserAccountRepository userAccountRepository;
 
     SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
+    List<ZkbIbCrossUser> zkbIbCrossUserList = new ArrayList<>();
+    HashMap<String, ZkbIbCrossUser> userHashMap = new HashMap<>();
+    List<ZkbIbCrossRelationShip> zkbIbCrossRelationShipList = new ArrayList<>();
+    HashMap<String, ZkbIbCrossRelationShip> relationShipHashMap = new HashMap<>();
+    HashMap<String, String> tenantMap = new HashMap<>();
 
     @Transactional(rollbackFor = Exception.class)
     public void handleIbCrossJob(){
@@ -72,59 +77,12 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
         zkbIbCrossRelationShipRepository.deleteAllBatch();
 
         List<String> tenantUidList = zkbContractRepository.queryByLastModifiedDate(d1,d2);
-        List<ZkbIbCrossUser> zkbIbCrossUserList = new ArrayList<>();
-        HashMap<String, ZkbIbCrossUser> userHashMap = new HashMap<>();
-        List<ZkbIbCrossRelationShip> zkbIbCrossRelationShipList = new ArrayList<>();
-        HashMap<String, ZkbIbCrossRelationShip> relationShipHashMap = new HashMap<>();
-        HashMap<String, String> tenantMap = new HashMap<>();
+
 
         if(tenantUidList !=null && tenantUidList.size() > 0){
             for(String tenantUid : tenantUidList){
                 tenantMap.put(tenantUid,tenantUid);
-                List<ZkbContractAsset> zkbContractAssetList = getContractAsset(tenantUid,d1,d2);
-                List<ZkbIbCrossUser> zkbIbCrossUsers = zkbIbCrossMapper.findUsersByTenantUid(tenantUid);
-                if(zkbContractAssetList == null || zkbContractAssetList.size() ==0){
-                    for(ZkbIbCrossUser u : zkbIbCrossUsers) {
-                        if (userHashMap.containsKey(u.getLoginName())) {
-                            continue;
-                        }
-                        u.setLoginName("ZKB." + u.getLoginName());
-                        u.setUserId(Integer.parseInt(u.getId()));
-                        u.setId(null);
-                        u.setDeleted(true);
-                        userHashMap.put(u.getLoginName(), u);
-                        zkbIbCrossUserList.add(u);
-                    }
-                }else{
-                    for(ZkbIbCrossUser u : zkbIbCrossUsers){
-                        if(userHashMap.containsKey(u.getLoginName())){
-                            continue;
-                        }
-                        u.setLoginName("ZKB."+u.getLoginName());
-                        u.setUserId(Integer.parseInt(u.getId()));
-                        u.setId(null);
-                        userHashMap.put(u.getLoginName(),u);
-                        zkbIbCrossUserList.add(u);
-
-                        for(ZkbContractAsset a : zkbContractAssetList){
-                            if(relationShipHashMap.containsKey(u.getLoginName()+"|"+a.getAssetId())){
-                                continue;
-                            }
-                            AssetInfo assetInfo = assetInfoRepository.findByUid(a.getAssetId());
-                            if(StringUtils.isEmpty(assetInfo.getSystemId())){
-                                continue;
-                            }else if(!assetInfo.getSystemId().startsWith("0824")){
-                                continue;
-                            }
-                            ZkbIbCrossRelationShip r = new ZkbIbCrossRelationShip();
-                            r.setLoginName(u.getLoginName());
-                            r.setSystemId(assetInfo.getSystemId());
-                            r.setQrCode(assetInfo.getQrCode());
-                            zkbIbCrossRelationShipList.add(r);
-                            relationShipHashMap.put(u.getLoginName()+"|"+a.getAssetId(),r);
-                        }
-                    }
-                }
+                handleContractAsset(tenantUid, d1, d2);
             }
         }
 
@@ -134,21 +92,7 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
                 if(tenantMap.containsKey(t)){
                     continue;
                 }
-                List<ZkbContractAsset> zkbContractAssets = zkbContractAssetRepository.findByEndDateAsset(t,d1);
-                if(zkbContractAssets != null || zkbContractAssets.size() > 0){
-                    List<ZkbIbCrossUser> zkbIbCrossUsers = zkbIbCrossMapper.findUsersByTenantUid(t);
-                    for(ZkbIbCrossUser u : zkbIbCrossUsers) {
-                        if (userHashMap.containsKey(u.getLoginName())) {
-                            continue;
-                        }
-                        u.setLoginName("ZKB." + u.getLoginName());
-                        u.setUserId(Integer.parseInt(u.getId()));
-                        u.setId(null);
-                        u.setDeleted(true);
-                        userHashMap.put(u.getLoginName(), u);
-                        zkbIbCrossUserList.add(u);
-                    }
-                }
+                handleContractAsset(t, d1, d2);
             }
         }
 
@@ -162,7 +106,7 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
                 List<ZkbIbCrossUser> zkbIbCrossUsers = zkbIbCrossMapper.findUsersByTenantUid(t);
 
                 for(ZkbIbCrossUser u : zkbIbCrossUsers){
-                    if(userHashMap.containsKey(u.getLoginName())){
+                    if(userHashMap.containsKey("ZKB."+u.getLoginName())){
                         continue;
                     }
                     u.setLoginName("ZKB."+u.getLoginName());
@@ -198,7 +142,7 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
             if(StringUtils.isEmpty(s.getLoginName())){
                 continue;
             }
-            if(userHashMap.containsKey(s.getLoginName())){
+            if(userHashMap.containsKey("ZKB."+s.getLoginName())){
                 ZkbIbCrossUser u = userHashMap.get(s.getLoginName());
                 if("D".equals(s.getStatus())){
                     if(u.getDeleted() == null || !u.getDeleted()){
@@ -258,8 +202,60 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
         if(zkbIbCrossUserStatusList.size() > 0){
             zkbIbCrossUserStatusRepository.delete(zkbIbCrossUserStatusList);
         }
+
+        zkbIbCrossUserList.clear();
+        userHashMap.clear();
+        zkbIbCrossRelationShipList.clear();
+        relationShipHashMap.clear();
+        tenantMap.clear();
     }
 
+    public void handleContractAsset(String tenantUid,Date d1,Date d2){
+        List<ZkbContractAsset> zkbContractAssetList = getContractAsset(tenantUid,d1,d2);
+        List<ZkbIbCrossUser> zkbIbCrossUsers = zkbIbCrossMapper.findUsersByTenantUid(tenantUid);
+        if(zkbContractAssetList == null || zkbContractAssetList.size() ==0){
+            for(ZkbIbCrossUser u : zkbIbCrossUsers) {
+                if (userHashMap.containsKey("ZKB."+u.getLoginName())) {
+                    continue;
+                }
+                u.setLoginName("ZKB." + u.getLoginName());
+                u.setUserId(Integer.parseInt(u.getId()));
+                u.setId(null);
+                u.setDeleted(true);
+                userHashMap.put(u.getLoginName(), u);
+                zkbIbCrossUserList.add(u);
+            }
+        }else{
+            for(ZkbIbCrossUser u : zkbIbCrossUsers){
+                if(userHashMap.containsKey("ZKB."+u.getLoginName())){
+                    continue;
+                }
+                u.setLoginName("ZKB."+u.getLoginName());
+                u.setUserId(Integer.parseInt(u.getId()));
+                u.setId(null);
+                userHashMap.put(u.getLoginName(),u);
+                zkbIbCrossUserList.add(u);
+
+                for(ZkbContractAsset a : zkbContractAssetList){
+                    if(relationShipHashMap.containsKey(u.getLoginName()+"|"+a.getAssetId())){
+                        continue;
+                    }
+                    AssetInfo assetInfo = assetInfoRepository.findByUid(a.getAssetId());
+                    if(StringUtils.isEmpty(assetInfo.getSystemId())){
+                        continue;
+                    }else if(!assetInfo.getSystemId().startsWith("0824")){
+                        continue;
+                    }
+                    ZkbIbCrossRelationShip r = new ZkbIbCrossRelationShip();
+                    r.setLoginName(u.getLoginName());
+                    r.setSystemId(assetInfo.getSystemId());
+                    r.setQrCode(assetInfo.getQrCode());
+                    zkbIbCrossRelationShipList.add(r);
+                    relationShipHashMap.put(u.getLoginName()+"|"+a.getAssetId(),r);
+                }
+            }
+        }
+    }
 
 
     public Date addDays(Date date,int days){
