@@ -352,6 +352,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         contentTypeFlag =false;
         if(auditConfigItem!=null){
             auditConfigItemSelected=auditConfigItem ;
+            entryContent=auditConfigItem.getContent();
         }
     }
     public void editAuditSystementry(){
@@ -927,7 +928,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     public void setContentNothing(){
         AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
         if (auditConfigItem!=null){
-            auditConfigItemSelected=auditConfigItem;
+            entryContent=auditConfigItem.getContent();
         }
     }
 

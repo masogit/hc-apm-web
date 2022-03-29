@@ -252,7 +252,7 @@
                                                          update="contentDlg"/>
                                         <p:commandButton  icon="ui-icon-pencil"  style="zoom:0.8;" class="btn btn-sm btn-gray" process="@this" oncomplete="PF('contentDlg').show()"
                                                           title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditConfigItem(item)}"
-                                                          rendered="#{not empty item.mark}"  update="contentDlg"/>
+                                                          rendered="#{not empty item.mark}"  update="contentForm"/>
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
                                                          actionListener="#{auditSystemCaseEditController.deleteNode(item)}" rendered="#{not empty item.mark}"
                                                          update="argetList">
@@ -374,7 +374,7 @@
                             </h:panelGroup>
                             <h:panelGroup id="entryContent">
                                 <label class="label">内容</label>
-                                <p:inputTextarea rows="3" cols="50"  value="#{auditSystemCaseEditController.auditConfigItemSelected.content}" style="width: 100%;" disabled="true"/>
+                                <p:inputTextarea rows="3" cols="50"  value="#{auditSystemCaseEditController.entryContent}" style="width: 100%;" disabled="true"/>
                             </h:panelGroup>
                         </p:panelGrid>
 
