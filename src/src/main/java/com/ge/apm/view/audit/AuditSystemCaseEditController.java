@@ -349,6 +349,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
     }
     public void editAuditConfigItem(AuditConfigItem auditConfigItem){
+        contentTypeFlag =false;
         if(auditConfigItem!=null){
             auditConfigItemSelected=auditConfigItem ;
         }
@@ -641,7 +642,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             WebUtil.addErrorMessage("请上传图片！");
             return ;
         }
-
+        if(selected.getType()!=null && selected.getType()==2){
+            auditConfigItem.setContentType(3);
+        }
         // 同类型下，mark唯一
         List<SearchFilter> searchFilterList = new ArrayList<>();
         searchFilterList.add(new SearchFilter("mark", SearchFilter.Operator.EQ, auditConfigItem.getMark()));
@@ -920,9 +923,11 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
 
     public void setNothing(){
+    }
+    public void setContentNothing(){
         AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
         if (auditConfigItem!=null){
-            entryContent=auditConfigItem.getContent();
+            auditConfigItemSelected=auditConfigItem;
         }
     }
 
