@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.AuditEntryTemplateRelRepository;
 import com.ge.apm.dao.AuditEventRepository;
 import com.ge.apm.dao.AuditTemplateRepository;
-import com.ge.apm.domain.AuditEntryTemplateRel;
-import com.ge.apm.domain.AuditEvent;
-import com.ge.apm.domain.AuditTemplate;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.audit.AuditTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -38,10 +36,18 @@ public class AuditEventController extends GenericCRUDUUIDController<AuditEvent> 
 
     private AuditEventRepository dao;
 
+    private I18nMessageRepository i18nDao;
+
+    private List<I18nMessage> eventType;
+    private List<I18nMessage> eventResult;
+
     @Override
     protected void init() {
         this.filterBySite = false;
         dao = WebUtil.getBean(AuditEventRepository.class);
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        eventType = i18nDao.getByMsgType("auditEvent");
+        eventResult = i18nDao.getByMsgType("auditEventResult");
     }
 
     @Override
@@ -67,5 +73,21 @@ public class AuditEventController extends GenericCRUDUUIDController<AuditEvent> 
     public void setSelected(String uid) {
         AuditEvent auditEvent = dao.findById(uid);
         super.setSelected(auditEvent);
+    }
+
+    public List<I18nMessage> getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(List<I18nMessage> eventType) {
+        this.eventType = eventType;
+    }
+
+    public List<I18nMessage> getEventResult() {
+        return eventResult;
+    }
+
+    public void setEventResult(List<I18nMessage> eventResult) {
+        this.eventResult = eventResult;
     }
 }

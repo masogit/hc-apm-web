@@ -25,13 +25,25 @@
                         <p:ajax event="filter" listener="#{auditEventController.onFilter}" />
 
                         <p:column headerText="#{msg.eventType}" sortBy="#{item.eventType}" filterBy="#{item.eventType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.eventType}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('auditEvent',item.eventType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{auditEventController.eventType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <p:column headerText="#{msg.Content}" filterBy="#{item.content}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.content}"/>
                         </p:column>
                         <p:column headerText="#{msg.eventResult}" sortBy="#{item.result}" filterBy="#{item.result}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.result}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('auditEventResult',item.result)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{auditEventController.eventResult}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <p:column headerText="#{msg.operator}" filterBy="#{item.operator}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.operator}"/>
