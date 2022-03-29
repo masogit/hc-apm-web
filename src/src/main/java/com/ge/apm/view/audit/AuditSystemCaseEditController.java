@@ -634,14 +634,15 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             WebUtil.addErrorMessage(WebUtil.getMessage("Save") + WebUtil.getMessage("FAILED"));
         }
     }
-    public void typeChecking(){
+    public boolean typeChecking(){
         if (selected.getType()==2){
             List<AuditSystemCase> data = dao.findByType(selected.getType());
             if(data!=null && !data.isEmpty()){
                 WebUtil.addErrorMessage("已存在质控配置不能重复添加!");
-                return ;
+                return true;
             }
         }
+        return false;
 
     }
     private void createEvent(String eventType, AuditConfigItem item, String result){
@@ -684,7 +685,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         orgTree = getEntryTreeNodes(auditSystemEntryRepository.findListByName(entryMarkName,uid));
     }
     public void saveSelectedOrg() {
-        this.typeChecking();
+       if( this.typeChecking()){
+           return;
+       }
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         selected.setStatus(1);
         selected.setCreateTime(new Date());
