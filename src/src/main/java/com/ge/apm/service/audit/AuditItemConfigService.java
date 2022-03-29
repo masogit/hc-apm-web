@@ -23,7 +23,7 @@ public class AuditItemConfigService {
 
     @Transactional(rollbackFor = Exception.class)
     public void saveAuditConfigItem(AuditConfigItem auditConfigItem, List<V2_BlobObject> list){
-        auditConfigItemDao.save(auditConfigItem);
+        auditConfigItem=auditConfigItemDao.save(auditConfigItem);
         List<V2_BlobObject> attachList = new ArrayList();
         if(CollectionUtils.isNotEmpty(list)){
             for (V2_BlobObject item : list) {

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -65,6 +66,7 @@ import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.service.utils.NurseSiteMaintainComparator;
 
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 /**
  * Created by 503035627
@@ -892,6 +894,23 @@ public class NurseSiteMaintainService {
 			tempItem.setModifyDate(date);
 			List<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
+			ca.setTime(tempItem.getCheckDate());
+			ca.set(Calendar.DAY_OF_MONTH,1);
+			Date firstDayOfMonthByCheckDay = ca.getTime();
+			ca.setTime(sheculeDate);
+			ca.set(Calendar.DAY_OF_MONTH,1);
+			Date firstDayOfMonthByShecudleDate = ca.getTime();
+			boolean delayNextMonth =  firstDayOfMonthByCheckDay.getDay() > firstDayOfMonthByShecudleDate.getDay() ? true : false;
+
+			if(delayNextMonth) {
+				UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+				if(userContextService.accessContainsOfJiangNing()) {  //江宁医院，delay到下个月，只有科长（医学工程处主任）才能补单
+					if(!userContextService.hasRole("AssetHead")) {
+						WebUtil.addErrorMessage("超过补单时间！");
+						return;
+					}
+				}
+			}
 			boolean delay=tempItem.getCheckDate().after(sheculeDate)?true:false;
 			boolean hasComment=StringUtils.isNotEmpty(tempItem.getComment())?true:false;
 			//0：未检查,1:已检查，4进行中,2:通过没commnet没有delay，5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，3有问题，延期了,8，有问题，没有延期
