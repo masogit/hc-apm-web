@@ -4563,3 +4563,15 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Version','版本','Version',NULL,-1);
 
+-- 供应商三证到期时间
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SupplierCertificateManage','供应商资质证书管理','Supplier qualification certificate management',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','productionLicenseExpireDays','生产许可证到期提醒提前天数','The number of days in advance for the production license expiration reminder',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ProductionLicenseExpireTimes','生产许可证到期提醒提前次数','The number of production license expiration reminder advances',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BusinessLicenseExpireDays','经营许可证到期提醒提前天数','The number of days in advance for the reminder of the expiration of the operating license',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BusinessLicenseExpireTimes','经营许可证到期提醒提前次数','The number of times the business license expires in advance',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RegistrationCertificateExpireDays','注册证到期提醒提前天数','The number of days in advance of the reminder of the expiration of the registration certificate',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RegistrationCertificateExpireTimes','注册证到期提醒提前次数','The number of times the registration certificate expires in advance',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ProductionLicenseExpireDate','生产许可证到期时间','Production license expiration time',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BusinessLicenseExpireDate','经营许可证到期时间','The expiry time of the operating license',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RegistrationCertificateExpireDate','注册证到期时间','Registration certificate expiry time',NULL,-1);
+
