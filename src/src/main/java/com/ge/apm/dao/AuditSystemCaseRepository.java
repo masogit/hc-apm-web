@@ -14,4 +14,5 @@ public interface AuditSystemCaseRepository extends GenericRepositoryUUID<AuditSy
 
     public AuditSystemCase findByUid(String uid);
     public List<AuditSystemCase> findByType(Integer type);
+    public List<AuditSystemCase> findByStatus(Integer status);
 }
