@@ -897,7 +897,7 @@ public class NurseSiteMaintainService {
 			Calendar calendar1 = Calendar.getInstance();
 			Calendar calendar2 = Calendar.getInstance();
 			calendar1.setTime(tempItem.getCheckDate());
-			calendar2.setTime(sheculeDate);
+			calendar2.setTime(obj.getScheduleDate());
 			boolean delayNextMonth =  calendar1.get(Calendar.MONTH)>calendar2.get(Calendar.MONTH) ? true : false;
 
 			if(delayNextMonth) {
