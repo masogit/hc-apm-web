@@ -237,6 +237,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             date=auditSystemEntrySelected;
             eventType="EDIT_SYSTEM_ENTRY";
         }else {
+            date.setCreator(UserContextService.getCurrentUserAccount().getName());
+            date.setCreateTime(new Date());
             if(auditSystemEntry!=null){
                 type= auditSystemEntry.getType();
             }
@@ -776,12 +778,12 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         String eventType = "ADD_SYSTEM_CASE";
         if (selected.getUid()!=null){
             eventType = "EDIT_SYSTEM_CASE";
-        }
-        try {
             UserAccount userAccount = UserContextService.getCurrentUserAccount();
-            selected.setStatus(1);
             selected.setCreateTime(new Date());
             selected.setCreator(userAccount.getName());
+        }
+        try {
+            selected.setStatus(1);
             dao.save(selected);
             buildOrdTree();
             createEventSysytemCase(eventType, selected, "success");
