@@ -49,6 +49,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private String entryName;
     private String entryMark;
     private String sourceText;
+    private String evaluationCriteria;
     private Double entryScoreStandard;
     private Integer entryType;
     private Integer targetType;
@@ -62,6 +63,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private Double targetScoreStandard;
     private boolean onSelectFlag = true;
     private boolean entryFlag = false;
+    private boolean evaluationCriteriaFlag = false;
     private boolean entryScoreFlag = true;
     private boolean orderByFlag = true;
     private int caseLevel=0;
@@ -270,6 +272,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         date.setMark(entryMark);
         date.setScoreStandard(entryScoreStandard);
         date.setSourceText(sourceText);
+        date.setEvaluationCriteria(evaluationCriteria);
 
         try {
             auditSystemEntryRepository.save(date);
@@ -278,6 +281,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             entryType=null;
             entryScoreStandard=null;
             sourceText=null;
+            evaluationCriteria=null;
             createEventSysytemEntry(eventType, date, "success");
             WebUtil.addSuccessMessage(WebUtil.getMessage("saveSuccess"));
         } catch (Exception e){
@@ -357,15 +361,20 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
     public void editAuditSystementry(){
         if(auditSystemEntry!=null&&auditSystemEntry.getUid()!=null){
+            evaluationCriteriaFlag=false;
             entryType=auditSystemEntry.getType();
             entryMark=auditSystemEntry.getMark();
             entryName=auditSystemEntry.getName();
             entryScoreStandard=auditSystemEntry.getScoreStandard();
             sourceText=auditSystemEntry.getSourceText();
+            evaluationCriteria=auditSystemEntry.getEvaluationCriteria();
             auditSystemEntrySelected=auditSystemEntry;
             entryScoreFlag=true;
             if(auditSystemEntry.getLevel()==1){
                 entryScoreFlag=false;
+            }
+            if(auditSystemEntry.getLevel()==3){
+                evaluationCriteriaFlag=true;
             }
         }
     }
@@ -412,6 +421,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         entryScoreStandard=null;
         sourceText=null;
+        evaluationCriteria=null;
     }
     public void preDelete() {
         onSelectFlag=true;
@@ -454,6 +464,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         entryName=null;
         entryMark=null;
+        evaluationCriteriaFlag=false;
         if (onSelectFlag){
             caseLevel=0;
             entryUid = null;
@@ -465,9 +476,13 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             entryFlag =false;
             entryScoreFlag=true;
         }
+        if (caseLevel>=2){
+            evaluationCriteriaFlag=true;
+        }
         auditSystemEntrySelected=new AuditSystemEntry();
         entryScoreStandard=null;
         sourceText=null;
+        evaluationCriteria=null;
     }
     public List<AuditTemplate> auditTemplates(){
         return auditTemplateRepository.findByType(1);
@@ -826,6 +841,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         this.sourceText = sourceText;
     }
 
+    public String getEvaluationCriteria() {
+        return evaluationCriteria;
+    }
+
+    public void setEvaluationCriteria(String evaluationCriteria) {
+        this.evaluationCriteria = evaluationCriteria;
+    }
+
     public Double getEntryScoreStandard() {
         return entryScoreStandard;
     }
@@ -959,6 +982,15 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     public void setSelectType(String selectType) {
         this.selectType = selectType;
     }
+
+    public boolean isEvaluationCriteriaFlag() {
+        return evaluationCriteriaFlag;
+    }
+
+    public void setEvaluationCriteriaFlag(boolean evaluationCriteriaFlag) {
+        this.evaluationCriteriaFlag = evaluationCriteriaFlag;
+    }
+
     public int getCaseLevel() {
         return caseLevel;
     }
