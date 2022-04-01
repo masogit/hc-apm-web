@@ -4605,5 +4605,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BusinessLicenseExpireDate','经营许可证到期时间','The expiry time of the operating license',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RegistrationCertificateExpireDate','注册证到期时间','Registration certificate expiry time',NULL,-1);
 
--- 维修->恢复时间不能大于接单时间
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RepairRecoveryTimeCheck','恢复时间不能大于接单时间','The recovery time cannot be greater than the order time',NULL,-1);
+-- 维修->恢复时间不能小于接单时间
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RepairRecoveryTimeCheck','恢复时间不能小于接单时间','The recovery time cannot be less than the order time',NULL,-1);

@@ -21,7 +21,7 @@
                                         value="#{workOrderMgrController.confirmedUpDate}" showOn="button"
                                         showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"
                                         required="false" requiredMessage="#{msg.recoveryTime} #{msg.ValidationRequire}"
-                                        maxdate="#{workOrderMgrController.selectedWorkOrder.acceptStepStartTime}"
+                                        mindate="#{workOrderMgrController.selectedWorkOrder.acceptStepStartTime}"
                                         validatorMessage="#{msg.RepairRecoveryTimeCheck}">
                             </p:calendar>
                         </h:panelGroup>
