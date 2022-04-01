@@ -64,7 +64,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private boolean onSelectFlag = true;
     private boolean entryFlag = false;
     private boolean evaluationCriteriaFlag = false;
-    private boolean entryScoreFlag = true;
+    private boolean entryScoreFlag = false;
     private boolean orderByFlag = true;
     private int caseLevel=0;
     private Integer entryOrderBy =0;
@@ -371,9 +371,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             sourceText=auditSystemEntry.getSourceText();
             evaluationCriteria=auditSystemEntry.getEvaluationCriteria();
             auditSystemEntrySelected=auditSystemEntry;
-            entryScoreFlag=true;
-            if(auditSystemEntry.getLevel()==1){
-                entryScoreFlag=false;
+            entryScoreFlag=false;
+            if(auditSystemEntry.getLevel()>=1){
+                entryScoreFlag=true;
             }
             if(auditSystemEntry.getLevel()==3){
                 evaluationCriteriaFlag=true;
@@ -473,9 +473,11 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         if (caseLevel==1){
             entryFlag =true;
-            entryScoreFlag=true;
         }else{
             entryFlag =false;
+        }
+        entryScoreFlag=false;
+        if (caseLevel>=1){
             entryScoreFlag=true;
         }
         if (caseLevel>=2){
@@ -609,6 +611,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         dao.delete(selected);
     }
     public void onContent() {
+        entryContent=null;
         contentTypeFlag=false;
         auditConfigItemSelected=new AuditConfigItem();
         auditTemplateSelected=new AuditTemplate();

@@ -102,7 +102,7 @@
                                 <p:commandButton id = "adminListSearch" icon="ui-icon-location-searching" style="width: 90px;"   actionListener="#{auditSystemCaseEditController.filterNode()}" value="#{msg.Search2}"  update="entryTree" disabled="#{empty auditSystemCaseEditController.selected.uid}"/>
                                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"  title="#{msg.Create}"   update="MarkForm"  actionListener="#{auditSystemCaseEditController.preCreate()}"
                                                  disabled="#{empty auditSystemCaseEditController.selected.uid}" oncomplete="PF('markDlg').show()"/>
-                                <p:commandButton  icon="ui-icon-pencil"    class="btn btn-sm btn-gray" process="@this" oncomplete="PF('markDlg').show()" disabled="#{empty auditSystemCaseEditController.selected.uid}"
+                                <p:commandButton  id="editButton" icon="ui-icon-pencil"    class="btn btn-sm btn-gray" process="@this" oncomplete="PF('markDlg').show()" disabled="#{empty auditSystemCaseEditController.auditSystemEntry.uid}"
                                                   title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditSystementry()}"
                                                   update="markDlg"/>
                                 <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" update="entryTree"  disabled="#{empty auditSystemCaseEditController.selected.uid}"
@@ -111,7 +111,7 @@
 
                             <p:scrollPanel style="height:95%;border: 0" mode="native">
                                 <p:tree id="entryTree" class="tree" style="width:98%;border:0;"  value="#{auditSystemCaseEditController.orgTree}"  var="node" selectionMode="single" selection="#{auditSystemCaseEditController.selectedNode}" highlight="true">
-                                    <p:ajax process="@this" event="select" listener="#{auditSystemCaseEditController.onSelectTreeNode}" update="editContentForm"/>
+                                    <p:ajax process="@this" event="select" listener="#{auditSystemCaseEditController.onSelectTreeNode}" update="editContentForm entryForm:editButton"/>
 
                                     <p:treeNode type="org" >
                                         <h:outputText value="#{node.mark}__#{node.name}" rendered="#{auditSystemCaseEditController.selected.type==1}"/>
