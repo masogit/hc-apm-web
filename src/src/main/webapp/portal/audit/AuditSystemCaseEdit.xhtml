@@ -340,6 +340,10 @@
                                     <label class="label">原文</label>
                                     <p:inputTextarea rows="3" cols="50" id="sourceText" value="#{auditSystemCaseEditController.sourceText}" style="width: 60%;"/>
                                 </h:panelGroup>
+                                <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1 and auditSystemCaseEditController.evaluationCriteriaFlag}">
+                                    <label class="label">评审标准</label>
+                                    <p:inputTextarea rows="3" cols="50" id="evaluationCriteria" value="#{auditSystemCaseEditController.evaluationCriteria}" style="width: 60%;"/>
+                                </h:panelGroup>
                             </p:panelGrid>
                         </p:fieldset>
                         <br/>
