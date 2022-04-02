@@ -1635,7 +1635,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public Boolean enableDestroyTenant() {
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-        return 2==tenantInfo.getActiveType();
+        return Objects.equals(2,tenantInfo.getActiveType());
     }
 
     public Boolean getConfirmDestroy() {
