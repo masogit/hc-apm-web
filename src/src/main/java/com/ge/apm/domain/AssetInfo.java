@@ -670,7 +670,15 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     private String errorMessage;
     @Transient
+    @Getter
+    @Setter
+    private String branchIds;
+    @Transient
     private String aet;
+    @Transient
+    @Getter
+    @Setter
+    private Integer rank;
     @Transient
     private Date studydate;
     @Transient
