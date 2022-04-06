@@ -565,12 +565,6 @@
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">是否启用主子设备信息</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableAssetPreview}">
-                                <p:ajax process="@this" />
-                            </p:selectBooleanCheckbox>
-                        </h:panelGroup>
-                        <h:panelGroup>
                             <label class="label">是否启用小型物联网设备(急救类)服务</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isiotenabled}">
                                 <p:ajax process="@this" />
@@ -775,6 +769,12 @@
                             <p:inputNumber id="registrationCertificateExpireTimes" value="#{workflowConfigController.selected.registrationCertificateExpireTimes}" minValue="0" decimalPlaces="0">
                                 <p:ajax process="@this" />
                             </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否启用主子设备信息</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableAssetPreview}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
