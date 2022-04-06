@@ -60,15 +60,15 @@
                     </h:panelGrid>
                 </h:form>
                 <h:form id="assetPreviewListForm">
-                    <p:dataTable id="dataList" value="#{assetPreviewController.lazyModel}" var="item"
+                    <p:dataTable id="dataList" value="#{assetPreviewController.getAssetInfos()}" var="item"
                                  widgetVar="varDataList"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.branchIds}" sortMode="single" sortOrder="descending" sortBy="#{item.branchIds}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-
+                        <p:ajax event="filter" listener="#{assetPreviewController.onFilter}"  update="dataList"/>
 
                         <p:column headerText="图标" id="imgs" exportable="false">
                             <p:graphicImage url="/portal/asset/previewAsset/dot.jpeg" style="width: 20px; height: 20px;" rendered="#{item.rank != 0}"/>
