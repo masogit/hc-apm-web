@@ -99,10 +99,10 @@ public class UaaService {
         
         return url;
     }
-    
+
     private String getDefautHomePage(String roleName){
         loadSysRoles();
-        
+
         SysRole sysRole = sysRoles.get(roleName);
         if(sysRole!=null)
             return sysRole.getHomePage();
@@ -194,6 +194,12 @@ public class UaaService {
             //判断是否是智康宝用户，如果不是就移除掉智康宝的角色
             if(srVO.getName().equals("zkbDealerSales") || srVO.getName().equals("zkbDealerFE")){
                 if(null != ti.getType() && ti.getType()!=3){
+                    continue;
+                }
+            }
+            //如果是GE租户下放开产品超管和PM超管角色 别的租户看不到
+            if(!"GE".equals(ti.getName())){
+                if(srVO.getName().equals("ReviewSystemAdministrator")||srVO.getName().equals("PMAdministrator")){
                     continue;
                 }
             }

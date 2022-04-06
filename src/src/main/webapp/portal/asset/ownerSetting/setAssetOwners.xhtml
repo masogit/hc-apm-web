@@ -12,7 +12,7 @@
     </div>-->
     <div class="ui-g-12 card">
         <h:form id="SetOwner">
-            <p:fieldset legend="#{msg.FilterCondition}">
+            <p:fieldset legend="#{msg.assetSearchingConditions}">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
 
@@ -38,8 +38,8 @@
 
 
                     <h:panelGroup >
-                        <label class="label">#{msg.assetGroup}*</label>
-                        <p:selectOneMenu id="assetGroup" value="#{assetOwnerSettingController.queryAsset.assetGroup}" required="true">
+                        <label class="label">#{msg.assetGroup}</label>
+                        <p:selectOneMenu id="assetGroup" value="#{assetOwnerSettingController.queryAsset.assetGroup}">
                             <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList assetGroupSecondary" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>

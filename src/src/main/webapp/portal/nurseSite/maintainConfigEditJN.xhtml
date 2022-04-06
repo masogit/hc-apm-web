@@ -48,7 +48,7 @@
 			<br />
 			<p:commandButton id="saveButtonId" validateClient="true" value="#{msg.Save}" process="@parent" update=":growl,:maintainConfigListForm" icon="ui-icon-check"
 				oncomplete="PF('maintainConfigEditDialog').hide();handleSubmit(args, 'maintainConfigEditDialog')" action="#{maintainConfigJNController.update}"
-				disabled="#{maintainConfigJNController.saveDisable}" timeout="180000" />
+				timeout="180000" />
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainConfigEditDialog').hide()" />
 		</h:form>
 	</p:dialog>

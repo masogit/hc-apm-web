@@ -47,6 +47,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     private boolean isShowQrCode = Boolean.FALSE;
 
+    private Boolean isShowSupplierCertificate = null;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(SupplierRepository.class);
@@ -322,6 +324,13 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     public boolean activeSupplier(){
         return supplierService.activeSupplier();
+    }
+
+    public boolean activeSupplierCertificateManage(){
+        if(isShowSupplierCertificate == null){
+            isShowSupplierCertificate = supplierService.activeSupplierCertificateManage();
+        }
+        return isShowSupplierCertificate;
     }
 
     public void onShowQrCode(){

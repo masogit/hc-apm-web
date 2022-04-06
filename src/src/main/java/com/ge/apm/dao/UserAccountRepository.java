@@ -159,13 +159,20 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value= "update user_account set active_time = null,is_active = false where tenant_uid = ?1 and id not in(select user_id from user_role where role_id = 9)",nativeQuery=true)
     public void deactiveTenantMembersStatus(String tenantUid);
 
+
+    @Transactional
+    @Modifying
+    @Query(value= "update user_account set is_deleted = true where tenant_uid = ?1 ",nativeQuery=true)
+    public void deleteTenantUser(String tenantUid);
+
+
     @Transactional
     @Modifying
     @Query(value= "update user_account set active_time= now(),is_active=true where id = ?1",nativeQuery=true)
     public void activeSingleUser(Integer userId);
 
-    @Query(value="select * from user_account where  site_uid = ?2 and id in ?1",nativeQuery = true)
-    List<UserAccount> getUserAccounts(List<Integer> id,String siteUID );
+    @Query(value="select * from user_account where  hospital_uid = ?2 and id in ?1",nativeQuery = true)
+    List<UserAccount> getUserAccounts(List<Integer> id,String hospitalUID );
 
     @Transactional
     @Modifying
@@ -250,4 +257,6 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     UserAccount findByLoginName(String loginName);
 
+    @Query(value= "SELECT sys_role.NAME FROM user_role INNER JOIN user_account ON user_role.user_id = user_account.id INNER JOIN sys_role ON user_role.role_id = sys_role.id WHERE user_account.ID =?1",nativeQuery=true)
+    List<String> findUsname(Integer id);
 }

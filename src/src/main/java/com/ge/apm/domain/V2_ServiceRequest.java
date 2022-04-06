@@ -206,6 +206,10 @@ public class V2_ServiceRequest implements Serializable {
     private String siebleNumber;
     @Transient
     private String callCenterNumber;
+    /**县域 开单类型： 1主动开单、2被动开单**/
+    @Transient
+    private String orderType;
+
     public String getTenantUID() {
         return tenantUID;
     }
@@ -556,6 +560,14 @@ public class V2_ServiceRequest implements Serializable {
 
     public void setCallCenterNumber(String callCenterNumber) {
         this.callCenterNumber = callCenterNumber;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 
     @Override

@@ -24,7 +24,10 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">邮箱*</label>
-                        <p:inputText id="email" value="#{zkbFePartOrderUserConfigController.selected.email}" maxlength="40" required="true" requiredMessage="邮箱#{msg.ValidationRequire}" />
+                        <p:inputText id="email" validatorMessage="请输入正确的邮箱格式" value="#{zkbFePartOrderUserConfigController.selected.email}" maxlength="40" required="true" requiredMessage="邮箱#{msg.ValidationRequire}" >
+                            <f:validateRegex
+                                    pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">电话*</label>

@@ -68,6 +68,9 @@
                 <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.functionType}"/>
                 </p:column>
+                <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE" rendered="#{userContextService.isCountyArea()}">
+                    <h:outputText value="#{item.assetInfo.systemId}"/>
+                </p:column>
                 <!--所属科室-->
                 <p:column headerText="#{msg.clinicalDeptName}"  width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <f:facet name="header">
