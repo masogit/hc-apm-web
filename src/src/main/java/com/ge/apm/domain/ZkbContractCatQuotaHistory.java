@@ -17,22 +17,6 @@ public class ZkbContractCatQuotaHistory {
 
     private static final long serialVersionUID = 1L;
 
-    public String getProbeType() {
-        return probeType;
-    }
-
-    public void setProbeType(String probeType) {
-        this.probeType = probeType;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -74,6 +58,23 @@ public class ZkbContractCatQuotaHistory {
      */
     @Column(name = "status")
     private String status;
+
+
+    public String getProbeType() {
+        return probeType;
+    }
+
+    public void setProbeType(String probeType) {
+        this.probeType = probeType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
 
     public String getId() {
