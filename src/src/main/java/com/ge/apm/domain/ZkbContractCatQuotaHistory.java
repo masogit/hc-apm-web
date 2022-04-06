@@ -56,15 +56,20 @@ public class ZkbContractCatQuotaHistory {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
-    @Column(name = "asset_uid")
-    private String assetUid;
-
     /**
-     * 数据状态 Y N
+     * 数据状态
+     * Y 有效
+     * N 无效
      */
     @Column(name = "status")
     private String status = "Y";
 
+    /**
+     * highMachine  超声高端机
+     * lowMachine   超声低端机
+     */
+    @Column(name = "asset_type")
+    private String assetType;
 
     public String getProbeType() {
         return probeType;
@@ -82,12 +87,12 @@ public class ZkbContractCatQuotaHistory {
         this.status = status;
     }
 
-    public String getAssetUid() {
-        return assetUid;
+    public String getAssetType() {
+        return assetType;
     }
 
-    public void setAssetUid(String assetUid) {
-        this.assetUid = assetUid;
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 
     public String getId() {
