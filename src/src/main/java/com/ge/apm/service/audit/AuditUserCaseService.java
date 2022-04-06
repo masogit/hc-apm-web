@@ -32,12 +32,23 @@ public class AuditUserCaseService {
     private AuditResultRepository auditResultRepository;
     @Autowired
     private AuditSelfEvaluationRepository auditSelfEvaluationRepository;
+    @Autowired
+    private AuditSystemCaseRepository auditSystemCaseRepository;
 
 
     @Transactional(rollbackFor = Exception.class)
     public void saveUserCase(AuditCase auditCase){
         // uid为空，说明是新增
         if(StringUtils.isEmpty(auditCase.getUid())){
+            // 判断，一个院区只能有一个质控/评审配置
+            AuditSystemCase systemCase = auditSystemCaseRepository.findByUid(auditCase.getSystemCaseUid());
+
+            int count = auditCaseRepository.preSaveJudge(auditCase.getSiteUid(), systemCase.getType());
+
+            if(count > 0){
+                throw new RuntimeException("该院区已有已激活的该类型配置，无法再次配置!");
+            }
+
             auditCase.setScore(0.0);
             auditCase.setStatus(1);
             auditCase.setProcess(0.0);

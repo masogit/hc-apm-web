@@ -340,7 +340,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    private void setUserSearchFilters() {
+    public void setUserSearchFilters() {
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         if(isPmSearch!=null) {
             if(isPmSearch.equals("ypz")) {

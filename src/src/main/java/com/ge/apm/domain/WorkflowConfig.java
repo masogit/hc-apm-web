@@ -253,6 +253,10 @@ public class WorkflowConfig implements Serializable {
     //是否启用院间借调
     @Column(name = "enable_site_to_site_allocation")
     private Boolean enableSiteToSiteAllocation;
+    @Setter
+    @Getter
+    @Column(name = "enable_asset_preview")
+    private Boolean enableAssetPreview;
     //是否启用小型物联网设备(急救类)服务
     @Column(name = "is_io_tenabled")
     private Boolean isiotenabled;
