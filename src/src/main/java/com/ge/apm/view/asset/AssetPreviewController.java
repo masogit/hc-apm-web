@@ -131,7 +131,9 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
         assetInfo.setSerialNum(checkData(o[6]));
         assetInfo.setDepartNum(checkData(o[7]));
         assetInfo.setAssetGroup(Integer.parseInt(checkData(o[8])));
-        assetInfo.setAssetDeptId(Integer.parseInt(checkData(o[9])));
+        if(o[9] != null) {
+            assetInfo.setAssetDeptId(Integer.parseInt(checkData(o[9])));
+        }
         assetInfo.setClinicalDeptName(checkData(o[10]));
         assetInfo.setManufacture(checkData(o[11]));
         assetInfo.setVendor(checkData(o[12]));
