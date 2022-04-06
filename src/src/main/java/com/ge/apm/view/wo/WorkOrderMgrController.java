@@ -1602,6 +1602,11 @@ public void test1(){
             WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
             valid = false;
+        }else if(this.confirmedUpDate.getTime() < selectedWorkOrder.getAcceptStepStartTime().getTime()){
+            // 恢复时间不能小于接单时间
+            WebUtil.addErrorMessage(WebUtil.getMessage("RepairRecoveryTimeCheck"));
+            RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
+            valid = false;
         }
         if (requireCaseType() && null == selectedWorkOrder.getCaseType()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("caseType") + WebUtil.getMessage("ValidationRequire"));
