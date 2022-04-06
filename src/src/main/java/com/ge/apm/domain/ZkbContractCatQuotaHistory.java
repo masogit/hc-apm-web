@@ -29,6 +29,9 @@ public class ZkbContractCatQuotaHistory {
     @Column(name = "contract_no")
     private String contractNo;
 
+    /*
+     * 任意  普通  特殊
+     */
     @Column(name = "probe_type")
     private String probeType;
 
@@ -53,11 +56,14 @@ public class ZkbContractCatQuotaHistory {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
+    @Column(name = "asset_uid")
+    private String assetUid;
+
     /**
-     * 数据状态
+     * 数据状态 Y N
      */
     @Column(name = "status")
-    private String status;
+    private String status = "Y";
 
 
     public String getProbeType() {
@@ -76,6 +82,13 @@ public class ZkbContractCatQuotaHistory {
         this.status = status;
     }
 
+    public String getAssetUid() {
+        return assetUid;
+    }
+
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
+    }
 
     public String getId() {
         return id;
