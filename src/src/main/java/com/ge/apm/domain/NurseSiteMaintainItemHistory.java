@@ -2,18 +2,27 @@ package com.ge.apm.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
+
 
 @Data
 @Entity
+@Cacheable(false)
+@org.hibernate.annotations.Cache(usage= CacheConcurrencyStrategy.NONE)
 @Table(name = "nurse_site_maintain_item_history")
 public class NurseSiteMaintainItemHistory {
 
 
     @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
@@ -47,8 +56,16 @@ public class NurseSiteMaintainItemHistory {
     @Column(name = "modify_by")
     private String modifyByUid;
 
+    @Transient
+    private UserAccount createBy;
 
-    @Column(name="parent_id")
+    @Transient
+    private UserAccount modifyBy;
+
+    @Column(name = "update_by")
+    private String updateByUid;
+
+    @Column(name="parent_id",insertable = false, updatable = false)
     private String parentId;
 
     @Column(name="asset_uid")
@@ -82,6 +99,72 @@ public class NurseSiteMaintainItemHistory {
 
     @Column(name="comment")
     private String comment="";
+
+    @Transient
+    private boolean needGetItem=true;
+
+    public boolean isNeedGetItem() {
+        return needGetItem;
+    }
+
+    public void setNeedGetItem(boolean needGetItem) {
+        this.needGetItem = needGetItem;
+    }
+
+    public void setSequence(Integer sequence) {
+        if(sequence==null){
+            sequence=0;
+        }
+        this.sequence = sequence;
+    }
+
+    public String getSequenceName(){
+        if(sequence==null||sequence<0){
+            return "";
+        }
+        else{
+            return sequence+"";
+        }
+    }
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "item", fetch = FetchType.LAZY)
+    private List<NurseSiteMaintainDataHistory> listData;
+
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private NurseSiteMaintainHistory nurseSiteMaintainHistory;
+
+    @Transient
+    private AssetInfo assetInfo;
+
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are
+        // not set
+        if (!(object instanceof NurseSiteMaintainItemHistory)) {
+            return false;
+        }
+        NurseSiteMaintainItemHistory other = (NurseSiteMaintainItemHistory) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))|| (this.id==null && other.id==null)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "NurseSiteMaintainItemHistory [ id=" + id + " ]";
+    }
 
 
 }
