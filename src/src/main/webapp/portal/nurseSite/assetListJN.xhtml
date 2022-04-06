@@ -11,17 +11,17 @@
         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
                 <label class="label">所属院区</label>
-                <p:inputText id="selectedOrgName" value="#{assetSelectController.selectedOrg.name}" readonly="true" required="true"
-                             requiredMessage="#{msg.orgId} #{msg.ValidationRequire}" disabled="#{assetSelectController.is4Edit}"/>
-                <p:commandButton id="orgBtn" process="@this" disabled="#{assetSelectController.is4Edit}" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
+                <p:inputText id="selectedOrgName" value="#{assetSelectJNController.selectedOrg.name}" readonly="true" required="true"
+                             requiredMessage="#{msg.orgId} #{msg.ValidationRequire}" disabled="#{assetSelectJNController.is4Edit}"/>
+                <p:commandButton id="orgBtn" process="@this" disabled="#{assetSelectJNController.is4Edit}" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
                 <p:overlayPanel id="orgPanel" widgetVar="varOrgPanel" for="orgBtn" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel"
                                 style="width:300px;" modal="false">
                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                        <p:tree id="userTree" class="tree" style="width:98%;border:0;" value="#{assetSelectController.orgTree}"
+                        <p:tree id="userTree" class="tree" style="width:98%;border:0;" value="#{assetSelectJNController.orgTree}"
                                 var="node" selectionMode="single">
                             <p:ajax process="@this" event="select"
                                     update="@parent:selectedOrgName,@parent:deptOrgInfoCreate"
-                                    listener="#{assetSelectController.onSelectOrgFromTree}" oncomplete="PF('varOrgPanel').hide();" />
+                                    listener="#{assetSelectJNController.onSelectOrgFromTree}" oncomplete="PF('varOrgPanel').hide();" />
                             <p:ajax process="@this" event="expand" />
                             <p:ajax process="@this" event="collapse" />
                             <p:treeNode type="org">
@@ -36,22 +36,22 @@
                 <!--指代所属科室或使用科室-->
                 <label class="label">科室</label>
                 <!-- <p:autoComplete id="deptOrgInfo"
-                                dropdown="true" value="#{assetSelectController.selectedDeptName}"
-                                scrollHeight="300"  forceSelection="true" size="20" disabled="#{assetSelectController.is4Edit}"
-                                completeMethod="#{assetSelectController.autoCompleteDeptName}" multiple="true">
-                    <p:ajax process="@this" listener="#{assetSelectController.onDeptNameChange}" event="itemSelect"/>
+                                dropdown="true" value="#{assetSelectJNController.selectedDeptName}"
+                                scrollHeight="300"  forceSelection="true" size="20" disabled="#{assetSelectJNController.is4Edit}"
+                                completeMethod="#{assetSelectJNController.autoCompleteDeptName}" multiple="true">
+                    <p:ajax process="@this" listener="#{assetSelectJNController.onDeptNameChange}" event="itemSelect"/>
                     <f:attribute name="departNumComponent" value="#{departNumComponent}"/>
                 </p:autoComplete> -->
-				<p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"
-					filterMatchMode="contains" showCheckbox="true" style="width:100%" rendered="#{!assetSelectController.is4Edit}">
-					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
+				<p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectJNController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"
+					filterMatchMode="contains" showCheckbox="true" style="width:100%" rendered="#{!assetSelectJNController.is4Edit}">
+					<f:selectItems value="#{assetSelectJNController.deptList}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
 					<p:column style="float: left;text-align:left;">
 						<h:outputText value="#{t.shortName}" />
 					</p:column>
 				</p:selectManyMenu>
-				<p:selectOneMenu id="deptOrgInfoEdit" value="#{assetSelectController.listCheckOrgInfo[0]}" var="t" converter="orgInfoConverter" required="false" filter="false"
-					showCheckbox="false" style="width:100%" rendered="#{assetSelectController.is4Edit}" disabled="#{assetSelectController.is4Edit}">
-					<f:selectItems value="#{assetSelectController.deptList}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
+				<p:selectOneMenu id="deptOrgInfoEdit" value="#{assetSelectJNController.listCheckOrgInfo[0]}" var="t" converter="orgInfoConverter" required="false" filter="false"
+					showCheckbox="false" style="width:100%" rendered="#{assetSelectJNController.is4Edit}" disabled="#{assetSelectJNController.is4Edit}">
+					<f:selectItems value="#{assetSelectJNController.deptList}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
 					<p:column style="float: left;text-align:left;">
 						<h:outputText value="#{t.shortName}" />
 					</p:column>
@@ -59,32 +59,32 @@
 			</h:panelGroup>
             <h:panelGroup>
                 <label class="label">设备名称</label>
-                <p:inputText value="#{assetSelectController.assetName}"/>
+                <p:inputText value="#{assetSelectJNController.assetName}"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">设备分类</label>
-                <p:selectOneMenu value="#{assetSelectController.assetGroup}" disabled="false">
+                <p:selectOneMenu value="#{assetSelectJNController.assetGroup}" disabled="false">
                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                 </p:selectOneMenu>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">设备型号</label>
-                <p:inputText value="#{assetSelectController.functionType}"/>
+                <p:inputText value="#{assetSelectJNController.functionType}"/>
             </h:panelGroup>
-            <h:panelGroup rendered="#{!assetSelectController.is4Edit}">
+            <h:panelGroup rendered="#{!assetSelectJNController.is4Edit}">
                 <label class="label">设备编号</label>
-                <p:inputText id="departNumInput" binding="#{departNumComponent}" value="#{assetSelectController.departNum}"/>
+                <p:inputText id="departNumInput" binding="#{departNumComponent}" value="#{assetSelectJNController.departNum}"/>
             </h:panelGroup>
 			<p:commandButton validateClient="true" value="查询"
 				update=":maintainConfigCreateFormJN:assets4maintain :maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:assets4maintain :maintainConfigEditFormJN:saveButtonId"
-				action="#{assetSelectController.findAssets2Maintain}" />
+				action="#{assetSelectJNController.findAssets2Maintain}" />
 
 		</p:panelGrid>
 
         <!--asset search result list-->
         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
-            <p:dataTable id="assets4maintain" value="#{assetSelectController.assets4Maintain}" var="asset"
+            <p:dataTable id="assets4maintain" value="#{assetSelectJNController.assets4Maintain}" var="asset"
                          selectionMode="single"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{asset.id}" sortMode="single" sortOrder="descending"
@@ -93,13 +93,13 @@
                          rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
                          rowsPerPageTemplate="20,50,100,500">
                 <p:column width="40" id="checkBoxCol">
-                    <p:selectBooleanCheckbox value="#{assetSelectController.selectedAssetUids[asset.uid]}" class="selectCheckBox">
-                        <p:ajax event="change" listener="#{assetSelectController.updateSelctedAssetList}" update=":maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:saveButtonId"/>
+                    <p:selectBooleanCheckbox value="#{assetSelectJNController.selectedAssetUids[asset.uid]}" class="selectCheckBox">
+                        <p:ajax event="change" listener="#{assetSelectJNController.updateSelctedAssetList}" update=":maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:saveButtonId"/>
                         <f:attribute name="assetObj" value="#{asset}"/>
                     </p:selectBooleanCheckbox>
                     <f:facet name="header">
-                        <p:selectBooleanCheckbox value="#{assetSelectController.isAllSelected}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                            <p:ajax event="change" listener="#{assetSelectController.addAssetsOfCurrentPage}" update="@(.selectCheckBox) :maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:saveButtonId"/>
+                        <p:selectBooleanCheckbox value="#{assetSelectJNController.isAllSelected}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax event="change" listener="#{assetSelectJNController.addAssetsOfCurrentPage}" update="@(.selectCheckBox) :maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:saveButtonId"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
@@ -115,11 +115,11 @@
 		<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 			<p:commandButton validateClient="true" value="添加已勾选设备"
 				update=":maintainConfigCreateFormJN:assets4maintain :maintainConfigCreateFormJN:assets5maintain :maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:assets4maintain :maintainConfigEditFormJN:assets5maintain :maintainConfigEditFormJN:saveButtonId"
-				action="#{assetSelectController.addAssetInfo}" />
+				action="#{assetSelectJNController.addAssetInfo}" />
 		</p:panelGrid>
 
 		<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group ">
-            <p:dataTable id="assets5maintain" value="#{assetSelectController.assets5Maintain}" var="asset"
+            <p:dataTable id="assets5maintain" value="#{assetSelectJNController.assets5Maintain}" var="asset"
                          selectionMode="single"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{asset.id}" sortMode="single" sortOrder="descending"
@@ -128,13 +128,13 @@
                          rows="20" emptyMessage="#{msg.noRecordFound}" filterDelay="1200"
                          rowsPerPageTemplate="20,50,100,500">
                 <p:column width="40" id="checkBoxCol">
-                    <p:selectBooleanCheckbox value="#{assetSelectController.selectedAssetUids5[asset.uid]}" class="selectCheckBox2">
-                        <p:ajax event="change" listener="#{assetSelectController.updateSelctedAssetList5}" update=":maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:saveButtonId"/>
+                    <p:selectBooleanCheckbox value="#{assetSelectJNController.selectedAssetUids5[asset.uid]}" class="selectCheckBox2">
+                        <p:ajax event="change" listener="#{assetSelectJNController.updateSelctedAssetList5}" update=":maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:saveButtonId"/>
                         <f:attribute name="assetObj" value="#{asset}"/>
                     </p:selectBooleanCheckbox>
                     <f:facet name="header">
-                        <p:selectBooleanCheckbox value="#{assetSelectController.isAllSelected5}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                            <p:ajax event="change" listener="#{assetSelectController.addAssetsOfCurrentPage5}" update="@(.selectCheckBox2) :maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:saveButtonId"/>
+                        <p:selectBooleanCheckbox value="#{assetSelectJNController.isAllSelected5}" id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax event="change" listener="#{assetSelectJNController.addAssetsOfCurrentPage5}" update="@(.selectCheckBox2) :maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:saveButtonId"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
@@ -150,10 +150,10 @@
 		<p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 			<p:commandButton validateClient="true" value="删除已勾选设备"
 				update=":maintainConfigCreateFormJN:assets4maintain :maintainConfigCreateFormJN:assets5maintain :maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:assets4maintain :maintainConfigEditFormJN:assets5maintain :maintainConfigEditFormJN:saveButtonId"
-				action="#{assetSelectController.removeAssetInfo}" />
+				action="#{assetSelectJNController.removeAssetInfo}" />
 			<p:commandButton validateClient="true" value="清空"
 				update=":maintainConfigCreateFormJN:assets4maintain :maintainConfigCreateFormJN:assets5maintain :maintainConfigCreateFormJN:saveButtonId :maintainConfigEditFormJN:assets4maintain :maintainConfigEditFormJN:assets5maintain :maintainConfigEditFormJN:saveButtonId"
-				action="#{assetSelectController.clearAssetInfo}" />
+				action="#{assetSelectJNController.clearAssetInfo}" />
 		</p:panelGrid>
 	</div>
 </ui:composition>

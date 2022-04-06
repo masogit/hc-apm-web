@@ -2589,6 +2589,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return true;
         }
     }
+
+    public boolean approveFlag() {
+        for (V2_WorkOrder_Detail v2_workOrder_detail :accessoryList){
+            if(!"000".equals(v2_workOrder_detail.getId()) && (v2_workOrder_detail.getApproved()==null || !v2_workOrder_detail.getApproved())){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public List<String> autoCompleteSupplier(String query) {
         supplierList = aimService.getSuplierListBySiteUid(selectedPmOrder.getTenantUID());
         List<Supplier> suList = autoCompleteService.autoCompleteVendor(query, supplierList);

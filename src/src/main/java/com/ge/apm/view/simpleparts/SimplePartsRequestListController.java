@@ -18,7 +18,6 @@ import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -80,7 +79,6 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
     @Getter
     @Setter
     private List<SimplePartsRequestLineItem> partsRequestLineItems = Collections.emptyList();
-
     @Override
     protected void init() {
         partsRequestRepository = WebUtil.getBean(SimplePartsRequestRepository.class);
@@ -201,6 +199,7 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
                     item.setPartsWarehouseId(selected.getPartsWarehouseId());
                 }
             }
+            item.setWorkOrderNo(selected.getMaintenanceWorkOrderNumber());
         });
         partsRequestEditController.onServerEvent(EDIT_PARTS_REQUEST, selected);
     }
@@ -544,5 +543,4 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
 
         return false;
     }
-
 }

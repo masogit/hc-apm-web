@@ -300,7 +300,14 @@ public class SimplePartsRequestWorkOrderService {
      * @param firstMultiLevelApproval
      */
     private void assignmentPartsRequestLineItem(V2_WorkOrder_Detail item, SimplePartsRequest partsRequest, SimplePartsRequestLineItem partsRequestLineItem, UserAccount currentUserAccount){
-        SimplePartsItem foundPartsItem = partsItemRepository.findById(item.getPartsItemId());
+        String partsitemid=null;
+        if (item.getPartsItemId()==null){
+            partsitemid="";
+        }
+        else {
+            partsitemid=item.getPartsItemId();
+        }
+        SimplePartsItem foundPartsItem = partsItemRepository.findById(partsitemid);
         if(foundPartsItem == null){
             log.error("备件申请单详情未查询到备件信息. PartsItemId : "+item.getPartsItemId());
             throw new RuntimeException("备件申请单详情未查询到备件信息. PartsItemId : "+item.getPartsItemId());

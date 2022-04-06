@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.AuditTemplate}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="auditConfigItemListForm">
+                    <p:dataTable id="datalist" class="datalist" value="#{auditTemplateController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{auditTemplateController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="filter" listener="#{auditTemplateController.onFilter}" />
+
+                        <p:column headerText="#{msg.TemplateName}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Mark}" filterBy="#{item.mark}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.mark}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.FileName}" filterBy="#{item.fileName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.fileName}"/>
+                        </p:column>
+                        <!--<p:column headerText="#{msg.FileSize}">
+                            <h:outputText value="#{auditTemplateController.fileSizeTransfer(item.fileSize)}"/>
+                        </p:column>-->
+                        <p:column headerText="#{msg.download}" exportable="false">
+                            <!--<p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">下载</p:link>-->
+                            <p:commandLink value="#{msg.download}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(item.objectStorageId)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Operation}" exportable="false" width="120" id="operatorColumn">
+                            <h:panelGroup>
+                                <p:commandLink id="editButton" title="#{msg.Edit}"  actionListener="#{auditTemplateController.setSelected(item.uid)}" update=":auditTemplateEditDlg" oncomplete="PF('auditTemplateEditDialog').show()">
+                                    <p:graphicImage name="icons/edit.png" style="width: 25px; height: 25px;"/>
+                                </p:commandLink>
+                                <p:commandLink id="deleteButton" title="#{msg.Delete}" actionListener="#{auditTemplateController.deleteItem(item)}" update="datalist">
+                                    <p:graphicImage name="icons/delete.png" style="width: 25px; height: 25px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{auditTemplateController.prepareCreate}" update=":auditTemplateEditDlg" oncomplete="PF('auditTemplateEditDialog').show()" />
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="auditTemplateEdit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>

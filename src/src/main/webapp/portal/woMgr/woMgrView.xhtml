@@ -183,8 +183,15 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.caseType}</label>
-                                    <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(woItem.caseType)}"/>
-                                </h:panelGroup>
+                                    <c:choose>
+                                        <c:when test="#{userContextService.isCountyArea()}">
+                                            <p:outputLabel value="#{fieldMsg.fieldValue('faultTypeCountyAreaMore', woItem.caseType)}"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(woItem.caseType)}"/>
+                                        </c:otherwise>
+                                    </c:choose>
+                            </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.patProblems}</label>
                                     <p:outputLabel value="#{woItem.patProblems}" style="word-wrap: break-word;"/>
@@ -238,15 +245,22 @@
                                     <label class="label">#{msg.maintenanceValue}</label>
                                     <p:outputLabel value="#{woItem.maintenanceValue}"/>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{userContextService.countyArea}">
-                                    <label class="label">#{msg.siebleNumber}</label>
-                                    <p:outputLabel value="#{woItem.siebleNumber}" />
-                                </h:panelGroup>
+                                <c:if test="#{userContextService.countyArea}">
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.siebleNumber}</label>
+                                        <p:outputLabel value="#{woItem.siebleNumber}" />
+                                    </h:panelGroup>
 
-                                <h:panelGroup rendered="#{userContextService.countyArea}">
-                                    <label class="label">#{msg.callCenterNumber}</label>
-                                    <p:outputLabel value="#{woItem.callCenterNumber}" />
-                                </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.callCenterNumber}</label>
+                                        <p:outputLabel value="#{woItem.callCenterNumber}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.countyAreaOrderType}</label>
+                                        <p:outputLabel value="#{fieldMsg.fieldValue('countyAreaOrderType',woItem.orderType)}" rendered="#{not empty woItem.orderType}"/>
+                                    </h:panelGroup>
+                                </c:if>
                             </p:panelGrid>
 
 
@@ -350,9 +364,10 @@
                                 </p:dataTable>
                             </h:panelGroup>
 
-                            <h:panelGroup rendered="#{userContextService.isCountyArea() and not empty workOrderMgrController.getWorkOrderDetailReturn(woItem.id)}">
+                            <h:panelGroup rendered="#{userContextService.isCountyArea() and not empty workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}">
                                 <label class="label" >县域租户备件归还</label>
-                                <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturn(woItem.id)}"
+
+                                <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}"
                                              var="item"  lazy="false" paginator="false" rowKey="#{item.id}" rows="100" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.accessory}">
                                         <h:outputText value="#{item.partName}"/>

@@ -95,7 +95,8 @@
                         </p:column>
 
                         <p:column headerText="#{msg.download}" exportable="false">
-                            <p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">#{msg.download}</p:link>
+                            <!--<p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">#{msg.download}</p:link>-->
+                            <p:commandLink value="#{msg.download}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(item.objectStorageId)}"/>
                         </p:column>
 
                         <f:facet name="{Toolbar}">

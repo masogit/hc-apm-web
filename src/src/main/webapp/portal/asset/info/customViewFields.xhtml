@@ -205,6 +205,12 @@
             <p:inputText id="rfGroup" value="#{assetInfoDetailController.selected.rfGroup}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'currentId')}">
+        <h:panelGroup >
+            <label class="label">#{msg.currentId}</label>
+            <p:inputText id="currentId" value="#{assetInfoDetailController.selected.currentId}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'powerOnThreshold')}">
         <h:panelGroup >
             <label class="label">#{msg.powerOnThreshold}</label>
@@ -390,7 +396,7 @@
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'riskGrade')}">
         <h:panelGroup >
             <label class="label">#{msg.riskGrade}</label>
-            <p:inputText id="riskGrade" value="#{fieldMsg.fieldValue('riskGrade', assetInfoDetailController.selected.riskGrade)}" readonly="true"/>
+            <p:inputText id="riskGrade" value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', assetInfoDetailController.selected.riskGrade) : fieldMsg.fieldValue('riskGrade', assetInfoDetailController.selected.riskGrade)}" readonly="true"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'emergencyEquipment')}">

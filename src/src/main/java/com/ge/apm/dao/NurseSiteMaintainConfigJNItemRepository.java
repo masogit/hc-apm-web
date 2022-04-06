@@ -23,7 +23,12 @@ public interface NurseSiteMaintainConfigJNItemRepository extends GenericReposito
 	
 	@Query(value="select exists (select 1 from nurse_site_maintain_config_item_jn o where o.asset_uid=?1)",nativeQuery=true)
 	public Boolean findExistsAssetUid(String assetUid);
-	
+
+	@Transactional
+	@Modifying
+	@Query(value="delete from nurse_site_maintain_config_item_jn o where o.id=?1",nativeQuery=true)
+	public void deleteById(String id);
+
 	@Query(value="select o.* from nurse_site_maintain_config_item_jn o order by o.create_date limit ?1 offset ?2*?1",nativeQuery=true)
 	public List<NurseSiteMaintainConfigJNItem> findByLimit(int limit,int offset);
 

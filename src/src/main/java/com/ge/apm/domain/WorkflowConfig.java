@@ -142,6 +142,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "wo_spare_parts_sign")
     private Boolean woSparePartsSign ; // 新增备件是否需要签名
 
+    @Column(name = "is_jump_to_work_bench_after_orders")
+    private Boolean isJumpToWorkBenchAfterOrders ; // 接单后是否跳转至工作台
+
     @Column(name = "is_mobile_phone_file_review")
     private Boolean isMobilePhoneFileReview ; // 手机建档是否需要审核
 
@@ -250,6 +253,21 @@ public class WorkflowConfig implements Serializable {
     //是否启用院间借调
     @Column(name = "enable_site_to_site_allocation")
     private Boolean enableSiteToSiteAllocation;
+    @Setter
+    @Getter
+    @Column(name = "enable_asset_preview")
+    private Boolean enableAssetPreview;
+    //是否启用小型物联网设备(急救类)服务
+    @Column(name = "is_io_tenabled")
+    private Boolean isiotenabled;
+
+    public Boolean getIsiotenabled() {
+        return isiotenabled;
+    }
+
+    public void setIsiotenabled(Boolean isiotenabled) {
+        this.isiotenabled = isiotenabled;
+    }
 
     public Boolean getWhethertoenableunattended() {
         if(whethertoenableunattended ==null){
@@ -349,6 +367,28 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "other_clinical_dept_head_weight")
     private Integer otherClinicalDeptHeadWeight = 1;//院区下的其他科室主任
 
+    @Column(name = "external_expenses")
+    private Boolean externalExpenses ; // 外修费用
+
+    @Column(name = "other_expenses")
+    private Boolean otherExpenses ; // 其他费用
+
+    public Boolean getExternalExpenses() {
+        return externalExpenses == null ? false : externalExpenses;
+    }
+
+    public Boolean getOtherExpenses() {
+        return otherExpenses == null ? false : otherExpenses;
+    }
+
+    public void setExternalExpenses(Boolean externalExpenses) {
+        this.externalExpenses = externalExpenses;
+    }
+
+    public void setOtherExpenses(Boolean otherExpenses) {
+        this.otherExpenses = otherExpenses;
+    }
+
     public Boolean getWoSparePartsSign() {
         return woSparePartsSign;
     }
@@ -356,6 +396,10 @@ public class WorkflowConfig implements Serializable {
     public void setWoSparePartsSign(Boolean woSparePartsSign) {
         this.woSparePartsSign = woSparePartsSign;
     }
+
+    public Boolean getIsJumpToWorkBenchAfterOrders() { return isJumpToWorkBenchAfterOrders; }
+
+    public void setIsJumpToWorkBenchAfterOrders(Boolean jumpToWorkBenchAfterOrders) { isJumpToWorkBenchAfterOrders = jumpToWorkBenchAfterOrders; }
 
     public Boolean getIsMobilePhoneFileReview() {
         return isMobilePhoneFileReview == null ? false : isMobilePhoneFileReview;
@@ -715,6 +759,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "parts_need_sign")
     private Boolean partsNeedSign; //备件审核是否需要签名
 
+    @Column(name = "use_new_risk_grade")
+    private Boolean useNewRiskGrade; //风险等级是否沿用高中低
+
     @Column(name = "ack_need_sign")
     private Boolean ackNeedSign; //验收是否需要签名
 
@@ -758,6 +805,86 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "is_active_supplier")
     private Boolean isActiveSupplier = Boolean.FALSE;//是否激活供应商流程
+
+
+
+    //供应商资质证书管理
+    @Column(name = "supplier_certificate_manage")
+    private Boolean supplierCertificateManage = Boolean.FALSE;;
+    //生产许可证到期提醒提前天数
+    @Column(name = "production_license_expire_days")
+    private Integer productionLicenseExpireDays;
+    //生产许可证到期提醒提前次数
+    @Column(name = "production_license_expire_times")
+    private Integer productionLicenseExpireTimes;
+    //经营许可证到期提醒提前天数
+    @Column(name = "business_license_expire_days")
+    private Integer businessLicenseExpireDays;
+    //经营许可证到期提醒提前次数
+    @Column(name = "business_license_expire_times")
+    private Integer businessLicenseExpireTimes;
+    //注册证到期提醒提前天数
+    @Column(name = "registration_certificate_expire_days")
+    private Integer registrationCertificateExpireDays;
+    //注册证到期提醒提前次数
+    @Column(name = "registration_certificate_expire_times")
+    private Integer registrationCertificateExpireTimes;
+
+    public Boolean getSupplierCertificateManage() {
+        return supplierCertificateManage;
+    }
+
+    public void setSupplierCertificateManage(Boolean supplierCertificateManage) {
+        this.supplierCertificateManage = supplierCertificateManage;
+    }
+
+    public Integer getProductionLicenseExpireDays() {
+        return productionLicenseExpireDays;
+    }
+
+    public void setProductionLicenseExpireDays(Integer productionLicenseExpireDays) {
+        this.productionLicenseExpireDays = productionLicenseExpireDays;
+    }
+
+    public Integer getProductionLicenseExpireTimes() {
+        return productionLicenseExpireTimes;
+    }
+
+    public void setProductionLicenseExpireTimes(Integer productionLicenseExpireTimes) {
+        this.productionLicenseExpireTimes = productionLicenseExpireTimes;
+    }
+
+    public Integer getBusinessLicenseExpireDays() {
+        return businessLicenseExpireDays;
+    }
+
+    public void setBusinessLicenseExpireDays(Integer businessLicenseExpireDays) {
+        this.businessLicenseExpireDays = businessLicenseExpireDays;
+    }
+
+    public Integer getBusinessLicenseExpireTimes() {
+        return businessLicenseExpireTimes;
+    }
+
+    public void setBusinessLicenseExpireTimes(Integer businessLicenseExpireTimes) {
+        this.businessLicenseExpireTimes = businessLicenseExpireTimes;
+    }
+
+    public Integer getRegistrationCertificateExpireDays() {
+        return registrationCertificateExpireDays;
+    }
+
+    public void setRegistrationCertificateExpireDays(Integer registrationCertificateExpireDays) {
+        this.registrationCertificateExpireDays = registrationCertificateExpireDays;
+    }
+
+    public Integer getRegistrationCertificateExpireTimes() {
+        return registrationCertificateExpireTimes;
+    }
+
+    public void setRegistrationCertificateExpireTimes(Integer registrationCertificateExpireTimes) {
+        this.registrationCertificateExpireTimes = registrationCertificateExpireTimes;
+    }
 
     public Integer getShareAutoConfirm() {
         return shareAutoConfirm;
@@ -1026,6 +1153,10 @@ public class WorkflowConfig implements Serializable {
     public void setOrderReopenTimeframe(Integer orderReopenTimeframe) {
         this.orderReopenTimeframe = orderReopenTimeframe;
     }
+
+    public Boolean getUseNewRiskGrade() { return useNewRiskGrade; }
+
+    public void setUseNewRiskGrade(Boolean useNewRiskGrade) { this.useNewRiskGrade = useNewRiskGrade; }
 
     public Integer getMaxMessageCount() {
         return maxMessageCount;

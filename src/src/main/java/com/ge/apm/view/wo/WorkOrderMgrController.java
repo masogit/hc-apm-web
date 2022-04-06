@@ -139,6 +139,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String stepFileter;
     //for details form
     private List<V2_WorkOrder_Detail> accessoryList;
+    private Boolean approveFlag = false;
     private List<V2_WorkOrderCoworker> coWorkerList;
 
     private V2_WorkOrder_Detail itemDetail;
@@ -897,20 +898,24 @@ public void test1(){
                 TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
                 if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
                     List<UserAccount> userAccountList = new ArrayList<>();
-                    AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getSiteUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
-                    String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
-                    List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
-                    if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
-                        for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
-                            AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
-                            List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                            UserAccount account = userDao.getByUid(userUids.get(0));
-                            userAccountList.add(account);
-                        }
+                    AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
+                    if(auditGroupConfiguration!=null){
+                        String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+                        List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+                        if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                            for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                                AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                                List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                                UserAccount account = userDao.getByUid(userUids.get(0));
+                                userAccountList.add(account);
+                            }
 
+                        }
                     }
                     if (userAccountList.contains(userAccount)){
-                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1));
+                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1,"1*approve+"));
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId(),"1*approve+9*"));
+                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0,"1*approve+9*"));
                     }else {
                         searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0));
@@ -995,25 +1000,25 @@ public void test1(){
             }else{
                 bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
             }
+            UserAccount userAccount = userContextService.getCurrentUserAccount();
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+            List<V2_WorkOrder> workOrderList = new ArrayList<>();
+            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10){
+                List<V2_WorkOrder> v2_workOrders = dao.findBySearchFilter(this.searchFilters);
+                if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
+                    for (V2_WorkOrder v2_workOrder :v2_workOrders) {
+                        if (getSign(v2_workOrder.getId(), userAccount)) {
+                            workOrderList.add(v2_workOrder);
+                        }
+                    }
+                    int size = workOrderList.size();
+                    workOrderList= this.pageNum(workOrderList, pageRequest);
+                    bySearchFilter = new PageImpl<V2_WorkOrder>(workOrderList, pageRequest, size);
+                }
+            }
         } catch (Exception e) {
             LOGGER.error("load data occur exception,{}", e.getMessage());
             throw e;
-        }
-        UserAccount userAccount = userContextService.getCurrentUserAccount();
-        TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
-        List<V2_WorkOrder> workOrderList = new ArrayList<>();
-        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
-            List<V2_WorkOrder> v2_workOrders = bySearchFilter.getContent();
-            if(v2_workOrders!=null && !v2_workOrders.isEmpty()){
-                for (V2_WorkOrder v2_workOrder :v2_workOrders) {
-                    if (getSign(v2_workOrder.getId(), userAccount)) {
-                        workOrderList.add(v2_workOrder);
-                    }
-                }
-                int size = workOrderList.size();
-                workOrderList= this.pageNum(workOrderList, pageRequest);
-                bySearchFilter = new PageImpl<V2_WorkOrder>(workOrderList, pageRequest, size);
-            }
         }
         return   bySearchFilter;
     }
@@ -1080,15 +1085,23 @@ public void test1(){
             searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (!this.hasFilterOnField("siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            UserAccount userAccount = userContextService.getCurrentUserAccount();
+            String tenantUID = userAccount.getTenantUID();
+            TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+            if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim()) && queryIndex == 10) {
+                String hospitalUID = UserContextService.getCurrentUserAccount().getHospitalUID();
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
+            }else {
+                List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            }
         }
     }
 
@@ -1153,6 +1166,7 @@ public void test1(){
         selectedAsset = null;
 //      requestAssetUid = null;
         locationName = null;
+        v2WorkOrderDetailReturnList = null;
     }
 
     public void onSelectWorkOrder() {
@@ -1243,7 +1257,14 @@ public void test1(){
     }
 
     public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturn(String woId) {
-        return woService.getWorkOrderDetailReturn(woId);
+        if(v2WorkOrderDetailReturnList == null){
+            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(woId);
+        }
+        return v2WorkOrderDetailReturnList;
+    }
+
+    public List<V2_WorkOrder_Detail_Return> getWorkOrderDetailReturnView(String woId) {
+        return  woService.getWorkOrderDetailReturn(woId);
     }
 
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
@@ -1296,12 +1317,28 @@ public void test1(){
         prepareAct(v2WorkOrder.getId());
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
-        approvedDetails.stream().forEach(item -> {
-            if (item.getApproved() == null) {
-                item.setApproved(false);
-            }
-            selectedMap.put(item.getId(), item.getApproved());
-        });
+        UserAccount userAccount = userContextService.getCurrentUserAccount();
+        String tenantUID = userAccount.getTenantUID();
+        TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+            List<V2_WorkOrder_Detail> approvedDetailList = new ArrayList<>();
+            approvedDetails.stream().forEach(item -> {
+                if (item.getApproved() == null || !item.getApproved()) {
+                    item.setApproved(false);
+                    selectedMap.put(item.getId(), item.getApproved());
+                    approvedDetailList.add(item);
+                }
+            });
+            approvedDetails = new ArrayList<>();
+            approvedDetails.addAll(approvedDetailList);
+        }else {
+            approvedDetails.stream().forEach(item -> {
+                if (item.getApproved() == null) {
+                    item.setApproved(false);
+                }
+                selectedMap.put(item.getId(), item.getApproved());
+            });
+        }
     }
 
     public List<V2_WorkOrder_Detail> getNeedApprovalDetails() {
@@ -1319,6 +1356,9 @@ public void test1(){
         attachList = new ArrayList<V2_BlobObject>();
         equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
         takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
+        if(userContextService.isCountyArea()){
+            v2WorkOrderDetailReturnList = woService.getWorkOrderDetailReturn(woId);
+        }
     }
     public void prepareEditCloseOrder(String woId) {
         prepareAct(woId);
@@ -1343,9 +1383,8 @@ public void test1(){
 
 
     public void prepareCompleteOrder(String woid) {
+        approveFlag =false;
         selectedWorkOrder = dao.findById(woid);
-        logger.info("selectedWorkOrder"+selectedWorkOrder);
-        logger.info("multiLevelApprovalService"+multiLevelApprovalService);
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
@@ -1872,7 +1911,7 @@ public void test1(){
         if(currentStatus==2){ //选择停机状态
              needConfirmTime=true;
         }
-        if(currentStatus==3){//选择 限制功能使用
+        if(currentStatus==3 || currentStatus==1){//选择 限制功能使用 或可正常使用
             needConfirmTime=false;
         }
 
@@ -2101,7 +2140,11 @@ public void test1(){
         saveItem();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         cancelWorkdetail();
-
+        for (V2_WorkOrder_Detail v2_workOrder_detail :accessoryList){
+            if(v2_workOrder_detail.getApproved()==null || !v2_workOrder_detail.getApproved()){
+                approveFlag =true;
+            }
+        }
         System.out.println(accessoryList);
     }
     public void updateAccessPrice(){
@@ -2248,14 +2291,14 @@ public void test1(){
 
         for (int i = 0; i < approvedDetails.size(); i++) {
             V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
-            if (selectedMap.get(v2_workOrder_detail.getId())) {
+            if (selectedMap!=null && selectedMap.get(v2_workOrder_detail.getId())) {
                 if (v2_workOrder_detail.getApproved() == null || !v2_workOrder_detail.getApproved()) {
                     approvedDetailsNew.add(v2_workOrder_detail);
                 }
                 v2_workOrder_detail.setApproved(true);
             }else{
                 v2_workOrder_detail.setApproved(false);
-                approvedDetailsNew.add(v2_workOrder_detail);
+//                approvedDetailsNew.add(v2_workOrder_detail);
             }
         }
 
@@ -2327,17 +2370,22 @@ public void test1(){
         List<UserAccount> uaList=new ArrayList<>();
         if (hospitalNameBoolean){
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getSiteUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
-            String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
-            List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
-            if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
-                for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
-                    AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
-                    List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                    UserAccount userAccount = userDao.getByUid(userUids.get(0));
-                    uaList.add(userAccount);
-                }
+            AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(currentUserAccount.getHospitalUID(), WorkOrderConstant.MEDICAL_TEAM_GROUP);
+            if(auditGroupConfiguration!=null){
+                String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+                List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+                if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                    for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                        AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                        List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                        UserAccount userAccount = userDao.getByUid(userUids.get(0));
+                        uaList.add(userAccount);
+                    }
 
+                }
+            }else {
+                WebUtil.addErrorMessage("未配置医工分组,请先配置!");
+                return uaList;
             }
         }else {
             uaList= woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
@@ -2442,6 +2490,11 @@ public void test1(){
     public List<V2_WorkOrder_Detail> getAccessoryList() {
         if (accessoryList == null) {
             return null;
+        }
+        for (V2_WorkOrder_Detail v2_workOrder_detail :accessoryList){
+            if(v2_workOrder_detail.getApproved()==null || !v2_workOrder_detail.getApproved()){
+                approveFlag =true;
+            }
         }
         V2_WorkOrder_Detail emptyDetail = new V2_WorkOrder_Detail();
         emptyDetail.setId("000");
@@ -2653,6 +2706,14 @@ public void test1(){
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    public Boolean getApproveFlag() {
+        return approveFlag;
+    }
+
+    public void setApproveFlag(Boolean approveFlag) {
+        this.approveFlag = approveFlag;
     }
 
     public OrgInfo getSelectSite() {

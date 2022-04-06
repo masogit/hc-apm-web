@@ -295,9 +295,15 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
             request = sharedDao.findById(returnReqId);
         } else {
             //已归还
-            request = sharedDao.findById(reqDetail.getBorrowId());
+            if (reqDetail.getBorrowId()==null){
+                request = sharedDao.findById("");
+            }
+            else {
+                request = sharedDao.findById(reqDetail.getBorrowId());
+            }
+
         }
-        if("1".equals(request.getType())) {
+        if(request!=null && "1".equals(request.getType())) {
             totalAmount = 0d;
         } else {
             totalAmount = reqDetail.getRentalAmount().doubleValue();

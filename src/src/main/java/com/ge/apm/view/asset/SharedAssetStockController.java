@@ -19,7 +19,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.model.SelectItem;
-import javax.xml.XMLConstants;
+import javax.persistence.Transient;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -27,6 +27,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SharedAssetReqDetailRepository;
+import com.ge.apm.dao.SharedAssetRequestRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.RequestType;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -40,16 +45,13 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SharedAssetReqDetail;
-import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.service.sharedasset.SharedAssetStockService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -70,10 +72,17 @@ import webapp.framework.web.mvc.MyCRUDController;
 public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
 
     private static final Logger logger = LoggerFactory.getLogger(SharedAssetStockController.class);
-
+    @Autowired
+    private OrgInfoRepository orgInfoRepository;
     @Getter
     @Setter
     private String searchCriteria;
+
+//    private UserAccount user;
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
+    @Autowired
+    private SharedAssetRequestRepository sharedAssetRequestRepository;
 
     @Getter
     @Setter
@@ -92,20 +101,30 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
     private Date maxChargingEndTime;
 
     private SharedAssetStockService sharedAssetStockService;
-    
+
     @Getter
     @Setter
     private StreamedContent exportPdf;
+
+//    public SharedAssetStockController(UserAccount user) {
+//        this.user = user;
+//    }
 
     @Override
     protected BaseMapper<AssetInfo> getDAO() {
         return null;
     }
 
+    @Transient
+    SharedAssetReqDetailRepository asdDao = WebUtil.getBean(SharedAssetReqDetailRepository.class);
+
     @Override
     protected void init() {
         logger.info("Start to initialize component");
         sharedAssetStockService = WebUtil.getBean(SharedAssetStockService.class);
+        orgInfoRepository= WebUtil.getBean(OrgInfoRepository.class);
+        assetInfoRepository= WebUtil.getBean(AssetInfoRepository.class);
+        sharedAssetRequestRepository=WebUtil.getBean(SharedAssetRequestRepository.class);
     }
 
     @Override
@@ -200,7 +219,22 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
             }
         }
     }
-
+    public void forceEditAssets() {
+        AssetInfo selected = this.selected;
+        SharedAssetReqDetail sharedAssetReqDetail = selected.getSharedAssetReqDetail();
+        sharedAssetReqDetail=asdDao.findById(sharedAssetReqDetail.getId());
+        OrgInfo orgInfo = orgInfoRepository.findByNameAndSiteUID(this.leaseDeptName, selected.getSiteUID());
+        selected=assetInfoRepository.findById(selected.getId());
+        selected.setAssetDeptUID(orgInfo.getUid());
+        assetInfoRepository.save(selected);
+        sharedAssetReqDetail.setClinicalDeptName(this.leaseDeptName);
+        sharedAssetReqDetail.setClinicalDeptUid(orgInfo.getUid());
+        asdDao.save(sharedAssetReqDetail);
+        SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(sharedAssetReqDetail.getBorrowId());
+        sharedAssetRequest.setClinicalDeptUid(orgInfo.getUid());
+        sharedAssetRequest.setClinicalDeptName(this.leaseDeptName);
+        sharedAssetRequestRepository.save(sharedAssetRequest);
+    }
     public void forceReturnAsset() {
         if(this.selected != null) {
             try {

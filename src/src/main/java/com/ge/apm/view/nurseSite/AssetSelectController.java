@@ -47,6 +47,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     private String departNum;
 
+    private String emergencyEquipment;
+
     private Boolean isAllSelected = Boolean.FALSE;
     
     private Boolean isAllSelected5 = Boolean.FALSE;
@@ -116,6 +118,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.assets5Maintain=new ArrayList<>();
         this.assetGroup = null;
         this.assetName = null;
+        this.emergencyEquipment = null;
         this.listCheckOrgInfo=new ArrayList<OrgInfo>();
         this.is4Edit = Boolean.FALSE;
     }
@@ -136,33 +139,6 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 			this.listCheckOrgInfo.clear();
 		}
 		listCheckOrgInfo.add(selectedDept);
-        this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
-
-        //sort assets by selected for edit view
-        List<AssetInfo> assetsWithoutSelected = this.loadAssets4EditView().stream()
-                .filter(t -> !this.selectedAssetUids.getOrDefault(t.getUid(), Boolean.FALSE))
-                .collect(Collectors.toList());
-        this.assets4Maintain = new ArrayList<>();
-        this.assets4Maintain.addAll(assetsWithoutSelected);
-        this.assets5Maintain = new ArrayList<>(this.selectedAssets);
-    }
-
-    public void loadData4EditJN(NurseSiteMaintainConfigJN config) {
-        this.is4Edit = Boolean.TRUE;
-        this.orgTree = assetSelectService.loadOrgTree();
-        this.selectedOrg = assetSelectService.loadSelectedOrg();
-
-        this.selectedAssets = assetSelectService.loadSelectedAssetByConfig(config.getId()).stream().collect(Collectors.toSet());
-        this.selectedAssets.stream().forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
-        OrgInfo selectedDept = assetSelectService.getOrgInfoByUid(config.getClinicalDeptUID());
-        this.selectedOrg = assetSelectService.getOrgInfoByUid(selectedDept.getParentUID());
-        if (this.listCheckOrgInfo == null) {
-            this.listCheckOrgInfo = new ArrayList<OrgInfo>();
-        }
-        else{
-            this.listCheckOrgInfo.clear();
-        }
-        listCheckOrgInfo.add(selectedDept);
         this.deptList = assetSelectService.loadValidDeptList(selectedOrg);
 
         //sort assets by selected for edit view
@@ -364,6 +340,10 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             }
             if(StringUtils.isNotBlank(this.getFunctionType())) {
                 searchFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, this.getFunctionType(), "1*"));
+                ++count;
+            }
+            if(StringUtils.isNotBlank(this.getEmergencyEquipment())) {
+                searchFilters.add(new SearchFilter("emergencyEquipment", SearchFilter.Operator.EQ, this.getEmergencyEquipment(), "1*"));
                 ++count;
             }
             

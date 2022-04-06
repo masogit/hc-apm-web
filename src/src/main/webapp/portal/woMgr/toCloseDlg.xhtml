@@ -8,6 +8,7 @@
     <ui:composition><!--维修工单关单对话框-->
         <p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="#{msg.closeWo}" height="500">
             <h:form id="toCloseDialogForm" >
+
                 <h:panelGroup id="display3" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>

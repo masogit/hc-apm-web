@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="主子设备信息"/>
+                </div>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="3">
+                        <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
+                            <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":assetPreviewListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{userContextService.hasAnyRole('MVSAdmin,MVSFE')}">
+                            .                            <p:commandButton id="btnTenant" value="#{empty assetInfoListController.selectSite? msg.AllTenants:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
+                            <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="tenantTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(1)}" selection="#{tenantTreeController.selectedTenantOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":assetPreviewListForm :searchForm" oncomplete="PF('varPanelTenant').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <p:inputText id="searchText" value="#{assetPreviewController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}/#{msg.assetTags}" maxlength="100" style="width: 500px">
+                            <p:ajax event="keyup" update=":assetPreviewListForm searchButtons " />
+                        </p:inputText>
+
+                        <h:panelGroup id='searchButtons'>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":assetPreviewListForm :searchForm"  rendered="#{empty assetPreviewController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":assetPreviewListForm :searchForm " actionListener="#{assetPreviewController.setOneSearchStr('')}" rendered="#{not empty assetPreviewController.oneSearchStr}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:form>
+                <h:form id="assetPreviewListForm">
+                    <p:dataTable id="dataList" value="#{assetPreviewController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+
+                        <p:column headerText="图标" id="imgs" exportable="false">
+                            <p:graphicImage url="/portal/asset/previewAsset/dot.jpeg" style="width: 20px; height: 20px;" rendered="#{item.rank != 0}"/>
+                        </p:column>
+
+
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" >
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.functionType}">
+                            <h:outputText
+                                    value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.serialNum}">
+                            <h:outputText
+                                    value="#{item.serialNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.departNum}">
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetGroup}">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetDeptName}">
+                            <h:outputText value="#{item.assetDeptOrg.shortName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}" >
+                            <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.manufacture}">
+                            <h:outputText value="#{item.manufacture}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.vendor}">
+                            <h:outputText value="#{item.vendor}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.QRCode}" >
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetTags}">
+                            <h:outputText value="#{item.assetTagsView}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton value="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                                <p:dataExporter type="xls" target="dataList" fileName="assetPreview_export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
