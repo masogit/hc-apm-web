@@ -998,6 +998,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
 
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+            this.selected.setCatNum(1);
         }
         /*if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             this.selected.setQty(1);
