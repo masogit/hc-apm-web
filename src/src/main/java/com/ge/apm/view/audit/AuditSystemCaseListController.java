@@ -196,6 +196,16 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
     public void deleteAction() {
         if(selected.getStatus()==1){
             try {
+                String caseUid = selected.getUid();
+                List<AuditSystemEntry> systemEntries = auditSystemEntryRepository.findByCaseUid(caseUid);
+                if (systemEntries!=null && !systemEntries.isEmpty()){
+                    for (AuditSystemEntry auditSystemEntry :systemEntries){
+                        auditEntryTemplateRelRepository.deleteByEntryUid(auditSystemEntry.getUid());
+                        auditEntryItemRelRepository.deleteBySystemEntryUid(auditSystemEntry.getUid());
+                    }
+                    auditSystemEntryRepository.deleteByCaseUid(caseUid);
+                }
+                auditTargetRepository.deleteBySystemCaseUid(caseUid);
                 dao.delete(selected);
                 createEventSysytemCase("DELETE_SYSTEM_CASE", selected, "success");
                 WebUtil.addSuccessMessage(WebUtil.getMessage("deleteSuccess"));

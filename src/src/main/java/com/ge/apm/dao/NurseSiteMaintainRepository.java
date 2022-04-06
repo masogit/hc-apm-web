@@ -119,5 +119,13 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	@Query(value="select distinct o.* from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<=?3 and o.clinical_dept_uid in (?1) order by o.schedule_date",nativeQuery=true)
 	public List<NurseSiteMaintain> findDefaultData(Set<String> orgUids,Date startDate,Date endDate);
 
+	@Query(value="select o.* from nurse_site_maintain o where o.config_id = ?3 and o.schedule_date between ?1 and ?2 ;",nativeQuery=true)
+    List<NurseSiteMaintain> findUncheckedMaintain(Date startBatchDate, Date endBatchDate, String id);
+
+	@Query(value="select o.* from nurse_site_maintain o where o.config_id = ?3 ;",nativeQuery=true)
+	List<NurseSiteMaintain> findMaintainByConfigId(String id);
+
+	@Query(value="select id from nurse_site_maintain_item where parent_id in (?1);",nativeQuery=true)
+	List<String> findItemIdByMaintainList(List<String> maintainIdList);
 }
 

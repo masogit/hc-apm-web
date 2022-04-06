@@ -1,7 +1,9 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.AuditSystemEntry;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
 
 import java.util.List;
@@ -28,6 +30,8 @@ public interface AuditSystemEntryRepository extends GenericRepository<AuditSyste
     @Query(value = "select o from AuditSystemEntry o where o.caseUid = ?1 order by o.createTime desc")
     List<AuditSystemEntry> entryList( String caseUid);
 
-
+    @Transactional
+    @Modifying
+    public void deleteByCaseUid(String caseUid);
 
 }

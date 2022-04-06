@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class AuditSystemCaseEditController extends GenericCRUDUUIDController<AuditSystemCase> {
 
     private AuditSystemCaseRepository dao;
+    private AuditCaseRepository auditCaseRepository;
     private AuditSystemEntryRepository auditSystemEntryRepository;
     private AuditConfigItemRepository auditConfigItemRepository;
     private AuditEntryItemRelRepository auditEntryItemRelRepository;
@@ -48,6 +49,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private String entryName;
     private String entryMark;
     private String sourceText;
+    private String evaluationCriteria;
     private Double entryScoreStandard;
     private Integer entryType;
     private Integer targetType;
@@ -61,7 +63,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private Double targetScoreStandard;
     private boolean onSelectFlag = true;
     private boolean entryFlag = false;
-    private boolean entryScoreFlag = true;
+    private boolean evaluationCriteriaFlag = false;
+    private boolean entryScoreFlag = false;
     private boolean orderByFlag = true;
     private int caseLevel=0;
     private Integer entryOrderBy =0;
@@ -91,6 +94,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     @Override
     protected void init() {
         dao = WebUtil.getBean(AuditSystemCaseRepository.class);
+        auditCaseRepository = WebUtil.getBean(AuditCaseRepository.class);
         auditSystemEntryRepository = WebUtil.getBean(AuditSystemEntryRepository.class);
         auditConfigItemRepository = WebUtil.getBean(AuditConfigItemRepository.class);
         auditEntryItemRelRepository = WebUtil.getBean(AuditEntryItemRelRepository.class);
@@ -233,6 +237,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             date=auditSystemEntrySelected;
             eventType="EDIT_SYSTEM_ENTRY";
         }else {
+            date.setCreator(UserContextService.getCurrentUserAccount().getName());
+            date.setCreateTime(new Date());
             if(auditSystemEntry!=null){
                 type= auditSystemEntry.getType();
             }
@@ -268,6 +274,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         date.setMark(entryMark);
         date.setScoreStandard(entryScoreStandard);
         date.setSourceText(sourceText);
+        date.setEvaluationCriteria(evaluationCriteria);
 
         try {
             auditSystemEntryRepository.save(date);
@@ -276,6 +283,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             entryType=null;
             entryScoreStandard=null;
             sourceText=null;
+            evaluationCriteria=null;
             createEventSysytemEntry(eventType, date, "success");
             WebUtil.addSuccessMessage(WebUtil.getMessage("saveSuccess"));
         } catch (Exception e){
@@ -347,21 +355,28 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
     }
     public void editAuditConfigItem(AuditConfigItem auditConfigItem){
+        contentTypeFlag =false;
         if(auditConfigItem!=null){
             auditConfigItemSelected=auditConfigItem ;
+            entryContent=auditConfigItem.getContent();
         }
     }
     public void editAuditSystementry(){
         if(auditSystemEntry!=null&&auditSystemEntry.getUid()!=null){
+            evaluationCriteriaFlag=false;
             entryType=auditSystemEntry.getType();
             entryMark=auditSystemEntry.getMark();
             entryName=auditSystemEntry.getName();
             entryScoreStandard=auditSystemEntry.getScoreStandard();
             sourceText=auditSystemEntry.getSourceText();
+            evaluationCriteria=auditSystemEntry.getEvaluationCriteria();
             auditSystemEntrySelected=auditSystemEntry;
-            entryScoreFlag=true;
-            if(auditSystemEntry.getLevel()==1){
-                entryScoreFlag=false;
+            entryScoreFlag=false;
+            if(auditSystemEntry.getLevel()>=1){
+                entryScoreFlag=true;
+            }
+            if(auditSystemEntry.getLevel()==3){
+                evaluationCriteriaFlag=true;
             }
         }
     }
@@ -408,6 +423,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         entryScoreStandard=null;
         sourceText=null;
+        evaluationCriteria=null;
     }
     public void preDelete() {
         onSelectFlag=true;
@@ -450,20 +466,27 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         entryName=null;
         entryMark=null;
+        evaluationCriteriaFlag=false;
         if (onSelectFlag){
             caseLevel=0;
             entryUid = null;
         }
         if (caseLevel==1){
             entryFlag =true;
-            entryScoreFlag=true;
         }else{
             entryFlag =false;
+        }
+        entryScoreFlag=false;
+        if (caseLevel>=1){
             entryScoreFlag=true;
+        }
+        if (caseLevel>=2){
+            evaluationCriteriaFlag=true;
         }
         auditSystemEntrySelected=new AuditSystemEntry();
         entryScoreStandard=null;
         sourceText=null;
+        evaluationCriteria=null;
     }
     public List<AuditTemplate> auditTemplates(){
         return auditTemplateRepository.findByType(1);
@@ -472,6 +495,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         Integer contentTyp =1;
         if (entryType!=null){
             contentTyp =entryType;
+        }
+        if(selected.getType()!=null && selected.getType()==2){
+            contentTyp=3;//质控只有 解读
         }
         auditConfigItems = auditConfigItemRepository.findByContentType(contentTyp);
         return auditConfigItems;
@@ -552,6 +578,12 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             String eventType = "EDIT_SYSTEM_CASE";
             if (status==2){
                 eventType = "ENABLE_SYSTEM_CASE";
+            }else if(status==1) {
+                List<AuditCase> list = auditCaseRepository.findBySystemCaseUid(selected.getUid());
+                if (list!=null && !list.isEmpty()){
+                    WebUtil.addErrorMessage("数据被引用中,不能存为草稿!");
+                    return null;
+                }
             }
             try {
                 selected.setStatus(status);
@@ -579,6 +611,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         dao.delete(selected);
     }
     public void onContent() {
+        entryContent=null;
         contentTypeFlag=false;
         auditConfigItemSelected=new AuditConfigItem();
         auditTemplateSelected=new AuditTemplate();
@@ -630,7 +663,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             WebUtil.addErrorMessage("请上传图片！");
             return ;
         }
-
+        if(selected.getType()!=null && selected.getType()==2){
+            auditConfigItem.setContentType(3);
+        }
         // 同类型下，mark唯一
         List<SearchFilter> searchFilterList = new ArrayList<>();
         searchFilterList.add(new SearchFilter("mark", SearchFilter.Operator.EQ, auditConfigItem.getMark()));
@@ -732,7 +767,12 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         if (selected!=null){
             uid= selected.getUid();
         }
-        orgTree = getEntryTreeNodes(auditSystemEntryRepository.findListByName(entryMarkName,uid));
+        if(entryMarkName==null || "".equals(entryMarkName)){
+            this.buildOrdTree();
+        }else {
+            orgTree = getEntryTreeNodes(auditSystemEntryRepository.findListByName(entryMarkName,uid));
+        }
+
     }
     public void saveSelectedOrg() {
         if( this.typeChecking()){
@@ -741,12 +781,12 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         String eventType = "ADD_SYSTEM_CASE";
         if (selected.getUid()!=null){
             eventType = "EDIT_SYSTEM_CASE";
-        }
-        try {
             UserAccount userAccount = UserContextService.getCurrentUserAccount();
-            selected.setStatus(1);
             selected.setCreateTime(new Date());
             selected.setCreator(userAccount.getName());
+        }
+        try {
+            selected.setStatus(1);
             dao.save(selected);
             buildOrdTree();
             createEventSysytemCase(eventType, selected, "success");
@@ -804,6 +844,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public void setSourceText(String sourceText) {
         this.sourceText = sourceText;
+    }
+
+    public String getEvaluationCriteria() {
+        return evaluationCriteria;
+    }
+
+    public void setEvaluationCriteria(String evaluationCriteria) {
+        this.evaluationCriteria = evaluationCriteria;
     }
 
     public Double getEntryScoreStandard() {
@@ -904,6 +952,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
 
     public void setNothing(){
+    }
+    public void setContentNothing(){
         AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
         if (auditConfigItem!=null){
             entryContent=auditConfigItem.getContent();
@@ -937,6 +987,15 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     public void setSelectType(String selectType) {
         this.selectType = selectType;
     }
+
+    public boolean isEvaluationCriteriaFlag() {
+        return evaluationCriteriaFlag;
+    }
+
+    public void setEvaluationCriteriaFlag(boolean evaluationCriteriaFlag) {
+        this.evaluationCriteriaFlag = evaluationCriteriaFlag;
+    }
+
     public int getCaseLevel() {
         return caseLevel;
     }
