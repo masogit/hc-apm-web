@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -16,10 +14,7 @@ import webapp.framework.web.mvc.GenericCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -46,13 +41,40 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
     }
 
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
-        Set<Integer> rootIds = getRootIds();
-        List<Object> assetInfoObjects = dao.findParentAndChildrenAsset1(rootIds);
+        List<AssetInfo> assetInfos = getAssetInfos();
+        PageImpl page = new PageImpl(assetInfos, pageRequest, assetInfos.size());
+        return page;
+    }
+
+    public List<AssetInfo> getAssetInfos(){
+        Set<Integer> tempRootIds = getRootIds();
+        Set<Integer> rootIds = new HashSet<>();
+        rootIds = removeOnlyParentAsset(tempRootIds,rootIds);
         List<AssetInfo> assetInfos = new ArrayList<>();
-        assetInfoObjects.stream().forEach(e -> {
-            convertToAssetInfo(assetInfos, (Object[]) e);
+        if(CollectionUtils.isNotEmpty(rootIds)) {
+            List<Object> assetInfoObjects = dao.findParentAndChildrenAsset1(rootIds);
+            assetInfoObjects.stream().forEach(e -> {
+                convertToAssetInfo(assetInfos, (Object[]) e);
+            });
+        }
+        Map<Integer, AssetInfo> assetInfoMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, v -> v, (o1, o2) -> o2));
+        List<SearchFilter> temp = new ArrayList<>();
+        temp.add(new SearchFilter("id", SearchFilter.Operator.IN,assetInfoMap.keySet()));
+        List<AssetInfo> infos = dao.findBySearchFilter(temp);
+        infos.stream().forEach(e->{
+            e.setRank(assetInfoMap.get(e.getId()).getRank());
+            e.setBranchIds(assetInfoMap.get(e.getId()).getBranchIds());
         });
-        return new PageImpl(assetInfos, pageRequest, assetInfos.size());
+//         pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC, "branchIds"));
+        List<AssetInfo> infos1 = infos.stream().sorted(Comparator.comparing(AssetInfo::getBranchIds)).collect(Collectors.toList());
+        return infos1;
+    }
+
+    private Set<Integer> removeOnlyParentAsset(Set<Integer> tempRootIds, Set<Integer> rootIds) {
+        List<SearchFilter> tempFilters = new ArrayList<>();
+        tempFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IN,tempRootIds));
+        List<AssetInfo> assetInfos = dao.findBySearchFilter(tempFilters);
+        return assetInfos.stream().map(AssetInfo::getParentAssetId).collect(Collectors.toSet());
     }
 
     private Set<Integer> getRootIds() {
@@ -63,21 +85,12 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
         assetInfoListController.setOneSearchStr(oneSearchStr);
         assetInfoListController.setUserSearchFilters();
         List<AssetInfo> assetInfoList = dao.findBySearchFilter(assetInfoListController.searchFilters);
-        Set<Integer> parentIds = assetInfoList.stream().map(AssetInfo::getParentAssetId).collect(Collectors.toSet());
-        List<AssetInfo> hasParentAndChildAssetList = new ArrayList<>();
-        removeOnlyParentAsset(assetInfoList, parentIds, hasParentAndChildAssetList);
         Set<Integer> rootIds = new HashSet<>();
-        getRootIdsByRecursion(hasParentAndChildAssetList, rootIds);
+        getRootIdsByRecursion(assetInfoList, rootIds);
         return rootIds;
     }
 
-    private void removeOnlyParentAsset(List<AssetInfo> assetInfoList, Set<Integer> parentIds, List<AssetInfo> hasParentAndChildAssetList) {
-        assetInfoList.stream().forEach(e -> {
-            if (e.getParentAssetId() != null || (e.getParentAssetId() == null && parentIds.contains(e.getId()))) {
-                hasParentAndChildAssetList.add(e);
-            }
-        });
-    }
+
 
     private void getRootIdsByRecursion(List<AssetInfo> assetInfoList, Set<Integer> rootIds) {
         Set<AssetInfo> rootAssets = assetInfoList.stream().filter(e -> e.getParentAssetId() == null).collect(Collectors.toSet());
