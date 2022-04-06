@@ -285,7 +285,6 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             sourceText=null;
             evaluationCriteria=null;
             createEventSysytemEntry(eventType, date, "success");
-            WebUtil.addSuccessMessage(WebUtil.getMessage("saveSuccess"));
         } catch (Exception e){
             createEventSysytemEntry(eventType, date, "fail");
             WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));
@@ -436,7 +435,6 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             deleteAuditSystemEntryList(auditSystemEntry.getUid());
             buildOrdTree();
             createEventSysytemEntry("DELETE_SYSTEM_ENTRY", auditSystemEntry, "success");
-            WebUtil.addSuccessMessage(WebUtil.getMessage("deleteSuccess"));
         } catch (Exception e){
             createEventSysytemEntry("DELETE_SYSTEM_ENTRY", auditSystemEntry, "fail");
             WebUtil.addErrorMessage(WebUtil.getMessage("delete") + WebUtil.getMessage("FAILED"));
@@ -589,7 +587,6 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
                 selected.setStatus(status);
                 dao.save(selected);
                 createEventSysytemCase(eventType, selected, "success");
-                WebUtil.addSuccessMessage(WebUtil.getMessage("saveSuccess"));
             } catch (Exception e){
                 createEventSysytemCase(eventType, selected, "fail");
                 WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));
@@ -693,7 +690,6 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             saveAuditConfigItem(auditConfigItem);
             createEvent(eventType, auditConfigItem, "success");
             auditConfigItem=null;
-            WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
         } catch (Exception e){
             createEvent(eventType, auditConfigItem, "fail");
             WebUtil.addErrorMessage(WebUtil.getMessage("Save") + WebUtil.getMessage("FAILED"));
@@ -790,7 +786,6 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             dao.save(selected);
             buildOrdTree();
             createEventSysytemCase(eventType, selected, "success");
-            WebUtil.addSuccessMessage(WebUtil.getMessage("saveSuccess"));
         } catch (Exception e){
             createEventSysytemCase(eventType, selected, "fail");
             WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));

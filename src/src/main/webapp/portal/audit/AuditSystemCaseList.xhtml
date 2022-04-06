@@ -25,14 +25,14 @@
 
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton" listener="#{auditSystemCaseListController.onSelectAuditSystemCase()}"/>
                         <p:ajax event="filter" listener="#{auditSystemCaseListController.onFilter}" update="createButton"/>
-                        <p:column headerText="版本编号"   sortBy="#{item.version}" filterBy="#{item.version}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.version}"/>
+                        <p:column headerText="版本编号"   sortBy="#{item.versionNumber}" filterBy="#{item.versionNumber}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.versionNumber}"/>
                         </p:column>
 
                         <p:column headerText="省份" sortBy="#{item.zone}" filterBy="#{item.zone}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.zone}"/>
                         </p:column>
-                        <p:column headerText="版本号" >
+                        <p:column headerText="版本号" sortBy="#{item.version}" filterBy="#{item.version}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.version}"/>
                         </p:column>
                         <p:column headerText="条数量">
@@ -62,8 +62,8 @@
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.Actions}" style="width: 120px" >
-                            <p:commandButton  value=" 过  期 "  actionListener="#{auditSystemCaseListController.listAction(item)}"
-                                              update="auditSystemCaseListForm" disabled="#{item.status eq 1 or item.status eq 3}"/>
+                            <p:commandButton  value=" 过  期 "  oncomplete="PF('expiredDlg').show()" actionListener="#{auditSystemCaseListController.onCreateCopy(item)}"
+                                              disabled="#{item.status eq 1 or item.status eq 3}" />
                             <br/> <br/>
                             <p:commandButton  value="创建副本" actionListener="#{auditSystemCaseListController.onCreateCopy(item)}"
                                                rendered="true" oncomplete="PF('createCopyDlg').show()" />
@@ -83,21 +83,35 @@
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
-                    <p:dialog id="createCopyDlg" widgetVar="createCopyDlg" modal="true" resizable="true" draggable="true"
-                              header="创建副本" width="300" height="200">
-                        <h:form id="createCopyForm">
-                            <h:panelGroup  >
-                                <br/><br/>
-                                <p>确定创建副本吗?</p>
-                                <br/><br/><br/><br/>
-                                <p:commandButton validateClient="true" actionListener="#{auditSystemCaseListController.createCopy()}"
-                                                 value="创建" update="auditSystemCaseListForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'createCopyDlg');"/>
-                                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
-                                                 onclick="PF('createCopyDlg').hide()"/>
-                            </h:panelGroup>
-                        </h:form>
-                    </p:dialog>
-                </h:form>
+            </h:form>
+                <p:dialog id="expiredDlg" widgetVar="expiredDlg" modal="true" resizable="true" draggable="true"
+                          header="过期" width="300" height="200">
+                    <h:form id="expiredForm">
+                        <h:panelGroup  >
+                            <br/><br/>
+                            <p>确定过期操作吗?</p>
+                            <br/><br/><br/><br/>
+                            <p:commandButton validateClient="true" actionListener="#{auditSystemCaseListController.listAction()}"
+                                             value="过期" update="auditSystemCaseListForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'expiredDlg');"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                             onclick="PF('expiredDlg').hide()"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+                <p:dialog id="createCopyDlg" widgetVar="createCopyDlg" modal="true" resizable="true" draggable="true"
+                          header="创建副本" width="300" height="200">
+                    <h:form id="createCopyForm">
+                        <h:panelGroup  >
+                            <br/><br/>
+                            <p>确定创建副本吗?</p>
+                            <br/><br/><br/><br/>
+                            <p:commandButton validateClient="true" actionListener="#{auditSystemCaseListController.createCopy()}"
+                                             value="创建" update="auditSystemCaseListForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'createCopyDlg');"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                             onclick="PF('createCopyDlg').hide()"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
             </div>
         </div>
     </ui:define>
