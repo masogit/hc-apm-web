@@ -3,6 +3,7 @@ package com.ge.apm.domain;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author : 503189362
@@ -36,6 +37,18 @@ public class ZkbContractCatQuotaHistory {
 
     @Column(name = "qty")
     private Integer qty;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @Column(name = "last_modified_by")
+    private String lastModifiedBy;
+
+    @Column(name = "last_modified_date")
+    private Date lastModifiedDate;
 
     public String getId() {
         return id;
