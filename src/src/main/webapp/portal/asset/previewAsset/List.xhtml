@@ -70,7 +70,7 @@
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:ajax event="filter" listener="#{assetPreviewController.onFilter}"  update="dataList"/>
 
-                        <p:column headerText="图标" id="imgs" exportable="false">
+                        <p:column headerText="子设备" id="imgs" exportable="false">
                             <p:graphicImage url="/portal/asset/previewAsset/dot.jpeg" style="width: 20px; height: 20px;" rendered="#{item.rank != 0}"/>
                         </p:column>
 
