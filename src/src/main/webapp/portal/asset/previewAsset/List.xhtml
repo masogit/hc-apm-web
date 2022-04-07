@@ -5,6 +5,23 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
     <ui:define name="content">
+        <script>
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+        </script>
+        <style>
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
         <div class="ui-g">
             <div class="ui-g-12">
                 <div class="ui-g-12 card cardTitle">
@@ -60,16 +77,15 @@
                     </h:panelGrid>
                 </h:form>
                 <h:form id="assetPreviewListForm">
-                    <p:dataTable id="dataList" value="#{assetPreviewController.getAssetInfos()}" var="item"
-                                 widgetVar="varDataList"
+                    <p:dataTable id="dataList" value="#{assetPreviewController.lazyModel}" var="item"
+                                 widgetVar="varDataList" selection="#{assetPreviewController.selected}" selectionMode="single"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.branchIds}" sortMode="single" sortOrder="descending" sortBy="#{item.branchIds}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:ajax event="filter" listener="#{assetPreviewController.onFilter}"  update="dataList"/>
-
+                        <p:ajax  event="rowSelect" listener="#{assetPreviewController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />
                         <p:column headerText="子设备" id="imgs" exportable="false">
                             <p:graphicImage url="/portal/asset/previewAsset/dot.jpeg" style="width: 20px; height: 20px;" rendered="#{item.rank != 0}"/>
                         </p:column>
@@ -92,9 +108,9 @@
                         <p:column headerText="#{msg.assetGroup}">
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.assetDeptName}">
+                       <!-- <p:column headerText="#{msg.assetDeptName}">
                             <h:outputText value="#{item.assetDeptOrg.shortName}"/>
-                        </p:column>
+                        </p:column>-->
                         <p:column headerText="#{msg.clinicalDeptName}" >
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
@@ -104,15 +120,25 @@
                         <p:column headerText="#{msg.vendor}">
                             <h:outputText value="#{item.vendor}"/>
                         </p:column>
+                        <p:column headerText="#{msg.status}">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.warrantyDate}">
+                            <h:outputText value="#{item.warrantyDate}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.financingNum}">
+                            <h:outputText value="#{item.financingNum}"/>
+                        </p:column>
                         <p:column headerText="#{msg.QRCode}" >
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
-                        <p:column headerText="#{msg.assetTags}">
+                       <!-- <p:column headerText="#{msg.assetTags}">
                             <h:outputText value="#{item.assetTagsView}"/>
-                        </p:column>
+                        </p:column>-->
                         <f:facet name="{Toolbar}">
-                            <p:commandButton value="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-                                <p:dataExporter type="xls" target="dataList" fileName="assetPreview_export"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetPreviewController.exportExcel}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                <p:fileDownload value="#{assetInfoListController.excelFile}" />
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
