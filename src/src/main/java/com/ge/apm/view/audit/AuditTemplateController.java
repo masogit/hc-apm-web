@@ -157,18 +157,22 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
             blobService.saveBlobObject(blobObject);
             fileObj = blobObject;
 
+            int dot = fileObj.getObjectName().lastIndexOf(".");
+
+            this.selected.setName(fileObj.getObjectName().substring(0,dot));
             this.selected.setFileName(fileObj.getObjectName());
             this.selected.setFileSize(fileObj.getObjectSize());
             this.selected.setObjectUId(fileObj.getId());
             this.selected.setObjectStorageId(fileObj.getObjectStorageId());
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
-            WebUtil.addErrorMessage("fail to upload file");
+            WebUtil.addErrorMessage(WebUtil.getMessage("FileUploadFailed"));
         }
     }
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
+        this.selected.setName(null);
         this.selected.setFileName(null);
         this.selected.setFileSize(null);
         this.selected.setObjectUId(null);
