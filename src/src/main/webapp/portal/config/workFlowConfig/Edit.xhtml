@@ -728,6 +728,54 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.SupplierCertificateManage}</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.supplierCertificateManage}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.ProductionLicenseExpireDays}</label>
+                            <p:inputNumber id="productionLicenseExpireDays" value="#{workflowConfigController.selected.productionLicenseExpireDays}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.ProductionLicenseExpireTimes}</label>
+                            <p:inputNumber id="productionLicenseExpireTimes" value="#{workflowConfigController.selected.productionLicenseExpireTimes}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.BusinessLicenseExpireDays}</label>
+                            <p:inputNumber id="businessLicenseExpireDays" value="#{workflowConfigController.selected.businessLicenseExpireDays}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.BusinessLicenseExpireTimes}</label>
+                            <p:inputNumber id="businessLicenseExpireTimes" value="#{workflowConfigController.selected.businessLicenseExpireTimes}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.RegistrationCertificateExpireDays}</label>
+                            <p:inputNumber id="registrationCertificateExpireDays" value="#{workflowConfigController.selected.registrationCertificateExpireDays}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.RegistrationCertificateExpireTimes}</label>
+                            <p:inputNumber id="registrationCertificateExpireTimes" value="#{workflowConfigController.selected.registrationCertificateExpireTimes}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否启用主子设备信息</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableAssetPreview}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
                 <!-- <p:spacer/> -->

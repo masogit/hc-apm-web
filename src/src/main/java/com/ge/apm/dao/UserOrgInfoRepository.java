@@ -23,7 +23,11 @@ public interface UserOrgInfoRepository extends GenericRepositoryUUID<UserOrgInfo
     
     @Query(value = "select o.* from user_org o where o.user_uid = ?1",nativeQuery = true)
     public List<UserOrgInfo> findOrgUidListByUserUid(String userUid);
-    
+
+    @Query(value = "select oi.uid from user_org o, org_info oi where o.user_uid =?1 " +
+            "and o.org_uid in (oi.tenant_uid,oi.institution_uid,oi.hospital_uid,oi.site_uid,oi.uid) and oi.org_type =4 ;",nativeQuery = true)
+    public List<String> findAccessUidByUserUid(String userUid);
+
     @Query(value = "select o.* from user_org o where o.user_uid in ?1",nativeQuery = true)
     public List<UserOrgInfo> findOrgUidListByUserUid(Set<String> userUid);
 
