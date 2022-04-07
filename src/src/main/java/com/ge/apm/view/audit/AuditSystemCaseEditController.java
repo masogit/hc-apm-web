@@ -380,11 +380,11 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
     }
     public void deleteTemplate(AuditTemplate auditTemplate){
-        auditEntryTemplateRelRepository.deleteByTemplateUid(auditTemplate.getUid());
+        auditEntryTemplateRelRepository.deleteByTemplateUidAndEntryUid(auditTemplate.getUid(),auditSystemEntry.getUid());
     }
 
     public void deleteNode(AuditConfigItem auditConfigItem) {
-        auditEntryItemRelRepository.deleteByItemUid(auditConfigItem.getUid());
+        auditEntryItemRelRepository.deleteByItemUidAndOrderBy(auditConfigItem.getUid(),auditSystemEntry.getOrderBy());
         if (caseLevel==1){
             auditConfigItemStripList.remove(auditConfigItem);
         }else if(caseLevel==2){
