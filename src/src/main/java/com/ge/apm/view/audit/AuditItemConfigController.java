@@ -187,7 +187,7 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
-            WebUtil.addErrorMessage("fail to upload file");
+            WebUtil.addErrorMessage(WebUtil.getMessage("FileUploadFailed"));
         }
     }
 
