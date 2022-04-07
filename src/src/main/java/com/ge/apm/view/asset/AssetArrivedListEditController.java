@@ -505,7 +505,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             //制造商
             selected.setManufacture(srcList.getManufacture());
             selected.setOrigin(srcList.getOrigin());
-            selected.setInvoiceNum(srcList.getInvoiceNum());
             //供应商
             selected.setVendor(srcList.getVendor());
             selected.setTenantUID(srcList.getTenantUID());
@@ -523,11 +522,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 selected.setContractPrice(srcList.getContractPrice());
                 selected.setAgent(srcList.getAgent());
                 selected.setArrivalDate(srcList.getArrivalDate());
+                selected.setInvoiceNum(srcList.getInvoiceNum());
             }else{
                 selected.setContractNum("");
                 selected.setContractPrice(null);
                 selected.setAgent("");
                 selected.setArrivalDate(null);
+                selected.setInvoiceNum("");
+                selected.setProcessType(srcList.getProcessType());
                 selected.setMakerShortName(srcList.getMakerShortName());
                 String manufactureUid=srcList.getManufactureId();
                 if(StringUtils.isNotEmpty(manufactureUid)){
