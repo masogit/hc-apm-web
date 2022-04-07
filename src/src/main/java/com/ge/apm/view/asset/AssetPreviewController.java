@@ -14,6 +14,7 @@ import webapp.framework.web.mvc.GenericCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,10 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
     @Getter
     @Setter
     private String oneSearchStr;
-
+    @Getter
+    @Setter
+    private List<AssetInfo> assetInfoList = new ArrayList<>();
+    private Map<String, Boolean> selectedMap = new HashMap<>();
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         assetInfoListController = WebUtil.getBean(AssetInfoListController.class);
@@ -42,8 +46,8 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
 
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         List<AssetInfo> assetInfos = getAssetInfos();
-        PageImpl page = new PageImpl(assetInfos, pageRequest, assetInfos.size());
-        return page;
+        assetInfoList = assetInfos;
+        return new PageImpl(assetInfos.subList(pageRequest.getPageNumber()*pageRequest.getPageSize(),Math.min((pageRequest.getPageNumber()+1)*pageRequest.getPageSize(),assetInfos.size())), pageRequest, assetInfos.size());
     }
 
     public List<AssetInfo> getAssetInfos(){
@@ -133,5 +137,26 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
         } else {
             return String.valueOf(o);
         }
+    }
+
+    public Map<String, Boolean> initSelectMap(List<AssetInfo> assetInfos){
+        selectedMap.clear();
+        if(CollectionUtils.isNotEmpty(assetInfos)){
+            assetInfos.stream().forEach(e->{
+                selectedMap.put(e.getUid(),true);
+            });
+        }
+        return selectedMap;
+    }
+
+    public void exportExcel() throws IOException {
+        assetInfoListController.setSelectedMap(initSelectMap(assetInfoList));
+        assetInfoListController.setIsOrderByForParentAndChildren(true);
+        assetInfoListController.exportExcel();
+    }
+
+    public void onSelectAsset() throws IOException {
+        assetInfoListController.setSelected(selected);
+        assetInfoListController.onSelectAsset();
     }
 }
