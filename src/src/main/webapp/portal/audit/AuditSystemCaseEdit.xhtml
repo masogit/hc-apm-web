@@ -29,8 +29,12 @@
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}" >
-                                    <label class="label">年份</label>
-                                    <p:inputText id="version" value="#{auditSystemCaseEditController.selected.version}" style="width: 60%" />
+                                    <label class="label">版本编号</label>
+                                    <p:inputText id="version" value="#{auditSystemCaseEditController.selected.versionNumber}" style="width: 60%" />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}" >
+                                    <label class="label">版本号</label>
+                                    <p:inputText id="version1" value="#{auditSystemCaseEditController.selected.version}" style="width: 60%" />
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}" >
                                     <label class="label">地区</label>
