@@ -29,14 +29,16 @@
                         <p:selectOneMenu id="version" value="#{auditUserCaseController.selected.systemCaseUid}" required="true" requiredMessage="#{msg.Version} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
                             <p:ajax event="change" update="target"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.zone} - #{entry.version}" itemValue="#{entry.uid}"/>
+                            <!--<f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.zone} - #{entry.version}" itemValue="#{entry.uid}"/>-->
+                            <f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.type == 1 ? entry.zone.concat('-').concat(entry.version) : '质控'}" itemValue="#{entry.uid}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.Target}*</label>
-                        <p:selectOneMenu id="target" value="#{auditUserCaseController.selected.target}" required="true" requiredMessage="#{msg.Target} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
+                        <label class="label">#{msg.Target}</label>
+                        <p:selectOneMenu id="target" value="#{auditUserCaseController.selected.target}" required="false" autoWidth="false" style="width: 95%;">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{auditUserCaseController.getTarget()}" var="entry" itemLabel="#{entry.target} - #{entry.score}" itemValue="#{entry.target}"/>
+                            <f:selectItems value="#{auditUserCaseController.getTarget()}" var="entry"
+                                           itemLabel="#{fieldMsg.fieldValue('targetType',entry.target)} - #{entry.score}" itemValue="#{entry.target}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
@@ -53,7 +55,7 @@
                     </h:panelGroup>-->
                 </p:panelGrid>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{auditUserCaseController.saveAuditCase}" update="auditCaseListForm:datalist :growl auditCaseEditDlg" icon="ui-icon-check"/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{auditUserCaseController.saveAuditCase}" update=":growl" icon="ui-icon-check"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('auditCaseEditDialog').hide()"/>
             </h:form>
         </p:dialog>

@@ -68,12 +68,27 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         auditTemplateService = WebUtil.getBean(AuditTemplateService.class);
         auditUserCaseService = WebUtil.getBean(AuditUserCaseService.class);
 
-        selectedTenant = new TenantInfo();
-        selectedTenant.setName("请选择租户");
+        String selectedTenantUid = WebUtil.getRequestParameter("selectedTenantUid");
 
-        selectedOrg = new OrgInfo();
-        selectedOrg.setUid("请选择院区");
-        selectedOrg.setName("请选择院区");
+        if(StringUtils.isNotBlank(selectedTenantUid)){
+            selectedTenant = tenantInfoRepository.findByuid(selectedTenantUid);
+        }else{
+            selectedTenant = new TenantInfo();
+            selectedTenant.setName("请选择租户");
+        }
+
+        String selectedOrgUid = WebUtil.getRequestParameter("selectedOrgUid");
+
+        if(StringUtils.isNotBlank(selectedOrgUid)){
+            selectedOrg = orgInfoRepository.findByUid(selectedOrgUid);
+        }else{
+            selectedOrg = new OrgInfo();
+            selectedOrg.setUid("请选择院区");
+            selectedOrg.setName("请选择院区");
+        }
+
+
+
     }
 
     @Override
@@ -139,16 +154,19 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         super.setSelected(auditCase);
     }
 
-    public void saveAuditCase(){
+    public String saveAuditCase(){
         try {
             auditUserCaseService.saveUserCase(this.selected);
-            createEvent("ENABLE_TENANT_AUDIT", this.selected, "success");
+            createEvent("ADD_CASE", this.selected, "success");
             this.selected=null;
             WebUtil.addSuccessMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Success"));
         }catch (Exception e){
-            createEvent("ENABLE_TENANT_AUDIT", this.selected, "fail");
-            WebUtil.addSuccessMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Failed"));
+            createEvent("ADD_CASE", this.selected, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Failed") + "！" + e.getMessage());
+            return "";
         }
+        return "auditUserCaseList?faces-redirect=true&selectedTenantUid="
+                + this.selectedTenant.getUid() + "&selectedOrgUid=" + this.selectedOrg.getUid();
     }
 
     /**
@@ -182,7 +200,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     }
 
     public List<AuditSystemCase> getAllSystemCase(){
-        Iterable<AuditSystemCase> systemCases = caseDao.findAll();
+        Iterable<AuditSystemCase> systemCases = caseDao.findByStatus(2);
         if(systemCases != null){
             return Lists.newArrayList(systemCases);
         }
@@ -219,7 +237,8 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         if(StringUtils.isEmpty(this.selectedTenant.getUid())){
             return new ArrayList<>();
         }
-        return orgInfoRepository.findAllSiteByTenantUid(this.selectedTenant.getUid());
+        List<OrgInfo> list = orgInfoRepository.findAllSiteByTenantUid(this.selectedTenant.getUid());
+        return list;
     }
 
     public void setTenant(String tenantUid) {

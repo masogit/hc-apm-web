@@ -1,21 +1,29 @@
 package com.ge.apm.view.audit;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.audit.AuditItemConfigService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 503189829
@@ -27,17 +35,21 @@ import java.util.*;
 public class AuditSystemCaseEditController extends GenericCRUDUUIDController<AuditSystemCase> {
 
     private AuditSystemCaseRepository dao;
+    private AuditCaseRepository auditCaseRepository;
     private AuditSystemEntryRepository auditSystemEntryRepository;
     private AuditConfigItemRepository auditConfigItemRepository;
     private AuditEntryItemRelRepository auditEntryItemRelRepository;
     private AuditTargetRepository auditTargetRepository;
     private AuditTemplateRepository auditTemplateRepository;
     private AuditEntryTemplateRelRepository auditEntryTemplateRelRepository;
+    private AuditItemConfigService auditItemConfigService;
+    private AuditEventRepository auditEventRepository;
 
     private String retrieval;
     private String entryName;
     private String entryMark;
     private String sourceText;
+    private String evaluationCriteria;
     private Double entryScoreStandard;
     private Integer entryType;
     private Integer targetType;
@@ -51,7 +63,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private Double targetScoreStandard;
     private boolean onSelectFlag = true;
     private boolean entryFlag = false;
-    private boolean entryScoreFlag = true;
+    private boolean evaluationCriteriaFlag = false;
+    private boolean entryScoreFlag = false;
     private boolean orderByFlag = true;
     private int caseLevel=0;
     private Integer entryOrderBy =0;
@@ -67,20 +80,31 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private AuditTemplate auditTemplateSelected = new AuditTemplate();
     private  AuditSystemEntry auditSystemEntrySelected = new AuditSystemEntry();
     private  AuditTarget auditTargetSelected = new AuditTarget();
+    private  AuditConfigItem auditConfigItem = new AuditConfigItem();
+    private List<V2_BlobObject> attachements;
+    private BlobFileService blobService;
     private final AuditTemplate auditTemplate = new AuditTemplate();
     public static final String STRIP = "STRIP";//条
     public static final String PAYMENT = "PAYMENT";//款
     public static final String TARGET = "TARGET";//指标
     protected String currentTabId = null;
+    private String selectType = "1";
+    private String entryContent = null;
+    private boolean contentTypeFlag = false;
     @Override
     protected void init() {
         dao = WebUtil.getBean(AuditSystemCaseRepository.class);
+        auditCaseRepository = WebUtil.getBean(AuditCaseRepository.class);
         auditSystemEntryRepository = WebUtil.getBean(AuditSystemEntryRepository.class);
         auditConfigItemRepository = WebUtil.getBean(AuditConfigItemRepository.class);
         auditEntryItemRelRepository = WebUtil.getBean(AuditEntryItemRelRepository.class);
         auditTargetRepository = WebUtil.getBean(AuditTargetRepository.class);
         auditTemplateRepository = WebUtil.getBean(AuditTemplateRepository.class);
         auditEntryTemplateRelRepository = WebUtil.getBean(AuditEntryTemplateRelRepository.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
+        auditItemConfigService = WebUtil.getBean(AuditItemConfigService.class);
+        auditEventRepository = WebUtil.getBean(AuditEventRepository.class);
+
         String uid = WebUtil.getRequestParameter("uid");
         if (uid!=null){
             selected = dao.findByUid(uid);
@@ -207,10 +231,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public void saveAuditSystemEntry() {
         AuditSystemEntry date = new AuditSystemEntry();
+        String eventType = "ADD_SYSTEM_ENTRY";
         Integer type=0;
         if(auditSystemEntrySelected!=null&&auditSystemEntrySelected.getUid()!=null){
             date=auditSystemEntrySelected;
+            eventType="EDIT_SYSTEM_ENTRY";
         }else {
+            date.setCreator(UserContextService.getCurrentUserAccount().getName());
+            date.setCreateTime(new Date());
             if(auditSystemEntry!=null){
                 type= auditSystemEntry.getType();
             }
@@ -246,19 +274,28 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         date.setMark(entryMark);
         date.setScoreStandard(entryScoreStandard);
         date.setSourceText(sourceText);
+        date.setEvaluationCriteria(evaluationCriteria);
 
-
-        auditSystemEntryRepository.save(date);
-        buildOrdTree();
-        caseLevel=0;
-        entryType=null;
-        entryScoreStandard=null;
-        sourceText=null;
+        try {
+            auditSystemEntryRepository.save(date);
+            buildOrdTree();
+            caseLevel=0;
+            entryType=null;
+            entryScoreStandard=null;
+            sourceText=null;
+            evaluationCriteria=null;
+            createEventSysytemEntry(eventType, date, "success");
+        } catch (Exception e){
+            createEventSysytemEntry(eventType, date, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));
+        }
     }
-    public void saveAuditConfigItem() {
-        AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
+    public void saveAuditConfigItem(AuditConfigItem data) {
+        if(data==null){
+            data = auditConfigItemRepository.findByUid(configItemUid);
+        }
         AuditEntryItemRel auditEntryItemRel = new AuditEntryItemRel();
-        auditEntryItemRel.setItemUid(auditConfigItem.getUid());
+        auditEntryItemRel.setItemUid(data.getUid());
         auditEntryItemRel.setSystemEntryUid(auditSystemEntry.getUid());
         Integer orderBy;
         if ( currentTabId == STRIP){
@@ -317,21 +354,28 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
     }
     public void editAuditConfigItem(AuditConfigItem auditConfigItem){
+        contentTypeFlag =false;
         if(auditConfigItem!=null){
             auditConfigItemSelected=auditConfigItem ;
+            entryContent=auditConfigItem.getContent();
         }
     }
     public void editAuditSystementry(){
         if(auditSystemEntry!=null&&auditSystemEntry.getUid()!=null){
+            evaluationCriteriaFlag=false;
             entryType=auditSystemEntry.getType();
             entryMark=auditSystemEntry.getMark();
             entryName=auditSystemEntry.getName();
             entryScoreStandard=auditSystemEntry.getScoreStandard();
             sourceText=auditSystemEntry.getSourceText();
+            evaluationCriteria=auditSystemEntry.getEvaluationCriteria();
             auditSystemEntrySelected=auditSystemEntry;
-            entryScoreFlag=true;
-            if(auditSystemEntry.getLevel()==1){
-                entryScoreFlag=false;
+            entryScoreFlag=false;
+            if(auditSystemEntry.getLevel()>=1){
+                entryScoreFlag=true;
+            }
+            if(auditSystemEntry.getLevel()==3){
+                evaluationCriteriaFlag=true;
             }
         }
     }
@@ -378,6 +422,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         entryScoreStandard=null;
         sourceText=null;
+        evaluationCriteria=null;
     }
     public void preDelete() {
         onSelectFlag=true;
@@ -385,9 +430,15 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
              WebUtil.addErrorMessage("请选择数据!");
              return;
          }
-        auditSystemEntryRepository.delete(auditSystemEntry);
-        deleteAuditSystemEntryList(auditSystemEntry.getUid());
-        buildOrdTree();
+        try {
+            auditSystemEntryRepository.delete(auditSystemEntry);
+            deleteAuditSystemEntryList(auditSystemEntry.getUid());
+            buildOrdTree();
+            createEventSysytemEntry("DELETE_SYSTEM_ENTRY", auditSystemEntry, "success");
+        } catch (Exception e){
+            createEventSysytemEntry("DELETE_SYSTEM_ENTRY", auditSystemEntry, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("delete") + WebUtil.getMessage("FAILED"));
+        }
     }
 
     public  void deleteAuditSystemEntryList(String parentUid){
@@ -413,20 +464,27 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         entryName=null;
         entryMark=null;
+        evaluationCriteriaFlag=false;
         if (onSelectFlag){
             caseLevel=0;
             entryUid = null;
         }
         if (caseLevel==1){
             entryFlag =true;
-            entryScoreFlag=true;
         }else{
             entryFlag =false;
+        }
+        entryScoreFlag=false;
+        if (caseLevel>=1){
             entryScoreFlag=true;
+        }
+        if (caseLevel>=2){
+            evaluationCriteriaFlag=true;
         }
         auditSystemEntrySelected=new AuditSystemEntry();
         entryScoreStandard=null;
         sourceText=null;
+        evaluationCriteria=null;
     }
     public List<AuditTemplate> auditTemplates(){
         return auditTemplateRepository.findByType(1);
@@ -435,6 +493,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         Integer contentTyp =1;
         if (entryType!=null){
             contentTyp =entryType;
+        }
+        if(selected.getType()!=null && selected.getType()==2){
+            contentTyp=3;//质控只有 解读
         }
         auditConfigItems = auditConfigItemRepository.findByContentType(contentTyp);
         return auditConfigItems;
@@ -512,8 +573,28 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
     public String listAction(Integer status) {
         if(selected.getUid()!=null){
-            selected.setStatus(status);
-            dao.save(selected);
+            String eventType = "EDIT_SYSTEM_CASE";
+            if (status==2){
+                eventType = "ENABLE_SYSTEM_CASE";
+            }else if(status==1) {
+                List<AuditCase> list = auditCaseRepository.findBySystemCaseUid(selected.getUid());
+                if (list!=null && !list.isEmpty()){
+                    WebUtil.addErrorMessage("数据被引用中,不能存为草稿!");
+                    return null;
+                }
+            }
+            try {
+                selected.setStatus(status);
+                dao.save(selected);
+                createEventSysytemCase(eventType, selected, "success");
+            } catch (Exception e){
+                createEventSysytemCase(eventType, selected, "fail");
+                WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));
+            }
+
+        }else{
+            WebUtil.addErrorMessage("请先保存数据!");
+            return null;
         }
         String operation= "AuditSystemCaseList.xhtml?actionName=Create";
        return UrlEncryptController.encodeUrlParam(operation);
@@ -527,6 +608,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         dao.delete(selected);
     }
     public void onContent() {
+        entryContent=null;
+        contentTypeFlag=false;
         auditConfigItemSelected=new AuditConfigItem();
         auditTemplateSelected=new AuditTemplate();
         entryType = null;
@@ -536,6 +619,122 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     public void onAuditTarget() {
         targetScore = null;
         targetType = null;
+    }
+    public void changeContentType(){
+         contentTypeFlag =true;
+    }
+    public void changeType(){
+        selectType = "1".equals(selectType) ? "2" : "1";
+    }
+    public List<V2_BlobObject> getAttachList(String itemUid, String type) {
+        if (attachements == null) {
+            attachements = blobService.findBlobObjectsByBoUid(itemUid);
+        }
+        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+        return collect;
+    }
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            attachements.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_AUDIT_CONFIG_ITEM);
+            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+            blobObject.setBoUuid(selected.getUid());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+    }
+    public void saveNewAuditConfigItem(){
+
+        if(1 ==auditConfigItem.getType() && StringUtils.isEmpty(auditConfigItem.getContent())){
+            WebUtil.addErrorMessage("请填写内容！");
+            return ;
+        }
+        if(2 ==auditConfigItem.getType() && CollectionUtils.isEmpty(this.attachements)){
+            WebUtil.addErrorMessage("请上传图片！");
+            return ;
+        }
+        if(selected.getType()!=null && selected.getType()==2){
+            auditConfigItem.setContentType(3);
+        }
+        // 同类型下，mark唯一
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        searchFilterList.add(new SearchFilter("mark", SearchFilter.Operator.EQ, auditConfigItem.getMark()));
+        searchFilterList.add(new SearchFilter("contentType", SearchFilter.Operator.EQ, auditConfigItem.getContentType()));
+
+        if(StringUtils.isNotEmpty(auditConfigItem.getUid())){
+            searchFilterList.add(new SearchFilter("uid", SearchFilter.Operator.NE, auditConfigItem.getUid()));
+        }
+
+        List<AuditConfigItem> auditConfigItemList = auditConfigItemRepository.findBySearchFilter(searchFilterList);
+
+        if(CollectionUtils.isNotEmpty(auditConfigItemList)){
+            WebUtil.addErrorMessage("同类型下，编号重复，无法提交！");
+            return ;
+        }
+        String eventType = "EDIT_CONFIG_ITEM";
+        if(StringUtils.isBlank(auditConfigItem.getUid())){
+            auditConfigItem.setCreator(UserContextService.getCurrentUserAccount().getName());
+            auditConfigItem.setCreateTime(new Date());
+            eventType = "ADD_CONFIG_ITEM";
+        }
+
+        try {
+            auditItemConfigService.saveAuditConfigItem(auditConfigItem, attachements);
+            saveAuditConfigItem(auditConfigItem);
+            createEvent(eventType, auditConfigItem, "success");
+            auditConfigItem=null;
+        } catch (Exception e){
+            createEvent(eventType, auditConfigItem, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("Save") + WebUtil.getMessage("FAILED"));
+        }
+    }
+    public boolean typeChecking(){
+        if (selected.getType()==2){
+            List<AuditSystemCase> data = dao.findByType(selected.getType());
+            if(data!=null && !data.isEmpty()){
+                WebUtil.addErrorMessage("已存在质控配置不能重复添加!");
+                return true;
+            }
+        }
+        return false;
+
+    }
+    private void createEvent(String eventType, AuditConfigItem item, String result){
+        AuditEvent event = new AuditEvent();
+        event.setEventType(eventType);
+        event.setOperator(UserContextService.getCurrentUserAccount().getName());
+        event.setContent(JSON.toJSONString(item));
+        event.setEventObjectUid(item.getUid());
+        event.setResult(result);
+        event.setEventTime(new Date());
+        auditEventRepository.save(event);
+    }
+    private void createEventSysytemCase(String eventType, AuditSystemCase auditSystemCase, String result){
+        AuditEvent event = new AuditEvent();
+        event.setEventType(eventType);
+        event.setOperator(UserContextService.getCurrentUserAccount().getName());
+        event.setContent(JSON.toJSONString(auditSystemCase));
+        event.setEventObjectUid(auditSystemCase.getUid());
+        event.setResult(result);
+        event.setEventTime(new Date());
+        auditEventRepository.save(event);
+    }
+    private void createEventSysytemEntry(String eventType, AuditSystemEntry data, String result){
+        AuditEvent event = new AuditEvent();
+        event.setEventType(eventType);
+        event.setOperator(UserContextService.getCurrentUserAccount().getName());
+        event.setContent(JSON.toJSONString(data));
+        event.setEventObjectUid(data.getUid());
+        event.setResult(result);
+        event.setEventTime(new Date());
+        auditEventRepository.save(event);
     }
     public void strip() {
         currentTabId = STRIP;
@@ -564,15 +763,34 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         if (selected!=null){
             uid= selected.getUid();
         }
-        orgTree = getEntryTreeNodes(auditSystemEntryRepository.findListByName(entryMarkName,uid));
+        if(entryMarkName==null || "".equals(entryMarkName)){
+            this.buildOrdTree();
+        }else {
+            orgTree = getEntryTreeNodes(auditSystemEntryRepository.findListByName(entryMarkName,uid));
+        }
+
     }
     public void saveSelectedOrg() {
-        UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        selected.setStatus(1);
-        selected.setCreateTime(new Date());
-        selected.setCreator(userAccount.getName());
-        dao.save(selected);
-        buildOrdTree();
+        if( this.typeChecking()){
+            return;
+        }
+        String eventType = "ADD_SYSTEM_CASE";
+        if (selected.getUid()!=null){
+            eventType = "EDIT_SYSTEM_CASE";
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            selected.setCreateTime(new Date());
+            selected.setCreator(userAccount.getName());
+        }
+        try {
+            selected.setStatus(1);
+            dao.save(selected);
+            buildOrdTree();
+            createEventSysytemCase(eventType, selected, "success");
+        } catch (Exception e){
+            createEventSysytemCase(eventType, selected, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));
+        }
+
     }
 
     public Integer getEntryType() {
@@ -621,6 +839,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public void setSourceText(String sourceText) {
         this.sourceText = sourceText;
+    }
+
+    public String getEvaluationCriteria() {
+        return evaluationCriteria;
+    }
+
+    public void setEvaluationCriteria(String evaluationCriteria) {
+        this.evaluationCriteria = evaluationCriteria;
     }
 
     public Double getEntryScoreStandard() {
@@ -683,6 +909,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         return configItemUid;
     }
 
+    public boolean getContentTypeFlag() {
+        return contentTypeFlag;
+    }
+
+    public void setContentTypeFlag(boolean contentTypeFlag) {
+        this.contentTypeFlag = contentTypeFlag;
+    }
+
     public void setConfigItemUid(String configItemUid) {
         this.configItemUid = configItemUid;
     }
@@ -712,10 +946,49 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
 
 
-    public void setNothing(){}
+    public void setNothing(){
+    }
+    public void setContentNothing(){
+        AuditConfigItem auditConfigItem = auditConfigItemRepository.findByUid(configItemUid);
+        if (auditConfigItem!=null){
+            entryContent=auditConfigItem.getContent();
+        }
+    }
+
+    public String getEntryContent() {
+        return entryContent;
+    }
+
+    public void setEntryContent(String entryContent) {
+        this.entryContent = entryContent;
+    }
+
+    public AuditConfigItem getAuditConfigItem() {
+        return auditConfigItem;
+    }
+
+    public void setAuditConfigItem(AuditConfigItem auditConfigItem) {
+        this.auditConfigItem = auditConfigItem;
+    }
 
     public List<AuditConfigItem> getAuditConfigItems() {
         return auditConfigItems;
+    }
+
+    public String getSelectType() {
+        return selectType;
+    }
+
+    public void setSelectType(String selectType) {
+        this.selectType = selectType;
+    }
+
+    public boolean isEvaluationCriteriaFlag() {
+        return evaluationCriteriaFlag;
+    }
+
+    public void setEvaluationCriteriaFlag(boolean evaluationCriteriaFlag) {
+        this.evaluationCriteriaFlag = evaluationCriteriaFlag;
     }
 
     public int getCaseLevel() {
