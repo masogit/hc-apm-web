@@ -371,7 +371,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             evaluationCriteria=auditSystemEntry.getEvaluationCriteria();
             auditSystemEntrySelected=auditSystemEntry;
             entryScoreFlag=false;
-            if(auditSystemEntry.getLevel()>=1){
+            if(auditSystemEntry.getLevel()>1){
                 entryScoreFlag=true;
             }
             if(auditSystemEntry.getLevel()==3){
@@ -502,9 +502,12 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
     public List<AuditTarget> getTargetTypeList() {
         AuditTarget auditTarget = new AuditTarget();
-        List<AuditTarget> auditTargets = auditTargetRepository.findBySystemCaseUid(caseUid);
-        if (auditTargets.contains(auditTarget)){
-            auditTargets.remove(auditTarget);
+        List<AuditTarget> auditTargets = new ArrayList<>();
+        if(caseUid!=null){
+            auditTargets = auditTargetRepository.findBySystemCaseUid(caseUid);
+            if (auditTargets.contains(auditTarget)){
+                auditTargets.remove(auditTarget);
+            }
         }
         auditTarget.setUid("000");
         auditTargets.add(auditTarget);
@@ -784,6 +787,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         try {
             selected.setStatus(1);
             dao.save(selected);
+            caseUid=selected.getUid();
             buildOrdTree();
             createEventSysytemCase(eventType, selected, "success");
         } catch (Exception e){
