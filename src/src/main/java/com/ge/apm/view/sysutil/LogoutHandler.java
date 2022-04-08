@@ -4,7 +4,6 @@ import com.ge.apm.dao.LoginRecordRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.LoginRecord;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.api.UserApiService;
 import com.ge.apm.web.cboard.CBoardController;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -28,8 +27,6 @@ public class LogoutHandler extends SimpleUrlLogoutSuccessHandler implements Logo
     private static String logoutSuccessUrl = "/login.xhtml";
     @Autowired
     protected UserAccountRepository userAccountDao;
-    @Autowired
-    private UserApiService userApi;
 
     public static void setLogoutSuccessUrl(String _logoutSuccessUrl) {
         logoutSuccessUrl = _logoutSuccessUrl;
@@ -51,7 +48,6 @@ public class LogoutHandler extends SimpleUrlLogoutSuccessHandler implements Logo
             request.getSession().invalidate();
             request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, "");
             saveLogoutRecord(user);
-            userApi.removeUser(user.getLoginName());
             super.onLogoutSuccess(request, response, auth);
         } else
             request.getRequestDispatcher(logoutSuccessUrl).forward(request, response);
