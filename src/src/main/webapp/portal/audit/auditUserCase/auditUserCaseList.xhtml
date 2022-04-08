@@ -51,10 +51,13 @@
                         <p:column headerText="#{msg.mark}">
                             <h:outputText value="#{rowIndex + 1}"/>
                         </p:column>
+                        <p:column headerText="版本编号" filterBy="#{item.auditSystemCase.versionNumber}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.auditSystemCase.versionNumber}"/>
+                        </p:column>
                         <p:column headerText="省份" filterBy="#{item.auditSystemCase.zone}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.auditSystemCase.zone}"/>
                         </p:column>
-                        <p:column headerText="版本编号" filterBy="#{item.auditSystemCase.version}" filterMatchMode="LIKE">
+                        <p:column headerText="版本号" filterBy="#{item.auditSystemCase.version}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.auditSystemCase.version}"/>
                         </p:column>
                         <p:column headerText="类型">
@@ -71,6 +74,12 @@
                         </p:column>
                         <p:column headerText="总分值" sortBy="#{item.score}">
                             <h:outputText value="#{item.auditSystemCase.scoreNum}"/>
+                        </p:column>
+                        <p:column headerText="目标">
+                            <h:outputText value="#{fieldMsg.fieldValue('targetType', item.targetId)}"/>
+                        </p:column>
+                        <p:column headerText="目标分值">
+                            <h:outputText value="#{item.targetScore}"/>
                         </p:column>
                         <p:column headerText="评分方式">
                             <h:outputText value="#{fieldMsg.fieldValue('Scoring', item.auditSystemCase.judgeLogic)}"/>
