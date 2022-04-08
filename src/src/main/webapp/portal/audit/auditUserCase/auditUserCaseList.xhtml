@@ -75,6 +75,9 @@
                         <p:column headerText="评分方式">
                             <h:outputText value="#{fieldMsg.fieldValue('Scoring', item.auditSystemCase.judgeLogic)}"/>
                         </p:column>
+                        <p:column headerText="状态">
+                            <h:outputText value="#{fieldMsg.fieldValue('auditCaseStatus', item.status)}"/>
+                        </p:column>
                         <p:column headerText="启用时间" sortBy="#{item.startTime}">
                             <h:outputText value="#{item.startTime}">
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
@@ -88,8 +91,12 @@
                         </p:column>
                         <p:column headerText="#{msg.Operation}" exportable="false" width="120" id="operatorColumn">
                             <h:panelGroup>
-                                <p:commandButton value="#{msg.Initialize}" process="@this" actionListener="#{auditUserCaseController.initialize(item.uid)}" update="auditCaseListForm:datalist :growl">
+                                <p:commandButton value="#{msg.Initialize}" disabled="#{item.status == 2}" process="@this" actionListener="#{auditUserCaseController.initialize(item.uid)}" update="auditCaseListForm:datalist :growl">
                                     <p:confirm header="#{msg.InitializeConformation}" message="#{msg.InitializeConformationMsg}" icon="ui-icon-warning" />
+                                </p:commandButton>
+                                <br/><br/>
+                                <p:commandButton value="#{msg.expired}" disabled="#{item.status == 2}" process="@this" actionListener="#{auditUserCaseController.expired(item.uid)}" update="auditCaseListForm:datalist :growl">
+                                    <p:confirm header="#{msg.AuditCaseExpiredConformation}" message="#{msg.AuditCaseExpiredConformationMsg}" icon="ui-icon-warning" />
                                 </p:commandButton>
                             </h:panelGroup>
                         </p:column>
