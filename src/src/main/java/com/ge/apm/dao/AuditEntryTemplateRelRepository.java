@@ -17,7 +17,7 @@ public interface AuditEntryTemplateRelRepository extends GenericRepositoryUUID<A
     List<AuditEntryTemplateRel> findByEntryUid(String entryUid);
     @Transactional
     @Modifying
-    public void deleteByTemplateUid(String templateUid);
+    public void deleteByTemplateUidAndEntryUid(String templateUid,String entryUid);
     @Transactional
     @Modifying
     public void deleteByEntryUid(String entryUid);

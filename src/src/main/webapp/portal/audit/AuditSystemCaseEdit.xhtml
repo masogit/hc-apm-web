@@ -374,7 +374,8 @@
                             <h:panelGroup id="content">
                                 <label class="label">#{msg.mark}*</label>
                                 <p:selectOneMenu value="#{auditSystemCaseEditController.configItemUid}"   requiredMessage="#{msg.content} #{msg.ValidationRequire}"
-                                                 autoWidth="false" style="width: 50%;">
+                                    panelStyle="width:220px" effect="fade"
+                                    filter="true" filterMatchMode="contains">
                                     <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? auditSystemCaseEditController.auditConfigItemSelected.mark : msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
                                     <f:selectItems value="#{auditSystemCaseEditController.auditConfigItemList()}" var="entry" itemLabel="#{entry.mark}"  itemValue="#{entry.uid}"/>
                                     <p:ajax process="@this" listener="#{auditSystemCaseEditController.setContentNothing()}" update="entryContent"/>
@@ -485,7 +486,8 @@
                             <h:panelGroup id="TemplateName">
                                 <label class="label">#{msg.Mark}*</label>
                                 <p:selectOneMenu value="#{auditSystemCaseEditController.templateUid}" required="true" requiredMessage="#{msg.content} #{msg.ValidationRequire}"
-                                                 autoWidth="false" style="width: 50%;">
+                                    panelStyle="width:220px" effect="fade"
+                                    filter="true" filterMatchMode="contains">
                                     <f:selectItem itemLabel="#{auditSystemCaseEditController.auditTemplateSelected.uid !=null ? auditSystemCaseEditController.auditTemplateSelected.mark : msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
 
                                     <f:selectItems value="#{auditSystemCaseEditController.auditTemplates()}" var="template" itemLabel="#{template.mark}"  itemValue="#{template.uid}"/>
