@@ -75,6 +75,13 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
                             scoreNum=score.add(scoreStandard).doubleValue();
                             paymentNum++;
                         }else {
+                            String parentUid = auditSystemEntry.getParentUid();
+                            AuditSystemEntry data = auditSystemEntryRepository.findByUid(parentUid);
+                            if(data!=null && data.getType()==1){
+                                BigDecimal score = new BigDecimal(scoreNum);
+                                BigDecimal scoreStandard = new BigDecimal(auditSystemEntry.getScoreStandard()==null ? 0D :auditSystemEntry.getScoreStandard());
+                                scoreNum=score.add(scoreStandard).doubleValue();
+                            }
                             targetNum++;
                         }
                     }
