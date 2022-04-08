@@ -220,6 +220,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        isOrderByForParentAndChildren = false;
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
