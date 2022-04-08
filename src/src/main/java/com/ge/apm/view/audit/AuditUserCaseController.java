@@ -184,6 +184,21 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         }
     }
 
+    /**
+     * 用户版本过期
+     */
+    public void expired(String caseUid){
+        AuditCase auditCase = auditCaseRepository.findById(caseUid);
+        try {
+            auditCaseRepository.expiredCase(caseUid);
+            createEvent("EXPIRED_TENANT_AUDIT", auditCase, "success");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("expired") + WebUtil.getMessage("Success"));
+        }catch (Exception e){
+            createEvent("EXPIRED_TENANT_AUDIT", auditCase, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("expired") + WebUtil.getMessage("Failed"));
+        }
+    }
+
     public List<TenantInfo> getAllTenant(){
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             return tenantInfoRepository.findAllByTestStatusIsNullOrTestStatusNotOrderByName(-1);
