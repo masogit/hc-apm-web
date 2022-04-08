@@ -115,6 +115,14 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
 
         for(AuditCase auditCase : list){
             AuditSystemCase auditSystemCase = auditCase.getAuditSystemCase();
+
+            AuditTarget target = targetDao.findBySystemCaseUidAndAndTarget(auditSystemCase.getUid(), auditCase.getTarget());
+
+            if(target != null){
+                auditCase.setTargetId(target.getTarget());
+                auditCase.setTargetScore(target.getScore());
+            }
+
             Integer stripNum=0;//条总数
             Integer paymentNum=0;//款总数
             Integer targetNum=0;//指标总数
