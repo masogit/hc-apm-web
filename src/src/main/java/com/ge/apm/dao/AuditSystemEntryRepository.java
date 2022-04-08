@@ -17,7 +17,7 @@ public interface AuditSystemEntryRepository extends GenericRepository<AuditSyste
 
     List<AuditSystemEntry> findByMark(String mark);
 
-    @Query("select a from AuditSystemEntry a where (a.name like %?1% or a.mark like %?1%) and a.caseUid = ?2  order by a.createTime desc")
+    @Query("select a from AuditSystemEntry a where (a.name like %?1% or a.mark like %?1%) and a.caseUid = ?2  order by a.createTime asc")
     List<AuditSystemEntry> findListByName(String name,String caseUid);
 
     AuditSystemEntry  findByUid(String uid);
@@ -27,7 +27,7 @@ public interface AuditSystemEntryRepository extends GenericRepository<AuditSyste
 
     List<AuditSystemEntry> findByParentUid(String parentUid);
 
-    @Query(value = "select o from AuditSystemEntry o where o.caseUid = ?1 order by o.createTime desc")
+    @Query(value = "select o from AuditSystemEntry o where o.caseUid = ?1 order by o.createTime asc")
     List<AuditSystemEntry> entryList( String caseUid);
 
     @Transactional
