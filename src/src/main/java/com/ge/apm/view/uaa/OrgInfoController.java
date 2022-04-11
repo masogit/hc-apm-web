@@ -581,12 +581,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             if(CollectionUtils.isEmpty(qrcodeList)){
                 failureType=null;
                 WebUtil.addErrorMessage("该组织下有二维码已删除");
+            }else{
+                for (QrCodeLib qrCodeLib : qrcodeList) {
+                    qrcodeLibDao.deleteQrCodeLib(qrCodeLib.getUid());
+                }
+                failureType=null;
+                WebUtil.addErrorMessage("该组织下有二维码已删除");
             }
-            for (QrCodeLib qrCodeLib : qrcodeList) {
-                qrcodeLibDao.deleteQrCodeLib(qrCodeLib.getUid());
-            }
-            failureType=null;
-            WebUtil.addErrorMessage("该组织下有二维码已删除");
         } catch (Exception e) {
             e.printStackTrace();
             WebUtil.addErrorMessage("删除二维码失败");
