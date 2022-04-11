@@ -365,7 +365,7 @@
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 80%" rendered="true">
                             <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}">
                                 <label class="label">#{msg.ContentType}*</label>
-                                <p:selectOneMenu value="#{auditSystemCaseEditController.entryType}"   requiredMessage="#{msg.ContentType} #{msg.ValidationRequire}" autoWidth="false" style="width: 50%;">
+                                <p:selectOneMenu value="#{auditSystemCaseEditController.contentType}"   requiredMessage="#{msg.ContentType} #{msg.ValidationRequire}" autoWidth="false" style="width: 50%;">
                                     <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? fieldMsg.fieldValue('auditItemType',auditSystemCaseEditController.auditConfigItemSelected.contentType) : msg.SelectOneMessage}" itemValue="#{null}"  noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('auditItemType')}"  var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}" />
                                     <p:ajax process="@this" listener="#{auditSystemCaseEditController.auditConfigItemList()}" update="content"/>
