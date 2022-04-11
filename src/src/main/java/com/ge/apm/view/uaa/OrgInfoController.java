@@ -8,6 +8,7 @@ import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
@@ -577,7 +578,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             checkFilters.add(new SearchFilter("orgId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
             QrCodeLibRepository qrcodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
             List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
-            qrcodeLibDao.delete(qrcodeList);
+            if(CollectionUtils.isEmpty(qrcodeList)){
+                failureType=null;
+                WebUtil.addErrorMessage("该组织下有二维码已删除");
+            }
+            for (QrCodeLib qrCodeLib : qrcodeList) {
+                qrcodeLibDao.deleteQrCodeLib(qrCodeLib.getUid());
+            }
             failureType=null;
             WebUtil.addErrorMessage("该组织下有二维码已删除");
         } catch (Exception e) {
