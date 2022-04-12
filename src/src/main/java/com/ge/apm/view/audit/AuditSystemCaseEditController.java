@@ -372,10 +372,6 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             sourceText=auditSystemEntry.getSourceText();
             evaluationCriteria=auditSystemEntry.getEvaluationCriteria();
             auditSystemEntrySelected=auditSystemEntry;
-            entryScoreFlag=false;
-            if(auditSystemEntry.getLevel()>1){
-                entryScoreFlag=true;
-            }
             if(auditSystemEntry.getLevel()==3){
                 evaluationCriteriaFlag=true;
             }
@@ -425,6 +421,8 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         entryScoreStandard=null;
         sourceText=null;
         evaluationCriteria=null;
+        entryFlag=false;
+        entryScoreFlag=false;
     }
     public void preDelete() {
         onSelectFlag=true;
@@ -487,6 +485,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         entryScoreStandard=null;
         sourceText=null;
         evaluationCriteria=null;
+        entryType=null;
     }
     public List<AuditTemplate> auditTemplates(){
         return auditTemplateRepository.findByType(1);
