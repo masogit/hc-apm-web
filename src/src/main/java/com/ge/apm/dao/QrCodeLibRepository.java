@@ -23,8 +23,4 @@ public interface QrCodeLibRepository extends GenericRepository<QrCodeLib> {
      @Query("select a from QrCodeLib a where a.uid is null or  a.uid='' ")
     public List<QrCodeLib> getNeedUpdateUidEntity();
 
-    @Transactional
-    @Modifying
-    @Query(value = "delete from qr_code_lib where uid = ?1",nativeQuery = true)
-    void deleteQrCodeLib(String uid);
 }
