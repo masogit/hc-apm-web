@@ -16,4 +16,6 @@ public interface AuditTargetRepository extends GenericRepositoryUUID<AuditTarget
     @Transactional
     @Modifying
     public void deleteBySystemCaseUid(String systemCaseUid);
+
+    AuditTarget findBySystemCaseUidAndAndTarget(String systemCaseUid, Integer target);
 }

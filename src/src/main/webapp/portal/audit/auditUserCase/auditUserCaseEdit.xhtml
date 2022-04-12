@@ -30,7 +30,7 @@
                             <p:ajax event="change" update="target"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <!--<f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.zone} - #{entry.version}" itemValue="#{entry.uid}"/>-->
-                            <f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.type == 1 ? entry.zone.concat('-').concat(entry.version) : '质控'}" itemValue="#{entry.uid}"/>
+                            <f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.type == 1 ? entry.zone.concat(' - ').concat(entry.version).concat(' - ').concat(entry.versionNumber) : '质控'}" itemValue="#{entry.uid}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>

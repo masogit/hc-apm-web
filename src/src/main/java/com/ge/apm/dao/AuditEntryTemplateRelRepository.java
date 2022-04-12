@@ -22,8 +22,8 @@ public interface AuditEntryTemplateRelRepository extends GenericRepositoryUUID<A
     @Modifying
     public void deleteByEntryUid(String entryUid);
 
-    @Query(value = "SELECT c FROM AuditTemplate c WHERE c.uid in (SELECT r.templateUid FROM  AuditEntryTemplateRel r WHERE r.entryUid = ?1 and r.orderBy=?2)")
-    public List<AuditTemplate> entryAndTemplateList( String entryUid, Integer orderBy);
+    @Query(value = "SELECT c FROM AuditTemplate c WHERE c.uid in (SELECT r.templateUid FROM  AuditEntryTemplateRel r WHERE r.entryUid = ?1 )")
+    public List<AuditTemplate> entryAndTemplateList( String entryUid);
 
     @Query(value = "SELECT c FROM AuditTemplate c WHERE c.uid in (SELECT r.templateUid FROM  AuditEntryTemplateRel r WHERE r.entryUid = ?1)")
     public List<AuditTemplate> auditTemplateList( String entryUid);

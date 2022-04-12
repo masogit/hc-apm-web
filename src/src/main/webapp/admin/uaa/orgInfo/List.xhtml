@@ -6,16 +6,6 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
-        <script type="text/javascript">
-            function deleteAfter() {
-               var failureType=document.getElementById("editForm:failureType").innerText
-               if(failureType!= null ){
-                   if(failureType == 1){
-                       PF('failureModal').show();
-                   }
-               }
-            }
-        </script>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{msg.OrgAdmin}"/>
@@ -60,7 +50,7 @@
                                     <p:commandButton id="createHospital" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Hospital}" actionListener="#{orgInfoController.prepareCreateHospital}" update=":editForm:editPanel" disabled="#{orgInfoController.isCreateHospitalDisabled}"/>
                                     <p:commandButton id="createSite" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Site}" actionListener="#{orgInfoController.prepareCreateSite}" update=":editForm:editPanel" disabled="#{orgInfoController.isCreateSiteDisabled}"/>
                                     <p:commandButton id="createDept" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Department}" actionListener="#{orgInfoController.prepareCreateDepartment}" update=":editForm:editPanel" disabled="#{orgInfoController.isCreateDepartmentDisabled}"/>
-                                    <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{orgInfoController.deleteSelectedOrg}" update=":editForm" oncomplete="deleteAfter();" disabled="#{empty orgInfoController.selected or empty orgInfoController.selected.id}">
+                                    <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{orgInfoController.deleteSelectedOrg}" update=":editForm" disabled="#{empty orgInfoController.selected or empty orgInfoController.selected.id}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                 </h:panelGrid>
@@ -146,14 +136,6 @@
                             </h:panelGroup>
                         </div>
                     </div>
-                    <p:dialog id="Active" widgetVar="failureModal" width="350" height="100" modal="true" resizable="true" draggable="true" header="删除确认" closable="true">
-
-                        <p class="p-m-0">该组织下有二维码存在,是否要先删除二维码?</p>
-                        <h:panelGrid columns="3">
-                            <p:commandButton process="@this" icon="ui-icon-close" value="删除" actionListener="#{orgInfoController.deleteFailureCode}" update=":editForm" oncomplete="PF('failureModal').hide()" />
-                            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('failureModal').hide()"/>
-                        </h:panelGrid>
-                    </p:dialog>
                 </h:form>
             </div>
         </div>
