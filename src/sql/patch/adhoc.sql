@@ -2,11 +2,11 @@ INSERT INTO sys_role("name", role_desc, home_page) VALUES( 'ReviewSystemAdminist
 INSERT INTO sys_role("name", role_desc, home_page) VALUES( 'PMAdministrator', '评审管理组', '/');
 INSERT INTO sys_role("name", role_desc, home_page) VALUES( 'ReviewAdministrator', '评审管理员', '/');
 delete from  	qr_code_lib  where id in(
-select id  from  qr_code_lib  where	tenant_uid=(select  uid  from org_info  where name='山东阳光融合医院（待删除）')
-        or  institution_uid=(select  uid  from org_info  where name='山东阳光融合医院（待删除）')
-        or  hospital_uid=(select  uid  from org_info  where name='山东阳光融合医院（待删除）')
-        or  site_uid=(select  uid  from org_info  where name='山东阳光融合医院（待删除）')
-        or  org_id=(select  id  from org_info  where name='山东阳光融合医院（待删除）')
+select id  from  qr_code_lib  where	tenant_uid=(select  uid  from org_info  where name='山东阳光融和医院（待删除）')
+        or  institution_uid=(select  uid  from org_info  where name='山东阳光融和医院（待删除）')
+        or  hospital_uid=(select  uid  from org_info  where name='山东阳光融和医院（待删除）')
+        or  site_uid=(select  uid  from org_info  where name='山东阳光融和医院（待删除）')
+        or  org_id=(select  id  from org_info  where name='山东阳光融和医院（待删除）')
 
 );
 delete from  	qr_code_lib  where id in(
