@@ -54,7 +54,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private String  address;
     private String  contactPerson;
     private String  contactPhone;
-    private Integer failureType;
     private UserCommonService userCommonService;
 
     private OrgInfo currentOrg;
@@ -442,7 +441,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void deleteSelectedOrg() {
-        failureType=null;
         if (canDelete()) {
             int tenantId = selected.getSiteId();
             String institutionUID = selected.getInstitutionUID();
@@ -526,7 +524,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
         if (qrcodeList != null && !qrcodeList.isEmpty()) {
             WebUtil.addErrorMessage("该组织下有二维码存在,不能删除.");
-            failureType=1;
             return false;
         }
 
@@ -567,32 +564,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
         return true;
     }
-    public void deleteFailureCode(){
-        try {
-            List<SearchFilter> checkFilters = new ArrayList<>();
-            checkFilters.clear();
-            checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
-            checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
-            checkFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
-            checkFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
-            checkFilters.add(new SearchFilter("orgId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
-            QrCodeLibRepository qrcodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
-            List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
-            if(CollectionUtils.isEmpty(qrcodeList)){
-                failureType=null;
-                WebUtil.addErrorMessage("该组织下二维码已删除");
-            }else{
-                for (QrCodeLib qrCodeLib : qrcodeList) {
-                    qrcodeLibDao.deleteQrCodeLib(qrCodeLib.getUid());
-                }
-                failureType=null;
-                WebUtil.addErrorMessage("该组织下二维码已删除");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            WebUtil.addErrorMessage("删除二维码失败");
-        }
-    }
+
     private String preName;
 
     public void onSelectTreeNode(NodeSelectEvent event) {
@@ -759,11 +731,4 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         this.contactPhone = contactPhone;
     }
 
-    public Integer getFailureType() {
-        return failureType;
-    }
-
-    public void setFailureType(Integer failureType) {
-        this.failureType = failureType;
-    }
 }
