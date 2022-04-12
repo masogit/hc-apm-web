@@ -1,8 +1,10 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.QrCodeLib;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
 
 import java.util.List;
