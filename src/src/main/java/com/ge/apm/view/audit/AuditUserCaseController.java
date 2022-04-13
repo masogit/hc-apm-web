@@ -83,7 +83,6 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
             selectedOrg = orgInfoRepository.findByUid(selectedOrgUid);
         }else{
             selectedOrg = new OrgInfo();
-            selectedOrg.setUid("请选择院区");
             selectedOrg.setName("请选择院区");
         }
 
@@ -180,8 +179,17 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
             WebUtil.addErrorMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Failed") + "！" + e.getMessage());
             return "";
         }
-        return "auditUserCaseList?faces-redirect=true&selectedTenantUid="
-                + this.selectedTenant.getUid() + "&selectedOrgUid=" + this.selectedOrg.getUid();
+
+        StringBuilder url = new StringBuilder("auditUserCaseList?faces-redirect=true");
+
+        if(this.selectedTenant != null && StringUtils.isNotBlank(this.selectedTenant.getUid())){
+            url.append("&selectedTenantUid=").append(this.selectedTenant.getUid());
+        }
+        if(this.selectedOrg != null && StringUtils.isNotBlank(this.selectedOrg.getUid())){
+            url.append("&selectedOrgUid=").append(this.selectedOrg.getUid());
+        }
+
+        return url.toString();
     }
 
     /**
@@ -264,7 +272,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
      * @return
      */
     public List<OrgInfo> getSiteByTenantForListPage(){
-        if(StringUtils.isEmpty(this.selectedTenant.getUid())){
+        if(this.selectedTenant == null || StringUtils.isEmpty(this.selectedTenant.getUid())){
             return new ArrayList<>();
         }
         List<OrgInfo> list = orgInfoRepository.findAllSiteByTenantUid(this.selectedTenant.getUid());
