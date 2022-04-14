@@ -52,6 +52,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     BlobObjectRepository blobObjectRepository;
 
     /**
+     * 2022新逻辑  service
+     */
+    @Autowired
+    private ZkbContractCatQuotaHistoryService zkbContractCatQuotaHistoryService;
+
+    /**
      * 设备
      */
     @Autowired
@@ -1936,6 +1942,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if (!ZkbFePartOrderSparePartDetailController.badReturnValue.equals(zkbFePartOrder.getReturnType())) {
             if (zkbFePartOrder.getQty() != null && zkbFePartOrder.getQty() > 0) {
                 this.moveProbe(5, zkbContract, zkbFePartOrder.getQty(), showZkbPoProbeQuotaType, zkbFePartOrder.getZkbPoProbeQuotaType(), userAccount, zkbFePartOrder, true, i18Map.get("GEAdminAccept"));
+            }
+            //TODO liyonjian ZKB - 2022年新探头逻辑
+            if(true){
+                zkbContractCatQuotaHistoryService.updateZkbFeContractCatQuotaHistoryStatus(zkbContract,zkbFePartOrder,userAccount,"N");
             }
             if (StringUtils.isNotBlank(zkbFePartOrder.getContractCatId())) {
                 this.updateZkbContractCat(userAccount, true, zkbFePartOrder.getContractCatId());
