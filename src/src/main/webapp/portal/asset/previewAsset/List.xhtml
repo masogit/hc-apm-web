@@ -86,7 +86,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:ajax  event="rowSelect" listener="#{assetPreviewController.onSelectAsset()}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />
-                        <p:column headerText="子设备" id="imgs" exportable="false">
+                        <p:column headerText="子设备" id="imgs" exportable="false" width="30">
                             <p:graphicImage url="/portal/asset/previewAsset/dot.png" style="width: 10px; height: 10px;" rendered="#{item.rank != 0}"/>
                         </p:column>
 
