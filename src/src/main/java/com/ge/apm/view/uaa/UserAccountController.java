@@ -740,11 +740,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                             List<String> userUids = node.getUserUids();
                            if (userUids!=null && userUids.contains(selected.getUid())){
                                WebUtil.addErrorMessage("该用户为多级审核人，不能删除！");
-                            return;
+                                return;
                            }
                     }
                 }
             }
+        }
+        if(getApproveByUserAccount()){
+            WebUtil.addErrorMessage("该用户为审核人员，不能删除！");
+            return;
         }
         if (canDelete()) {
             //super.delete();
@@ -764,7 +768,27 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         }
     }
+    public boolean getApproveByUserAccount(){
+        AuditGroupConfigurationRepository auditGroupConfigurationRepository=WebUtil.getBean(AuditGroupConfigurationRepository.class);
+        List<AuditGroupConfiguration> auditGroupConfigurations = auditGroupConfigurationRepository.find();
+        if(auditGroupConfigurations!=null && !auditGroupConfigurations.isEmpty()){
+            for (AuditGroupConfiguration auditGroupConfiguration:auditGroupConfigurations){
+                String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+                List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+                if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                    for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                        AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                        List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                        if (userUids!=null && userUids.contains(selected.getUid())){
+                            return true;
+                        }
+                    }
 
+                }
+            }
+        }
+        return false;
+    }
     private Boolean canDelete() {
         List<SearchFilter> checkFilters = new ArrayList<>();
         checkFilters.add(new SearchFilter("dispatchUserId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
