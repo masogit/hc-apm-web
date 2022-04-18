@@ -325,7 +325,7 @@ public class UserContextService implements Serializable {
                     AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
                     List<String> userUids = auditGroupConfigurationNode.getUserUids();
                     UserAccount user = userAccountRepository.getByUid(userUids.get(0));
-                    if (userAccount.getUid().equals(user.getUid())){
+                    if (user!=null && userAccount.getUid().equals(user.getUid())){
                         return true;
                     }
                 }
