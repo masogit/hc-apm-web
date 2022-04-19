@@ -1,38 +1,31 @@
 package com.ge.apm.view.approval;
 
+import com.ge.apm.dao.BudgetApplicationRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
-import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.domain.AdverseEvents;
 import com.ge.apm.domain.MultiLevelApproval;
 import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.V2_WorkOrder;
+import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
-import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.constant.ApprovalConstant;
-import com.ge.apm.service.simpleparts.SimplePartsRequestLineItemService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.web.TransactionForm;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 
 @ManagedBean
 @ViewScoped
@@ -44,6 +37,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private V2_WorkOrderRepository v2_WorkOrderRepository;
     private V2_PmOrderRepository v2_PmOrderRepository;
     private V2_WorkOrderService woService;
+    private BudgetApplicationRepository budgetDao;
 
     @Setter
     @Getter
@@ -78,6 +72,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         v2_PmOrderRepository= WebUtil.getBean(V2_PmOrderRepository.class);
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
+        budgetDao = WebUtil.getBean(BudgetApplicationRepository.class);
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -117,6 +112,11 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 list.add(adverseEvents);
                 primaryApprovalData = list;
                 secondaryApprovalData = adverseEvents;
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
+                BudgetApplication budgetApplication = budgetDao.findById(multiLevelApproval.getBusinessUid());
+                primaryApprovalData = budgetApplication;
+                secondaryApprovalData = budgetApplication.getBudgetAssets();
                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
