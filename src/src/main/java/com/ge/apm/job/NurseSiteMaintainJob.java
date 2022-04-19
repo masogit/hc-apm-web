@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,6 +82,7 @@ public class NurseSiteMaintainJob {
             doJob();
         } catch (Exception e) {
             // TODO: handle exception
+            e.printStackTrace();
             LOGGER.error(e.getMessage());
             if (firstJob != null) {
                 firstJob.setLog(e.getMessage().substring(0, Math.min(240, e.getMessage().length())));
@@ -374,8 +376,27 @@ public class NurseSiteMaintainJob {
         Set<Tuple2<LocalDate, Integer>> scheduleDateSet = listMaintain.stream()
                 .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
                         i.getSequence())).collect(Collectors.toSet());
-        deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
-        createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig );
+        // ‘覆盖历史未完成检查’，先删除，然后新建未完成的检查，如果是‘修改将来未完成检查’，只需要删除更新配置后的未完成检查
+        if(nurseSiteMaintainConfig.getApplyDirectly()){
+            deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
+            createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig );
+
+        }else if(nurseSiteMaintainConfig.getApplyFeatureData()){
+            LocalDate applyFeatureTime = nurseSiteMaintainConfig.getApplyFeatureTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            List<NurseSiteMaintain> maintainList = listMaintain.stream().filter(s -> {
+                // 筛选，去除集合中计划检查日期为今天以及今天之前的
+                LocalDate scheduleDate = Instant.ofEpochMilli(s.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+                return applyFeatureTime.until(scheduleDate, ChronoUnit.DAYS) > 0;
+            }).collect(Collectors.toList());
+
+            Set<Tuple2<LocalDate, Integer>> featureScheduleDateSet = maintainList.stream()
+                    .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
+                            i.getSequence())).collect(Collectors.toSet());
+
+            deleteMaintains(maintainList.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
+            createAndSaveNurseSiteMaintains(featureScheduleDateSet, userUid,nurseSiteMaintainConfig);
+        }
+
     }
 
     public void deleteUnCheckedMaintainData(String configId, String assetUid, boolean all) {
