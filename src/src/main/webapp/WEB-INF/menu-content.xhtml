@@ -10,6 +10,7 @@
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.accessContains('asset')}">
                 <!--<p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>-->
                 <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.accessContains('asset.info')}"/>
+                <p:menuitem id="um031" value="主子设备信息" outcome="/portal/asset/previewAsset/List" rendered="#{userContextService.accessContains('asset.info') and userContextService.enableAssetPreview()}"/>
 
 <!--                <p:menuitem value="地图" outcome="/portal/asset/fileAttachment/mapGD.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead')}"/>-->
                 <p:menuitem value="资产批量修改院区" outcome="/portal/asset/bulkEdit/AssetBulkEditSite.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead') and userContextService.isAllowAssetBatchUpdate()}"/>

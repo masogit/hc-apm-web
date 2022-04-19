@@ -163,6 +163,24 @@ public class Supplier implements Serializable, ChineseName {
     @Temporal(TemporalType.TIMESTAMP)
     private Date productRegistrationEndDate;
 
+    //生产许可证到期日期
+    @Column(name = "production_license_expire_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date productionLicenseExpireDate;
+
+    //注册许可证到期日期
+    @Column(name = "business_license_expire_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date businessLicenseExpireDate;
+
+    //注册证到期日期
+    @Column(name = "registration_certificate_expire_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date registrationCertificateExpireDate;
+
     //供应商状态
     private String status = "Enable";
 
@@ -479,6 +497,30 @@ public class Supplier implements Serializable, ChineseName {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getProductionLicenseExpireDate() {
+        return productionLicenseExpireDate;
+    }
+
+    public void setProductionLicenseExpireDate(Date productionLicenseExpireDate) {
+        this.productionLicenseExpireDate = productionLicenseExpireDate;
+    }
+
+    public Date getBusinessLicenseExpireDate() {
+        return businessLicenseExpireDate;
+    }
+
+    public void setBusinessLicenseExpireDate(Date businessLicenseExpireDate) {
+        this.businessLicenseExpireDate = businessLicenseExpireDate;
+    }
+
+    public Date getRegistrationCertificateExpireDate() {
+        return registrationCertificateExpireDate;
+    }
+
+    public void setRegistrationCertificateExpireDate(Date registrationCertificateExpireDate) {
+        this.registrationCertificateExpireDate = registrationCertificateExpireDate;
     }
 
     @Override

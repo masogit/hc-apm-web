@@ -529,7 +529,7 @@
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                         </p:commandButton>
                                     </p:dataList>
-                                    <p:fileUpload rendered="#{assetArrivedListEditController.activeSupplier()}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUploadJiuYuan}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                    <p:fileUpload id="jiuyuantypeasset4" rendered="#{assetArrivedListEditController.activeSupplier()}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUploadJiuYuan}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                   multiple="true"  sizeLimit="100000000"  update="accessoryFinishedList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                 </h:panelGroup>
                             </p:fieldset>
@@ -588,7 +588,7 @@
                                     </p:selectBooleanCheckbox>
                                 </h:panelGrid>
                                 <p:commandButton validateClient="true"  actionListener="#{assetArrivedListEditController.applyChange}" value="#{msg.Save}" update=":AssetArrivalEditForm  :growl" icon="ui-icon-check" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
-                                <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="arrivalList?faces-redirect=true" update="display,:AssetArrivalEditForm :growl"/>
+                                <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back"  actionListener="#{assetArrivedListEditController.closecopyForm}" action="arrivalList?faces-redirect=true" update="display,:AssetArrivalEditForm :growl"/>
                                 <p:commandButton validateClient="true" value="#{msg.Submit}"  actionListener="#{assetArrivedListEditController.submitArrivalList}" update=":AssetArrivalEditForm :growl" disabled="#{assetArrivedListEditController.selected.status ne 1}" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
                             </h:panelGroup>
                         </h:panelGroup>
@@ -629,7 +629,7 @@
             </h:form>
         </p:dialog>
         <script type="text/javascript">
-            var arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm:arrivalListAttachment'),{
+            var arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm'),{
                 // url:'data-original',
                 show: function() {
                     arrivalListImg.update();

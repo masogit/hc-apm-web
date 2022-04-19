@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition>
+
+    <!-- 资产名称 -->
+    <p:column headerText="#{msg.assetName}" width="100" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+        <h:outputText value="#{empty item.name ? item.assetName : item.name}"/>
+    </p:column>
+
+    <!-- 资产编号 -->
+    <p:column headerText="#{msg.AssetID}" width="125" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+        <h:outputText value="#{empty item.financingNum ? '暂无' : item.financingNum}"/>
+    </p:column>
+
+    <!-- 设备编号 -->
+    <p:column headerText="#{msg.departNum}" width="125" rendered="#{currentCustomConfigController.showImportantField('departNum')}">
+        <h:outputText value="#{item.departNum}"/>
+    </p:column>
+
+    <!-- 使用部门 -->
+    <p:column headerText="#{msg.assetDeptName}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('assetDeptName')}">
+        <h:outputText value="#{item.assetDeptName}"/>
+    </p:column>
+
+    <!-- 所属部门 -->
+    <p:column headerText="#{msg.clinicalDeptName}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('clinicalDeptName')}">
+        <h:outputText value="#{item.clinicalDeptName}"/>
+    </p:column>
+
+    <!-- 使用人 -->
+    <p:column headerText="#{msg.clinicalOwnerName}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('clinicalOwnerName')}">
+        <h:outputText value="#{item.clinicalOwnerName}" />
+    </p:column>
+
+    <!-- 安装位置 -->
+    <p:column headerText="#{msg.locationName}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('locationName')}">
+        <h:outputText value="#{item.locationName}" />
+    </p:column>
+
+    <!-- 资产状态 -->
+    <p:column headerText="#{msg.deviceStatus}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('deviceStatus')}">
+        <h:outputText value="#{item.deviceStatus}" />
+    </p:column>
+
+    <!-- 当前状态 -->
+    <p:column headerText="#{msg.status}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('status')}">
+        <h:outputText value="#{item.status}" />
+    </p:column>
+
+    <!-- 在用? -->
+    <p:column headerText="#{msg.isValid}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('isValid')}">
+        <h:outputText value="#{item.isValid}" />
+    </p:column>
+
+    <!-- 采购日期 -->
+    <p:column headerText="#{msg.purchaseDate}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('purchaseDate')}">
+        <h:outputText value="#{item.purchaseDate}" />
+    </p:column>
+
+    <!-- 采购原值 -->
+    <p:column headerText="#{msg.purchasePrice}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('purchasePrice')}">
+        <h:outputText value="#{item.purchasePrice}" />
+    </p:column>
+
+    <!-- 二维码 -->
+    <p:column headerText="#{msg.qrCode}(旧)" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('qrCode')}">
+        <h:outputText value="#{item.qrCodeOld}" />
+    </p:column>
+    <p:column headerText="#{msg.qrCode}(新)" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('qrCode')}">
+        <h:outputText value="#{item.qrCodeNew}" />
+    </p:column>
+
+    <!-- 启用日期 -->
+    <p:column headerText="#{msg.installDate}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('installDate')}">
+        <h:outputText value="#{item.installDate}" />
+    </p:column>
+
+    <!-- 设备型号 -->
+    <p:column headerText="#{msg.functionType}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('functionType')}">
+        <h:outputText value="#{item.functionType}" />
+    </p:column>
+
+    <!-- 修改人 contains-->
+    <p:column headerText="#{msg.ModifiedBy}" width="80" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
+        <h:outputText value="#{item.createdBy}"/>
+    </p:column>
+
+    <!-- 修改时间 -->
+    <p:column headerText="#{msg.modifiedTime}" width="160" filterBy="#{item.createdDate}" filterMatchMode="GTE">
+        <f:facet name="filter">
+            <p:inputText id="filterLastModifiedDateAll" widgetVar="varFilterLastModifiedDateAll" />
+        </f:facet>
+        <h:outputText value="#{item.createdDate}">
+            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+        </h:outputText>
+    </p:column>
+
+    <!-- 导出文件 -->
+    <f:facet name="{Toolbar}">
+        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
+                         class="btn btn-sm btn-gray"
+                         ajax="false">
+            <p:dataExporter type="xls" target="datalistView"
+                            fileName="#{msg.ModifyRecord}"/>
+        </p:commandButton>
+    </f:facet>
+
+</ui:composition>
+</html>
+
