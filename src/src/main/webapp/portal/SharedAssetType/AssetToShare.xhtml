@@ -86,6 +86,9 @@
                         <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE" >
                             <h:outputText value="#{item.departNum}"/>
                         </p:column>
+                        <p:column headerText="#{msg.QRCode}" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
 
                         <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>

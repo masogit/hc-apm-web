@@ -2893,6 +2893,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'LifeCycleBeyond', '使用年限超过国家或厂家规定', 'Life cycle beyond that is specified by the country or manufacturer', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MainFunctionIsDamaged', '主要功能损坏，无法修复或维修成本过高', 'Main function is damaged, cannot be repaired or the maintenance cost is too high', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TheEquipmentIsDefective', '设备有缺陷，国家警示需强制报废', 'The equipment is defective and should be forcibly terminated according to the national warning', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AccessoriesOrConsumablesNotAvailable', '配件或耗材无法获取', 'Accessories or consumables not available', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UploadedFileTerminatedInBatch', '上传文件批量报废', 'Uploaded File Terminated in Batch', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetIDRequired', '文件中填入要批量报废的资产数据，资产编号必填', 'Fill in the file with the asset data to be terminated in batch with the asset ID required', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BasicInformation', '基本资料', 'Basic Information', NULL, '-1');
@@ -3289,6 +3290,7 @@
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PMPlanTime', '保养计划时间', 'PM Plan Time', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetSearchingConditions', '相关设备查询条件([所属院区]为必选条件，其它查询条件最少要填写或选择一个)', 'Relevant equipment query conditions (the hospital area to which it belongs) is a mandatory condition, other query conditions must be filled in or selected at least one)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetSearchingConditions2', '相关设备查询条件([所属院区]为必选条件，其它查询条件设备分类和所属科室最少要填写或选择一个)', 'Relevant equipment query conditions (the hospital area to which it belongs) is a mandatory condition, other query conditions must be filled in or selected at least one)', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'relationAsset', '相关设备', 'relationAsset', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'relationAttachment', '相关附件', 'relationAttachment', NULL, '-1');
 
@@ -4507,3 +4509,110 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','countyAreaOrderType','开单类型','Order Type',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('countyAreaOrderType', '1', '主动开单', 'Initiative Order', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('countyAreaOrderType', '2', '被动开单', 'Passive Order', NULL, '-1');
+
+-- 质控评审
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','config.auditItemConfig','评审知识库配置-解读','Review Knowledge Base Configuration - Interpretation',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AuditItemConfig','评审知识库配置-解读','Review Knowledge Base Configuration - Interpretation',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','contentType','内容类型','Content Type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','content','内容','Content',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','mark','序号','Mark',NULL,-1);
+-- 质控评审知识库内容类型
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditItemType','1','指引','Guidelines',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditItemType','2','概述','Summary',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditItemType','3','解读','Interpretation',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditItemType','4','得分点','Scoring points',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditItemType','5','失分点','Lost score points',NULL,-1);
+-- 质控评审参考模板
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','config.AuditTemplate','评审知识库配置-参考模板','Review knowledge base configuration - reference template',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AuditTemplate','评审知识库配置-参考模板','Review knowledge base configuration - reference template',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','TemplateName','模板名称','Template name',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('entryType','2','款','payment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('entryType','3','指标','target',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('Scoring','1','折算分制','Converted points system',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('Scoring','2','扣分制','deduction system',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('Scoring','3','累加分制','cumulative points system',NULL,-1);
+-- 质控评审PM超管配置页面
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','config.AuditUserCase','省份&版本管理','Province & Version Management',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AuditUserCase','省份&版本管理','Province & Version Management',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Target','目标','Target',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','tenant','租户','Tenant',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Initialize','初始化','Initialize',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','InitializeConformation','初始化确认','Fallback Conformation',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','InitializeConformationMsg','请务必确认是否执行初始化，执行初始化系统将初始化页面至初始设置项，历史资料暂不留存！','Please be sure to confirm whether to perform initialization, the initialization system will initialize the page to the initial settings item, and the historical data will not be retained!',NULL,-1);
+-- 质控评审省份版本类型
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('VersionType','1','评审','Review',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('VersionType','2','质控','Quality control',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('targetType','1','三甲','top three',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('targetType','2','三乙','Trib',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('targetType','3','三丙','Three C',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('targetType','4','未定','undecided',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'provinceVersionConfiguration', '省份&版本配置', 'Province version configuration', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Success','成功','Success',NULL,-1);
+-- 质控评审event
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','config.auditEvent','质控评审事件','Quality control review event',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AuditEvent','质控评审事件','Quality control review event',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','operator','操作人','Operator',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','eventTime','事件时间','Event time',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','eventType','事件类型','Event type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','eventResult','事件结果','Event result',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Version','版本','Version',NULL,-1);
+-- 质控评审事件类型
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_CONGFIG_ITEM','添加系统知识库','Add system item',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EDIT_CONFIG_ITEM','编辑系统知识库','Edit system item',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','DELETE_CONFIG_ITEM','删除系统知识库','Delete system item',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_TEMPLATE','添加系统模板','Add system template',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EDIT_TEMPLATE','编辑系统模板','Edit system template',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','DELETE_TEMPLATE','删除模板','Delete template',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_SYSTEM_CASE','添加系统版本','Add system case',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EDIT_SYSTEM_CASE','编辑系统版本','Edit system case',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ENABLE_SYSTEM_CASE','启用系统版本','Enable system case',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EXPIRE_SYSTEM_CASE','过期系统版本','Expire system case',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','DELETE_SYSTEM_CASE','删除系统版本','Delete system case',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_SYSTEM_ENTRY','添加系统条款','Add system entry',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EDIT_SYSTEM_ENTRY','编辑系统条款','Edit system entry',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','DELETE_SYSTEM_ENTRY','删除系统条款','Delete system entry',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ENABLE_TENANT_AUDIT','租户启用评审权限','Enable tenant audit',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_CASE','创建租户适合的版本','Add tenant case',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ARCHIEVE_CASE','归档租户版本','Archieve tenant case',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','INIT_TENANT_AUDIT','初始化租户版本','Init tenant case',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ASSIGN_POINT','分配自评到个人','Assign point',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','COMPUTE_CASE','启动自评','Compute case',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EXPORT_RESULT','导出结果excel','Export excel',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_AUDIT_RESULT','添加实际评审结果','Add audit result',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','UPLOAD_FILE','用户上传文件','User upload file',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','UPLOAD_TEMPLATE','用户上传模板','User upload template',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','DELETE_FILE','用户删除文件','Delete file',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EDIT_POINT','编辑更新自评','Edit point',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','QUIT_OWNER','退回管理员重新分配','Quit owner',NULL,-1);
+-- 质控评审事件结果
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEventResult','success','成功','Success',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEventResult','fail','失败','Fail',NULL,-1);
+-- 质控评审配置菜单
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','config.auditConfig','质控评审配置','Quality control review configuration',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','auditConfig','质控评审配置','Quality control review configuration',NULL,-1);
+-- 质控评审管理-状态
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditCaseStatus','1','发布','publish',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditCaseStatus','2','过期','expired',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EXPIRED_TENANT_AUDIT','过期租户版本','Expired tenant version',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','expired','过期','Expired',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','AuditCaseExpiredConformation','过期确认','Expired Conformation',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','AuditCaseExpiredConformationMsg','确认是否过期该版本？','Confirm if the version expires?',NULL,-1);
+-- 供应商三证到期时间
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SupplierCertificateManage','供应商资质证书管理','Supplier qualification certificate management',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','productionLicenseExpireDays','生产许可证到期提醒提前天数','The number of days in advance for the production license expiration reminder',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ProductionLicenseExpireTimes','生产许可证到期提醒提前次数','The number of production license expiration reminder advances',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BusinessLicenseExpireDays','经营许可证到期提醒提前天数','The number of days in advance for the reminder of the expiration of the operating license',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BusinessLicenseExpireTimes','经营许可证到期提醒提前次数','The number of times the business license expires in advance',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RegistrationCertificateExpireDays','注册证到期提醒提前天数','The number of days in advance of the reminder of the expiration of the registration certificate',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RegistrationCertificateExpireTimes','注册证到期提醒提前次数','The number of times the registration certificate expires in advance',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ProductionLicenseExpireDate','生产许可证到期时间','Production license expiration time',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BusinessLicenseExpireDate','经营许可证到期时间','The expiry time of the operating license',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RegistrationCertificateExpireDate','注册证到期时间','Registration certificate expiry time',NULL,-1);
+
+-- 维修->恢复时间不能小于接单时间
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RepairRecoveryTimeCheck','恢复时间不能小于接单时间','The recovery time cannot be less than the order time',NULL,-1);
