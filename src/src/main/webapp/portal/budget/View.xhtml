@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+
+    <p:dialog id="BudgetApplicationViewDlg" widgetVar="BudgetApplicationViewDialog" modal="true" resizable="true"
+              draggable="true" appendTo="@(body)" width="1000" height="600"
+              header="#{budgetController.CRUDActionName}#{msg.Blank}#{msg.BudgetApplication}">
+        <h:form id="BudgetApplicationViewForm">
+            <h:panelGroup id="display">
+                <p:fieldset legend="#{msg.BudgetInfo}">
+                    <p:dataTable id="budgetlist" value="#{budgetController.selected}"
+                                 var="item" widgetVar="varbudgetDatalist"
+                                 lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                                 sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+                        <p:column headerText="#{msg.ApplicationNum}">
+                            <h:outputText value="#{item.applicationNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Applicant}">
+                            <h:outputText value="#{item.applicant.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationDept}">
+                            <h:outputText value="#{item.applicationDept.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationTotalAmount}">
+                            <h:outputText value="#{item.totalAmount}">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationDate}">
+                            <h:outputText value="#{item.applicationDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+
+                <p:fieldset legend="#{msg.BudgetAssetInfo}">
+                    <p:dataTable id="budgetAssetlist" value="#{budgetController.selected.budgetAssets}"
+                                 var="item" widgetVar="varbudgetAssetDatalist" lazy="true" paginator="true"
+                                 paginatorPosition="top" paginatorAlwaysVisible="true" rowKey="#{item.id}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
+
+                        <p:column headerText="#{msg.StockType}">
+                            <h:outputText value="#{fieldMsg.fieldValue('budgetStockType', item.stockType)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.deviceNum}">
+                            <h:outputText value="#{item.asset.departNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.EquipmentName}">
+                            <h:outputText value="#{item.asset.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.AssetBrand}">
+                            <h:outputText value="#{item.asset.brand.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.AssetType}">
+                            <h:outputText value="#{item.asset.assetType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Unit}">
+                            <h:outputText value="#{item.unit}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationQuantity}">
+                            <h:outputText converter="javax.faces.Number" value="#{item.applicationQuantity}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationPrice}">
+                            <h:outputText value="#{item.applicationPrice}">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationAmount}">
+                            <h:outputText value="#{item.applicationAmount}">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+
+                <p:fieldset
+                        legend="#{msg.BudgetApprovalInfo}: #{budgetController.selected.approvalConfig.approvalName}">
+                    <p:dataTable id="budgetApprovallist" value="#{budgetController.selected.budgetApprovals}"
+                                 var="item" widgetVar="varbudgetApprovalDatalist"
+                                 lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                                 sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+                        <p:column headerText="审批单号">
+                            <h:outputText value="#{item.approvalNumber}"/>
+                        </p:column>
+                        <p:column headerText="实际审批人">
+                            <h:outputText value="#{item.actualApproverName}"/>
+                        </p:column>
+                        <p:column headerText="审批级别">
+                            <h:outputText value="#{item.approvalLevel}级审批人"/>
+                        </p:column>
+                        <p:column headerText="审批意见">
+                            <h:outputText value="#{item.approvalOpinion}"/>
+                        </p:column>
+                        <p:column headerText="审批节点状态">
+                            <h:outputText
+                                    value="#{multiLevelApprovalGlobalController.getApprovalNodeStatus(item.approvalNodeStatus)}"/>
+                        </p:column>
+                        <p:column headerText="审批时间">
+                            <h:outputText value="#{item.actualApproverDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+
+                <br/>
+                <p:commandButton rendered="#{budgetController.deleteAction}"
+                                 actionListener="#{budgetController.delete}" value="#{msg.Delete}"
+                                 update="display,:BudgetApplicationViewDlg, budgetTabView, :growl"
+                                 oncomplete="handleSubmit(args, 'BudgetApplicationViewDialog');"/>
+                <p:commandButton immediate="true" value="#{msg.Close}"
+                                 onclick="PF('BudgetApplicationViewDialog').hide()"/>
+
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+</html>

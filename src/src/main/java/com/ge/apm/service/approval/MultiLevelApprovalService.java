@@ -6,11 +6,14 @@ import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.simpleparts.SimplePartsRequest;
+import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.WechatSendMsgService;
-import com.ge.apm.service.constant.*;
+import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.constant.PmConstant;
+import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.simpleparts.SimplePartsConfigService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestService;
@@ -18,19 +21,19 @@ import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.view.budget.BudgetConstant;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.web.PmOrderActionForm;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -56,6 +59,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private V2_WorkOrderRepository v2_WorkOrderRepository;
     @Autowired
     private V2_PmOrderRepository v2_PmOrderRepository;
+    @Autowired
+    private BudgetApplicationRepository budgetApplicationRepository;
     @Autowired
     private V2_WorkOrderDetailRepository v2_WorkOrderDetailRepository;
     @Autowired
@@ -104,6 +109,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 return ApprovalConstant.APPROVAL_ASSET_TRANSFER;
             case ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS:
                 return ApprovalConstant.APPROVAL_ADVERSE_EVENTS;
+            case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
+                return ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT;
             default: return null;
         }
     }
@@ -251,6 +258,10 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 v2_PmOrderRepository.save(v2PmOrder);
                 this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null);
                 break;
+            case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
+                // 预算管理
+                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_NOT_APPROVED);
+                break;
             //备件审批
             default:
                 throw new RuntimeException("New Business type not handled yet");
@@ -333,7 +344,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
         if(null != configList &&configList.size()>0){
             logger.info("多级审核  configList : "+configList.toString());
-            if(ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType)){
+            if(ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType) || ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT.equals(busiType)){
                 return getPartsSteam(configList,amount);
             }else{
                 return configList.get(0);
@@ -348,7 +359,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         }
         List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
         if(null != configList &&configList.size()>0){
-            if(ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType) || ApprovalConstant.APPROVAL_ASSET_REPAIR.equals(busiType) || ApprovalConstant.APPROVAL_ASSET_MAINTAIN.equals(busiType)){
+            if(ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType) || ApprovalConstant.APPROVAL_ASSET_REPAIR.equals(busiType)
+                    || ApprovalConstant.APPROVAL_ASSET_MAINTAIN.equals(busiType) || ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT.equals(busiType)){
                 return getPartsSteam(configList,amount);
             }else{
                 return configList.get(0);
@@ -517,6 +529,10 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                     generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList, userAccountRepository.getByUid(v2PmOrder.getCurrentPersonId()));
                                 }
                                 break;
+                            case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
+                                // 预算管理
+                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_APPROVED);
+                                break;
                             default:
                                 throw new RuntimeException("New Business type not handled yet");
 //                                this.editParts(multiLevelApproval,ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
@@ -573,6 +589,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             date.setApprovalOpinion(null);
                             //生成下条待审批数据
                             multiLevelApprovalRepository.save(date);
+                            if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT) {
+                                updateBudget(multiLevelApproval.getBusinessUid(), BudgetConstant.BUDGET_APPLICATION_STATUS_IN_PROGRESS);
+                            }
                             //审批同意时 给审批人发送微信
                             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1+ApprovalConstant.WX_MESSAGE_APPROVAL_2+date.getBusinessNumber()+ApprovalConstant.WX_MESSAGE_APPROVAL_3;
                             this.sendWxMsg(weChatIdList,message,"待审批");
@@ -648,6 +667,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 return ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN;
             case ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS:
                 return ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS_NAME;
+            case ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT:
+                return ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME;
         }
         return null;
     }
@@ -685,5 +706,15 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             String message = responseMap.get("message").toString();
             throw new RuntimeException(message);
         }
+    }
+
+    // 预算管理
+    private void updateBudget(String businessUid, Integer approvalStatus) {
+        BudgetApplication budget = budgetApplicationRepository.findById(businessUid);
+        budget.setApplicationStatus(approvalStatus);
+        budget.setApprovalProgress(budget.getApprovalProgress() + 1);
+        budget.setApproverId(UserContextService.getCurrentUserAccount().getId());
+        budget.setApprovalDate(new Date());
+        budgetApplicationRepository.save(budget);
     }
 }
