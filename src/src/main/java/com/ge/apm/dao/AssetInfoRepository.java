@@ -110,6 +110,11 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
             "and (a.measure_grade <> 4 or a.measure_grade is null) order by a.id desc " , nativeQuery = true)
     public List<AssetInfo> getBySerialNumAndSiteUID_ForDbTable(String serialNum, String siteUID);
 
+    //excel 报表导出需要忽略大小写 所以使用jpa原生sql 加了ILIKE关键字( getBySerialNumAndSiteUID 方法是原本的业务)
+    @Query(value = "select * from asset_info a where a.is_deleted = false and a.qr_code ILIKE ?1 and a.site_uid=?2 " +
+            "and (a.measure_grade <> 4 or a.measure_grade is null) order by a.id desc " , nativeQuery = true)
+    public List<AssetInfo> getByQrCodeAndSiteUID_ForDbTable(String serialNum, String siteUID);
+
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and (a.name like concat('%',?2,'%') or a.name_py_code like concat('%',?2,'%'))order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);
 
