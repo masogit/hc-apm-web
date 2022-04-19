@@ -513,6 +513,17 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			LOGGER.error("checkSaveDisable"+e.getMessage());
 		}
 	}
+
+	public void applyChange(int type){
+		Boolean applyDirectly = this.selected.getApplyDirectly();
+		Boolean applyFeatureData = this.selected.getApplyFeatureData();
+		if(type == 1 && applyDirectly){
+			this.selected.setApplyFeatureData(false);
+		}
+		if(type == 2 && applyFeatureData){
+			this.selected.setApplyDirectly(false);
+		}
+	}
 	
 	public void onSelectedCheckItemChange(){
 		checkSaveDisable();

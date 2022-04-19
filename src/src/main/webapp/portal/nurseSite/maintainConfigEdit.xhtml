@@ -88,8 +88,13 @@
 					<ui:include src="assetList.xhtml"></ui:include>
 				</p:fieldset>
 			</h:panelGroup>
-			<h:panelGroup rendered="#{maintainConfigController.selected.id!=null}">
-				<p:selectBooleanCheckbox value="#{maintainConfigController.selected.applyDirectly}" label="覆盖历史未完成检查"/>
+			<h:panelGroup id="applyPanel" rendered="#{maintainConfigController.selected.id!=null}">
+				<p:selectBooleanCheckbox value="#{maintainConfigController.selected.applyDirectly}" label="覆盖历史未完成检查">
+					<p:ajax process="@this" listener="#{maintainConfigController.applyChange(1)}" update=":maintainConfigEditForm:applyPanel"></p:ajax>
+				</p:selectBooleanCheckbox>
+				<p:selectBooleanCheckbox value="#{maintainConfigController.selected.applyFeatureData}" label="修改将来未完成检查">
+					<p:ajax process="@this" listener="#{maintainConfigController.applyChange(2)}" update=":maintainConfigEditForm:applyPanel"></p:ajax>
+				</p:selectBooleanCheckbox>
 			</h:panelGroup>
 			<br />
 			<br />
