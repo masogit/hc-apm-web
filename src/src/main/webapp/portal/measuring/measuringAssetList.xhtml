@@ -32,7 +32,7 @@
                         <h:outputText value="#{item.financingNum}"/>
                     </p:column>
                     <p:column headerText="#{msg.QRCode}" width="150" sortBy="#{item.qrCode}"
-                              filterBy="#{item.qrCode}" filterMatchMode="LIKE" rendered="#{userContexService.isYunNanFuWai()}">
+                              filterBy="#{item.qrCode}" filterMatchMode="LIKE" rendered="#{measureAssetListController.isYunNanFuWai()}">
                         <h:outputText value="#{item.qrCode}"/>
                     </p:column>
                     <p:column headerText="设备型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
