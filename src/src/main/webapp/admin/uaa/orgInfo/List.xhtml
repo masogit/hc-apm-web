@@ -8,9 +8,12 @@
     <ui:define name="content">
         <script type="text/javascript">
             function deleteAfter() {
-               var failureType=document.getElementById("editForm:failureType").innerText
+               var failureType=document.getElementById("editForm:failureType");
                if(failureType!= null ){
-                   if(failureType == 1){
+                   let vl = failureType.value;
+                   if(vl == null){
+                        return ;
+                   }else if(vl == 1){
                        PF('failureModal').show();
                    }
                }
@@ -133,7 +136,7 @@
                                     <br/>
                                     <p:spacer></p:spacer>
                                     <p:commandButton style="width: 90px;margin-top: -10px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
-                                    <p:outputLabel id="failureType" style="display: none" value="#{orgInfoController.failureType}"/>
+                                    <h:inputHidden id="failureType" value="#{orgInfoController.failureType}"/>
                                 </p:panelGrid>
 
                                 <h:panelGroup>
