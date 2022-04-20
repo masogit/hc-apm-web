@@ -83,7 +83,6 @@ public class NurseSiteMaintainJob {
         } catch (Exception e) {
             // TODO: handle exception
             LOGGER.error(e.getMessage());
-            LOGGER.error(e.toString());
             if (firstJob != null) {
                 firstJob.setLog(e.getMessage().substring(0, Math.min(240, e.getMessage().length())));
                 firstJob.setProcessEndTime(new Date());
@@ -388,24 +387,25 @@ public class NurseSiteMaintainJob {
         }else if(nurseSiteMaintainConfig.getApplyFeatureData()){
             LOGGER.info("执行修改将来未完成检查");
 
-            List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findUncheckedByConfigAfterToday(nurseSiteMaintainConfig.getId());
-            Set<Tuple2<LocalDate, Integer>> scheduleDateSet = listMaintain.stream()
-                    .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
-                            i.getSequence())).collect(Collectors.toSet());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                String date = sdf.format(nurseSiteMaintainConfig.getApplyFeatureTime());
+                Date applyFeatureTime = sdf.parse(date);
+                List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findUncheckedByConfigAfterToday(nurseSiteMaintainConfig.getId(), applyFeatureTime);
+                Set<Tuple2<LocalDate, Integer>> scheduleDateSet = listMaintain.stream()
+                        .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
+                                i.getSequence())).collect(Collectors.toSet());
 
-            /*LocalDate applyFeatureTime = Instant.ofEpochMilli(nurseSiteMaintainConfig.getApplyFeatureTime().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-            LOGGER.info("筛选的时间节点=" + applyFeatureTime);
-            List<NurseSiteMaintain> maintainList = listMaintain.stream().filter(s -> {
-                // 筛选，去除集合中计划检查日期为今天以及今天之前的
-                LocalDate scheduleDate = Instant.ofEpochMilli(s.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-                return applyFeatureTime.until(scheduleDate, ChronoUnit.DAYS) >= 0;
-            }).collect(Collectors.toList());*/
-            LOGGER.info("将来未完成工单=" + listMaintain.size());
-            LOGGER.info("将来未完成工单日期集合=" + scheduleDateSet);
-            LOGGER.info("将来未完成工单日期集合=" + scheduleDateSet.size());
+                LOGGER.info("将来未完成工单=" + listMaintain.size());
+                LOGGER.info("将来未完成工单日期集合=" + scheduleDateSet);
+                LOGGER.info("将来未完成工单日期集合=" + scheduleDateSet.size());
 
-            deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
-            createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig);
+                deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
+                createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig);
+            } catch (ParseException e) {
+                LOGGER.error("修改将来未完成检查日期格式化异常", e);
+
+            }
         }
 
     }
