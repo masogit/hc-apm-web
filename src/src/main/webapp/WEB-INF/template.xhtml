@@ -62,7 +62,14 @@
         </div>
         <div class="layout-profile" style="font-size: 14px; text-align: right;">
             <div class="profile-name">
-                #{userContextService.loginUserOrgInfo.orgFullName}
+                <h:form id="measureOrderDetailForm" class="measureOrderDetailFormCls">
+                    <h:outputLabel   value="#{userContextService.loginUserOrgInfo.orgFullName}"/>
+                    <h:selectOneMenu rendered="#{userContextService.getSiteOrgInfoChild().size() > 0}"  id="txt3" value="#{userContextService.selectedSiteUid}" style="width:100%">
+                        <p:ajax  listener="#{userContextService.updateSiteUid()}" oncomplete="refreshPage();" />
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{userContextService.siteOrgInfoChild}" var="fieldItem" itemLabel="#{fieldItem.name}"  itemValue="#{fieldItem.uid}" />
+                    </h:selectOneMenu>
+                </h:form>
             </div>
             <div class="profile-name">
                 #{userContextService.userName}
@@ -87,5 +94,9 @@
         <p:commandButton process="@this" value="#{msg.Cancel}" type="button" immediate="true" styleClass="ui-confirmdialog-no uiButton" icon="ui-icon-close"/>
     </p:confirmDialog>
 </h:body>
-
+<script type="text/javascript">
+    function refreshPage() {
+        window.location.reload();
+    }
+</script>
 </html>
