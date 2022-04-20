@@ -393,7 +393,7 @@ public class NurseSiteMaintainJob {
             List<NurseSiteMaintain> maintainList = listMaintain.stream().filter(s -> {
                 // 筛选，去除集合中计划检查日期为今天以及今天之前的
                 LocalDate scheduleDate = Instant.ofEpochMilli(s.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-                return applyFeatureTime.until(scheduleDate, ChronoUnit.DAYS) > 0;
+                return applyFeatureTime.until(scheduleDate, ChronoUnit.DAYS) >= 0;
             }).collect(Collectors.toList());
             LOGGER.info("将来未完成工单=" + maintainList.size());
 
@@ -417,8 +417,10 @@ public class NurseSiteMaintainJob {
 
     private void deleteMaintains( List<String> removeMaintainIdList){
         if (!CollectionUtils.isEmpty(removeMaintainIdList)) {
+            LOGGER.info("删除操作：MaintainIdList:" + removeMaintainIdList);
             List<String> maintainItemIdList = nurseSiteMaintainRepository.findItemIdByMaintainList(removeMaintainIdList);
             if (!CollectionUtils.isEmpty(maintainItemIdList)) {
+                LOGGER.info("删除操作：maintainItemIdList:" + maintainItemIdList);
                 nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(new HashSet<>(maintainItemIdList));
                 nurseSiteMaintainItemRepository.deleteMaintainItemByParentId(new HashSet<>(removeMaintainIdList));
             }
@@ -440,7 +442,8 @@ public class NurseSiteMaintainJob {
         List<NurseSiteMaintain> maintains = scheduleDateSet.stream().map(i-> createMaintain(Date.from(i._1().atStartOfDay(ZoneId.systemDefault()).toInstant()),i._2(),
                 userUid,nurseSiteMaintainConfig, createNurseSiteMaintainItem(listAssetUid, jsonArray))
         ).collect(Collectors.toList());
-
+        LOGGER.info("新增操作maintains集合长度 ：" + maintains.size());
+        LOGGER.info("新增操作maintains：" + maintains);
         nurseSiteMaintainRepository.save(maintains);
     }
 
