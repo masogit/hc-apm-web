@@ -69,6 +69,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_auto_enabled")
     private Boolean isAutoEnabled; //是否自动派工
 
+    @Column(name = "when_auto_enabled_is_auto_accept")
+    private Boolean whenAutoEnabledIsAutoAccept; //自动派工时是否自动接单
+
     @Column(name = "is_wo_supplier_auto_enabled")
     private Boolean isWoSupplierAutoEnabled; //是否供应商自动抢单(维修)
 
@@ -470,6 +473,10 @@ public class WorkflowConfig implements Serializable {
     public void setEnableScrappedControl(boolean enableScrappedControl) {
         this.enableScrappedControl = enableScrappedControl;
     }
+
+    public Boolean getWhenAutoEnabledIsAutoAccept() { return whenAutoEnabledIsAutoAccept; }
+
+    public void setWhenAutoEnabledIsAutoAccept(Boolean whenAutoEnabledIsAutoAccept) { this.whenAutoEnabledIsAutoAccept = whenAutoEnabledIsAutoAccept; }
 
     public Boolean getIiMobileEnable() {
         return iiMobileEnable;
