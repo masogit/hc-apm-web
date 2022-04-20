@@ -82,7 +82,6 @@ public class NurseSiteMaintainJob {
             doJob();
         } catch (Exception e) {
             // TODO: handle exception
-            e.printStackTrace();
             LOGGER.error(e.getMessage());
             if (firstJob != null) {
                 firstJob.setLog(e.getMessage().substring(0, Math.min(240, e.getMessage().length())));
@@ -382,7 +381,7 @@ public class NurseSiteMaintainJob {
             createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig );
 
         }else if(nurseSiteMaintainConfig.getApplyFeatureData()){
-            LocalDate applyFeatureTime = nurseSiteMaintainConfig.getApplyFeatureTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate applyFeatureTime = Instant.ofEpochMilli(nurseSiteMaintainConfig.getApplyFeatureTime().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
             List<NurseSiteMaintain> maintainList = listMaintain.stream().filter(s -> {
                 // 筛选，去除集合中计划检查日期为今天以及今天之前的
                 LocalDate scheduleDate = Instant.ofEpochMilli(s.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
