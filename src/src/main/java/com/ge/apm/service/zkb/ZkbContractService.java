@@ -149,6 +149,13 @@ public class ZkbContractService {
             }
             zkbContractDataMap.put("公司编码", zkbContract.getCompanyCode());
             zkbContractDataMap.put("关联合同号", zkbContract.getLinkContractNo());
+            if(StringUtils.isNotEmpty(zkbContract.getAssetQuotaType())){
+                if(CopyByInvok.T.equals(zkbContract.getAssetQuotaType())){
+                    zkbContractDataMap.put("2022年起探头高低端名额分类", "是");
+                }else  if(CopyByInvok.F.equals(zkbContract.getAssetQuotaType())){
+                    zkbContractDataMap.put("2022年起探头高低端名额分类", "否");
+                }
+            }
 
             zkbContractDataList.add(zkbContractDataMap);
             //处理合同课程数据
@@ -515,6 +522,7 @@ public class ZkbContractService {
             }*/
 
         }
+
         if (errorLog.length()>0){
             errorLog = errorLog.substring(0,errorLog.length()-1);
         }
