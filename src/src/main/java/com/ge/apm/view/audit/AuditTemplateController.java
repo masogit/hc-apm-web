@@ -7,13 +7,16 @@ import com.ge.apm.dao.AuditTemplateRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.audit.AuditTemplateService;
+import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StreamUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -21,6 +24,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +45,7 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
 
     private BlobFileService blobService;
     private AuditTemplateService auditTemplateService;
+    private FileDownloadService fileDownloadService;
 
     @Override
     protected void init() {
@@ -49,6 +55,7 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
         auditEventRepository = WebUtil.getBean(AuditEventRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         auditTemplateService = WebUtil.getBean(AuditTemplateService.class);
+        fileDownloadService = WebUtil.getBean(FileDownloadService.class);
     }
 
     @Override
@@ -157,18 +164,22 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
             blobService.saveBlobObject(blobObject);
             fileObj = blobObject;
 
+            int dot = fileObj.getObjectName().lastIndexOf(".");
+
+            this.selected.setName(fileObj.getObjectName().substring(0,dot));
             this.selected.setFileName(fileObj.getObjectName());
             this.selected.setFileSize(fileObj.getObjectSize());
             this.selected.setObjectUId(fileObj.getId());
             this.selected.setObjectStorageId(fileObj.getObjectStorageId());
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
-            WebUtil.addErrorMessage("fail to upload file");
+            WebUtil.addErrorMessage(WebUtil.getMessage("FileUploadFailed"));
         }
     }
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
+        this.selected.setName(null);
         this.selected.setFileName(null);
         this.selected.setFileSize(null);
         this.selected.setObjectUId(null);
@@ -187,6 +198,22 @@ public class AuditTemplateController extends GenericCRUDUUIDController<AuditTemp
 
     public void setFileObj(V2_BlobObject fileObj) {
         this.fileObj = fileObj;
+    }
+
+    public void downloadDocument(String reportStorageId) {
+        try {
+            StreamedContent file = fileDownloadService.getFile(reportStorageId);
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            response.setHeader("Content-Disposition", "attachment;filename=" + file.getName());
+
+            StreamUtils.copy(file.getStream(), response.getOutputStream());
+
+            facesContext.responseComplete();
+            facesContext.renderResponse();
+        } catch (Exception e) {
+            WebUtil.addErrorMessage("Fail to download report.");
+        }
     }
 
     private void createEvent(String eventType, AuditTemplate template, String result){

@@ -127,5 +127,8 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 
 	@Query(value="select id from nurse_site_maintain_item where parent_id in (?1);",nativeQuery=true)
 	List<String> findItemIdByMaintainList(List<String> maintainIdList);
+
+	@Query(value="select o.* from nurse_site_maintain o where o.config_id=?1 and o.schedule_date >= ?2 and o.status=0 order by o.schedule_date",nativeQuery=true)
+	public List<NurseSiteMaintain> findUncheckedByConfigAfterToday(String configId, Date applyFeatureTime);
 }
 

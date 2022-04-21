@@ -14,6 +14,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -73,6 +74,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private Set<String> clinicalDeptOrgUidSet;
     private Set<String> assetDeptOrgUidSet;
     //复选的设备
+    @Getter
+    @Setter
     private Map<String, Boolean> selectedMap;
 
     //搜索字串
@@ -80,6 +83,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     //是否保养
     @Getter @Setter
     private String isPmSearch;
+    @Getter @Setter
+    private Boolean isOrderByForParentAndChildren = false;
 
     //显示子设备，主设备，或者全部类型的设备
     @Getter
@@ -215,6 +220,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        isOrderByForParentAndChildren = false;
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -658,9 +664,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
         }
-
+            if(isOrderByForParentAndChildren){
+                resultList =  orderByForParentAndChildren(resultList);
+            }
         return resultList;
     }
+
+    private List<AssetInfo> orderByForParentAndChildren(List<AssetInfo> resultList) {
+        if(CollectionUtils.isNotEmpty(resultList)) {
+            resultList.stream().forEach(e -> {
+                if (e.getParentAssetId() == null) {
+                    e.setBranchIds("" + e.getId());
+                } else {
+                    e.setBranchIds("" + e.getParentAssetId() + e.getId());
+                }
+        });
+            return resultList.stream().sorted(Comparator.comparing(AssetInfo::getBranchIds)).collect(Collectors.toList());
+        }
+        return resultList;
+    }
+
     public void getAssetInfoBatchEdit() {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
         List<AssetInfo> resultList;

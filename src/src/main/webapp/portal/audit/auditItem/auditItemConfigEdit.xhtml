@@ -49,7 +49,7 @@
                                 </p:panel>
                             </p:dataGrid>
                             <p:fileUpload id="imageUpload" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{auditItemConfigController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:95%"
-                                          multiple="true"  sizeLimit="10000000"  update="#{auditItemConfigController.CRUDActionName.equals('修改')?'pictureList auditConfigItemEditForm:pict':'pictureList'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                          multiple="true"  sizeLimit="20971520"  update="#{auditItemConfigController.CRUDActionName.equals('修改')?'pictureList auditConfigItemEditForm:pict':'pictureList'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}20M" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </h:panelGroup>
                 </p:panelGrid>

@@ -50,7 +50,7 @@ public class AuditCase implements Serializable {
     private Integer status;
 
     @Column(name = "target")
-    private Double target;
+    private Integer target;
 
     @Column(name = "start_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -91,5 +91,17 @@ public class AuditCase implements Serializable {
     @OneToOne
     @JoinColumn(name = "system_case_uid", insertable = false, updatable = false)
     private AuditSystemCase auditSystemCase;
+
+    /**
+     * 目标
+     */
+    @Transient
+    private Integer targetId;
+
+    /**
+     * 目标分值
+     */
+    @Transient
+    private Double targetScore;
 
 }

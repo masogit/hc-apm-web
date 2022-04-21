@@ -50,6 +50,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     private BlobFileService blobService;
     private BlobObjectRepository blobDao;
+    private TenantInfoRepository tenantInfoDao;
 
     private UaaService uaaService;
 
@@ -72,6 +73,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         i18nMessageDao = WebUtil.getBean(I18nMessageRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
@@ -371,6 +373,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         }
 
         this.searchFilters.removeAll(searchFilters);
+    }
+
+    public Boolean isYunNanFuWai(){
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+        if("云南省阜外心血管病医院".equals(tenantInfo.getName().trim())){
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
     public int getCurrentMonthCount() {

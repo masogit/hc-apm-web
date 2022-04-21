@@ -205,7 +205,9 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
     public String getName(List<UserAccount> approveUsers){
         if (approveUsers!=null && !approveUsers.isEmpty()){
             for (UserAccount userAccount:approveUsers) {
-                return userAccount.getName();
+                if(userAccount!=null){
+                    return userAccount.getName();
+                }
             }
         }
         return null;
@@ -217,12 +219,14 @@ public class AuditGroupConfigurationController extends GenericCRUDUUIDController
             if (userUids!=null && !userUids.isEmpty()){
                 for (int i = 0; i < userUids.size(); i++) {
                     UserAccount account = userAccountDao.getByUid(userUids.get(i).getUserUids().get(0));
-                    if(i==0){
-                        groupMember=account.getName();
-                    }else{
-                        groupMember=groupMember+"/"+account.getName();
-                    }
+                    if(account!=null){
+                        if(i==0){
+                            groupMember=account.getName();
+                        }else{
+                            groupMember=groupMember+"/"+account.getName();
+                        }
 
+                    }
 
                 }
 

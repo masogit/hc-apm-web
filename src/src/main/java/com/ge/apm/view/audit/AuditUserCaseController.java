@@ -83,7 +83,6 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
             selectedOrg = orgInfoRepository.findByUid(selectedOrgUid);
         }else{
             selectedOrg = new OrgInfo();
-            selectedOrg.setUid("请选择院区");
             selectedOrg.setName("请选择院区");
         }
 
@@ -115,6 +114,14 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
 
         for(AuditCase auditCase : list){
             AuditSystemCase auditSystemCase = auditCase.getAuditSystemCase();
+
+            AuditTarget target = targetDao.findBySystemCaseUidAndAndTarget(auditSystemCase.getUid(), auditCase.getTarget());
+
+            if(target != null){
+                auditCase.setTargetId(target.getTarget());
+                auditCase.setTargetScore(target.getScore());
+            }
+
             Integer stripNum=0;//条总数
             Integer paymentNum=0;//款总数
             Integer targetNum=0;//指标总数
@@ -130,6 +137,13 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
                         scoreNum=score.add(scoreStandard).doubleValue();
                         paymentNum++;
                     }else {
+                        String parentUid = auditSystemEntry.getParentUid();
+                        AuditSystemEntry data = auditSystemEntryRepository.findByUid(parentUid);
+                        if(data!=null && data.getType()==1){
+                            BigDecimal score = new BigDecimal(scoreNum);
+                            BigDecimal scoreStandard = new BigDecimal(auditSystemEntry.getScoreStandard()==null ? 0D :auditSystemEntry.getScoreStandard());
+                            scoreNum=score.add(scoreStandard).doubleValue();
+                        }
                         targetNum++;
                     }
                 }
@@ -165,8 +179,17 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
             WebUtil.addErrorMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Failed") + "！" + e.getMessage());
             return "";
         }
-        return "auditUserCaseList?faces-redirect=true&selectedTenantUid="
-                + this.selectedTenant.getUid() + "&selectedOrgUid=" + this.selectedOrg.getUid();
+
+        StringBuilder url = new StringBuilder("auditUserCaseList?faces-redirect=true");
+
+        if(this.selectedTenant != null && StringUtils.isNotBlank(this.selectedTenant.getUid())){
+            url.append("&selectedTenantUid=").append(this.selectedTenant.getUid());
+        }
+        if(this.selectedOrg != null && StringUtils.isNotBlank(this.selectedOrg.getUid())){
+            url.append("&selectedOrgUid=").append(this.selectedOrg.getUid());
+        }
+
+        return url.toString();
     }
 
     /**
@@ -181,6 +204,21 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         }catch (Exception e){
             createEvent("INIT_TENANT_AUDIT", auditCase, "fail");
             WebUtil.addErrorMessage(WebUtil.getMessage("Initialize") + WebUtil.getMessage("Failed"));
+        }
+    }
+
+    /**
+     * 用户版本过期
+     */
+    public void expired(String caseUid){
+        AuditCase auditCase = auditCaseRepository.findById(caseUid);
+        try {
+            auditCaseRepository.expiredCase(caseUid);
+            createEvent("EXPIRED_TENANT_AUDIT", auditCase, "success");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("expired") + WebUtil.getMessage("Success"));
+        }catch (Exception e){
+            createEvent("EXPIRED_TENANT_AUDIT", auditCase, "fail");
+            WebUtil.addErrorMessage(WebUtil.getMessage("expired") + WebUtil.getMessage("Failed"));
         }
     }
 
@@ -234,7 +272,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
      * @return
      */
     public List<OrgInfo> getSiteByTenantForListPage(){
-        if(StringUtils.isEmpty(this.selectedTenant.getUid())){
+        if(this.selectedTenant == null || StringUtils.isEmpty(this.selectedTenant.getUid())){
             return new ArrayList<>();
         }
         List<OrgInfo> list = orgInfoRepository.findAllSiteByTenantUid(this.selectedTenant.getUid());
