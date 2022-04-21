@@ -200,6 +200,13 @@
                 <p:menuitem id="um507" value="#{msg.CustomRole}" outcome="/portal/uaa/customRole/List.xhtml" rendered= "#{userContextService.accessContains('config.customRole')}"/>
                 <p:menuitem id="um508" value="#{msg.Accountdash}" url="/account-dashboard/#/" target="_blank" rendered="#{userContextService.accessContains('config.accountdash')}"/>
             </p:submenu>
+            <p:submenu id="um_audit" label="#{msg.auditConfig}" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,ReviewSystemAdministrator,PMAdministrator')}">
+                <p:menuitem id="um510" value="#{msg.AuditItemConfig}" outcome="/portal/audit/auditItem/auditItemConfigList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
+                <p:menuitem id="um511" value="#{msg.AuditTemplate}" outcome="/portal/audit/auditTemplate/auditTemplateList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
+                <p:menuitem id="um461" value="#{msg.provinceVersionConfiguration}" outcome="/portal/audit/AuditSystemCaseList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
+                <p:menuitem id="um512" value="#{msg.AuditUserCase}" outcome="/portal/audit/auditUserCase/auditUserCaseList.xhtml" rendered="#{userContextService.hasAnyRole('PMAdministrator')}"/>
+                <p:menuitem id="um513" value="#{msg.AuditEvent}" outcome="/portal/audit/auditEvent/auditEventList.xhtml" rendered="#{userContextService.hasAnyRole('PMAdministrator')}"/>
+            </p:submenu>
             <p:submenu id="um3000" label="#{msg.MVSEquipmentManagement}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin,MVSFE')}">
                 <p:menuitem id="um3001" value="#{msg.BasicInfo}" outcome="/portal/asset/info/AssetList"/>
                 <p:menuitem id="um3002" value="#{msg.PurchaseManagement}" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.hasNotAnyRole('MVSFE')}"/>
