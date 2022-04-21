@@ -230,7 +230,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         userAccountService = WebUtil.getBean(UserAccountService.class);
-//        userApi = WebUtil.getBean(UserApiService.class);
+        userApi = WebUtil.getBean(UserApiService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         userTagsDao = WebUtil.getBean(UserTagsRepository.class);
         userTagsMapper = WebUtil.getBean(UserTagsMapper.class);
@@ -626,7 +626,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         uaaService.setUserRoles(selected, assignedRoles);
         updateUserScope();
-//        userApi.resetUser(selected.getLoginName());
+        userApi.resetUser(selected.getLoginName());
         selected.getUserRoleList().clear();
         selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("UserRole") + WebUtil.getMessage("Updated"));
@@ -736,7 +736,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 }
             }
             userAccountService.deleteUserAccount(this.selected);
-//            userApi.removeUser(selected.getLoginName());
+            userApi.removeUser(selected.getLoginName());
 
         }
     }
@@ -883,11 +883,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private void isRepeatedAfter() {
         userAccountEditFlag = true;
         super.save();
-//        if (selected.getIsLocked()) {
-//            userApi.removeUser(selected.getLoginName());
-//        } else {
-//            userApi.resetUser(selected.getLoginName());
-//        }
+        if (selected.getIsLocked()) {
+            userApi.removeUser(selected.getLoginName());
+        } else {
+            userApi.resetUser(selected.getLoginName());
+        }
         log.info("save/update user to user_account successful, id: {}",selected.getId());
 
         saveTags();
