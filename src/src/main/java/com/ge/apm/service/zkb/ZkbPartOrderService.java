@@ -1609,7 +1609,19 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         zkbContractCatRepository.save(zkbContractCat);
                     }
                 }
-
+                if(CopyByInvok.T.equals(zkbContract.getAssetQuotaType())){
+                    if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                        ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                        if(zkbContractCat != null) {
+                            if (!CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())) {
+                                return;
+                            }
+                        }else{
+                            return;
+                        }
+                    }
+                    //插入历史数据
+                }
             }
             //endregion
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
