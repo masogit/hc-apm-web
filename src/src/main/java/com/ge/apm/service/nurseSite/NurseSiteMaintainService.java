@@ -1403,9 +1403,14 @@ public class NurseSiteMaintainService {
 
 	@Transactional
 	public boolean updateMaintainConfig(NurseSiteMaintainConfig tempConfig, UserAccount currentUser, List<AssetInfo> listCheckAssets) {
+		// 记录‘修改将来未完成检查’时间参照点
+		if(tempConfig.getApplyFeatureData()){
+			tempConfig.setApplyFeatureTime(new Date());
+		}
+
 		save(tempConfig);
 		saveConfigChildren(tempConfig, listCheckAssets);
-		if (tempConfig.getApplyDirectly()) {
+		if (tempConfig.getApplyDirectly() || tempConfig.getApplyFeatureData()) {
 //			updateUnCheckedMaintainData(tempConfig, currentUser, 0, listCheckAssets);
 			addBatchJob("update",tempConfig, null, null, currentUser.getUid(),null);
 		}

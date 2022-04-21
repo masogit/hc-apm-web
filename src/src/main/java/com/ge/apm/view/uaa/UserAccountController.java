@@ -1,5 +1,7 @@
 package com.ge.apm.view.uaa;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
@@ -101,6 +103,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private UserAccount loginUser;
 
     private TenantInfoRepository tenantInfoRepository;
+
+    private MultiLevelApprovalConfigRepository multiLevelApprovalConfigRepository;
 
     private JsonTemplateRepository jsonTemplateRepository;
 
@@ -234,6 +238,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         userTagsDao = WebUtil.getBean(UserTagsRepository.class);
         userTagsMapper = WebUtil.getBean(UserTagsMapper.class);
+        multiLevelApprovalConfigRepository = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
@@ -722,6 +727,29 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
 
+        //判断多级审核是否在用此用户
+        List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.find();
+        if (multiLevelApprovalConfigs!=null && !multiLevelApprovalConfigs.isEmpty()){
+            for (MultiLevelApprovalConfig multiLevelApprovalConfig: multiLevelApprovalConfigs){
+                String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+                if (null != approvalItem) {
+                    List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>(){
+                    });
+                    for (int i = 0; i < approvalNodes.size(); i++) {
+                        ApprovalNode node = approvalNodes.get(i);
+                            List<String> userUids = node.getUserUids();
+                           if (userUids!=null && userUids.contains(selected.getUid())){
+                               WebUtil.addErrorMessage("该用户为多级审核人，不能删除！");
+                                return;
+                           }
+                    }
+                }
+            }
+        }
+        if(getApproveByUserAccount()){
+            WebUtil.addErrorMessage("该用户为审核人员，不能删除！");
+            return;
+        }
         if (canDelete()) {
             //super.delete();
             log.info("start delete user, uid: {}",this.selected.getUid());
@@ -740,7 +768,27 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         }
     }
+    public boolean getApproveByUserAccount(){
+        AuditGroupConfigurationRepository auditGroupConfigurationRepository=WebUtil.getBean(AuditGroupConfigurationRepository.class);
+        List<AuditGroupConfiguration> auditGroupConfigurations = auditGroupConfigurationRepository.find();
+        if(auditGroupConfigurations!=null && !auditGroupConfigurations.isEmpty()){
+            for (AuditGroupConfiguration auditGroupConfiguration:auditGroupConfigurations){
+                String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+                List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+                if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                    for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                        AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                        List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                        if (userUids!=null && userUids.contains(selected.getUid())){
+                            return true;
+                        }
+                    }
 
+                }
+            }
+        }
+        return false;
+    }
     private Boolean canDelete() {
         List<SearchFilter> checkFilters = new ArrayList<>();
         checkFilters.add(new SearchFilter("dispatchUserId", SearchFilter.Operator.EQ, selected.getId(), "1+"));

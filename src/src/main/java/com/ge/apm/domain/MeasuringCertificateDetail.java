@@ -115,6 +115,10 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(name = "file_no")
     private String fileNo;
 
+    //二维码
+    @Column(name = "qr_code")
+    private String qrCode;
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     @Size(max = 32)
     private String tenantUID;
@@ -389,6 +393,14 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setValidDateToDisplay(String validDateToDisplay) {
         this.validDateToDisplay = validDateToDisplay;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
     }
 
     @Override

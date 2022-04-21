@@ -5,6 +5,7 @@ import com.ge.apm.domain.AssetInfo;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.domain.*;
 import webapp.framework.dao.GenericRepository;
@@ -47,6 +48,9 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         List<AssetInfo> assetInfos = getAssetInfos();
         assetInfoList = assetInfos;
+        if((pageRequest.getPageNumber()+1)*pageRequest.getPageSize()>assetInfos.size()){
+            pageRequest = new PageRequest(assetInfos.size()%pageRequest.getPageSize() == 0 ? assetInfos.size()/pageRequest.getPageSize()-1:assetInfos.size()/pageRequest.getPageSize(),pageRequest.getPageSize(),pageRequest.getSort());
+        }
         return new PageImpl(assetInfos.subList(pageRequest.getPageNumber()*pageRequest.getPageSize(),Math.min((pageRequest.getPageNumber()+1)*pageRequest.getPageSize(),assetInfos.size())), pageRequest, assetInfos.size());
     }
 
@@ -60,18 +64,19 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
             assetInfoObjects.stream().forEach(e -> {
                 convertToAssetInfo(assetInfos, (Object[]) e);
             });
+
+            Map<Integer, AssetInfo> assetInfoMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, v -> v, (o1, o2) -> o2));
+            List<SearchFilter> temp = new ArrayList<>();
+            temp.add(new SearchFilter("id", SearchFilter.Operator.IN,assetInfoMap.keySet()));
+            List<AssetInfo> infos = dao.findBySearchFilter(temp);
+            infos.stream().forEach(e->{
+                e.setRank(assetInfoMap.get(e.getId()).getRank());
+                e.setBranchIds(assetInfoMap.get(e.getId()).getBranchIds());
+            });
+            return infos.stream().sorted(Comparator.comparing(AssetInfo::getBranchIds)).collect(Collectors.toList());
         }
-        Map<Integer, AssetInfo> assetInfoMap = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getId, v -> v, (o1, o2) -> o2));
-        List<SearchFilter> temp = new ArrayList<>();
-        temp.add(new SearchFilter("id", SearchFilter.Operator.IN,assetInfoMap.keySet()));
-        List<AssetInfo> infos = dao.findBySearchFilter(temp);
-        infos.stream().forEach(e->{
-            e.setRank(assetInfoMap.get(e.getId()).getRank());
-            e.setBranchIds(assetInfoMap.get(e.getId()).getBranchIds());
-        });
-//         pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC, "branchIds"));
-        List<AssetInfo> infos1 = infos.stream().sorted(Comparator.comparing(AssetInfo::getBranchIds)).collect(Collectors.toList());
-        return infos1;
+
+        return Collections.EMPTY_LIST;
     }
 
     private Set<Integer> removeOnlyParentAsset(Set<Integer> tempRootIds, Set<Integer> rootIds) {
@@ -118,16 +123,16 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
         assetInfo.setParentAssetId(Integer.parseInt(checkData(o[2] == null ? -1 : o[2])));
         assetInfo.setBranchIds(checkData(o[3]));
         assetInfo.setRank(Integer.parseInt(checkData(o[4])));
-        assetInfo.setFunctionType(checkData(o[5]));
-        assetInfo.setSerialNum(checkData(o[6]));
-        assetInfo.setDepartNum(checkData(o[7]));
-        assetInfo.setAssetGroup(Integer.parseInt(checkData(o[8])));
-        if (o[9] != null) {
-            assetInfo.setAssetDeptId(Integer.parseInt(checkData(o[9])));
-        }
-        assetInfo.setClinicalDeptName(checkData(o[10]));
-        assetInfo.setManufacture(checkData(o[11]));
-        assetInfo.setVendor(checkData(o[12]));
+//        assetInfo.setFunctionType(checkData(o[5]));
+//        assetInfo.setSerialNum(checkData(o[6]));
+//        assetInfo.setDepartNum(checkData(o[7]));
+//        assetInfo.setAssetGroup(Integer.parseInt(checkData(o[8])));
+//        if (o[9] != null) {
+//            assetInfo.setAssetDeptId(Integer.parseInt(checkData(o[9])));
+//        }
+//        assetInfo.setClinicalDeptName(checkData(o[10]));
+//        assetInfo.setManufacture(checkData(o[11]));
+//        assetInfo.setVendor(checkData(o[12]));
         assetInfos.add(assetInfo);
     }
 
