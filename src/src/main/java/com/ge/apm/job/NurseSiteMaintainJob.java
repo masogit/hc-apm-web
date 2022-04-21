@@ -371,12 +371,8 @@ public class NurseSiteMaintainJob {
 
 
     public void updateUnCheckedMaintainData(String userUid, NurseSiteMaintainConfig nurseSiteMaintainConfig) {
-        LOGGER.info("进入更新操作 ...");
-
         // ‘覆盖历史未完成检查’，先删除，然后新建未完成的检查，如果是‘修改将来未完成检查’，只需要删除更新配置后的未完成检查
-        LOGGER.info("覆盖历史未完成检查:" + nurseSiteMaintainConfig.getApplyDirectly() + "修改将来未完成检查:" + nurseSiteMaintainConfig.getApplyFeatureData());
         if(nurseSiteMaintainConfig.getApplyDirectly()){
-            LOGGER.info("执行覆盖历史未完成检查");
             List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findUncheckedByConfig(nurseSiteMaintainConfig.getId());
             Set<Tuple2<LocalDate, Integer>> scheduleDateSet = listMaintain.stream()
                     .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
@@ -385,8 +381,6 @@ public class NurseSiteMaintainJob {
             createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig );
 
         }else if(nurseSiteMaintainConfig.getApplyFeatureData()){
-            LOGGER.info("执行修改将来未完成检查");
-
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             try {
                 String date = sdf.format(nurseSiteMaintainConfig.getApplyFeatureTime());
@@ -396,15 +390,10 @@ public class NurseSiteMaintainJob {
                         .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
                                 i.getSequence())).collect(Collectors.toSet());
 
-                LOGGER.info("将来未完成工单=" + listMaintain.size());
-                LOGGER.info("将来未完成工单日期集合=" + scheduleDateSet);
-                LOGGER.info("将来未完成工单日期集合=" + scheduleDateSet.size());
-
                 deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
                 createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig);
             } catch (ParseException e) {
-                LOGGER.error("修改将来未完成检查日期格式化异常", e);
-
+                LOGGER.error("修改将来未完成检查异常:", e);
             }
         }
 
@@ -419,10 +408,8 @@ public class NurseSiteMaintainJob {
 
     private void deleteMaintains( List<String> removeMaintainIdList){
         if (!CollectionUtils.isEmpty(removeMaintainIdList)) {
-            LOGGER.info("删除操作：MaintainIdList:" + removeMaintainIdList.size());
             List<String> maintainItemIdList = nurseSiteMaintainRepository.findItemIdByMaintainList(removeMaintainIdList);
             if (!CollectionUtils.isEmpty(maintainItemIdList)) {
-                LOGGER.info("删除操作：maintainItemIdList:" + maintainItemIdList.size());
                 nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(new HashSet<>(maintainItemIdList));
                 nurseSiteMaintainItemRepository.deleteMaintainItemByParentId(new HashSet<>(removeMaintainIdList));
             }
@@ -444,7 +431,6 @@ public class NurseSiteMaintainJob {
         List<NurseSiteMaintain> maintains = scheduleDateSet.stream().map(i-> createMaintain(Date.from(i._1().atStartOfDay(ZoneId.systemDefault()).toInstant()),i._2(),
                 userUid,nurseSiteMaintainConfig, createNurseSiteMaintainItem(listAssetUid, jsonArray))
         ).collect(Collectors.toList());
-        LOGGER.info("新增操作maintains集合长度 ：" + maintains.size());
         nurseSiteMaintainRepository.save(maintains);
     }
 
