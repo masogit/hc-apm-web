@@ -906,8 +906,10 @@ public void test1(){
                             for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
                                 AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
                                 List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                                UserAccount account = userDao.getByUid(userUids.get(0));
-                                userAccountList.add(account);
+                                if(userUids!=null){
+                                    UserAccount account = userDao.getByUid(userUids.get(0));
+                                    userAccountList.add(account);
+                                }
                             }
 
                         }
@@ -2383,8 +2385,10 @@ public void test1(){
                     for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
                         AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
                         List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                        UserAccount userAccount = userDao.getByUid(userUids.get(0));
-                        uaList.add(userAccount);
+                        if(userUids!=null){
+                            UserAccount userAccount = userDao.getByUid(userUids.get(0));
+                            uaList.add(userAccount);
+                        }
                     }
 
                 }

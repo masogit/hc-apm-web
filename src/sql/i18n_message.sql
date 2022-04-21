@@ -4598,6 +4598,13 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- 质控评审配置菜单
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','config.auditConfig','质控评审配置','Quality control review configuration',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','auditConfig','质控评审配置','Quality control review configuration',NULL,-1);
+-- 质控评审管理-状态
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditCaseStatus','1','发布','publish',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditCaseStatus','2','过期','expired',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EXPIRED_TENANT_AUDIT','过期租户版本','Expired tenant version',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','expired','过期','Expired',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','AuditCaseExpiredConformation','过期确认','Expired Conformation',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','AuditCaseExpiredConformationMsg','确认是否过期该版本？','Confirm if the version expires?',NULL,-1);
 -- 供应商三证到期时间
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SupplierCertificateManage','供应商资质证书管理','Supplier qualification certificate management',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','productionLicenseExpireDays','生产许可证到期提醒提前天数','The number of days in advance for the production license expiration reminder',NULL,-1);

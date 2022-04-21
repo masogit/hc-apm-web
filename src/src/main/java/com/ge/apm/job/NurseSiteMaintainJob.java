@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -370,12 +371,32 @@ public class NurseSiteMaintainJob {
 
 
     public void updateUnCheckedMaintainData(String userUid, NurseSiteMaintainConfig nurseSiteMaintainConfig) {
-        List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findUncheckedByConfig(nurseSiteMaintainConfig.getId());
-        Set<Tuple2<LocalDate, Integer>> scheduleDateSet = listMaintain.stream()
-                .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
-                        i.getSequence())).collect(Collectors.toSet());
-        deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
-        createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig );
+        // ‘覆盖历史未完成检查’，先删除，然后新建未完成的检查，如果是‘修改将来未完成检查’，只需要删除更新配置后的未完成检查
+        if(nurseSiteMaintainConfig.getApplyDirectly()){
+            List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findUncheckedByConfig(nurseSiteMaintainConfig.getId());
+            Set<Tuple2<LocalDate, Integer>> scheduleDateSet = listMaintain.stream()
+                    .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
+                            i.getSequence())).collect(Collectors.toSet());
+            deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
+            createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig );
+
+        }else if(nurseSiteMaintainConfig.getApplyFeatureData()){
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                String date = sdf.format(nurseSiteMaintainConfig.getApplyFeatureTime());
+                Date applyFeatureTime = sdf.parse(date);
+                List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findUncheckedByConfigAfterToday(nurseSiteMaintainConfig.getId(), applyFeatureTime);
+                Set<Tuple2<LocalDate, Integer>> scheduleDateSet = listMaintain.stream()
+                        .map(i-> new Tuple2<>(Instant.ofEpochMilli(i.getScheduleDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
+                                i.getSequence())).collect(Collectors.toSet());
+
+                deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
+                createAndSaveNurseSiteMaintains(scheduleDateSet, userUid,nurseSiteMaintainConfig);
+            } catch (ParseException e) {
+                LOGGER.error("修改将来未完成检查异常:", e);
+            }
+        }
+
     }
 
     public void deleteUnCheckedMaintainData(String configId, String assetUid, boolean all) {
@@ -410,7 +431,6 @@ public class NurseSiteMaintainJob {
         List<NurseSiteMaintain> maintains = scheduleDateSet.stream().map(i-> createMaintain(Date.from(i._1().atStartOfDay(ZoneId.systemDefault()).toInstant()),i._2(),
                 userUid,nurseSiteMaintainConfig, createNurseSiteMaintainItem(listAssetUid, jsonArray))
         ).collect(Collectors.toList());
-
         nurseSiteMaintainRepository.save(maintains);
     }
 

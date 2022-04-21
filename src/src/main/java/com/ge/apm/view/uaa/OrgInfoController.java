@@ -2,12 +2,14 @@ package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
@@ -38,7 +40,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private OrgInfoClinicalDeptService clinicalDeptService;
     private UserOrgInfoRepository userOrgDao;
     private UserContextService userContextService;
-
+    private BlobFileService blobObjectService;
     private boolean acShow = false;
     private boolean isShow = false;
     private boolean isShjyDept = false;
@@ -72,7 +74,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
-
+        blobObjectService = WebUtil.getBean(BlobFileService.class);
         findPerson();
         loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
@@ -577,9 +579,25 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             checkFilters.add(new SearchFilter("orgId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
             QrCodeLibRepository qrcodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
             List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
-            qrcodeLibDao.delete(qrcodeList);
-            failureType=null;
-            WebUtil.addErrorMessage("该组织下有二维码已删除");
+            if(CollectionUtils.isEmpty(qrcodeList)){
+                failureType=null;
+                WebUtil.addErrorMessage("该组织下二维码已删除");
+            }else{
+                for (QrCodeLib qrCodeLib : qrcodeList) {
+                    qrcodeLibDao.deleteQrCodeLib(qrCodeLib.getUid());
+                    List<V2_BlobObject> blobObjectsList = blobObjectService.findBlobObjectsByBoUid(qrCodeLib.getUid());
+                    blobObjectsList.forEach(item -> {
+                        try {
+                            blobObjectService.deleteBlobFile(item);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+
+                failureType=null;
+                WebUtil.addErrorMessage("该组织下二维码已删除");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             WebUtil.addErrorMessage("删除二维码失败");

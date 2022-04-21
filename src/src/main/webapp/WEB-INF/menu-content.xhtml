@@ -11,6 +11,8 @@
                 <!--<p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>-->
                 <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.accessContains('asset.info')}"/>
                 <p:menuitem id="um031" value="主子设备信息" outcome="/portal/asset/previewAsset/List" rendered="#{userContextService.accessContains('asset.info') and userContextService.enableAssetPreview()}"/>
+
+<!--                <p:menuitem value="地图" outcome="/portal/asset/fileAttachment/mapGD.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead')}"/>-->
                 <p:menuitem value="资产批量修改院区" outcome="/portal/asset/bulkEdit/AssetBulkEditSite.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead') and userContextService.isAllowAssetBatchUpdate()}"/>
                 <p:menuitem id="um1002" value="#{msg.EquipmentLocation}" target="_new" url="#{userContextService.getTenantInfo().locationEn}" rendered="#{userContextService.getTenantInfo().locationEn ne null}"/>
                 <p:menuitem id="um04" value="#{msg.AssetInventory}" rendered="false" outcome="/portal/asset/AssetInventory.xhtml"/>
@@ -203,7 +205,7 @@
                 <p:menuitem id="um511" value="#{msg.AuditTemplate}" outcome="/portal/audit/auditTemplate/auditTemplateList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
                 <p:menuitem id="um461" value="#{msg.provinceVersionConfiguration}" outcome="/portal/audit/AuditSystemCaseList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
                 <p:menuitem id="um512" value="#{msg.AuditUserCase}" outcome="/portal/audit/auditUserCase/auditUserCaseList.xhtml" rendered="#{userContextService.hasAnyRole('PMAdministrator')}"/>
-                <p:menuitem id="um513" value="#{msg.AuditEvent}" outcome="/portal/audit/auditEvent/auditEventList.xhtml" rendered="#{userContextService.hasAnyRole('ReviewSystemAdministrator')}"/>
+                <p:menuitem id="um513" value="#{msg.AuditEvent}" outcome="/portal/audit/auditEvent/auditEventList.xhtml" rendered="#{userContextService.hasAnyRole('PMAdministrator')}"/>
             </p:submenu>
             <p:submenu id="um3000" label="#{msg.MVSEquipmentManagement}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin,MVSFE')}">
                 <p:menuitem id="um3001" value="#{msg.BasicInfo}" outcome="/portal/asset/info/AssetList"/>

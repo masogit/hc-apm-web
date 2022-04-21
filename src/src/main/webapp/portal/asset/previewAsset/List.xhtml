@@ -77,17 +77,17 @@
                     </h:panelGrid>
                 </h:form>
                 <h:form id="assetPreviewListForm">
-                    <p:dataTable id="dataList" value="#{assetPreviewController.lazyModel}" var="item"
+                    <p:dataTable id="dataList" value="#{assetPreviewController.lazyModel}" var="item"  resizableColumns="true" liveResize="true" resizeMode="fit" scrollable="false"
                                  widgetVar="varDataList" selection="#{assetPreviewController.selected}" selectionMode="single"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.branchIds}" sortMode="single" sortOrder="descending" sortBy="#{item.branchIds}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.branchIds}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:ajax  event="rowSelect" listener="#{assetPreviewController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />
-                        <p:column headerText="子设备" id="imgs" exportable="false">
-                            <p:graphicImage url="/portal/asset/previewAsset/dot.jpeg" style="width: 20px; height: 20px;" rendered="#{item.rank != 0}"/>
+                        <p:ajax  event="rowSelect" listener="#{assetPreviewController.onSelectAsset()}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />
+                        <p:column headerText="子设备" id="imgs" exportable="false" width="30">
+                            <p:graphicImage url="/portal/asset/previewAsset/dot.png" style="width: 10px; height: 10px;" rendered="#{item.rank != 0}"/>
                         </p:column>
 
 
