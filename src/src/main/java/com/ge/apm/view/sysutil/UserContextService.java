@@ -54,7 +54,8 @@ public class UserContextService implements Serializable {
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
     private Boolean activeSupplierFlag = null;
-
+    private String selectedSiteUid;
+    private List<OrgInfo> child;
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
@@ -325,7 +326,7 @@ public class UserContextService implements Serializable {
                     AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
                     List<String> userUids = auditGroupConfigurationNode.getUserUids();
                     UserAccount user = userAccountRepository.getByUid(userUids.get(0));
-                    if (userAccount.getUid().equals(user.getUid())){
+                    if (user!=null && userAccount.getUid().equals(user.getUid())){
                         return true;
                     }
                 }
@@ -1461,5 +1462,39 @@ public class UserContextService implements Serializable {
             return true;
         }
         return false;
+    }
+    public void updateSiteUid(){
+        if(userAccount == null)return;
+        if(StringUtils.isEmpty(selectedSiteUid)){
+            userAccount.setSiteUID(userAccount.getHospitalUID());
+        }else{
+            userAccount.setSiteUID(selectedSiteUid);
+        }
+    }
+    public String getSelectedSiteUid() {
+        return selectedSiteUid;
+    }
+
+    public void setSelectedSiteUid(String selectedSiteUid) {
+        this.selectedSiteUid = selectedSiteUid;
+    }
+
+    public List<OrgInfo> getSiteOrgInfoChild(){
+        if(child == null){
+            String hospitalUID = userAccount.getHospitalUID();
+            if(userAccount.getOrgLevel() == 2 && hospitalUID.equals(userAccount.getSiteUID())){
+                OrgInfoRepository orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+                child= orgInfoRepository.getHospitalByTenantUIDAndType(hospitalUID);
+                if(child.size() > 0){
+                    child=child.stream().filter(item->{
+                        if(item == null)return false;
+                        Integer orgLevel = item.getOrgLevel();
+                        Integer orgType = item.getOrgType();
+                        return orgLevel !=null && orgType !=null && orgLevel == 3 && orgType==3;
+                    }).collect(Collectors.toList());
+                }
+            }
+        }
+        return  child;
     }
 }

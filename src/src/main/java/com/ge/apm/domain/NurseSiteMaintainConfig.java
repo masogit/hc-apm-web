@@ -91,6 +91,18 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 	@Column(name="apply_directly")
 	private Boolean applyDirectly=false;
 
+	//修改将来未完成检查
+	@Column(name="apply_feature_data")
+	private Boolean applyFeatureData=false;
+
+	//修改将来未完成检查
+	@Column(name="apply_feature_time")
+	private Date applyFeatureTime;
+
+	// 记录页面选择的是 覆盖历史未完成检查 还是 修改将来未完成检查
+	@Transient
+	private Integer selectApplyType;
+
 	public String getId() {
 		return id;
 	}
@@ -239,6 +251,36 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 			applyDirectly=false;
 		}
 		this.applyDirectly = applyDirectly;
+	}
+
+	public Boolean getApplyFeatureData() {
+		if(applyFeatureData==null){
+			applyFeatureData=false;
+		}
+		return applyFeatureData;
+	}
+
+	public void setApplyFeatureData(Boolean applyFeatureData) {
+		if(applyFeatureData==null){
+			applyFeatureData=false;
+		}
+		this.applyFeatureData = applyFeatureData;
+	}
+
+	public Date getApplyFeatureTime() {
+		return applyFeatureTime;
+	}
+
+	public void setApplyFeatureTime(Date applyFeatureTime) {
+		this.applyFeatureTime = applyFeatureTime;
+	}
+
+	public Integer getSelectApplyType() {
+		return selectApplyType;
+	}
+
+	public void setSelectApplyType(Integer selectApplyType) {
+		this.selectApplyType = selectApplyType;
 	}
 
 	@Override

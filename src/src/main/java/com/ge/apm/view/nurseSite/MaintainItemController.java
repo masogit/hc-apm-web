@@ -89,9 +89,12 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		nurseSiteMaintainService.checkRightAll(nurseSiteMaintain);
 	}
 	public void completeMaintain(){
-		nurseSiteMaintainService.completeMaintain(nurseSiteMaintain, new Date(), currentUser);
-		this.maintainController.updateEvent();
-		addMessage("工单已保存");
+		if(nurseSiteMaintainService.completeMaintain(nurseSiteMaintain, new Date(), currentUser)) {
+			this.maintainController.updateEvent();
+			addMessage("工单已保存");
+		} else {
+			return;
+		}
 	}
 	public void saveCheckData(){
 		List<String> listCheckData=new ArrayList<String>();

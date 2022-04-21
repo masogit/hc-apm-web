@@ -29,8 +29,12 @@
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}" >
-                                    <label class="label">年份</label>
-                                    <p:inputText id="version" value="#{auditSystemCaseEditController.selected.version}" style="width: 60%" />
+                                    <label class="label">版本编号</label>
+                                    <p:inputText id="version" value="#{auditSystemCaseEditController.selected.versionNumber}" style="width: 60%" />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}" >
+                                    <label class="label">版本号</label>
+                                    <p:inputText id="version1" value="#{auditSystemCaseEditController.selected.version}" style="width: 60%" />
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}" >
                                     <label class="label">地区</label>
@@ -105,8 +109,8 @@
                                 <p:commandButton  id="editButton" icon="ui-icon-pencil"    class="btn btn-sm btn-gray" process="@this" oncomplete="PF('markDlg').show()" disabled="#{empty auditSystemCaseEditController.auditSystemEntry.uid}"
                                                   title="#{msg.Edit}" actionListener="#{auditSystemCaseEditController.editAuditSystementry()}"
                                                   update="markDlg"/>
-                                <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" update="entryTree"  disabled="#{empty auditSystemCaseEditController.selected.uid}"
-                                                 actionListener="#{auditSystemCaseEditController.preDelete}"/>
+                                <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}"   disabled="#{empty auditSystemCaseEditController.selected.uid}"
+                                                  oncomplete="PF('deleteDlg').show()" />
                             </h:panelGroup>
 
                             <p:scrollPanel style="height:95%;border: 0" mode="native">
@@ -361,7 +365,7 @@
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 80%" rendered="true">
                             <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}">
                                 <label class="label">#{msg.ContentType}*</label>
-                                <p:selectOneMenu value="#{auditSystemCaseEditController.entryType}"   requiredMessage="#{msg.ContentType} #{msg.ValidationRequire}" autoWidth="false" style="width: 50%;">
+                                <p:selectOneMenu value="#{auditSystemCaseEditController.contentType}"   requiredMessage="#{msg.ContentType} #{msg.ValidationRequire}" autoWidth="false" style="width: 50%;">
                                     <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? fieldMsg.fieldValue('auditItemType',auditSystemCaseEditController.auditConfigItemSelected.contentType) : msg.SelectOneMessage}" itemValue="#{null}"  noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('auditItemType')}"  var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}" />
                                     <p:ajax process="@this" listener="#{auditSystemCaseEditController.auditConfigItemList()}" update="content"/>
@@ -370,7 +374,8 @@
                             <h:panelGroup id="content">
                                 <label class="label">#{msg.mark}*</label>
                                 <p:selectOneMenu value="#{auditSystemCaseEditController.configItemUid}"   requiredMessage="#{msg.content} #{msg.ValidationRequire}"
-                                                 autoWidth="false" style="width: 50%;">
+                                    panelStyle="width:220px" effect="fade"
+                                    filter="true" filterMatchMode="contains">
                                     <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? auditSystemCaseEditController.auditConfigItemSelected.mark : msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
                                     <f:selectItems value="#{auditSystemCaseEditController.auditConfigItemList()}" var="entry" itemLabel="#{entry.mark}"  itemValue="#{entry.uid}"/>
                                     <p:ajax process="@this" listener="#{auditSystemCaseEditController.setContentNothing()}" update="entryContent"/>
@@ -481,7 +486,8 @@
                             <h:panelGroup id="TemplateName">
                                 <label class="label">#{msg.Mark}*</label>
                                 <p:selectOneMenu value="#{auditSystemCaseEditController.templateUid}" required="true" requiredMessage="#{msg.content} #{msg.ValidationRequire}"
-                                                 autoWidth="false" style="width: 50%;">
+                                    panelStyle="width:220px" effect="fade"
+                                    filter="true" filterMatchMode="contains">
                                     <f:selectItem itemLabel="#{auditSystemCaseEditController.auditTemplateSelected.uid !=null ? auditSystemCaseEditController.auditTemplateSelected.mark : msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
 
                                     <f:selectItems value="#{auditSystemCaseEditController.auditTemplates()}" var="template" itemLabel="#{template.mark}"  itemValue="#{template.uid}"/>
@@ -496,6 +502,20 @@
                                              value="#{msg.Save}" update="editContentForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'auditTemplateDlg');"/>
                             <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
                                              onclick="PF('auditTemplateDlg').hide()"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+                <p:dialog id="deleteDlg" widgetVar="deleteDlg" modal="true" resizable="true" draggable="true"
+                          header="删除" width="300" height="200">
+                    <h:form id="deleteForm">
+                        <h:panelGroup  >
+                            <br/><br/>
+                            <p>确定删除操作吗?</p>
+                            <br/><br/><br/><br/>
+                            <p:commandButton validateClient="true"  actionListener="#{auditSystemCaseEditController.preDelete}"
+                                             value="删除" update="entryForm:entryTree" icon="ui-icon-check" oncomplete="handleSubmit(args, 'deleteDlg');"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                             onclick="PF('deleteDlg').hide()"/>
                         </h:panelGroup>
                     </h:form>
                 </p:dialog>

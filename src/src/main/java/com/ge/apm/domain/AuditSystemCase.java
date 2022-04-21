@@ -25,10 +25,15 @@ public class AuditSystemCase implements Serializable {
     @Column(name = "uid")
     private String uid;
     /**
-     * 年份
+     * 版本号
      */
     @Column(name = "version")
     private String version;
+    /**
+     * 版本编号
+     */
+    @Column(name = "version_number")
+    private String versionNumber;
     /**
      * 适用地区
      */
