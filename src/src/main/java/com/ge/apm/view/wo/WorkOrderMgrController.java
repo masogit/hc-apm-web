@@ -1377,7 +1377,14 @@ public void test1(){
             RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
             return;
         }
-
+        if(!picList.isEmpty()){
+            String srId = selectedWorkOrder.getSrId();
+            for (V2_BlobObject bo : picList) {
+                bo.setBoUuid(srId);
+                bo.setBoType(V2_BlobObject.BO_TYPE_WorkOrder);
+            }
+            blobObjectRepository.save(picList);
+        }
         dao.save(selectedWorkOrder);
     }
 
