@@ -509,8 +509,6 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         }
         if (StringUtils.isNotEmpty(name)) {
             filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
-        } else if (StringUtils.isNotEmpty(queryAsset.getName())) {
-            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
         }
         List<PmOrderRule> rules = pmOrderRuleRepository.findBySearchFilter(filter);
         rules.sort(new Comparator<PmOrderRule>() {
