@@ -44,6 +44,10 @@ public class ZkbContract implements ChineseName, Serializable {
         Y,N
     }
 
+    public enum AssetQuotaTypeEnum{
+        t,f
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
