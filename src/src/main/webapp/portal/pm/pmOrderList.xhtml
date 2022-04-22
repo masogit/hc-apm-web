@@ -123,7 +123,7 @@
                             </f:facet>
                             <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                         </p:column>
-                        <p:column>
+                        <p:column filterBy="#{item.ruleName}" filterMatchMode="LIKE">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.PmOrderRule}"/><br/>
                                 <!--<p:autoComplete dropdown="true" value="#{v2PmOrderController.filterRule}" appendTo="@(Body)"
@@ -136,7 +136,7 @@
 
                         </p:column>
 
-                        <p:column headerText="保养周期(月)">
+                        <p:column headerText="保养周期(月)" filterBy="#{item.period}" filterMatchMode="EQ">
                             <h:outputText value="#{v2PmOrderController.getRulePm(item).period}"/>
                         </p:column>
 
@@ -154,7 +154,7 @@
                 </p:column>
                 <p:column headerText="#{msg.CurrentProcessingStep}"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                     <f:facet name="filter" >
-                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.stepFileter}"  rendered="#{v2PmOrderController.queryIndex==-1}">
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.stepFileter}" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                             <f:selectItems value="#{pmOrderGlobalController.stepsInTableFilter}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
                         </p:selectOneMenu>
