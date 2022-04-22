@@ -17,38 +17,44 @@
                 <p:panelGrid id="assetSearchPanel" columns="3" layout="grid"
                              styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">#{msg.AssetType}</label>
-                        <p:autoComplete dropdown="true" value="#{budgetController.assetSearchForm.assetType}"
-                                        scrollHeight="250" forceSelection="false"/>
-                        <!--                                                completeMethod="#{budgetController.listItems}"/>-->
+                        <label class="label">#{msg.AssetGroup}</label>
+                        <p:selectOneMenu value="#{budgetController.assetSearchForm.assetGroup}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
+                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <p:ajax event="change" listener="#{budgetController.onAssetAssetGroupChange}"
+                                    update="@this assetGroupSecondary"/>
+                        </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.AssetBrand}</p:outputLabel>
-                        <p:autoComplete dropdown="true" value="#{budgetController.assetSearchForm.assetBrand}"
-                                        scrollHeight="250" forceSelection="false">
-                            <!--                                                completeMethod="#{budgetController.listSearchWarehouse}">-->
-                            <!--                                    <p:ajax event="itemSelect" update="searchLocator"-->
-                            <!--                                            listener="#{budgetController.onSearchWarehouseSelect}"/>-->
-                        </p:autoComplete>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.EquipmentModel}</label>
-                        <p:autoComplete dropdown="true" value="#{budgetController.assetSearchForm.functionType}"
-                                        scrollHeight="250" forceSelection="false"/>
-                        <!--                                                completeMethod="#{budgetController.listItems}"/>-->
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <p:outputLabel class="label">#{msg.Asset2ndClassify}</p:outputLabel>
-                        <p:autoComplete id="searchLocator" dropdown="true"
-                                        value="#{budgetController.assetSearchForm.asset2ndClassify}"
-                                        scrollHeight="250" forceSelection="false">
-                            <!--                                                completeMethod="#{budgetController.listSearchLocator}">-->
-                            <!--                                    <p:ajax event="itemSelect" listener="#{budgetController.onSearchLocatorSelect}"/>-->
-                        </p:autoComplete>
+                        <p:outputLabel class="label">#{msg.AssetGroupSecondary}</p:outputLabel>
+                        <p:selectOneMenu id="assetGroupSecondary"
+                                         value="#{budgetController.assetSearchForm.assetGroupSecondary}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{budgetController.assetAssetGroupSecondaryList}" var="item"
+                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
                         <p:outputLabel class="label" value="#{msg.EquipmentName}"/>
                         <p:inputText value="#{budgetController.assetSearchForm.assetName}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.AssetBrand}</p:outputLabel>
+                        <p:inputText value="#{budgetController.assetSearchForm.assetBrand}"/>
+                        <!--                        <p:autoComplete dropdown="true" value="#{budgetController.assetSearchForm.assetBrand}"-->
+                        <!--                                        scrollHeight="250" forceSelection="false">-->
+                        <!--                                                completeMethod="#{budgetController.listSearchWarehouse}">-->
+                        <!--                                    <p:ajax event="itemSelect" update="searchLocator"-->
+                        <!--                                            listener="#{budgetController.onSearchWarehouseSelect}"/>-->
+                        <!--                        </p:autoComplete>-->
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.EquipmentModel}</label>
+                        <p:inputText value="#{budgetController.assetSearchForm.functionType}"/>
+                        <!--                        <p:autoComplete dropdown="true" value="#{budgetController.assetSearchForm.functionType}"-->
+                        <!--                                        scrollHeight="250" forceSelection="false"/>-->
+                        <!--                                                completeMethod="#{budgetController.listItems}"/>-->
                     </h:panelGroup>
                     <h:panelGroup style="display: flex;">
                         <p:commandButton value="#{msg.Search}"
@@ -56,7 +62,7 @@
                                          update="AssetEditForm"/>
                         <p:commandButton value="#{msg.Reset}"
                                          actionListener="#{budgetController.resetAssetSearch}"
-                                         update="AssetEditForm"/>
+                                         update="AssetEditForm assetSearchForm"/>
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
@@ -79,8 +85,8 @@
                 <p:column headerText="#{msg.AssetBrand}">
                     <h:outputText value="#{item.asset.brand.name}"/>
                 </p:column>
-                <p:column headerText="#{msg.AssetType}">
-                    <h:outputText value="#{item.asset.assetType}"/>
+                <p:column headerText="#{msg.EquipmentModel}">
+                    <h:outputText value="#{item.asset.functionType}"/>
                 </p:column>
                 <p:column headerText="#{msg.Unit}">
                     <p:inputText styleClass="width-pct-100" value="#{item.unit}"/>

@@ -3,18 +3,28 @@ package com.ge.apm.view.budget;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BudgetApplicationRepository;
 import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
+import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.SysRoleConstant;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -42,6 +52,8 @@ import java.util.stream.Collectors;
 public class BudgetApplicationController extends GenericCRUDUUIDController<BudgetApplication> {
     private static Logger logger = LoggerFactory.getLogger(BudgetApplicationController.class);
     private UserAccount account = UserContextService.getCurrentUserAccount();
+    private OrgInfo org = null;
+    private Page<BudgetApplication> emptyPage = new PageImpl<>(Collections.emptyList());
 
     private Integer tabIndex = 0;
 
@@ -50,7 +62,10 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     // 已选择的设备列表
     private List<BudgetApplicationAsset> selectedBudgetAssets = new ArrayList<>();
 
-    private List<I18nMessage> asset2ncClassifyList = new ArrayList<>();
+    private List<I18nMessage> budgetAssetGroupSecondaryList = new ArrayList<>();
+    private List<I18nMessage> assetAssetGroupSecondaryList = new ArrayList<>();
+
+    private List<String> readableFieldsList = new ArrayList<>();
 
     private List<SearchFilter> assetSearchFilters;
 
@@ -58,10 +73,14 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     private AssetInfoRepository assetDao;
     private I18nMessageRepository i18nDao;
 
+    private UserContextService userContextService;
     private BudgetPersistService persistService;
+    private UaaService uaaService;
 
     private BudgetSearchForm searchForm = new BudgetSearchForm();
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
+
+    private TreeNode orgTree;
 
     @Override
     protected void init() {
@@ -69,7 +88,18 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 
+        userContextService = WebUtil.getBean(UserContextService.class);
         persistService = WebUtil.getBean(BudgetPersistService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+
+        OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        org = orgDao.findById(account.getOrgInfoId());
+
+        CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
+        CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        initOrgTree();
     }
 
     @Override
@@ -88,7 +118,36 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
             updateSearchFilter(new SearchFilter("applicationStatus", SearchFilter.Operator.EQ, tabIndex));
         }
         updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
-        updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
+        // 设备科室主任是什么 ?
+        if (userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)
+                || userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
+            // 临床科室主任
+            switch (org.getOrgType()) {
+                case 4:
+                    // 科室
+                    updateSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, account.getOrgInfoId()));
+                case 3:
+                    // 院区
+                    updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, account.getSiteUID()));
+                case 2:
+                    // 医院
+                    updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, account.getHospitalUID()));
+                case 1:
+                    // 集团
+                    updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, account.getInstitutionUID()));
+                case 0:
+                    // 租户
+                default:
+                    updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
+                    break;
+            }
+            if (userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
+                // 临床科室人员
+                updateSearchFilter(new SearchFilter("applicantId", SearchFilter.Operator.EQ, account.getId()));
+            }
+        } else {
+            return emptyPage;
+        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -145,11 +204,13 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     }
 
     public void search() {
+        selected = null;
         clearSearchFilter();
         addSearchFilter();
     }
 
     public void resetSearch() {
+        selected = null;
         clearSearchFilter();
         searchForm = new BudgetSearchForm();
         addSearchFilter();
@@ -164,11 +225,8 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     }
 
     private void addSearchFilter() {
-        if (null != searchForm.getDeptId()) {
-            updateSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, searchForm.getDeptId()));
-        }
-        if (StringUtils.isNotBlank(searchForm.getAssetType())) {
-            updateSearchFilter(new SearchFilter("budgetAssets.assetType", SearchFilter.Operator.LIKE, searchForm.getAssetType()));
+        if (null != searchForm.getDept()) {
+            updateSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, searchForm.getDept().getId()));
         }
         if (null != searchForm.getDateStart()) {
             updateSearchFilter(new SearchFilter("applicationDate", SearchFilter.Operator.GTE, searchForm.getDateStart()));
@@ -179,14 +237,17 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         if (StringUtils.isNotBlank(searchForm.getApplicationNum())) {
             updateSearchFilter(new SearchFilter("applicationNum", SearchFilter.Operator.LIKE, searchForm.getApplicationNum()));
         }
-        if (null != searchForm.getApplicantId()) {
-            updateSearchFilter(new SearchFilter("applicantId", SearchFilter.Operator.EQ, searchForm.getApplicantId()));
+        if (null != searchForm.getAssetGroup()) {
+            updateSearchFilter(new SearchFilter("budgetAssets.assetGroup", SearchFilter.Operator.EQ, searchForm.getAssetGroup()));
+        }
+        if (null != searchForm.getAssetGroupSecondary()) {
+            updateSearchFilter(new SearchFilter("budgetAssets.assetGroupSecondary", SearchFilter.Operator.EQ, searchForm.getAssetGroupSecondary()));
+        }
+        if (StringUtils.isNotBlank(searchForm.getApplicantName())) {
+            updateSearchFilter(new SearchFilter("applicant.name", SearchFilter.Operator.EQ, searchForm.getApplicantName()));
         }
         if (StringUtils.isNotBlank(searchForm.getAssetName())) {
             updateSearchFilter(new SearchFilter("budgetAssets.assetName", SearchFilter.Operator.LIKE, searchForm.getAssetName()));
-        }
-        if (null != searchForm.getAsset2ndClassify()) {
-            updateSearchFilter(new SearchFilter("budgetAssets.assetGroupSecondary", SearchFilter.Operator.EQ, searchForm.getAsset2ndClassify()));
         }
     }
 
@@ -198,9 +259,8 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     }
 
     public void resetAssetSearch() {
-        clearAssetSearchFilter();
         assetSearchForm = new BudgetAssetSearchForm();
-        addAssetSearchFilter();
+        searchAsset();
     }
 
     private void clearAssetSearchFilter() {
@@ -212,8 +272,11 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     }
 
     private void addAssetSearchFilter() {
-        if (StringUtils.isNotBlank(assetSearchForm.getAssetType())) {
-            updateAssetSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.LIKE, assetSearchForm.getAssetType()));
+        if (null != assetSearchForm.getAssetGroup()) {
+            updateAssetSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, assetSearchForm.getAssetGroup()));
+        }
+        if (null != assetSearchForm.getAssetGroupSecondary()) {
+            updateAssetSearchFilter(new SearchFilter("assetGroupSecondary", SearchFilter.Operator.EQ, assetSearchForm.getAssetGroupSecondary()));
         }
         if (StringUtils.isNotBlank(assetSearchForm.getAssetBrand())) {
             updateAssetSearchFilter(new SearchFilter("brand.name", SearchFilter.Operator.LIKE, assetSearchForm.getAssetBrand()));
@@ -224,9 +287,29 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         if (StringUtils.isNotBlank(assetSearchForm.getAssetName())) {
             updateAssetSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, assetSearchForm.getAssetName()));
         }
-        if (null != assetSearchForm.getAsset2ndClassify()) {
-            updateAssetSearchFilter(new SearchFilter("assetGroupSecondary", SearchFilter.Operator.EQ, assetSearchForm.getAsset2ndClassify()));
+        OrgInfo orgInfo = selected.getApplicationDept();
+        if (orgInfo != null) {
+            switch (orgInfo.getOrgType()) {
+                case 4:
+                    // 科室
+                    updateAssetSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, orgInfo.getId()));
+                case 3:
+                    // 院区
+                    updateAssetSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getSiteUID()));
+                case 2:
+                    // 医院
+                    updateAssetSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getHospitalUID()));
+                case 1:
+                    // 集团
+                    updateAssetSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getInstitutionUID()));
+                case 0:
+                    // 租户
+                default:
+                    updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getTenantUID()));
+                    break;
+            }
         }
+        updateAssetSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
     }
 
     private void convertAssetToBudgetAsset(List<AssetInfo> assetInfoList) {
@@ -273,7 +356,6 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     public void preAddBudgetAsset() {
         resetAssetSearch();
-        optionalBudgetAssets.clear();
     }
 
     public void addBudgetAsset() {
@@ -292,6 +374,70 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         selected.getBudgetAssets().remove(budgetAsset);
 
         calcTotalAmount();
+    }
+
+    public void initOrgTree() {
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid());
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.setSelectable(false);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        }
+        rootNode.setExpanded(true);
+    }
+
+    public void onSearchTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        searchForm.setDept(orgInfo);
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        if (selected.getApplicationDeptId() != null && !orgInfo.getId().equals(selected.getApplicationDeptId())) {
+            selected.getBudgetAssets().clear();
+        }
+        selected.setApplicationDept(orgInfo);
+        selected.setApplicationDeptId(orgInfo.getId());
+    }
+
+    public boolean show(String fieldKey) {
+        return readableFieldsList.contains(fieldKey);
+    }
+
+    public void onBudgetAssetGroupChange(AjaxBehaviorEvent event) {
+        searchForm.setAssetGroupSecondary(null);
+        budgetAssetGroupSecondaryList.clear();
+        fillBudgetAssetGroupSecondaryList();
+    }
+
+    private void fillBudgetAssetGroupSecondaryList() {
+        if (searchForm.getAssetGroup() == null) {
+            budgetAssetGroupSecondaryList = Collections.emptyList();
+        } else {
+            budgetAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
+                    + searchForm.getAssetGroup(), UserContextService.getCurrentUserAccount().getSiteId());
+        }
+    }
+
+    public void onAssetAssetGroupChange(AjaxBehaviorEvent event) {
+        assetSearchForm.setAssetGroupSecondary(null);
+        assetAssetGroupSecondaryList.clear();
+        fillAssetAssetGroupSecondaryList();
+    }
+
+    private void fillAssetAssetGroupSecondaryList() {
+        if (assetSearchForm.getAssetGroup() == null) {
+            assetAssetGroupSecondaryList = Collections.emptyList();
+        } else {
+            assetAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
+                    + assetSearchForm.getAssetGroup(), UserContextService.getCurrentUserAccount().getSiteId());
+        }
     }
 
     @Override
@@ -341,26 +487,6 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         assetSearchFilters.add(searchFilter);
     }
 
-    public List<Integer> budgetDeptList() {
-        List<Integer> list = new ArrayList<>();
-        return list;
-    }
-
-    public void onAssetTypeChange(AjaxBehaviorEvent event) {
-        searchForm.setAsset2ndClassify(null);
-        asset2ncClassifyList.clear();
-        fillAsset2ndClassifyList();
-    }
-
-    private void fillAsset2ndClassifyList() {
-        if (searchForm.getAssetType() == null) {
-            asset2ncClassifyList = Collections.emptyList();
-        } else {
-            asset2ncClassifyList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
-                    + searchForm.getAssetType(), UserContextService.getCurrentUserAccount().getSiteId());
-        }
-    }
-
     /*
      * getter and setter
      */
@@ -380,12 +506,20 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         this.optionalBudgetAssets = optionalBudgetAssets;
     }
 
-    public List<I18nMessage> getAsset2ncClassifyList() {
-        return asset2ncClassifyList;
+    public List<I18nMessage> getBudgetAssetGroupSecondaryList() {
+        return budgetAssetGroupSecondaryList;
     }
 
-    public void setAsset2ncClassifyList(List<I18nMessage> asset2ncClassifyList) {
-        this.asset2ncClassifyList = asset2ncClassifyList;
+    public void setBudgetAssetGroupSecondaryList(List<I18nMessage> budgetAssetGroupSecondaryList) {
+        this.budgetAssetGroupSecondaryList = budgetAssetGroupSecondaryList;
+    }
+
+    public List<I18nMessage> getAssetAssetGroupSecondaryList() {
+        return assetAssetGroupSecondaryList;
+    }
+
+    public void setAssetAssetGroupSecondaryList(List<I18nMessage> assetAssetGroupSecondaryList) {
+        this.assetAssetGroupSecondaryList = assetAssetGroupSecondaryList;
     }
 
     public BudgetSearchForm getSearchForm() {
@@ -402,5 +536,13 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     public void setAssetSearchForm(BudgetAssetSearchForm assetSearchForm) {
         this.assetSearchForm = assetSearchForm;
+    }
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
     }
 }

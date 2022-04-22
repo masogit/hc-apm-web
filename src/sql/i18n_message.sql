@@ -4622,6 +4622,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- 预算管理 👇
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'Blank', '', ' ', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetMgr', '预算管理', 'Budget Management', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetApplication', '预算申请', 'Budget Application', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetInfo', '预算详情', 'Budget Details', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetAssetInfo', '预算设备详情', 'Budget Asset Details', NULL, -1);
