@@ -5,23 +5,31 @@ package com.ge.apm.view.budget;
  * @date 4/8/2022 17:21
  */
 public class BudgetAssetSearchForm {
-    // 设备类型
-    private String assetType;
+    // 设备分类
+    private Integer assetGroup;
+    // 设备二级分类
+    private Integer assetGroupSecondary;
     // 设备品牌
     private String assetBrand;
     // 设备型号
     private String functionType;
-    // 设备二级分类
-    private Integer asset2ndClassify;
     // 设备名称
     private String assetName;
 
-    public String getAssetType() {
-        return assetType;
+    public Integer getAssetGroup() {
+        return assetGroup;
     }
 
-    public void setAssetType(String assetType) {
-        this.assetType = assetType == null ? null : assetType.trim();
+    public void setAssetGroup(Integer assetGroup) {
+        this.assetGroup = assetGroup;
+    }
+
+    public Integer getAssetGroupSecondary() {
+        return assetGroupSecondary;
+    }
+
+    public void setAssetGroupSecondary(Integer assetGroupSecondary) {
+        this.assetGroupSecondary = assetGroupSecondary;
     }
 
     public String getAssetBrand() {
@@ -38,14 +46,6 @@ public class BudgetAssetSearchForm {
 
     public void setFunctionType(String functionType) {
         this.functionType = functionType == null ? null : functionType.trim();
-    }
-
-    public Integer getAsset2ndClassify() {
-        return asset2ndClassify;
-    }
-
-    public void setAsset2ndClassify(Integer asset2ndClassify) {
-        this.asset2ndClassify = asset2ndClassify;
     }
 
     public String getAssetName() {

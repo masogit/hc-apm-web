@@ -109,6 +109,12 @@
         <p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>
         <p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
             </p:submenu>
+
+            <p:submenu label="#{msg.BudgetMgr}" icon="attach_money"
+                       rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}">
+                <p:menuitem value="#{msg.BudgetApplication}" outcome="/portal/budget/List.xhtml"/>
+            </p:submenu>
+
             <p:submenu id="um25" label="#{msg.MyTrain}" icon="fa fa-check-square-o" rendered="#{userContextService.isAccessMyTrain()}">
               <p:menuitem value="#{msg.TrainReport}" outcome="/portal/trainreport/trainReport.xhtml"/>
             </p:submenu>

@@ -52,8 +52,8 @@
                       filterBy="#{item.approver.name}" filterMatchMode="LIKE">
                 <h:outputText value="#{item.approver.name}"/>
             </p:column>
-            <p:column headerText="#{msg.ApprovalDate}" sortBy="#{item.approvalDate}">
-                <!--                      filterBy="#{item.approvalDate}" filterMatchMode="GTE">-->
+            <p:column headerText="#{msg.ApprovalDate}" sortBy="#{item.approvalDate}"
+                      filterBy="#{item.approvalDate}" filterMatchMode="GTE">
                 <f:facet name="filter">
                     <p:inputText id="approvalDate" widgetVar="varApprovalDate"/>
                 </f:facet>
@@ -68,7 +68,8 @@
                                  title="#{msg.Create}"
                                  actionListener="#{budgetController.prepareCreate}"
                                  update=":BudgetApplicationEditDlg"
-                                 oncomplete="PF('BudgetApplicationEditDialog').show()"/>
+                                 oncomplete="PF('BudgetApplicationEditDialog').show()"
+                                 disabled="#{userContextService.hasNotAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}"/>
                 <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"
                                  title="#{msg.View}"
                                  actionListener="#{budgetController.prepareView}"
@@ -96,28 +97,27 @@
             </f:facet>
         </p:dataTable>
 
-        <!--        <p:overlayPanel widgetVar="dateFilter" for="@parent:datalist:approvalDate" dismissable="true"-->
-        <!--                        style="position: relative">-->
-        <!--            <h:panelGrid columns="2">-->
-        <!--                <p:outputLabel value="#{msg.From}"/>-->
-        <!--                <p:calendar id="from" timeZone="#{userContextService.getTimeZone()}"-->
-        <!--                            locale="#{userContextService.getCalendarLocale()}"-->
-        <!--                            pattern="#{userContextService.timeFormat()}"-->
-        <!--                            widgetVar="varApprovalDateFrom" showButtonPanel="true"-->
-        <!--                            showOn="button" navigator="true"/>-->
-        <!--                <p:outputLabel value="#{msg.To}"/>-->
-        <!--                <p:calendar id="to" timeZone="#{userContextService.getTimeZone()}"-->
-        <!--                            locale="#{userContextService.getCalendarLocale()}"-->
-        <!--                            pattern="#{userContextService.timeFormat()}"-->
-        <!--                            widgetVar="varApprovalDateTo" showButtonPanel="true"-->
-        <!--                            showOn="button" navigator="true"/>-->
-        <!--            </h:panelGrid>-->
-        <!--            <p:commandButton-->
-        <!--                    onclick="setDateFilter('varDataList', 'varApprovalDate', 'varApprovalDateFrom', 'varApprovalDateTo'); PF('dateFilter').hide();"-->
-        <!--                    title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>-->
-        <!--            <p:commandButton onclick="PF('dateFilter').hide()" title="#{msg.Close}"-->
-        <!--                             icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>-->
-        <!--        </p:overlayPanel>-->
+        <p:overlayPanel widgetVar="dateFilter" for="@parent:datalist:approvalDate" dismissable="true">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar id="from" timeZone="#{userContextService.getTimeZone()}"
+                            locale="#{userContextService.getCalendarLocale()}"
+                            pattern="#{userContextService.timeFormat()}"
+                            widgetVar="varApprovalDateFrom" showButtonPanel="true"
+                            showOn="button" navigator="true"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar id="to" timeZone="#{userContextService.getTimeZone()}"
+                            locale="#{userContextService.getCalendarLocale()}"
+                            pattern="#{userContextService.timeFormat()}"
+                            widgetVar="varApprovalDateTo" showButtonPanel="true"
+                            showOn="button" navigator="true"/>
+            </h:panelGrid>
+            <p:commandButton
+                    onclick="setDateFilter('varDataList', 'varApprovalDate', 'varApprovalDateFrom', 'varApprovalDateTo'); PF('dateFilter').hide();"
+                    title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('dateFilter').hide()" title="#{msg.Close}"
+                             icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
     </h:form>
 
 </ui:composition>
