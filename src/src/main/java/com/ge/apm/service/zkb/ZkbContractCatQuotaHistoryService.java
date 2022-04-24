@@ -37,6 +37,23 @@ public class ZkbContractCatQuotaHistoryService {
     }
 
 
+    public void saveZkbFeQuotaHistory(ZkbContract zkbContract, ZkbContractAsset zkbContractAsset, String zkbPartOrderId, String zkbPartOrderNo, String probeType, UserAccount currentUser){
+        ZkbContractCatQuotaHistory zkbContractCatQuotaHistory = new ZkbContractCatQuotaHistory();
+        zkbContractCatQuotaHistory.setCreatedBy(currentUser.getUid());
+        zkbContractCatQuotaHistory.setCreatedDate(new Date());
+        zkbContractCatQuotaHistory.setLastModifiedBy(currentUser.getUid());
+        zkbContractCatQuotaHistory.setLastModifiedDate(new Date());
+        zkbContractCatQuotaHistory.setContractNo(zkbContract.getContractNo());
+        zkbContractCatQuotaHistory.setContractId(zkbContract.getId());
+        zkbContractCatQuotaHistory.setPartOrderId(zkbPartOrderId);
+        zkbContractCatQuotaHistory.setPartOrderNo(zkbPartOrderNo);
+        zkbContractCatQuotaHistory.setPartOrderNo(zkbPartOrderNo);
+        zkbContractCatQuotaHistory.setProbeType(probeType);
+        zkbContractCatQuotaHistory.setAssetType(zkbContractAsset.getHighLowMachine());
+        zkbContractCatQuotaHistoryRepository.save(zkbContractCatQuotaHistory);
+
+    }
+
     public void insertZkbFeContractCatQuotaHistory(ZkbContract zct, ZkbFePartOrder zkbFePartOrder, UserAccount currentUser){
         ZkbContractCatQuotaHistory zkbContractCatQuotaHistory = new ZkbContractCatQuotaHistory();
         zkbContractCatQuotaHistory.setCreatedBy(currentUser.getUid());
