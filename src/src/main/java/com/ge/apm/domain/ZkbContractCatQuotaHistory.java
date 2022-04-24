@@ -17,6 +17,10 @@ public class ZkbContractCatQuotaHistory {
 
     private static final long serialVersionUID = 1L;
 
+    public enum ProbeTypeStatus {
+        OldProbe,Any,Special,Normal,High
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
