@@ -3,8 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+                template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
         <style>
@@ -107,6 +106,9 @@
                         <!--不良事件-->
                         <ui:include src="content/AdverseEventsApproval.xhtml"></ui:include>
 
+                        <!-- 预算审核页面-->
+                        <ui:include src="budget/BudgetDetail.xhtml"/>
+
                         <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 13}">
                             <label class="label" style="font-size: medium; font-weight: bold">审核结果</label>
                             <p:selectOneRadio id="enable" value="#{multiLevelApprovalController.approvalResult}">
@@ -120,7 +122,7 @@
                                          value="#{multiLevelApprovalController.approvalOpinion}"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 13}">
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14}">
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                     </h:panelGroup>
@@ -129,7 +131,17 @@
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.adverseEventsAgree()}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.adverseEventsDisagree()}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                     </h:panelGroup>
-
+                    <!-- 预算审核 -->
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 14}">
+                        <p:commandButton validateClient="true" immediate="false"
+                                         actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}"
+                                         value="#{msg.Approved}" update="approvalList ItemDetailViewForm"
+                                         oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                        <p:commandButton validateClient="true" immediate="false"
+                                         actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}"
+                                         value="#{msg.NotApproved}" update="approvalList ItemDetailViewForm"
+                                         oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                    </h:panelGroup>
                 </h:form>
 
             </p:dialog>
