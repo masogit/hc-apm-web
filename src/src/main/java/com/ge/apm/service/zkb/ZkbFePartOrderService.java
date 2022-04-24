@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 503202755 2020/12/8
@@ -330,6 +331,25 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return "设备已报废，不能继续申请！！";
         }*/
         return "";
+    }
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2022/4/22
+     * 获取当前保修单的 设备类型是高端机还是低端机
+     */
+    public String getAssetTypeName(ZkbContract zkbContract,ZkbFePartOrder zkbFePartOrder) {
+        String assetTypeName = new String ();
+        Set<ZkbContractAsset> zkbContractAsset = zkbContract.getZkbContractAssets().stream().filter(ass -> {
+            if(ass.getAssetInfo()!=null){
+                return ass.getAssetInfo().getSystemId().equals(zkbFePartOrder.getSystemId());
+            }
+            return false;
+        }).collect(Collectors.toSet());
+        if(!zkbContractAsset.isEmpty()){
+            assetTypeName = zkbContractAsset.iterator().next().getAssetType();
+        }
+        return assetTypeName;
     }
 
 
@@ -849,10 +869,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                         zkbContract.setProbeQuotaNormal(probeQuotaNormal - qty);
                         zkbContract.setProbeQuotaNormalApply(probeQuotaNormalApply + qty);
                     }
-                    //TODO liyonjian ZKB - 2022年新探头逻辑
-                    if(true){
-                        zkbContractCatQuotaHistoryService.insertZkbFeContractCatQuotaHistory(zkbContract,zkbFePartOrder,userAccount);
-                    }
                     break;
                 case 2:
                     if (ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType)) {
@@ -952,10 +968,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     //探头剩余名额-1，探头申请名额+1
                     zkbContract.setProbeQuota(zkbContract.getProbeQuota() - qty);
                     zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaApply() + qty);
-                    //TODO liyonjian ZKB - 2022年新探头逻辑
-                    if(true){
-                        zkbContractCatQuotaHistoryService.insertZkbFeContractCatQuotaHistory(zkbContract,zkbFePartOrder,userAccount);
-                    }
                     break;
                 case 2:
                     //探头申请名额-1，探头已使用名额+1
@@ -1951,7 +1963,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             if (zkbFePartOrder.getQty() != null && zkbFePartOrder.getQty() > 0) {
                 this.moveProbe(5, zkbContract, zkbFePartOrder.getQty(), showZkbPoProbeQuotaType, zkbFePartOrder.getZkbPoProbeQuotaType(), userAccount, zkbFePartOrder, true, i18Map.get("GEAdminAccept"));
                 //TODO liyonjian ZKB - 2022年新探头逻辑
-                if(true){
+                if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
                     zkbContractCatQuotaHistoryService.updateZkbFeContractCatQuotaHistoryStatusOrQty(zkbContract,zkbFePartOrder,userAccount,"N",null);
                 }
             }
