@@ -46,11 +46,8 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     private BlobFileService blobService;
     private AuditTemplateService auditTemplateService;
     private AuditUserCaseService auditUserCaseService;
-    // 编辑页面用
-    private String selectedTenantUid;
     // 列表页面用
     private TenantInfo selectedTenant;
-    private OrgInfo selectedOrg;
 
     @Override
     protected void init() {
@@ -67,27 +64,8 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         blobService = WebUtil.getBean(BlobFileService.class);
         auditTemplateService = WebUtil.getBean(AuditTemplateService.class);
         auditUserCaseService = WebUtil.getBean(AuditUserCaseService.class);
-
-        String selectedTenantUid = WebUtil.getRequestParameter("selectedTenantUid");
-
-        if(StringUtils.isNotBlank(selectedTenantUid)){
-            selectedTenant = tenantInfoRepository.findByuid(selectedTenantUid);
-        }else{
-            selectedTenant = new TenantInfo();
-            selectedTenant.setName("请选择租户");
-        }
-
-        String selectedOrgUid = WebUtil.getRequestParameter("selectedOrgUid");
-
-        if(StringUtils.isNotBlank(selectedOrgUid)){
-            selectedOrg = orgInfoRepository.findByUid(selectedOrgUid);
-        }else{
-            selectedOrg = new OrgInfo();
-            selectedOrg.setName("请选择院区");
-        }
-
-
-
+        selectedTenant = new TenantInfo();
+        selectedTenant.setName("请选择租户");
     }
 
     @Override
@@ -102,8 +80,6 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         if(CollectionUtils.isEmpty(this.searchFilters)){
             this.searchFilters = new ArrayList<>();
         }
-        removeFilterOnField("siteUid");
-        this.searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, this.selectedOrg.getUid()));
         List<SearchFilter> searchFilters = this.searchFilters;
         Page<AuditCase> pageList = dao.findBySearchFilter(searchFilters, page);
 
@@ -159,7 +135,6 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
 
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
-        this.selectedTenantUid = null;
         super.prepareCreate();
     }
 
@@ -180,16 +155,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
             return "";
         }
 
-        StringBuilder url = new StringBuilder("auditUserCaseList?faces-redirect=true");
-
-        if(this.selectedTenant != null && StringUtils.isNotBlank(this.selectedTenant.getUid())){
-            url.append("&selectedTenantUid=").append(this.selectedTenant.getUid());
-        }
-        if(this.selectedOrg != null && StringUtils.isNotBlank(this.selectedOrg.getUid())){
-            url.append("&selectedOrgUid=").append(this.selectedOrg.getUid());
-        }
-
-        return url.toString();
+        return "auditUserCaseList?faces-redirect=true";
     }
 
     /**
@@ -231,10 +197,10 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     }
 
     public List<OrgInfo> getSiteByTenant(){
-        if(StringUtils.isEmpty(this.selectedTenantUid)){
+        if(this.selected == null || StringUtils.isEmpty(this.selected.getTenantUid())){
             return new ArrayList<>();
         }
-        return orgInfoRepository.findAllSiteByTenantUid(this.selectedTenantUid);
+        return orgInfoRepository.findAllSiteByTenantUid(this.selected.getTenantUid());
     }
 
     public List<AuditSystemCase> getAllSystemCase(){
@@ -261,12 +227,6 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         }
     }
 
-    public void setSelectOrgInfo(){
-        if(StringUtils.isNotEmpty(this.selectedOrg.getUid())){
-            this.selectedOrg = orgInfoRepository.findByUid(this.selectedOrg.getUid());
-        }
-    }
-
     /**
      * 列表页面的院区查询
      * @return
@@ -279,16 +239,19 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         return list;
     }
 
-    public void setTenant(String tenantUid) {
-        this.selectedTenantUid = tenantUid;
+    public String getTenantName(String tenantUID) {
+        return tenantInfoRepository.findByuid(tenantUID).getName();
     }
 
-    public String getSelectedTenantUid() {
-        return selectedTenantUid;
-    }
-
-    public void setSelectedTenantUid(String selectedTenantUid) {
-        this.selectedTenantUid = selectedTenantUid;
+    public String getSiteNameByUId(String uid) {
+        OrgInfo oi = orgInfoRepository.getByUid(uid);
+        if (oi == null) {
+            return null;
+        }
+        if (oi.getOrgLevel() == 3) {
+            return oi.getName();
+        }
+        return null;
     }
 
     public TenantInfo getSelectedTenant() {
@@ -297,14 +260,6 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
 
     public void setSelectedTenant(TenantInfo selectedTenant) {
         this.selectedTenant = selectedTenant;
-    }
-
-    public OrgInfo getSelectedOrg() {
-        return selectedOrg;
-    }
-
-    public void setSelectedOrg(OrgInfo selectedOrg) {
-        this.selectedOrg = selectedOrg;
     }
 
     private void createEvent(String eventType, AuditCase auditCase, String result){
