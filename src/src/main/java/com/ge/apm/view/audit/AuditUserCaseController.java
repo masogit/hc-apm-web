@@ -51,7 +51,6 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
 
     @Override
     protected void init() {
-        this.filterBySite = false;
         dao = WebUtil.getBean(AuditCaseRepository.class);
         relDao = WebUtil.getBean(AuditEntryTemplateRelRepository.class);
         caseDao = WebUtil.getBean(AuditSystemCaseRepository.class);
@@ -75,13 +74,11 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
 
     @Override
     protected Page<AuditCase> loadData(PageRequest pageRequest) {
-        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
-        PageRequest page = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         if(CollectionUtils.isEmpty(this.searchFilters)){
             this.searchFilters = new ArrayList<>();
         }
         List<SearchFilter> searchFilters = this.searchFilters;
-        Page<AuditCase> pageList = dao.findBySearchFilter(searchFilters, page);
+        Page<AuditCase> pageList = dao.findBySearchFilter(searchFilters, pageRequest);
 
         List<AuditCase> list = pageList.getContent();
         if(CollectionUtils.isEmpty(list)){
