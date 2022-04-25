@@ -21,11 +21,11 @@
                     <p:dataTable id="datalist" class="datalist" value="#{auditUserCaseController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{auditUserCaseController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.uid}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}" rowIndexVar="rowIndex"
-                                 rowsPerPageTemplate="10,20,30,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="filter" listener="#{auditUserCaseController.onFilter}" />
 
@@ -96,7 +96,11 @@
                             <h:outputText value="#{item.updater}"/>
                         </p:column>
                         <p:column headerText="更新时间" sortBy="#{item.updateTime}">
-                            <h:outputText value="#{item.updateTime}"/>
+                            <h:outputText value="#{item.updateTime}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.Operation}" exportable="false" width="120" id="operatorColumn">
                             <h:panelGroup>

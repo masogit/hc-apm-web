@@ -57,11 +57,8 @@ public class AuditEventController extends GenericCRUDUUIDController<AuditEvent> 
 
     @Override
     protected Page<AuditEvent> loadData(PageRequest pageRequest) {
-        Sort sort = new Sort(Sort.Direction.DESC, "eventTime");
-        PageRequest page = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
-
         List<SearchFilter> searchFilters = this.searchFilters;
-        Page<AuditEvent> list = dao.findBySearchFilter(searchFilters, page);
+        Page<AuditEvent> list = dao.findBySearchFilter(searchFilters, pageRequest);
         return list;
     }
 
