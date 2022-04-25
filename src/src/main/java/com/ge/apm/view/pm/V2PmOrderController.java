@@ -467,7 +467,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         Object periodObj = filters.get("period");
         filters.keySet().removeIf(key->(key.equals("ruleName")||key.equals("period")));
         super.onFilter(event);
+        if(ruleNameObj != null || periodObj != null) {
+            filterRuleNameOrPeriod(ruleNameObj, periodObj);
+        }
 
+    }
+
+    private void filterRuleNameOrPeriod(Object ruleNameObj, Object periodObj) {
         List<V2_PmOrder> pmOrders = dao.findBySearchFilter(searchFilters);
         Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(V2_PmOrder::getId, Function.identity(), (o1, o2) -> o2));
         Set<String> assetUids = pmOrderMap.values().stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
@@ -532,7 +538,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }else{
             searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,-1));
         }
-
     }
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
