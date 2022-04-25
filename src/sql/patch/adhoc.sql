@@ -1,3 +1,2 @@
-INSERT INTO sys_role("name", role_desc, home_page) VALUES( 'ReviewSystemAdministrator', '评审专家', '/');
-INSERT INTO sys_role("name", role_desc, home_page) VALUES( 'PMAdministrator', '评审管理组', '/');
-INSERT INTO sys_role("name", role_desc, home_page) VALUES( 'ReviewAdministrator', '评审管理员', '/');
+-- 质控评审 省份&版本管理，租户需要可筛选
+update audit_case t1 set tenant_uid = t2.tenant_uid from org_info t2 where t1.site_uid = t2.uid;
