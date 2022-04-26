@@ -11,7 +11,7 @@
                 let vl = failureType.value;
                 if(vl == null){
                     return ;
-                }else if(vl == 1){
+                }else{
                     PF('failureModal').show();
                 }
             }
@@ -150,10 +150,19 @@
                         </div>
                     </div>
                     <p:dialog id="Active" widgetVar="failureModal" width="350" height="100" modal="true" resizable="true" draggable="true" header="删除确认" closable="true">
-
-                        <p class="p-m-0">该组织下有二维码存在,是否要先删除二维码?</p>
+                        <c:choose>
+                            <c:when test="#{orgInfoController.failureType == 1}">
+                                <p class="p-m-0" >该组织下有二维码存在,是否要先删除二维码?</p>
+                            </c:when>
+                            <c:when test="#{orgInfoController.failureType == 2}">
+                                <p class="p-m-0" >该组织下有用户权限关联,是否要先解除关联?</p>
+                            </c:when>
+                            <c:otherwise>
+                                <p class="p-m-0" >出错了！</p>
+                            </c:otherwise>
+                        </c:choose>
                         <h:panelGrid columns="3">
-                            <p:commandButton process="@this" icon="ui-icon-close" value="删除" actionListener="#{orgInfoController.deleteFailureCode}" update="@form" oncomplete="PF('failureModal').hide()" />
+                            <p:commandButton process="@this" icon="ui-icon-close" value="#{orgInfoController.failureType == 1?'删除':'解除'}" actionListener="#{orgInfoController.deleteFailureCode}" update="@form" oncomplete="PF('failureModal').hide()" />
                             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('failureModal').hide()"/>
                         </h:panelGrid>
                     </p:dialog>

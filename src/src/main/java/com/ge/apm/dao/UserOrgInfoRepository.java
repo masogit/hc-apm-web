@@ -40,6 +40,11 @@ public interface UserOrgInfoRepository extends GenericRepositoryUUID<UserOrgInfo
 
     @Transactional
     @Modifying
+    @Query(value = "delete from user_org where org_uid = ?1", nativeQuery = true)
+    void deleteByOrgUId(String OrgUid);
+
+    @Transactional
+    @Modifying
     @Query(value = "delete from user_org where user_uid= ?1 and org_uid in (\n" +
             "with recursive cte_org as (\n" +
             "    select oi.uid\n" +
