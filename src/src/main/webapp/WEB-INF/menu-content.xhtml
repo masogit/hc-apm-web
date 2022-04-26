@@ -111,7 +111,7 @@
             </p:submenu>
 
             <p:submenu label="#{msg.BudgetMgr}" icon="attach_money"
-                       rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}">
+                       rendered="#{userContextService.versionContains('budgetMgr') and userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}">
                 <p:menuitem value="#{msg.BudgetApplication}" outcome="/portal/budget/List.xhtml"/>
             </p:submenu>
 
