@@ -5,13 +5,13 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import java.text.ParseException;
@@ -137,6 +137,7 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("公司编码", "setCompanyCode");
             contractRow.setFieldStringValue("599合同年份", "setFirstYearFlag");
             contractRow.setFieldStringValue("关联合同号", "setLinkContractNo");
+            contractRow.setFieldStringValue("2022年起探头高低端名额分类", "setAssetQuotaType");
 
             if(contractInfoVO.isNull()){
                 break;
@@ -223,18 +224,6 @@ public class ZkbContractImportService {
 
             if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
                 if("是".equals(contractInfoVO.getFiveNineNineFlag())){
-                   /*
-                    zkbContract.setYearCount(1);
-                    zkbContract.setStartDate(zkbContract.getContractStartDate());
-                    int year = zkbContract.getYearCount() == null ? 1 :  zkbContract.getYearCount();
-                    if(zkbContract.getYearCount() == null){
-                        zkbContract.setYearCount(1);
-                    }
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(zkbContract.getContractStartDate());
-                    cal.add(Calendar.YEAR, year);
-                    cal.add(Calendar.DATE, -1);
-                    zkbContract.setEndDate(cal.getTime());*/
                     zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
                     if("599合同第一年".equals(contractInfoVO.getFirstYearFlag())){
                         zkbContract.setFirstYearFlag(CopyByInvok.T);
@@ -244,13 +233,18 @@ public class ZkbContractImportService {
                         zkbContract.setFirstYearFlag("");
                     }
                 }else{
-                    /*
-                    zkbContract.setStartDate(zkbContract.getContractStartDate());
-                    zkbContract.setEndDate(zkbContract.getContractEndDate());*/
                     zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.N.toString());
                 }
                 zkbContract.setLinkContractNo(contractInfoVO.getLinkContractNo());
                 zkbContract.setCompanyCode(contractInfoVO.getCompanyCode());
+            }
+
+            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
+                if("是".equals(contractInfoVO.getAssetQuotaType())){
+                    zkbContract.setAssetQuotaType(CopyByInvok.T);
+                }else if("否".equals(contractInfoVO.getAssetQuotaType())){
+                    zkbContract.setAssetQuotaType(CopyByInvok.F);
+                }
             }
             zkbContract.setLastModifiedBy(currentUser.getLoginName());
             zkbContract.setLastModifiedDate(new Date());
@@ -471,6 +465,8 @@ public class ZkbContractImportService {
                 isValidateData = false;
             }
         }
+
+
         for (Map<String, Object> tempContractMap: importContractMapList) {
             ZkbContractVO tempZkbContractVO = (ZkbContractVO)tempContractMap.get("contractInfoVO");
             Integer tempHashCode = Integer.valueOf(tempContractMap.get("hashCode").toString());

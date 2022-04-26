@@ -18,6 +18,7 @@ public enum GatewayURL {
     // Objects
     UPLOAD_SINGLE_FILE_BY_URL("/hcapmobjecthubservice/api/apm/objectHub/objects/urlFile"),
     UPLOAD_SINGLE_FILE("/zuul/hcapmobjecthubservice/api/apm/objectHub/objects/single"),
+    UPLOAD_SINGLE_COMPRESS_FILE("/zuul/hcapmobjecthubservice/api/apm/objectHub/objects/compressImageSingle"),
     DELETE_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
     DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/download"),
     SEARCH_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),

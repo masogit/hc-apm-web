@@ -31,6 +31,8 @@ import javax.validation.constraints.Size;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -242,6 +244,16 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     @Transient
     private BigDecimal totalPriceToBigDecimal;
+
+    @Transient
+    @Getter
+    @Setter
+    private String ruleName;
+
+    @Transient
+    @Getter
+    @Setter
+    private String period;
 
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
