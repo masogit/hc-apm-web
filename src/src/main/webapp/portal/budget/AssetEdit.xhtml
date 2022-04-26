@@ -26,7 +26,7 @@
                                     update="@this assetGroupSecondary"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{budgetController.show('assetGroupSecondary')}">
                         <p:outputLabel class="label">#{msg.AssetGroupSecondary}</p:outputLabel>
                         <p:selectOneMenu id="assetGroupSecondary"
                                          value="#{budgetController.assetSearchForm.assetGroupSecondary}">
