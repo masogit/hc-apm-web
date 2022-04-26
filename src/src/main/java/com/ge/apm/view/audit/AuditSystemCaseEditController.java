@@ -375,6 +375,10 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             if(auditSystemEntry.getLevel()==3){
                 evaluationCriteriaFlag=true;
             }
+            entryScoreFlag=false;
+            if (auditSystemEntry.getLevel()>=1){
+                entryScoreFlag=true;
+            }
         }
     }
     public void deleteTemplate(AuditTemplate auditTemplate){
@@ -709,6 +713,12 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         return false;
 
+    }
+    public void entryTypeChecking(){
+        evaluationCriteriaFlag=false;
+        if (entryType != null && entryType==3){
+            evaluationCriteriaFlag=true;
+        }
     }
     private void createEvent(String eventType, AuditConfigItem item, String result){
         AuditEvent event = new AuditEvent();
