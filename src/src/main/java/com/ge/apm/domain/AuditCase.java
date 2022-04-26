@@ -44,6 +44,11 @@ public class AuditCase implements Serializable {
     @Column(name = "site_uid")
     private String siteUid;
     /**
+     * tenant_uid
+     */
+    @Column(name = "tenant_uid")
+    private String tenantUid;
+    /**
      * 状态 :1 active, 2 archieve
      */
     @Column(name = "status")

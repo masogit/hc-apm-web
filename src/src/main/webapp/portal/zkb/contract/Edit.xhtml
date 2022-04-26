@@ -62,13 +62,6 @@
                             </label>
                             <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">名额扣除类型*</label>
-                            <p:selectOneMenu id="quotaDeductType" value="#{zkbContractEditController.selected.quotaDeductType}" required="true" requiredMessage="名额扣除类型 #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{zkbContractEditController.quotaDeductTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
                         <h:panelGroup rendered="#{!(empty zkbContractEditController.selected.id)}">
                             <label class="label">修改类型*</label>
                             <p:selectOneMenu id="modifyType" value="#{zkbContractEditController.selected.modifyType}" required="true" requiredMessage="修改类型 #{msg.ValidationRequire}" >
@@ -76,6 +69,22 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractModifyType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">名额扣除类型*</label>
+                            <p:selectOneMenu id="quotaDeductType" value="#{zkbContractEditController.selected.quotaDeductType}" required="true" requiredMessage="名额扣除类型 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{zkbContractEditController.quotaDeductTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">2022年起探头高低端名额分类*</label>
+                            <p:selectOneMenu  value="#{zkbContractEditController.selected.assetQuotaType}" required="true" requiredMessage="2022年起探头高低端名额分类 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemValue="t" itemLabel="是"/>
+                                <f:selectItem itemValue="f" itemLabel="否"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">是否ZKB 599方案*</label>
                             <p:selectOneMenu  value="#{zkbContractEditController.selected.fiveNineNineFlag}" required="true" requiredMessage="是否ZKB 599合同 #{msg.ValidationRequire}">
@@ -95,12 +104,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup id="linkContractNoGroup">
-                            <h:panelGroup rendered="#{zkbContractEditController.selected.fiveNineNineFlag eq 'Y'}">
-                                <label class="label">关联合同号</label>
-                                <p:inputText id="linkContractNo" value="#{zkbContractEditController.selected.linkContractNo}" />
-                            </h:panelGroup>
-                        </h:panelGroup>
+
 
                         <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Spare')}">
                             <label class="label">#{msg.zkbContract_spareQuota_total}</label>
@@ -274,7 +278,12 @@
                             <p:inputText id="remark" value="#{zkbContractEditController.selected.remark}" />
                         </h:panelGroup>
 
-
+                        <h:panelGroup id="linkContractNoGroup">
+                            <h:panelGroup rendered="#{zkbContractEditController.selected.fiveNineNineFlag eq 'Y'}">
+                                <label class="label">关联合同号</label>
+                                <p:inputText id="linkContractNo" value="#{zkbContractEditController.selected.linkContractNo}" />
+                            </h:panelGroup>
+                        </h:panelGroup>
                     </p:panelGrid>
 
 

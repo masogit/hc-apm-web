@@ -2981,7 +2981,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MeasurementConfiguration', '计量配置', 'Measurement Configuration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MeasurementRelatedLaborCost', '计量工单人工费用', 'Measurement-related Labor Cost', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentSwapConfiguration', '设备调剂配置', 'Equipment Swap Configuration', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SwapCenter', '调剂无人值守', 'Swap Center', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SwapCenter', '调剂中心', 'Swap Center', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WhetherOrNotToCalculateTheManhours', '是否计算借用工时', 'Whether or not to calculate the manhours', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RentManhourDefault', '借用工时默认值', 'Rent Manhour Default', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CalculateReturnTheManhours', '是否计算归还工时', 'Whether or not to calculate return the manhours', NULL, '-1');
@@ -4565,7 +4565,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Version','版本','Version',NULL,-1);
 -- 质控评审事件类型
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_CONGFIG_ITEM','添加系统知识库','Add system item',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_CONFIG_ITEM','添加系统知识库','Add system item',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EDIT_CONFIG_ITEM','编辑系统知识库','Edit system item',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','DELETE_CONFIG_ITEM','删除系统知识库','Delete system item',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_TEMPLATE','添加系统模板','Add system template',NULL,-1);

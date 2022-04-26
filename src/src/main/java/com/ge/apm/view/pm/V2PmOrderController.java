@@ -6,8 +6,8 @@
 package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONPath;
-import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
@@ -19,7 +19,6 @@ import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
@@ -55,6 +54,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
+import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.LoggerFactory;
@@ -78,6 +78,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -129,6 +131,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<PmOrderRuleCheckList> pmOrderRuleCheckList;
     private ServiceRequestApiService serviceRequestApiService;
     private PmOrderRuleRepository pmOrderRuleRepository;
+    private RelRuleAssetRepository relRuleAssetRepository;
     private String token;
     private List<UnstructuredDataCollection> unDataCollection;
     private UnstructuredDataCollection unCollection;
@@ -458,7 +461,117 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
         });
     }
+    @Override
+    public void onFilter(FilterEvent event){
+        Map<String, Object> filters = event.getFilters();
+        Object ruleNameObj = filters.get("ruleName");
+        Object periodObj = filters.get("period");
+        filters.keySet().removeIf(key->(key.equals("ruleName")||key.equals("period")));
+        removeFilterOnFields();
+        List<V2_PmOrder> pmOrders = dao.findBySearchFilter(searchFilters);
+        super.onFilter(event);
+        if((ruleNameObj != null || periodObj != null) && CollectionUtils.isNotEmpty(pmOrders)) {
+            filterRuleNameOrPeriod(ruleNameObj, periodObj,pmOrders);
+        }
+    }
 
+    private void removeFilterOnFields() {
+        removeFilterOnField("id");
+        removeFilterOnField("assetInfo.name");
+        removeFilterOnField("assetInfo.serialNum");
+        removeFilterOnField("assetInfo.departNum");
+        removeFilterOnField("assetInfo.functionType");
+        removeFilterOnField("ruleLevel");
+        removeFilterOnField("pmType");
+        removeFilterOnField("creatorName");
+        removeFilterOnField("ownerName");
+        removeFilterOnField("pmNum");
+        removeFilterOnField("currentStepName");
+        removeFilterOnField("planTime");
+        removeFilterOnField("endTime");
+    }
+
+    private void filterRuleNameOrPeriod(Object ruleNameObj, Object periodObj,List<V2_PmOrder> pmOrders) {
+        Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(V2_PmOrder::getId, Function.identity(), (o1, o2) -> o2));
+        Set<String> assetUids = pmOrderMap.values().stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
+
+        List<SearchFilter> relRuleAssetFilter = new ArrayList<>();
+        String tenantUid = userContextService.getTenantInfo().getUid();
+
+        relRuleAssetFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUid));
+        relRuleAssetFilter.add(new SearchFilter("assetUID", SearchFilter.Operator.IN,assetUids));
+        List<RelRuleAsset> relRuleAssets = relRuleAssetRepository.findBySearchFilter(relRuleAssetFilter);
+//        Map<String, RelRuleAsset> relRuleAssetMap = relRuleAssets.stream().collect(Collectors.toMap(RelRuleAsset::getAssetUID, Function.identity(), (o1, o2) -> o2));
+
+        Map<String,Map<Integer,String>> assetUidLevelPmRuleUidMap = new HashedMap<>();
+        Set<String> pmRuleuids = new HashSet<>();
+        relRuleAssets.stream().forEach(e ->{
+            Map<Integer,String> levelPmRuleUidMap = new HashedMap<>();
+            if(StringUtils.isNotEmpty(e.getRuleUID())){
+                pmRuleuids.add(e.getRuleUID());
+                levelPmRuleUidMap.put(3,e.getRuleUID());
+            }
+            if(StringUtils.isNotEmpty(e.getRuleUID1())){
+                pmRuleuids.add(e.getRuleUID1());
+                levelPmRuleUidMap.put(1,e.getRuleUID1());
+            }
+            if(StringUtils.isNotEmpty(e.getRuleUID2())){
+                pmRuleuids.add(e.getRuleUID2());
+                levelPmRuleUidMap.put(2,e.getRuleUID2());
+            }
+            if(StringUtils.isNotEmpty(e.getRuleUID4())){
+                pmRuleuids.add(e.getRuleUID4());
+                levelPmRuleUidMap.put(4,e.getRuleUID4());
+            }
+            assetUidLevelPmRuleUidMap.put(e.getAssetUID(),levelPmRuleUidMap);
+        });
+
+        List<SearchFilter> pmRuleFilter = new ArrayList<>();
+        relRuleAssetFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUid));
+        relRuleAssetFilter.add(new SearchFilter("uid", SearchFilter.Operator.IN,pmRuleuids));
+        List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findBySearchFilter(pmRuleFilter);
+        if(ruleNameObj != null){
+            pmOrderRules = pmOrderRules.stream().filter(e -> {
+                if(e.getName() != null){
+                   return e.getName().contains(String.valueOf(ruleNameObj));
+                    }
+                    return false;
+                }
+                ).collect(Collectors.toList());
+        }
+        if(periodObj != null){
+            AtomicInteger period = new AtomicInteger(-1);
+            try{
+                period.set( Integer.parseInt(String.valueOf(periodObj)));
+            }catch (Exception e1){
+                pmOrderRules.clear();
+            }
+            pmOrderRules = pmOrderRules.stream().filter(e ->{
+                if(e.getPeriod() != null){
+                    return e.getPeriod() == period.get();
+                }
+                return false;
+            } ).collect(Collectors.toList());
+        }
+
+        Map<String, PmOrderRule> pmOrderRuleMap = pmOrderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, Function.identity(), (o1, o2) -> o2));
+
+        List<V2_PmOrder> pmOrders1 = pmOrders.stream().filter(e -> {
+            if(e.getAssetUid() != null
+                && assetUidLevelPmRuleUidMap.get(e.getAssetUid()) != null
+                && assetUidLevelPmRuleUidMap.get(e.getAssetUid()).get(e.getRuleLevel()) != null
+                && pmOrderRuleMap.get(assetUidLevelPmRuleUidMap.get(e.getAssetUid()).get(e.getRuleLevel())) != null){
+                    return true;
+            }else {
+                return  false;
+            }
+        }).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(pmOrders1)){
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,pmOrders1.stream().map(V2_PmOrder::getId).collect(Collectors.toSet())));
+        }else{
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,"-1"));
+        }
+    }
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
         System.out.println();
@@ -1426,6 +1539,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         unstructuredDataDao = WebUtil.getBean(UnstructuredDataRepository.class);
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
         pmckLstDao = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         reportDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
