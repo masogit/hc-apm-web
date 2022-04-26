@@ -467,12 +467,28 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         Object ruleNameObj = filters.get("ruleName");
         Object periodObj = filters.get("period");
         filters.keySet().removeIf(key->(key.equals("ruleName")||key.equals("period")));
-        removeFilterOnField("id");
+        removeFilterOnFields();
         List<V2_PmOrder> pmOrders = dao.findBySearchFilter(searchFilters);
         super.onFilter(event);
         if((ruleNameObj != null || periodObj != null) && CollectionUtils.isNotEmpty(pmOrders)) {
             filterRuleNameOrPeriod(ruleNameObj, periodObj,pmOrders);
         }
+    }
+
+    private void removeFilterOnFields() {
+        removeFilterOnField("id");
+        removeFilterOnField("assetInfo.name");
+        removeFilterOnField("assetInfo.serialNum");
+        removeFilterOnField("assetInfo.departNum");
+        removeFilterOnField("assetInfo.functionType");
+        removeFilterOnField("ruleLevel");
+        removeFilterOnField("pmType");
+        removeFilterOnField("creatorName");
+        removeFilterOnField("ownerName");
+        removeFilterOnField("pmNum");
+        removeFilterOnField("currentStepName");
+        removeFilterOnField("planTime");
+        removeFilterOnField("endTime");
     }
 
     private void filterRuleNameOrPeriod(Object ruleNameObj, Object periodObj,List<V2_PmOrder> pmOrders) {
