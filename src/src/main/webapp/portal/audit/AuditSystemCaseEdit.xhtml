@@ -318,6 +318,7 @@
                                     <p:selectOneMenu value="#{auditSystemCaseEditController.entryType}">
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('entryType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        <p:ajax process="@this" update="basic" listener="#{auditSystemCaseEditController.entryTypeChecking()}" />
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1}">
@@ -346,7 +347,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==1 and auditSystemCaseEditController.evaluationCriteriaFlag}">
                                     <label class="label">评审标准</label>
-                                    <p:inputTextarea rows="3" cols="50" id="evaluationCriteria" value="#{auditSystemCaseEditController.evaluationCriteria}" style="width: 60%;"/>
+                                    <p:inputTextarea rows="3" cols="50"  value="#{auditSystemCaseEditController.evaluationCriteria}" style="width: 60%;"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:fieldset>
