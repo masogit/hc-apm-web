@@ -466,15 +466,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         Object ruleNameObj = filters.get("ruleName");
         Object periodObj = filters.get("period");
         filters.keySet().removeIf(key->(key.equals("ruleName")||key.equals("period")));
+        List<V2_PmOrder> pmOrders = dao.findBySearchFilter(searchFilters);
         super.onFilter(event);
         if(ruleNameObj != null || periodObj != null) {
-            filterRuleNameOrPeriod(ruleNameObj, periodObj);
+            filterRuleNameOrPeriod(ruleNameObj, periodObj,pmOrders);
         }
-
     }
 
-    private void filterRuleNameOrPeriod(Object ruleNameObj, Object periodObj) {
-        List<V2_PmOrder> pmOrders = dao.findBySearchFilter(searchFilters);
+    private void filterRuleNameOrPeriod(Object ruleNameObj, Object periodObj,List<V2_PmOrder> pmOrders) {
         Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(V2_PmOrder::getId, Function.identity(), (o1, o2) -> o2));
         Set<String> assetUids = pmOrderMap.values().stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
 
@@ -536,7 +535,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(CollectionUtils.isNotEmpty(pmOrders1)){
             searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,pmOrders1.stream().map(V2_PmOrder::getId).collect(Collectors.toSet())));
         }else{
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,-1));
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,"-1"));
         }
     }
 
