@@ -1687,6 +1687,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 .filter(i-> !Strings.isNullOrEmpty(i.getWeChatId()))
                 .collect(Collectors.toList());
         dao.save(tenantUsers);
+        if(!CollectionUtils.isEmpty(tenantUsers)) {
+            tenantUsers.stream().forEach(u -> userApi.removeUser(u.getLoginName()));
+        }
         logout();
     }
 
