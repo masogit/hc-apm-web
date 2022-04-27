@@ -1,18 +1,17 @@
 package com.ge.apm.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
+import com.ge.apm.domain.AssetInfo;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.domain.AssetInfo;
-
 import webapp.framework.dao.GenericRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
@@ -299,4 +298,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
             "left join tenant_info t on t.uid = a.tenant_uid " +
             "where t.type ='3' and (q.is_qr_code != true or q.is_qr_code is null) and a.system_id like '0824%' and a.tenant_uid = ?1", nativeQuery = true)
     List<AssetInfo> queryAssetByZkbQrCode(String tenantUid);
+
+    @Query(value = "with recursive cte as ( select id, name, parent_asset_id as pid, cast(id as text )as branch,function_type,serial_num,depart_num,asset_group,asset_dept_id,clinical_dept_name,manufacture,vendor from asset_info a where id in (?1) union all select origin.id, origin.name, cte.id as pid, cast(cte.branch as text) || '~' || origin.id,origin.function_type,origin.serial_num,origin.depart_num,origin.asset_group,origin.asset_dept_id,origin.clinical_dept_name,origin.manufacture,origin.vendor from cte join asset_info as origin on origin.parent_asset_id = cte.id ) select id,name, pid, branch, (length(branch)-length(replace(branch, '~', ''))) as rank,function_type,serial_num,depart_num,asset_group,asset_dept_id,clinical_dept_name,manufacture,vendor from cte order by branch; ",nativeQuery = true)
+    List<Object> findParentAndChildrenAsset1(Set<Integer> rootIds);
 }

@@ -8,6 +8,7 @@ import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
@@ -53,7 +54,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private String  address;
     private String  contactPerson;
     private String  contactPhone;
-
     private UserCommonService userCommonService;
 
     private OrgInfo currentOrg;
@@ -730,4 +730,5 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     public void setContactPhone(String contactPhone) {
         this.contactPhone = contactPhone;
     }
+
 }

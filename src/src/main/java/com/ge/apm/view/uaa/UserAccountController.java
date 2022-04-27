@@ -1,10 +1,10 @@
 package com.ge.apm.view.uaa;
 
-import ca.uhn.hl7v2.model.v24.datatype.ST;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.api.UserApiService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -25,7 +25,6 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-import org.primefaces.ultima.domain.User;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -112,7 +111,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private List<SysRoleVO> roleListVO;
 
     private UserAccountService userAccountService;
-    
+
+    private UserApiService userApi;
+
     private UserAccountExportService userAccountExportService;
     
     private StreamedContent exportFile;
@@ -229,6 +230,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         userAccountService = WebUtil.getBean(UserAccountService.class);
+        userApi = WebUtil.getBean(UserApiService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         userTagsDao = WebUtil.getBean(UserTagsRepository.class);
         userTagsMapper = WebUtil.getBean(UserTagsMapper.class);
@@ -624,6 +626,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         uaaService.setUserRoles(selected, assignedRoles);
         updateUserScope();
+        userApi.resetUser(selected.getLoginName());
         selected.getUserRoleList().clear();
         selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("UserRole") + WebUtil.getMessage("Updated"));
@@ -733,6 +736,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 }
             }
             userAccountService.deleteUserAccount(this.selected);
+            userApi.removeUser(selected.getLoginName());
 
         }
     }
@@ -879,6 +883,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private void isRepeatedAfter() {
         userAccountEditFlag = true;
         super.save();
+        if (selected.getIsLocked()) {
+            userApi.removeUser(selected.getLoginName());
+        } else {
+            userApi.resetUser(selected.getLoginName());
+        }
         log.info("save/update user to user_account successful, id: {}",selected.getId());
 
         saveTags();
@@ -1635,7 +1644,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public Boolean enableDestroyTenant() {
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-        return 2==tenantInfo.getActiveType();
+        return Objects.equals(2,tenantInfo.getActiveType());
     }
 
     public Boolean getConfirmDestroy() {

@@ -47,6 +47,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
 
     private String departNum;
 
+    private String emergencyEquipment;
+
     private Boolean isAllSelected = Boolean.FALSE;
     
     private Boolean isAllSelected5 = Boolean.FALSE;
@@ -116,6 +118,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.assets5Maintain=new ArrayList<>();
         this.assetGroup = null;
         this.assetName = null;
+        this.emergencyEquipment = null;
         this.listCheckOrgInfo=new ArrayList<OrgInfo>();
         this.is4Edit = Boolean.FALSE;
     }
@@ -337,6 +340,10 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             }
             if(StringUtils.isNotBlank(this.getFunctionType())) {
                 searchFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, this.getFunctionType(), "1*"));
+                ++count;
+            }
+            if(StringUtils.isNotBlank(this.getEmergencyEquipment())) {
+                searchFilters.add(new SearchFilter("emergencyEquipment", SearchFilter.Operator.EQ, this.getEmergencyEquipment(), "1*"));
                 ++count;
             }
             
