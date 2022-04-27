@@ -253,6 +253,10 @@ public class WorkflowConfig implements Serializable {
     //是否启用院间借调
     @Column(name = "enable_site_to_site_allocation")
     private Boolean enableSiteToSiteAllocation;
+    @Setter
+    @Getter
+    @Column(name = "enable_asset_preview")
+    private Boolean enableAssetPreview;
     //是否启用小型物联网设备(急救类)服务
     @Column(name = "is_io_tenabled")
     private Boolean isiotenabled;
@@ -801,6 +805,86 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "is_active_supplier")
     private Boolean isActiveSupplier = Boolean.FALSE;//是否激活供应商流程
+
+
+
+    //供应商资质证书管理
+    @Column(name = "supplier_certificate_manage")
+    private Boolean supplierCertificateManage = Boolean.FALSE;;
+    //生产许可证到期提醒提前天数
+    @Column(name = "production_license_expire_days")
+    private Integer productionLicenseExpireDays;
+    //生产许可证到期提醒提前次数
+    @Column(name = "production_license_expire_times")
+    private Integer productionLicenseExpireTimes;
+    //经营许可证到期提醒提前天数
+    @Column(name = "business_license_expire_days")
+    private Integer businessLicenseExpireDays;
+    //经营许可证到期提醒提前次数
+    @Column(name = "business_license_expire_times")
+    private Integer businessLicenseExpireTimes;
+    //注册证到期提醒提前天数
+    @Column(name = "registration_certificate_expire_days")
+    private Integer registrationCertificateExpireDays;
+    //注册证到期提醒提前次数
+    @Column(name = "registration_certificate_expire_times")
+    private Integer registrationCertificateExpireTimes;
+
+    public Boolean getSupplierCertificateManage() {
+        return supplierCertificateManage;
+    }
+
+    public void setSupplierCertificateManage(Boolean supplierCertificateManage) {
+        this.supplierCertificateManage = supplierCertificateManage;
+    }
+
+    public Integer getProductionLicenseExpireDays() {
+        return productionLicenseExpireDays;
+    }
+
+    public void setProductionLicenseExpireDays(Integer productionLicenseExpireDays) {
+        this.productionLicenseExpireDays = productionLicenseExpireDays;
+    }
+
+    public Integer getProductionLicenseExpireTimes() {
+        return productionLicenseExpireTimes;
+    }
+
+    public void setProductionLicenseExpireTimes(Integer productionLicenseExpireTimes) {
+        this.productionLicenseExpireTimes = productionLicenseExpireTimes;
+    }
+
+    public Integer getBusinessLicenseExpireDays() {
+        return businessLicenseExpireDays;
+    }
+
+    public void setBusinessLicenseExpireDays(Integer businessLicenseExpireDays) {
+        this.businessLicenseExpireDays = businessLicenseExpireDays;
+    }
+
+    public Integer getBusinessLicenseExpireTimes() {
+        return businessLicenseExpireTimes;
+    }
+
+    public void setBusinessLicenseExpireTimes(Integer businessLicenseExpireTimes) {
+        this.businessLicenseExpireTimes = businessLicenseExpireTimes;
+    }
+
+    public Integer getRegistrationCertificateExpireDays() {
+        return registrationCertificateExpireDays;
+    }
+
+    public void setRegistrationCertificateExpireDays(Integer registrationCertificateExpireDays) {
+        this.registrationCertificateExpireDays = registrationCertificateExpireDays;
+    }
+
+    public Integer getRegistrationCertificateExpireTimes() {
+        return registrationCertificateExpireTimes;
+    }
+
+    public void setRegistrationCertificateExpireTimes(Integer registrationCertificateExpireTimes) {
+        this.registrationCertificateExpireTimes = registrationCertificateExpireTimes;
+    }
 
     public Integer getShareAutoConfirm() {
         return shareAutoConfirm;

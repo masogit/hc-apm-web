@@ -29,6 +29,9 @@ public class ZkbEmailSendLog implements Serializable {
     @Column(name = "work_order_id")//工单id
     private String workOrderId;
 
+    @Column(name = "part_order_no")//
+    private String partOrderNo;
+
     @Column(name = "send_time")  //发送时间
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -40,6 +43,9 @@ public class ZkbEmailSendLog implements Serializable {
     @Column(name = "cc_email")//抄送人邮箱
     private String ccEmail;
 
+    @Column(name = "message_type")//消息类型  微信  邮件
+    private String messageType;
+
     @Column(name = "step")//步骤
     private String step;
 
@@ -49,9 +55,20 @@ public class ZkbEmailSendLog implements Serializable {
     @Column(name = "has_exception")//是否异常
     private Boolean hasException;
 
+
     @Column(name = "error_message")//错误信息
     @Size(max = 4000)
     private String errorMessage;
+
+    public String getPartOrderNo() {
+        return partOrderNo;
+    }
+
+    public void setPartOrderNo(String partOrderNo) {
+        this.partOrderNo = partOrderNo;
+    }
+
+
 
     public String getCcEmail() {
         return ccEmail;
@@ -127,6 +144,14 @@ public class ZkbEmailSendLog implements Serializable {
 
     public void setMailType(String mailType) {
         this.mailType = mailType;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
     @Override

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -65,6 +66,7 @@ import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.service.utils.NurseSiteMaintainComparator;
 
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 /**
  * Created by 503035627
@@ -871,10 +873,10 @@ public class NurseSiteMaintainService {
 			}
 		}
 	}
-	private void updateMaintainItem(NurseSiteMaintain obj, Date date, UserAccount user) {
+	private boolean updateMaintainItem(NurseSiteMaintain obj, Date date, UserAccount user) {
 		List<NurseSiteMaintainItem> listItem = obj.getListNurseSiteMaintainItem();
 		if(listItem==null || listItem.size()==0){
-			return;
+			return false;
 		}
 		Iterator<NurseSiteMaintainItem> it = listItem.iterator();
 		int itemStatus = 0;
@@ -892,6 +894,21 @@ public class NurseSiteMaintainService {
 			tempItem.setModifyDate(date);
 			List<NurseSiteMaintainData> listData = tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData = listData.iterator();
+			Calendar calendar1 = Calendar.getInstance();
+			Calendar calendar2 = Calendar.getInstance();
+			calendar1.setTime(tempItem.getCheckDate());
+			calendar2.setTime(obj.getScheduleDate());
+			boolean delayNextMonth =  calendar1.get(Calendar.MONTH)>calendar2.get(Calendar.MONTH) ? true : false;
+
+			if(delayNextMonth) {
+				UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+				if(userContextService.accessContainsOfJiangNing()) {  //江宁医院，delay到下个月，只有科长（医学工程处主任）才能补单
+					if(!userContextService.hasRole("AssetHead")) {
+						WebUtil.addErrorMessage("超过补单时间！");
+						return false;
+					}
+				}
+			}
 			boolean delay=tempItem.getCheckDate().after(sheculeDate)?true:false;
 			boolean hasComment=StringUtils.isNotEmpty(tempItem.getComment())?true:false;
 			//0：未检查,1:已检查，4进行中,2:通过没commnet没有delay，5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，3有问题，延期了,8，有问题，没有延期
@@ -943,6 +960,7 @@ public class NurseSiteMaintainService {
 			}
 			tempItem.setStatus(itemStatus);
 		}
+		return true;
 	}
 	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
 	public void updateMaintain(NurseSiteMaintain obj, Date date, UserAccount user) {
@@ -1214,7 +1232,7 @@ public class NurseSiteMaintainService {
 	}
 
 	public boolean saveMaintain(NurseSiteMaintain tempNurseSiteMaintain,Date date,UserAccount user) {
-		updateMaintainItem(tempNurseSiteMaintain,date,user);
+		if(!updateMaintainItem(tempNurseSiteMaintain,date,user)) return false;
 		saveMaintainItem(tempNurseSiteMaintain);
 		updateMaintain(tempNurseSiteMaintain,date,user);
 		save(tempNurseSiteMaintain);
@@ -1222,6 +1240,20 @@ public class NurseSiteMaintainService {
 	}
 
 	public boolean completeMaintain(NurseSiteMaintain tempNurseSiteMaintain,Date date,UserAccount user) {
+		Calendar calendar1 = Calendar.getInstance();
+		Calendar calendar2 = Calendar.getInstance();
+		calendar1.setTime(date);
+		calendar2.setTime(tempNurseSiteMaintain.getScheduleDate());
+		boolean delayNextMonth =  calendar1.get(Calendar.MONTH)>calendar2.get(Calendar.MONTH) ? true : false;
+		if(delayNextMonth) {
+			UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+			if(userContextService.accessContainsOfJiangNing()) {  //江宁医院，delay到下个月，只有科长（医学工程处主任）才能补单
+				if(!userContextService.hasRole("AssetHead")) {
+					WebUtil.addErrorMessage("超过补单时间！");
+					return false;
+				}
+			}
+		}
 		Set<String> setMaintainIds = new HashSet<String>();
 		Set<String> setMaintainItemIds = new HashSet<String>();
 		Set<String> setMaintainDataIds = new HashSet<String>();
