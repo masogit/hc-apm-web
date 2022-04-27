@@ -349,6 +349,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(!zkbContractAsset.isEmpty()){
             assetTypeName = zkbContractAsset.iterator().next().getAssetType();
         }
+        assetTypeName = "highMachine".equals(assetTypeName)?"高端机":"低端机";
         return assetTypeName;
     }
 

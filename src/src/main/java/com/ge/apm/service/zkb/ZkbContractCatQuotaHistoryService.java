@@ -89,6 +89,7 @@ public class ZkbContractCatQuotaHistoryService {
                 assetType = zkbContractAsset.iterator().next().getAssetType();
             }
         }
+        assetType = ("depot".equals(assetType)||"N/A".equals(assetType))?"lowMachine":assetType;
         zkbContractCatQuotaHistory.setAssetType(assetType);
         zkbContractCatQuotaHistoryRepository.save(zkbContractCatQuotaHistory);
     }
@@ -109,6 +110,7 @@ public class ZkbContractCatQuotaHistoryService {
                 assetType = zkbContractAsset.iterator().next().getAssetType();
             }
         }
+        assetType = ("depot".equals(assetType)||"N/A".equals(assetType))?"lowMachine":assetType;
         filters.add(new SearchFilter("assetType", SearchFilter.Operator.EQ,assetType));
         List<ZkbContractCatQuotaHistory> zkbContractCatQuotaHistoryList = zkbContractCatQuotaHistoryRepository.findBySearchFilter(filters);
         zkbContractCatQuotaHistoryList.stream().forEach(history ->{
@@ -154,6 +156,7 @@ public class ZkbContractCatQuotaHistoryService {
         if(!zkbContractAsset.isEmpty()){
             assetType = zkbContractAsset.iterator().next().getAssetType();
         }
+        assetType = ("depot".equals(assetType)||"N/A".equals(assetType))?"lowMachine":assetType;
         List<ZkbContractCatQuotaHistory> zkbContractCatQuotaHistoryList =   this.zkbContractCatQuotaHistoryRepository.queryZkbContractCatQuotaHistory(zkbContract.getId(),"Y");
         int highMachineUsed = zkbContractCatQuotaHistoryList.stream().filter(z -> this.checkFilter(logistic,"highMachine",z,zkbFePartOrder)).mapToInt(ZkbContractCatQuotaHistory::getQty).sum();
         int lowMachineUsed = zkbContractCatQuotaHistoryList.stream().filter(z -> this.checkFilter(logistic,"lowMachine",z,zkbFePartOrder)).mapToInt(ZkbContractCatQuotaHistory::getQty).sum();
