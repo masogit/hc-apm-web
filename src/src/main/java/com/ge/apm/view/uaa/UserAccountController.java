@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.SessionCache;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -1683,12 +1684,16 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         tenantInfo.setActiveType(3);
         tenantInfoRepository.save(tenantInfo);
-        final List<UserAccount> tenantUsers = dao.findByTenantUID(loginUser.getTenantUID()).stream()
+        final List<UserAccount> tenantUsers = dao.findByTenantUID(loginUser.getTenantUID());
+        final List<UserAccount> tenantUserWithWeChatId = tenantUsers.stream()
                 .filter(i-> !Strings.isNullOrEmpty(i.getWeChatId()))
                 .collect(Collectors.toList());
-        dao.save(tenantUsers);
+        dao.save(tenantUserWithWeChatId);
+        if(!CollectionUtils.isEmpty(tenantUserWithWeChatId)) {
+            tenantUserWithWeChatId.forEach(u -> userApi.removeUser(u.getLoginName()));
+        }
         if(!CollectionUtils.isEmpty(tenantUsers)) {
-            tenantUsers.stream().forEach(u -> userApi.removeUser(u.getLoginName()));
+            tenantUsers.forEach(SessionCache::destroyedSession);
         }
         logout();
     }
