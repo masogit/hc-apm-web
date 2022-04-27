@@ -51,9 +51,9 @@ import java.util.stream.Collectors;
 @ManagedBean(name = "budgetController")
 public class BudgetApplicationController extends GenericCRUDUUIDController<BudgetApplication> {
     private static Logger logger = LoggerFactory.getLogger(BudgetApplicationController.class);
-    private UserAccount account = UserContextService.getCurrentUserAccount();
-    private OrgInfo org = null;
+
     private Page<BudgetApplication> emptyPage = new PageImpl<>(Collections.emptyList());
+    private UserAccount account = UserContextService.getCurrentUserAccount();
 
     private Integer tabIndex = 0;
 
@@ -64,8 +64,6 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     private List<I18nMessage> budgetAssetGroupSecondaryList = new ArrayList<>();
     private List<I18nMessage> assetAssetGroupSecondaryList = new ArrayList<>();
-
-    private List<String> readableFieldsList = new ArrayList<>();
 
     private List<SearchFilter> assetSearchFilters;
 
@@ -80,6 +78,8 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     private BudgetSearchForm searchForm = new BudgetSearchForm();
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
 
+    private OrgInfo org;
+    private CustomConfigObject customConfig;
     private TreeNode orgTree;
 
     @Override
@@ -96,8 +96,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         org = orgDao.findById(account.getOrgInfoId());
 
         CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
-        CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-        readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
         initOrgTree();
     }
@@ -407,7 +406,22 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     }
 
     public boolean show(String fieldKey) {
-        return readableFieldsList.contains(fieldKey);
+        if (customConfig.getAssetsEditpageBasicFields().contains(fieldKey)) {
+            return true;
+        }
+        if (customConfig.getAssetsEditpageCatalogFields().contains(fieldKey)) {
+            return true;
+        }
+        if (customConfig.getAssetsEditpageCodesFields().contains(fieldKey)) {
+            return true;
+        }
+        if (customConfig.getAssetsEditpageDateFields().contains(fieldKey)) {
+            return true;
+        }
+        if (customConfig.getAssetsEditpageFinicialFields().contains(fieldKey)) {
+            return true;
+        }
+        return customConfig.getAssetsEditpageStatusFields().contains(fieldKey);
     }
 
     public void onBudgetAssetGroupChange(AjaxBehaviorEvent event) {
@@ -483,8 +497,12 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     }
 
     private void updateAssetSearchFilter(SearchFilter searchFilter) {
-        removeFilterOnField(searchFilter.fieldName);
+        removeAssetFilterOnField(searchFilter.fieldName);
         assetSearchFilters.add(searchFilter);
+    }
+
+    private void removeAssetFilterOnField(String fieldName) {
+        assetSearchFilters.removeAll(assetSearchFilters.stream().filter(item -> fieldName.equals(item.fieldName)).collect(Collectors.toList()));
     }
 
     /*
