@@ -1679,21 +1679,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
     }
 
-    public void destroyTenant(){
+    public void destroyTenant() {
         this.dao.deleteTenantUser(loginUser.getTenantUID());
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         tenantInfo.setActiveType(3);
         tenantInfoRepository.save(tenantInfo);
         final List<UserAccount> tenantUsers = dao.findByTenantUID(loginUser.getTenantUID());
-        final List<UserAccount> tenantUserWithWeChatId = tenantUsers.stream()
-                .filter(i-> !Strings.isNullOrEmpty(i.getWeChatId()))
-                .collect(Collectors.toList());
-        dao.save(tenantUserWithWeChatId);
-        if(!CollectionUtils.isEmpty(tenantUserWithWeChatId)) {
-            tenantUserWithWeChatId.forEach(u -> userApi.removeUser(u.getLoginName()));
-        }
-        if(!CollectionUtils.isEmpty(tenantUsers)) {
-            tenantUsers.forEach(SessionCache::destroyedSession);
+        if (!CollectionUtils.isEmpty(tenantUsers)) {
+            tenantUsers.forEach(u -> {
+                userApi.removeUser(u.getLoginName());
+                SessionCache.destroyedSession(u);
+            });
         }
         logout();
     }
