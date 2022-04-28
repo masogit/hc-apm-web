@@ -376,7 +376,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
                 evaluationCriteriaFlag=true;
             }
             entryScoreFlag=false;
-            if (auditSystemEntry.getLevel()>=1){
+            if (auditSystemEntry.getLevel()>1){
                 entryScoreFlag=true;
             }
         }
@@ -485,6 +485,23 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         if (caseLevel>=2){
             evaluationCriteriaFlag=true;
         }
+        auditSystemEntrySelected=new AuditSystemEntry();
+        entryScoreStandard=null;
+        sourceText=null;
+        evaluationCriteria=null;
+        entryType=null;
+    }
+    public void preCreateStrip()  {
+        if (selected!=null){
+            caseUid = selected.getUid();
+        }
+        entryName=null;
+        entryMark=null;
+        evaluationCriteriaFlag=false;
+        caseLevel=0;
+        entryUid = null;
+        entryFlag =false;
+        entryScoreFlag=false;
         auditSystemEntrySelected=new AuditSystemEntry();
         entryScoreStandard=null;
         sourceText=null;

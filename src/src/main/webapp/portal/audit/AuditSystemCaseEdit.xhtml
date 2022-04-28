@@ -123,6 +123,7 @@
                                     </p:treeNode>
                                     <p:treeNode type="hidden" rendered="false"/>
                                 </p:tree>
+                                <p:commandButton value="新增条"  process="@this"  update="markDlg" actionListener="#{auditSystemCaseEditController.preCreateStrip()}" oncomplete="PF('markDlg').show()" style="background-color: #FFFFFF; color: #0d0d0d; box-shadow: 0 0 #FFFFFF; margin-left: 14px" />
                             </p:scrollPanel>
                         </div>
                     </div>
@@ -329,13 +330,22 @@
                                         <p:ajax process="@this"/>
                                     </p:inputText>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{auditSystemCaseEditController.selected.type==2}">
                                     <label class="label" style="font-size: medium; font-weight: bold">层级名称</label>
                                     <p:inputText id="entryName"
                                                  value="#{auditSystemCaseEditController.entryName}" required="true"
                                                  requiredMessage="层级名称不能为空">
                                         <p:ajax process="@this"/>
                                     </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup  rendered="#{auditSystemCaseEditController.selected.type==1}">
+                                    <label class="label">层级名称</label>
+                                    <p:selectOneMenu value="#{auditSystemCaseEditController.entryName}"   requiredMessage="#{msg.content} #{msg.ValidationRequire}"
+                                                     panelStyle="width:220px" effect="fade"
+                                                     filter="true" filterMatchMode="contains">
+                                        <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? auditSystemCaseEditController.auditConfigItemSelected.mark : msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
+                                        <f:selectItems value="#{auditSystemCaseEditController.auditConfigItemList()}" var="entry" itemLabel="#{entry.content}"  itemValue="#{entry.content}"/>
+                                    </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.entryScoreFlag and auditSystemCaseEditController.selected.type==1}">
                                     <label class="label">分值</label>
