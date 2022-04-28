@@ -6,6 +6,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Yangfan, Liu
@@ -14,18 +15,18 @@ public class SessionCache {
     private static Map<String, HttpSession> sessionCache = new HashMap<>();
 
     public static void putSession(HttpSession session) {
-        UserAccount user = ((UserContextService) session.getAttribute("userContextService")).getLoginUser();
-        sessionCache.put(user.getUid(), session);
-        System.out.println("session count: " + sessionCache.size());
+        Optional.ofNullable(session.getAttribute("userContextService"))
+                .flatMap(c -> Optional.ofNullable(((UserContextService) c).getLoginUser()))
+                .ifPresent(u -> sessionCache.put(u.getUid(), session));
     }
 
     public static void moveSession(HttpSession session) {
-        UserAccount user = ((UserContextService) session.getAttribute("userContextService")).getLoginUser();
-        sessionCache.remove(user.getUid());
-        System.out.println("session count: " + sessionCache.size());
+        Optional.ofNullable(session.getAttribute("userContextService"))
+                .flatMap(c -> Optional.ofNullable(((UserContextService) c).getLoginUser()))
+                .ifPresent(u -> sessionCache.remove(u.getUid()));
     }
 
     public static void destroyedSession(UserAccount user) {
-        sessionCache.get(user.getUid()).invalidate();
+        Optional.ofNullable(sessionCache.get(user.getUid())).ifPresent(HttpSession::invalidate);
     }
 }
