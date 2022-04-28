@@ -49,9 +49,26 @@ public class ZkbContractCatQuotaHistoryService {
         zkbContractCatQuotaHistory.setPartOrderNo(zkbPartOrderNo);
         zkbContractCatQuotaHistory.setPartOrderNo(zkbPartOrderNo);
         zkbContractCatQuotaHistory.setProbeType(probeType);
-        zkbContractCatQuotaHistory.setAssetType(zkbContractAsset.getHighLowMachine());
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+            zkbContractCatQuotaHistory.setAssetType(ZkbContractAsset.AssetTypeEnum.highMachine.toString());
+        }else{
+            zkbContractCatQuotaHistory.setAssetType(ZkbContractAsset.AssetTypeEnum.lowMachine.toString());
+        }
         zkbContractCatQuotaHistoryRepository.save(zkbContractCatQuotaHistory);
 
+    }
+
+    public void deleteZkbFeHistory(String partOrderId){
+        List<ZkbContractCatQuotaHistory> list = zkbContractCatQuotaHistoryRepository.queryByPartOrderId(partOrderId);
+        if(list == null || list.size() == 0){
+            return;
+        }
+        if(list.size() > 1 ){
+            return;
+        }
+        ZkbContractCatQuotaHistory zkbContractCatQuotaHistory = list.get(0);
+        zkbContractCatQuotaHistory.setStatus("N");
+        zkbContractCatQuotaHistoryRepository.save(zkbContractCatQuotaHistory);
     }
 
     public void insertZkbFeContractCatQuotaHistory(ZkbContract zct, ZkbFePartOrder zkbFePartOrder, UserAccount currentUser){
@@ -122,6 +139,47 @@ public class ZkbContractCatQuotaHistoryService {
         zkbContractCatQuotaHistoryRepository.save(zkbContractCatQuotaHistoryList);
     }
 
+    public boolean checkQuotaByHistory(ZkbContract zkbContract,ZkbContractAsset zkbContractAsset, String probeType,Integer qty){
+        //第一步得出总得高端机名额或者低端机名额
+        Integer total = 0;
+        if(ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString().equals(probeType)){
+            total = zkbContract.getProbeQuotaTotal();
+        }else if(ZkbContractCatQuotaHistory.ProbeTypeStatus.Any.toString().equals(probeType)){
+            total = zkbContract.getProbeQuotaTotal();
+        }else if(ZkbContractCatQuotaHistory.ProbeTypeStatus.Special.toString().equals(probeType)){
+            total = zkbContract.getProbeQuotaSpecialTotal();
+        }else if(ZkbContractCatQuotaHistory.ProbeTypeStatus.Normal.toString().equals(probeType)){
+            total = zkbContract.getProbeQuotaNormalTotal();
+        }
+        int highMachine = (total % 2 == 0 ? total :total-1)/2;
+        int lowMachine = (total % 2 == 0 ? total :total+1)/2;
+
+        String assetType = "";
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+            assetType = ZkbContractAsset.AssetTypeEnum.highMachine.toString();
+        }else{
+            assetType = ZkbContractAsset.AssetTypeEnum.lowMachine.toString();
+        }
+
+        Integer useQty= 0;
+        List<ZkbContractCatQuotaHistory> zkbContractCatQuotaHistoryList = zkbContractCatQuotaHistoryRepository.queryByCondition(zkbContract.getId(), probeType, assetType);
+        if(zkbContractCatQuotaHistoryList != null && zkbContractCatQuotaHistoryList.size() >= 0){
+            for(ZkbContractCatQuotaHistory h : zkbContractCatQuotaHistoryList){
+                useQty += h.getQty();
+            }
+        }
+
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+            if(qty > (highMachine - useQty)){
+                return false;
+            }
+        }else{
+            if(qty > (lowMachine - useQty)){
+                return false;
+            }
+        }
+        return true;
+    }
 
 
     public Integer handleQty(ZkbContract zkbContract,ZkbFePartOrder zkbFePartOrder){
