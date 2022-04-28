@@ -38,6 +38,9 @@ public class AssetInfoBulkEditCheckService {
     @Autowired
     private V2_PmOrderRepository v2_PmOrderRepository;
 
+    @Autowired
+    private WorkflowConfigRepository workflowConfigRepository;
+
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
@@ -45,7 +48,10 @@ public class AssetInfoBulkEditCheckService {
                 String assetDeptUID = assetInfo.getAssetDeptUID();
                 String clinicalDeptUID = assetInfo.getClinicalDeptUID();
                 if(assetDeptUID!=null && clinicalDeptUID !=null &&!assetDeptUID.equals(clinicalDeptUID)){
-                    return false;
+                    List<WorkflowConfig> workflowConfigs = workflowConfigRepository.findByDeptForSharedAsset(clinicalDeptUID);
+                    if(workflowConfigs!=null && !workflowConfigs.isEmpty()){
+                        return false;
+                    }
                 }
             }
            List<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toList());
