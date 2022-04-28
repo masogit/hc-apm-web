@@ -655,9 +655,12 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        if(this.selected.getQty()>0)
-        {
+        if(this.selected.getQty()>0) {
             this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("TenantReject"));
+            //TODO liyonjian ZKB - 2022年新探头逻辑
+            if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                zkbContractCatQuotaHistoryService.updateZkbFeContractCatQuotaHistoryStatusOrQty(zkbContract,this.selected,this.currentUser,"N",null);
+            }
         }
         if (StringUtils.isNotBlank(selected.getContractCatId())) {
             this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
@@ -783,6 +786,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0){
             this.zkbFePartOrderService.moveProbe(6,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("FourHundredsReject"));
+            //TODO liyonjian ZKB - 2022年新探头逻辑  //此处需要改为update
+            if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                zkbContractCatQuotaHistoryService.updateZkbFeContractCatQuotaHistoryStatusOrQty(zkbContract,this.selected,this.currentUser,"N",null);
+            }
         }
         if (StringUtils.isNotBlank(selected.getContractCatId())) {
             this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
