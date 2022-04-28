@@ -51,10 +51,10 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="版本编号" filterBy="#{item.auditSystemCase.versionNumber}" filterMatchMode="LIKE">
+                        <p:column headerText="版本编号" filterBy="#{item.auditSystemCase.versionNumber}" filterMatchMode="LIKE" sortBy="#{item.auditSystemCase.versionNumber}">
                             <h:outputText value="#{item.auditSystemCase.versionNumber}"/>
                         </p:column>
-                        <p:column headerText="省份" filterBy="#{item.auditSystemCase.zone}" filterMatchMode="LIKE">
+                        <p:column headerText="省份" filterBy="#{item.auditSystemCase.zone}" filterMatchMode="LIKE" sortBy="#{item.auditSystemCase.zone}">
                             <h:outputText value="#{item.auditSystemCase.zone}"/>
                         </p:column>
                         <p:column headerText="版本号" filterBy="#{item.auditSystemCase.version}" filterMatchMode="LIKE">
@@ -72,7 +72,7 @@
                         <p:column headerText="指标数量">
                             <h:outputText value="#{item.auditSystemCase.targetNum}"/>
                         </p:column>
-                        <p:column headerText="总分值" sortBy="#{item.score}">
+                        <p:column headerText="总分值">
                             <h:outputText value="#{item.auditSystemCase.scoreNum}"/>
                         </p:column>
                         <p:column headerText="目标">
@@ -81,7 +81,7 @@
                         <p:column headerText="目标分值">
                             <h:outputText value="#{item.targetScore}"/>
                         </p:column>
-                        <p:column headerText="评分方式">
+                        <p:column headerText="评分方式" sortBy="#{item.auditSystemCase.judgeLogic}">
                             <h:outputText value="#{fieldMsg.fieldValue('Scoring', item.auditSystemCase.judgeLogic)}"/>
                         </p:column>
                         <p:column headerText="状态">
@@ -92,7 +92,7 @@
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="操作人">
+                        <p:column headerText="操作人" sortBy="#{item.updater}">
                             <h:outputText value="#{item.updater}"/>
                         </p:column>
                         <p:column headerText="更新时间" sortBy="#{item.updateTime}">
