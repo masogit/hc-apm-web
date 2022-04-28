@@ -189,7 +189,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             return tenantInfoRepository.findAllByTestStatusIsNullOrTestStatusNotOrderByName(-1);
         } else {
-            return tenantInfoRepository.getAllOrderByName();
+            return tenantInfoRepository.getAllByTenantConfig();
         }
     }
 
