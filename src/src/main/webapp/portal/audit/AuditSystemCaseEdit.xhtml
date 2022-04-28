@@ -344,7 +344,7 @@
                                                      panelStyle="width:220px" effect="fade"
                                                      filter="true" filterMatchMode="contains">
                                         <f:selectItem itemLabel="#{auditSystemCaseEditController.auditConfigItemSelected.uid !=null ? auditSystemCaseEditController.auditConfigItemSelected.mark : msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"  />
-                                        <f:selectItems value="#{auditSystemCaseEditController.auditConfigItemList()}" var="entry" itemLabel="#{entry.content}"  itemValue="#{entry.content}"/>
+                                        <f:selectItems value="#{auditSystemCaseEditController.getConfigItemList()}" var="entry" itemLabel="#{entry.content}"  itemValue="#{entry.content}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{auditSystemCaseEditController.entryScoreFlag and auditSystemCaseEditController.selected.type==1}">
