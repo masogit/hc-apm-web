@@ -521,6 +521,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         auditConfigItems = auditConfigItemRepository.findByContentType(contentType);
         return auditConfigItems;
     }
+    public List<AuditConfigItem> getConfigItemList(){
+        return auditConfigItemRepository.findByContentType(1);
+    }
     public List<AuditTarget> getTargetTypeList() {
         AuditTarget auditTarget = new AuditTarget();
         List<AuditTarget> auditTargets = new ArrayList<>();
