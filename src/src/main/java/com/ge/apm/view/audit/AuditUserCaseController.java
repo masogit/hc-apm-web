@@ -1,6 +1,8 @@
 package com.ge.apm.view.audit;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
@@ -24,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by 503266962
@@ -186,7 +189,20 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     }
 
     public List<TenantInfo> getAllTenant(){
-        return tenantInfoRepository.getAllByTenantConfig();
+        List<TenantInfo> list = tenantInfoRepository.getAllOrderByName();
+        List<TenantInfo> tenantInfoList = list.stream().filter(item -> {
+            String tenantConfig = item.getTenantConfig();
+            JSONObject jsonObject = JSONObject.parseObject(tenantConfig);
+            if(jsonObject != null){
+                JSONArray jsonArray = jsonObject.getJSONArray("menuList");
+                List<String> menuList = jsonArray != null ? jsonArray.toJavaList(String.class) : null;
+                if (menuList != null && menuList.size() > 0 && menuList.contains("audit")) {
+                    return true;
+                }
+            }
+            return false;
+        }).collect(Collectors.toList());
+        return tenantInfoList;
     }
 
     public List<OrgInfo> getSiteByTenant(){
