@@ -71,4 +71,7 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
 
     @Query(value = " select ti.* from tenant_info ti join supplier_tenant_join stj on stj.tenant_id = ti.id where stj.supplier_id = ?1  ", nativeQuery = true)
     List<TenantInfo> findSupplierJoinTenant(Integer  siteId);
+
+    @Query(value = "select * from tenant_info where tenant_config like '%\"audit\"%' order by name", nativeQuery = true)
+    public List<TenantInfo> getAllByTenantConfig();
 }
