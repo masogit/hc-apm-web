@@ -519,15 +519,19 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             {
                 this.zkbFePartOrderService.calDeductQty(this.selected,this.contractList.get(0));
                 calcRemainQty();
+                ZkbContract zkbContract = this.contractList.get(0);
                 if(this.selected.getRemainQty()<0){
-                    ZkbContract zkbContract = this.contractList.get(0);
-                    if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                    return "";
+                }
+                if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                    calcRemainQty2022();
+                    if(this.selected.getRemainQty()<0){
                         String assetTypeName = this.zkbFePartOrderService.getAssetTypeName(zkbContract,this.selected);
                         WebUtil.addErrorMessage("错误：该合同中的"+assetTypeName+"探头名额不足",null);
-                    }else {
-                        WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                        return "";
                     }
-                    return "";
+
                 }
                 if(!this.checkShowSN())
                 {
@@ -600,13 +604,17 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         {
             this.calcRemainQty();
             if(this.selected.getQty()!=null&&this.selected.getQty()>0&&this.selected.getRemainQty()<0){
-                if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                return "";
+            }
+            if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                this.calcRemainQty2022();
+                if(this.selected.getQty()!=null&&this.selected.getQty()>0&&this.selected.getRemainQty()<0){
                     String assetTypeName = this.zkbFePartOrderService.getAssetTypeName(zkbContract,this.selected);
                     WebUtil.addErrorMessage("错误：该合同中的"+assetTypeName+"探头名额不足",null);
-                }else {
-                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                    return "";
                 }
-                return "";
+
             }
             if(this.selected.getQty()!=null&&this.selected.getQty()>0)
             {
@@ -738,13 +746,17 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                         if(secondSave){
                             calcRemainQty();
                             if(this.selected.getRemainQty()<0){
-                                if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                                WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                                return "";
+                            }
+                            if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                                this.calcRemainQty2022();
+                                if(this.selected.getRemainQty()<0){
                                     String assetTypeName = this.zkbFePartOrderService.getAssetTypeName(zkbContract,this.selected);
                                     WebUtil.addErrorMessage("错误：该合同中的"+assetTypeName+"探头名额不足",null);
-                                }else {
-                                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                                    return "";
                                 }
-                                return "";
+
                             }
                         }
                         this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,firstSave,this.i18Map.get("FourHundredsAccept"));
@@ -844,33 +856,41 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         ZkbContract zkbContract = contractList.get(0);
         Integer qty = new Integer(0);
         boolean logistic = ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())?true:false;
-        //TODO liyonjian ZKB - 2022年新探头逻辑
-        if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
-            qty = zkbContractCatQuotaHistoryService.handleQty(zkbContract,this.selected);
-        }else{
-            if(logistic){
-                if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(this.selected.getZkbPoProbeQuotaType())){
-                    qty=zkbContract.getProbeQuota();
-                }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(this.selected.getZkbPoProbeQuotaType())){
-                    qty=zkbContract.getProbeQuotaSpecial();
-                }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(this.selected.getZkbPoProbeQuotaType())){
-                    qty=zkbContract.getProbeQuotaNormal();
-                }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(this.selected.getZkbPoProbeQuotaType())){
-                    qty=zkbContract.getProbeQuotaNormal();
-                }
-            }else{
+        if(logistic){
+            if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(this.selected.getZkbPoProbeQuotaType())){
                 qty=zkbContract.getProbeQuota();
+            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(this.selected.getZkbPoProbeQuotaType())){
+                qty=zkbContract.getProbeQuotaSpecial();
+            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(this.selected.getZkbPoProbeQuotaType())){
+                qty=zkbContract.getProbeQuotaNormal();
+            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(this.selected.getZkbPoProbeQuotaType())){
+                qty=zkbContract.getProbeQuotaNormal();
             }
+        }else{
+            qty=zkbContract.getProbeQuota();
         }
         Integer contractCount = qty == null ? 0 : qty;
+        this.selected.setRemainQty(contractCount - this.selected.getQty());
+
+    }
+
+    public void calcRemainQty2022(){
+        if(CollectionUtils.isEmpty(contractList)){
+            return;
+        }
+        ZkbContract zkbContract = contractList.get(0);
+        Integer qty = new Integer(0);
+        boolean logistic = ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())?true:false;
+        //TODO liyonjian ZKB - 2022年新探头逻辑
+        qty = zkbContractCatQuotaHistoryService.handleQty(zkbContract,this.selected);
+        Integer contractCount = qty == null ? 0 : qty;
         //TODO liyonjian ZKB - 2022年新探头逻辑  新逻辑 如果dubble 需要*2
-        if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())&&ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())&&ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())) {
+        if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())&&ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())) {
             this.selected.setRemainQty(contractCount - this.selected.getQty()*2);
         }else{
             this.selected.setRemainQty(contractCount - this.selected.getQty());
         }
     }
-
 
     public String backList(){
         return this.zkbFePartOrderService.backList(this.queryStatus);
