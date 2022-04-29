@@ -15,32 +15,57 @@
         <h:form id="BudgetApplicationEditForm">
             <h:panelGroup id="display">
                 <p:fieldset legend="#{msg.BudgetInfo}">
-                    <p:dataTable id="budgetlist" value="#{budgetController.selected}"
-                                 var="item" widgetVar="varbudgetDatalist"
-                                 lazy="true" rowKey="#{item.id}" sortOrder="descending"
-                                 sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
-                        <p:column headerText="#{msg.ApplicationNum}">
-                            <h:outputText value="#{item.applicationNum}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.Applicant}">
-                            <h:outputText value="#{item.applicant.name}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.ApplicationDept}">
-                            <h:outputText value="#{item.applicationDept.name}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.ApplicationTotalAmount}">
-                            <h:outputText value="#{item.totalAmount}">
+                    <p:panelGrid id="editPanel" columns="4" layout="grid"
+                                 styleClass="ui-panelgrid-blank form-group"
+                                 rendered="#{budgetController.selected != null}">
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.ApplicationNum}</p:outputLabel>
+                            <h:outputText value="#{budgetController.selected.applicationNum}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.ApplicationDept}</p:outputLabel>
+                            <p:inputText id="dept" readonly="true"
+                                         value="#{budgetController.selected.applicationDept.name}"/>
+                            <p:commandButton id="org" process="@this" icon="fa fa-angle-down"
+                                             class="btn btn-sm popupIconButton"/>
+                            <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade"
+                                            style="width: 300px;"
+                                            dynamic="false" modal="false">
+                                <p:scrollPanel style="height:300px; border: 0" mode="native">
+                                    <p:tree id="orgTree" value="#{budgetController.orgTree}" var="node"
+                                            selectionMode="single" class="tree" style="width:98%; border:0">
+                                        <p:ajax process="@this" event="select"
+                                                update="@parent:dept BudgetApplicationEditForm:budgetAssetlist BudgetApplicationEditForm:saveButton"
+                                                listener="#{budgetController.onSelectTreeNode}"
+                                                oncomplete="PF('varOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
+                            <h:outputText value="#{budgetController.selected.applicant.name}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.ApplicationTotalAmount}</p:outputLabel>
+                            <h:outputText value="#{budgetController.selected.totalAmount}">
                                 <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                             </h:outputText>
-                        </p:column>
-                        <p:column headerText="#{msg.ApplicationDate}">
-                            <h:outputText value="#{item.applicationDate}">
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.ApplicationDate}</p:outputLabel>
+                            <h:outputText value="#{budgetController.selected.applicationDate}">
                                 <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
                                                    locale="#{userContextService.getCalendarLocale()}"
                                                    pattern="#{userContextService.timeFormat14()}"/>
                             </h:outputText>
-                        </p:column>
-                    </p:dataTable>
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </p:fieldset>
 
                 <p:fieldset legend="#{msg.BudgetAssetInfo}">
@@ -127,24 +152,27 @@
                         <p:column headerText="#{msg.Actions}" width="50">
                             <!--                            <p:rowEditor/>-->
                             <p:commandButton process="@this" icon="ui-icon-close" styleClass="zoom-06"
-                                             title="#{msg.Delete}" update="budgetAssetlist"
+                                             title="#{msg.Delete}"
+                                             update="budgetAssetlist BudgetApplicationEditForm:saveButton"
                                              actionListener="#{budgetController.delBudgetAsset(item)}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton title="#{msg.Add}"
+                            <p:commandButton title="#{msg.Add}" id="addButton"
                                              icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
                                              actionListener="#{budgetController.preAddBudgetAsset}"
-                                             update="AssetEditDlg"
-                                             oncomplete="PF('AssetEditDialog').show()"/>
+                                             update="AssetEditDlg BudgetApplicationEditForm:saveButton"
+                                             oncomplete="PF('AssetEditDialog').show()"
+                                             disabled="#{budgetController.selected.applicationDept eq null}"/>
                         </f:facet>
                     </p:dataTable>
                 </p:fieldset>
 
                 <br/>
                 <p:commandButton validateClient="true" actionListener="#{budgetController.save}"
-                                 value="#{msg.Save}"
+                                 value="#{msg.Save}" id="saveButton"
                                  update="display,:BudgetApplicationEditDlg, budgetTabView, :growl"
-                                 oncomplete="handleSubmit(args, 'BudgetApplicationEditDialog');"/>
+                                 oncomplete="handleSubmit(args, 'BudgetApplicationEditDialog');"
+                                 disabled="#{empty budgetController.selected.budgetAssets}"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}"
                                  onclick="PF('BudgetApplicationEditDialog').hide()"/>
             </h:panelGroup>

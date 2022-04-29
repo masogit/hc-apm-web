@@ -78,6 +78,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -466,9 +467,31 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         Object ruleNameObj = filters.get("ruleName");
         Object periodObj = filters.get("period");
         filters.keySet().removeIf(key->(key.equals("ruleName")||key.equals("period")));
-        super.onFilter(event);
-
+        removeFilterOnFields();
         List<V2_PmOrder> pmOrders = dao.findBySearchFilter(searchFilters);
+        super.onFilter(event);
+        if((ruleNameObj != null || periodObj != null) && CollectionUtils.isNotEmpty(pmOrders)) {
+            filterRuleNameOrPeriod(ruleNameObj, periodObj,pmOrders);
+        }
+    }
+
+    private void removeFilterOnFields() {
+        removeFilterOnField("id");
+        removeFilterOnField("assetInfo.name");
+        removeFilterOnField("assetInfo.serialNum");
+        removeFilterOnField("assetInfo.departNum");
+        removeFilterOnField("assetInfo.functionType");
+        removeFilterOnField("ruleLevel");
+        removeFilterOnField("pmType");
+        removeFilterOnField("creatorName");
+        removeFilterOnField("ownerName");
+        removeFilterOnField("pmNum");
+        removeFilterOnField("currentStepName");
+        removeFilterOnField("planTime");
+        removeFilterOnField("endTime");
+    }
+
+    private void filterRuleNameOrPeriod(Object ruleNameObj, Object periodObj,List<V2_PmOrder> pmOrders) {
         Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(V2_PmOrder::getId, Function.identity(), (o1, o2) -> o2));
         Set<String> assetUids = pmOrderMap.values().stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
 
@@ -508,10 +531,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         relRuleAssetFilter.add(new SearchFilter("uid", SearchFilter.Operator.IN,pmRuleuids));
         List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findBySearchFilter(pmRuleFilter);
         if(ruleNameObj != null){
-            pmOrderRules = pmOrderRules.stream().filter(e -> e.getName().contains(String.valueOf(ruleNameObj))).collect(Collectors.toList());
+            pmOrderRules = pmOrderRules.stream().filter(e -> {
+                if(e.getName() != null){
+                   return e.getName().contains(String.valueOf(ruleNameObj));
+                    }
+                    return false;
+                }
+                ).collect(Collectors.toList());
         }
         if(periodObj != null){
-            pmOrderRules = pmOrderRules.stream().filter(e -> e.getPeriod().equals(Integer.parseInt(String.valueOf(periodObj)))).collect(Collectors.toList());
+            AtomicInteger period = new AtomicInteger(-1);
+            try{
+                period.set( Integer.parseInt(String.valueOf(periodObj)));
+            }catch (Exception e1){
+                pmOrderRules.clear();
+            }
+            pmOrderRules = pmOrderRules.stream().filter(e ->{
+                if(e.getPeriod() != null){
+                    return e.getPeriod() == period.get();
+                }
+                return false;
+            } ).collect(Collectors.toList());
         }
 
         Map<String, PmOrderRule> pmOrderRuleMap = pmOrderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, Function.identity(), (o1, o2) -> o2));
@@ -526,13 +566,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 return  false;
             }
         }).collect(Collectors.toList());
-
         if(CollectionUtils.isNotEmpty(pmOrders1)){
             searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,pmOrders1.stream().map(V2_PmOrder::getId).collect(Collectors.toSet())));
         }else{
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,-1));
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,"-1"));
         }
-
     }
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){

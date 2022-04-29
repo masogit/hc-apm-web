@@ -375,6 +375,10 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
             if(auditSystemEntry.getLevel()==3){
                 evaluationCriteriaFlag=true;
             }
+            entryScoreFlag=false;
+            if (auditSystemEntry.getLevel()>1){
+                entryScoreFlag=true;
+            }
         }
     }
     public void deleteTemplate(AuditTemplate auditTemplate){
@@ -487,6 +491,23 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         evaluationCriteria=null;
         entryType=null;
     }
+    public void preCreateStrip()  {
+        if (selected!=null){
+            caseUid = selected.getUid();
+        }
+        entryName=null;
+        entryMark=null;
+        evaluationCriteriaFlag=false;
+        caseLevel=0;
+        entryUid = null;
+        entryFlag =false;
+        entryScoreFlag=false;
+        auditSystemEntrySelected=new AuditSystemEntry();
+        entryScoreStandard=null;
+        sourceText=null;
+        evaluationCriteria=null;
+        entryType=null;
+    }
     public List<AuditTemplate> auditTemplates(){
         return auditTemplateRepository.findByType(1);
     }
@@ -499,6 +520,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         auditConfigItems = auditConfigItemRepository.findByContentType(contentType);
         return auditConfigItems;
+    }
+    public List<AuditConfigItem> getConfigItemList(){
+        return auditConfigItemRepository.findByContentType(1);
     }
     public List<AuditTarget> getTargetTypeList() {
         AuditTarget auditTarget = new AuditTarget();
@@ -709,6 +733,12 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
         return false;
 
+    }
+    public void entryTypeChecking(){
+        evaluationCriteriaFlag=false;
+        if (entryType != null && entryType==3){
+            evaluationCriteriaFlag=true;
+        }
     }
     private void createEvent(String eventType, AuditConfigItem item, String result){
         AuditEvent event = new AuditEvent();

@@ -45,8 +45,8 @@ public class BudgetApplicationAsset implements Serializable {
     @Formula("(select a.name from asset_info a where a.id = application_asset_id)")
     private String assetName;
 
-    @Formula("(select a.asset_type from asset_info a where a.id = application_asset_id)")
-    private String assetType;
+    @Formula("(select a.asset_group from asset_info a where a.id = application_asset_id)")
+    private Integer assetGroup;
 
     @Formula("(select a.asset_group_secondary from asset_info a where a.id = application_asset_id)")
     private Integer assetGroupSecondary;
@@ -167,12 +167,12 @@ public class BudgetApplicationAsset implements Serializable {
         this.assetName = assetName;
     }
 
-    public String getAssetType() {
-        return assetType;
+    public Integer getAssetGroup() {
+        return assetGroup;
     }
 
-    public void setAssetType(String assetType) {
-        this.assetType = assetType;
+    public void setAssetGroup(Integer assetGroup) {
+        this.assetGroup = assetGroup;
     }
 
     public Integer getAssetGroupSecondary() {
