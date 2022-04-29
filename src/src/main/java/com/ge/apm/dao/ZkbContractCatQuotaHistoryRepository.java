@@ -18,4 +18,12 @@ public interface ZkbContractCatQuotaHistoryRepository extends GenericRepositoryU
     List<ZkbContractCatQuotaHistory> queryZkbContractCatQuotaHistory(String contractId, String status);
 
 
+    List<ZkbContractCatQuotaHistory> queryByPartOrderId(String partOrderId);
+
+    @Query("select h from ZkbContractCatQuotaHistory h where h.status = 'Y' and h.contractId = ?1 and h.probeType = ?2 and h.assetType = ?3")
+    List<ZkbContractCatQuotaHistory> queryByCondition(String contractId, String probeType, String assetType);
+
+    @Query("select h from ZkbContractCatQuotaHistory h where h.status = 'Y' and h.contractId = ?1 and h.probeType = ?2 and h.assetType = ?3 and h.partOrderId <> ?4")
+    List<ZkbContractCatQuotaHistory> queryByConditionWithOutId(String contractId, String probeType, String assetType,String partOrderId);
+
 }
