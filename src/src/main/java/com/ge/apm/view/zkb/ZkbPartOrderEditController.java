@@ -867,7 +867,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         reLog += "高值探头不能选用任意名额！";
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(selected.getProbeQuotaType())){
-                    probeType = ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString();
+                    probeType = ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString();
                     Integer contractCount = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
                     if(contractCount - selected.getQty() < 0){
                         reLog = "合同探头普通剩余名额不足，请检查！";
@@ -876,7 +876,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         reLog += "探头普通剩余名额只能选择普通探头！";
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
-                    probeType = ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString();
+                    probeType = ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString();
                     Integer contractCount = zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial();
                     if(contractCount - selected.getQty() < 0){
                         reLog = "合同探头特殊剩余名额不足，请检查！";
@@ -886,7 +886,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
                     if(CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())){
-                        probeType = ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString();
+                        probeType = ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString();
                         Integer contractCount = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
                         if(contractCount - selected.getQty() < 0){
                             reLog = "合同探头普通剩余名额不足，请检查！";
