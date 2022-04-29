@@ -71,7 +71,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String supplementFlag = CopyByInvok.F;;
     private List<I18nMessage> exchangeTypeList = new ArrayList<>();
     private I18nMessageRepository i18nMessageRepository;
-    private ZkbContractCatQuotaHistoryService zkbContractCatQuotaHistoryService;
 
     @Override
     protected void init() {
@@ -86,7 +85,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         zkbContractAssetRepository = WebUtil.getBean(ZkbContractAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         zkbContractAssetService = WebUtil.getBean(ZkbContractAssetService.class);
-        zkbContractCatQuotaHistoryService = WebUtil.getBean(ZkbContractCatQuotaHistoryService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
@@ -915,7 +913,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             if(CopyByInvok.T.equals(zkbContract.getAssetQuotaType())){
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
-                boolean r = zkbContractCatQuotaHistoryService.checkQuotaByHistory(zkbContract, zkbContractAsset, probeType, selected.getQty());
+                boolean r = zkbPartOrderService.checkQuotaHistory("apply", zkbContract, selected,zkbContractAsset, probeType);
                 if(!r){
                     reLog = "高低端机名额不够,请检查！";
                 }
