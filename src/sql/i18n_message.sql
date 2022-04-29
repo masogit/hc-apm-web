@@ -4565,7 +4565,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Version','版本','Version',NULL,-1);
 -- 质控评审事件类型
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_CONGFIG_ITEM','添加系统知识库','Add system item',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_CONFIG_ITEM','添加系统知识库','Add system item',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','EDIT_CONFIG_ITEM','编辑系统知识库','Edit system item',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','DELETE_CONFIG_ITEM','删除系统知识库','Delete system item',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('auditEvent','ADD_TEMPLATE','添加系统模板','Add system template',NULL,-1);
@@ -4622,6 +4622,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- 预算管理 👇
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'Blank', '', ' ', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu', 'budgetMgr', '预算管理', 'Budget Management', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetMgr', '预算管理', 'Budget Management', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetApplication', '预算申请', 'Budget Application', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetInfo', '预算详情', 'Budget Details', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetAssetInfo', '预算设备详情', 'Budget Asset Details', NULL, -1);

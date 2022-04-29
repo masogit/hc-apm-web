@@ -24,7 +24,13 @@ public class QueryAsset {
     private Double purchasePriceStart;//采购价格(元)Start
     private Double purchasePriceEnd;//采购价格(元)end
 	private boolean generate;
-    public Double getPurchasePriceStart() {
+	private Integer riskGrade;
+
+	public Integer getRiskGrade() { return riskGrade; }
+
+	public void setRiskGrade(Integer riskGrade) { this.riskGrade = riskGrade; }
+
+	public Double getPurchasePriceStart() {
         return purchasePriceStart;
     }
 

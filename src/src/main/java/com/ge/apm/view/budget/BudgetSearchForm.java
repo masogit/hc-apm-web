@@ -1,5 +1,7 @@
 package com.ge.apm.view.budget;
 
+import com.ge.apm.domain.OrgInfo;
+
 import java.util.Date;
 
 /**
@@ -8,28 +10,30 @@ import java.util.Date;
  */
 public class BudgetSearchForm {
     // 申请科室
-    private Integer deptId;
-    // 申请日期
+    private OrgInfo dept;
+    // 申请日期 start
     private Date dateStart;
-    // 申请日期
+    // 申请日期 end
     private Date dateEnd;
-    // 设备类型
-    private String assetType;
     // 申请编号
     private String applicationNum;
+    // 设备分类
+    private Integer assetGroup;
+    // 设备二级分类
+    private Integer assetGroupSecondary;
     // 申请人
     private Integer applicantId;
+    // 申请人
+    private String applicantName;
     // 设备名称
     private String assetName;
-    // 设备二级分类
-    private Integer asset2ndClassify;
 
-    public Integer getDeptId() {
-        return deptId;
+    public OrgInfo getDept() {
+        return dept;
     }
 
-    public void setDeptId(Integer deptId) {
-        this.deptId = deptId;
+    public void setDept(OrgInfo dept) {
+        this.dept = dept;
     }
 
     public Date getDateStart() {
@@ -48,20 +52,28 @@ public class BudgetSearchForm {
         this.dateEnd = dateEnd;
     }
 
-    public String getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(String assetType) {
-        this.assetType = assetType == null ? null : assetType.trim();
-    }
-
     public String getApplicationNum() {
         return applicationNum;
     }
 
     public void setApplicationNum(String applicationNum) {
         this.applicationNum = applicationNum == null ? null : applicationNum.trim();
+    }
+
+    public Integer getAssetGroup() {
+        return assetGroup;
+    }
+
+    public void setAssetGroup(Integer assetGroup) {
+        this.assetGroup = assetGroup;
+    }
+
+    public Integer getAssetGroupSecondary() {
+        return assetGroupSecondary;
+    }
+
+    public void setAssetGroupSecondary(Integer assetGroupSecondary) {
+        this.assetGroupSecondary = assetGroupSecondary;
     }
 
     public Integer getApplicantId() {
@@ -72,19 +84,19 @@ public class BudgetSearchForm {
         this.applicantId = applicantId;
     }
 
+    public String getApplicantName() {
+        return applicantName;
+    }
+
+    public void setApplicantName(String applicantName) {
+        this.applicantName = applicantName;
+    }
+
     public String getAssetName() {
         return assetName;
     }
 
     public void setAssetName(String assetName) {
         this.assetName = assetName == null ? null : assetName.trim();
-    }
-
-    public Integer getAsset2ndClassify() {
-        return asset2ndClassify;
-    }
-
-    public void setAsset2ndClassify(Integer asset2ndClassify) {
-        this.asset2ndClassify = asset2ndClassify;
     }
 }

@@ -38,9 +38,27 @@
                                      styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">#{msg.ApplicationDept}</label>
-                                <p:autoComplete dropdown="true" value="#{budgetController.searchForm.deptId}"
-                                                scrollHeight="250" forceSelection="false"/>
-                                <!--                                                completeMethod="#{budgetController.listItems}"/>-->
+                                <p:inputText id="dept" readonly="true"
+                                             value="#{budgetController.searchForm.dept}"/>
+                                <p:commandButton id="org" process="@this" icon="fa fa-angle-down"
+                                                 class="btn btn-sm popupIconButton"/>
+                                <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade"
+                                                style="width: 300px;"
+                                                dynamic="false" modal="false">
+                                    <p:scrollPanel style="height:300px; border: 0" mode="native">
+                                        <p:tree id="orgTree" value="#{budgetController.orgTree}" var="node"
+                                                selectionMode="single" class="tree" style="width:98%; border:0">
+                                            <p:ajax process="@this" event="select" update="searchForm:dept"
+                                                    listener="#{budgetController.onSearchTreeNode}"
+                                                    oncomplete="PF('varOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label" value="#{msg.ApplicationDate}(#{msg.From})"/>
@@ -71,44 +89,30 @@
                                 <p:inputText value="#{budgetController.searchForm.applicationNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:outputLabel class="label">#{msg.AssetType}</p:outputLabel>
-                                <p:selectOneMenu value="#{budgetController.searchForm.assetType}">
+                                <p:outputLabel class="label">#{msg.AssetGroup}</p:outputLabel>
+                                <p:selectOneMenu value="#{budgetController.searchForm.assetGroup}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
                                                    itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                    <p:ajax event="change" listener="#{budgetController.onAssetTypeChange}"
-                                            update="@this asset2ncClassify"/>
+                                    <p:ajax event="change" listener="#{budgetController.onBudgetAssetGroupChange}"
+                                            update="@this assetGroupSecondary"/>
                                 </p:selectOneMenu>
-                                <!--                                <p:autoComplete dropdown="true" value="#{budgetController.searchForm.assetType}"-->
-                                <!--                                                scrollHeight="250" forceSelection="false">-->
-                                <!--                                                completeMethod="#{fieldMsg.getFieldValueList('assetClass')}"-->
-                                <!--                                    <p:ajax event="itemSelect" update="searchLocator"-->
-                                <!--                                            listener="#{budgetController.onSearchWarehouseSelect}"/>-->
-                                <!--                                </p:autoComplete>-->
                             </h:panelGroup>
-                            <h:panelGroup>
-                                <p:outputLabel class="label">#{msg.Asset2ndClassify}</p:outputLabel>
-                                <p:selectOneMenu id="asset2ncClassify"
-                                                 value="#{budgetController.searchForm.asset2ndClassify}">
+                            <h:panelGroup rendered="#{budgetController.show('assetGroupSecondary')}">
+                                <p:outputLabel class="label">#{msg.AssetGroupSecondary}</p:outputLabel>
+                                <p:selectOneMenu id="assetGroupSecondary"
+                                                 value="#{budgetController.searchForm.assetGroupSecondary}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{budgetController.asset2ncClassifyList}" var="item"
+                                    <f:selectItems value="#{budgetController.budgetAssetGroupSecondaryList}" var="item"
                                                    itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
-                                <!--                                <p:autoComplete id="searchLocator" dropdown="true"-->
-                                <!--                                                value="#{budgetController.searchForm.asset2ndClassify}"-->
-                                <!--                                                scrollHeight="250" forceSelection="false">-->
-                                <!--                                                completeMethod="#{budgetController.listSearchLocator}">-->
-                                <!--                                    <p:ajax event="itemSelect" listener="#{budgetController.onSearchLocatorSelect}"/>-->
-                                <!--                                </p:autoComplete>-->
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{userContextService.hasAnyRole('DeptHead')}">
                                 <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
-                                <p:autoComplete dropdown="true" value="#{budgetController.searchForm.applicantId}"
-                                                scrollHeight="250" forceSelection="false">
-                                    <!--                                                completeMethod="#{budgetController.listSearchWarehouse}">-->
-                                    <!--                                    <p:ajax event="itemSelect" update="searchLocator"-->
-                                    <!--                                            listener="#{budgetController.onSearchWarehouseSelect}"/>-->
-                                </p:autoComplete>
+                                <!--                                <p:autoComplete dropdown="true" value="#{budgetController.searchForm.applicantId}"-->
+                                <!--                                                scrollHeight="250" forceSelection="false">-->
+                                <!--                                </p:autoComplete>-->
+                                <p:inputText value="#{budgetController.searchForm.applicantName}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:outputLabel class="label" value="#{msg.EquipmentName}"/>

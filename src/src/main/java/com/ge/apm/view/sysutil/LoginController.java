@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.util.SessionCache;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.LoginService;
@@ -255,6 +256,7 @@ public class LoginController extends LoginService {
             dao.save(user);
         }
         request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, loginName);
+        SessionCache.putSession(request.getSession());
 
         //登录信息记录
         saveLoginRecord(ctx,user);

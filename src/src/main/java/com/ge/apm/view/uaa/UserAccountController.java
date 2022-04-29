@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.SessionCache;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -1678,15 +1679,18 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
     }
 
-    public void destroyTenant(){
+    public void destroyTenant() {
         this.dao.deleteTenantUser(loginUser.getTenantUID());
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         tenantInfo.setActiveType(3);
         tenantInfoRepository.save(tenantInfo);
-        final List<UserAccount> tenantUsers = dao.findByTenantUID(loginUser.getTenantUID()).stream()
-                .filter(i-> !Strings.isNullOrEmpty(i.getWeChatId()))
-                .collect(Collectors.toList());
-        dao.save(tenantUsers);
+        final List<UserAccount> tenantUsers = dao.findByTenantUID(loginUser.getTenantUID());
+        if (!CollectionUtils.isEmpty(tenantUsers)) {
+            tenantUsers.forEach(u -> {
+                userApi.removeUser(u.getLoginName());
+                SessionCache.destroyedSession(u);
+            });
+        }
         logout();
     }
 
