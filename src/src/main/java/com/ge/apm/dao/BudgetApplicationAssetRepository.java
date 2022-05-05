@@ -8,4 +8,11 @@ import webapp.framework.dao.GenericRepositoryUUID;
  */
 public interface BudgetApplicationAssetRepository extends GenericRepositoryUUID<BudgetApplicationAsset> {
 
+    /**
+     * count using budget asset list
+     *
+     * @param budgetAssetId budgetAssetId
+     * @return count
+     */
+    Integer countByApplicationAssetId(String budgetAssetId);
 }

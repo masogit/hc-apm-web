@@ -10,7 +10,7 @@
 <ui:composition>
 
     <p:dialog id="BudgetApplicationEditDlg" widgetVar="BudgetApplicationEditDialog" modal="true" resizable="false"
-              draggable="true" appendTo="@(body)" width="1000" height="600"
+              draggable="true" appendTo="@(body)" width="1000" height="600" closable="false"
               header="#{budgetController.CRUDActionName}#{msg.Blank}#{msg.BudgetApplication}">
         <h:form id="BudgetApplicationEditForm">
             <h:panelGroup id="display">
@@ -25,19 +25,19 @@
                         <h:panelGroup>
                             <p:outputLabel class="label">#{msg.ApplicationDept}</p:outputLabel>
                             <p:inputText id="dept" readonly="true"
-                                         value="#{budgetController.selected.applicationDept.name}"/>
-                            <p:commandButton id="org" process="@this" icon="fa fa-angle-down"
+                                         value="#{budgetController.selectedDept.name}"/>
+                            <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down"
                                              class="btn btn-sm popupIconButton"/>
-                            <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade"
-                                            style="width: 300px;"
+                            <p:overlayPanel id="popupPanelEdit" widgetVar="varOrgEdit" for="orgEdit" hideEffect="fade"
+                                            style="position: absolute; left: 0; top: 0; width: 300px;"
                                             dynamic="false" modal="false">
                                 <p:scrollPanel style="height:300px; border: 0" mode="native">
-                                    <p:tree id="orgTree" value="#{budgetController.orgTree}" var="node"
+                                    <p:tree id="orgTreeEdit" value="#{budgetController.orgTree}" var="node"
                                             selectionMode="single" class="tree" style="width:98%; border:0">
                                         <p:ajax process="@this" event="select"
                                                 update="@parent:dept BudgetApplicationEditForm:budgetAssetlist BudgetApplicationEditForm:saveButton"
                                                 listener="#{budgetController.onSelectTreeNode}"
-                                                oncomplete="PF('varOrg').hide();"/>
+                                                oncomplete="PF('varOrgEdit').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -93,26 +93,19 @@
                             <!--                            </p:cellEditor>-->
                         </p:column>
                         <p:column headerText="#{msg.deviceNum}">
-                            <h:outputText value="#{item.asset.departNum}"/>
+                            <h:outputText value="#{item.asset.financingNum}"/>
                         </p:column>
                         <p:column headerText="#{msg.EquipmentName}">
                             <h:outputText value="#{item.asset.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.AssetBrand}">
-                            <h:outputText value="#{item.asset.brand.name}"/>
+                            <h:outputText value="#{item.asset.assetBrand}"/>
                         </p:column>
-                        <p:column headerText="#{msg.AssetType}">
-                            <h:outputText value="#{item.asset.assetType}"/>
+                        <p:column headerText="#{msg.EquipmentModel}">
+                            <h:outputText value="#{item.asset.assetModel}"/>
                         </p:column>
                         <p:column headerText="#{msg.Unit}">
-                            <!--                            <p:cellEditor>-->
-                            <!--                                <f:facet name="output">-->
-                            <!--                                    <h:outputText value="#{item.unit}" inputStyleClass="width-pct-100"/>-->
-                            <!--                                </f:facet>-->
-                            <!--                                <f:facet name="input">-->
-                            <p:inputText styleClass="width-pct-100" value="#{item.unit}"/>
-                            <!--                                </f:facet>-->
-                            <!--                            </p:cellEditor>-->
+                            <h:outputText value="#{item.asset.unit}"/>
                         </p:column>
                         <p:column headerText="#{msg.ApplicationQuantity}">
                             <!--                            <p:cellEditor>-->
@@ -162,7 +155,7 @@
                                              actionListener="#{budgetController.preAddBudgetAsset}"
                                              update="AssetEditDlg BudgetApplicationEditForm:saveButton"
                                              oncomplete="PF('AssetEditDialog').show()"
-                                             disabled="#{budgetController.selected.applicationDept eq null}"/>
+                                             disabled="#{budgetController.selectedDept eq null}"/>
                         </f:facet>
                     </p:dataTable>
                 </p:fieldset>
@@ -170,10 +163,10 @@
                 <br/>
                 <p:commandButton validateClient="true" actionListener="#{budgetController.save}"
                                  value="#{msg.Save}" id="saveButton"
-                                 update="display,:BudgetApplicationEditDlg, budgetTabView, :growl"
+                                 update="display :BudgetApplicationEditDlg searchForm budgetTabView :growl"
                                  oncomplete="handleSubmit(args, 'BudgetApplicationEditDialog');"
                                  disabled="#{empty budgetController.selected.budgetAssets}"/>
-                <p:commandButton immediate="true" value="#{msg.Cancel}"
+                <p:commandButton immediate="true" value="#{msg.Cancel}" update="searchForm"
                                  onclick="PF('BudgetApplicationEditDialog').hide()"/>
             </h:panelGroup>
         </h:form>
