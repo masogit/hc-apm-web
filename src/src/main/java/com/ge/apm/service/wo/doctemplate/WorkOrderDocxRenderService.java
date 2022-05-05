@@ -143,6 +143,27 @@ public class WorkOrderDocxRenderService {
                 mapESignSignature(null, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
             }
         }
+        mapESign(source, target, "partsSignature", "partsSignature_title", "新增备件签名： ");
+        mapESign(source, target, "medicalWorkerApproverSignature", "medicalWorkerApproverSignature_title", "医工组长签名： ");
+        if (source.containsKey("approverSignatureList")) {
+            List<String> approverSignatures= (List)source.get("approverSignatureList");
+            log.info("approverSignatureList:{}",approverSignatures.size());
+            if (approverSignatures!=null && !approverSignatures.isEmpty()){
+                size = approverSignatures.size();
+                for (int i = 0; i < size; i++) {
+                    String storageId = approverSignatures.get(i);
+                    if (storageId !=null){
+                        log.info("核心组storageId:{}",storageId);
+                        mapESignSignature(storageId, target,"approverSignatureList"+i, "approverSignatureList_title"+i, "核心组签名： ");
+                    }
+                }
+            }
+        }
+        if(size<9){
+            for (int i = size; i < 9; i++) {
+                mapESignSignature(null, target,"approverSignatureList"+i, "approverSignatureList_title"+i, "核心组签名： ");
+            }
+        }
         putWorkOrderStep(target, (String) source.get("woId"));
         putServiceRequestMessage(target, (String) source.get("woId"));
         putWorkOrderCoworker(target, (String) source.get("woId"));
