@@ -262,6 +262,7 @@ public class NurseSiteMaintainJob {
     }
 
     private void doJobCreate(String[] params) throws Exception {
+        LOGGER.info("执行批量创建任务");
         String configId = params[0];
         String strStart = params[1];
         String strEnd = params[2];
@@ -315,7 +316,7 @@ public class NurseSiteMaintainJob {
     }
 
     private void batchSaveMaintainData(LocalDate start, LocalDate end, String userUid, NurseSiteMaintainConfig nurseSiteMaintainConfig) {
-
+        LOGGER.info("进入批量创建");
         Integer type = nurseSiteMaintainConfig.getType();
         String typeValue = nurseSiteMaintainConfig.getTypeValue();
 
@@ -334,9 +335,11 @@ public class NurseSiteMaintainJob {
                         }
                         break;
                     case 2:
+                        LOGGER.info("周工单执行：" + date);
                         Instant instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
                         Date utilDate = Date.from(instant);
                         calendar.setTime(utilDate);
+                        LOGGER.info("dayOfWeek：" + calendar.get(Calendar.DAY_OF_WEEK));
                         if (arr.contains(calendar.get(Calendar.DAY_OF_WEEK))) {
                             scheduleDateSet.add(new Tuple2<>(date, 0));
                         }
