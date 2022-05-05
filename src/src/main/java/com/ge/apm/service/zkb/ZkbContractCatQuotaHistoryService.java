@@ -94,7 +94,6 @@ public class ZkbContractCatQuotaHistoryService {
         zkbContractCatQuotaHistory.setPartOrderId(zkbFePartOrder.getId());
         zkbContractCatQuotaHistory.setPartOrderNo(zkbFePartOrder.getPartOrderNo());
         zkbContractCatQuotaHistory.setQty(zkbFePartOrder.getQty());
-        zkbContractCatQuotaHistory.setAssetType(zkbFePartOrder.getId());
         //高值扣普通  FourInOne 扣普通
         boolean logistic = ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zct.getQuotaDeductType())?true:false;
         if(logistic){
