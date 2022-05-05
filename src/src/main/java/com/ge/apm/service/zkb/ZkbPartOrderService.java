@@ -1730,7 +1730,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
         if(CopyByInvok.T.equals(zkbContract.getAssetQuotaType())){
             if(qty > 0){
-                zkbContractCatQuotaHistoryService.saveZkbFeQuotaHistory(zkbContract,zkbContractAsset, zkbPartOrder.getId(),zkbPartOrder.getPartOrderNo(), probeType, userAccount);
+                zkbContractCatQuotaHistoryService.saveZkbFeQuotaHistory(zkbContract,zkbContractAsset, zkbPartOrder.getId(),zkbPartOrder.getPartOrderNo(), probeType, userAccount, qty);
             }else{
                 zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId());
             }
