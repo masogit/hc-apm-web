@@ -652,10 +652,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * 供应商拒绝
      * @return
      */
-    public String supplierReject(String comment)
-    {
-        if(StringUtils.isBlank(comment))
-        {
+    public String supplierReject(String comment) {
+        if(StringUtils.isBlank(comment)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("代理商审批备注不能为空"));
             return "";
         }
@@ -706,9 +704,12 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setCommercialAssignUser(this.userName);
         this.selected.setCommercialAssignDate(date);
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        if(this.selected.getQty()>0)
-        {
+        if(this.selected.getQty()>0){
             this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("TenantReject"));
+            //TODO liyonjian ZKB - 2022年新探头逻辑  //此处需要改为update
+            if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                zkbContractCatQuotaHistoryService.updateZkbFeContractCatQuotaHistoryStatusOrQty(zkbContract,this.selected,this.currentUser,"N",null);
+            }
         }
         if (StringUtils.isNotBlank(selected.getContractCatId())) {
             this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
