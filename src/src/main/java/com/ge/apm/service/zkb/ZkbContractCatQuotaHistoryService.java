@@ -34,7 +34,7 @@ public class ZkbContractCatQuotaHistoryService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveZkbFeQuotaHistory(ZkbContract zkbContract, ZkbContractAsset zkbContractAsset, String zkbPartOrderId, String zkbPartOrderNo, String probeType, UserAccount currentUser){
+    public void saveZkbFeQuotaHistory(ZkbContract zkbContract, ZkbContractAsset zkbContractAsset, String zkbPartOrderId, String zkbPartOrderNo, String probeType, UserAccount currentUser,Integer qty){
         ZkbContractCatQuotaHistory zkbContractCatQuotaHistory = new ZkbContractCatQuotaHistory();
         zkbContractCatQuotaHistory.setCreatedBy(currentUser.getUid());
         zkbContractCatQuotaHistory.setCreatedDate(new Date());
@@ -46,6 +46,7 @@ public class ZkbContractCatQuotaHistoryService {
         zkbContractCatQuotaHistory.setPartOrderNo(zkbPartOrderNo);
         zkbContractCatQuotaHistory.setPartOrderNo(zkbPartOrderNo);
         zkbContractCatQuotaHistory.setProbeType(probeType);
+        zkbContractCatQuotaHistory.setQty(qty);
         if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
             zkbContractCatQuotaHistory.setAssetType(ZkbContractAsset.AssetTypeEnum.highMachine.toString());
         }else{
