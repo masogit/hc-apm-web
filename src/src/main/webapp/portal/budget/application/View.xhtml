@@ -56,19 +56,19 @@
                             <h:outputText value="#{fieldMsg.fieldValue('budgetStockType', item.stockType)}"/>
                         </p:column>
                         <p:column headerText="#{msg.deviceNum}">
-                            <h:outputText value="#{item.asset.departNum}"/>
+                            <h:outputText value="#{item.asset.financingNum}"/>
                         </p:column>
                         <p:column headerText="#{msg.EquipmentName}">
                             <h:outputText value="#{item.asset.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.AssetBrand}">
-                            <h:outputText value="#{item.asset.brand.name}"/>
+                            <h:outputText value="#{item.asset.assetBrand}"/>
                         </p:column>
-                        <p:column headerText="#{msg.AssetType}">
-                            <h:outputText value="#{item.asset.assetType}"/>
+                        <p:column headerText="#{msg.EquipmentModel}">
+                            <h:outputText value="#{item.asset.assetModel}"/>
                         </p:column>
                         <p:column headerText="#{msg.Unit}">
-                            <h:outputText value="#{item.unit}"/>
+                            <h:outputText value="#{item.asset.unit}"/>
                         </p:column>
                         <p:column headerText="#{msg.ApplicationQuantity}">
                             <h:outputText converter="javax.faces.Number" value="#{item.applicationQuantity}"/>
@@ -121,7 +121,7 @@
                 <br/>
                 <p:commandButton rendered="#{budgetController.deleteAction}"
                                  actionListener="#{budgetController.delete}" value="#{msg.Delete}"
-                                 update="display,:BudgetApplicationViewDlg, budgetTabView, :growl"
+                                 update="display :BudgetApplicationViewDlg budgetTabView :growl"
                                  oncomplete="handleSubmit(args, 'BudgetApplicationViewDialog');"/>
                 <p:commandButton immediate="true" value="#{msg.Close}"
                                  onclick="PF('BudgetApplicationViewDialog').hide()"/>

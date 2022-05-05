@@ -111,8 +111,9 @@
             </p:submenu>
 
             <p:submenu label="#{msg.BudgetMgr}" icon="attach_money"
-                       rendered="#{userContextService.versionContains('budgetMgr') and userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}">
-                <p:menuitem value="#{msg.BudgetApplication}" outcome="/portal/budget/List.xhtml"/>
+                       rendered="#{userContextService.versionContains('budgetMgr') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff')}">
+                <p:menuitem value="#{msg.BudgetAsset}" outcome="/portal/budget/asset/List.xhtml"/>
+                <p:menuitem value="#{msg.BudgetApplication}" outcome="/portal/budget/application/List.xhtml"/>
             </p:submenu>
 
             <p:submenu id="um25" label="#{msg.MyTrain}" icon="fa fa-check-square-o" rendered="#{userContextService.isAccessMyTrain()}">

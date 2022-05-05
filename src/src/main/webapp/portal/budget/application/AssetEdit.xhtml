@@ -51,7 +51,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.EquipmentModel}</label>
-                        <p:inputText value="#{budgetController.assetSearchForm.functionType}"/>
+                        <p:inputText value="#{budgetController.assetSearchForm.assetModel}"/>
                         <!--                        <p:autoComplete dropdown="true" value="#{budgetController.assetSearchForm.functionType}"-->
                         <!--                                        scrollHeight="250" forceSelection="false"/>-->
                         <!--                                                completeMethod="#{budgetController.listItems}"/>-->
@@ -77,19 +77,19 @@
                          rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
 
                 <p:column headerText="#{msg.deviceNum}">
-                    <h:outputText value="#{item.asset.departNum}"/>
+                    <h:outputText value="#{item.asset.financingNum}"/>
                 </p:column>
                 <p:column headerText="#{msg.EquipmentName}">
                     <h:outputText value="#{item.asset.name}"/>
                 </p:column>
                 <p:column headerText="#{msg.AssetBrand}">
-                    <h:outputText value="#{item.asset.brand.name}"/>
+                    <h:outputText value="#{item.asset.assetBrand}"/>
                 </p:column>
                 <p:column headerText="#{msg.EquipmentModel}">
-                    <h:outputText value="#{item.asset.functionType}"/>
+                    <h:outputText value="#{item.asset.assetModel}"/>
                 </p:column>
                 <p:column headerText="#{msg.Unit}">
-                    <p:inputText styleClass="width-pct-100" value="#{item.unit}"/>
+                    <h:outputText value="#{item.asset.unit}"/>
                 </p:column>
                 <p:column headerText="#{msg.StockType}">
                     <p:selectOneMenu id="stockType" value="#{item.stockType}">
