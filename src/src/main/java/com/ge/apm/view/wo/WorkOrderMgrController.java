@@ -1385,6 +1385,14 @@ public void test1(){
             }
             blobObjectRepository.save(picList);
         }
+        if(!attachList.isEmpty()) {
+            String srId = selectedWorkOrder.getSrId();
+            for (V2_BlobObject bo : attachList) {
+                bo.setBoUuid(srId);
+                bo.setObjectType(V2_BlobObject.BO_SUB_TYPE_DOCS);
+            }
+            blobObjectRepository.save(attachList);
+        }
         dao.save(selectedWorkOrder);
     }
 
