@@ -9,6 +9,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
@@ -74,6 +75,10 @@ public class WorkOrderExportService {
     V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
     @Autowired
     UserAccountRepository userAccountDao;
+    @Autowired
+    private TenantInfoRepository tenantInfoRepository;
+    @Autowired
+    private WorkAuditRepository workAuditRepository;
     @Autowired
     private OrgInfoTreeService orgInfoTreeService;
     @Autowired
@@ -390,6 +395,38 @@ public class WorkOrderExportService {
                     workOrderMap.put("auditSignatureList",list );
                 }
             }
+
+            if(workOrderExportPojo.getId()!=null){
+                UserAccount userAccount = userContextService.getCurrentUserAccount();
+                String tenantUID = userAccount.getTenantUID();
+                TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+                if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+                    List<V2_WorkOrder_Detail> v2_workOrder_details = workOrderDetailDao.getByWoIdOrderByCreatedDateDesc(workOrderExportPojo.getId());
+                    if (v2_workOrder_details!=null && !v2_workOrder_details.isEmpty()){
+                        V2_WorkOrder_Detail v2_workOrder_detail = v2_workOrder_details.get(0);
+                        //添加备件签名
+                        String partsSignature = v2_workOrder_detail.getPartsSignature();
+                        log.info("partsSignature:{}",partsSignature);
+                        workOrderMap.put("partsSignature",partsSignature );
+                        //医工组签名
+                        String medicalWorkerApproverSignature = v2_workOrder_detail.getMedicalWorkerApproverSignature();
+                        log.info("medicalWorkerApproverSignature:{}",medicalWorkerApproverSignature);
+                        workOrderMap.put("medicalWorkerApproverSignature",medicalWorkerApproverSignature );
+                        //核心组签名
+                        List<WorkAudit> workAudits = workAuditRepository.findByWorkOrderDetailId(v2_workOrder_detail.getId());
+                        if(workAudits!=null && !workAudits.isEmpty()){
+                            List<String> approverSignatureList = new ArrayList<>();
+                            for (WorkAudit workAudit : workAudits){//核心组签名
+                                approverSignatureList.add(workAudit.getAuditGroupConfigurationDetail().getApproverSignature());
+                                log.info("核心组签名:"+workAudit.getAuditGroupConfigurationDetail().getApproverSignature());
+                            }
+                            log.info("approverSignatureList:{}",approverSignatureList.size());
+                            workOrderMap.put("approverSignatureList",approverSignatureList );
+                        }
+                    }
+                }
+            }
+
 
             this.putPartsData(workOrderExportPojo ,workOrderMap);
             //this.putWorkOrderStep(workOrderExportPojo ,workOrderMap);
