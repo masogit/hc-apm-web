@@ -321,11 +321,11 @@ public class NurseSiteMaintainJob {
 
         Set<Tuple2<LocalDate, Integer>> scheduleDateSet = new HashSet<>();
         if (StringUtils.isNotEmpty(typeValue)) {
-            Integer intTypeValue = Integer.parseInt(typeValue);
             Set<Integer> arr = Arrays.stream(typeValue.split(",")).map(w -> Integer.parseInt(w)).collect(Collectors.toSet());
             for (LocalDate date = start; date.isBefore(end.plusDays(1)); date = date.plusDays(1)) {
                 switch (type) {
                     case 1:
+                        Integer intTypeValue = Integer.parseInt(typeValue);
                         for (int i = 0; i < intTypeValue; ++i) {
                             scheduleDateSet.add(new Tuple2<>(date, i + 1));
                         }
