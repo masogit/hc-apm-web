@@ -64,7 +64,7 @@ public class ZkbFePartOrderProvider {
                 " INNER JOIN asset_info ai ON ai.uid = zca.asset_id " +
                 " WHERE " +
                 " ai.uid = '"+uid+"' " +
-                " AND now() between ac.start_date and ac.end_date");
+                " AND to_timestamp(to_char(now(),'yyyy-mm-dd'),'yyyy-mm-dd') between ac.start_date and ac.end_date");
         return sb.toString();
     }
 
