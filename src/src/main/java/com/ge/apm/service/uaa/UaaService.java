@@ -1,11 +1,9 @@
 package com.ge.apm.service.uaa;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -14,16 +12,14 @@ import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -1200,6 +1196,15 @@ public class UaaService {
 
         return rootNode;
     }
+
+    public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelected(String parentOrgId, String userUid, Integer selectableLevel) {
+
+        List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
+        List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListWithClinicalDept(userUid);
+
+        return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoSelectableList, selectableLevel);
+    }
+
     public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(String parentOrgId, String userUid) {
 
         List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
@@ -1211,12 +1216,16 @@ public class UaaService {
     }
 
     public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList) {
+        return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoSelectableList, 4);
+    }
+
+    public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList, Integer selectableLevel) {
 
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
 
         for(OrgInfo org: orgInfoFullList){
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setSelectable(org.getOrgType() == 4);
+            node.setSelectable(selectable(org, selectableLevel));
             node.setRowKey("org_"+org.getId());
             treeMap.put(org.getUid(), node);
         }
@@ -1248,6 +1257,20 @@ public class UaaService {
         }
 
         return rootNode;
+    }
+
+    /**
+     * level is 4: dept
+     * level is 3: dept, site
+     * level is 2: dept, site, hospital
+     * level is 1: dept, site, hospital, institution
+     * level is 0: dept, site, hospital, institution, tenant
+     */
+    private boolean selectable(OrgInfo org, Integer selectableLevel) {
+        if (selectableLevel == null) {
+            return true;
+        }
+        return selectableLevel <= org.getOrgType();
     }
 
     public boolean isTemporaryAccount(String role) {

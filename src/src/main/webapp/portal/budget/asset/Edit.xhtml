@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+
+    <p:dialog id="BudgetAssetEditDlg" widgetVar="BudgetAssetEditDialog" modal="true" resizable="false"
+              draggable="true" appendTo="@(body)" width="1000"
+              header="#{budgetAssetController.CRUDActionName}#{msg.Blank}#{msg.BudgetAsset}">
+        <h:form id="BudgetAssetEditForm">
+            <h:panelGroup id="display">
+                <p:panelGrid id="editPanel" columns="4" layout="grid"
+                             styleClass="ui-panelgrid-blank form-group"
+                             rendered="#{budgetAssetController.selected != null}">
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.deviceNum}</p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.financingNum}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.EquipmentName}</p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.name}" required="true"
+                                     requiredMessage="#{msg.EquipmentName}#{msg.Blank}#{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.clinicaldepart}</p:outputLabel>
+                        <p:inputText id="dept" readonly="true"
+                                     value="#{budgetAssetController.selectedDept.name}"/>
+                        <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down"
+                                         class="btn btn-sm popupIconButton"/>
+                        <p:overlayPanel id="popupPanelEdit" widgetVar="varOrgEdit" for="orgEdit" hideEffect="fade"
+                                        style="position: absolute; left: 0; top: 0; width: 300px;"
+                                        dynamic="false" modal="false" dismissable="true">
+                            <p:scrollPanel style="height:300px; border: 0" mode="native">
+                                <p:tree id="orgTreeEdit" value="#{budgetAssetController.orgTreeEdit}" var="node"
+                                        selectionMode="single" class="tree" style="width:98%; border:0">
+                                    <p:ajax process="@this" event="select"
+                                            update="@parent:dept BudgetAssetEditForm:saveButton"
+                                            listener="#{budgetAssetController.onSelectTreeNode}"
+                                            oncomplete="PF('varOrgEdit').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.AssetGroup}</p:outputLabel>
+                        <p:selectOneMenu value="#{budgetAssetController.selected.assetGroup}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
+                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <p:ajax event="change" listener="#{budgetAssetController.onBudgetAssetGroupChange}"
+                                    update="@this assetGroupSecondary"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{budgetAssetController.show('assetGroupSecondary')}">
+                        <p:outputLabel class="label">#{msg.AssetGroupSecondary}</p:outputLabel>
+                        <p:selectOneMenu id="assetGroupSecondary"
+                                         value="#{budgetAssetController.selected.assetGroupSecondary}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{budgetAssetController.budgetAssetGroupSecondaryList}" var="item"
+                                           itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.AssetBrand}</p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.assetBrand}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.EquipmentModel}</p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.assetModel}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.Unit}</p:outputLabel>
+                        <p:inputText value="#{budgetAssetController.selected.unit}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">#{msg.Price}</p:outputLabel>
+                        <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2"
+                                       value="#{budgetAssetController.selected.price}">
+                        </p:inputNumber>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <br/>
+                <p:commandButton validateClient="true" actionListener="#{budgetAssetController.save}"
+                                 value="#{msg.Save}" id="saveButton"
+                                 update="display :BudgetAssetEditDlg searchForm assetList :growl"
+                                 oncomplete="handleSubmit(args, 'BudgetAssetEditDialog');"
+                                 disabled="#{empty budgetAssetController.selectedDept}"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}"
+                                 onclick="PF('BudgetAssetEditDialog').hide()"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+</html>

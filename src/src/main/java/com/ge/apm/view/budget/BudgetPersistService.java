@@ -3,6 +3,7 @@ package com.ge.apm.view.budget;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.BudgetApplicationRepository;
+import com.ge.apm.dao.BudgetAssetInfoRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.ApprovalNode;
@@ -10,6 +11,7 @@ import com.ge.apm.domain.MultiLevelApproval;
 import com.ge.apm.domain.MultiLevelApprovalConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.budget.BudgetApplication;
+import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -33,16 +35,18 @@ public class BudgetPersistService {
     private static Logger logger = LoggerFactory.getLogger(BudgetApplicationController.class);
 
     @Autowired
-    private BudgetApplicationRepository budgetDao;
+    private BudgetApplicationRepository budgetApplicationDao;
     @Autowired
-    private MultiLevelApprovalRepository approvalDao;
+    private BudgetAssetInfoRepository budgetAssetInfoDao;
     @Autowired
     private UserAccountRepository userDao;
+    @Autowired
+    private MultiLevelApprovalRepository approvalDao;
     @Autowired
     private MultiLevelApprovalService approvalService;
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean save(BudgetApplication application) {
+    public boolean saveApplication(BudgetApplication application) {
         boolean isEditAction = Optional.ofNullable(application.getId()).isPresent();
         application.getBudgetAssets().forEach(a -> {
             Optional.of(a.isNew()).filter(b -> b).ifPresent(b -> a.setId(null));
@@ -52,7 +56,7 @@ public class BudgetPersistService {
         // 新增
         if (!isEditAction) {
             // 保存以获得ID
-            application = budgetDao.save(application);
+            application = budgetApplicationDao.save(application);
             MultiLevelApprovalConfig approvalConfig = approvalService.getFirstApprovalList(application, false);
             MultiLevelApproval approval = generateApproval(application, approvalConfig);
             if (approval == null) {
@@ -63,7 +67,7 @@ public class BudgetPersistService {
                 logger.info("budget message 002: new budget application");
                 application.setApprovalConfigId(approval.getWorkflowConfigApproveUid());
                 approvalDao.save(approval);
-                budgetDao.save(application);
+                budgetApplicationDao.save(application);
                 sendMsg(application, approvalConfig);
             }
         } else {
@@ -108,15 +112,16 @@ public class BudgetPersistService {
                     sendMsg(application, newApprovalConfig);
                 }
             }
-            budgetDao.save(application);
+            budgetApplicationDao.save(application);
         }
         return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean delete(BudgetApplication application) {
+    public boolean deleteApplication(BudgetApplication application) {
         approvalDao.delete(application.getBudgetApprovals());
-        budgetDao.delete(application);
+        application.setIsDeleted(1);
+        budgetApplicationDao.save(application);
         return true;
     }
 
@@ -183,5 +188,18 @@ public class BudgetPersistService {
                     + application.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
             approvalService.sendWxMsg(weChatIdList, message, "待审批");
         });
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean saveAsset(BudgetAssetInfo assetInfo) {
+        budgetAssetInfoDao.save(assetInfo);
+        return true;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteAsset(BudgetAssetInfo assetInfo) {
+        assetInfo.setIsDeleted(1);
+        budgetAssetInfoDao.save(assetInfo);
+        return true;
     }
 }
