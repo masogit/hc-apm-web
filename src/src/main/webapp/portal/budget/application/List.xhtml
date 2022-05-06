@@ -43,8 +43,8 @@
                                 <p:commandButton id="org" process="@this" icon="fa fa-angle-down"
                                                  class="btn btn-sm popupIconButton"/>
                                 <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade"
-                                                style="width: 300px;"
-                                                dynamic="false" modal="false">
+                                                style="position: absolute; left: 0; top: 0; width: 300px;"
+                                                dynamic="false" modal="false" dismissable="true">
                                     <p:scrollPanel style="height:300px; border: 0" mode="native">
                                         <p:tree id="orgTree" value="#{budgetController.orgTree}" var="node"
                                                 selectionMode="single" class="tree" style="width:98%; border:0">
@@ -107,7 +107,7 @@
                                                    itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{userContextService.hasAnyRole('DeptHead')}">
+                            <h:panelGroup rendered="#{userContextService.hasAnyRole('AssetHead,DeptHead')}">
                                 <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
                                 <!--                                <p:autoComplete dropdown="true" value="#{budgetController.searchForm.applicantId}"-->
                                 <!--                                                scrollHeight="250" forceSelection="false">-->
