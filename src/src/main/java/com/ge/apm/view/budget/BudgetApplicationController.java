@@ -76,7 +76,6 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     private UserContextService userContextService;
     private BudgetPersistService persistService;
-    private UaaService uaaService;
 
     private BudgetSearchForm searchForm = new BudgetSearchForm();
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
@@ -95,7 +94,6 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
         userContextService = WebUtil.getBean(UserContextService.class);
         persistService = WebUtil.getBean(BudgetPersistService.class);
-        uaaService = WebUtil.getBean(UaaService.class);
 
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
@@ -103,6 +101,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
+        UaaService uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(treeNode);
@@ -174,7 +173,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
                 return;
             }
         }
-        boolean isOk = persistService.saveApplication(selected);
+        boolean isOk = persistService.saveApplication(selected, deletedBudgetAssets);
         actionMessage(isOk);
     }
 
