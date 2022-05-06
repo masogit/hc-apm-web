@@ -47,7 +47,7 @@ public class ZkbContractCatQuotaHistoryService {
         zkbContractCatQuotaHistory.setPartOrderNo(zkbPartOrderNo);
         zkbContractCatQuotaHistory.setProbeType(probeType);
         zkbContractCatQuotaHistory.setQty(qty);
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             zkbContractCatQuotaHistory.setAssetType(ZkbContractAsset.AssetTypeEnum.highMachine.toString());
         }else{
             zkbContractCatQuotaHistory.setAssetType(ZkbContractAsset.AssetTypeEnum.lowMachine.toString());
@@ -169,7 +169,7 @@ public class ZkbContractCatQuotaHistoryService {
         int lowMachine = (total % 2 == 0 ? total :total+1)/2;
 
         String assetType = "";
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             assetType = ZkbContractAsset.AssetTypeEnum.highMachine.toString();
         }else{
             assetType = ZkbContractAsset.AssetTypeEnum.lowMachine.toString();
@@ -183,7 +183,7 @@ public class ZkbContractCatQuotaHistoryService {
             }
         }
 
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             if(qty > (highMachine - useQty)){
                 return false;
             }
@@ -211,7 +211,7 @@ public class ZkbContractCatQuotaHistoryService {
         int lowMachine = (total % 2 == 0 ? total :total+1)/2;
 
         String assetType = "";
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             assetType = ZkbContractAsset.AssetTypeEnum.highMachine.toString();
         }else{
             assetType = ZkbContractAsset.AssetTypeEnum.lowMachine.toString();
@@ -225,7 +225,7 @@ public class ZkbContractCatQuotaHistoryService {
             }
         }
 
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             if(qty > (highMachine - useQty)){
                 return false;
             }
