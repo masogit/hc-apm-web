@@ -885,12 +885,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         //TODO liyonjian ZKB - 2022年新探头逻辑
         qty = zkbContractCatQuotaHistoryService.handleQty(zkbContract,this.selected);
         Integer contractCount = qty == null ? 0 : qty;
-        //TODO liyonjian ZKB - 2022年新探头逻辑  新逻辑 如果dubble 需要*2
-        if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())&&ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag())) {
-            this.selected.setRemainQty(contractCount - this.selected.getQty()*2);
-        }else{
-            this.selected.setRemainQty(contractCount - this.selected.getQty());
-        }
+        this.selected.setRemainQty(contractCount - this.selected.getQty());
     }
 
     public String backList(){
