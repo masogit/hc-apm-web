@@ -84,6 +84,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     private OrgInfo org;
     private CustomConfigObject customConfig;
     private TreeNode orgTree;
+    private TreeNode orgTreeEdit;
     private OrgInfo selectedDept;
 
     @Override
@@ -102,7 +103,10 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
-        initOrgTree();
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
+        TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        orgTree = initOrgTree(treeNode);
+        orgTreeEdit = initOrgTree(treeNodeEdit);
     }
 
     @Override
@@ -157,6 +161,11 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         // 保存时设置科室
         selected.setApplicationDept(selectedDept);
         selected.setApplicationDeptId(selectedDept.getId());
+
+        selected.setTenantUID(selectedDept.getTenantUID());
+        selected.setInstitutionUID(selectedDept.getInstitutionUID());
+        selected.setHospitalUID(selectedDept.getHospitalUID());
+        selected.setSiteUID(selectedDept.getSiteUID());
 
         if (selected.getId() != null) {
             BudgetApplication application = dao.findById(selected.getId());
@@ -231,7 +240,26 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     private void addSearchFilter() {
         if (null != searchForm.getDept()) {
-            updateSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, searchForm.getDept().getId()));
+            OrgInfo orgInfo = searchForm.getDept();
+            switch (orgInfo.getOrgType()) {
+                case 4:
+                    // 科室
+                    updateSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, orgInfo.getId()));
+                case 3:
+                    // 院区
+                    updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getSiteUID()));
+                case 2:
+                    // 医院
+                    updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getHospitalUID()));
+                case 1:
+                    // 集团
+                    updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getInstitutionUID()));
+                case 0:
+                    // 租户
+                default:
+                    updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getTenantUID()));
+                    break;
+            }
         }
         if (null != searchForm.getDateStart()) {
             updateSearchFilter(new SearchFilter("applicationDate", SearchFilter.Operator.GTE, searchForm.getDateStart()));
@@ -380,12 +408,11 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         calcTotalAmount();
     }
 
-    public void initOrgTree() {
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid());
+    public TreeNode initOrgTree(TreeNode treeNode) {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode orgTree = new DefaultTreeNode("root", null, null);
         TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
         rootNode.setSelectable(false);
         if (null != treeNode) {
@@ -398,6 +425,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
             rootNode.getChildren().add(node);
         }
         rootNode.setExpanded(true);
+        return orgTree;
     }
 
     public void onSearchTreeNode(NodeSelectEvent event) {
@@ -481,10 +509,6 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         selected.setBudgetApprovals(new HashSet<>());
 
         selected.setIsDeleted(0);
-        selected.setTenantUID(account.getTenantUID());
-        selected.setInstitutionUID(account.getInstitutionUID());
-        selected.setHospitalUID(account.getHospitalUID());
-        selected.setSiteUID(account.getSiteUID());
         selected.setCreatedBy(account.getLoginName());
         selected.setCreatedDate(date);
         selected.setLastModifiedBy(account.getLoginName());
@@ -574,6 +598,14 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     public void setOrgTree(TreeNode orgTree) {
         this.orgTree = orgTree;
+    }
+
+    public TreeNode getOrgTreeEdit() {
+        return orgTreeEdit;
+    }
+
+    public void setOrgTreeEdit(TreeNode orgTreeEdit) {
+        this.orgTreeEdit = orgTreeEdit;
     }
 
     public OrgInfo getSelectedDept() {

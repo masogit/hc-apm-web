@@ -60,6 +60,7 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
     private OrgInfo org;
     private CustomConfigObject customConfig;
     private TreeNode orgTree;
+    private TreeNode orgTreeEdit;
     private OrgInfo selectedDept;
 
     @Override
@@ -77,7 +78,10 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
         CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
-        initOrgTree();
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
+        TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        orgTree = initOrgTree(treeNode);
+        orgTreeEdit = initOrgTree(treeNodeEdit);
     }
 
     @Override
@@ -207,12 +211,11 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
         }
     }
 
-    public void initOrgTree() {
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
+    public TreeNode initOrgTree(TreeNode treeNode) {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode orgTree = new DefaultTreeNode("root", null, null);
         TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
         rootNode.setSelectable(false);
         if (null != treeNode) {
@@ -225,6 +228,7 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
             rootNode.getChildren().add(node);
         }
         rootNode.setExpanded(true);
+        return orgTree;
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
@@ -327,6 +331,14 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
 
     public void setOrgTree(TreeNode orgTree) {
         this.orgTree = orgTree;
+    }
+
+    public TreeNode getOrgTreeEdit() {
+        return orgTreeEdit;
+    }
+
+    public void setOrgTreeEdit(TreeNode orgTreeEdit) {
+        this.orgTreeEdit = orgTreeEdit;
     }
 
     public OrgInfo getSelectedDept() {
