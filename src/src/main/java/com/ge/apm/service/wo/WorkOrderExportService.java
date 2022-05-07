@@ -421,8 +421,11 @@ public class WorkOrderExportService {
                         if(workAudits!=null && !workAudits.isEmpty()){
                             List<String> approverSignatureList = new ArrayList<>();
                             for (WorkAudit workAudit : workAudits){//核心组签名
-                                approverSignatureList.add(workAudit.getAuditGroupConfigurationDetail().getApproverSignature());
-                                log.info("核心组签名:"+workAudit.getAuditGroupConfigurationDetail().getApproverSignature());
+                                String approverSignature = workAudit.getAuditGroupConfigurationDetail().getApproverSignature();
+                                if(approverSignature!=null){
+                                    approverSignatureList.add(approverSignature);
+                                    log.info("核心组签名:"+ approverSignature);
+                                }
                             }
                             log.info("approverSignatureList:{}",approverSignatureList.size());
                             workOrderMap.put("approverSignatureList",approverSignatureList );
