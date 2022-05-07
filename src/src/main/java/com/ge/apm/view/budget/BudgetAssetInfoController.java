@@ -20,7 +20,6 @@ import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -43,7 +42,6 @@ import java.util.List;
 public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetAssetInfo> {
     private static Logger logger = LoggerFactory.getLogger(BudgetAssetInfoController.class);
 
-    private Page<BudgetAssetInfo> emptyPage = new PageImpl<>(Collections.emptyList());
     private UserAccount account = UserContextService.getCurrentUserAccount();
 
     private List<I18nMessage> budgetAssetGroupSecondaryList = new ArrayList<>();
@@ -53,7 +51,6 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
     private I18nMessageRepository i18nDao;
 
     private BudgetPersistService persistService;
-    private UaaService uaaService;
 
     private BudgetAssetSearchForm searchForm = new BudgetAssetSearchForm();
 
@@ -70,7 +67,6 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 
         persistService = WebUtil.getBean(BudgetPersistService.class);
-        uaaService = WebUtil.getBean(UaaService.class);
 
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
@@ -78,6 +74,7 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
         CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
+        UaaService uaaService = WebUtil.getBean(UaaService.class);
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(treeNode);
