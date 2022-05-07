@@ -407,11 +407,15 @@ public class WorkOrderExportService {
                         //添加备件签名
                         String partsSignature = v2_workOrder_detail.getPartsSignature();
                         log.info("partsSignature:{}",partsSignature);
-                        workOrderMap.put("partsSignature",partsSignature );
+                        if(partsSignature!=null){
+                            workOrderMap.put("partsSignature",partsSignature );
+                        }
                         //医工组签名
                         String medicalWorkerApproverSignature = v2_workOrder_detail.getMedicalWorkerApproverSignature();
                         log.info("medicalWorkerApproverSignature:{}",medicalWorkerApproverSignature);
-                        workOrderMap.put("medicalWorkerApproverSignature",medicalWorkerApproverSignature );
+                        if(medicalWorkerApproverSignature!=null){
+                            workOrderMap.put("medicalWorkerApproverSignature",medicalWorkerApproverSignature );
+                        }
                         //核心组签名
                         List<WorkAudit> workAudits = workAuditRepository.findByWorkOrderDetailId(v2_workOrder_detail.getId());
                         if(workAudits!=null && !workAudits.isEmpty()){
