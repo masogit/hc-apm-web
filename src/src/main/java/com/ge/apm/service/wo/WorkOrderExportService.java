@@ -388,8 +388,11 @@ public class WorkOrderExportService {
                 if (multiLevelApprovals!=null && !multiLevelApprovals.isEmpty()){
                     List<String> list = new ArrayList<>();
                     for (MultiLevelApproval multiLevelApproval:multiLevelApprovals){
-                        list.add(multiLevelApproval.getAuditSignature());
-                        log.info("audit_signature:{}",multiLevelApproval.getAuditSignature());
+                        String auditSignature = multiLevelApproval.getAuditSignature();
+                        if(auditSignature!=null){
+                            list.add(auditSignature);
+                            log.info("audit_signature:{}", auditSignature);
+                        }
                     }
                     log.info("auditSignatureList:{}",list.size());
                     workOrderMap.put("auditSignatureList",list );
