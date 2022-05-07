@@ -145,12 +145,13 @@ public class WorkOrderDocxRenderService {
         }
         mapESign(source, target, "partsSignature", "partsSignature_title", "新增备件签名： ");
         mapESign(source, target, "medicalWorkerApproverSignature", "medicalWorkerApproverSignature_title", "医工组长签名： ");
+        int num=0;
         if (source.containsKey("approverSignatureList")) {
             List<String> approverSignatures= (List)source.get("approverSignatureList");
             log.info("approverSignatureList:{}",approverSignatures.size());
             if (approverSignatures!=null && !approverSignatures.isEmpty()){
-                size = approverSignatures.size();
-                for (int i = 0; i < size; i++) {
+                num = approverSignatures.size();
+                for (int i = 0; i < num; i++) {
                     String storageId = approverSignatures.get(i);
                     if (storageId !=null){
                         log.info("核心组storageId:{}",storageId);
@@ -159,8 +160,8 @@ public class WorkOrderDocxRenderService {
                 }
             }
         }
-        if(size<9){
-            for (int i = size; i < 9; i++) {
+        if(num<9){
+            for (int i = num; i < 9; i++) {
                 mapESignSignature(null, target,"approverSignatureList"+i, "approverSignatureList_title"+i, "核心组签名： ");
             }
         }
