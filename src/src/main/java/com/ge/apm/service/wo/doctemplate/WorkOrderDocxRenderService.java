@@ -155,7 +155,7 @@ public class WorkOrderDocxRenderService {
                     String storageId = approverSignatures.get(i);
                     if (storageId !=null){
                         log.info("核心组storageId:{}",storageId);
-                        mapESignSignature(storageId, target,"approverSignatureList"+i, "approverSignatureList_title"+i, "核心组签名： ");
+                        mapESignSignature(storageId, target,"approverSignatureList"+i, "approverSignatureList_title"+i, "核心组签名"+i+"： ");
                     }
                 }
             }
