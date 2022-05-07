@@ -883,8 +883,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         reLog += "探头特殊剩余名额只能选择特殊探头！";
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
-                    if(CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())){
-                        probeType = ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString();
+                    ZkbContractCat zkbContractCat = zkbPartOrderService.getZkbContractCatRepository().findById(this.selected.getContractCatId());
+                    if(zkbContractCat != null && CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){                        probeType = ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString();
                         Integer contractCount = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
                         if(contractCount - selected.getQty() < 0){
                             reLog = "合同探头普通剩余名额不足，请检查！";
@@ -902,7 +902,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         reLog = "合同探头剩余名额不足，请检查！";
                     }
                 }else if(CopyByInvok.T.equals(selected.getHighCatFlag())){
-                    if(CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())){
+                    ZkbContractCat zkbContractCat = zkbPartOrderService.getZkbContractCatRepository().findById(this.selected.getContractCatId());
+                    if(zkbContractCat != null && CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
                         probeType = ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString();
                         Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
                         if(contractCount - selected.getQty() < 0){
