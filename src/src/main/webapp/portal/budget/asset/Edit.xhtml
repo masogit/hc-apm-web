@@ -96,7 +96,7 @@
                                  update="display :BudgetAssetEditDlg searchForm assetList :growl"
                                  oncomplete="handleSubmit(args, 'BudgetAssetEditDialog');"
                                  disabled="#{empty budgetAssetController.selectedDept}"/>
-                <p:commandButton immediate="true" value="#{msg.Cancel}"
+                <p:commandButton immediate="true" value="#{msg.Cancel}" update="assetList"
                                  onclick="PF('BudgetAssetEditDialog').hide()"/>
             </h:panelGroup>
         </h:form>

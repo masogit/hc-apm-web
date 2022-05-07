@@ -2,15 +2,13 @@ package com.ge.apm.view.budget;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.ge.apm.dao.BudgetApplicationRepository;
-import com.ge.apm.dao.BudgetAssetInfoRepository;
-import com.ge.apm.dao.MultiLevelApprovalRepository;
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.ApprovalNode;
 import com.ge.apm.domain.MultiLevelApproval;
 import com.ge.apm.domain.MultiLevelApprovalConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.budget.BudgetApplication;
+import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -25,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * @author Yangfan, Liu
@@ -37,6 +36,8 @@ public class BudgetPersistService {
     @Autowired
     private BudgetApplicationRepository budgetApplicationDao;
     @Autowired
+    private BudgetApplicationAssetRepository budgetApplicationAssetDao;
+    @Autowired
     private BudgetAssetInfoRepository budgetAssetInfoDao;
     @Autowired
     private UserAccountRepository userDao;
@@ -46,12 +47,9 @@ public class BudgetPersistService {
     private MultiLevelApprovalService approvalService;
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean saveApplication(BudgetApplication application) {
+    public boolean saveApplication(BudgetApplication application, List<BudgetApplicationAsset> deletedBudgetAssets) {
         boolean isEditAction = Optional.ofNullable(application.getId()).isPresent();
-        application.getBudgetAssets().forEach(a -> {
-            Optional.of(a.isNew()).filter(b -> b).ifPresent(b -> a.setId(null));
-            Optional.of(isEditAction).filter(b -> !b).ifPresent(b -> a.setApplicationId(a.getId()));
-        });
+        application.getBudgetAssets().forEach(a -> Optional.of(a.isNew()).filter(b -> b).ifPresent(b -> a.setId(null)));
 
         // 新增
         if (!isEditAction) {
@@ -113,6 +111,11 @@ public class BudgetPersistService {
                 }
             }
             budgetApplicationDao.save(application);
+            // 删除逻辑
+            List<BudgetApplicationAsset> deletedAssets = deletedBudgetAssets.stream().filter(a -> StringUtils.isNotEmpty(a.getId())).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(deletedAssets)) {
+                budgetApplicationAssetDao.delete(deletedAssets);
+            }
         }
         return true;
     }
