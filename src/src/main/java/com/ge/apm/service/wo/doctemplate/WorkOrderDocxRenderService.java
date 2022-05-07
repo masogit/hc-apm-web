@@ -162,7 +162,7 @@ public class WorkOrderDocxRenderService {
         }
         if(num<9){
             for (int i = num; i < 9; i++) {
-                mapESignSignature(null, target,"approverSignatureList"+i, "approverSignatureList_title"+i, "核心组签名： ");
+                mapESignSignature(null, target,"approverSignatureList"+i, "approverSignatureList_title"+i, "核心组签名"+i+"： ");
             }
         }
         putWorkOrderStep(target, (String) source.get("woId"));
