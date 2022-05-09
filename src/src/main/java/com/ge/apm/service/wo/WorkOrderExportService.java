@@ -423,7 +423,7 @@ public class WorkOrderExportService {
                         }
                         //核心组签名
                         List<AuditGroupConfigurationDetail> auditGroupConfigurationDetails = auditGroupConfigurationDetailRepository.findByBusinessUidOrderByApproveNumDesc(workOrderExportPojo.getId());
-                        if (auditGroupConfigurationDetails != null && auditGroupConfigurationDetails.isEmpty()){
+                        if (auditGroupConfigurationDetails != null && !auditGroupConfigurationDetails.isEmpty()){
                             int num=0;
                             List<String> approverSignatureList = new ArrayList<>();
                             for (int i = 0; i <auditGroupConfigurationDetails.size() ; i++) {
