@@ -424,19 +424,23 @@ public class WorkOrderExportService {
                         //核心组签名
                         List<AuditGroupConfigurationDetail> auditGroupConfigurationDetails = auditGroupConfigurationDetailRepository.findByBusinessUidOrderByApproveNumDesc(workOrderExportPojo.getId());
                         if (auditGroupConfigurationDetails != null && auditGroupConfigurationDetails.isEmpty()){
-                            Integer approveNum=0;
+                            int num=0;
                             List<String> approverSignatureList = new ArrayList<>();
                             for (int i = 0; i <auditGroupConfigurationDetails.size() ; i++) {
                                 AuditGroupConfigurationDetail auditGroupConfigurationDetail = auditGroupConfigurationDetails.get(i);
                                 String approverSignature = auditGroupConfigurationDetail.getApproverSignature();
+                               Integer approveNum = auditGroupConfigurationDetail.getApproveNum();
+                               if (approveNum==null){
+                                   approveNum=0;
+                               }
                                 if (i==0){
-                                    approveNum = auditGroupConfigurationDetail.getApproveNum();
+                                    num = approveNum;
                                     if(approverSignature!=null){
                                         approverSignatureList.add(approverSignature);
                                         log.info("核心组签名:"+ approverSignature);
                                     }
                                 }else {
-                                    if (approveNum == auditGroupConfigurationDetail.getApproveNum()){
+                                    if (num == approveNum){
                                         if(approverSignature!=null){
                                             approverSignatureList.add(approverSignature);
                                             log.info("核心组签名:"+ approverSignature);
