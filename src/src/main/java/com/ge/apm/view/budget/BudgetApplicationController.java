@@ -65,8 +65,12 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     // 已删除的设备列表
     private List<BudgetApplicationAsset> deletedBudgetAssets = new ArrayList<>();
 
-    private List<I18nMessage> budgetAssetGroupSecondaryList = new ArrayList<>();
-    private List<I18nMessage> assetAssetGroupSecondaryList = new ArrayList<>();
+    // 预算筛选
+    private List<I18nMessage> budgetFilterAssetGroupSecondaryList = new ArrayList<>();
+    // 预算设备筛选
+    private List<I18nMessage> assetFilterAssetGroupSecondaryList = new ArrayList<>();
+    // 新增预算设备
+    private List<I18nMessage> assetCreateAssetGroupSecondaryList = new ArrayList<>();
 
     private List<SearchFilter> assetSearchFilters;
 
@@ -79,6 +83,8 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     private BudgetSearchForm searchForm = new BudgetSearchForm();
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
+
+    private BudgetAssetInfo selectedAsset;
 
     private OrgInfo org;
     private CustomConfigObject customConfig;
@@ -187,6 +193,22 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         boolean isOk = persistService.deleteApplication(selected);
         selected = null;
         actionMessage(isOk);
+    }
+
+    public void saveAsset() {
+        // 保存时设置科室
+        selectedAsset.setDept(selectedDept);
+        selectedAsset.setDeptId(selectedDept.getId());
+
+        selectedAsset.setTenantUID(selectedDept.getTenantUID());
+        selectedAsset.setInstitutionUID(selectedDept.getInstitutionUID());
+        selectedAsset.setHospitalUID(selectedDept.getHospitalUID());
+        selectedAsset.setSiteUID(selectedDept.getSiteUID());
+
+        boolean isOk = persistService.saveAsset(selectedAsset);
+        WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
+                + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
+                + (isOk ? WebUtil.getMessage("Successfully") : WebUtil.getMessage("Failed")));
     }
 
     private void actionMessage(boolean isOk) {
@@ -320,25 +342,10 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         if (StringUtils.isNotBlank(assetSearchForm.getAssetName())) {
             updateAssetSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, assetSearchForm.getAssetName()));
         }
-        switch (org.getOrgType()) {
-            case 4:
-                // 科室
-                updateAssetSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, org.getId()));
-            case 3:
-                // 院区
-                updateAssetSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
-            case 2:
-                // 医院
-                updateAssetSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
-            case 1:
-                // 集团
-                updateAssetSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
-            case 0:
-                // 租户
-            default:
-                updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
-                break;
-        }
+        // 科室
+//        updateAssetSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, selectedDept.getId()));
+        // 现在只要是同一租户下的设备都能看到
+        updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedDept.getTenantUID()));
         updateAssetSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
     }
 
@@ -407,6 +414,17 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         calcTotalAmount();
     }
 
+    public void prepareCreateAsset() {
+        Date date = new Date();
+        selectedAsset = new BudgetAssetInfo();
+
+        selectedAsset.setIsDeleted(0);
+        selectedAsset.setCreatedBy(account.getLoginName());
+        selectedAsset.setCreatedDate(date);
+        selectedAsset.setLastModifiedBy(account.getLoginName());
+        selectedAsset.setLastModifiedDate(date);
+    }
+
     public TreeNode initOrgTree(TreeNode treeNode) {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
@@ -461,32 +479,32 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         return customConfig.getAssetsEditpageStatusFields().contains(fieldKey);
     }
 
-    public void onBudgetAssetGroupChange(AjaxBehaviorEvent event) {
+    public void onBudgetFilterAssetGroupChange(AjaxBehaviorEvent event) {
         searchForm.setAssetGroupSecondary(null);
-        budgetAssetGroupSecondaryList.clear();
-        fillBudgetAssetGroupSecondaryList();
+        budgetFilterAssetGroupSecondaryList.clear();
+        fillBudgetFilterAssetGroupSecondaryList();
     }
 
-    private void fillBudgetAssetGroupSecondaryList() {
+    private void fillBudgetFilterAssetGroupSecondaryList() {
         if (searchForm.getAssetGroup() == null) {
-            budgetAssetGroupSecondaryList = Collections.emptyList();
+            budgetFilterAssetGroupSecondaryList = Collections.emptyList();
         } else {
-            budgetAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
+            budgetFilterAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
                     + searchForm.getAssetGroup(), UserContextService.getCurrentUserAccount().getSiteId());
         }
     }
 
-    public void onAssetAssetGroupChange(AjaxBehaviorEvent event) {
+    public void onAssetFilterAssetGroupChange(AjaxBehaviorEvent event) {
         assetSearchForm.setAssetGroupSecondary(null);
-        assetAssetGroupSecondaryList.clear();
-        fillAssetAssetGroupSecondaryList();
+        assetFilterAssetGroupSecondaryList.clear();
+        fillAssetFilterAssetGroupSecondaryList();
     }
 
-    private void fillAssetAssetGroupSecondaryList() {
+    private void fillAssetFilterAssetGroupSecondaryList() {
         if (assetSearchForm.getAssetGroup() == null) {
-            assetAssetGroupSecondaryList = Collections.emptyList();
+            assetFilterAssetGroupSecondaryList = Collections.emptyList();
         } else {
-            assetAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
+            assetFilterAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
                     + assetSearchForm.getAssetGroup(), UserContextService.getCurrentUserAccount().getSiteId());
         }
     }
@@ -571,20 +589,28 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         this.optionalBudgetAssets = optionalBudgetAssets;
     }
 
-    public List<I18nMessage> getBudgetAssetGroupSecondaryList() {
-        return budgetAssetGroupSecondaryList;
+    public List<I18nMessage> getBudgetFilterAssetGroupSecondaryList() {
+        return budgetFilterAssetGroupSecondaryList;
     }
 
-    public void setBudgetAssetGroupSecondaryList(List<I18nMessage> budgetAssetGroupSecondaryList) {
-        this.budgetAssetGroupSecondaryList = budgetAssetGroupSecondaryList;
+    public void setBudgetFilterAssetGroupSecondaryList(List<I18nMessage> budgetFilterAssetGroupSecondaryList) {
+        this.budgetFilterAssetGroupSecondaryList = budgetFilterAssetGroupSecondaryList;
     }
 
-    public List<I18nMessage> getAssetAssetGroupSecondaryList() {
-        return assetAssetGroupSecondaryList;
+    public List<I18nMessage> getAssetFilterAssetGroupSecondaryList() {
+        return assetFilterAssetGroupSecondaryList;
     }
 
-    public void setAssetAssetGroupSecondaryList(List<I18nMessage> assetAssetGroupSecondaryList) {
-        this.assetAssetGroupSecondaryList = assetAssetGroupSecondaryList;
+    public void setAssetFilterAssetGroupSecondaryList(List<I18nMessage> assetFilterAssetGroupSecondaryList) {
+        this.assetFilterAssetGroupSecondaryList = assetFilterAssetGroupSecondaryList;
+    }
+
+    public List<I18nMessage> getAssetCreateAssetGroupSecondaryList() {
+        return assetCreateAssetGroupSecondaryList;
+    }
+
+    public void setAssetCreateAssetGroupSecondaryList(List<I18nMessage> assetCreateAssetGroupSecondaryList) {
+        this.assetCreateAssetGroupSecondaryList = assetCreateAssetGroupSecondaryList;
     }
 
     public BudgetSearchForm getSearchForm() {
@@ -601,6 +627,14 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     public void setAssetSearchForm(BudgetAssetSearchForm assetSearchForm) {
         this.assetSearchForm = assetSearchForm;
+    }
+
+    public BudgetAssetInfo getSelectedAsset() {
+        return selectedAsset;
+    }
+
+    public void setSelectedAsset(BudgetAssetInfo selectedAsset) {
+        this.selectedAsset = selectedAsset;
     }
 
     public TreeNode getOrgTree() {

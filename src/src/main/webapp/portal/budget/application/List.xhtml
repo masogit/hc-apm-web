@@ -94,7 +94,7 @@
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
                                                    itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                    <p:ajax event="change" listener="#{budgetController.onBudgetAssetGroupChange}"
+                                    <p:ajax event="change" listener="#{budgetController.onBudgetFilterAssetGroupChange}"
                                             update="@this assetGroupSecondary"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
@@ -103,7 +103,7 @@
                                 <p:selectOneMenu id="assetGroupSecondary"
                                                  value="#{budgetController.searchForm.assetGroupSecondary}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{budgetController.budgetAssetGroupSecondaryList}" var="item"
+                                    <f:selectItems value="#{budgetController.budgetFilterAssetGroupSecondaryList}" var="item"
                                                    itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
@@ -152,6 +152,7 @@
 
                 <ui:include src="Edit.xhtml"/>
                 <ui:include src="View.xhtml"/>
+                <ui:include src="AssetSelect.xhtml"/>
                 <ui:include src="AssetEdit.xhtml"/>
 
             </div>
