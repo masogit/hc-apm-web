@@ -17,6 +17,8 @@ import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
