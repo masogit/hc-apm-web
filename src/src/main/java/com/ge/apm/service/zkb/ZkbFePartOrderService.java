@@ -848,8 +848,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         Integer probeQuotaHighTotal = zkbContract.getProbeQuotaHighTotal() == null ? 0 : zkbContract.getProbeQuotaHighTotal();
         String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderDeduct.toString();
         String orderType = null;
-        logger.info("3 liyonjian ZKB - 2022：zkbContract" + zkbContract.getProbeQuota()+"ProbeQuotaSpecial:"+zkbContract.getProbeQuotaSpecial()+"ProbeQuotaNormal:"+zkbContract.getProbeQuotaNormal());
-
         if (showZkbPoProbeQuotaType) {
 
             switch (type) {
@@ -998,12 +996,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             }
         }
         this.zkbContractRepository.save(zkbContract);
-        logger.info("4 liyonjian ZKB - 2022：zkbContract" + zkbContract.getProbeQuota()+"ProbeQuotaSpecial:"+zkbContract.getProbeQuotaSpecial()+"ProbeQuotaNormal:"+zkbContract.getProbeQuotaNormal());
 
         if (record && StringUtils.isNotBlank(orderType)) {
             this.zkbContractQuotaLogService.saveData(zkbContract, null, zkbFePartOrder, opType, orderType, "zkbFePartOrder", userAccount, step);
         }
-        logger.info("5 liyonjian ZKB - 2022：zkbContract" + zkbContract.getProbeQuota()+"ProbeQuotaSpecial:"+zkbContract.getProbeQuotaSpecial()+"ProbeQuotaNormal:"+zkbContract.getProbeQuotaNormal());
 
     }
 
