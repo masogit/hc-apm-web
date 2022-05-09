@@ -23,6 +23,8 @@ import java.util.logging.SimpleFormatter;
 @Service
 public class ZkbContractQuotaLogService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ZkbContractQuotaLogService.class);
+
     @Autowired
     ZkbContractQuotaLogRepository zkbContractQuotaLogRepository;
 
@@ -130,5 +132,8 @@ public class ZkbContractQuotaLogService {
             l.setQuotaUse(zkbContract.getProbeQuotaUse());
         }
         zkbContractQuotaLogRepository.save(l);
+        logger.info("5 liyonjian ZKB - 2022：zkbContract" + zkbContract.getProbeQuota()+"ProbeQuotaSpecial:"+zkbContract.getProbeQuotaSpecial()+"ProbeQuotaNormal:"+zkbContract.getProbeQuotaNormal());
+        logger.info("5 liyonjian ZKB - 2022：ZkbContractQuotaLog" + JSONObject.toJSONString(l, true) );
+
     }
 }
