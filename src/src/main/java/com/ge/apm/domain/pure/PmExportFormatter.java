@@ -3,6 +3,7 @@ package com.ge.apm.domain.pure;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.view.pm.V2PmOrderController;
@@ -116,8 +117,11 @@ public class PmExportFormatter<T> {
     }
 
     public String getClincialName() {
-
-        return orgDao.getByUid(v2_pmOrder.getClinicalDeptId()).getName();
+        OrgInfo orgInfo = orgDao.getByUid(v2_pmOrder.getClinicalDeptId());
+        if (orgInfo==null){
+            return null;
+        }
+        return orgInfo.getName();
     }
 
 
