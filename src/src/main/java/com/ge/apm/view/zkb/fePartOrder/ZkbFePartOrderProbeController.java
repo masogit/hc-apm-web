@@ -35,6 +35,9 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<ZkbFePartOrder> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ZkbFePartOrderProbeController.class);
+
     /**
      * 默认合同错误
      */
@@ -517,6 +520,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             }
         }else
             {
+                logger.info("1 liyonjian ZKB - 2022：zkbContract" + this.contractList.get(0).getProbeQuota()+"ProbeQuotaSpecial:"+this.contractList.get(0).getProbeQuotaSpecial()+"ProbeQuotaNormal:"+this.contractList.get(0).getProbeQuotaNormal());
                 this.zkbFePartOrderService.calDeductQty(this.selected,this.contractList.get(0));
                 calcRemainQty();
                 ZkbContract zkbContract = this.contractList.get(0);
@@ -539,6 +543,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                     this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
                 }
             }
+        logger.info("2 liyonjian ZKB - 2022：zkbContract" + this.contractList.get(0).getProbeQuota()+"ProbeQuotaSpecial:"+this.contractList.get(0).getProbeQuotaSpecial()+"ProbeQuotaNormal:"+this.contractList.get(0).getProbeQuotaNormal());
         if(!this.showZkbhighCatFlag)
         {
             this.selected.setHighCatFlag(null);
@@ -560,6 +565,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
           this.zkbFePartOrderService.updateZkbContractCat(currentUser,false,this.selected.getContractCatId());
         }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
+        logger.info("6 liyonjian ZKB - 2022：zkbContract" + this.contractList.get(0).getProbeQuota()+"ProbeQuotaSpecial:"+this.contractList.get(0).getProbeQuotaSpecial()+"ProbeQuotaNormal:"+this.contractList.get(0).getProbeQuotaNormal());
         return url;
     }
 
