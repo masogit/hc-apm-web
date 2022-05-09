@@ -80,6 +80,8 @@ public class WorkOrderExportService {
     @Autowired
     private WorkAuditRepository workAuditRepository;
     @Autowired
+    private AuditGroupConfigurationDetailRepository auditGroupConfigurationDetailRepository;
+    @Autowired
     private OrgInfoTreeService orgInfoTreeService;
     @Autowired
     private WorkOrderReportMapper worDao;
@@ -420,14 +422,30 @@ public class WorkOrderExportService {
                             workOrderMap.put("medicalWorkerApproverSignature",medicalWorkerApproverSignature );
                         }
                         //核心组签名
-                        List<WorkAudit> workAudits = workAuditRepository.findByWorkOrderDetailId(v2_workOrder_detail.getId());
-                        if(workAudits!=null && !workAudits.isEmpty()){
+                        List<AuditGroupConfigurationDetail> auditGroupConfigurationDetails = auditGroupConfigurationDetailRepository.findByBusinessUidOrderByApproveNumDesc(workOrderExportPojo.getId());
+                        if (auditGroupConfigurationDetails != null && !auditGroupConfigurationDetails.isEmpty()){
+                            int num=0;
                             List<String> approverSignatureList = new ArrayList<>();
-                            for (WorkAudit workAudit : workAudits){//核心组签名
-                                String approverSignature = workAudit.getAuditGroupConfigurationDetail().getApproverSignature();
-                                if(approverSignature!=null){
-                                    approverSignatureList.add(approverSignature);
-                                    log.info("核心组签名:"+ approverSignature);
+                            for (int i = 0; i <auditGroupConfigurationDetails.size() ; i++) {
+                                AuditGroupConfigurationDetail auditGroupConfigurationDetail = auditGroupConfigurationDetails.get(i);
+                                String approverSignature = auditGroupConfigurationDetail.getApproverSignature();
+                               Integer approveNum = auditGroupConfigurationDetail.getApproveNum();
+                               if (approveNum==null){
+                                   approveNum=0;
+                               }
+                                if (i==0){
+                                    num = approveNum;
+                                    if(approverSignature!=null){
+                                        approverSignatureList.add(approverSignature);
+                                        log.info("核心组签名:"+ approverSignature);
+                                    }
+                                }else {
+                                    if (num == approveNum){
+                                        if(approverSignature!=null){
+                                            approverSignatureList.add(approverSignature);
+                                            log.info("核心组签名:"+ approverSignature);
+                                        }
+                                    }
                                 }
                             }
                             log.info("approverSignatureList:{}",approverSignatureList.size());
