@@ -135,8 +135,5 @@ public class ZkbContractQuotaLogService {
             l.setQuotaUse(zkbContract.getProbeQuotaUse());
         }
         zkbContractQuotaLogRepository.save(l);
-        logger.info("5 liyonjian ZKB - 2022：zkbContract" + zkbContract.getProbeQuota()+"ProbeQuotaSpecial:"+zkbContract.getProbeQuotaSpecial()+"ProbeQuotaNormal:"+zkbContract.getProbeQuotaNormal());
-        logger.info("5 liyonjian ZKB - 2022：ZkbContractQuotaLog" + JSONObject.toJSONString(l, true) );
-
     }
 }

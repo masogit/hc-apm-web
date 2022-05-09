@@ -498,6 +498,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * @return
      */
     public String saveAndToListPage() {
+        this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         if (CollectionUtils.isEmpty(this.sparePartsZkbFePartOrderList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("工单不能为空！"));
             return "";
@@ -522,7 +523,6 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             }
         }else
             {
-                logger.info("1 liyonjian ZKB - 2022：zkbContract" + this.contractList.get(0).getProbeQuota()+"ProbeQuotaSpecial:"+this.contractList.get(0).getProbeQuotaSpecial()+"ProbeQuotaNormal:"+this.contractList.get(0).getProbeQuotaNormal());
                 this.zkbFePartOrderService.calDeductQty(this.selected,this.contractList.get(0));
                 calcRemainQty();
                 ZkbContract zkbContract = this.contractList.get(0);
