@@ -47,20 +47,20 @@
             <p:column headerText="#{msg.StockType}">
                 <h:outputText value="#{fieldMsg.fieldValue('budgetStockType', item.stockType)}"/>
             </p:column>
-            <p:column headerText="#{msg.deviceNum}">
-                <h:outputText value="#{item.asset.departNum}"/>
+            <p:column headerText="#{msg.ProductNumber}">
+                <h:outputText value="#{item.asset.financingNum}"/>
             </p:column>
             <p:column headerText="#{msg.EquipmentName}">
                 <h:outputText value="#{item.asset.name}"/>
             </p:column>
             <p:column headerText="#{msg.AssetBrand}">
-                <h:outputText value="#{item.asset.brand.name}"/>
+                <h:outputText value="#{item.asset.assetBrand}"/>
             </p:column>
-            <p:column headerText="#{msg.AssetType}">
-                <h:outputText value="#{item.asset.assetType}"/>
+            <p:column headerText="#{msg.EquipmentModel}">
+                <h:outputText value="#{item.asset.assetModel}"/>
             </p:column>
             <p:column headerText="#{msg.Unit}">
-                <h:outputText value="#{item.unit}"/>
+                <h:outputText value="#{item.asset.unit}"/>
             </p:column>
             <p:column headerText="#{msg.ApplicationQuantity}">
                 <h:outputText converter="javax.faces.Number" value="#{item.applicationQuantity}"/>
