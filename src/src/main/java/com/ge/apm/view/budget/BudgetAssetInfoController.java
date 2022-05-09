@@ -273,6 +273,12 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
         }
     }
 
+    public void clearSelected() {
+        if (StringUtils.isEmpty(selected.getId())) {
+            selected = null;
+        }
+    }
+
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         crudActionName = "Create";
