@@ -491,6 +491,18 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         }
     }
 
+    public void clearSelected() {
+        if (StringUtils.isEmpty(selected.getId())) {
+            selected = null;
+        }
+    }
+
+    public void onSelect() {
+        if (selected != null && selected.getId() != null) {
+            selected = dao.findById(selected.getId());
+        }
+    }
+
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         crudActionName = "Create";

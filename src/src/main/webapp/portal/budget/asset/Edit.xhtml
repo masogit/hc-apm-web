@@ -97,6 +97,7 @@
                                  oncomplete="handleSubmit(args, 'BudgetAssetEditDialog');"
                                  disabled="#{empty budgetAssetController.selectedDept}"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" update="assetList"
+                                 actionListener="#{budgetAssetController.clearSelected}"
                                  onclick="PF('BudgetAssetEditDialog').hide()"/>
             </h:panelGroup>
         </h:form>
