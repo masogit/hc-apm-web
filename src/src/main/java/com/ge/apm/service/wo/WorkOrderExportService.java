@@ -80,6 +80,8 @@ public class WorkOrderExportService {
     @Autowired
     private WorkAuditRepository workAuditRepository;
     @Autowired
+    private AuditGroupConfigurationDetailRepository auditGroupConfigurationDetailRepository;
+    @Autowired
     private OrgInfoTreeService orgInfoTreeService;
     @Autowired
     private WorkOrderReportMapper worDao;
@@ -388,8 +390,11 @@ public class WorkOrderExportService {
                 if (multiLevelApprovals!=null && !multiLevelApprovals.isEmpty()){
                     List<String> list = new ArrayList<>();
                     for (MultiLevelApproval multiLevelApproval:multiLevelApprovals){
-                        list.add(multiLevelApproval.getAuditSignature());
-                        log.info("audit_signature:{}",multiLevelApproval.getAuditSignature());
+                        String auditSignature = multiLevelApproval.getAuditSignature();
+                        if(auditSignature!=null){
+                            list.add(auditSignature);
+                            log.info("audit_signature:{}", auditSignature);
+                        }
                     }
                     log.info("auditSignatureList:{}",list.size());
                     workOrderMap.put("auditSignatureList",list );
@@ -407,18 +412,41 @@ public class WorkOrderExportService {
                         //添加备件签名
                         String partsSignature = v2_workOrder_detail.getPartsSignature();
                         log.info("partsSignature:{}",partsSignature);
-                        workOrderMap.put("partsSignature",partsSignature );
+                        if(partsSignature!=null){
+                            workOrderMap.put("partsSignature",partsSignature );
+                        }
                         //医工组签名
                         String medicalWorkerApproverSignature = v2_workOrder_detail.getMedicalWorkerApproverSignature();
                         log.info("medicalWorkerApproverSignature:{}",medicalWorkerApproverSignature);
-                        workOrderMap.put("medicalWorkerApproverSignature",medicalWorkerApproverSignature );
+                        if(medicalWorkerApproverSignature!=null){
+                            workOrderMap.put("medicalWorkerApproverSignature",medicalWorkerApproverSignature );
+                        }
                         //核心组签名
-                        List<WorkAudit> workAudits = workAuditRepository.findByWorkOrderDetailId(v2_workOrder_detail.getId());
-                        if(workAudits!=null && !workAudits.isEmpty()){
+                        List<AuditGroupConfigurationDetail> auditGroupConfigurationDetails = auditGroupConfigurationDetailRepository.findByBusinessUidOrderByApproveNumDesc(workOrderExportPojo.getId());
+                        if (auditGroupConfigurationDetails != null && !auditGroupConfigurationDetails.isEmpty()){
+                            int num=0;
                             List<String> approverSignatureList = new ArrayList<>();
-                            for (WorkAudit workAudit : workAudits){//核心组签名
-                                approverSignatureList.add(workAudit.getAuditGroupConfigurationDetail().getApproverSignature());
-                                log.info("核心组签名:"+workAudit.getAuditGroupConfigurationDetail().getApproverSignature());
+                            for (int i = 0; i <auditGroupConfigurationDetails.size() ; i++) {
+                                AuditGroupConfigurationDetail auditGroupConfigurationDetail = auditGroupConfigurationDetails.get(i);
+                                String approverSignature = auditGroupConfigurationDetail.getApproverSignature();
+                               Integer approveNum = auditGroupConfigurationDetail.getApproveNum();
+                               if (approveNum==null){
+                                   approveNum=0;
+                               }
+                                if (i==0){
+                                    num = approveNum;
+                                    if(approverSignature!=null){
+                                        approverSignatureList.add(approverSignature);
+                                        log.info("核心组签名:"+ approverSignature);
+                                    }
+                                }else {
+                                    if (num == approveNum){
+                                        if(approverSignature!=null){
+                                            approverSignatureList.add(approverSignature);
+                                            log.info("核心组签名:"+ approverSignature);
+                                        }
+                                    }
+                                }
                             }
                             log.info("approverSignatureList:{}",approverSignatureList.size());
                             workOrderMap.put("approverSignatureList",approverSignatureList );
