@@ -1,8 +1,11 @@
 package com.ge.apm.service.zkb;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.ZkbContractQuotaLogRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,8 @@ import java.util.logging.SimpleFormatter;
  */
 @Service
 public class ZkbContractQuotaLogService {
+ 
+    private static final Logger logger = LoggerFactory.getLogger(ZkbContractQuotaLogService.class);
 
     @Autowired
     ZkbContractQuotaLogRepository zkbContractQuotaLogRepository;

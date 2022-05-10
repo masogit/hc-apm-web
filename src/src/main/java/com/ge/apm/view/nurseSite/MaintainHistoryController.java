@@ -4,7 +4,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainHistoryService;
 import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -27,11 +26,12 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class MaintainHistoryController implements ServerEventInterface{
+public class MaintainHistoryController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MaintainHistoryController.class);
     private NurseSiteMaintainHistoryService nurseSiteMaintainService;
     private UserAccount currentUser;
     private List<OrgInfo> listCheckClinicalOrgInfo;
+    private OrgInfo selectClinicalOrgInfo;
     private List<NurseSiteMaintainHistory> listMaintainData;
     private List<NurseSiteMaintainHistory> selectedListMaintain;
     private OrgInfo selectedParentOrgInfo;
@@ -42,18 +42,12 @@ public class MaintainHistoryController implements ServerEventInterface{
     private Date startDate;
     private Date endDate;
     private List<OrgInfo> checkListParentOrgInfo;
-    private SearchController searchController;
     private WordReportExportService wordReportExportService;
     private UserAuth customRoleAuth;
     @PostConstruct
     protected void init() {
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainHistoryService.class);
         nurseSiteMaintainService.init();
-        searchController = WebUtil.getBean(SearchController.class);
-        searchController.setType(3);
-        searchController.setBlnDepartOrgUpdate(true);
-        searchController.updateData();
-        searchController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
         wordReportExportService = WebUtil.getBean(WordReportExportService.class);
@@ -363,21 +357,26 @@ public class MaintainHistoryController implements ServerEventInterface{
         exportFile = null;
     }
 
-	@Override
-    public void onServerEvent(String eventName, Object eventObject) {
-        // TODO Auto-generated method stub
+    public void onOrgDeptChange() {
         try {
-            if (eventObject != null) {
+            if (this.selectClinicalOrgInfo != null) {
                 if (listCheckClinicalOrgInfo == null) {
                     listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
                 } else {
                     listCheckClinicalOrgInfo.clear();
                 }
-                listCheckClinicalOrgInfo.add((OrgInfo) eventObject);
+                listCheckClinicalOrgInfo.add(this.selectClinicalOrgInfo);
             }
         } catch (Exception e) {
-            // TODO: handle exception
             LOGGER.error(e.getMessage());
         }
+    }
+
+    public OrgInfo getSelectClinicalOrgInfo() {
+        return selectClinicalOrgInfo;
+    }
+
+    public void setSelectClinicalOrgInfo(OrgInfo selectClinicalOrgInfo) {
+        this.selectClinicalOrgInfo = selectClinicalOrgInfo;
     }
 }
