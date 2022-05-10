@@ -57,7 +57,7 @@ public class ZkbContractCatQuotaHistoryService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteZkbFeHistory(String partOrderId){
+    public void deleteZkbFeHistory(String partOrderId, Integer qty){
         List<ZkbContractCatQuotaHistory> list = zkbContractCatQuotaHistoryRepository.queryByPartOrderId(partOrderId);
         if(list == null || list.size() == 0){
             return;
@@ -66,7 +66,11 @@ public class ZkbContractCatQuotaHistoryService {
             return;
         }
         ZkbContractCatQuotaHistory zkbContractCatQuotaHistory = list.get(0);
-        zkbContractCatQuotaHistory.setStatus("N");
+        if(qty > 0){
+            zkbContractCatQuotaHistory.setStatus("N");
+        }else{
+            zkbContractCatQuotaHistory.setStatus("Y");
+        }
         zkbContractCatQuotaHistoryRepository.save(zkbContractCatQuotaHistory);
     }
 
@@ -218,7 +222,7 @@ public class ZkbContractCatQuotaHistoryService {
         }
 
         Integer useQty= 0;
-        List<ZkbContractCatQuotaHistory> zkbContractCatQuotaHistoryList = zkbContractCatQuotaHistoryRepository.queryByConditionWithOutId(zkbContract.getId(), probeType, assetType,partOrderId);
+        List<ZkbContractCatQuotaHistory> zkbContractCatQuotaHistoryList = zkbContractCatQuotaHistoryRepository.queryByCondition(zkbContract.getId(), probeType, assetType);
         if(zkbContractCatQuotaHistoryList != null && zkbContractCatQuotaHistoryList.size() >= 0){
             for(ZkbContractCatQuotaHistory h : zkbContractCatQuotaHistoryList){
                 useQty += h.getQty();

@@ -43,8 +43,8 @@
                                 <p:commandButton id="org" process="@this" icon="fa fa-angle-down"
                                                  class="btn btn-sm popupIconButton"/>
                                 <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade"
-                                                style="width: 300px;"
-                                                dynamic="false" modal="false">
+                                                style="position: absolute; left: 0; top: 0; width: 300px;"
+                                                dynamic="false" modal="false" dismissable="true">
                                     <p:scrollPanel style="height:300px; border: 0" mode="native">
                                         <p:tree id="orgTree" value="#{budgetController.orgTree}" var="node"
                                                 selectionMode="single" class="tree" style="width:98%; border:0">
@@ -94,7 +94,7 @@
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
                                                    itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                    <p:ajax event="change" listener="#{budgetController.onBudgetAssetGroupChange}"
+                                    <p:ajax event="change" listener="#{budgetController.onBudgetFilterAssetGroupChange}"
                                             update="@this assetGroupSecondary"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
@@ -103,11 +103,11 @@
                                 <p:selectOneMenu id="assetGroupSecondary"
                                                  value="#{budgetController.searchForm.assetGroupSecondary}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{budgetController.budgetAssetGroupSecondaryList}" var="item"
+                                    <f:selectItems value="#{budgetController.budgetFilterAssetGroupSecondaryList}" var="item"
                                                    itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{userContextService.hasAnyRole('DeptHead')}">
+                            <h:panelGroup rendered="#{userContextService.hasAnyRole('AssetHead,DeptHead')}">
                                 <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
                                 <!--                                <p:autoComplete dropdown="true" value="#{budgetController.searchForm.applicantId}"-->
                                 <!--                                                scrollHeight="250" forceSelection="false">-->
@@ -152,6 +152,7 @@
 
                 <ui:include src="Edit.xhtml"/>
                 <ui:include src="View.xhtml"/>
+                <ui:include src="AssetSelect.xhtml"/>
                 <ui:include src="AssetEdit.xhtml"/>
 
             </div>

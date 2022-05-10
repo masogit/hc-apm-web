@@ -19,8 +19,6 @@
                      rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
 
             <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>
-            <p:ajax event="rowDblselect" listener="#{budgetController.prepareView}" update=":BudgetApplicationViewDlg"
-                    oncomplete="PF('BudgetApplicationViewDialog').show()"/>
             <p:ajax event="filter" listener="#{budgetController.onFilter}"
                     update="createButton editButton viewButton deleteButton"/>
 
@@ -69,7 +67,7 @@
                                  actionListener="#{budgetController.prepareCreate}"
                                  update=":BudgetApplicationEditDlg"
                                  oncomplete="PF('BudgetApplicationEditDialog').show()"
-                                 disabled="#{userContextService.hasNotAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}"/>
+                                 disabled="#{userContextService.hasNotAnyRole('AssetHead,DeptHead,ClinicalStaff')}"/>
                 <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"
                                  title="#{msg.View}"
                                  actionListener="#{budgetController.prepareView}"
@@ -97,7 +95,7 @@
             </f:facet>
         </p:dataTable>
 
-        <p:overlayPanel widgetVar="dateFilter" for="@parent:datalist:approvalDate" dismissable="true">
+        <p:overlayPanel widgetVar="dateFilter" for="@parent:datalist:approvalDate" dismissable="true" style="position: absolute; left: 0; top: 0">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:calendar id="from" timeZone="#{userContextService.getTimeZone()}"
