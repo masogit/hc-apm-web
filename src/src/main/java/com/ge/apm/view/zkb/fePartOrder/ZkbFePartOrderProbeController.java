@@ -17,6 +17,8 @@ import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
@@ -35,6 +37,9 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<ZkbFePartOrder> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ZkbFePartOrderProbeController.class);
+
     /**
      * 默认合同错误
      */
@@ -493,6 +498,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * @return
      */
     public String saveAndToListPage() {
+        this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         if (CollectionUtils.isEmpty(this.sparePartsZkbFePartOrderList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("工单不能为空！"));
             return "";
@@ -539,6 +545,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                     this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
                 }
             }
+        logger.info("2 liyonjian ZKB - 2022：zkbContract" + this.contractList.get(0).getProbeQuota()+"ProbeQuotaSpecial:"+this.contractList.get(0).getProbeQuotaSpecial()+"ProbeQuotaNormal:"+this.contractList.get(0).getProbeQuotaNormal());
         if(!this.showZkbhighCatFlag)
         {
             this.selected.setHighCatFlag(null);
@@ -560,6 +567,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
           this.zkbFePartOrderService.updateZkbContractCat(currentUser,false,this.selected.getContractCatId());
         }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
+        logger.info("6 liyonjian ZKB - 2022：zkbContract" + this.contractList.get(0).getProbeQuota()+"ProbeQuotaSpecial:"+this.contractList.get(0).getProbeQuotaSpecial()+"ProbeQuotaNormal:"+this.contractList.get(0).getProbeQuotaNormal());
         return url;
     }
 

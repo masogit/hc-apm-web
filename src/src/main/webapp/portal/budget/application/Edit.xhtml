@@ -92,7 +92,7 @@
                             <!--                                </f:facet>-->
                             <!--                            </p:cellEditor>-->
                         </p:column>
-                        <p:column headerText="#{msg.deviceNum}">
+                        <p:column headerText="#{msg.ProductNumber}">
                             <h:outputText value="#{item.asset.financingNum}"/>
                         </p:column>
                         <p:column headerText="#{msg.EquipmentName}">
@@ -153,8 +153,8 @@
                             <p:commandButton title="#{msg.Add}" id="addButton"
                                              icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
                                              actionListener="#{budgetController.preAddBudgetAsset}"
-                                             update="AssetEditDlg BudgetApplicationEditForm:saveButton"
-                                             oncomplete="PF('AssetEditDialog').show()"
+                                             update="AssetSelectDlg BudgetApplicationEditForm:saveButton"
+                                             oncomplete="PF('AssetSelectDialog').show()"
                                              disabled="#{budgetController.selectedDept eq null}"/>
                         </f:facet>
                     </p:dataTable>

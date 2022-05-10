@@ -31,7 +31,7 @@ public class BudgetAssetInfo implements Serializable {
     @Column(name = "name")
     private String name;
 
-    // 设备编号
+    // 产品编号
     @Column(name = "financing_num")
     private String financingNum;
 
