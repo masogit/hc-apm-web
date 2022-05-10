@@ -567,9 +567,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }).collect(Collectors.toList());
         if(CollectionUtils.isNotEmpty(pmOrders1)){
-            filterArrayList.add(new SearchFilter("id", SearchFilter.Operator.IN,pmOrders1.stream().map(V2_PmOrder::getId).collect(Collectors.toSet())));
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,pmOrders1.stream().map(V2_PmOrder::getId).collect(Collectors.toSet())));
         }else{
-            filterArrayList.add(new SearchFilter("id", SearchFilter.Operator.EQ,"-1"));
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,"-1"));
         }
     }
 
