@@ -116,6 +116,14 @@
                            </p:inputText>
                        </h:panelGroup>
 
+                       <h:panelGroup>
+                           <label class="label">#{msg.riskGrade}</label>
+                           <p:selectOneMenu id="riskGrade" value="#{relRuleAssetController.queryAsset.riskGrade}">
+                               <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                               <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                           </p:selectOneMenu>
+                       </h:panelGroup>
+
                       <h:panelGroup >
                             <label class="label">#{msg.MaintenanceRuleCombine}</label>
                             <p:selectOneRadio id="deviceStatus" value="#{relRuleAssetController.queryAsset.ruleStatus}" >
