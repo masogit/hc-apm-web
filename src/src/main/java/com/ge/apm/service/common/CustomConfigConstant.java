@@ -65,7 +65,7 @@ public class CustomConfigConstant {
                 "lastMeteringDate", "acceptDate", "warrantyMonth","maitanance", "maitananceTel", "qrCode",
                 "locationCode", "locationName", "comments", "locationNotes","assetUsage", "capitalSource",
                 "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
-                "accountingCategory", "status","isPm", "isChecked", "assetValueCategory", "deviceStatus",
+                "accountingCategory", "status","isPm", "isFixed","isChecked", "assetValueCategory", "deviceStatus",
                 "warranty", "subjectProject", "proprietaryClass", "assetTags", "UCMID", "createdDate",
                 "createdBy","mainDirectory","secondDirectory","geDeviceType","UUID"
         );
@@ -155,6 +155,7 @@ public class CustomConfigConstant {
         allFields.put("lifecycle", WebUtil.getMessage("lifecycle"));
         allFields.put("depreciationMethod", WebUtil.getMessage("depreciationMethod"));
         allFields.put("isPm", WebUtil.getMessage("isAssetPMed"));
+        allFields.put("isFixed", WebUtil.getMessage("isFixed"));
         allFields.put("isChecked", WebUtil.getMessage("isAssetChecked"));
         allFields.put("lastPmDate", WebUtil.getMessage("lastPmDate"));
         allFields.put("lastQaDate", WebUtil.getMessage("lastQaDate"));
@@ -202,7 +203,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsDetailpageDetailFields() {
         return Arrays.asList("parentAssetId", "deviceName", "systemId", "financingNum", "departNum",
                 "barcode", "registrationNo", "modalityId", "qrCode", "functionType", "functionGroup", "assetCode68", "medicalApparatusClassification","functionGrade",
-                "repairForm", "locationCode", "locationName", "status", "deviceStatus", "isPm", "isChecked", "comments", "assetUsage",
+                "repairForm", "locationCode", "locationName", "status", "deviceStatus", "isPm","isFixed", "isChecked", "comments", "assetUsage",
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
@@ -222,7 +223,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsEditpageStatusFields() {
         return Arrays.asList("functionType", "functionGroup", "assetCode68", "medicalApparatusClassification","functionGrade", "repairForm",
-                "locationCode", "locationName", "status", "deviceStatus", "isPm", "isChecked", "comments", "locationNotes");
+                "locationCode", "locationName", "status", "deviceStatus", "isPm", "isFixed","isChecked", "comments", "locationNotes");
     }
 
     public static List<String> getAssetsEditpageCatalogFields() {
@@ -250,7 +251,7 @@ public class CustomConfigConstant {
         return Arrays.asList("aliasName", "systemId", "manufacture", "vendor", "maitanance", "maitananceTel", "assetOwnerName", "assetOwnerTel",
                 "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "serialNum", "nationalStandardCode", "repairForm", "assetUsage",
                 "functionGrade", "functionGroup", "assetCode68","medicalApparatusClassification", "capitalSource", "riskGrade", "measureGrade", "emergencyEquipment", "importEquipment",
-                "isPm", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
+                "isPm","isFixed", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
                 "locationName", "functionType", "manufactDate", "purchaseDate", "warrantyDate", "arriveDate", "installDate", "factoryWarrantyDate", "terminateDate",
                 "lastPmDate", "lastQaDate", "lastMeteringDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod","createdBy");
     }
