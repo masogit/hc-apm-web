@@ -119,6 +119,7 @@
                        <h:panelGroup>
                            <label class="label">#{msg.riskGrade}</label>
                            <p:selectOneMenu id="riskGrade" value="#{relRuleAssetController.queryAsset.riskGrade}">
+                               <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                            </p:selectOneMenu>
