@@ -9,6 +9,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
@@ -74,6 +75,12 @@ public class WorkOrderExportService {
     V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
     @Autowired
     UserAccountRepository userAccountDao;
+    @Autowired
+    private TenantInfoRepository tenantInfoRepository;
+    @Autowired
+    private WorkAuditRepository workAuditRepository;
+    @Autowired
+    private AuditGroupConfigurationDetailRepository auditGroupConfigurationDetailRepository;
     @Autowired
     private OrgInfoTreeService orgInfoTreeService;
     @Autowired
@@ -383,13 +390,71 @@ public class WorkOrderExportService {
                 if (multiLevelApprovals!=null && !multiLevelApprovals.isEmpty()){
                     List<String> list = new ArrayList<>();
                     for (MultiLevelApproval multiLevelApproval:multiLevelApprovals){
-                        list.add(multiLevelApproval.getAuditSignature());
-                        log.info("audit_signature:{}",multiLevelApproval.getAuditSignature());
+                        String auditSignature = multiLevelApproval.getAuditSignature();
+                        if(auditSignature!=null){
+                            list.add(auditSignature);
+                            log.info("audit_signature:{}", auditSignature);
+                        }
                     }
                     log.info("auditSignatureList:{}",list.size());
                     workOrderMap.put("auditSignatureList",list );
                 }
             }
+
+            if(workOrderExportPojo.getId()!=null){
+                UserAccount userAccount = userContextService.getCurrentUserAccount();
+                String tenantUID = userAccount.getTenantUID();
+                TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
+                if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+                    List<V2_WorkOrder_Detail> v2_workOrder_details = workOrderDetailDao.getByWoIdOrderByCreatedDateDesc(workOrderExportPojo.getId());
+                    if (v2_workOrder_details!=null && !v2_workOrder_details.isEmpty()){
+                        V2_WorkOrder_Detail v2_workOrder_detail = v2_workOrder_details.get(0);
+                        //添加备件签名
+                        String partsSignature = v2_workOrder_detail.getPartsSignature();
+                        log.info("partsSignature:{}",partsSignature);
+                        if(partsSignature!=null){
+                            workOrderMap.put("partsSignature",partsSignature );
+                        }
+                        //医工组签名
+                        String medicalWorkerApproverSignature = v2_workOrder_detail.getMedicalWorkerApproverSignature();
+                        log.info("medicalWorkerApproverSignature:{}",medicalWorkerApproverSignature);
+                        if(medicalWorkerApproverSignature!=null){
+                            workOrderMap.put("medicalWorkerApproverSignature",medicalWorkerApproverSignature );
+                        }
+                        //核心组签名
+                        List<AuditGroupConfigurationDetail> auditGroupConfigurationDetails = auditGroupConfigurationDetailRepository.findByBusinessUidOrderByApproveNumDesc(workOrderExportPojo.getId());
+                        if (auditGroupConfigurationDetails != null && !auditGroupConfigurationDetails.isEmpty()){
+                            int num=0;
+                            List<String> approverSignatureList = new ArrayList<>();
+                            for (int i = 0; i <auditGroupConfigurationDetails.size() ; i++) {
+                                AuditGroupConfigurationDetail auditGroupConfigurationDetail = auditGroupConfigurationDetails.get(i);
+                                String approverSignature = auditGroupConfigurationDetail.getApproverSignature();
+                               Integer approveNum = auditGroupConfigurationDetail.getApproveNum();
+                               if (approveNum==null){
+                                   approveNum=0;
+                               }
+                                if (i==0){
+                                    num = approveNum;
+                                    if(approverSignature!=null){
+                                        approverSignatureList.add(approverSignature);
+                                        log.info("核心组签名:"+ approverSignature);
+                                    }
+                                }else {
+                                    if (num == approveNum){
+                                        if(approverSignature!=null){
+                                            approverSignatureList.add(approverSignature);
+                                            log.info("核心组签名:"+ approverSignature);
+                                        }
+                                    }
+                                }
+                            }
+                            log.info("approverSignatureList:{}",approverSignatureList.size());
+                            workOrderMap.put("approverSignatureList",approverSignatureList );
+                        }
+                    }
+                }
+            }
+
 
             this.putPartsData(workOrderExportPojo ,workOrderMap);
             //this.putWorkOrderStep(workOrderExportPojo ,workOrderMap);

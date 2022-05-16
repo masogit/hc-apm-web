@@ -322,17 +322,23 @@ public class NurseSiteMaintainJob {
 
         Set<Tuple2<LocalDate, Integer>> scheduleDateSet = new HashSet<>();
         if (StringUtils.isNotEmpty(typeValue)) {
-            Integer intTypeValue = Integer.parseInt(typeValue);
             Set<Integer> arr = Arrays.stream(typeValue.split(",")).map(w -> Integer.parseInt(w)).collect(Collectors.toSet());
+
+            Calendar calendar = Calendar.getInstance();
+
             for (LocalDate date = start; date.isBefore(end.plusDays(1)); date = date.plusDays(1)) {
                 switch (type) {
                     case 1:
+                        Integer intTypeValue = Integer.parseInt(typeValue);
                         for (int i = 0; i < intTypeValue; ++i) {
                             scheduleDateSet.add(new Tuple2<>(date, i + 1));
                         }
                         break;
                     case 2:
-                        if (arr.contains(date.getDayOfWeek().getValue())) {
+                        Instant instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
+                        Date utilDate = Date.from(instant);
+                        calendar.setTime(utilDate);
+                        if (arr.contains(calendar.get(Calendar.DAY_OF_WEEK))) {
                             scheduleDateSet.add(new Tuple2<>(date, 0));
                         }
                         break;

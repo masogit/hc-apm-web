@@ -927,7 +927,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),selected.getAssetId());
                                 boolean r = zkbPartOrderService.checkQuotaHistory("order",zkbContract, selected, zkbContractAsset, ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString());
                                 if(!r){
-                                    WebUtil.addErrorMessage("高低端机名额不够,请检查！","");
+                                    if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())) {
+                                        WebUtil.addErrorMessage("该合同中的高端机名额不足,请检查！","");
+
+                                    }else{
+                                        WebUtil.addErrorMessage("该合同中的低端机名额不足,请检查！","");
+                                    }
                                     return "";
                                 }
                             }

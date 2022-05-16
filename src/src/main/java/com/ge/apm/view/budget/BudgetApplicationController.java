@@ -1,19 +1,21 @@
 package com.ge.apm.view.budget;
 
-import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BudgetApplicationRepository;
+import com.ge.apm.dao.BudgetAssetInfoRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
+import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
+import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -26,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -61,36 +62,44 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     private List<BudgetApplicationAsset> optionalBudgetAssets = new ArrayList<>();
     // 已选择的设备列表
     private List<BudgetApplicationAsset> selectedBudgetAssets = new ArrayList<>();
+    // 已删除的设备列表
+    private List<BudgetApplicationAsset> deletedBudgetAssets = new ArrayList<>();
 
-    private List<I18nMessage> budgetAssetGroupSecondaryList = new ArrayList<>();
-    private List<I18nMessage> assetAssetGroupSecondaryList = new ArrayList<>();
+    // 预算筛选
+    private List<I18nMessage> budgetFilterAssetGroupSecondaryList = new ArrayList<>();
+    // 预算设备筛选
+    private List<I18nMessage> assetFilterAssetGroupSecondaryList = new ArrayList<>();
+    // 新增预算设备
+    private List<I18nMessage> assetCreateAssetGroupSecondaryList = new ArrayList<>();
 
     private List<SearchFilter> assetSearchFilters;
 
     private BudgetApplicationRepository dao;
-    private AssetInfoRepository assetDao;
+    private BudgetAssetInfoRepository budgetAssetDao;
     private I18nMessageRepository i18nDao;
 
     private UserContextService userContextService;
     private BudgetPersistService persistService;
-    private UaaService uaaService;
 
     private BudgetSearchForm searchForm = new BudgetSearchForm();
     private BudgetAssetSearchForm assetSearchForm = new BudgetAssetSearchForm();
 
+    private BudgetAssetInfo selectedAsset;
+
     private OrgInfo org;
     private CustomConfigObject customConfig;
     private TreeNode orgTree;
+    private TreeNode orgTreeEdit;
+    private OrgInfo selectedDept;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(BudgetApplicationRepository.class);
-        assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        budgetAssetDao = WebUtil.getBean(BudgetAssetInfoRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 
         userContextService = WebUtil.getBean(UserContextService.class);
         persistService = WebUtil.getBean(BudgetPersistService.class);
-        uaaService = WebUtil.getBean(UaaService.class);
 
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         org = orgDao.findById(account.getOrgInfoId());
@@ -98,7 +107,11 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         CustomConfigService ccService = WebUtil.getBean(CustomConfigService.class);
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
 
-        initOrgTree();
+        UaaService uaaService = WebUtil.getBean(UaaService.class);
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
+        TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
+        orgTree = initOrgTree(treeNode);
+        orgTreeEdit = initOrgTree(treeNodeEdit);
     }
 
     @Override
@@ -117,10 +130,9 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
             updateSearchFilter(new SearchFilter("applicationStatus", SearchFilter.Operator.EQ, tabIndex));
         }
         updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
-        // 设备科室主任是什么 ?
-        if (userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)
-                || userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
-            // 临床科室主任
+        if (userContextService.hasRole(SysRoleConstant.ROLE_ASSET_HEAD)
+                || userContextService.hasRole(SysRoleConstant.ROLE_DEPT_HEAD)) {
+            // 临床科室主任, 医学工程处主任
             switch (org.getOrgType()) {
                 case 4:
                     // 科室
@@ -140,10 +152,9 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
                     updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
                     break;
             }
-            if (userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
-                // 临床科室人员
-                updateSearchFilter(new SearchFilter("applicantId", SearchFilter.Operator.EQ, account.getId()));
-            }
+        } else if (userContextService.hasRole(SysRoleConstant.ROLE_CLINICAL_STAFF)) {
+            // 临床科室人员
+            updateSearchFilter(new SearchFilter("applicantId", SearchFilter.Operator.EQ, account.getId()));
         } else {
             return emptyPage;
         }
@@ -152,6 +163,15 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     @Override
     public void save() {
+        // 保存时设置科室
+        selected.setApplicationDept(selectedDept);
+        selected.setApplicationDeptId(selectedDept.getId());
+
+        selected.setTenantUID(selectedDept.getTenantUID());
+        selected.setInstitutionUID(selectedDept.getInstitutionUID());
+        selected.setHospitalUID(selectedDept.getHospitalUID());
+        selected.setSiteUID(selectedDept.getSiteUID());
+
         if (selected.getId() != null) {
             BudgetApplication application = dao.findById(selected.getId());
             if (!BudgetConstant.BUDGET_APPLICATION_STATUS_PENDING.equals(application.getApplicationStatus())) {
@@ -159,7 +179,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
                 return;
             }
         }
-        boolean isOk = persistService.save(selected);
+        boolean isOk = persistService.saveApplication(selected, deletedBudgetAssets);
         actionMessage(isOk);
     }
 
@@ -170,9 +190,25 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
             WebUtil.addErrorMessage(WebUtil.getMessage("BudgetAlreadyInProgress"));
             return;
         }
-        boolean isOk = persistService.delete(selected);
+        boolean isOk = persistService.deleteApplication(selected);
         selected = null;
         actionMessage(isOk);
+    }
+
+    public void saveAsset() {
+        // 保存时设置科室
+        selectedAsset.setDept(selectedDept);
+        selectedAsset.setDeptId(selectedDept.getId());
+
+        selectedAsset.setTenantUID(selectedDept.getTenantUID());
+        selectedAsset.setInstitutionUID(selectedDept.getInstitutionUID());
+        selectedAsset.setHospitalUID(selectedDept.getHospitalUID());
+        selectedAsset.setSiteUID(selectedDept.getSiteUID());
+
+        boolean isOk = persistService.saveAsset(selectedAsset);
+        WebUtil.addSuccessMessage(WebUtil.getMessage("BudgetAsset") + WebUtil.getMessage("Blank")
+                + WebUtil.getMessage("Create") + WebUtil.getMessage("Blank")
+                + (isOk ? WebUtil.getMessage("Successfully") : WebUtil.getMessage("Failed")));
     }
 
     private void actionMessage(boolean isOk) {
@@ -225,7 +261,26 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
 
     private void addSearchFilter() {
         if (null != searchForm.getDept()) {
-            updateSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, searchForm.getDept().getId()));
+            OrgInfo orgInfo = searchForm.getDept();
+            switch (orgInfo.getOrgType()) {
+                case 4:
+                    // 科室
+                    updateSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, orgInfo.getId()));
+                case 3:
+                    // 院区
+                    updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getSiteUID()));
+                case 2:
+                    // 医院
+                    updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getHospitalUID()));
+                case 1:
+                    // 集团
+                    updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getInstitutionUID()));
+                case 0:
+                    // 租户
+                default:
+                    updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getTenantUID()));
+                    break;
+            }
         }
         if (null != searchForm.getDateStart()) {
             updateSearchFilter(new SearchFilter("applicationDate", SearchFilter.Operator.GTE, searchForm.getDateStart()));
@@ -254,7 +309,8 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         clearAssetSearchFilter();
         addAssetSearchFilter();
         optionalBudgetAssets.clear();
-        convertAssetToBudgetAsset(assetDao.findBySearchFilter(assetSearchFilters, new Sort(Sort.Direction.ASC, "id")));
+        List<BudgetAssetInfo> assetInfoList = budgetAssetDao.findBySearchFilter(assetSearchFilters);
+        fillOptionalAssets(assetInfoList);
     }
 
     public void resetAssetSearch() {
@@ -278,48 +334,30 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
             updateAssetSearchFilter(new SearchFilter("assetGroupSecondary", SearchFilter.Operator.EQ, assetSearchForm.getAssetGroupSecondary()));
         }
         if (StringUtils.isNotBlank(assetSearchForm.getAssetBrand())) {
-            updateAssetSearchFilter(new SearchFilter("brand.name", SearchFilter.Operator.LIKE, assetSearchForm.getAssetBrand()));
+            updateAssetSearchFilter(new SearchFilter("assetBrand", SearchFilter.Operator.LIKE, assetSearchForm.getAssetBrand()));
         }
-        if (StringUtils.isNotBlank(assetSearchForm.getFunctionType())) {
-            updateAssetSearchFilter(new SearchFilter("functionType", SearchFilter.Operator.EQ, assetSearchForm.getFunctionType()));
+        if (StringUtils.isNotBlank(assetSearchForm.getAssetModel())) {
+            updateAssetSearchFilter(new SearchFilter("assetModel", SearchFilter.Operator.EQ, assetSearchForm.getAssetModel()));
         }
         if (StringUtils.isNotBlank(assetSearchForm.getAssetName())) {
             updateAssetSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, assetSearchForm.getAssetName()));
         }
-        OrgInfo orgInfo = selected.getApplicationDept();
-        if (orgInfo != null) {
-            switch (orgInfo.getOrgType()) {
-                case 4:
-                    // 科室
-                    updateAssetSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, orgInfo.getId()));
-                case 3:
-                    // 院区
-                    updateAssetSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getSiteUID()));
-                case 2:
-                    // 医院
-                    updateAssetSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getHospitalUID()));
-                case 1:
-                    // 集团
-                    updateAssetSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getInstitutionUID()));
-                case 0:
-                    // 租户
-                default:
-                    updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getTenantUID()));
-                    break;
-            }
-        }
-        updateAssetSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        // 科室
+//        updateAssetSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, selectedDept.getId()));
+        // 现在只要是同一租户下的设备都能看到
+        updateAssetSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedDept.getTenantUID()));
+        updateAssetSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
     }
 
-    private void convertAssetToBudgetAsset(List<AssetInfo> assetInfoList) {
+    private void fillOptionalAssets(List<BudgetAssetInfo> assetInfoList) {
         Date date = new Date();
         assetInfoList.forEach(asset -> {
             BudgetApplicationAsset budgetAsset = new BudgetApplicationAsset();
             budgetAsset.setAsset(asset);
             budgetAsset.setApplicationAssetId(asset.getId());
+            budgetAsset.setApplicationPrice(asset.getPrice());
 
             budgetAsset.setNew(true);
-            budgetAsset.setIsDeleted(0);
             budgetAsset.setTenantUID(account.getTenantUID());
             budgetAsset.setInstitutionUID(account.getInstitutionUID());
             budgetAsset.setHospitalUID(account.getHospitalUID());
@@ -370,23 +408,41 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     }
 
     public void delBudgetAsset(BudgetApplicationAsset budgetAsset) {
+        deletedBudgetAssets.add(budgetAsset);
         selected.getBudgetAssets().remove(budgetAsset);
 
         calcTotalAmount();
     }
 
-    public void initOrgTree() {
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid());
+    public void prepareCreateAsset() {
+        Date date = new Date();
+        selectedAsset = new BudgetAssetInfo();
+
+        selectedAsset.setIsDeleted(0);
+        selectedAsset.setCreatedBy(account.getLoginName());
+        selectedAsset.setCreatedDate(date);
+        selectedAsset.setLastModifiedBy(account.getLoginName());
+        selectedAsset.setLastModifiedDate(date);
+    }
+
+    public TreeNode initOrgTree(TreeNode treeNode) {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode orgTree = new DefaultTreeNode("root", null, null);
         TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
         rootNode.setSelectable(false);
         if (null != treeNode) {
             rootNode.getChildren().add(treeNode);
+        } else {
+            // 用户在科室级别时, 可选择所在科室
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(org.getOrgType() == 4);
+            node.setRowKey("org_" + org.getId());
+            rootNode.getChildren().add(node);
         }
         rootNode.setExpanded(true);
+        return orgTree;
     }
 
     public void onSearchTreeNode(NodeSelectEvent event) {
@@ -401,8 +457,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         if (selected.getApplicationDeptId() != null && !orgInfo.getId().equals(selected.getApplicationDeptId())) {
             selected.getBudgetAssets().clear();
         }
-        selected.setApplicationDept(orgInfo);
-        selected.setApplicationDeptId(orgInfo.getId());
+        selectedDept = orgInfo;
     }
 
     public boolean show(String fieldKey) {
@@ -424,33 +479,45 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         return customConfig.getAssetsEditpageStatusFields().contains(fieldKey);
     }
 
-    public void onBudgetAssetGroupChange(AjaxBehaviorEvent event) {
+    public void onBudgetFilterAssetGroupChange(AjaxBehaviorEvent event) {
         searchForm.setAssetGroupSecondary(null);
-        budgetAssetGroupSecondaryList.clear();
-        fillBudgetAssetGroupSecondaryList();
+        budgetFilterAssetGroupSecondaryList.clear();
+        fillBudgetFilterAssetGroupSecondaryList();
     }
 
-    private void fillBudgetAssetGroupSecondaryList() {
+    private void fillBudgetFilterAssetGroupSecondaryList() {
         if (searchForm.getAssetGroup() == null) {
-            budgetAssetGroupSecondaryList = Collections.emptyList();
+            budgetFilterAssetGroupSecondaryList = Collections.emptyList();
         } else {
-            budgetAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
+            budgetFilterAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
                     + searchForm.getAssetGroup(), UserContextService.getCurrentUserAccount().getSiteId());
         }
     }
 
-    public void onAssetAssetGroupChange(AjaxBehaviorEvent event) {
+    public void onAssetFilterAssetGroupChange(AjaxBehaviorEvent event) {
         assetSearchForm.setAssetGroupSecondary(null);
-        assetAssetGroupSecondaryList.clear();
-        fillAssetAssetGroupSecondaryList();
+        assetFilterAssetGroupSecondaryList.clear();
+        fillAssetFilterAssetGroupSecondaryList();
     }
 
-    private void fillAssetAssetGroupSecondaryList() {
+    private void fillAssetFilterAssetGroupSecondaryList() {
         if (assetSearchForm.getAssetGroup() == null) {
-            assetAssetGroupSecondaryList = Collections.emptyList();
+            assetFilterAssetGroupSecondaryList = Collections.emptyList();
         } else {
-            assetAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
+            assetFilterAssetGroupSecondaryList = i18nDao.getByMsgTypeAndSiteId("assetGroupSecondary_"
                     + assetSearchForm.getAssetGroup(), UserContextService.getCurrentUserAccount().getSiteId());
+        }
+    }
+
+    public void clearSelected() {
+        if (StringUtils.isEmpty(selected.getId())) {
+            selected = null;
+        }
+    }
+
+    public void onSelect() {
+        if (selected != null && selected.getId() != null) {
+            selected = dao.findById(selected.getId());
         }
     }
 
@@ -458,6 +525,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         crudActionName = "Create";
         selectedBudgetAssets.clear();
+        selectedDept = null;
         Date date = new Date();
         selected = new BudgetApplication();
         selected.setApplicationNum(generateApplicationNum());
@@ -470,10 +538,6 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         selected.setBudgetApprovals(new HashSet<>());
 
         selected.setIsDeleted(0);
-        selected.setTenantUID(account.getTenantUID());
-        selected.setInstitutionUID(account.getInstitutionUID());
-        selected.setHospitalUID(account.getHospitalUID());
-        selected.setSiteUID(account.getSiteUID());
         selected.setCreatedBy(account.getLoginName());
         selected.setCreatedDate(date);
         selected.setLastModifiedBy(account.getLoginName());
@@ -484,6 +548,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
     public void prepareEdit() {
         crudActionName = "Edit";
         selectedBudgetAssets.clear();
+        selectedDept = selected.getApplicationDept();
     }
 
     @Override
@@ -524,20 +589,28 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         this.optionalBudgetAssets = optionalBudgetAssets;
     }
 
-    public List<I18nMessage> getBudgetAssetGroupSecondaryList() {
-        return budgetAssetGroupSecondaryList;
+    public List<I18nMessage> getBudgetFilterAssetGroupSecondaryList() {
+        return budgetFilterAssetGroupSecondaryList;
     }
 
-    public void setBudgetAssetGroupSecondaryList(List<I18nMessage> budgetAssetGroupSecondaryList) {
-        this.budgetAssetGroupSecondaryList = budgetAssetGroupSecondaryList;
+    public void setBudgetFilterAssetGroupSecondaryList(List<I18nMessage> budgetFilterAssetGroupSecondaryList) {
+        this.budgetFilterAssetGroupSecondaryList = budgetFilterAssetGroupSecondaryList;
     }
 
-    public List<I18nMessage> getAssetAssetGroupSecondaryList() {
-        return assetAssetGroupSecondaryList;
+    public List<I18nMessage> getAssetFilterAssetGroupSecondaryList() {
+        return assetFilterAssetGroupSecondaryList;
     }
 
-    public void setAssetAssetGroupSecondaryList(List<I18nMessage> assetAssetGroupSecondaryList) {
-        this.assetAssetGroupSecondaryList = assetAssetGroupSecondaryList;
+    public void setAssetFilterAssetGroupSecondaryList(List<I18nMessage> assetFilterAssetGroupSecondaryList) {
+        this.assetFilterAssetGroupSecondaryList = assetFilterAssetGroupSecondaryList;
+    }
+
+    public List<I18nMessage> getAssetCreateAssetGroupSecondaryList() {
+        return assetCreateAssetGroupSecondaryList;
+    }
+
+    public void setAssetCreateAssetGroupSecondaryList(List<I18nMessage> assetCreateAssetGroupSecondaryList) {
+        this.assetCreateAssetGroupSecondaryList = assetCreateAssetGroupSecondaryList;
     }
 
     public BudgetSearchForm getSearchForm() {
@@ -556,11 +629,35 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         this.assetSearchForm = assetSearchForm;
     }
 
+    public BudgetAssetInfo getSelectedAsset() {
+        return selectedAsset;
+    }
+
+    public void setSelectedAsset(BudgetAssetInfo selectedAsset) {
+        this.selectedAsset = selectedAsset;
+    }
+
     public TreeNode getOrgTree() {
         return orgTree;
     }
 
     public void setOrgTree(TreeNode orgTree) {
         this.orgTree = orgTree;
+    }
+
+    public TreeNode getOrgTreeEdit() {
+        return orgTreeEdit;
+    }
+
+    public void setOrgTreeEdit(TreeNode orgTreeEdit) {
+        this.orgTreeEdit = orgTreeEdit;
+    }
+
+    public OrgInfo getSelectedDept() {
+        return selectedDept;
+    }
+
+    public void setSelectedDept(OrgInfo selectedDept) {
+        this.selectedDept = selectedDept;
     }
 }

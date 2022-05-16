@@ -2,7 +2,6 @@ package com.ge.apm.domain.budget;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ge.apm.domain.AssetInfo;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NotFound;
@@ -39,16 +38,16 @@ public class BudgetApplicationAsset implements Serializable {
     private Integer stockType;
 
     // 申请设备id
-    @Column(name = "application_asset_id")
-    private Integer applicationAssetId;
+    @Column(name = "application_asset_id", columnDefinition = "CHAR(32)")
+    private String applicationAssetId;
 
-    @Formula("(select a.name from asset_info a where a.id = application_asset_id)")
+    @Formula("(select a.name from budget_asset_info a where a.id = application_asset_id)")
     private String assetName;
 
-    @Formula("(select a.asset_group from asset_info a where a.id = application_asset_id)")
+    @Formula("(select a.asset_group from budget_asset_info a where a.id = application_asset_id)")
     private Integer assetGroup;
 
-    @Formula("(select a.asset_group_secondary from asset_info a where a.id = application_asset_id)")
+    @Formula("(select a.asset_group_secondary from budget_asset_info a where a.id = application_asset_id)")
     private Integer assetGroupSecondary;
 
     // 申请设备
@@ -58,11 +57,7 @@ public class BudgetApplicationAsset implements Serializable {
             referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
     @NotFound(action = NotFoundAction.IGNORE)
-    private AssetInfo asset;
-
-    // 单位
-    @Column(name = "unit")
-    private String unit;
+    private BudgetAssetInfo asset;
 
     // 申请数量
     @Column(name = "application_quantity")
@@ -75,10 +70,6 @@ public class BudgetApplicationAsset implements Serializable {
     // 申请总金额
     @Column(name = "application_amount", scale = 2)
     private BigDecimal applicationAmount;
-
-    // 删除标识
-    @Column(name = "is_deleted")
-    private Integer isDeleted = 0;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -151,11 +142,11 @@ public class BudgetApplicationAsset implements Serializable {
         this.stockType = stockType;
     }
 
-    public Integer getApplicationAssetId() {
+    public String getApplicationAssetId() {
         return applicationAssetId;
     }
 
-    public void setApplicationAssetId(Integer applicationAssetId) {
+    public void setApplicationAssetId(String applicationAssetId) {
         this.applicationAssetId = applicationAssetId;
     }
 
@@ -183,20 +174,12 @@ public class BudgetApplicationAsset implements Serializable {
         this.assetGroupSecondary = assetGroupSecondary;
     }
 
-    public AssetInfo getAsset() {
+    public BudgetAssetInfo getAsset() {
         return asset;
     }
 
-    public void setAsset(AssetInfo asset) {
+    public void setAsset(BudgetAssetInfo asset) {
         this.asset = asset;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
     }
 
     public Integer getApplicationQuantity() {
@@ -222,14 +205,6 @@ public class BudgetApplicationAsset implements Serializable {
 
     public void setApplicationAmount(BigDecimal applicationAmount) {
         this.applicationAmount = applicationAmount;
-    }
-
-    public Integer getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(Integer isDeleted) {
-        this.isDeleted = isDeleted;
     }
 
     public String getTenantUID() {

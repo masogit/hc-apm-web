@@ -104,7 +104,8 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-
+                        <h:panelGroup rendered="#{empty zkbContractEditController.selected.id}">
+                        </h:panelGroup>
 
                         <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Spare')}">
                             <label class="label">#{msg.zkbContract_spareQuota_total}</label>
