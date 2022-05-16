@@ -47,7 +47,13 @@ public class WordReportExportService {
         List<byte[]> reports= null;
         Map<String,List<NurseSiteMaintain>>listMap = new LinkedHashMap<>();
         for (NurseSiteMaintain maintain : listMaintain) {
-            String name = maintain.getName();
+            String name;
+            Integer sequence = maintain.getSequence();
+            if (sequence==0){
+                 name = maintain.getName();
+            }else {
+                 name = maintain.getName()+"-"+sequence;
+            }
             if(listMap.containsKey(name)){
                 listMap.get(name).add(maintain);
                 listMap.put(name,listMap.get(name));
