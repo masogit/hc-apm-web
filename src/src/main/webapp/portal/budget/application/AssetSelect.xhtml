@@ -9,7 +9,7 @@
 
 <ui:composition>
 
-    <p:dialog id="AssetEditDlg" widgetVar="AssetEditDialog" modal="true" resizable="false"
+    <p:dialog id="AssetSelectDlg" widgetVar="AssetSelectDialog" modal="true" resizable="false"
               draggable="true" appendTo="@(body)" width="960" height="560"
               header="#{budgetController.CRUDActionName}#{msg.Blank}#{msg.BudgetApplication}">
         <h:form id="assetSearchForm">
@@ -22,7 +22,7 @@
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            <p:ajax event="change" listener="#{budgetController.onAssetAssetGroupChange}"
+                            <p:ajax event="change" listener="#{budgetController.onAssetFilterAssetGroupChange}"
                                     update="@this assetGroupSecondary"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
@@ -31,7 +31,7 @@
                         <p:selectOneMenu id="assetGroupSecondary"
                                          value="#{budgetController.assetSearchForm.assetGroupSecondary}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{budgetController.assetAssetGroupSecondaryList}" var="item"
+                            <f:selectItems value="#{budgetController.assetFilterAssetGroupSecondaryList}" var="item"
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
@@ -51,7 +51,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.EquipmentModel}</label>
-                        <p:inputText value="#{budgetController.assetSearchForm.functionType}"/>
+                        <p:inputText value="#{budgetController.assetSearchForm.assetModel}"/>
                         <!--                        <p:autoComplete dropdown="true" value="#{budgetController.assetSearchForm.functionType}"-->
                         <!--                                        scrollHeight="250" forceSelection="false"/>-->
                         <!--                                                completeMethod="#{budgetController.listItems}"/>-->
@@ -59,37 +59,37 @@
                     <h:panelGroup style="display: flex;">
                         <p:commandButton value="#{msg.Search}"
                                          actionListener="#{budgetController.searchAsset}"
-                                         update="AssetEditForm"/>
+                                         update="AssetSelectForm"/>
                         <p:commandButton value="#{msg.Reset}"
                                          actionListener="#{budgetController.resetAssetSearch}"
-                                         update="AssetEditForm assetSearchForm"/>
+                                         update="AssetSelectForm assetSearchForm"/>
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
         </h:form>
-        <h:form id="AssetEditForm">
+        <h:form id="AssetSelectForm">
             <p:dataTable id="assetDatalist" value="#{budgetController.optionalBudgetAssets}" var="item"
                          widgetVar="varAssetDatalist"
                          lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.asset.id}"
-                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                          currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                          rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
 
-                <p:column headerText="#{msg.deviceNum}">
-                    <h:outputText value="#{item.asset.departNum}"/>
+                <p:column headerText="#{msg.ProductNumber}">
+                    <h:outputText value="#{item.asset.financingNum}"/>
                 </p:column>
                 <p:column headerText="#{msg.EquipmentName}">
                     <h:outputText value="#{item.asset.name}"/>
                 </p:column>
                 <p:column headerText="#{msg.AssetBrand}">
-                    <h:outputText value="#{item.asset.brand.name}"/>
+                    <h:outputText value="#{item.asset.assetBrand}"/>
                 </p:column>
                 <p:column headerText="#{msg.EquipmentModel}">
-                    <h:outputText value="#{item.asset.functionType}"/>
+                    <h:outputText value="#{item.asset.assetModel}"/>
                 </p:column>
                 <p:column headerText="#{msg.Unit}">
-                    <p:inputText styleClass="width-pct-100" value="#{item.unit}"/>
+                    <h:outputText value="#{item.asset.unit}"/>
                 </p:column>
                 <p:column headerText="#{msg.StockType}">
                     <p:selectOneMenu id="stockType" value="#{item.stockType}">
@@ -114,15 +114,21 @@
                         <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                     </h:outputText>
                 </p:column>
+                <f:facet name="{Toolbar}">
+                    <p:commandButton value="#{msg.AddNewAsset}" class="zoom-08"
+                                     actionListener="#{budgetController.prepareCreateAsset}"
+                                     update="AssetEditDlg"
+                                     oncomplete="PF('AssetEditDialog').show()"/>
+                </f:facet>
             </p:dataTable>
 
             <br/>
             <p:commandButton validateClient="true" actionListener="#{budgetController.addBudgetAsset}"
                              value="#{msg.Save}"
-                             update=":AssetEditDlg, BudgetApplicationEditForm, :growl"
-                             oncomplete="handleSubmit(args, 'AssetEditDialog');"/>
+                             update=":AssetSelectDlg, BudgetApplicationEditForm, :growl"
+                             oncomplete="handleSubmit(args, 'AssetSelectDialog');"/>
             <p:commandButton immediate="true" value="#{msg.Cancel}"
-                             onclick="PF('AssetEditDialog').hide()"/>
+                             onclick="PF('AssetSelectDialog').hide()"/>
         </h:form>
     </p:dialog>
 

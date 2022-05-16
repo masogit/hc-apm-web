@@ -127,7 +127,7 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     private MultiLevelApprovalConfig approvalConfig;
 
-    // 删除标识
+    // 删除标识 0: 未删除；1：已删除
     @Column(name = "is_deleted")
     private Integer isDeleted = 0;
 

@@ -996,6 +996,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             }
         }
         this.zkbContractRepository.save(zkbContract);
+
         if (record && StringUtils.isNotBlank(orderType)) {
             this.zkbContractQuotaLogService.saveData(zkbContract, null, zkbFePartOrder, opType, orderType, "zkbFePartOrder", userAccount, step);
         }

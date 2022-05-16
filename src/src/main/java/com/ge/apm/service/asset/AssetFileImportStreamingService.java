@@ -203,6 +203,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("CurrentStatus")), "setStatus", assetStatusList, map, 1);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("AccountingCategory")), "setAccountingCategory", accountingCategoryList, map, null);
                 assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("IsPM")), "setIsPm", true);
+                assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("isFixed")), "setIsFixed", true);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetClass")), "setAssetClass", assetClassList, map, null);
                 assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("IsChecked")), "setIsChecked", true);
 

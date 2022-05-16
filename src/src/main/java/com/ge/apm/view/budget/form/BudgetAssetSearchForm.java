@@ -1,10 +1,14 @@
-package com.ge.apm.view.budget;
+package com.ge.apm.view.budget.form;
+
+import com.ge.apm.domain.OrgInfo;
 
 /**
  * @author Yangfan, Liu
  * @date 4/8/2022 17:21
  */
 public class BudgetAssetSearchForm {
+    // 科室
+    private OrgInfo dept;
     // 设备分类
     private Integer assetGroup;
     // 设备二级分类
@@ -12,9 +16,17 @@ public class BudgetAssetSearchForm {
     // 设备品牌
     private String assetBrand;
     // 设备型号
-    private String functionType;
+    private String assetModel;
     // 设备名称
     private String assetName;
+
+    public OrgInfo getDept() {
+        return dept;
+    }
+
+    public void setDept(OrgInfo dept) {
+        this.dept = dept;
+    }
 
     public Integer getAssetGroup() {
         return assetGroup;
@@ -40,12 +52,12 @@ public class BudgetAssetSearchForm {
         this.assetBrand = assetBrand == null ? null : assetBrand.trim();
     }
 
-    public String getFunctionType() {
-        return functionType;
+    public String getAssetModel() {
+        return assetModel;
     }
 
-    public void setFunctionType(String functionType) {
-        this.functionType = functionType == null ? null : functionType.trim();
+    public void setAssetModel(String functionType) {
+        this.assetModel = functionType == null ? null : functionType.trim();
     }
 
     public String getAssetName() {

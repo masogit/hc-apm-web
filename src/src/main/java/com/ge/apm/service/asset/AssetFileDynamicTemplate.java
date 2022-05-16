@@ -212,6 +212,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         int rowNum = 1;
         createDropdownWithStaticList(rowNum++, WebUtil.getMessage("FunctionGrade"), true, "1", "2", "3");
         createDropdownWithStaticList(rowNum++, WebUtil.getMessage("IsPM"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
+        createDropdownWithStaticList(rowNum++, WebUtil.getMessage("isFixed"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
         createDropdownWithStaticList(rowNum++, WebUtil.getMessage("IsChecked"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
         createDropdownWithStaticList(rowNum++, WebUtil.getMessage("WarrantyExpirationReminder"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
 

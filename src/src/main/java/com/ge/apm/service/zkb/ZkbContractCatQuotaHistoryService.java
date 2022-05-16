@@ -34,7 +34,7 @@ public class ZkbContractCatQuotaHistoryService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveZkbFeQuotaHistory(ZkbContract zkbContract, ZkbContractAsset zkbContractAsset, String zkbPartOrderId, String zkbPartOrderNo, String probeType, UserAccount currentUser){
+    public void saveZkbFeQuotaHistory(ZkbContract zkbContract, ZkbContractAsset zkbContractAsset, String zkbPartOrderId, String zkbPartOrderNo, String probeType, UserAccount currentUser,Integer qty){
         ZkbContractCatQuotaHistory zkbContractCatQuotaHistory = new ZkbContractCatQuotaHistory();
         zkbContractCatQuotaHistory.setCreatedBy(currentUser.getUid());
         zkbContractCatQuotaHistory.setCreatedDate(new Date());
@@ -46,7 +46,8 @@ public class ZkbContractCatQuotaHistoryService {
         zkbContractCatQuotaHistory.setPartOrderNo(zkbPartOrderNo);
         zkbContractCatQuotaHistory.setPartOrderNo(zkbPartOrderNo);
         zkbContractCatQuotaHistory.setProbeType(probeType);
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        zkbContractCatQuotaHistory.setQty(qty);
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             zkbContractCatQuotaHistory.setAssetType(ZkbContractAsset.AssetTypeEnum.highMachine.toString());
         }else{
             zkbContractCatQuotaHistory.setAssetType(ZkbContractAsset.AssetTypeEnum.lowMachine.toString());
@@ -56,7 +57,7 @@ public class ZkbContractCatQuotaHistoryService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteZkbFeHistory(String partOrderId){
+    public void deleteZkbFeHistory(String partOrderId, Integer qty){
         List<ZkbContractCatQuotaHistory> list = zkbContractCatQuotaHistoryRepository.queryByPartOrderId(partOrderId);
         if(list == null || list.size() == 0){
             return;
@@ -65,7 +66,11 @@ public class ZkbContractCatQuotaHistoryService {
             return;
         }
         ZkbContractCatQuotaHistory zkbContractCatQuotaHistory = list.get(0);
-        zkbContractCatQuotaHistory.setStatus("N");
+        if(qty > 0){
+            zkbContractCatQuotaHistory.setStatus("N");
+        }else{
+            zkbContractCatQuotaHistory.setStatus("Y");
+        }
         zkbContractCatQuotaHistoryRepository.save(zkbContractCatQuotaHistory);
     }
 
@@ -168,7 +173,7 @@ public class ZkbContractCatQuotaHistoryService {
         int lowMachine = (total % 2 == 0 ? total :total+1)/2;
 
         String assetType = "";
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             assetType = ZkbContractAsset.AssetTypeEnum.highMachine.toString();
         }else{
             assetType = ZkbContractAsset.AssetTypeEnum.lowMachine.toString();
@@ -182,7 +187,7 @@ public class ZkbContractCatQuotaHistoryService {
             }
         }
 
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             if(qty > (highMachine - useQty)){
                 return false;
             }
@@ -210,21 +215,21 @@ public class ZkbContractCatQuotaHistoryService {
         int lowMachine = (total % 2 == 0 ? total :total+1)/2;
 
         String assetType = "";
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             assetType = ZkbContractAsset.AssetTypeEnum.highMachine.toString();
         }else{
             assetType = ZkbContractAsset.AssetTypeEnum.lowMachine.toString();
         }
 
         Integer useQty= 0;
-        List<ZkbContractCatQuotaHistory> zkbContractCatQuotaHistoryList = zkbContractCatQuotaHistoryRepository.queryByConditionWithOutId(zkbContract.getId(), probeType, assetType,partOrderId);
+        List<ZkbContractCatQuotaHistory> zkbContractCatQuotaHistoryList = zkbContractCatQuotaHistoryRepository.queryByCondition(zkbContract.getId(), probeType, assetType);
         if(zkbContractCatQuotaHistoryList != null && zkbContractCatQuotaHistoryList.size() >= 0){
             for(ZkbContractCatQuotaHistory h : zkbContractCatQuotaHistoryList){
                 useQty += h.getQty();
             }
         }
 
-        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getHighLowMachine())){
+        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
             if(qty > (highMachine - useQty)){
                 return false;
             }

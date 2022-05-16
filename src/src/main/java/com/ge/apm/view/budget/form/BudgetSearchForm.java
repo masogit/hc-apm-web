@@ -1,4 +1,4 @@
-package com.ge.apm.view.budget;
+package com.ge.apm.view.budget.form;
 
 import com.ge.apm.domain.OrgInfo;
 

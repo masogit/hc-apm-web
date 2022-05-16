@@ -219,6 +219,10 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                     , queryAsset.getPurchaseDateEnd()));
         }
 
+        if (queryAsset.getRiskGrade()!=null) {
+            assetFilters.add(new SearchFilter("riskGrade", SearchFilter.Operator.EQ, queryAsset.getRiskGrade()));
+        }
+
         if (queryAsset.getStartInstallDate() != null) {
 
             assetFilters.add(new SearchFilter("installDate", SearchFilter.Operator.GTE, queryAsset.getStartInstallDate()));
