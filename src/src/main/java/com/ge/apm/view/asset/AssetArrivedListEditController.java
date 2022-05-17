@@ -516,7 +516,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             String tenantUid = currentUserAccount.getTenantUID();
             List<TenantInfo> tanentIfos = tenantInfoRepository.findByCustomTenant("3");
-            String tanentInfoUid = tanentIfos.get(0).getUid();
+            String tanentInfoUid = tanentIfos.isEmpty() ? null : tanentIfos.get(0).getUid();
             if(!tenantUid.equals(tanentInfoUid)){
                 selected.setContractNum(srcList.getContractNum());
                 selected.setContractPrice(srcList.getContractPrice());
