@@ -40,7 +40,7 @@
 					   </h:panelGroup>
 
 					   <h:panelGroup id="SelectedPmOrderRule">
-						   <label class="label">#{msg.PmOrderRule}*</label>
+						   <label class="label">#{msg.PmOrderRule}</label>
 						   <p:autoComplete value="#{generatePmOrdersController.pmOrderRule}" dropdown="true" scrollHeight="300" rendered="#{generatePmOrdersController.level > 0}"
 										   forceSelection="true" completeMethod="#{generatePmOrdersController.getRuleList}"
 										   var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="pmOrderRuleConverter">
