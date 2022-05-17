@@ -178,7 +178,7 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
     }
 
     public void handleFileUpload(FileUploadEvent event) {
-        V2_BlobObject blobObject = blobService.uploadFile(event);
+        V2_BlobObject blobObject = blobService.uploadCompressFile(event.getFile());
         if (null != blobObject) {
             attachements.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_AUDIT_CONFIG_ITEM);
@@ -187,7 +187,7 @@ public class AuditItemConfigController extends GenericCRUDUUIDController<AuditCo
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
-            WebUtil.addErrorMessage("fail to upload file");
+            WebUtil.addErrorMessage(WebUtil.getMessage("FileUploadFailed"));
         }
     }
 

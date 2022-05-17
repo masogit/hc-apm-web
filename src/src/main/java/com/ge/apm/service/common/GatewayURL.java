@@ -18,6 +18,7 @@ public enum GatewayURL {
     // Objects
     UPLOAD_SINGLE_FILE_BY_URL("/hcapmobjecthubservice/api/apm/objectHub/objects/urlFile"),
     UPLOAD_SINGLE_FILE("/zuul/hcapmobjecthubservice/api/apm/objectHub/objects/single"),
+    UPLOAD_SINGLE_COMPRESS_FILE("/zuul/hcapmobjecthubservice/api/apm/objectHub/objects/compressImageSingle"),
     DELETE_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
     DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/download"),
     SEARCH_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
@@ -134,8 +135,10 @@ public enum GatewayURL {
     // 不良事件详情
     GET_ADVERSE_EVENTS_INFO("/hcapmassetservice/api/apm/asset/adverse/events/getDetailByUid/{uid}"),
     // 不良事件审批
-    APPROVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveAdverseEvent");
+    APPROVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveAdverseEvent"),
 
+    RESET_USER_TO_REDIS("/hcapmgateway/api/apm/security/userAccounts/resetUser/{loginName}"),
+    REMOVE_USER_FROM_REDIS("/hcapmgateway/api/apm/security/userAccounts/removeUser/{loginName}");
 
     private final String url;
 

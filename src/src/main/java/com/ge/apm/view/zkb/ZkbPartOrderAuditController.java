@@ -61,6 +61,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String actionReturnName;
     private ZkbPartOrderReturnRepository zkbPartOrderReturnRepository;
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
+    private ZkbContractAssetRepository zkbContractAssetRepository;
     private ZkbPartOrderRepository zkbPartOrderRepository;
     private I18nMessageRepository i18nDao;
     private List<HashMap<String, Object>> v2_listHashMap;
@@ -103,6 +104,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbContractRepository = WebUtil.getBean(ZkbContractRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        zkbContractAssetRepository = WebUtil.getBean(ZkbContractAssetRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
 
         str = WebUtil.getRequestParameter("str");
@@ -916,6 +918,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             if(CopyByInvok.T.equals(selected.getNewCatFlag()) && StringUtils.isEmpty(selected.getProbeQuotaType())){
                                 if(c.getProbeQuota() < selected.getQty()){
                                     WebUtil.addErrorMessage("探头剩余名额不足，请联系供应商！","");
+                                    return "";
+                                }
+                            }
+                        }
+                        if(CopyByInvok.T.equals(zkbContract.getAssetQuotaType())){
+                            if (CopyByInvok.T.equals(selected.getNewCatFlag())) {
+                                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),selected.getAssetId());
+                                boolean r = zkbPartOrderService.checkQuotaHistory("order",zkbContract, selected, zkbContractAsset, ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString());
+                                if(!r){
+                                    if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())) {
+                                        WebUtil.addErrorMessage("该合同中的高端机名额不足,请检查！","");
+
+                                    }else{
+                                        WebUtil.addErrorMessage("该合同中的低端机名额不足,请检查！","");
+                                    }
                                     return "";
                                 }
                             }

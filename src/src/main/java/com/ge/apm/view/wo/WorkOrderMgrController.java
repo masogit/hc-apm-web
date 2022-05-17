@@ -906,8 +906,10 @@ public void test1(){
                             for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
                                 AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
                                 List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                                UserAccount account = userDao.getByUid(userUids.get(0));
-                                userAccountList.add(account);
+                                if(userUids!=null){
+                                    UserAccount account = userDao.getByUid(userUids.get(0));
+                                    userAccountList.add(account);
+                                }
                             }
 
                         }
@@ -1375,7 +1377,22 @@ public void test1(){
             RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
             return;
         }
-
+        if(!picList.isEmpty()){
+            String srId = selectedWorkOrder.getSrId();
+            for (V2_BlobObject bo : picList) {
+                bo.setBoUuid(srId);
+                bo.setBoType(V2_BlobObject.BO_TYPE_WorkOrder);
+            }
+            blobObjectRepository.save(picList);
+        }
+        if(!attachList.isEmpty()) {
+            String srId = selectedWorkOrder.getSrId();
+            for (V2_BlobObject bo : attachList) {
+                bo.setBoUuid(srId);
+                bo.setObjectType(V2_BlobObject.BO_SUB_TYPE_DOCS);
+            }
+            blobObjectRepository.save(attachList);
+        }
         dao.save(selectedWorkOrder);
     }
 
@@ -1600,6 +1617,11 @@ public void test1(){
         if (confirmedUpDate ==
                 null) {
             WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
+            valid = false;
+        }else if(this.confirmedUpDate.getTime() < selectedWorkOrder.getAcceptStepStartTime().getTime()){
+            // 恢复时间不能小于接单时间
+            WebUtil.addErrorMessage(WebUtil.getMessage("RepairRecoveryTimeCheck"));
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
             valid = false;
         }
@@ -2378,8 +2400,10 @@ public void test1(){
                     for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
                         AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
                         List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                        UserAccount userAccount = userDao.getByUid(userUids.get(0));
-                        uaList.add(userAccount);
+                        if(userUids!=null){
+                            UserAccount userAccount = userDao.getByUid(userUids.get(0));
+                            uaList.add(userAccount);
+                        }
                     }
 
                 }

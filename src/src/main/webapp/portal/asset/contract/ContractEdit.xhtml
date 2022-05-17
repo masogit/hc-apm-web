@@ -731,7 +731,7 @@
                                 </p:commandButton>
                             </p:dataList>
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{contractInfoEditController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                           multiple="true" sizeLimit="10000000" update=":uploadDialogForm:AttachUploadList saveButton" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}" />
+                                           multiple="true" sizeLimit="2097152000" update=":uploadDialogForm:AttachUploadList saveButton" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}200M"  label="#{msg.Add}" />
                         </h:panelGroup>
 
 

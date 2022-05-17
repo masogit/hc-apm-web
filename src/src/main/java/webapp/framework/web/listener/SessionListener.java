@@ -5,6 +5,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.log4j.Logger;
+import webapp.framework.util.SessionCache;
 
 /**
  * SessionListener class used to listen to session creation and destruction.<br>
@@ -38,6 +39,7 @@ public class SessionListener implements HttpSessionListener {
      */
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
+        SessionCache.moveSession(se.getSession());
         if (log.isInfoEnabled()) {
             HttpSession session = se.getSession();
             // session has been invalidated and all session data (except Id)is no longer available

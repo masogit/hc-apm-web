@@ -23,9 +23,9 @@
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|ppt|pptx|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|PPT|PPTX)$/"
                                           fileUploadListener="#{auditTemplateController.handleFileUpload}"
                                           mode="advanced" dragDropSupport="false" style="width:95%" process="@this"
-                                          multiple="false" sizeLimit="20000000"
-                                          update=":auditTemplateForm:upload" auto="true"
-                                          invalidSizeMessage="#{msg.invalidSizeMessage}20M" label="#{msg.Add}"/>
+                                          multiple="false" sizeLimit="104857600"
+                                          update=":auditTemplateForm:upload name" auto="true"
+                                          invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                         </h:panelGroup>
                         <h:panelGroup id="namepanel"
                                       rendered="#{auditTemplateController.selected.fileName!=null}">
@@ -34,7 +34,7 @@
                                          required="false" requiredMessage="#{msg.SelectUploadFile}" readonly="true"/>
                             <p:commandButton
                                     actionListener="#{auditTemplateController.removeAttachmentById(auditTemplateController.fileObj.id)}"
-                                    id="iconOnly" update=":auditTemplateForm:upload" icon="ui-icon-clear"
+                                    id="iconOnly" update=":auditTemplateForm:upload name" icon="ui-icon-clear"
                                     title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}"
                                            icon="ui-icon-warning"/>

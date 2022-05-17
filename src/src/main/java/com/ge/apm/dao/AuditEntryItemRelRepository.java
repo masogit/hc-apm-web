@@ -18,5 +18,8 @@ public interface AuditEntryItemRelRepository extends GenericRepository<AuditEntr
 
     @Transactional
     @Modifying
-    public void deleteByItemUid(String itemUid);
+    public void deleteByItemUidAndOrderBy(String itemUid,Integer orderBy);
+    @Transactional
+    @Modifying
+    public void deleteBySystemEntryUid(String systemEntryUid);
 }

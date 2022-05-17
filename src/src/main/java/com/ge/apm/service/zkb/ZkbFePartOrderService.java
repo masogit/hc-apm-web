@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 503202755 2020/12/8
@@ -50,6 +51,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
 
     @Autowired
     BlobObjectRepository blobObjectRepository;
+
+    /**
+     * 2022新逻辑  service
+     */
+    @Autowired
+    private ZkbContractCatQuotaHistoryService zkbContractCatQuotaHistoryService;
 
     /**
      * 设备
@@ -324,6 +331,26 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return "设备已报废，不能继续申请！！";
         }*/
         return "";
+    }
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2022/4/22
+     * 获取当前保修单的 设备类型是高端机还是低端机
+     */
+    public String getAssetTypeName(ZkbContract zkbContract,ZkbFePartOrder zkbFePartOrder) {
+        String assetTypeName = new String ();
+        Set<ZkbContractAsset> zkbContractAsset = zkbContract.getZkbContractAssets().stream().filter(ass -> {
+            if(ass.getAssetInfo()!=null){
+                return ass.getAssetInfo().getSystemId().equals(zkbFePartOrder.getSystemId());
+            }
+            return false;
+        }).collect(Collectors.toSet());
+        if(!zkbContractAsset.isEmpty()){
+            assetTypeName = zkbContractAsset.iterator().next().getAssetType();
+        }
+        assetTypeName = "highMachine".equals(assetTypeName)?"高端机":"低端机";
+        return assetTypeName;
     }
 
 
@@ -969,6 +996,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             }
         }
         this.zkbContractRepository.save(zkbContract);
+
         if (record && StringUtils.isNotBlank(orderType)) {
             this.zkbContractQuotaLogService.saveData(zkbContract, null, zkbFePartOrder, opType, orderType, "zkbFePartOrder", userAccount, step);
         }
@@ -1936,7 +1964,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if (!ZkbFePartOrderSparePartDetailController.badReturnValue.equals(zkbFePartOrder.getReturnType())) {
             if (zkbFePartOrder.getQty() != null && zkbFePartOrder.getQty() > 0) {
                 this.moveProbe(5, zkbContract, zkbFePartOrder.getQty(), showZkbPoProbeQuotaType, zkbFePartOrder.getZkbPoProbeQuotaType(), userAccount, zkbFePartOrder, true, i18Map.get("GEAdminAccept"));
+                //TODO liyonjian ZKB - 2022年新探头逻辑
+                if(ZkbContract.AssetQuotaTypeEnum.t.toString().equals(zkbContract.getAssetQuotaType())){
+                    zkbContractCatQuotaHistoryService.updateZkbFeContractCatQuotaHistoryStatusOrQty(zkbContract,zkbFePartOrder,userAccount,"N",null);
+                }
             }
+
             if (StringUtils.isNotBlank(zkbFePartOrder.getContractCatId())) {
                 this.updateZkbContractCat(userAccount, true, zkbFePartOrder.getContractCatId());
             }

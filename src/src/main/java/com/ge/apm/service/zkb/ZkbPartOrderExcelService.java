@@ -207,6 +207,13 @@ public class ZkbPartOrderExcelService {
             zkbPartOrderDataMap.put("销售总监审批时间", DateFormatUtils.format(p.getDirectorAuditDate(),"yyyy-MM-dd"));
         }
         zkbPartOrderDataMap.put("销售总监审批备注", p.getDirectorRemark());
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(p.getOrderType())){
+            if("1".equals(p.getArtificialType())){
+                zkbPartOrderDataMap.put("是否需要SSA Key", "t".equals(p.getSsaKeyFlag()) ? "是" : "否");
+            }else {
+                zkbPartOrderDataMap.put("是否需要Dongle", "t".equals(p.getSsaKeyFlag()) ? "是" : "否");
+            }
+        }
         return zkbPartOrderDataMap;
     }
 

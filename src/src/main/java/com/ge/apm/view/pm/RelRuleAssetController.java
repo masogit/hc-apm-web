@@ -219,6 +219,10 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                     , queryAsset.getPurchaseDateEnd()));
         }
 
+        if (queryAsset.getRiskGrade()!=null) {
+            assetFilters.add(new SearchFilter("riskGrade", SearchFilter.Operator.EQ, queryAsset.getRiskGrade()));
+        }
+
         if (queryAsset.getStartInstallDate() != null) {
 
             assetFilters.add(new SearchFilter("installDate", SearchFilter.Operator.GTE, queryAsset.getStartInstallDate()));
@@ -509,8 +513,6 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         }
         if (StringUtils.isNotEmpty(name)) {
             filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
-        } else if (StringUtils.isNotEmpty(queryAsset.getName())) {
-            filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
         }
         List<PmOrderRule> rules = pmOrderRuleRepository.findBySearchFilter(filter);
         rules.sort(new Comparator<PmOrderRule>() {

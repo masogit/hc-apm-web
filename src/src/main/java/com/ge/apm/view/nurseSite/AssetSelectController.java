@@ -127,6 +127,12 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.is4Edit = Boolean.TRUE;
         this.orgTree = assetSelectService.loadOrgTree();
         this.selectedOrg = assetSelectService.loadSelectedOrg();
+        // 页面 资产查询列表的复选框用
+        this.selectedAssetUids.clear();
+        // 编辑时，之前编辑的时候已经勾选了的资产
+        this.selectedAssets.clear();
+        // 本次编辑时勾选的资产
+        this.selectedAssetsed.clear();
 
         this.selectedAssets = assetSelectService.loadSelectedAssetByConfig(config.getId()).stream().collect(Collectors.toSet());
         this.selectedAssets.stream().forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));

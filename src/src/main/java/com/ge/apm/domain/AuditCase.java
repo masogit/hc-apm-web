@@ -44,13 +44,18 @@ public class AuditCase implements Serializable {
     @Column(name = "site_uid")
     private String siteUid;
     /**
+     * tenant_uid
+     */
+    @Column(name = "tenant_uid")
+    private String tenantUid;
+    /**
      * 状态 :1 active, 2 archieve
      */
     @Column(name = "status")
     private Integer status;
 
     @Column(name = "target")
-    private Double target;
+    private Integer target;
 
     @Column(name = "start_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -91,5 +96,17 @@ public class AuditCase implements Serializable {
     @OneToOne
     @JoinColumn(name = "system_case_uid", insertable = false, updatable = false)
     private AuditSystemCase auditSystemCase;
+
+    /**
+     * 目标
+     */
+    @Transient
+    private Integer targetId;
+
+    /**
+     * 目标分值
+     */
+    @Transient
+    private Double targetScore;
 
 }
