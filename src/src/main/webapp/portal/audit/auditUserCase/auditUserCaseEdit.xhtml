@@ -11,7 +11,7 @@
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.tenant}</label>
-                        <p:selectOneMenu value="#{auditUserCaseController.selectedTenantUid}" autoWidth="false" style="width: 95%;">
+                        <p:selectOneMenu value="#{auditUserCaseController.selected.tenantUid}" filter="true" autoWidth="false" style="width: 95%;">
                             <p:ajax event="change" update="site"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{auditUserCaseController.getAllTenant()}" var="entry" itemLabel="#{entry.name}" itemValue="#{entry.uid}"/>
@@ -19,7 +19,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.Site}*</label>
-                        <p:selectOneMenu id="site" value="#{auditUserCaseController.selected.siteUid}" required="true" requiredMessage="#{msg.Site} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
+                        <p:selectOneMenu id="site" value="#{auditUserCaseController.selected.siteUid}" filter="true" required="true" requiredMessage="#{msg.Site} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{auditUserCaseController.getSiteByTenant()}" var="entry" itemLabel="#{entry.name}" itemValue="#{entry.uid}"/>
                         </p:selectOneMenu>
@@ -30,7 +30,7 @@
                             <p:ajax event="change" update="target"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <!--<f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.zone} - #{entry.version}" itemValue="#{entry.uid}"/>-->
-                            <f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.type == 1 ? entry.zone.concat('-').concat(entry.version) : '质控'}" itemValue="#{entry.uid}"/>
+                            <f:selectItems value="#{auditUserCaseController.getAllSystemCase()}" var="entry" itemLabel="#{entry.type == 1 ? entry.versionNumber : '质控'}" itemValue="#{entry.uid}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>

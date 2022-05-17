@@ -3,14 +3,18 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
         <script type="text/javascript">
             function deleteAfter() {
-               var failureType=document.getElementById("editForm:failureType").innerText
+               var failureType=document.getElementById("editForm:failureType");
                if(failureType!= null ){
-                   if(failureType == 1){
+                   let vl = failureType.value;
+                   if(vl == null){
+                       return ;
+                   }else{
                        PF('failureModal').show();
                    }
                }
@@ -133,7 +137,7 @@
                                     <br/>
                                     <p:spacer></p:spacer>
                                     <p:commandButton style="width: 90px;margin-top: -10px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
-                                    <p:outputLabel id="failureType" style="display: none" value="#{orgInfoController.failureType}"/>
+                                    <h:inputHidden id="failureType" value="#{orgInfoController.failureType}"/>
                                 </p:panelGrid>
 
                                 <h:panelGroup>
@@ -148,9 +152,19 @@
                     </div>
                     <p:dialog id="Active" widgetVar="failureModal" width="350" height="100" modal="true" resizable="true" draggable="true" header="删除确认" closable="true">
 
-                        <p class="p-m-0">该组织下有二维码存在,是否要先删除二维码?</p>
+                        <c:choose>
+                            <c:when test="#{orgInfoController.failureType == 1}">
+                                <p class="p-m-0" >该组织下有二维码存在,是否要先删除二维码?</p>
+                            </c:when>
+                            <c:when test="#{orgInfoController.failureType == 2}">
+                                <p class="p-m-0" >该组织下有用户权限关联,是否要先解除关联?</p>
+                            </c:when>
+                            <c:otherwise>
+                                <p class="p-m-0" >出错了！</p>
+                            </c:otherwise>
+                        </c:choose>
                         <h:panelGrid columns="3">
-                            <p:commandButton process="@this" icon="ui-icon-close" value="删除" actionListener="#{orgInfoController.deleteFailureCode}" update=":editForm" oncomplete="PF('failureModal').hide()" />
+                            <p:commandButton process="@this" icon="ui-icon-close" value="#{orgInfoController.failureType == 1?'删除':'解除'}" actionListener="#{orgInfoController.deleteFailureCode}" update=":editForm" oncomplete="PF('failureModal').hide()" />
                             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('failureModal').hide()"/>
                         </h:panelGrid>
                     </p:dialog>

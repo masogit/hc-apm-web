@@ -15,7 +15,12 @@ import com.ge.apm.service.utils.OrgInfoComparator;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.github.stuxuhai.jpinyin.PinyinException;
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
@@ -31,10 +36,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -63,10 +65,11 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private String siteUid;
 	private Date planTime;
 	private Integer pmType;
-	private Boolean isInsulate;
-	private Integer loginUserOrgType;
-	private UserCommonService userCommonService;
-	//private SupplierRepository supplierDao;
+	@Getter @Setter
+	private PmOrderRule pmOrderRule;
+	//复选的设备
+	@Getter @Setter
+	private Map<String, Boolean> selectedMap;
 	private SupplierService supplierService;
 
     private TenantInfo selectedTenant;
@@ -101,12 +104,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		queryAsset.setRuleStatus(1);// 默认只显示已配置过规则的资产
 		siteUid = user.getSiteUID();
 		//initAssets();
-        userCommonService = WebUtil.getBean(UserCommonService.class);
+		selectedMap = new HashMap<>();
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
-		isInsulate = UserContextService.isInsulate();
-		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
         //initTree(user.getTenantUID());
 		initOrgTree();
@@ -191,10 +192,58 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		return orgInfo.getName();
 	}
 
+	public void onSelectAllOfPage() {
+		boolean isSelectedAll = !assetInfoList.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+		for (AssetInfo item : assetInfoList) {
+			selectedMap.put(item.getUid(), !isSelectedAll);
+		}
+	}
+
+	public void setRuleId() {}
+
+	public List<PmOrderRule> getRuleList(String name) {
+		List<SearchFilter> filter = new ArrayList<>();
+		filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+		filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1, 2, 3)));
+		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
+			filter.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+		}
+		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
+			filter.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
+		}
+		if (queryAsset.getAssetGroup() != null) {
+			filter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+		}
+		if (level != null) {
+			filter.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
+		}
+		if (StringUtils.isNotEmpty(name)) {
+			filter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, name));
+		}
+		List<PmOrderRule> rules = pmOrderRuleRepository.findBySearchFilter(filter);
+		rules.sort(new Comparator<PmOrderRule>() {
+			@Override
+			public int compare(PmOrderRule o1, PmOrderRule o2) {
+				try {
+					String name1 = PinyinHelper.convertToPinyinString(o1.getName(), "", PinyinFormat.WITHOUT_TONE);
+					String name2 = PinyinHelper.convertToPinyinString(o2.getName(), "", PinyinFormat.WITHOUT_TONE);
+					return name1.compareTo(name2);
+				} catch (PinyinException e) {
+					e.printStackTrace();
+					return 0;
+				}
+			}
+		});
+		return rules;
+	}
+
 	public List<AssetInfo> getAssetList() {
 		List<SearchFilter> assetFilters = new ArrayList<>();
 		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
 			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+		}
+		if (null != queryAsset.getRiskGrade()) {
+			assetFilters.add(new SearchFilter("riskGrade", SearchFilter.Operator.EQ, queryAsset.getRiskGrade()));
 		}
 		if (StringUtils.isNotEmpty(queryAsset.getName())) {
 			assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
@@ -218,21 +267,25 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		if(level != null) {
 			List<String> uids = null;
 			if(level == 1) {
-				uids = relRuleAssetRepository.findRuleUid1ByLevelAndTenantUID(user.getTenantUID());
+				uids = pmOrderRule==null ? relRuleAssetRepository.findRuleUid1ByLevelAndTenantUID(user.getTenantUID()) : relRuleAssetRepository.findRuleUid1ByLevelAndTenantUID(user.getTenantUID(),pmOrderRule.getUid());
 				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 			}else if(level == 2) {
-				uids = relRuleAssetRepository.findRuleUid2ByLevelAndTenantUID(user.getTenantUID());
+				uids = pmOrderRule==null ? relRuleAssetRepository.findRuleUid2ByLevelAndTenantUID(user.getTenantUID()) : relRuleAssetRepository.findRuleUid2ByLevelAndTenantUID(user.getTenantUID(),pmOrderRule.getUid());
 				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 			}else if(level == 3) {
-				uids = relRuleAssetRepository.findRuleUid3ByLevelAndTenantUID(user.getTenantUID());
+				uids = pmOrderRule==null ? relRuleAssetRepository.findRuleUid3ByLevelAndTenantUID(user.getTenantUID()) : relRuleAssetRepository.findRuleUid3ByLevelAndTenantUID(user.getTenantUID(),pmOrderRule.getUid());
 				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 			}else if(level == 4){
 				List<SearchFilter> searchFilters=new ArrayList<>();
 				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,user.getTenantUID()));
-				searchFilters.add(new SearchFilter("ruleUID4", SearchFilter.Operator.IsNotNull,null));
+				if(pmOrderRule==null) {
+					searchFilters.add(new SearchFilter("ruleUID4", SearchFilter.Operator.IsNotNull,null));
+				} else {
+					searchFilters.add(new SearchFilter("ruleUID4", SearchFilter.Operator.EQ,pmOrderRule.getUid()));
+				}
 				List<RelRuleAsset> bySearchFilter = relRuleAssetRepository.findBySearchFilter(searchFilters);
 				uids = bySearchFilter.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
 				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
@@ -284,6 +337,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void addFilter(){
 		assetInfoList.clear();
 		assetInfoList = getAssetList();
+		selectedMap = new HashMap<>();
+		for(AssetInfo assetInfo : assetInfoList) {
+			selectedMap.put(assetInfo.getUid(),true);
+		}
 		filterAssetInfoList();
 		total = assetInfoList.size();
 	}
@@ -361,8 +418,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			WebUtil.addErrorMessage(WebUtil.getMessage("AssetsIsBlank"));
 			return;
 		}
+		Set selectedAssetUid = selectedMap.keySet();
+		if(CollectionUtils.isEmpty(selectedAssetUid)) {
+			WebUtil.addErrorMessage("请勾选设备！");
+		}
+		List<AssetInfo> targetAssets = assetInfoList.stream().filter(assetInfo -> selectedAssetUid.contains(assetInfo.getUid()) && selectedMap.get(assetInfo.getUid())).distinct().collect(Collectors.toList());
 		List<AssetRuleModel> models = new ArrayList<>();
-		List<AssetInfo> targetAssets = assetInfoList.stream().distinct().collect(Collectors.toList());
 		if(targetAssets.size() == 1) {
 			AssetInfo ai = targetAssets.get(0);
 			if(ai.getClinicalDeptId() == null) {
@@ -463,9 +524,9 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	}
 
-	public void removeItem(String uid){
+/*	public void removeItem(String uid){
 		assetInfoList = assetInfoList.stream().filter( assetInfo -> !assetInfo.getUid().equals(uid)).collect(Collectors.toList());
-	}
+	}*/
 
 	public String getName(AssetInfo assetInfo){
 		return StringUtils.isEmpty(assetInfo.getName()) ? "  " : assetInfo.getName();

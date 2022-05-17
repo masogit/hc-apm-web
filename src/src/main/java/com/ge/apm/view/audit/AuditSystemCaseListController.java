@@ -75,6 +75,13 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
                             scoreNum=score.add(scoreStandard).doubleValue();
                             paymentNum++;
                         }else {
+                            String parentUid = auditSystemEntry.getParentUid();
+                            AuditSystemEntry data = auditSystemEntryRepository.findByUid(parentUid);
+                            if(data!=null && data.getType()==1){
+                                BigDecimal score = new BigDecimal(scoreNum);
+                                BigDecimal scoreStandard = new BigDecimal(auditSystemEntry.getScoreStandard()==null ? 0D :auditSystemEntry.getScoreStandard());
+                                scoreNum=score.add(scoreStandard).doubleValue();
+                            }
                             targetNum++;
                         }
                     }
@@ -108,7 +115,6 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
         try {
             AuditSystemCaseNew= dao.save(AuditSystemCaseNew);
             createEventSysytemCase("ADD_SYSTEM_CASE", AuditSystemCaseNew, "success");
-            WebUtil.addSuccessMessage(WebUtil.getMessage("saveSuccess"));
         } catch (Exception e){
             createEventSysytemCase("ADD_SYSTEM_CASE", AuditSystemCaseNew, "fail");
             WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));
@@ -152,7 +158,6 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
         try {
             systemEntry = auditSystemEntryRepository.save(auditSystemEntry);
             createEventSysytemEntry("ADD_SYSTEM_ENTRY", systemEntry, "success");
-            WebUtil.addSuccessMessage(WebUtil.getMessage("saveSuccess"));
         } catch (Exception e){
             createEventSysytemEntry("ADD_SYSTEM_ENTRY", systemEntry, "fail");
             WebUtil.addErrorMessage(WebUtil.getMessage("save") + WebUtil.getMessage("FAILED"));
@@ -196,9 +201,18 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
     public void deleteAction() {
         if(selected.getStatus()==1){
             try {
+                String caseUid = selected.getUid();
+                List<AuditSystemEntry> systemEntries = auditSystemEntryRepository.findByCaseUid(caseUid);
+                if (systemEntries!=null && !systemEntries.isEmpty()){
+                    for (AuditSystemEntry auditSystemEntry :systemEntries){
+                        auditEntryTemplateRelRepository.deleteByEntryUid(auditSystemEntry.getUid());
+                        auditEntryItemRelRepository.deleteBySystemEntryUid(auditSystemEntry.getUid());
+                    }
+                    auditSystemEntryRepository.deleteByCaseUid(caseUid);
+                }
+                auditTargetRepository.deleteBySystemCaseUid(caseUid);
                 dao.delete(selected);
                 createEventSysytemCase("DELETE_SYSTEM_CASE", selected, "success");
-                WebUtil.addSuccessMessage(WebUtil.getMessage("deleteSuccess"));
             } catch (Exception e){
                 createEventSysytemCase("DELETE_SYSTEM_CASE", selected, "fail");
                 WebUtil.addErrorMessage(WebUtil.getMessage("delete") + WebUtil.getMessage("FAILED"));
@@ -214,18 +228,18 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
         }
 
     }
-    public void listAction(AuditSystemCase auditSystemCase) {
+    public void listAction() {
         try {
-            if(auditSystemCase.getUid()!=null){
-                auditSystemCase.setStatus(3);
-                dao.save(auditSystemCase);
+            if(selected.getUid()!=null){
+                selected.setStatus(3);
+                dao.save(selected);
             }
-            createEventSysytemCase("EXPIRE_SYSTEM_CASE", auditSystemCase, "success");
-            WebUtil.addSuccessMessage(WebUtil.getMessage("expireSuccess"));
+            createEventSysytemCase("EXPIRE_SYSTEM_CASE", selected, "success");
         } catch (Exception e){
-            createEventSysytemCase("EXPIRE_SYSTEM_CASE", auditSystemCase, "fail");
+            createEventSysytemCase("EXPIRE_SYSTEM_CASE", selected, "fail");
             WebUtil.addErrorMessage(WebUtil.getMessage("expire") + WebUtil.getMessage("FAILED"));
         }
+        this.selected=null;
     }
     private void createEventSysytemCase(String eventType, AuditSystemCase auditSystemCase, String result){
         AuditEvent event = new AuditEvent();

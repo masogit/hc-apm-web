@@ -28,7 +28,7 @@
 						  	 <label class="label" >#{msg.ruleLevel}<c:if test="#{!generatePmOrdersController.findCustomTenant().equals('3')}">*</c:if></label>
 
 						   <p:selectOneMenu id="level" value="#{generatePmOrdersController.level}" required="#{!generatePmOrdersController.findCustomTenant().equals('3')}" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
-							   <p:ajax listener="#{generatePmOrdersController.addSelected()}" process="@this" />
+							   <p:ajax listener="#{generatePmOrdersController.addSelected()}" update="SelectedPmOrderRule" process="@this" />
 							   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                <c:if test="#{generatePmOrdersController.getPmRule()}">
                                    <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -37,6 +37,16 @@
                                    <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                </c:if>
 						   </p:selectOneMenu>
+					   </h:panelGroup>
+
+					   <h:panelGroup id="SelectedPmOrderRule">
+						   <label class="label">#{msg.PmOrderRule}</label>
+						   <p:autoComplete value="#{generatePmOrdersController.pmOrderRule}" dropdown="true" scrollHeight="300" rendered="#{generatePmOrdersController.level > 0}"
+										   forceSelection="true" completeMethod="#{generatePmOrdersController.getRuleList}"
+										   var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="pmOrderRuleConverter">
+							   <p:ajax process="@this" event="itemSelect" listener="#{generatePmOrdersController.setRuleId()}"/>
+							   <p:ajax process="@this" listener="#{generatePmOrdersController.setRuleId()}"/>
+						   </p:autoComplete>
 					   </h:panelGroup>
 
 					   <h:panelGroup>
@@ -75,6 +85,13 @@
 							 </p:inputText>
 						 </h:panelGroup>
 
+					   <h:panelGroup>
+						   <label class="label">#{msg.riskGrade}</label>
+						   <p:selectOneMenu id="riskGrade" value="#{generatePmOrdersController.queryAsset.riskGrade}">
+							   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+							   <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+						   </p:selectOneMenu>
+					   </h:panelGroup>
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.assetGroup}</label>
 		                     <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.assetGroup}">
@@ -126,6 +143,17 @@
 				<h:panelGroup id = "AssetsPickList"/>
 			<p:fieldset id="dataTable" legend="#{msg.totalAsset}#{generatePmOrdersController.total}#{msg.SeeMoreAsset}" >
 				<p:dataTable id="dataScroller" var="item" value="#{generatePmOrdersController.assetInfoList}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}">
+					<p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+					<p:column width="36"  id="checkBoxColumn">
+						<p:selectBooleanCheckbox value="#{generatePmOrdersController.selectedMap[item.uid]}"  class="selectCheckBox">
+							<p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+						</p:selectBooleanCheckbox>
+						<f:facet name="header"  >
+							<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+								<p:ajax listener="#{generatePmOrdersController.onSelectAllOfPage}" update="@(.selectCheckBox) :GeneratePmOrderForm:dataScroller" oncomplete="updateSelectAllCheckBox();"/>
+							</p:selectBooleanCheckbox>
+						</f:facet>
+					</p:column>
 					<p:column headerText="#{msg.AssetName}">
 						<h:outputText value="#{generatePmOrdersController.getName(item)}" />
 					</p:column>
@@ -141,10 +169,10 @@
 					<p:column headerText="#{msg.ManufacturerSerialNumber}" >
 						<h:outputText value="#{generatePmOrdersController.getSeriaNum(item)}" />
 					</p:column>
-					<p:column headerText="#{msg.Operation}" >
+<!--					<p:column headerText="#{msg.Operation}" >
 						<p:commandButton actionListener="#{generatePmOrdersController.removeItem(item.uid)}" update=":GeneratePmOrderForm:dataTable"
                                          icon="ui-icon-close" style="zoom: 0.7"/>
-					</p:column>
+					</p:column>-->
 
 				</p:dataTable>
 			</p:fieldset>
@@ -228,6 +256,20 @@
         </h:form>
         </div>
       </div>
-        
+		<script type="text/javascript">
+			function updateSelectAllCheckBox() {
+				var checkboxlist = $(".selectCheckBox");
+				var selectAllstatus = true;
+				checkboxlist.each(function () {
+					selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked ;
+				});
+				$("#GeneratePmOrderForm\\:dataTable\\:dataScroller\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+				if (selectAllstatus) {
+					$(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+				} else {
+					$(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+				}
+			}
+		</script>
     </ui:define>
 </ui:composition>

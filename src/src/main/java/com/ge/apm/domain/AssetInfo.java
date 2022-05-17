@@ -6,16 +6,13 @@ import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
-import jdk.nashorn.internal.runtime.AllocationStrategy;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Formula;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.format.annotation.DateTimeFormat;
 import webapp.framework.util.TimeUtil;
 
 import javax.persistence.*;
@@ -469,6 +466,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "is_pm")
     private Boolean isPm = Boolean.TRUE;//是否保养
 
+    @Column(name = "is_fixed")
+    private Boolean isFixed = Boolean.TRUE;//是否固定资产
+
     @Column(name = "is_checked")
     private Boolean isChecked = Boolean.TRUE;//是否盘点
 
@@ -670,7 +670,15 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     private String errorMessage;
     @Transient
+    @Getter
+    @Setter
+    private String branchIds;
+    @Transient
     private String aet;
+    @Transient
+    @Getter
+    @Setter
+    private Integer rank;
     @Transient
     private Date studydate;
     @Transient
@@ -2009,6 +2017,10 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setIsPm(Boolean isPm) {
         this.isPm = isPm;
     }
+
+    public Boolean getIsFixed() { return isFixed; }
+
+    public void setIsFixed(Boolean isFixed) { this.isFixed = isFixed; }
 
     public Boolean getIsChecked() {
         return isChecked;

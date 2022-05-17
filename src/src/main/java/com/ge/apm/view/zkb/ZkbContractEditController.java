@@ -168,6 +168,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         zkbContractAssetList = new ArrayList<>();
     }
 
+
     public void fourInOneFlagChange(){
         if(fourInOneFlag){
             zkbContractCatSelected.setSnNo(CopyByInvok.FOUR_TO_ONE);

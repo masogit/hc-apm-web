@@ -1240,6 +1240,20 @@ public class NurseSiteMaintainService {
 	}
 
 	public boolean completeMaintain(NurseSiteMaintain tempNurseSiteMaintain,Date date,UserAccount user) {
+		Calendar calendar1 = Calendar.getInstance();
+		Calendar calendar2 = Calendar.getInstance();
+		calendar1.setTime(date);
+		calendar2.setTime(tempNurseSiteMaintain.getScheduleDate());
+		boolean delayNextMonth =  calendar1.get(Calendar.MONTH)>calendar2.get(Calendar.MONTH) ? true : false;
+		if(delayNextMonth) {
+			UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+			if(userContextService.accessContainsOfJiangNing()) {  //江宁医院，delay到下个月，只有科长（医学工程处主任）才能补单
+				if(!userContextService.hasRole("AssetHead")) {
+					WebUtil.addErrorMessage("超过补单时间！");
+					return false;
+				}
+			}
+		}
 		Set<String> setMaintainIds = new HashSet<String>();
 		Set<String> setMaintainItemIds = new HashSet<String>();
 		Set<String> setMaintainDataIds = new HashSet<String>();
@@ -1389,9 +1403,14 @@ public class NurseSiteMaintainService {
 
 	@Transactional
 	public boolean updateMaintainConfig(NurseSiteMaintainConfig tempConfig, UserAccount currentUser, List<AssetInfo> listCheckAssets) {
+		// 记录‘修改将来未完成检查’时间参照点
+		if(tempConfig.getApplyFeatureData()){
+			tempConfig.setApplyFeatureTime(new Date());
+		}
+
 		save(tempConfig);
 		saveConfigChildren(tempConfig, listCheckAssets);
-		if (tempConfig.getApplyDirectly()) {
+		if (tempConfig.getApplyDirectly() || tempConfig.getApplyFeatureData()) {
 //			updateUnCheckedMaintainData(tempConfig, currentUser, 0, listCheckAssets);
 			addBatchJob("update",tempConfig, null, null, currentUser.getUid(),null);
 		}

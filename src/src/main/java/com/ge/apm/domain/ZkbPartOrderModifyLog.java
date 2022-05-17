@@ -61,6 +61,16 @@ public class ZkbPartOrderModifyLog {
     @Column(name = "part_name")
     private String partName;
 
+    private String needLetterFlag;
+
+    public String getNeedLetterFlag() {
+        return needLetterFlag;
+    }
+
+    public void setNeedLetterFlag(String needLetterFlag) {
+        this.needLetterFlag = needLetterFlag;
+    }
+
     public String getId() {
         return id;
     }

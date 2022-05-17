@@ -1,18 +1,17 @@
 package com.ge.apm.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
+import com.ge.apm.domain.AssetInfo;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.domain.AssetInfo;
-
 import webapp.framework.dao.GenericRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
@@ -110,6 +109,11 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "select * from asset_info a where a.is_deleted = false and a.serial_num ILIKE ?1 and a.site_uid=?2 " +
             "and (a.measure_grade <> 4 or a.measure_grade is null) order by a.id desc " , nativeQuery = true)
     public List<AssetInfo> getBySerialNumAndSiteUID_ForDbTable(String serialNum, String siteUID);
+
+    //excel 报表导出需要忽略大小写 所以使用jpa原生sql 加了ILIKE关键字( getBySerialNumAndSiteUID 方法是原本的业务)
+    @Query(value = "select * from asset_info a where a.is_deleted = false and a.qr_code ILIKE ?1 and a.site_uid=?2 " +
+            "and (a.measure_grade <> 4 or a.measure_grade is null) order by a.id desc " , nativeQuery = true)
+    public List<AssetInfo> getByQrCodeAndSiteUID_ForDbTable(String serialNum, String siteUID);
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and (a.name like concat('%',?2,'%') or a.name_py_code like concat('%',?2,'%'))order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);
@@ -299,4 +303,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
             "left join tenant_info t on t.uid = a.tenant_uid " +
             "where t.type ='3' and (q.is_qr_code != true or q.is_qr_code is null) and a.system_id like '0824%' and a.tenant_uid = ?1", nativeQuery = true)
     List<AssetInfo> queryAssetByZkbQrCode(String tenantUid);
+
+    //@Query(value = "with recursive cte as ( select id, name, parent_asset_id as pid, cast(id as text )as branch,function_type,serial_num,depart_num,asset_group,asset_dept_id,clinical_dept_name,manufacture,vendor from asset_info a where id in (?1) union all select origin.id, origin.name, cte.id as pid, cast(cte.branch as text) || '~' || origin.id,origin.function_type,origin.serial_num,origin.depart_num,origin.asset_group,origin.asset_dept_id,origin.clinical_dept_name,origin.manufacture,origin.vendor from cte join asset_info as origin on origin.parent_asset_id = cte.id ) select id,name, pid, branch, (length(branch)-length(replace(branch, '~', ''))) as rank,function_type,serial_num,depart_num,asset_group,asset_dept_id,clinical_dept_name,manufacture,vendor from cte order by branch; ",nativeQuery = true)
+    @Query(value = "with recursive cte as ( select id, name, parent_asset_id as pid, cast(id as text )as branch from asset_info a where id in (?1) union all select origin.id, origin.name, cte.id as pid, cast(cte.branch as text) || '~' || origin.id from cte join asset_info as origin on origin.parent_asset_id = cte.id ) select id,name, pid, branch, (length(branch)-length(replace(branch, '~', ''))) as rank from cte order by branch; ",nativeQuery = true)
+    List<Object> findParentAndChildrenAsset1(Set<Integer> rootIds);
 }

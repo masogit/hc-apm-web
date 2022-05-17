@@ -6,8 +6,8 @@
 package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONPath;
-import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
@@ -19,7 +19,6 @@ import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
@@ -55,6 +54,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
+import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.LoggerFactory;
@@ -78,6 +78,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -129,6 +131,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<PmOrderRuleCheckList> pmOrderRuleCheckList;
     private ServiceRequestApiService serviceRequestApiService;
     private PmOrderRuleRepository pmOrderRuleRepository;
+    private RelRuleAssetRepository relRuleAssetRepository;
     private String token;
     private List<UnstructuredDataCollection> unDataCollection;
     private UnstructuredDataCollection unCollection;
@@ -458,7 +461,117 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
         });
     }
+    @Override
+    public void onFilter(FilterEvent event){
+        Map<String, Object> filters = event.getFilters();
+        Object ruleNameObj = filters.get("ruleName");
+        Object periodObj = filters.get("period");
+        filters.keySet().removeIf(key->(key.equals("ruleName")||key.equals("period")));
+        removeFilterOnFields();
+        List<V2_PmOrder> pmOrders = dao.findBySearchFilter(filterArrayList);
+        super.onFilter(event);
+        if((ruleNameObj != null || periodObj != null) && CollectionUtils.isNotEmpty(pmOrders)) {
+            filterRuleNameOrPeriod(ruleNameObj, periodObj,pmOrders);
+        }
+    }
 
+    private void removeFilterOnFields() {
+        removeFilterOnField("id");
+        removeFilterOnField("assetInfo.name");
+        removeFilterOnField("assetInfo.serialNum");
+        removeFilterOnField("assetInfo.departNum");
+        removeFilterOnField("assetInfo.functionType");
+        removeFilterOnField("ruleLevel");
+        removeFilterOnField("pmType");
+        removeFilterOnField("creatorName");
+        removeFilterOnField("ownerName");
+        removeFilterOnField("pmNum");
+        removeFilterOnField("currentStepName");
+        removeFilterOnField("planTime");
+        removeFilterOnField("endTime");
+    }
+
+    private void filterRuleNameOrPeriod(Object ruleNameObj, Object periodObj,List<V2_PmOrder> pmOrders) {
+        Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(V2_PmOrder::getId, Function.identity(), (o1, o2) -> o2));
+        Set<String> assetUids = pmOrderMap.values().stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
+
+        List<SearchFilter> relRuleAssetFilter = new ArrayList<>();
+        String tenantUid = userContextService.getTenantInfo().getUid();
+
+        relRuleAssetFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUid));
+        relRuleAssetFilter.add(new SearchFilter("assetUID", SearchFilter.Operator.IN,assetUids));
+        List<RelRuleAsset> relRuleAssets = relRuleAssetRepository.findBySearchFilter(relRuleAssetFilter);
+//        Map<String, RelRuleAsset> relRuleAssetMap = relRuleAssets.stream().collect(Collectors.toMap(RelRuleAsset::getAssetUID, Function.identity(), (o1, o2) -> o2));
+
+        Map<String,Map<Integer,String>> assetUidLevelPmRuleUidMap = new HashedMap<>();
+        Set<String> pmRuleuids = new HashSet<>();
+        relRuleAssets.stream().forEach(e ->{
+            Map<Integer,String> levelPmRuleUidMap = new HashedMap<>();
+            if(StringUtils.isNotEmpty(e.getRuleUID())){
+                pmRuleuids.add(e.getRuleUID());
+                levelPmRuleUidMap.put(3,e.getRuleUID());
+            }
+            if(StringUtils.isNotEmpty(e.getRuleUID1())){
+                pmRuleuids.add(e.getRuleUID1());
+                levelPmRuleUidMap.put(1,e.getRuleUID1());
+            }
+            if(StringUtils.isNotEmpty(e.getRuleUID2())){
+                pmRuleuids.add(e.getRuleUID2());
+                levelPmRuleUidMap.put(2,e.getRuleUID2());
+            }
+            if(StringUtils.isNotEmpty(e.getRuleUID4())){
+                pmRuleuids.add(e.getRuleUID4());
+                levelPmRuleUidMap.put(4,e.getRuleUID4());
+            }
+            assetUidLevelPmRuleUidMap.put(e.getAssetUID(),levelPmRuleUidMap);
+        });
+
+        List<SearchFilter> pmRuleFilter = new ArrayList<>();
+        relRuleAssetFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUid));
+        relRuleAssetFilter.add(new SearchFilter("uid", SearchFilter.Operator.IN,pmRuleuids));
+        List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findBySearchFilter(pmRuleFilter);
+        if(ruleNameObj != null){
+            pmOrderRules = pmOrderRules.stream().filter(e -> {
+                if(e.getName() != null){
+                   return e.getName().contains(String.valueOf(ruleNameObj));
+                    }
+                    return false;
+                }
+                ).collect(Collectors.toList());
+        }
+        if(periodObj != null){
+            AtomicInteger period = new AtomicInteger(-1);
+            try{
+                period.set( Integer.parseInt(String.valueOf(periodObj)));
+            }catch (Exception e1){
+                pmOrderRules.clear();
+            }
+            pmOrderRules = pmOrderRules.stream().filter(e ->{
+                if(e.getPeriod() != null){
+                    return e.getPeriod() == period.get();
+                }
+                return false;
+            } ).collect(Collectors.toList());
+        }
+
+        Map<String, PmOrderRule> pmOrderRuleMap = pmOrderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, Function.identity(), (o1, o2) -> o2));
+
+        List<V2_PmOrder> pmOrders1 = pmOrders.stream().filter(e -> {
+            if(e.getAssetUid() != null
+                && assetUidLevelPmRuleUidMap.get(e.getAssetUid()) != null
+                && assetUidLevelPmRuleUidMap.get(e.getAssetUid()).get(e.getRuleLevel()) != null
+                && pmOrderRuleMap.get(assetUidLevelPmRuleUidMap.get(e.getAssetUid()).get(e.getRuleLevel())) != null){
+                    return true;
+            }else {
+                return  false;
+            }
+        }).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(pmOrders1)){
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,pmOrders1.stream().map(V2_PmOrder::getId).collect(Collectors.toSet())));
+        }else{
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,"-1"));
+        }
+    }
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
         System.out.println();
@@ -1426,6 +1539,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         unstructuredDataDao = WebUtil.getBean(UnstructuredDataRepository.class);
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
         pmckLstDao = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         reportDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
@@ -1657,11 +1771,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return tagGroupAssets;
     }
 
-    public void filterOutPm(List<SearchFilter> searchFilters){
-        searchFilters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.NE,true));
-        searchFilters.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,5));
-        searchFilters.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,4));
-        searchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
+    public void filterOutPm(List<SearchFilter> searchFilterList){
+        searchFilterList.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.NE,true));
+        searchFilterList.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,5));
+        searchFilterList.add(new SearchFilter("assetInfo.status", SearchFilter.Operator.NE,4));
+        searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ,true));
     }
 
     public void deleteReporter(String id) {
@@ -1673,35 +1787,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 			CONFIRM(5,"待验收", "Ack"),CLOSE(6,"待关单", "Close"),EVALUATE(7,"待评价", "Rate"),APPROVAL(8, "待审核", "Approval"), MAINTAIN(0, "保养中", "Repair");*/
     Page<V2_PmOrder> result;
 
+    List<SearchFilter> filterArrayList = new ArrayList<>();
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
 
         this.setSearchFilter();
-        removeFilterOnField("currentStepId");
-        removeFilterOnField("currentPersonId");
-        removeFilterOnField("isFinished");
-        removeFilterOnField("dispatchMode");
-        removeFilterOnField("ownerId");
-        removeFilterOnField("approvalStatus");
-        removeFilterOnField("assetInfo.assetOwnerId");
-        removeFilterOnField("assetInfo.assetOwnerId2");
-        removeFilterOnField("assetInfo.assetOwnerId3");
 
         if(queryIndex == 20){
-            filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ,
+            filterOutPm(filterArrayList);
+            filterArrayList.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ,
                 WebUtil.getMessage("Canceled")));
         }
         if(queryIndex==100){
             //from asset detail page
-            filterOutPm(searchFilters);
+            filterOutPm(filterArrayList);
             if (!Strings.isNullOrEmpty(queryAssetUid)) {
-                searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
+                filterArrayList.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
             }
         }
         if(queryIndex==10){
             pmIdList = new ArrayList<>();
-            filterOutPm(searchFilters);
+            filterOutPm(filterArrayList);
             Sort sort= returnSort(pageRequest);
 
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
@@ -1709,7 +1815,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 result  = dao.findBySearchFilter(filters, pageRequest);
             }else{
-                result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+                result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
             }
 //            Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
@@ -1718,15 +1824,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         if(queryIndex==-2){
             pmIdList = new ArrayList<>();
-            searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
+            filterArrayList.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
         if (queryIndex == -1) {//待办
 //            searchFilters = new ArrayList();
             setSearchFilter();
             pmIdList = new ArrayList<>();
-            filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*2+"));
+            filterOutPm(filterArrayList);
+            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, userContextService.getLoginUser().getUid(),"1*2+"));
             List<Sort.Order> orders = new ArrayList<Sort.Order>();
             orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
             orders.add(new   Sort.Order(Sort.Direction.DESC,"pmNum"));
@@ -1748,7 +1854,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 result  = dao.findBySearchFilter(filters, pageRequest);
             }else{
-                result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+                result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
             }
 //            Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
            // result.getContent().forEach(item->pmIdList.add(item.getId()));
@@ -1756,98 +1862,98 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return result;
         }
         if (queryIndex == 2) { //待派工  Assign
-            filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
-            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            filterOutPm(filterArrayList);
+            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
+            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+            filterArrayList.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
             List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
-            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
-            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
-            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
-            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
 
         } else if (queryIndex == 3) {//待接单
-            filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+            filterOutPm(filterArrayList);
+            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             //someone could only access siteA,but assigned with asset on SiteB, therefore "OR" is added saying that one also could see the asset that is assigned to him.
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 31) {//待抢单 dispatch 2表示人工派工或抢单模式 3表示抢单模式 4表示人工派工
             isBatchOp=true;
             //抢单tab中 ,已经派的单但是未被接单人接的单子也要显示出来 (已经派的单状态是Accept，所以也要加进来)
-            filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign", "1*3+"));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept", "1*3+7*"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+7*"));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+            filterOutPm(filterArrayList);
+            filterArrayList.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
+            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign", "1*3+"));
+            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept", "1*3+7*"));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+7*"));
+            filterArrayList.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
             /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+4*"));*/
             //用户必须对其可视范围内的设备都可见,包括打过标签的设备(如果该设备的标签和组绑定了，并且当前用户没有在该组内，那是看不到的)和没有打过标签的设备
             //打过标签的设备(该标签都和组绑定过)
             List<Integer> tagGroupAssets = getTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+"));
+                filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+"));
             } else {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+"));
+                filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+"));
             }
             //没有打过标签的设备
             tagGroupAssets = getNoTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+owner*"));
+                filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+owner*"));
             } else {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+owner*"));
+                filterArrayList.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+owner*"));
             }
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
             //维修责任人数量小于等于1的条件
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
+            filterArrayList.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
 
-            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
         } else if (queryIndex == 6) { //待关单
-            filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
-            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            filterOutPm(filterArrayList);
+            filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
+            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 8) { //待审核
-            filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
+            filterOutPm(filterArrayList);
+            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
             //1表示该pm工单已被提交等待审核
-            searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
-            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            filterArrayList.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 0) { //已计划
-            filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
-            searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
-            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-            searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            filterOutPm(filterArrayList);
+            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
+            filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
+            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 11) { //待验收
-            filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Acceptance"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
-            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+            filterOutPm(filterArrayList);
+            filterArrayList.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Acceptance"));
+            filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
+            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
 
         } else if (queryIndex == 7) { //已关单
 
             if (!userContextService.hasRole("AssetHead") && !userContextService.isPmDispatcher()) {
-                searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+                filterArrayList.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+                filterArrayList.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
             }
-            searchFilters.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已关单"));
-            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
+            filterArrayList.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已关单"));
+            filterArrayList.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
         }
         this.selected = null;
         Sort sort = returnSort(pageRequest);
@@ -1857,7 +1963,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             List<SearchFilter> filters = buildMvsSearchFilter();
             result = dao.findBySearchFilter(filters, pageRequest);
         }else{
-            result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
         }
         currentPagePmOrders = result.getContent();
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
@@ -1885,7 +1991,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<String> orderIds = getVisableMvsAssetSystemId();
         filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
 
-        for (SearchFilter searchFilter :searchFilters) {
+        for (SearchFilter searchFilter : filterArrayList) {
             if ("currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
@@ -2162,25 +2268,28 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
+        filterArrayList.clear();
+        filterArrayList.addAll(searchFilters);
 
             //先获取 filterOrgName-手术科的 uid
           //  List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
            // List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
 
             if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
-                this.updateSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
+                filterArrayList.add((new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*")));
+//                this.updateSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
             } else {
-                searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+//                searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
 
         if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//所属科室
-            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//使用科室
+            filterArrayList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filterArrayList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filterArrayList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filterArrayList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//所属科室
+            filterArrayList.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//使用科室
 
         }
     }
@@ -2297,17 +2406,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void setSearchFilterForOrg(){
+        filterArrayList.removeAll(filterArrayList.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
         if (null != selectSite) {
-            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
+            filterArrayList.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            filterArrayList.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            filterArrayList.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            filterArrayList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
         }
     }
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         this.searchFilters.clear();
+        this.filterArrayList.clear();
         if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             selectSite = (OrgInfo) event.getTreeNode().getData();
         } else {

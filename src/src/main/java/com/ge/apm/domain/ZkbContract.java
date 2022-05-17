@@ -44,6 +44,10 @@ public class ZkbContract implements ChineseName, Serializable {
         Y,N
     }
 
+    public enum AssetQuotaTypeEnum{
+        t,f
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -328,6 +332,22 @@ public class ZkbContract implements ChineseName, Serializable {
 
     @Column(name = "company_code")
     private String companyCode;
+
+    /**
+     * 2022年起探头高低端名额分类
+     * t:是
+     * f:否
+     */
+    @Column(name = "asset_quota_type")
+    private String assetQuotaType;
+
+    public String getAssetQuotaType() {
+        return assetQuotaType;
+    }
+
+    public void setAssetQuotaType(String assetQuotaType) {
+        this.assetQuotaType = assetQuotaType;
+    }
 
     public String getCompanyCode() {
         return companyCode;

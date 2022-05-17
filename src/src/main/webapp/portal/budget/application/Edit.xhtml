@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+
+    <p:dialog id="BudgetApplicationEditDlg" widgetVar="BudgetApplicationEditDialog" modal="true" resizable="false"
+              draggable="true" appendTo="@(body)" width="1000" height="600" onHide="#{budgetController.onSelect()}"
+              header="#{budgetController.CRUDActionName}#{msg.Blank}#{msg.BudgetApplication}">
+        <h:form id="BudgetApplicationEditForm">
+            <h:panelGroup id="display">
+                <p:fieldset legend="#{msg.BudgetInfo}">
+                    <p:panelGrid id="editPanel" columns="4" layout="grid"
+                                 styleClass="ui-panelgrid-blank form-group"
+                                 rendered="#{budgetController.selected != null}">
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.ApplicationNum}</p:outputLabel>
+                            <h:outputText value="#{budgetController.selected.applicationNum}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.ApplicationDept}</p:outputLabel>
+                            <p:inputText id="dept" readonly="true"
+                                         value="#{budgetController.selectedDept.name}"/>
+                            <p:commandButton id="orgEdit" process="@this" icon="fa fa-angle-down"
+                                             class="btn btn-sm popupIconButton"/>
+                            <p:overlayPanel id="popupPanelEdit" widgetVar="varOrgEdit" for="orgEdit" hideEffect="fade"
+                                            style="position: absolute; left: 0; top: 0; width: 300px;"
+                                            dynamic="false" modal="false" dismissable="true">
+                                <p:scrollPanel style="height:300px; border: 0" mode="native">
+                                    <p:tree id="orgTreeEdit" value="#{budgetController.orgTreeEdit}" var="node"
+                                            selectionMode="single" class="tree" style="width:98%; border:0">
+                                        <p:ajax process="@this" event="select"
+                                                update="@parent:dept BudgetApplicationEditForm:budgetAssetlist BudgetApplicationEditForm:saveButton"
+                                                listener="#{budgetController.onSelectTreeNode}"
+                                                oncomplete="PF('varOrgEdit').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
+                            <h:outputText value="#{budgetController.selected.applicant.name}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.ApplicationTotalAmount}</p:outputLabel>
+                            <h:outputText value="#{budgetController.selected.totalAmount}">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                            </h:outputText>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:outputLabel class="label">#{msg.ApplicationDate}</p:outputLabel>
+                            <h:outputText value="#{budgetController.selected.applicationDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+
+                <p:fieldset legend="#{msg.BudgetAssetInfo}">
+                    <p:dataTable id="budgetAssetlist" value="#{budgetController.selected.budgetAssets}"
+                                 var="item" widgetVar="varbudgetAssetDatalist" lazy="true" paginator="true"
+                                 paginatorPosition="top" paginatorAlwaysVisible="true" rowKey="#{item.id}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="5" pageLinks="5" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="5">
+
+                        <p:ajax event="rowEdit" update="budgetAssetlist"/>
+
+                        <p:column headerText="#{msg.StockType}">
+                            <!--                            <p:cellEditor>-->
+                            <!--                                <f:facet name="output">-->
+                            <!--                                    <h:outputText value="#{fieldMsg.fieldValue('budgetStockType', item.stockType)}"/>-->
+                            <!--                                </f:facet>-->
+                            <!--                                <f:facet name="input">-->
+                            <p:selectOneMenu id="stockType" value="#{item.stockType}">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('budgetStockType')}" var="t"
+                                               itemLabel="#{t.value}" itemValue="#{t.msgKey}"/>
+                            </p:selectOneMenu>
+                            <!--                                </f:facet>-->
+                            <!--                            </p:cellEditor>-->
+                        </p:column>
+                        <p:column headerText="#{msg.ProductNumber}">
+                            <h:outputText value="#{item.asset.financingNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.EquipmentName}">
+                            <h:outputText value="#{item.asset.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.AssetBrand}">
+                            <h:outputText value="#{item.asset.assetBrand}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.EquipmentModel}">
+                            <h:outputText value="#{item.asset.assetModel}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Unit}">
+                            <h:outputText value="#{item.asset.unit}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationQuantity}">
+                            <!--                            <p:cellEditor>-->
+                            <!--                                <f:facet name="output">-->
+                            <!--                                    <h:outputText converter="javax.faces.Number" value="#{item.applicationQuantity}"/>-->
+                            <!--                                </f:facet>-->
+                            <!--                                <f:facet name="input">-->
+                            <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0"
+                                           value="#{item.applicationQuantity}">
+                                <p:ajax listener="#{budgetController.calcAmount(item)}"
+                                        update="@this amount BudgetApplicationEditForm"/>
+                            </p:inputNumber>
+                            <!--                                </f:facet>-->
+                            <!--                            </p:cellEditor>-->
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationPrice}">
+                            <!--                            <p:cellEditor>-->
+                            <!--                                <f:facet name="output">-->
+                            <!--                                    <h:outputText value="#{item.applicationPrice}">-->
+                            <!--                                        <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>-->
+                            <!--                                    </h:outputText>-->
+                            <!--                                </f:facet>-->
+                            <!--                                <f:facet name="input">-->
+                            <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="2"
+                                           value="#{item.applicationPrice}">
+                                <p:ajax listener="#{budgetController.calcAmount(item)}"
+                                        update="@this amount BudgetApplicationEditForm"/>
+                            </p:inputNumber>
+                            <!--                                </f:facet>-->
+                            <!--                            </p:cellEditor>-->
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationAmount}">
+                            <h:outputText id="amount" value="#{item.applicationAmount}">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.Actions}" width="50">
+                            <!--                            <p:rowEditor/>-->
+                            <p:commandButton process="@this" icon="ui-icon-close" styleClass="zoom-06"
+                                             title="#{msg.Delete}"
+                                             update="budgetAssetlist BudgetApplicationEditForm:saveButton"
+                                             actionListener="#{budgetController.delBudgetAsset(item)}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.Add}" id="addButton"
+                                             icon="ui-icon-plus" class="btn btn-sm btn-gray zoom-08"
+                                             actionListener="#{budgetController.preAddBudgetAsset}"
+                                             update="AssetSelectDlg BudgetApplicationEditForm:saveButton"
+                                             oncomplete="PF('AssetSelectDialog').show()"
+                                             disabled="#{budgetController.selectedDept eq null}"/>
+                        </f:facet>
+                    </p:dataTable>
+                </p:fieldset>
+
+                <br/>
+                <p:commandButton validateClient="true" actionListener="#{budgetController.save}"
+                                 value="#{msg.Save}" id="saveButton"
+                                 update="display :BudgetApplicationEditDlg searchForm budgetTabView :growl"
+                                 oncomplete="handleSubmit(args, 'BudgetApplicationEditDialog');"
+                                 disabled="#{empty budgetController.selected.budgetAssets}"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}" update="searchForm budgetTabView"
+                                 actionListener="#{budgetController.clearSelected}"
+                                 onclick="PF('BudgetApplicationEditDialog').hide()"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+</html>

@@ -15,46 +15,49 @@
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{msg.AuditUserCase}"/>
             </div>
-            <div class="ui-g-12 card cardTitle">
-                <h:form id="selectForm" style="float: left">
-                    <p:commandButton id="btnTenant" value="#{auditUserCaseController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                    <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
-                        <p:selectOneListbox scrollHeight="300" style="border: none;" value="#{auditUserCaseController.selectedTenant.uid}">
-                            <p:ajax process="@this" event="click" update="selectForm" listener="#{auditUserCaseController.setSelectTenantInfo()}" oncomplete="PF('varPanelTenant').hide();"/>
-                            <f:selectItems value="#{auditUserCaseController.getAllTenant()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                        </p:selectOneListbox>
-                    </p:overlayPanel>
-
-                    <p:commandButton id="btnSite" value="#{auditUserCaseController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                    <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
-                        <p:selectOneListbox scrollHeight="300" style="border: none;" value="#{auditUserCaseController.selectedOrg.uid}">
-                            <p:ajax process="@this" event="click" update="@(.datalist) selectForm" listener="#{auditUserCaseController.setSelectOrgInfo()}" oncomplete="PF('varPanelSite').hide();"/>
-                            <f:selectItems value="#{auditUserCaseController.getSiteByTenantForListPage()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                        </p:selectOneListbox>
-                    </p:overlayPanel>
-                </h:form>
-            </div>
 
             <div class="ui-g-12 card">
                 <h:form id="auditCaseListForm">
                     <p:dataTable id="datalist" class="datalist" value="#{auditUserCaseController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{auditUserCaseController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.uid}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}" rowIndexVar="rowIndex"
-                                 rowsPerPageTemplate="10,20,30,90">
+                                 rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="filter" listener="#{auditUserCaseController.onFilter}" />
 
                         <p:column headerText="#{msg.mark}">
                             <h:outputText value="#{rowIndex + 1}"/>
                         </p:column>
-                        <p:column headerText="省份" filterBy="#{item.auditSystemCase.zone}" filterMatchMode="LIKE">
+                        <p:column headerText="租户" filterBy="#{item.tenantUid}" filterMatchMode="LIKE">
+                            <h:outputText value="#{auditUserCaseController.getTenantName(item.tenantUid)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{auditUserCaseController.selectedTenant.uid}" filter="true" autoWidth="false" style="max-width: 150px;">
+                                    <p:ajax process="@this" event="change" update="siteSelect" listener="#{auditUserCaseController.setSelectTenantInfo()}"/>
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{auditUserCaseController.getAllTenant()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="院区" filterBy="#{item.siteUid}" filterMatchMode="LIKE">
+                            <h:outputText value="#{auditUserCaseController.getSiteNameByUId(item.siteUid)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu id="siteSelect" onchange="PF('varDataList').filter()" filter="true" autoWidth="false" style="max-width: 150px;" >
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{auditUserCaseController.getSiteByTenantForListPage()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="版本编号" filterBy="#{item.auditSystemCase.versionNumber}" filterMatchMode="LIKE" sortBy="#{item.auditSystemCase.versionNumber}">
+                            <h:outputText value="#{item.auditSystemCase.versionNumber}"/>
+                        </p:column>
+                        <p:column headerText="省份" filterBy="#{item.auditSystemCase.zone}" filterMatchMode="LIKE" sortBy="#{item.auditSystemCase.zone}">
                             <h:outputText value="#{item.auditSystemCase.zone}"/>
                         </p:column>
-                        <p:column headerText="版本编号" filterBy="#{item.auditSystemCase.version}" filterMatchMode="LIKE">
+                        <p:column headerText="版本号" filterBy="#{item.auditSystemCase.version}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.auditSystemCase.version}"/>
                         </p:column>
                         <p:column headerText="类型">
@@ -69,32 +72,52 @@
                         <p:column headerText="指标数量">
                             <h:outputText value="#{item.auditSystemCase.targetNum}"/>
                         </p:column>
-                        <p:column headerText="总分值" sortBy="#{item.score}">
+                        <p:column headerText="总分值">
                             <h:outputText value="#{item.auditSystemCase.scoreNum}"/>
                         </p:column>
-                        <p:column headerText="评分方式">
+                        <p:column headerText="目标">
+                            <h:outputText value="#{fieldMsg.fieldValue('targetType', item.targetId)}"/>
+                        </p:column>
+                        <p:column headerText="目标分值">
+                            <h:outputText value="#{item.targetScore}"/>
+                        </p:column>
+                        <p:column headerText="评分方式" sortBy="#{item.auditSystemCase.judgeLogic}">
                             <h:outputText value="#{fieldMsg.fieldValue('Scoring', item.auditSystemCase.judgeLogic)}"/>
+                        </p:column>
+                        <p:column headerText="状态">
+                            <h:outputText value="#{fieldMsg.fieldValue('auditCaseStatus', item.status)}"/>
                         </p:column>
                         <p:column headerText="启用时间" sortBy="#{item.startTime}">
                             <h:outputText value="#{item.startTime}">
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="操作人">
+                        <p:column headerText="操作人" sortBy="#{item.updater}">
                             <h:outputText value="#{item.updater}"/>
                         </p:column>
                         <p:column headerText="更新时间" sortBy="#{item.updateTime}">
-                            <h:outputText value="#{item.updateTime}"/>
+                            <h:outputText value="#{item.updateTime}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.Operation}" exportable="false" width="120" id="operatorColumn">
                             <h:panelGroup>
-                                <p:commandButton value="#{msg.Initialize}" process="@this" actionListener="#{auditUserCaseController.initialize(item.uid)}" update="auditCaseListForm:datalist :growl">
+                                <p:commandButton value="#{msg.Initialize}" disabled="#{item.status == 2}" process="@this" actionListener="#{auditUserCaseController.initialize(item.uid)}" update="auditCaseListForm:datalist :growl">
                                     <p:confirm header="#{msg.InitializeConformation}" message="#{msg.InitializeConformationMsg}" icon="ui-icon-warning" />
+                                </p:commandButton>
+                                <br/><br/>
+                                <p:commandButton value="#{msg.expired}" disabled="#{item.status == 2}" process="@this" actionListener="#{auditUserCaseController.expired(item.uid)}" update="auditCaseListForm:datalist :growl">
+                                    <p:confirm header="#{msg.AuditCaseExpiredConformation}" message="#{msg.AuditCaseExpiredConformationMsg}" icon="ui-icon-warning" />
                                 </p:commandButton>
                             </h:panelGroup>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{auditUserCaseController.prepareCreate}" update=":auditCaseEditDlg" oncomplete="PF('auditCaseEditDialog').show()" />
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="省份版本管理导出"/>
+                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>

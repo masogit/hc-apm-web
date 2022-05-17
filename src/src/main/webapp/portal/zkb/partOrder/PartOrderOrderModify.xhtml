@@ -42,6 +42,14 @@
                                     <label class="label">价格*</label>
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.price}" required="true" requiredMessage="价格 #{msg.ValidationRequire}" />
                                 </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label" >是否需要探头说明函*</label>
+                                    <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.needLetterFlag}" required="true" requiredMessage="是否需要探头说明函 #{msg.ValidationRequire}" >
+                                        <f:selectItem itemLabel="不需要" itemValue="f"/>
+                                        <f:selectItem itemLabel="需要" itemValue="t"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
                             </c:when>
                         </c:choose>
                     </c:when>

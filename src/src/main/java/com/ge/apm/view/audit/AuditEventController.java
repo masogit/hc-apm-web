@@ -23,8 +23,10 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by 503266962
@@ -41,6 +43,9 @@ public class AuditEventController extends GenericCRUDUUIDController<AuditEvent> 
     private List<I18nMessage> eventType;
     private List<I18nMessage> eventResult;
 
+    private List<String> eventTypeKey = Arrays.asList("ENABLE_SYSTEM_CASE", "EXPIRE_SYSTEM_CASE",
+            "ADD_SYSTEM_CASE", "DELETE_SYSTEM_CASE", "ADD_CASE", "INIT_TENANT_AUDIT");
+
     @Override
     protected void init() {
         this.filterBySite = false;
@@ -48,6 +53,7 @@ public class AuditEventController extends GenericCRUDUUIDController<AuditEvent> 
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         eventType = i18nDao.getByMsgType("auditEvent");
         eventResult = i18nDao.getByMsgType("auditEventResult");
+        eventType = eventType.stream().filter(item -> eventTypeKey.contains(item.getMsgKey())).collect(Collectors.toList());
     }
 
     @Override
@@ -57,11 +63,18 @@ public class AuditEventController extends GenericCRUDUUIDController<AuditEvent> 
 
     @Override
     protected Page<AuditEvent> loadData(PageRequest pageRequest) {
-        Sort sort = new Sort(Sort.Direction.DESC, "eventTime");
-        PageRequest page = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
-
         List<SearchFilter> searchFilters = this.searchFilters;
-        Page<AuditEvent> list = dao.findBySearchFilter(searchFilters, page);
+
+        if(searchFilters == null){
+            searchFilters = new ArrayList<>();
+            searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.IN, eventTypeKey));
+        }else{
+            if(!hasFilterOnField("eventType")){
+                searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.IN, eventTypeKey));
+            }
+        }
+
+        Page<AuditEvent> list = dao.findBySearchFilter(searchFilters, pageRequest);
         return list;
     }
 
