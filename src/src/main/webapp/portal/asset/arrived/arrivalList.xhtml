@@ -34,6 +34,9 @@
                         <p:column headerText="#{msg.creatorUID}" sortBy="#{item.creatorUID}" filterBy="#{item.creator.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.creator.name}"/>
                         </p:column>
+                        <p:column headerText="#{msg.arrivalListAgent}" sortBy="#{item.agent}" filterBy="#{item.agent}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.agent}"/>
+                        </p:column>
                         <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalDate}" filterBy="#{item.arrivalDate}" filterMatchMode="GTE" rendered="#{not userContextService.activeSupplier()}">
                             <f:facet name="filter">
                                 <p:inputText id="filterArrivalDate" widgetVar="varFilterArrivalDate" value="#{assetArrivedListController.arrivalFormatTime}"/>
