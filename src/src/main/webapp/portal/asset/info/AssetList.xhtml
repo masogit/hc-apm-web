@@ -662,7 +662,15 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'isFixed'}">
-                                <p:column headerText="#{msg.isFixed}"  >
+                                <p:column headerText="#{msg.isFixed}" sortBy="#{item.isFixed}" filterBy="#{item.isFixed}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                            <f:converter converterId="javax.faces.Boolean" />
+                                            <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{item.isFixed?msg.True2Yes:msg.False2No}"/>
                                 </p:column>
                             </c:if>
