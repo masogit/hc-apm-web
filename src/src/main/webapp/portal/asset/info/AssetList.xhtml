@@ -411,12 +411,24 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'measureGrade'}">
-                                <p:column headerText="#{msg.measureGrade}" >
+                                <p:column headerText="#{msg.measureGrade}" sortBy="#{item.measureGrade}" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'riskGrade'}">
-                                <p:column headerText="#{msg.riskGrade}" >
+                                <p:column headerText="#{msg.riskGrade}" sortBy="#{item.riskGrade}" filterBy="#{item.riskGrade}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', item.riskGrade) : fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
                                 </p:column>
                             </c:if>
@@ -443,7 +455,13 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'measuringItemCategory'}">
-                                <p:column headerText="#{msg.measuringItemCategory}" >
+                                <p:column headerText="#{msg.measuringItemCategory}" sortBy="#{item.measuringItemCategory}" filterBy="#{item.measuringItemCategory}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
                                 </p:column>
                             </c:if>
