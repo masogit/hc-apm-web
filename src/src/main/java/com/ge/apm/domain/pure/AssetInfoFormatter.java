@@ -907,6 +907,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetClass"), this.getAssetClassAsString());
         map.put(getMessage("accountingCategory"), this.getAccountingCategoryAsString());
         map.put(getMessage("isAssetPMed"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? getMessage("true") : getMessage("false"));
+        map.put(getMessage("isFixed"), assetInfo.getIsFixed() == null || assetInfo.getIsFixed() ? getMessage("true") : getMessage("false"));
         map.put(getMessage("isAssetChecked"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? getMessage("true") : getMessage("false"));
 
         map.put(getMessage("assetValueCategory"), this.getAssetValueCategoryName());
