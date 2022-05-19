@@ -402,7 +402,8 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
                     break;
             }
         }
-        return new BigDecimal(approvalProgress).multiply(new BigDecimal(100)).divide(new BigDecimal(totalApprovalProgress), RoundingMode.HALF_UP);
+        return totalApprovalProgress == 0 ? BigDecimal.ZERO : new BigDecimal(approvalProgress).multiply(new BigDecimal(100))
+                .divide(new BigDecimal(totalApprovalProgress), RoundingMode.HALF_UP);
     }
 
     @Override
