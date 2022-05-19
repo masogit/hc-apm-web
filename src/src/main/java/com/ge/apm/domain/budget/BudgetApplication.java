@@ -159,9 +159,6 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
 
-    @Transient
-    private Integer totalApprovalProgress = 0;
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -387,23 +384,25 @@ public class BudgetApplication implements ApprovableTarget, Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public Integer getTotalApprovalProgress() {
+    // 计算审核进度
+    public BigDecimal approvalProgressPercentage() {
+        Integer totalApprovalProgress = 0;
         if (this.approvalConfig != null && this.approvalConfig.getApprovalItem() != null) {
             switch (this.getApplicationStatus()) {
                 case 1:
                 case 2:
-                    this.totalApprovalProgress = JSON.parseObject(this.approvalConfig.getApprovalItem(), new TypeReference<List<ApprovalNode>>() {
+                    totalApprovalProgress = JSON.parseObject(this.approvalConfig.getApprovalItem(), new TypeReference<List<ApprovalNode>>() {
                     }).size();
                     break;
                 case 3:
                 case 4:
-                    this.totalApprovalProgress = this.approvalProgress;
+                    totalApprovalProgress = this.approvalProgress;
                     break;
                 default:
                     break;
             }
         }
-        return totalApprovalProgress;
+        return new BigDecimal(approvalProgress).multiply(new BigDecimal(100)).divide(new BigDecimal(totalApprovalProgress), RoundingMode.HALF_UP);
     }
 
     @Override
