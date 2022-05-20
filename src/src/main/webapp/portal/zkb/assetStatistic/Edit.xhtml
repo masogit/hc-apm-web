@@ -53,11 +53,6 @@
                     <label class="label">#{msg.zkbAssetStatistic_canNotPastReason}</label>
                     <p:inputTextarea   value="#{zkbAssetStatisticController.selected.reason}" required="true" requiredMessage="#{msg.zkbAssetStatistic_canNotPastReason} #{msg.ValidationRequire}"  maxlength="100"/>
                 </h:panelGroup>
-                <h:panelGroup rendered="#{not empty zkbAssetStatisticController.selected.reasonDate}">
-                    <label class="label">修改时间</label>
-                    <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbAssetStatisticController.selected.reasonDate}"
-                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-                </h:panelGroup>
             </p:panelGrid>
             <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="float:left" rendered="#{empty zkbAssetStatisticController.selected.qrCodeCountState or zkbAssetStatisticController.selected.qrCodeCountState eq 'N'}"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbAssetQrCodeInfo').hide()"/>

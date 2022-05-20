@@ -190,13 +190,9 @@ public class ZkbAssetStatisticService {
         String qrCodeCountState = zkbAssetQrCodeInfo.getQrCodeCountState();
         Date date = new Date();
         if(qrCodeCountState == null || qrCodeCountState.equals("N")){
-            if("Y".equals(zkbAssetQrCodeInfo.getCanNotPastQrCode())){
-                zkbAssetQrCodeInfo.setQrCodeCountState("N");
-                zkbAssetQrCodeInfo.setCreatedDate(date);
-            }else if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
+            if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
                 zkbAssetQrCodeInfo.setQrCodeDate(date);
                 zkbAssetQrCodeInfo.setQrCodeCountState("Y");
-                zkbAssetQrCodeInfo.setCreatedDate(date);
                 zkbAssetQrCodeInfo.setQrCodeState(null);
             }else{
                 zkbAssetQrCodeInfo.setQrCodeState(null);
@@ -205,11 +201,11 @@ public class ZkbAssetStatisticService {
                     zkbAssetQrCodeInfo.setQrCodeState("Y");
                     zkbAssetQrCodeInfo.setQrCodeDate(date);
                     zkbAssetQrCodeInfo.setQrCodeCountState("Y");
-                    zkbAssetQrCodeInfo.setCreatedDate(date);
-                }else if(zkbAssetQrCodeInfo.getId() == null || qrCodeCountState == null){//ID == null 则新增记录
-                    zkbAssetQrCodeInfo.setQrCodeCountState("N");
-                    zkbAssetQrCodeInfo.setCreatedDate(date);
                 }
+            }
+            if(zkbAssetQrCodeInfo.getId() == null){//ID == null 则新增记录
+                zkbAssetQrCodeInfo.setQrCodeCountState("N");
+                zkbAssetQrCodeInfo.setCreatedDate(date);
             }
         }
         if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){

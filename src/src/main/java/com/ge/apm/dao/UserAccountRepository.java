@@ -162,7 +162,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Transactional
     @Modifying
-    @Query(value= "update user_account set is_deleted = true where tenant_uid = ?1 ",nativeQuery=true)
+    @Query(value= "update user_account set is_deleted = true, wechat_id = null, wechat_nickname = null, wx_union_id = null, ma_ib_open_id = null where tenant_uid = ?1 ",nativeQuery=true)
     public void deleteTenantUser(String tenantUid);
 
 
