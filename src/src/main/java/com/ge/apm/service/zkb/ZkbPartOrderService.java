@@ -2612,6 +2612,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
                 ZkbPartOrderModifyLog zkbPartOrderModifyLog = new ZkbPartOrderModifyLog();
+                zkbPartOrderModifyLog.setNeedLetterFlag(oldZkbPartOrder.getNeedLetterFlag());
                 zkbPartOrderModifyLog.setOrderNo(oldZkbPartOrder.getOrderNo());
                 zkbPartOrderModifyLog.setPrice(oldZkbPartOrder.getPrice());
                 zkbPartOrderModifyLog.setPartOrderId(oldZkbPartOrder.getId());

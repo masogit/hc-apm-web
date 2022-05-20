@@ -44,7 +44,7 @@
                 <h:outputText value="#{fieldMsg.fieldValue('budgetApplicationStatus', item.applicationStatus)}"/>
             </p:column>
             <p:column headerText="#{msg.ApprovalProgress}">
-                <h:outputText value="#{item.approvalProgress} / #{item.getTotalApprovalProgress()}"/>
+                <h:outputText value="#{item.approvalProgressPercentage()}%"/>
             </p:column>
             <p:column headerText="#{msg.Approver}" sortBy="#{item.approver.name}"
                       filterBy="#{item.approver.name}" filterMatchMode="LIKE">

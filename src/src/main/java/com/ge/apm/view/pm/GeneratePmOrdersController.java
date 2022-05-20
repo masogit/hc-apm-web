@@ -337,6 +337,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void addFilter(){
 		assetInfoList.clear();
 		assetInfoList = getAssetList();
+		selectedMap = new HashMap<>();
+		for(AssetInfo assetInfo : assetInfoList) {
+			selectedMap.put(assetInfo.getUid(),true);
+		}
 		filterAssetInfoList();
 		total = assetInfoList.size();
 	}
