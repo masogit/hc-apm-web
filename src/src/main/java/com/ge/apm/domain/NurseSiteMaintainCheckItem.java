@@ -2,19 +2,9 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
@@ -76,6 +66,13 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 	
 	@Column(name="key")
 	private Long key;
+
+	@Column(name = "deleted")
+	private Boolean deleted;
+
+	// 删除结果，用于定时任务删除已创建未完成的将来工单
+	@Column(name = "delete_result")
+	private Boolean deleteResult;
 
 	public String getId() {
 		return id;
@@ -173,6 +170,22 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 		this.key = key;
 	}
 
+	public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public Boolean getDeleteResult() {
+		return deleteResult;
+	}
+
+	public void setDeleteResult(Boolean deleteResult) {
+		this.deleteResult = deleteResult;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = 0;
@@ -214,5 +227,15 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 			LOGGER.error(e.getMessage());
 		}
 		return temp;
+	}
+
+	@PrePersist
+	public void initializeUid() {
+		if (id == null) {
+			id = UUID.randomUUID().toString().replace("-", "");
+		}
+		if (deleted == null) {
+			deleted = false;
+		}
 	}
 }

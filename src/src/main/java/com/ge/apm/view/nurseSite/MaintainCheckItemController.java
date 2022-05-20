@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -14,6 +15,7 @@ import javax.faces.context.FacesContext;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
@@ -33,8 +35,6 @@ import com.ge.apm.dao.NurseSiteMaintainCheckItemRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.MaintainDataPair;
 import com.ge.apm.domain.NurseSiteMaintainCheckItem;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserAuth;
@@ -56,6 +56,7 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     private UserAccount currentUser;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private NurseSiteMaintainCheckItemRepository dao;
+    private List<NurseSiteMaintainCheckItem> listSelected;
   	
 
     @Override
@@ -80,6 +81,7 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
         }
         //need list or set
 		this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*"));
+		this.updateSearchFilter(new SearchFilter("deleted", SearchFilter.Operator.EQ, false));
         Page<NurseSiteMaintainCheckItem> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
         return pageResult;
     }
@@ -106,9 +108,21 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     
     @Override
     public void delete() {
-    	// TODO Auto-generated method stub
-    	super.delete();
-    }
+
+		if(CollectionUtils.isEmpty(listSelected)){
+			WebUtil.addErrorMessage("请至少选择一条数据！");
+			return;
+		}
+
+		listSelected = listSelected.stream().map(item -> {
+			item.setDeleteResult(false);
+			item.setDeleted(true);
+			item.setModifyByUid(currentUser.getUid());
+			item.setModifyDate(new Date());
+			return item;
+		}).collect(Collectors.toList());
+		nurseSiteMaintainService.deleteCheckItem(listSelected, currentUser.getUid());
+	}
 	
 	@Override
 	protected String getActionMessage(String actionName) {
@@ -134,5 +148,18 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 		FacesMessage message = new FacesMessage(str,null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
-	
+
+
+	public List<NurseSiteMaintainCheckItem> getListSelected() {
+		return listSelected;
+	}
+
+	public void setListSelected(List<NurseSiteMaintainCheckItem> listSelected) {
+		if (listSelected != null && listSelected.size() == 1) {
+			this.selected = listSelected.get(0);
+		} else {
+			this.selected = null;
+		}
+		this.listSelected = listSelected;
+	}
 }

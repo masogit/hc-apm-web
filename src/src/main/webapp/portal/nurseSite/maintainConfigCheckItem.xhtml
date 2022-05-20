@@ -13,18 +13,20 @@
             <div class="ui-g-12 card ">
                 <h:form id="maintainConfigCheckItemListForm">
                     <p:dataTable id="datalist" value="#{maintainCheckItemController.lazyModel}" var="item" widgetVar="varDataList"
-                        selection="#{maintainCheckItemController.selected}" selectionMode="single" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                        selection="#{maintainCheckItemController.listSelected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                         rowKey="#{item.id}" sortOrder="descending" sortBy="#{item.id}"
                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
                			<!--<p:column selectionMode="single" style="width:32px;text-align:center" exportable="false">
 						</p:column>-->
+                        <p:column selectionMode="multiple" style="width:32px;text-align:center" exportable="false">
+                        </p:column>
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
-						<!-- <p:ajax event="rowSelectCheckbox" update="createButton editButton deleteButton" />
+						<p:ajax event="rowSelectCheckbox" update="createButton editButton deleteButton" />
 						<p:ajax event="rowUnselectCheckbox" update="createButton editButton deleteButton" />
-						<p:ajax event="toggleSelect" update="createButton editButton deleteButton"/> -->
+						<p:ajax event="toggleSelect" update="createButton editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{maintainCheckItemController.onFilter}" />
-                
+
                         <p:column headerText="检查项" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}" />
                         </p:column>
@@ -52,8 +54,9 @@
                                 actionListener="#{maintainCheckItemController.prepareCreate}" update=":maintainConfigcheckItemEditDlg"
                                 oncomplete="PF('maintainConfigcheckItemEditDlg').show()"/>
                             <p:commandButton id="editButton" actionListener="#{maintainCheckItemController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
-                                update="maintainConfigcheckItemEditDlg" oncomplete="PF('maintainConfigcheckItemEditDlg').show()" disabled="#{empty maintainCheckItemController.selected}"/>
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"  disabled="#{empty maintainCheckItemController.selected}"
+                                update="maintainConfigcheckItemEditDlg" oncomplete="PF('maintainConfigcheckItemEditDlg').show()"
+                                disabled="#{(empty maintainCheckItemController.listSelected) or (maintainCheckItemController.listSelected.size()>1)}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"  disabled="#{empty maintainCheckItemController.listSelected}"
                                 actionListener="#{maintainCheckItemController.delete}" update=":maintainConfigCheckItemListForm:datalist">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
                             </p:commandButton>

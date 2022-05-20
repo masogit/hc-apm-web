@@ -2015,6 +2015,12 @@ public class NurseSiteMaintainService {
 		}
 	}
 
+	public void deleteCheckItem(List<NurseSiteMaintainCheckItem> list, String userUid){
+		nurseSiteMaintainCheckItemRepository.save(list);
+		addBatchJob("deleteCheckItem", null, null, null, userUid,null);
+
+	}
+
 	// private void formatExistMaintainDate(){
 	// List<Date> tempList=new ArrayList<Date>();
 	// for(int i=0;i<existMaintainDate.size();++i){

@@ -33,4 +33,7 @@ public interface NurseSiteMaintainConfigRepository extends GenericRepositoryUUID
 	@Modifying
 	@Query(value = "delete from nurse_site_maintain_config where id in ?1", nativeQuery = true)
 	public void deleteMaintainConfigData(Set<String> ids);
+
+	@Query(value="select o.* from nurse_site_maintain_config o where o.check_items_detail like concat('%',?1,'%')",nativeQuery=true)
+	public List<NurseSiteMaintainConfig> findByCheckItem(String checkItemId);
 }

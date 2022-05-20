@@ -1,5 +1,7 @@
 package com.ge.apm.job;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import javaslang.Tuple2;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -24,20 +26,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.domain.BatchJob;
-import com.ge.apm.domain.NurseSiteMaintain;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.NurseSiteMaintainConfigItem;
-import com.ge.apm.domain.NurseSiteMaintainData;
-import com.ge.apm.domain.NurseSiteMaintainItem;
-import com.ge.apm.dao.BatchJobRepository;
-import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
-import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
-import com.ge.apm.dao.NurseSiteMaintainDataRepository;
-import com.ge.apm.dao.NurseSiteMaintainItemRepository;
-import com.ge.apm.dao.NurseSiteMaintainRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -74,6 +64,9 @@ public class NurseSiteMaintainJob {
 
     @Autowired
     NurseSiteMaintainService nurseSiteMaintainService;
+
+    @Autowired
+    NurseSiteMaintainCheckItemRepository nurseSiteMaintainCheckItemRepository;
 
     @Scheduled(cron = "5/20 * * * * *")
     public void execute() {
@@ -131,6 +124,8 @@ public class NurseSiteMaintainJob {
                 doJobDelete(params);
             } else if ("dailyUpdate".equals(action)) {
                 doJobDailyUpdate(content);
+            } else if ("deleteCheckItem".equals(action)) {
+                doJobDeleteCheckItem(params);
             }
         }
         firstJob.setProcessEndTime(new Date());
@@ -498,6 +493,69 @@ public class NurseSiteMaintainJob {
             tempItem.setStatus(0);
         });
         return tempNurseSiteMaintain;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void doJobDeleteCheckItem(String[] params){
+        List<NurseSiteMaintainCheckItem> list = nurseSiteMaintainCheckItemRepository.findByStatus();
+
+        if(CollectionUtils.isEmpty(list)){
+            return;
+        }
+
+        String userUid = params[3];
+
+        Set<NurseSiteMaintainConfig> configIdLSet = new HashSet<>();
+        List<String> itemIdList = new ArrayList<>();
+        for (NurseSiteMaintainCheckItem item : list) {
+            itemIdList.add(item.getId());
+            List<NurseSiteMaintainConfig> configList = nurseSiteMaintainConfigRepository.findByCheckItem(item.getId());
+            if(CollectionUtils.isNotEmpty(configList)){
+                for (NurseSiteMaintainConfig config : configList) {
+                    configIdLSet.add(config);
+                }
+            }
+        }
+
+        if(CollectionUtils.isNotEmpty(configIdLSet)){
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            for (NurseSiteMaintainConfig config : configIdLSet) {
+                Date date = null;
+                try {
+                    date = sdf.parse(sdf.format(new Date()));
+                } catch (ParseException e) {
+                    LOGGER.error("删除检查项配置，日期格式化异常", e);
+                    return;
+                }
+                // 删除将来未完成工单
+                List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findFeatureUncheckedOrder(config.getId(), date);
+                deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
+                // 更新config的checkItemsDetail字段
+                String checkItemsDetail = config.getCheckItemsDetail();
+                if(StringUtils.isNotEmpty(checkItemsDetail)){
+                    JSONArray jsonArray = JSONArray.parseArray(checkItemsDetail);
+                    Iterator<Object> iterator = jsonArray.iterator();
+                    while (iterator.hasNext()) {
+                        JSONObject jsonObject = (JSONObject) iterator.next();
+                        if(jsonObject != null && StringUtils.isNotEmpty(jsonObject.getString("id"))
+                            && itemIdList.contains(jsonObject.getString("id"))) {
+                            iterator.remove();
+                        }
+                    }
+                    String newCheckItem = jsonArray.toJSONString();
+                    config.setCheckItemsDetail(newCheckItem);
+                    config.setModifyByUid(userUid);
+                    config.setModifyDate(new Date());
+                    nurseSiteMaintainConfigRepository.save(config);
+                }
+            }
+        }
+        list = list.stream().map(item -> {
+            item.setDeleteResult(true);
+            item.setModifyByUid(userUid);
+            item.setModifyDate(new Date());
+            return item;
+        }).collect(Collectors.toList());
     }
 
 }
