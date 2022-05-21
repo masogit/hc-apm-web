@@ -197,7 +197,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
 
     //给出当前用户能够访问到的资产
-    @Query(value = "select assetinfo0_.* from asset_info assetinfo0_ where assetinfo0_.is_deleted=false and assetinfo0_.is_valid=true and (assetinfo0_.institution_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)or assetinfo0_.hospital_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)  or assetinfo0_.site_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.clinical_dept_uid in(select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.tenant_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid))",nativeQuery = true)
+    @Query(value = "select distinct ai.* from asset_info ai,user_org uo,user_account ua where ua.uid=uo.user_uid and uo.org_uid in(ai.tenant_uid, ai.institution_uid,ai.hospital_uid,ai.site_uid) and  ua.id =? and ai.is_deleted=false and ai.is_valid=true ",nativeQuery = true)
     public ArrayList<AssetInfo> getUserListByAsset(Integer userId);
 
     @Query(value= "select u.* from asset_info u where u.uid in ?1 ",nativeQuery=true)
