@@ -56,7 +56,6 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     private UserAccount currentUser;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private NurseSiteMaintainCheckItemRepository dao;
-    private List<NurseSiteMaintainCheckItem> listSelected;
   	
 
     @Override
@@ -81,7 +80,6 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
         }
         //need list or set
 		this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*"));
-		this.updateSearchFilter(new SearchFilter("deleted", SearchFilter.Operator.EQ, false));
         Page<NurseSiteMaintainCheckItem> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
         return pageResult;
     }
@@ -108,20 +106,8 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     
     @Override
     public void delete() {
-
-		if(CollectionUtils.isEmpty(listSelected)){
-			WebUtil.addErrorMessage("请至少选择一条数据！");
-			return;
-		}
-
-		listSelected = listSelected.stream().map(item -> {
-			item.setDeleteResult(false);
-			item.setDeleted(true);
-			item.setModifyByUid(currentUser.getUid());
-			item.setModifyDate(new Date());
-			return item;
-		}).collect(Collectors.toList());
-		nurseSiteMaintainService.deleteCheckItem(listSelected, currentUser.getUid());
+		// TODO Auto-generated method stub
+		super.delete();
 	}
 	
 	@Override
@@ -147,19 +133,5 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str,null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
-	}
-
-
-	public List<NurseSiteMaintainCheckItem> getListSelected() {
-		return listSelected;
-	}
-
-	public void setListSelected(List<NurseSiteMaintainCheckItem> listSelected) {
-		if (listSelected != null && listSelected.size() == 1) {
-			this.selected = listSelected.get(0);
-		} else {
-			this.selected = null;
-		}
-		this.listSelected = listSelected;
 	}
 }

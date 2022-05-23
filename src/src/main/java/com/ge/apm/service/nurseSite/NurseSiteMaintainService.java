@@ -1455,15 +1455,20 @@ public class NurseSiteMaintainService {
 	}
 
 	@Transactional
-	public boolean deleteMaintainConfig(NurseSiteMaintainConfig tempConfig) {
-		Integer count = nurseSiteMaintainRepository.fetchCountByConfigId(tempConfig.getId());
-		if (count != null && count > 0) {
-			return false;
-		} else {
-			deleteConfigChildren(tempConfig.getId());
-			delete(tempConfig);
+	public void deleteMaintainConfig(List<NurseSiteMaintainConfig> configList, UserAccount currentUser) {
+
+		for (NurseSiteMaintainConfig tempConfig : configList) {
+			// YHAAO-15742 日常检查--批量删除日常检查设置 批量删除做逻辑删除
+			// deleteConfigChildren(tempConfig.getId());
+			// delete(tempConfig);
+			tempConfig.setDeleted(true);
+			tempConfig.setDeleteResult(false);
+			tempConfig.setModifyByUid(currentUser.getUid());
+			tempConfig.setModifyBy(currentUser);
+			tempConfig.setModifyDate(new Date());
+			this.save(tempConfig);
 		}
-		return true;
+		addBatchJob("deleteCheckConfig", null, null, null, currentUser.getUid(),null);
 	}
 
 	public boolean deleteConfigChildren(String parentId) {
@@ -2013,12 +2018,6 @@ public class NurseSiteMaintainService {
 		if(listModifyConfig.size()>0){
 			nurseSiteMaintainConfigRepository.save(listModifyConfig);
 		}
-	}
-
-	public void deleteCheckItem(List<NurseSiteMaintainCheckItem> list, String userUid){
-		nurseSiteMaintainCheckItemRepository.save(list);
-		addBatchJob("deleteCheckItem", null, null, null, userUid,null);
-
 	}
 
 	// private void formatExistMaintainDate(){

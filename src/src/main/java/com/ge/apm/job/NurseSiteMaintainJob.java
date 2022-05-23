@@ -124,8 +124,8 @@ public class NurseSiteMaintainJob {
                 doJobDelete(params);
             } else if ("dailyUpdate".equals(action)) {
                 doJobDailyUpdate(content);
-            } else if ("deleteCheckItem".equals(action)) {
-                doJobDeleteCheckItem(params);
+            } else if ("deleteCheckConfig".equals(action)) {
+                doJobDeleteConfig(params);
             }
         }
         firstJob.setProcessEndTime(new Date());
@@ -496,66 +496,31 @@ public class NurseSiteMaintainJob {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void doJobDeleteCheckItem(String[] params){
-        List<NurseSiteMaintainCheckItem> list = nurseSiteMaintainCheckItemRepository.findByStatus();
+    public void doJobDeleteConfig(String[] params){
+        List<NurseSiteMaintainConfig> list = nurseSiteMaintainConfigRepository.findByDeletedStatus();
 
         if(CollectionUtils.isEmpty(list)){
             return;
         }
-
         String userUid = params[3];
 
-        Set<NurseSiteMaintainConfig> configIdLSet = new HashSet<>();
-        List<String> itemIdList = new ArrayList<>();
-        for (NurseSiteMaintainCheckItem item : list) {
-            itemIdList.add(item.getId());
-            List<NurseSiteMaintainConfig> configList = nurseSiteMaintainConfigRepository.findByCheckItem(item.getId());
-            if(CollectionUtils.isNotEmpty(configList)){
-                for (NurseSiteMaintainConfig config : configList) {
-                    configIdLSet.add(config);
-                }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        for (NurseSiteMaintainConfig config : list) {
+            Date date = null;
+            try {
+                date = sdf.parse(sdf.format(new Date()));
+            } catch (ParseException e) {
+                LOGGER.error("删除检查项配置，日期格式化异常", e);
+                return;
             }
+            // 删除将来未完成工单
+            List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findUncheckedByConfigAfterToday(config.getId(), date);
+            deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
+            config.setDeleteResult(true);
+            config.setModifyByUid(userUid);
+            config.setModifyDate(new Date());
+            nurseSiteMaintainConfigRepository.save(config);
         }
-
-        if(CollectionUtils.isNotEmpty(configIdLSet)){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            for (NurseSiteMaintainConfig config : configIdLSet) {
-                Date date = null;
-                try {
-                    date = sdf.parse(sdf.format(new Date()));
-                } catch (ParseException e) {
-                    LOGGER.error("删除检查项配置，日期格式化异常", e);
-                    return;
-                }
-                // 删除将来未完成工单
-                List<NurseSiteMaintain> listMaintain = nurseSiteMaintainRepository.findFeatureUncheckedOrder(config.getId(), date);
-                deleteMaintains(listMaintain.stream().map(NurseSiteMaintain::getId).collect(Collectors.toList()));
-                // 更新config的checkItemsDetail字段
-                String checkItemsDetail = config.getCheckItemsDetail();
-                if(StringUtils.isNotEmpty(checkItemsDetail)){
-                    JSONArray jsonArray = JSONArray.parseArray(checkItemsDetail);
-                    Iterator<Object> iterator = jsonArray.iterator();
-                    while (iterator.hasNext()) {
-                        JSONObject jsonObject = (JSONObject) iterator.next();
-                        if(jsonObject != null && StringUtils.isNotEmpty(jsonObject.getString("id"))
-                            && itemIdList.contains(jsonObject.getString("id"))) {
-                            iterator.remove();
-                        }
-                    }
-                    String newCheckItem = jsonArray.toJSONString();
-                    config.setCheckItemsDetail(newCheckItem);
-                    config.setModifyByUid(userUid);
-                    config.setModifyDate(new Date());
-                    nurseSiteMaintainConfigRepository.save(config);
-                }
-            }
-        }
-        list = list.stream().map(item -> {
-            item.setDeleteResult(true);
-            item.setModifyByUid(userUid);
-            item.setModifyDate(new Date());
-            return item;
-        }).collect(Collectors.toList());
     }
 
 }
