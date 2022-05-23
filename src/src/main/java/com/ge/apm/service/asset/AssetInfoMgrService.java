@@ -5,7 +5,10 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
@@ -19,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -50,11 +54,28 @@ public class AssetInfoMgrService {
     private ConfigService configService;
     @Autowired
     private NurseSiteMaintainService nurseSiteMaintainService;
-
+    @Autowired
+    private InventoryOrderDetailAssetInfoRepository  detailAssetInfoRepository;
+    @Autowired
+    private V2_WorkOrderRepository v2_workOrderRepository;
+    @Autowired
+    private V2_WorkOrderStepRepository v2_workOrder_step;
+    @Autowired
+    private V2_PmOrderRepository v2_pmOrderRepository;
+    @Autowired
+    private AssetInfoHistoryRepository assetInfoHistory;
+    @Autowired
+    private InventoryIssueRepository inventoryIssueRepository;
+    @Autowired
+    private ContractInfoItemRepository contractInfoItemRepository;
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoMgrService.class);
 
     public void deleteAsset(AssetInfo asset) {
-        List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
+        //List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
+        List<SearchFilter> searchFilters=new ArrayList<>();
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, asset.getId()));
+        List<V2_WorkOrder> srlist = v2_workOrderRepository.findBySearchFilter(searchFilters);
         if (srlist != null && !srlist.isEmpty()) {
             WebUtil.addErrorMessage("该设备有工单存在,不能删除");
             return;
@@ -235,6 +256,105 @@ public class AssetInfoMgrService {
 
     public List<AssetLifecycleEvent> getAssetEventsList(AssetInfo selected) {
         return eventDao.findByAssetUid(selected.getUid());
+    }
+    @Transactional
+    public void deleteAssetForever(AssetInfo asset) throws Exception {
+        try {
+            AssetInfoHistory history=new AssetInfoHistory();
+            Integer assetId = asset.getId();
+            String uid = asset.getUid();
+            String name = asset.getName();
+            asset= assetDao.getByUid(uid);
+            if(asset == null){
+                throw new RuntimeException("未查询到 \""+name+"\" 设备信息");
+            }
+            history.setAssetInfo(JSONArray.toJSONString(asset, SerializerFeature.WRITE_MAP_NULL_FEATURES));
+            List<SearchFilter> searchFilters=new ArrayList<>();
+
+            searchFilters.add(new SearchFilter("assetInfo", SearchFilter.Operator.EQ,asset));
+            List<InventoryOrderDetail> bySearchFilter = detailAssetInfoRepository.findBySearchFilter(searchFilters);
+            if(!CollectionUtils.isEmpty(bySearchFilter)){
+                String jsonString = JSONArray.toJSONString(bySearchFilter,SerializerFeature.WRITE_MAP_NULL_FEATURES);
+                history.setInventoryOrderDetail(jsonString);
+                List<String> collect = bySearchFilter.stream().map(InventoryOrderDetail::getId).collect(Collectors.toList());
+                Integer aLong = detailAssetInfoRepository.deleteById(collect);
+                logger.info("detailAssetInfoRepository:{}",aLong);
+            }
+            searchFilters.clear();
+            searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ,asset.getUid()));
+            List<ContractInfoItem> contractInfoItemList = contractInfoItemRepository.findBySearchFilter(searchFilters);
+            if(!CollectionUtils.isEmpty(contractInfoItemList)){
+                String jsonString = JSONArray.toJSONString(contractInfoItemList,SerializerFeature.WRITE_MAP_NULL_FEATURES);
+                history.setContractInfoItem(jsonString);
+                List<String> collect = contractInfoItemList.stream().map(ContractInfoItem::getId).collect(Collectors.toList());
+                Integer aLong = contractInfoItemRepository.deleteById(collect);
+                logger.info("contractInfoItemRepository:{}",aLong);
+            }
+            searchFilters.clear();
+            searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ,assetId));
+            List<AssetLifecycleEvent> assetLifecycleEventByAssetId = eventDao.findBySearchFilter(searchFilters);
+            if(!CollectionUtils.isEmpty(assetLifecycleEventByAssetId)){
+                String jsonString = JSONArray.toJSONString(assetLifecycleEventByAssetId,SerializerFeature.WRITE_MAP_NULL_FEATURES);
+                history.setAssetLifecycleEvent(jsonString);
+                for (AssetLifecycleEvent assetLifecycleEvent : assetLifecycleEventByAssetId) {
+                    eventDao.delete(assetLifecycleEvent.getId());
+                }
+
+            }
+            searchFilters.clear();
+            searchFilters.add(new SearchFilter("assetInfo", SearchFilter.Operator.EQ,asset));
+            List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(searchFilters);
+            //setAttribute(history,"inventoryIssue",inventoryIssueList);
+            if(!CollectionUtils.isEmpty(inventoryIssueList)){
+                String jsonString = JSONArray.toJSONString(inventoryIssueList,SerializerFeature.WRITE_MAP_NULL_FEATURES);
+                history.setInventoryIssue(jsonString);
+                List<String> collect = inventoryIssueList.stream().map(InventoryIssue::getId).collect(Collectors.toList());
+                Integer aLong = inventoryIssueRepository.deleteById(collect);
+                logger.info("inventoryIssueRepository:{}",aLong);
+            }
+            List<V2_WorkOrder> workOrder = v2_workOrderRepository.findByAssetId(assetId);
+            //setAttribute(history,"workOrder",workOrder);
+            if(!CollectionUtils.isEmpty(workOrder)){
+                String jsonString = JSONArray.toJSONString(workOrder,SerializerFeature.WRITE_MAP_NULL_FEATURES);
+                history.setWorkOrder(jsonString);
+                List<String> woIds = workOrder.stream().map(V2_WorkOrder::getId).collect(Collectors.toList());
+                    searchFilters.clear();
+                    searchFilters.add(new SearchFilter("woId", SearchFilter.Operator.IN,woIds));
+                    List<V2_WorkOrder_Step>  workOrderSteps = v2_workOrder_step.findBySearchFilter(searchFilters);
+                    if(!CollectionUtils.isEmpty(workOrderSteps)){
+                        jsonString = JSONArray.toJSONString(workOrderSteps,SerializerFeature.WRITE_MAP_NULL_FEATURES);
+                        history.setWorkOrderStep(jsonString);
+                        List<String> collect = workOrderSteps.stream().map(V2_WorkOrder_Step::getId).collect(Collectors.toList());
+                        Integer aLong = v2_workOrder_step.deleteById(collect);
+                        logger.info("v2_workOrder_step:{}",aLong);
+                    }
+                Integer aLong=v2_workOrderRepository.deleteById(woIds);
+                logger.info("v2_workOrderRepository:{}",aLong);
+            }
+
+
+            searchFilters.clear();
+            searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ,assetId));
+            List<V2_PmOrder> pmOrder = v2_pmOrderRepository.findBySearchFilter(searchFilters);
+            if(!CollectionUtils.isEmpty(pmOrder)){
+                String  jsonString = JSONArray.toJSONString(pmOrder,SerializerFeature.WRITE_MAP_NULL_FEATURES);
+                history.setPmOrder(jsonString);
+                List<String> collect = pmOrder.stream().map(V2_PmOrder::getId).collect(Collectors.toList());
+                Integer aLong = v2_pmOrderRepository.deleteById(collect);
+                logger.info("v2_pmOrderRepository:{}",aLong);
+            }
+
+            assetDao.delete(asset);
+            String userUid = UserContextService.getCurrentUserAccount().getUid();
+            history.setAssetUid(asset.getUid());
+            history.setSiteUID(asset.getSiteUID());
+            history.setName(asset.getName());
+            history.setCreateBy(userUid);
+            history.setCreateDate(new Date());
+            assetInfoHistory.save(history);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

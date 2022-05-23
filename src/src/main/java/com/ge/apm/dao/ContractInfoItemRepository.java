@@ -8,6 +8,7 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.ContractInfoItem;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import java.util.List;
 /**
@@ -33,4 +34,8 @@ public interface ContractInfoItemRepository extends GenericRepositoryUUID<Contra
    List<ContractInfoItem>  findByParentIdAndContractId(String parentId, String contractId);
 
    List<ContractInfoItem> findByPurchaseItemIdAndContractId(String purchaseItemId, String contractId);
+   @Modifying
+   @Transactional
+   @Query(value = "delete from contract_info_item where id in ?1",nativeQuery = true)
+   Integer deleteById(List<String> collect);
 }
