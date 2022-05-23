@@ -1,13 +1,12 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.V2_WorkOrder_Step;
-import java.util.List;
-
-import com.ge.apm.domain.WorkflowConfig;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import webapp.framework.dao.GenericRepository;
-
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
+
+import java.util.List;
 
 public interface V2_WorkOrderStepRepository extends GenericRepositoryUUID<V2_WorkOrder_Step> {
 
@@ -36,6 +35,10 @@ public interface V2_WorkOrderStepRepository extends GenericRepositoryUUID<V2_Wor
 
     @Query("select s from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%')")
     public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName);
+    @Modifying
+    @Transactional
+    @Query(value = "delete from v2_work_order_step where id in ?1",nativeQuery = true)
+    Integer deleteById(List<String> collect);
 
 //    public List<V2_WorkOrder_Step> findByWoIdAndStepIdOrderByCreatedDateDesc(String woId, int stepId);
 }

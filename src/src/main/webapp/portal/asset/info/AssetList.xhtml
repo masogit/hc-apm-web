@@ -134,7 +134,7 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="操 作" exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
-                            <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
+                            <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate and assetInfoListController.filterAssetStatus != -1}">
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
@@ -146,6 +146,12 @@
                             <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
                                 <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                             </p:commandButton>
+                            <h:panelGroup rendered="#{assetInfoListController.filterAssetStatus == -1}">
+                            <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteForever" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAssetForever(item)}" update="datalist" >
+                                <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                <p:confirm header="#{msg.DeleteConformation}" message="您确定要删除选定的记录么? 操作不可逆，设备记录将会丢失!" icon="ui-icon-warning"/>
+                            </p:commandLink>
+                            </h:panelGroup>
                         </p:column>
                         <p:column  headerText="是否已配置保养规则" rendered="#{assetInfoListController.showIsPm()}" filterBy="#{item.isPm}" filterMatchMode="EQ">
                             <h:outputText value="#{assetInfoListController.getRelRuleStatusName(item.uid,item.isPm)}"/>
@@ -271,6 +277,9 @@
                                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <c:if test="#{userContextService.hasRole('AssetHead')}">
+                                                <f:selectItem itemLabel="待删除" itemValue="-1" noSelectionOption="true" />
+                                            </c:if>
                                         </p:selectOneMenu>
                                     </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
