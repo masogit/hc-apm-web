@@ -7,9 +7,9 @@
     <script type="text/javascript">
         function deleteAfter() {
             var failureType=document.getElementById("tabview:orgEditForm:failureType");
-            if(failureType!= null ){
+            if(failureType != null  ){
                 let vl = failureType.value;
-                if(vl == null){
+                if(vl == null || vl==""){
                     return ;
                 }else{
                     PF('failureModal').show();
