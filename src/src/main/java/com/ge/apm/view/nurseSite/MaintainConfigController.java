@@ -14,6 +14,7 @@ import javax.faces.context.FacesContext;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
@@ -140,6 +141,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 		//need list or set
 		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listOrgUid, "1*"));
+		searchFilters.add(new SearchFilter("deleted", SearchFilter.Operator.EQ, false));
         Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
         return pageResult;
     }
@@ -185,16 +187,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     public void delete() {
     	// TODO Auto-generated method stub
   
-    	if(this.listSelected!=null && this.listSelected.size()>0){
-    		for(int i=0;i<listSelected.size();++i){
-    			NurseSiteMaintainConfig tempConfig=listSelected.get(i);
-    			boolean result=nurseSiteMaintainService.deleteMaintainConfig(tempConfig);
-    			if(!result){
-    				WebUtil.addSuccessMessage("配置 "+tempConfig.getName()+" 有工单存在不能删除！");
-    			}
-    		}
-    	}
-    	WebUtil.addSuccessMessage("操作完毕！");
+    	if(CollectionUtils.isEmpty(this.listSelected)){
+			WebUtil.addErrorMessage("请至少选择一条数据！");
+			return;
+		}
+		nurseSiteMaintainService.deleteMaintainConfig(listSelected,currentUser);
+		WebUtil.addSuccessMessage("操作完毕！");
     	if(this.listSelected!=null){
     		this.listSelected.clear();
     	}
@@ -432,6 +430,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			nurseSiteMaintainConfig.setModifyBy(currentUser);
 			nurseSiteMaintainConfig.setModifyByUid(currentUser.getUid());
 			nurseSiteMaintainConfig.setModifyDate(currentDate);
+			nurseSiteMaintainConfig.setDeleted(false);
 		}
 		else{
 			nurseSiteMaintainConfig.setModifyBy(currentUser);
