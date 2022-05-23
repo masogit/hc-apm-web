@@ -12,7 +12,7 @@
                var failureType=document.getElementById("editForm:failureType");
                if(failureType!= null ){
                    let vl = failureType.value;
-                   if(vl == null){
+                   if(vl == null || vl==''){
                        return ;
                    }else{
                        PF('failureModal').show();
