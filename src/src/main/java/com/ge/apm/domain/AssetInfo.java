@@ -633,9 +633,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     private int lineNum;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "uid", referencedColumnName = "asset_uid")
-    @JsonIgnore
+//    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinColumn(name = "uid", referencedColumnName = "asset_uid")
+//    @JsonIgnore
     private MeasuringCertificateDetail measuringCertificateDetail;
 
 
