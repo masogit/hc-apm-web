@@ -4,6 +4,8 @@ package com.ge.apm.domain;
 
 import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import lombok.Getter;
@@ -28,6 +30,7 @@ import java.util.*;
  */
 @Entity
 @Table(name = "asset_info",indexes = {@Index(columnList = "asset_dept_uid"),@Index(columnList = "shared_asset_type")})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property = "id")
 public class AssetInfo implements ChineseName,Serializable {
 
     private static final long serialVersionUID = 1L;
