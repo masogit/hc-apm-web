@@ -158,7 +158,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> audioList;
     private List<V2_BlobObject> attachList;
-
+    public static List<AssetInfo> assetInfos = null;
 
     private List<Integer> tagGroupAssets;
     private List<Integer> tagNoGroupAssets;
@@ -1797,6 +1797,45 @@ public void test1(){
         newServiceRequest.setRequestTime(new Date());
         faultReason=WebUtil.getMessage("EquipmentFault");
         selected = null;
+    }
+
+    public void saveBatchServiceRequest(){
+        if(assetInfos!=null && !assetInfos.isEmpty()){
+            for (AssetInfo assetInfo:assetInfos){
+                WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(assetInfo.getId());
+                if (woc != null && woc.getIsWoSupplierAutoEnabled() !=null && woc.getIsWoSupplierAutoEnabled()) {
+                    this.saveServiceRequestSupplier();
+                }
+                if(StringUtils.isEmpty(faultReason)){
+                    newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
+                }else{
+                    newServiceRequest.setRequestReason(faultReason);
+                }
+
+                if (assetInfo.getStatus() == 4) {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("validationFailed", true);
+                } else if (Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())) {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("NoAssetDepartmentNoRepaired"));
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("validationFailed", true);
+                } else {
+                    assetInfo.setStatus(currentStatus);
+                    newServiceRequest.setAssetLocation(locationName);
+                    woService.createServiceRequest(newServiceRequest, assetInfo, picList,null);
+                    cancel();
+                }
+            }
+            assetInfos=null;
+        }else {
+                WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+        }
+        String operation= "/portal/measuring/measuringResultMain.xhtml?faces-redirect=true";
+        WebUtil.navigateTo(operation);
     }
 
     public void saveServiceRequest() {

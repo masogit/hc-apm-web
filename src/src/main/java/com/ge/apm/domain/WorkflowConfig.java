@@ -229,6 +229,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_measure_manual_enabled")
     private Boolean isMeasureManualEnabled; //是否人工派工
 
+    @Column(name = "measurement_repair")
+    private Boolean measurementRepair; //是否开启计量报修
+
     @Column(name = "is_measure_auto_enabled")
     private Boolean isMeasureAutoEnabled; //是否自动派工
 
@@ -836,6 +839,14 @@ public class WorkflowConfig implements Serializable {
     //注册证到期提醒提前次数
     @Column(name = "registration_certificate_expire_times")
     private Integer registrationCertificateExpireTimes;
+
+    public Boolean getMeasurementRepair() {
+        return measurementRepair;
+    }
+
+    public void setMeasurementRepair(Boolean measurementRepair) {
+        this.measurementRepair = measurementRepair;
+    }
 
     public Boolean getSupplierCertificateManage() {
         return supplierCertificateManage;
