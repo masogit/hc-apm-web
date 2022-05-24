@@ -428,7 +428,11 @@
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoDetailController.selected.qrCode}">
-                        <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" />
+<!--                        <img id="codeImg" src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" />-->
+                        <p:graphicImage id="qrcode" value="#{qrCodeShowController.getImg(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" stream="false" />
+                        <h:commandButton id="btn" value="#{msg.print}">
+                            <p:printer target="qrcode" />
+                        </h:commandButton>
                     </p:tab>
                 </p:tabView>
             </h:form>

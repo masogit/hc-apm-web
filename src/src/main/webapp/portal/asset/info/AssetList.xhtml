@@ -134,7 +134,7 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="操 作" exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
-                            <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
+                            <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate and assetInfoListController.filterAssetStatus != -1}">
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
@@ -146,6 +146,12 @@
                             <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
                                 <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                             </p:commandButton>
+                            <h:panelGroup rendered="#{assetInfoListController.filterAssetStatus == -1}">
+                            <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteForever" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAssetForever(item)}" update="datalist" >
+                                <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                <p:confirm header="#{msg.DeleteConformation}" message="您确定要删除选定的记录么? 操作不可逆，设备记录将会丢失!" icon="ui-icon-warning"/>
+                            </p:commandLink>
+                            </h:panelGroup>
                         </p:column>
                         <p:column  headerText="是否已配置保养规则" rendered="#{assetInfoListController.showIsPm()}" filterBy="#{item.isPm}" filterMatchMode="EQ">
                             <h:outputText value="#{assetInfoListController.getRelRuleStatusName(item.uid,item.isPm)}"/>
@@ -271,6 +277,9 @@
                                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <c:if test="#{userContextService.hasRole('AssetHead')}">
+                                                <f:selectItem itemLabel="待删除" itemValue="-1" noSelectionOption="true" />
+                                            </c:if>
                                         </p:selectOneMenu>
                                     </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
@@ -411,12 +420,24 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'measureGrade'}">
-                                <p:column headerText="#{msg.measureGrade}" >
+                                <p:column headerText="#{msg.measureGrade}" sortBy="#{item.measureGrade}" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'riskGrade'}">
-                                <p:column headerText="#{msg.riskGrade}" >
+                                <p:column headerText="#{msg.riskGrade}" sortBy="#{item.riskGrade}" filterBy="#{item.riskGrade}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', item.riskGrade) : fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
                                 </p:column>
                             </c:if>
@@ -443,7 +464,13 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'measuringItemCategory'}">
-                                <p:column headerText="#{msg.measuringItemCategory}" >
+                                <p:column headerText="#{msg.measuringItemCategory}" sortBy="#{item.measuringItemCategory}" filterBy="#{item.measuringItemCategory}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
                                 </p:column>
                             </c:if>
@@ -662,7 +689,15 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'isFixed'}">
-                                <p:column headerText="#{msg.isFixed}"  >
+                                <p:column headerText="#{msg.isFixed}" sortBy="#{item.isFixed}" filterBy="#{item.isFixed}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                            <f:converter converterId="javax.faces.Boolean" />
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" />
+                                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{item.isFixed?msg.True2Yes:msg.False2No}"/>
                                 </p:column>
                             </c:if>

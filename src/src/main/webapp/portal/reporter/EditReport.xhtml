@@ -67,6 +67,12 @@
                                             <h:outputText value="#{fieldMsg.fieldValue('TableReportResult',editReportController.tableValue[fieldItem.resKey])}" style="#{editReportController.tableValue[fieldItem.resKey] eq 'Normal'?'':'color:red'}" />
                                         </h:panelGroup>
                                     </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Compute'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}<p:commandLink actionListener="#{editReportController.computeFormula}" update=":EditReportForm" value="计算"/></label>
+                                            <h:outputText value="#{editReportController.tableValue[fieldItem.key]}"  />
+                                        </h:panelGroup>
+                                    </c:if>
                                 </c:forEach>
 
                             </p:panelGrid>

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -14,6 +15,7 @@ import javax.faces.context.FacesContext;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
@@ -33,8 +35,6 @@ import com.ge.apm.dao.NurseSiteMaintainCheckItemRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.MaintainDataPair;
 import com.ge.apm.domain.NurseSiteMaintainCheckItem;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserAuth;
@@ -106,9 +106,9 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     
     @Override
     public void delete() {
-    	// TODO Auto-generated method stub
-    	super.delete();
-    }
+		// TODO Auto-generated method stub
+		super.delete();
+	}
 	
 	@Override
 	protected String getActionMessage(String actionName) {
@@ -134,5 +134,4 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 		FacesMessage message = new FacesMessage(str,null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
-	
 }

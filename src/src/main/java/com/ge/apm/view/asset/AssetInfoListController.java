@@ -347,7 +347,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void setUserSearchFilters() {
-        this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        boolean assetStatus = "-1".equals(filterAssetStatus);
+        if(assetStatus){
+            this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, true));
+            this.removeFilterOnField("status");
+        }else{
+            this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        }
         if(isPmSearch!=null) {
             if(isPmSearch.equals("ypz")) {
                 this.updateSearchFilter(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
@@ -362,10 +368,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.removeFilterOnField("isPm");
             this.removeFilterOnField("uid");
         }
-        if (terminate) {
-            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
-        } else {
-            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        if(!assetStatus){
+            if (terminate) {
+                this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
+            } else {
+                this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+            }
         }
 
         if (!UserContextService.isMVSRole()) {
@@ -554,7 +562,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             dao.save(ai);
         }
     }
+    public void deleteAssetForever(AssetInfo asset){
 
+        try {
+        aiMgrService.deleteAssetForever(asset);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void exportExcel() throws IOException {
 
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());

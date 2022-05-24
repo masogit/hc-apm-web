@@ -79,7 +79,7 @@
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
                                 actionListener="#{maintainConfigController.delete}" update=":maintainConfigListForm:datalist"
                                 disabled="#{empty maintainConfigController.listSelected}" rendered="#{maintainConfigController.customRoleAuth.authDelete}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteNurseSiteMaintainConfig}" icon="ui-icon-alert" />
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>

@@ -11,7 +11,17 @@ import com.google.common.base.Strings;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.imageio.ImageIO;
+
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import webapp.framework.web.WebUtil;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *
@@ -40,4 +50,11 @@ public class QrCodeShowController {
         return qrCodeService.getQrCodeImageBase64(asset);
     }
 
+    public StreamedContent getImg(String code, String siteUid) throws IOException {
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BufferedImage qrCodeImage = qrCodeService.getQrCodeImage(code, siteUid);
+        ImageIO.write(qrCodeImage, "png", os);
+        return  new DefaultStreamedContent(new ByteArrayInputStream(os.toByteArray()), "image/jpeg", "qrCodes.jpeg");
+    }
 }
