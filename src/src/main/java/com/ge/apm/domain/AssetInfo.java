@@ -630,6 +630,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     private int lineNum;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "uid", referencedColumnName = "asset_uid", unique = true, insertable = false, updatable = false)
+    private MeasuringCertificateDetail measuringCertificateDetail;
+
+
     @Transient
     private Set<SharedAssetReqDetail> sharedAssetReqDetailList;
     
@@ -700,6 +705,15 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private String sharedAssetSwapIndex;
+
+
+    public MeasuringCertificateDetail getMeasuringCertificateDetail() {
+        return measuringCertificateDetail;
+    }
+
+    public void setMeasuringCertificateDetail(MeasuringCertificateDetail measuringCertificateDetail) {
+        this.measuringCertificateDetail = measuringCertificateDetail;
+    }
 
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
