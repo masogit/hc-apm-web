@@ -47,12 +47,13 @@
                                     showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"
                                     required="true" requiredMessage="#{msg.EnableTime} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
-                    <!--<h:panelGroup>
-                        <label class="label">#{msg.endTime}*</label>
-                        <p:calendar timeZone="GMT+8"  id="endTime" pattern="yyyy/MM/dd" value="#{auditUserCaseController.selected.endTime}"
-                                    showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"
-                                    required="true" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"/>
-                    </h:panelGroup>-->
+                    <h:panelGroup>
+                        <label class="label">#{msg.AllowDownloadTemplate}*</label>
+                        <p:selectOneRadio id="allowDownload" value="#{auditUserCaseController.selected.allowDownload}" required="true" requiredMessage="#{msg.AllowDownloadTemplate} #{msg.ValidationRequire}" layout="responsive" columns="4">
+                            <f:selectItem itemLabel="是" itemValue="true" />
+                            <f:selectItem itemLabel="否" itemValue="false" />
+                        </p:selectOneRadio>
+                    </h:panelGroup>
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" action="#{auditUserCaseController.saveAuditCase}" update=":growl" icon="ui-icon-check"/>
