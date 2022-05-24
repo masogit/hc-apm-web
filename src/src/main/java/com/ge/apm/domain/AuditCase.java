@@ -97,6 +97,9 @@ public class AuditCase implements Serializable {
     @JoinColumn(name = "system_case_uid", insertable = false, updatable = false)
     private AuditSystemCase auditSystemCase;
 
+    @Column(name = "allow_download")
+    private Boolean allowDownload;
+
     /**
      * 目标
      */

@@ -136,6 +136,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
+        this.selected.setAllowDownload(true);
     }
 
     public void setSelected(String uid) {
@@ -185,6 +186,19 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         }catch (Exception e){
             createEvent("EXPIRED_TENANT_AUDIT", auditCase, "fail");
             WebUtil.addErrorMessage(WebUtil.getMessage("expired") + WebUtil.getMessage("Failed"));
+        }
+    }
+
+    public void changeAllowDownload(String caseUid, Boolean allowDownload){
+        try {
+            AuditCase auditCase = auditCaseRepository.findById(caseUid);
+            auditCase.setAllowDownload(allowDownload);
+            auditCase.setUpdater(UserContextService.getCurrentUserAccount().getName());
+            auditCase.setUpdateTime(new Date());
+            auditCaseRepository.save(auditCase);
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Success"));
+        } catch (Exception e){
+            WebUtil.addErrorMessage(WebUtil.getMessage("Operation") + WebUtil.getMessage("Failed") + "！" + e.getMessage());
         }
     }
 
