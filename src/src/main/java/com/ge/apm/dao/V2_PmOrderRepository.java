@@ -1,7 +1,9 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.V2_PmOrder;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.Date;
@@ -131,4 +133,8 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 
 	@Query(value = "select count(asset_id) from v2_pm_order where asset_id= ?1 and pm_type = ?2 ",nativeQuery = true)
 	Long findCountByAssetIdAndPmType(Integer id,Integer pmType);
+	@Modifying
+	@Transactional
+	@Query(value = "delete from v2_pm_order where id in ?1",nativeQuery = true)
+	Integer deleteById(List<String> collect);
 }

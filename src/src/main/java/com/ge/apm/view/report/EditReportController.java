@@ -70,6 +70,10 @@ public class EditReportController {
         });
     }
 
+    public void computeFormula(){
+        tableValue.putAll(tableService.getRuleResultData(tableValue,table));
+    }
+
     public void save() {
         tableValue.putAll(tableService.getRuleResultData(tableValue,table));
         tableService.saveTableDate(report,tableValue);

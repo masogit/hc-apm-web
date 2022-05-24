@@ -19,4 +19,5 @@ public interface NurseSiteMaintainCheckItemRepository extends GenericRepositoryU
 	
 	@Query(value="select exists(select 1 from nurse_site_maintain_check_item o where o.site_uid=?1 and o.name=?2)",nativeQuery=true)
 	public boolean findExistsBySiteUid(String siteUid,String name);
+
 }

@@ -103,6 +103,13 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 	@Transient
 	private Integer selectApplyType;
 
+	@Column(name = "deleted")
+	private Boolean deleted;
+
+	// 删除结果，用于定时任务删除已创建未完成的将来工单
+	@Column(name = "delete_result")
+	private Boolean deleteResult;
+
 	public String getId() {
 		return id;
 	}
@@ -324,5 +331,21 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 			LOGGER.error(e.getMessage());
 		}
 		return temp;
+	}
+
+	public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public Boolean getDeleteResult() {
+		return deleteResult;
+	}
+
+	public void setDeleteResult(Boolean deleteResult) {
+		this.deleteResult = deleteResult;
 	}
 }

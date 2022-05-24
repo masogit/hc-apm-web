@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class TableItem{
     public static enum ComponentType {
-        Text,Number, Switch,Select,TextArea,Date,Label
+        Text,Number, Switch,Select,TextArea,Date,Label, Compute
     }
     private String key;
     private String label;
