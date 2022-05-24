@@ -4669,3 +4669,5 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message', 'BudgetAssetAlreadyInUsing', '操作失败, 该设备正在使用中', 'The operation failed, the asset is already in use', NULL, -1);
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message', 'DeleteNurseSiteMaintainConfig', '删除配置项时会同时删除此配置项相关的将来未完成工单，确定要删除吗？', 'Deleting a configuration item also deletes future unfinished tickets related to this configuration item, are you sure you want to delete it?', NULL, -1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','supplierqualificationCertification','是否资质认证','Supplier qualification Certification',NULL,-1);
