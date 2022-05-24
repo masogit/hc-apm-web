@@ -40,7 +40,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @Column(columnDefinition = "CHAR(32)")
+    @Column(columnDefinition = "CHAR(32)", insertable = false, updatable = false)
     private String uid;
 
     @Basic(optional = false)
@@ -634,7 +634,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private int lineNum;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "uid", referencedColumnName = "asset_uid", unique = true, insertable = false, updatable = false)
+    @JoinColumn(name = "uid", referencedColumnName = "asset_uid")
     @JsonIgnore
     private MeasuringCertificateDetail measuringCertificateDetail;
 
