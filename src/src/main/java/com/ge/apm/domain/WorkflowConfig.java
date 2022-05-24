@@ -232,6 +232,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "measurement_repair")
     private Boolean measurementRepair; //是否开启计量报修
 
+    @Column(name = "supplier_qualification_certification")
+    private Boolean supplierQualificationCertification=true; //是否资质认证
+
     @Column(name = "is_measure_auto_enabled")
     private Boolean isMeasureAutoEnabled; //是否自动派工
 
@@ -424,6 +427,13 @@ public class WorkflowConfig implements Serializable {
         this.isNursingStaffCodeLedger = isNursingStaffCodeLedger;
     }
 
+    public Boolean getSupplierQualificationCertification() {
+        return supplierQualificationCertification;
+    }
+
+    public void setSupplierQualificationCertification(Boolean supplierQualificationCertification) {
+        this.supplierQualificationCertification = supplierQualificationCertification;
+    }
 
     public Integer getOutboundstatuscheckinterval() {
         return outboundstatuscheckinterval;

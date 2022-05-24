@@ -784,6 +784,12 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.supplierqualificationCertification}</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.supplierQualificationCertification}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
                 <!-- <p:spacer/> -->
