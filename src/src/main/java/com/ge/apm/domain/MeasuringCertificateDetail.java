@@ -2,6 +2,7 @@ package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -26,12 +27,13 @@ public class MeasuringCertificateDetail implements Serializable {
     private String id;
 
     //设备UID
-    @Column(name = "asset_uid")
+    @Column(name = "asset_uid",insertable = false, updatable = false)
     private String assetUID;
 
     @JoinColumn(insertable=false,updatable=false, name = "asset_uid", referencedColumnName = "uid")
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
+    @JsonIgnore
     private AssetInfo assetInfo;
 
     //证书编号
