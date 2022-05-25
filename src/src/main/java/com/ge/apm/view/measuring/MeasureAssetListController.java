@@ -250,6 +250,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                     return;
                 }
             }
+        }else {
+            WebUtil.addErrorMessage("有设备检定结论,不符合要求");
+            flag=false;
+            return;
         }
         WorkOrderMgrController.assetInfos = currentPageAssets;
 
