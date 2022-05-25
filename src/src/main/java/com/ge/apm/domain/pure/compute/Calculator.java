@@ -225,7 +225,8 @@ public class Calculator {
         Calculator calculator = new Calculator();
         String equation = "9+avg(3,1,sum(1,3)-sum(2,-4),7)*3+8/2";//25.75
         String equation2 = "stdev(1,2,3,4,5,6,7,8,9)";//2.738612788
-        String result = calculator.calculate(equation2);
+        String equation3 = "if(not(10-10),不合格,合格)";//<0
+        String result = calculator.calculate(equation3);
         System.out.println(result);
     }
 }
