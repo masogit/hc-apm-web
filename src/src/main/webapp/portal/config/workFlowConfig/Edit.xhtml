@@ -307,6 +307,10 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
+                        <h:panelGroup rendered="true">
+                            <label class = "label">是否开启计量报修?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.measurementRepair}"/>
+                        </h:panelGroup >
                     </p:panelGrid>
                 </p:fieldset>
 
@@ -463,10 +467,6 @@
                             <label class="label">#{msg.MeasurementRelatedLaborCost}(#{msg.rmb_hour})</label>
                             <p:inputNumber id="measureManHourPrice" value="#{workflowConfigController.selected.measureManhourPrice}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="true">
-                            <label class = "label">是否开启计量报修?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.measurementRepair}"/>
-                        </h:panelGroup >
                     </p:panelGrid>
                 </p:fieldset>
 
