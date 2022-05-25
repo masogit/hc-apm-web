@@ -1824,7 +1824,7 @@ public void test1(){
                     assetInfo.setStatus(currentStatus);
                     newServiceRequest.setAssetLocation(locationName);
                     woService.createServiceRequest(newServiceRequest, assetInfo, picList,null);
-                    cancel();
+
                 }
             }
             assetInfos=null;
@@ -1834,6 +1834,7 @@ public void test1(){
                 requestContext.addCallbackParam("validationFailed", true);
                 return;
         }
+        cancel();
         String operation= "/portal/measuring/measuringResultMain.xhtml?faces-redirect=true";
         WebUtil.navigateTo(operation);
     }
