@@ -578,6 +578,10 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">维护消毒工时默认值</label>
+                            <p:inputNumber  value="#{workflowConfigController.selected.defaultMaintainManHour}" minValue="0.0" decimalPlaces="1"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 
