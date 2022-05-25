@@ -117,7 +117,7 @@ public class Functions {
             return "";
         }
         BigDecimal judge = new BigDecimal(stack.pop().toString());
-        if(judge.doubleValue() < 0.0){
+        if(judge.doubleValue() <= 0.0){
             stack.pop();
         }
         return String.valueOf(stack.pop());
@@ -150,7 +150,7 @@ public class Functions {
         String res ="1";
         while (!stack.isEmpty()) {
             BigDecimal judge = new BigDecimal(stack.pop().toString());
-            if(judge.doubleValue() < 0.0 ){
+            if(judge.doubleValue() <= 0.0 ){
                 res = "-1";
                 break;
             }

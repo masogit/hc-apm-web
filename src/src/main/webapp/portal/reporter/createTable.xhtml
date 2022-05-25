@@ -264,7 +264,7 @@
                                 <f:selectItem itemLabel="#{msg.SetValueVerification}" itemValue="#{'VerifyRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Label'}"/>
                                 <f:selectItem itemLabel="#{msg.DeviationVerification}" itemValue="#{'DeltaRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Label'}"/>
                                 <f:selectItem itemLabel="公式计算" itemValue="#{'FormulaValue'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Compute'}"/>
-                                <f:selectItem itemLabel="公式校验" itemValue="#{'FormulaRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Compute'}"/>
+<!--                                <f:selectItem itemLabel="公式校验" itemValue="#{'FormulaRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Compute'}"/>-->
                             </p:selectOneMenu>
                             </h:panelGroup >
                             <h:panelGroup  rendered="#{tableCreateController.editTableItem.component eq 'Number'}">
@@ -432,12 +432,10 @@
                         </p:fieldset>
                         <p:fieldset legend="公式计算"  rendered="#{'FormulaValue' eq tableCreateController.editTableItem.exp['rule']}" >
                             <p class="label">说明： [key] 表示引用表中已经填充的数据 支持函数： sum,avg,max,min,if,abs,eq,not,and,or,stdev  </p>
-                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <h:panelGroup  >
+                            <h:panelGroup>
                                     <label class="label">公式</label>
-                                    <p:inputText   value="#{tableCreateController.editTableItem.exp['formula']}" required="true" requiredMessage="公式#{msg.ValidationRequire}" />
-                                </h:panelGroup>
-                            </p:panelGrid>
+                                    <p:inputTextarea  cols="90"  value="#{tableCreateController.editTableItem.exp['formula']}" required="true" requiredMessage="公式#{msg.ValidationRequire}" />
+                            </h:panelGroup>
                         </p:fieldset>
                         <p:fieldset legend="公式校验"  rendered="#{'FormulaRule' eq tableCreateController.editTableItem.exp['rule']}" >
                             <p class="label">说明： [key] 表示引用表中已经填充的数据 支持函数： sum,avg,max,min,if,abs,eq,not,and,or,stdev  </p>
