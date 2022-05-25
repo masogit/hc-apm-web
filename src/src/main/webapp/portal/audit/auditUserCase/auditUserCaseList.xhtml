@@ -115,8 +115,8 @@
                                     <p:confirm header="#{msg.AuditCaseExpiredConformation}" message="#{msg.AuditCaseExpiredConformationMsg}" icon="ui-icon-warning" />
                                 </p:commandButton>
                                 <br/><br/>
-                                <p:commandButton value="#{msg.AllowDownload}" style="width:100px;font-size:13px;" rendered="#{!item.allowDownload}" process="@this" actionListener="#{auditUserCaseController.changeAllowDownload(item.uid, true)}" update="auditCaseListForm:datalist :growl" />
-                                <p:commandButton value="#{msg.NotAllowDownload}" style="width:100px;font-size:13px;" rendered="#{item.allowDownload}" process="@this" actionListener="#{auditUserCaseController.changeAllowDownload(item.uid, false)}" update="auditCaseListForm:datalist :growl" />
+                                <p:commandButton value="#{msg.AllowDownload}" rendered="#{!item.allowDownload}" process="@this" actionListener="#{auditUserCaseController.changeAllowDownload(item.uid, true)}" update="auditCaseListForm:datalist :growl" />
+                                <p:commandButton value="#{msg.NotAllowDownload}" rendered="#{item.allowDownload}" process="@this" actionListener="#{auditUserCaseController.changeAllowDownload(item.uid, false)}" update="auditCaseListForm:datalist :growl" />
                             </h:panelGroup>
                         </p:column>
                         <f:facet name="{Toolbar}">
