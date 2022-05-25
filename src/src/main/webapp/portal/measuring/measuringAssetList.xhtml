@@ -20,7 +20,7 @@
                              rowsPerPageTemplate="20,50,100,500">
 
                     <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm"/>
-                    <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" />
+                    <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                     <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                     <p:column width="36"  id="checkBoxColumn" rendered="#{measureAssetListController.judgeMeasurementRepair()}">
                         <p:selectBooleanCheckbox value="#{measureAssetListController.selectedMap[item.uid]}"  class="selectCheckBox">
@@ -92,7 +92,7 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('measuringStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                             </p:selectOneMenu>
                         </f:facet>
-                        <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.measuringCertificateDetail.status)}"/>
+                        <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.verificationConclusion)}"/>
                     </p:column>
                     <p:column headerText="计量种别" filterBy="#{item.measuringType}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.measuringType}"/>
