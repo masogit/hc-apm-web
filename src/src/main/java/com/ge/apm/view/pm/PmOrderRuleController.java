@@ -455,17 +455,35 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         if(CollectionUtils.isNotEmpty(relRuleAssets)){
             for (RelRuleAsset rra :relRuleAssets) {
                 if(StringUtils.isNotEmpty(rra.getRuleUID()) && rra.getRuleUID().equals(uid)){
-                    if(StringUtils.isEmpty(rra.getRuleUID2())){
+                    if(StringUtils.isEmpty(rra.getRuleUID2())
+                            && StringUtils.isEmpty(rra.getRuleUID4()) && StringUtils.isEmpty(rra.getRuleUIDInspection())){
                         deleteList.add(rra);
                     }else{
                         rra.setRuleUID(null);
                         updateList.add(rra);
                     }
                 }else if(StringUtils.isNotEmpty(rra.getRuleUID2()) && rra.getRuleUID2().equals(uid)){
-                    if(StringUtils.isEmpty(rra.getRuleUID())){
+                    if(StringUtils.isEmpty(rra.getRuleUID())
+                            && StringUtils.isEmpty(rra.getRuleUID4()) && StringUtils.isEmpty(rra.getRuleUIDInspection())){
                         deleteList.add(rra);
                     }else{
                         rra.setRuleUID2(null);
+                        updateList.add(rra);
+                    }
+                }else if(StringUtils.isNotEmpty(rra.getRuleUIDInspection()) && rra.getRuleUIDInspection().equals(uid)){
+                    if(StringUtils.isEmpty(rra.getRuleUID())
+                            && StringUtils.isEmpty(rra.getRuleUID2()) && StringUtils.isEmpty(rra.getRuleUID4())){
+                        deleteList.add(rra);
+                    }else{
+                        rra.setRuleUIDInspection(null);
+                        updateList.add(rra);
+                    }
+                }else if(StringUtils.isNotEmpty(rra.getRuleUID4()) && rra.getRuleUID4().equals(uid)){
+                    if(StringUtils.isEmpty(rra.getRuleUID())
+                            && StringUtils.isEmpty(rra.getRuleUID2()) && StringUtils.isEmpty(rra.getRuleUIDInspection())){
+                        deleteList.add(rra);
+                    }else{
+                        rra.setRuleUID4(null);
                         updateList.add(rra);
                     }
                 }

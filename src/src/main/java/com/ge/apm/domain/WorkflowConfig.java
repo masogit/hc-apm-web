@@ -827,6 +827,8 @@ public class WorkflowConfig implements Serializable {
     private Boolean isActiveSupplier = Boolean.FALSE;//是否激活供应商流程
 
 
+    @Column(name = "aa_default_maintain_man_hour")
+    private Double defaultMaintainManHour = 0.0D;
 
     //供应商资质证书管理
     @Column(name = "supplier_certificate_manage")
@@ -1542,6 +1544,13 @@ public class WorkflowConfig implements Serializable {
         this.isWoSupplierAutoEnabled = isWoSupplierAutoEnabled;
     }
 
+    public Double getDefaultMaintainManHour() {
+        return defaultMaintainManHour==null?0.0D:defaultMaintainManHour;
+    }
+
+    public void setDefaultMaintainManHour(Double defaultMaintainManHour) {
+        this.defaultMaintainManHour = defaultMaintainManHour;
+    }
 
     @Override
     public int hashCode() {
