@@ -42,7 +42,7 @@
                 checkboxlist.each(function () {
                     selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
                 });
-                $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                $("#measuringAssetListForm\\:datalist_measuringAsset\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
                 if (selectAllstatus) {
                     $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
                 } else {

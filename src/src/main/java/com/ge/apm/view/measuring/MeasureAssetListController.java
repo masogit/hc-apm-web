@@ -15,6 +15,7 @@ import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
@@ -55,12 +56,12 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private TreeNode selectedNode;
 
     private OrgInfoTreeService orgInfoTreeService;
-
+    private Integer verificationConclusion =null;
     private int currentMonthCount = 0;
     private int nextMonthCount = 0;
     public List<AssetInfo> currentPageAssets;
     //复选的设备
-    private Map<String, Boolean> selectedMap = new HashMap();
+    private Map<String, Boolean> selectedMap;
     private Boolean flag=true;
     @Override
     protected void init() {
@@ -77,7 +78,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         currentUser = UserContextService.getCurrentUserAccount();
 
         attachements = new ArrayList<>();
-
+        this.selectedMap = new HashMap();
         totalMeasureExpireMonths();
     }
 
@@ -87,6 +88,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        List<AssetInfo> assetInfoList = new ArrayList<>();
+
         List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -113,16 +116,6 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
         if(!this.hasFilterOnField("isDeleted")){
             searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE, "1*"));
-        }
-        if(this.hasFilterOnField("verificationConclusion")){
-                String verificationConclusion =null;
-                for (SearchFilter searchFilter :searchFilters) {
-                    if ("verificationConclusion".equals(searchFilter.fieldName)) {
-                        verificationConclusion = (String)searchFilter.value;
-                    }
-                }
-                searchFilters.removeIf(e -> e.fieldName.equals("verificationConclusion"));
-                searchFilters.add(new SearchFilter("measuringCertificateDetail.status", SearchFilter.Operator.EQ, verificationConclusion));
         }
 
         if(!this.hasFilterOnField("measureGrade")){
@@ -166,8 +159,39 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
         }
-        Page<AssetInfo> assetInfoPage = dao.findBySearchFilter(searchFilters, pageRequest);
-        currentPageAssets=assetInfoPage.getContent();
+        if(this.hasFilterOnField("verificationConclusion")){
+            for (SearchFilter searchFilter :searchFilters) {
+                if ("verificationConclusion".equals(searchFilter.fieldName)) {
+                    verificationConclusion = Integer.valueOf((String)searchFilter.value);
+                }
+            }
+            searchFilters.removeIf(e -> e.fieldName.equals("verificationConclusion"));
+        }
+        List<AssetInfo> assetInfos = dao.findBySearchFilter(searchFilters);
+        if (assetInfos!=null && !assetInfos.isEmpty()){
+            for (AssetInfo assetInfo: assetInfos){
+                List<MeasuringCertificateDetail> measuringCertificateDetails;
+                if(verificationConclusion==null){
+                    measuringCertificateDetails = measuringCertificateDetailDao.findByAssetUID(assetInfo.getUid());
+                    if (measuringCertificateDetails!=null && !measuringCertificateDetails.isEmpty()) {
+                        assetInfo.setVerificationConclusion(measuringCertificateDetails.get(0).getStatus());
+                    }
+                    assetInfoList.add(assetInfo);
+                }else {
+                    measuringCertificateDetails=measuringCertificateDetailDao.findByAssetUIDAndStatus(assetInfo.getUid(),verificationConclusion);
+                    if (measuringCertificateDetails!=null && !measuringCertificateDetails.isEmpty()) {
+                        assetInfo.setVerificationConclusion(measuringCertificateDetails.get(0).getStatus());
+                        assetInfoList.add(assetInfo);
+                    }
+                }
+
+
+            }
+        }
+        currentPageAssets=assetInfoList;
+        int size = assetInfoList.size();
+        assetInfoList= this.pageNum(assetInfoList, pageRequest);
+        Page<AssetInfo>  assetInfoPage = new PageImpl<AssetInfo>(assetInfoList, pageRequest, size);
         return assetInfoPage;
         /*Specification<AssetInfo> specification=new Specification<AssetInfo>() {
             @Override
@@ -186,6 +210,20 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
         return dao.findBySpecification(specification, pageRequest);*/
     }
+    private List<AssetInfo> pageNum(List<AssetInfo> assetInfoList,PageRequest pageRequest){
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize() - 1;
+        int numStart = pageNumber * pageSize;
+        numStart = numStart + pageNumber;
+        int numEnd = numStart + pageSize + 1;
+        int size = assetInfoList.size();
+        if(size > numEnd){
+            assetInfoList = assetInfoList.subList(numStart ,numEnd);
+        }else {
+            assetInfoList = assetInfoList.subList(numStart ,size);
+        }
+        return assetInfoList;
+    }
     public void onSelectAllOfPage() {
         boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
         for (AssetInfo item : currentPageAssets) {
@@ -197,22 +235,21 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         List<String> selectedAssetUids = new ArrayList<>();
         selectedMap.keySet().stream().forEach(assetUid -> { if(selectedMap.get(assetUid)) selectedAssetUids.add(assetUid); });
         if (selectedAssetUids.isEmpty()) {
-            searchFilters.add(new SearchFilter("measuringCertificateDetail.status", SearchFilter.Operator.EQ, 2));
-            currentPageAssets = dao.findBySearchFilter(searchFilters);
-            searchFilters.clear();
+            if (currentPageAssets==null){
+                currentPageAssets = dao.findBySearchFilter(searchFilters);
+            }
         } else {
             currentPageAssets = dao.findByUidIn(selectedAssetUids);
-            if (currentPageAssets!=null && ! currentPageAssets.isEmpty()){
-                for (AssetInfo assetInfo : currentPageAssets){
-                    MeasuringCertificateDetail measuringCertificateDetail = assetInfo.getMeasuringCertificateDetail();
-                    if(measuringCertificateDetail==null || measuringCertificateDetail.getStatus()!=2){
-                        WebUtil.addErrorMessage("有设备检定结论,不符合要求");
-                        flag=false;
-                        return;
-                    }
+        }
+        if (currentPageAssets!=null && !currentPageAssets.isEmpty()){
+            for (AssetInfo assetInfo: currentPageAssets){
+                List<MeasuringCertificateDetail>  measuringCertificateDetails = measuringCertificateDetailDao.findByAssetUIDAndStatus(assetInfo.getUid(),2);
+                if (measuringCertificateDetails==null || measuringCertificateDetails.isEmpty()) {
+                    WebUtil.addErrorMessage("有设备检定结论,不符合要求");
+                    flag=false;
+                    return;
                 }
             }
-
         }
         WorkOrderMgrController.assetInfos = currentPageAssets;
 

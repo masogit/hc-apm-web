@@ -4,9 +4,6 @@ package com.ge.apm.domain;
 
 import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import lombok.Getter;
@@ -40,7 +37,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @Column(columnDefinition = "CHAR(32)", insertable = false, updatable = false)
+    @Column(columnDefinition = "CHAR(32)")
     private String uid;
 
     @Basic(optional = false)
@@ -633,12 +630,6 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     private int lineNum;
 
-//    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "uid", referencedColumnName = "asset_uid")
-//    @JsonIgnore
-    private MeasuringCertificateDetail measuringCertificateDetail;
-
-
     @Transient
     private Set<SharedAssetReqDetail> sharedAssetReqDetailList;
     
@@ -662,6 +653,9 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private Boolean canEdit;
+
+    @Transient
+    private Integer verificationConclusion;
 
     @Transient
     private OrgInfo clinicalDeptOrg;
@@ -709,15 +703,6 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private String sharedAssetSwapIndex;
-
-
-    public MeasuringCertificateDetail getMeasuringCertificateDetail() {
-        return measuringCertificateDetail;
-    }
-
-    public void setMeasuringCertificateDetail(MeasuringCertificateDetail measuringCertificateDetail) {
-        this.measuringCertificateDetail = measuringCertificateDetail;
-    }
 
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
@@ -1084,6 +1069,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setMeasuringItemCategory(Integer measuringItemCategory) {
         this.measuringItemCategory = measuringItemCategory;
+    }
+
+    public Integer getVerificationConclusion() {
+        return verificationConclusion;
+    }
+
+    public void setVerificationConclusion(Integer verificationConclusion) {
+        this.verificationConclusion = verificationConclusion;
     }
 
     public Integer getUsageStatus() {
