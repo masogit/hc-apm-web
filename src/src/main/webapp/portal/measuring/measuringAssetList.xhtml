@@ -118,7 +118,7 @@
                     </p:column>
 
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUids()}" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.judgeMeasurementRepair()}"/>
+                        <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.judgeMeasurementRepair()}"/>
 
                         <!--<p:commandButton id="uploadButton" icon="ui-icon-file-upload" class="btn btn-sm btn-gray" title="上传附件" disabled="#{empty measureAssetListController.selected}" update="measuringTab:measuringUploadDlg" oncomplete="PF('measuringUploadDialog').show()"/>-->
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
@@ -144,7 +144,9 @@
                             <p:column headerText="设备序列号">
                                 <h:outputText value="#{item.serialNum}"/>
                             </p:column>
-
+                            <p:column headerText="设备型号">
+                                <h:outputText value="#{item.functionType}"/>
+                            </p:column>
                         </p:dataTable>
 
                     <br/>
