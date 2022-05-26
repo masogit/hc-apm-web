@@ -5,6 +5,7 @@
  */
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AeMapper;
@@ -112,7 +113,7 @@ public class AssetInfoDetailController {
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
-        if(selectedId!=null) selected = assetDao.findById(Integer.parseInt(selectedId));
+        if(selectedId!=null) selected = assetDao.findByUid(selectedId);
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
@@ -330,7 +331,7 @@ public class AssetInfoDetailController {
         return null;
     }
     public String getCustomConfigString() {
-        return JSONObject.toJSONString(customConfig);
+        return JSON.toJSONString(customConfig);
     }
 
     public TreeNode getParentsRelationTree() {
