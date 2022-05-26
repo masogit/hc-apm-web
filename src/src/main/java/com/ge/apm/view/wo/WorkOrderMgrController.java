@@ -1823,7 +1823,8 @@ public void test1(){
                     requestContext.addCallbackParam("validationFailed", true);
                 } else {
                     assetInfo.setStatus(currentStatus);
-//                    newServiceRequest.setAssetLocation(locationName);
+                    onSelectedAsset(assetInfo);
+                    newServiceRequest.setAssetLocation(locationName);
                     if (i==1 && picList!=null && !picList.isEmpty()){
                         for (V2_BlobObject blobObject : picList){
                             blobObject.setId(null);
