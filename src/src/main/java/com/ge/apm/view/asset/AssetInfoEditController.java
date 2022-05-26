@@ -256,7 +256,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         } else if ("Edit".equalsIgnoreCase(actionName)) {
             isStatusAssetHistory = true;
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
-            setSelected(Integer.parseInt(selectedId));
+            setSelected(dao.findByUid(selectedId));
             String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
             terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
             prepareEdit();

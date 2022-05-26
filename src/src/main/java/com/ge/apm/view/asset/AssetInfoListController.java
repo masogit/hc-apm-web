@@ -525,7 +525,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
         String url = "actionName=View&selectedid="
-                + selected.getId().toString()
+                + selected.getUid()
                 + "&asset_name=" + selected.getName()
                 + "&terminate=" + this.terminate;
         url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
@@ -541,8 +541,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public String getEditPage(String assetId, String assetName) {
-        String operation = "AssetCreate.xhtml?actionName=Edit&selectedid=" + assetId
+    public String getEditPage(String assetUid, String assetName) {
+        String operation = "AssetCreate.xhtml?actionName=Edit&selectedid=" + assetUid
                 + "&asset_name=" + assetName
                 + "&terminate=" + this.terminate;
         return UrlEncryptController.encodeUrlParam(operation);
