@@ -1801,7 +1801,8 @@ public void test1(){
 
     public void saveBatchServiceRequest(){
         if(assetInfos!=null && !assetInfos.isEmpty()){
-            for (AssetInfo assetInfo:assetInfos){
+            for (int i = 0; i < assetInfos.size(); i++) {
+                AssetInfo assetInfo = assetInfos.get(i);
                 WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(assetInfo.getId());
                 if (woc != null && woc.getIsWoSupplierAutoEnabled() !=null && woc.getIsWoSupplierAutoEnabled()) {
                     this.saveServiceRequestSupplier();
@@ -1823,6 +1824,11 @@ public void test1(){
                 } else {
                     assetInfo.setStatus(currentStatus);
 //                    newServiceRequest.setAssetLocation(locationName);
+                    if (i==1 && picList!=null && !picList.isEmpty()){
+                        for (V2_BlobObject blobObject : picList){
+                            blobObject.setId(null);
+                        }
+                    }
                     woService.createServiceRequest(newServiceRequest, assetInfo, picList,null);
 
                 }
