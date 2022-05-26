@@ -187,6 +187,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
 
             }
+            verificationConclusion=null;
         }
         currentPageAssets=assetInfoList;
         int size = assetInfoList.size();
@@ -232,6 +233,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void setSelectedAssetsUids() {
+        flag=true;
         List<String> selectedAssetUids = new ArrayList<>();
         selectedMap.keySet().stream().forEach(assetUid -> { if(selectedMap.get(assetUid)) selectedAssetUids.add(assetUid); });
         if (selectedAssetUids.isEmpty()) {
@@ -245,13 +247,13 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             for (AssetInfo assetInfo: currentPageAssets){
                 List<MeasuringCertificateDetail>  measuringCertificateDetails = measuringCertificateDetailDao.findByAssetUIDAndStatus(assetInfo.getUid(),2);
                 if (measuringCertificateDetails==null || measuringCertificateDetails.isEmpty()) {
-                    WebUtil.addErrorMessage("有设备检定结论,不符合要求");
+                    WebUtil.addErrorMessage("有设备检定结论,不符合要求,暂不支持报修");
                     flag=false;
                     return;
                 }
             }
         }else {
-            WebUtil.addErrorMessage("有设备检定结论,不符合要求");
+            WebUtil.addErrorMessage("有设备检定结论,不符合要求,暂不支持报修");
             flag=false;
             return;
         }

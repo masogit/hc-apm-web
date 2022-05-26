@@ -1822,7 +1822,7 @@ public void test1(){
                     requestContext.addCallbackParam("validationFailed", true);
                 } else {
                     assetInfo.setStatus(currentStatus);
-                    newServiceRequest.setAssetLocation(locationName);
+//                    newServiceRequest.setAssetLocation(locationName);
                     woService.createServiceRequest(newServiceRequest, assetInfo, picList,null);
 
                 }
