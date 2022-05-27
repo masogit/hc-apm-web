@@ -89,7 +89,7 @@ public class EditReportController {
     }
     
     public String getOptionValue(TableItem fieldItem){
-        String optionKey = (String)tableValue.get(fieldItem.getKey());
+        String optionKey = String.valueOf(tableValue.get(fieldItem.getKey()));
         if(!Strings.isNullOrEmpty(optionKey)){
             TableOption option = fieldItem.getOptions().stream().filter(item-> optionKey.equals(item.getKey())).findAny().orElse(null);
             return option==null?null:option.getValue();
