@@ -43,7 +43,7 @@
                         <h:panelGroup id="assetstatus"><!--当前状态-->
                             <label class="label">#{msg.status}</label>
                             <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
-                                <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
+                                <p:ajax  listener="#{workOrderMgrController.onBatchStatusChange()}"  update="assetstatus" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 <c:if test="#{userContextService.countyArea}">
                                     <f:selectItem  itemLabel="可正常使用" itemValue="1"/>
@@ -104,7 +104,7 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
-                        <p:commandButton validateClient="true" value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveBatchServiceRequest()}" process="@this" update="measuringTab:measuringAssetListForm" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton validateClient="true" value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveBatchServiceRequest()}"   update="measuringTab:measuringAssetListForm" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
 
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update=" " style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                     </h:panelGroup>
