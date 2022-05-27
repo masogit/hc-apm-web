@@ -170,19 +170,17 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         List<AssetInfo> assetInfos = dao.findBySearchFilter(searchFilters);
         if (assetInfos!=null && !assetInfos.isEmpty()){
             for (AssetInfo assetInfo: assetInfos){
-                List<MeasuringCertificateDetail> measuringCertificateDetails;
+                List<MeasuringCertificateDetail> measuringCertificateDetails=measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(assetInfo.getUid());
+                Integer status=null;
+                if (measuringCertificateDetails!=null && !measuringCertificateDetails.isEmpty()) {
+                    status = measuringCertificateDetails.get(0).getStatus();
+                }
                 if(verificationConclusion==null){
-                    measuringCertificateDetails = measuringCertificateDetailDao.findByAssetUID(assetInfo.getUid());
-                    if (measuringCertificateDetails!=null && !measuringCertificateDetails.isEmpty()) {
-                        assetInfo.setVerificationConclusion(measuringCertificateDetails.get(0).getStatus());
-                    }
+                    assetInfo.setVerificationConclusion(status);
                     assetInfoList.add(assetInfo);
-                }else {
-                    measuringCertificateDetails=measuringCertificateDetailDao.findByAssetUIDAndStatus(assetInfo.getUid(),verificationConclusion);
-                    if (measuringCertificateDetails!=null && !measuringCertificateDetails.isEmpty()) {
-                        assetInfo.setVerificationConclusion(measuringCertificateDetails.get(0).getStatus());
+                }else if (verificationConclusion==status){
+                        assetInfo.setVerificationConclusion(status);
                         assetInfoList.add(assetInfo);
-                    }
                 }
 
 
@@ -245,15 +243,16 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         }
         if (currentPageAssets!=null && !currentPageAssets.isEmpty()){
             for (AssetInfo assetInfo: currentPageAssets){
-                List<MeasuringCertificateDetail>  measuringCertificateDetails = measuringCertificateDetailDao.findByAssetUIDAndStatus(assetInfo.getUid(),2);
-                if (measuringCertificateDetails==null || measuringCertificateDetails.isEmpty()) {
+                List<MeasuringCertificateDetail>  measuringCertificateDetails = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(assetInfo.getUid());
+                if (measuringCertificateDetails!=null && !measuringCertificateDetails.isEmpty() && 2==measuringCertificateDetails.get(0).getStatus()) {
+                }else {
                     WebUtil.addErrorMessage("有设备检定结论,不符合要求,暂不支持报修");
                     flag=false;
                     return;
                 }
             }
         }else {
-            WebUtil.addErrorMessage("有设备检定结论,不符合要求,暂不支持报修");
+            WebUtil.addErrorMessage("请选择设备,暂不支持报修");
             flag=false;
             return;
         }
