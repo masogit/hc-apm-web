@@ -1990,6 +1990,18 @@ public void test1(){
             needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
         }*/
     }
+    public void onBatchStatusChange() {
+        if (assetInfos == null) {
+            return;
+        }
+        if(currentStatus==2){ //选择停机状态
+            needConfirmTime=true;
+        }
+        if(currentStatus==3 || currentStatus==1){//选择 限制功能使用 或可正常使用
+            needConfirmTime=false;
+        }
+
+    }
     public void acceptWorkOrder() {
         Integer repairType = selectedWorkOrder.getRepairType();
 
