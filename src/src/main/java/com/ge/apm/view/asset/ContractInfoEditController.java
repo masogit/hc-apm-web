@@ -433,7 +433,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         String url = "";
         if (null != item) {
             AssetInfo asset = item;
-            url = "actionName=View&selectedid=" + asset.getId().toString() + "&asset_name=" + asset.getName() + "&terminate=" + !asset.getIsValid();
+            url = "actionName=View&selectedid=" + asset.getUid().toString() + "&asset_name=" + asset.getName() + "&terminate=" + !asset.getIsValid();
             url = "/portal/asset/info/AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         }
@@ -443,7 +443,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public String getDetailPageLink(String uid) {
         AssetInfo viewAsset = assetDao.findByUid(uid);
         String url = "actionName=View&selectedid="
-                + viewAsset.getId().toString()
+                + viewAsset.getUid()
                 + "&asset_name=" + viewAsset.getName()
                 + "&terminate=" + this.terminate;
         url ="/portal/asset/info/AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);

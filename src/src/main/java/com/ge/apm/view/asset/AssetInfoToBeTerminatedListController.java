@@ -410,7 +410,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void onSelectAsset() {
         String url = "actionName=View&selectedid="
-                + selected.getId().toString()
+                + selected.getUid().toString()
                 + "&asset_name=" + selected.getName();
         url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 

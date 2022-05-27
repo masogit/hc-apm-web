@@ -148,7 +148,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
 
     public void onSelectAsset() throws IOException {
         String url = "actionName=View&selectedid="
-            + selected.getId().toString()
+            + selected.getUid()
             + "&asset_name=" + selected.getName()
             + "&terminate=" + false;
         url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
