@@ -353,7 +353,7 @@ public class AssetInfoDetailController {
     public String getDetailPageLink(String uid) {
         AssetInfo viewAsset = assetDao.findByUid(uid);
         String url = "actionName=View&selectedid="
-                + viewAsset.getId().toString()
+                + viewAsset.getUid().toString()
                 + "&asset_name=" + viewAsset.getName()
                 + "&terminate=" + this.terminate;
         url = "AssetDetail.xhtml?faces-redirect=true&str=" + UrlParamUtil.encodeUrlQueryString(url);
