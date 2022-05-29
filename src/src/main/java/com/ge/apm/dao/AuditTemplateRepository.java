@@ -19,4 +19,8 @@ public interface AuditTemplateRepository extends GenericRepositoryUUID<AuditTemp
 
     public List<AuditTemplate> findByType(Integer type);
     public  AuditTemplate findByUid(String uid);
+
+    @Query(value = "select c.* from audit_template c join audit_entry_template_rel r on r.template_uid=c.uid where r.entry_uid=?1 order by r.order_by",nativeQuery = true)
+    public List<AuditTemplate> findAuditTemplateListByEntryUID(String systemEntryUid);
+
 }
