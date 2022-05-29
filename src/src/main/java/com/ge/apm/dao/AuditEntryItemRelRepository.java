@@ -15,10 +15,12 @@ public interface AuditEntryItemRelRepository extends GenericRepository<AuditEntr
 
     List<AuditEntryItemRel> findByItemUid(String itemUid);
     List<AuditEntryItemRel> findByItemUidAndSystemEntryUidAndOrderBy(String itemUid,String systemEntryUid,Integer orderBy);
+    List<AuditEntryItemRel> findByItemUidAndSystemEntryUid(String itemUid,String systemEntryUid);
+    List<AuditEntryItemRel> findBySystemEntryUid(String systemEntryUid);
 
     @Transactional
     @Modifying
-    public void deleteByItemUidAndOrderBy(String itemUid,Integer orderBy);
+    public void deleteByItemUidAndSystemEntryUid(String itemUid, String systemEntryUid);
     @Transactional
     @Modifying
     public void deleteBySystemEntryUid(String systemEntryUid);
