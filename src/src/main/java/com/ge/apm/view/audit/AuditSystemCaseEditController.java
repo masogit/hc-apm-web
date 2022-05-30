@@ -68,7 +68,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private BlobFileService blobService;
     protected String currentTabId = null;
     private String selectType = "1";
-
+    private boolean entryFlag = false;
     private  String editChoiceConfigItemUid;  //被编辑item Uid
     @Override
     protected void init() {
@@ -304,6 +304,10 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     public void editAuditSystementry(){
         if(auditSystemEntry!=null&&auditSystemEntry.getUid()!=null){
             auditSystemEntrySelected=auditSystemEntry;
+            entryFlag = false;
+            if (auditSystemEntry.getLevel()==1){
+                entryFlag=true;
+            }
         }
     }
     public void deleteTemplate(AuditTemplate auditTemplate){
@@ -375,6 +379,10 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         auditSystemEntrySelected.setType(auditSystemEntrySelected.getLevel());
         auditSystemEntrySelected.setParentUid(Optional.ofNullable(auditSystemEntry).map(AuditSystemEntry::getUid).orElse("1"));
         auditSystemEntrySelected.setOrderBy(Optional.ofNullable(selectedNode).map(TreeNode::getChildren).map(n-> n.size()+1).orElse(1));
+        entryFlag = false;
+        if (auditSystemEntrySelected.getLevel()==2){
+            entryFlag=true;
+        }
     }
 
     public void preCreateStrip()  {
@@ -401,6 +409,11 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
     }
 
+    public void onEntryTypeChecking(){
+        if (auditSystemEntrySelected!=null){
+            auditSystemEntrySelected.setType(auditSystemEntrySelected.getLevel());
+        }
+    }
     public List<AuditConfigItem> getConfigItemList(){
         return auditConfigItemRepository.findByContentType(1);
     }
@@ -473,6 +486,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
                 auditConfigItemSelected=new AuditConfigItem();
                 if(2== selected.getType()){ //质控
                     auditConfigItemSelected.setContentType(3);
+                    this.onContentTypeChange();
                 }
                 auditConfigItem = null;
                 editChoiceConfigItemUid = null;
@@ -765,6 +779,14 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
 
     public void setTemplateUid(String templateUid) {
         this.templateUid = templateUid;
+    }
+
+    public boolean isEntryFlag() {
+        return entryFlag;
+    }
+
+    public void setEntryFlag(boolean entryFlag) {
+        this.entryFlag = entryFlag;
     }
 
     public void setNothing(){
