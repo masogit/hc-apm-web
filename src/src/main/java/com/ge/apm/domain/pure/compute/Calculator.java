@@ -7,7 +7,7 @@ import java.util.*;
 
 public class Calculator {
 
-    Map<String,String> functionMap = new HashMap<>();
+    Map<String, String> functionMap = new HashMap<>();
     //存放后序表达式
     Queue queue = new ArrayDeque();
     //含有计算方法的class
@@ -123,7 +123,7 @@ public class Calculator {
         //定义临时存储运算符的栈
         Stack stack = new Stack();
         StringBuilder tempStringBuilder = new StringBuilder();
-        boolean maybeNegative=true;
+        boolean maybeNegative = true;
         for (int i = 0; i < equation.length(); i++) {
             tempStringBuilder = tempStringBuilder.append(equation.substring(i, i + 1));
             if (i + 2 <= equation.length() && !isTrue(equation.substring(i + 1, i + 2)) && !isTrue(tempStringBuilder.toString())) {
@@ -168,7 +168,7 @@ public class Calculator {
                         if (!",".equals(operatorString)) {
                             queue.add(operatorString);
                             maybeNegative = false;
-                        }else{
+                        } else {
                             maybeNegative = true;
                         }
                     } else {
@@ -180,7 +180,6 @@ public class Calculator {
                     queue.add("0");
                 }
                 stack.push(temp);
-                maybeNegative = false;
             } else {
                 //如果是数字直接进入队列
                 queue.add(temp);
@@ -210,6 +209,7 @@ public class Calculator {
 
     /**
      * 判断是不是特殊符号
+     *
      * @param temp
      * @return
      */
@@ -226,7 +226,14 @@ public class Calculator {
         String equation = "9+avg(3,1,sum(1,3)-sum(2,-4),7)*3+8/2";//25.75
         String equation2 = "stdev(1,2,3,4,5,6,7,8,9)";//2.738612788
         String equation3 = "if(not(10-10),不合格,合格)";//<0
-        String result = calculator.calculate(equation3);
+        String equation4 = "power(2,3)";//8
+        String equation5 = "degrees(3.14159265)";//180
+        String equation6 = "correl(1,2,3,4,9,8,4,5)";//-0.867721831
+        String equation7 = "slope(1,2,3,4,9,8,4,5)";//-0.470588235
+        String equation8 = "slope(2,5,8,7,3,6,-2,0,3,5,2,-3)";//0.366548
+        String equation9 = "intercept(2,5,8,7,3,6,-2,0,3,5,2,-3)";//4.861209964
+
+        String result = calculator.calculate(equation9);
         System.out.println(result);
     }
 }
