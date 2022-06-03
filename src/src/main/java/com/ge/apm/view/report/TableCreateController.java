@@ -345,10 +345,13 @@ public class TableCreateController extends TieWebSheetBean {
             if (editTableItem.getOptions() == null || editTableItem.getOptions().isEmpty()) {
                 editTableItem.setOptions(new ArrayList<TableOption>());
             }
+        }else{
+            editTableItem.setOptions(null);
         }
         if (null != editTableItem.getExp()) {
             editTableItem.getExp().clear();
         }
+        editTableItem.setDefaultValue(null);
 
     }
 
