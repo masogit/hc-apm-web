@@ -1,6 +1,7 @@
 package com.ge.apm.domain.pure.compute;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -21,6 +22,14 @@ public class Functions {
             .put("and","andFunction")
             .put("or","orFunction")
             .put("stdev","stdevFunction")
+            .put("power","powerFunction")
+            .put("sqrt","sqrtFunction")
+            .put("degrees","degreesFunction")
+            .put("correl","correlFunction")
+            .put("slope","slopeFunction")
+            .put("intercept","interceptFunction")
+            .put("atan","atanFunction")
+            .put("tan","tanFunction")
             .build();
 
     /**
@@ -205,4 +214,150 @@ public class Functions {
         return new BigDecimal(Math.sqrt(sum.divide(new BigDecimal(valueList.size()-1), 7, BigDecimal.ROUND_HALF_UP).doubleValue()));
 
     }
+
+    /**
+     * same as Math.pow
+     * @param stack
+     * @return
+     */
+    public static BigDecimal powerFunction(Stack stack){
+        if(stack.size()!=2){
+            return new BigDecimal(0);
+        }
+        double base = Double.parseDouble(stack.pop().toString());
+        double pow = Double.parseDouble(stack.pop().toString());
+        return new BigDecimal(Math.pow(base, pow));
+    }
+
+
+    public static BigDecimal sqrtFunction(Stack stack){
+        if(stack.size()!=1){
+            return new BigDecimal(0);
+        }
+        return new BigDecimal(Math.sqrt(Double.parseDouble(stack.pop().toString())));
+    }
+
+    public static BigDecimal tanFunction(Stack stack){
+        if(stack.size()!=1){
+            return new BigDecimal(0);
+        }
+        return new BigDecimal(Math.tan(Double.parseDouble(stack.pop().toString())));
+    }
+
+    public static BigDecimal atanFunction(Stack stack){
+        if(stack.size()!=1){
+            return new BigDecimal(0);
+        }
+        return new BigDecimal(Math.atan(Double.parseDouble(stack.pop().toString())));
+    }
+
+    public static BigDecimal degreesFunction(Stack stack){
+        if(stack.size()!=1){
+            return new BigDecimal(0);
+        }
+        return new BigDecimal(Math.toDegrees(Double.parseDouble(stack.pop().toString())));
+    }
+
+    /**
+     * 相关系数，参数为偶数，前一半X数组，后一半Y数组
+     * @param stack
+     * @return
+     */
+    public static BigDecimal correlFunction(Stack stack){
+        if(stack.size() % 2 ==1){
+            return new BigDecimal(0);
+        }
+        int length = stack.size()/2;
+        double []x = new double[length];
+        double []y = new double[length];
+        for(int i= 0;i<length;i++){
+            x[i] = Double.parseDouble(stack.pop().toString());
+        }
+        for(int i= 0;i<length;i++){
+            y[i] = Double.parseDouble(stack.pop().toString());
+        }
+        double averageX = getAverage(x);
+        double averageY = getAverage(y);
+
+        double sum1 = 0, sum2 = 0, sum3 = 0;
+        for(int i= 0;i<length;i++){
+            sum1 += (x[i]-averageX)*(y[i]-averageY);
+            sum2 += (x[i]-averageX)*(x[i]-averageX);
+            sum3 += (y[i]-averageY)*(y[i]-averageY);
+        }
+        return new BigDecimal(sum1/Math.sqrt(sum2*sum3));
+    }
+
+    /**
+     * 返回通过 known_y's 和 known_x's 中数据点的线性回归线的斜率。
+     * 参数为偶数，前一半X数组，后一半Y数组
+     * @param stack
+     * @return
+     */
+    public static BigDecimal slopeFunction(Stack stack){
+        if(stack.size() % 2 ==1){
+            return new BigDecimal(0);
+        }
+        int length = stack.size()/2;
+        double []x = new double[length];
+        double []y = new double[length];
+        for(int i= 0;i<length;i++){
+            x[i] = Double.parseDouble(stack.pop().toString());
+        }
+        for(int i= 0;i<length;i++){
+            y[i] = Double.parseDouble(stack.pop().toString());
+        }
+        double averageX = getAverage(x);
+        double averageY = getAverage(y);
+        double sum1 = 0, sum2 = 0;
+        for(int i= 0;i<length;i++){
+            sum1 += (x[i]-averageX)*(y[i]-averageY);
+            sum2 += (y[i]-averageY)*(y[i]-averageY);
+        }
+        return new BigDecimal(sum1/sum2);
+    }
+
+
+    /**
+     * 参数为偶数，前一半X数组，后一半Y数组
+     * @param stack
+     * @return
+     */
+    public static BigDecimal interceptFunction(Stack stack){
+        if(stack.size() % 2 ==1){
+            return new BigDecimal(0);
+        }
+        int length = stack.size()/2;
+        double []x = new double[length];
+        double []y = new double[length];
+        for(int i= 0;i<length;i++){
+            x[i] = Double.parseDouble(stack.pop().toString());
+        }
+        for(int i= 0;i<length;i++){
+            y[i] = Double.parseDouble(stack.pop().toString());
+        }
+        double averageX = getAverage(x);
+        double averageY = getAverage(y);
+        double sum1 = 0, sum2 = 0;
+        for(int i= 0;i<length;i++){
+            sum1 += (x[i]-averageX)*(y[i]-averageY);
+            sum2 += (y[i]-averageY)*(y[i]-averageY);
+        }
+        return new BigDecimal(averageX-averageY*sum1/sum2);
+    }
+
+    private static double getAverage(double[] inputData) {
+        if (ArrayUtils.isEmpty(inputData)) {
+            return 0;
+        }
+        return getSum(inputData) / inputData.length;
+    }
+
+    private static double getSum(double[] inputData) {
+        if (ArrayUtils.isEmpty(inputData)) {
+            return 0;
+        }
+        return Arrays.stream(inputData).sum();
+    }
+
 }
