@@ -452,9 +452,11 @@ public class WorkOrderExportService {
                             workOrderMap.put("approverSignatureList",approverSignatureList );
                         }
                     }
+                }else if(tenantInfo.getType() != null && tenantInfo.getType() == 6){//县域新增
+                    workOrderMap.put(WebUtil.getMessage("siebleNumber"), workOrderExportPojo.getSiebleNumber());
+                    workOrderMap.put(WebUtil.getMessage("callCenterNumber"), workOrderExportPojo.getCallCenterNumber());
                 }
             }
-
 
             this.putPartsData(workOrderExportPojo ,workOrderMap);
             //this.putWorkOrderStep(workOrderExportPojo ,workOrderMap);

@@ -33,6 +33,13 @@ public class PmOrderActionForm {
     private Integer createType = 1;
 //    String currentPersonId;//验收人
 
+    /**县域需求：顾客姓名 来源于设备所属院区的ContactPerson字段*/
+    private String customerName;
+    /**县域需求：顾客电话 来源于设备所属院区的ContactPhone字段*/
+    private String customerTel;
+    /**县域需求：院区名称 来源于设备所属院区的name字段*/
+    private String siteName;
+
 
 //V2_WorkOrder_Coworker[] coworkes //optional
     public String getPmOrderId() {
@@ -194,4 +201,28 @@ public class PmOrderActionForm {
 //    public void setCurrentPersonId(String currentPersonId) {
 //        this.currentPersonId = currentPersonId;
 //    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerTel() {
+        return customerTel;
+    }
+
+    public void setCustomerTel(String customerTel) {
+        this.customerTel = customerTel;
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
 }

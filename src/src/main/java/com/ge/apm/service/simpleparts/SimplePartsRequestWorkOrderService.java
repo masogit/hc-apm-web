@@ -198,6 +198,7 @@ public class SimplePartsRequestWorkOrderService {
             partsRequestLineItem.setRequestQty(apartsQuantity);
             if(isCountyArea()){//保存县域租户备件表拼凑的收货信息
                 partsRequestLineItem.setAddressInfo(item.getComment());
+                partsRequestLineItem.setComments(item.getPartsDescription());
             }
             assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, userAccount);
             // 未出库

@@ -234,6 +234,16 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Column(name = "supplier_uid")
     private String supplierUid;
 
+    /**县域需求：顾客姓名 来源于设备所属院区的ContactPerson字段*/
+    @Column(name="customer_name")
+    private String customerName;
+    /**县域需求：顾客电话 来源于设备所属院区的ContactPhone字段*/
+    @Column(name="customer_tel")
+    private String customerTel;
+    /**县域需求：院区名称 来源于设备所属院区的name字段*/
+    @Column(name="site_name")
+    private String siteName;
+
     @Transient
     @JsonIgnore
     private String strPlanTime;
@@ -735,5 +745,29 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setWcSignature(String wcSignature) {
         this.wcSignature = wcSignature;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerTel() {
+        return customerTel;
+    }
+
+    public void setCustomerTel(String customerTel) {
+        this.customerTel = customerTel;
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
 }

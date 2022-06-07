@@ -203,6 +203,10 @@ public class SimplePartsTransaction implements Serializable {
     @Column(name = "transport_company")
     private String transportCompany;
 
+    //备件描述
+    @Column(name = "parts_description")
+    private String partsDescription;
+
     @Override
     public int hashCode() {
         int hash = 0;

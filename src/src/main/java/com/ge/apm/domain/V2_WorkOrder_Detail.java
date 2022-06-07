@@ -217,6 +217,9 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     @Column(name = "part_use_type")
     private String partUseType;
 
+    @Column(name = "parts_description")
+    private String partsDescription;
+
     public String getPartsSignature() {
         return partsSignature;
     }
@@ -551,6 +554,14 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
 
     public void setPartUseType(String partUseType) {
         this.partUseType = partUseType;
+    }
+
+    public String getPartsDescription() {
+        return partsDescription;
+    }
+
+    public void setPartsDescription(String partsDescription) {
+        this.partsDescription = partsDescription;
     }
 
     @Override

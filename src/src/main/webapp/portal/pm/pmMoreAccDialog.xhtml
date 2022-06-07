@@ -150,6 +150,11 @@
                                         update="pmmoreAccDialogForm"/>
                             </p:autoComplete>
                         </h:panelGroup>
+                        <h:panelGroup id="itemCode" rendered="#{userContextService.isCountyArea()}">
+                            <label class="label">备件编号</label>
+                            <p:inputText readonly="true"
+                                         value="#{v2PmOrderController.getPartsItemCode(null)}"/>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.PartQuantity}*</label>
                            <p:inputNumber  decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
@@ -237,6 +242,12 @@
                             <p:inputTextarea id="area1" value="#{v2PmOrderController.itemDetail.comment}"/>
                         </h:panelGroup>
 
+                    </p:panelGrid>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userContextService.isCountyArea()}">
+                        <h:panelGroup>
+                            <label class="label">备件描述</label>
+                            <p:inputTextarea rows="1" cols="100" value="#{v2PmOrderController.itemDetail.partsDescription}"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>

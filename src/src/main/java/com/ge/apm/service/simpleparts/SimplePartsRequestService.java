@@ -317,7 +317,7 @@ public class SimplePartsRequestService {
             partsTransaction.setTransportNo(item.getTransportNo()); //运单号
             partsTransaction.setTransportCompany(item.getTransportCompany());   //运输公司
             partsTransaction.setAddressInfo(item.getAddressInfo());//地址信息
-
+            partsTransaction.setPartsDescription(item.getPartsDescription());//备件描述
             SimplePartsTransactionService.addCurrentOrgInfo(partsTransaction);
             partsTransactionRepository.save(partsTransaction);
 
