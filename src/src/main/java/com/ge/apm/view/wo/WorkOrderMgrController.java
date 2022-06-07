@@ -1798,7 +1798,44 @@ public void test1(){
         faultReason=WebUtil.getMessage("EquipmentFault");
         selected = null;
     }
+    public void createBatchServiceRequest() {
 
+        cancel();
+
+        if (!Strings.isNullOrEmpty(requestAssetUid)) {
+            selectedAsset = assetDao.findByUid(requestAssetUid);
+            onSelectedAsset(selectedAsset);
+            currentStatus = selectedAsset.getStatus();
+            if (currentStatus == 1) {
+                currentStatus = 3;
+            }
+        }
+        //从配置信息获取紧急程度
+        CustomConfigObject currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        //从配置信息获取当前状态
+        String strPriority =JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.group[type='orderFields'].priority.defaultValue[0]").toString();
+        String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
+        newServiceRequest = new V2_ServiceRequest();
+        Object requestReason=JSONPath.eval(currentCustomConfig, "mobilePage.pageWorkOrder.group[type='descriptions'].requestReason.defaultValue[0]");
+
+        if(requestReason==null){
+            newServiceRequest.setRequestReason(WebUtil.getMessage("FailedToMeasure"));
+        }else{
+            newServiceRequest.setRequestReason(requestReason.toString());
+        }
+
+        newServiceRequest = new V2_ServiceRequest();
+        picList = new ArrayList();
+        newServiceRequest.setCasePriority(Integer.valueOf(strPriority));//紧急程度默认是设置为一般
+        currentStatus= Integer.valueOf(strAssetStatus);
+        newServiceRequest.setStatus(currentStatus);
+        newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
+        newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
+        newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
+        newServiceRequest.setRequestTime(new Date());
+        faultReason=WebUtil.getMessage("FailedToMeasure");
+        selected = null;
+    }
     public void saveBatchServiceRequest(){
         if(assetInfos!=null && !assetInfos.isEmpty()){
             for (int i = 0; i < assetInfos.size(); i++) {
@@ -1808,7 +1845,7 @@ public void test1(){
                     this.saveServiceRequestSupplier();
                 }
                 if(StringUtils.isEmpty(faultReason)){
-                    newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
+                    newServiceRequest.setRequestReason(WebUtil.getMessage("FailedToMeasure"));
                 }else{
                     newServiceRequest.setRequestReason(faultReason);
                 }

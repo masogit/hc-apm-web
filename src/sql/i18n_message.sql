@@ -2104,6 +2104,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentFault', '设备故障', 'Equipment Fault', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'RepairTelephoneNumberTips', '该设备可以外修,报修电话', 'The equipment can be repaired externally. Repair Telephone Number', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AddDocument', '添加文档', 'Add Document', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FailedToMeasure', '计量不通过', 'Failed to measure', NULL, '-1');
 
 
 

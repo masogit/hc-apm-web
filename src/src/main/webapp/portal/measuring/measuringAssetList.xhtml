@@ -150,7 +150,7 @@
                         </p:dataTable>
 
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.createServiceRequest()}" disabled="#{!measureAssetListController.flag}"
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.createBatchServiceRequest()}" disabled="#{!measureAssetListController.flag}"
                                      value="确认" update="measuringTab:ServiceRequestCreateForm" icon="ui-icon-check"
                                      oncomplete="PF('createSRDialog').show()" onclick="PF('BatchRepairDialog').hide()"/>
 
