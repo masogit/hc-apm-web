@@ -27,7 +27,7 @@
 
                     <h:panelGrid id="buttonSearchList" columns="12" cellpadding="5">
                         <p:inputText id="searchText" value="#{simplePartsTransactionController.oneSearchStr}"
-                                     placeholder="备件名称/申请单编"
+                                     placeholder="备件名称/申请单编号/工单编号"
                                      maxlength="105" style="width: 360px">
                             <p:ajax event="keyup"
                                     update=":SparePartsInventoryListForm:datalist searchButtons"/>
@@ -68,7 +68,9 @@
                                   filterBy="#{item.requestCode}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.requestCode}"/>
                         </p:column>
-
+                        <p:column headerText="工单号" rendered="#{userContextService.isCountyArea()}">
+                            <h:outputText value="#{simplePartsTransactionController.getMaintenanceWorkOrderNumber(item.partsRequestId)}"/>
+                        </p:column>
                         <p:column headerText="申请单类型" sortBy="#{item.requestType}"
                                   filterBy="#{item.requestType}" filterMatchMode="EQ">
 

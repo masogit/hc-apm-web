@@ -256,6 +256,10 @@ public class SimplePartsRequestLineItem implements Serializable {
     @Transient
     private SimplePartsItemValue partsItemValue;
 
+    //备件描述
+    @Column(name = "parts_description")
+    private String partsDescription;
+
     public Integer getRequestQtyAsObject() {
         if (null == this.getId()) {
             return null;

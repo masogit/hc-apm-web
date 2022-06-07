@@ -39,7 +39,9 @@
                                     <p:column headerText="#{msg.PartName}">
                                         <h:outputText value="#{item.parts}"/>
                                     </p:column>
-
+                                    <p:column headerText="#{msg.PartsItemCode}" rendered="#{userContextService.countyArea}">
+                                        <h:outputText value="#{v2PmOrderController.getPartsItemCode(item)}"/>
+                                    </p:column>
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{item.apartsQuantity}"/>
                                     </p:column>

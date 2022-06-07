@@ -116,6 +116,14 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("requestCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            List<SimplePartsRequest> simplePartsRequestList = partsRequestRepository.findByMaintenanceWorkOrderNumberLike(oneSearchStr + "%");
+            if(simplePartsRequestList != null){
+                List<String> partsRequestIds = new ArrayList<>();
+                simplePartsRequestList.stream().forEach(item -> partsRequestIds.add(item.getId()));
+                if(partsRequestIds != null && partsRequestIds.size() > 0){
+                    this.updateSearchFilter(new SearchFilter("partsRequestId", SearchFilter.Operator.IN,partsRequestIds));
+                }
+            }
         }
     }
 
@@ -192,5 +200,13 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
     public void onFilter(FilterEvent event) {
         selected = null;
         super.onFilter(event);
+    }
+
+    public String getMaintenanceWorkOrderNumber(String partsRequestId){
+        SimplePartsRequest simplePartsRequest = partsRequestRepository.findById(partsRequestId);
+        if(simplePartsRequest != null){
+            return simplePartsRequest.getMaintenanceWorkOrderNumber();
+        }
+        return null;
     }
 }

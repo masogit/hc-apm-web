@@ -137,6 +137,7 @@ public class SimplePartsRequestLineItemService {
         partsTransaction.setComments(partsRequestLineItem.getComments());//备注
         partsTransaction.setStorageType(partsRequestLineItem.getStorageType());//入库类型
         partsTransaction.setAddressInfo(partsRequestLineItem.getAddressInfo());//地址信息
+        partsTransaction.setPartsDescription(partsRequestLineItem.getPartsDescription());//备件描述
 
 
 

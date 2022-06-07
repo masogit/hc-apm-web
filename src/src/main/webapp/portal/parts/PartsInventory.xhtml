@@ -49,6 +49,14 @@
                             <p:column headerText="备件名称">
                                 <h:outputText value="#{item.name}"/>
                             </p:column>
+                            <p:column headerText="#{msg.PartsItemCode}" rendered="#{userContextService.countyArea}">
+                                <h:outputText value="#{simplePartsInventoryController.getPartsItemCode(item)}"/>
+                            </p:column>
+                            <p:column headerText="备件单价" rendered="#{userContextService.countyArea}">
+                                <h:outputText value="#{simplePartsInventoryController.getPartsItemUnitPrice(item)}">
+                                    <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                </h:outputText>
+                            </p:column>
                             <p:column headerText="所属仓库">
                                 <h:outputText
                                         value="#{simplePartsInventoryController.findWarehouseNameById(item.partsWarehouseId,null).name}"/>
