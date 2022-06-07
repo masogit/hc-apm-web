@@ -5,6 +5,8 @@
  */
 package com.ge.apm.domain.pure;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,34 +14,12 @@ import java.util.List;
  *
  * @author 212579464
  */
+@Data
 public class TableSchema {
 
     private String schemaId;
     private String title;
     private List<TableGroup> groups=new ArrayList();
 
-    public String getTitle() {
-        return title;
-    }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<TableGroup> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<TableGroup> groups) {
-        this.groups = groups;
-    }
-
-    public String getSchemaId() {
-        return schemaId;
-    }
-
-    public void setSchemaId(String schemaId) {
-        this.schemaId = schemaId;
-    }
-    
 }
