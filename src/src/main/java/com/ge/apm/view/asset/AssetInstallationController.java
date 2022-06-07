@@ -453,10 +453,9 @@ public class AssetInstallationController {
                                 //通过assetinfo中的uid值，获取到id值保存到集合
                                 RelRuleAssetController.assetInfoUids=assetIds;
                                 return "/portal/asset/arrived/ItemEdit2?faces-redirect=true";
-                            }else{
-                                return "/portal/reporter/schemaList?faces-redirect=true";
                             }
                         }
+                        return "/portal/reporter/schemaList?faces-redirect=true";
                     }else{
                         return "/portal/reporter/schemaList?faces-redirect=true";
                     }
