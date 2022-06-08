@@ -1885,12 +1885,17 @@ public void test1(){
 
     public void saveServiceRequest() {
         if(userContextService.isCountyArea()){
+            String msg = null;
             if(newServiceRequest.getSiebleNumber() != null && newServiceRequest.getSiebleNumber().length() != 13){
-                WebUtil.addErrorMessage(WebUtil.getMessage("siebleNumber")+"长度必须填为13位");
-                return;
+                msg = WebUtil.getMessage("siebleNumber")+"长度必须填为13位";
             }
             if(newServiceRequest.getCallCenterNumber() != null && newServiceRequest.getCallCenterNumber().length() != 10){
-                WebUtil.addErrorMessage(WebUtil.getMessage("callCenterNumber")+"长度必须填为10位");
+                msg = WebUtil.getMessage("callCenterNumber")+"长度必须填为10位";
+            }
+            if(StringUtils.isNotBlank(msg)){
+                WebUtil.addErrorMessage(msg);
+                //前端弹窗不退出并提示错误信息
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
         }
