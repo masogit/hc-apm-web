@@ -202,9 +202,9 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
             partsItemService = WebUtil.getBean(SimplePartsItemService.class);
         }
         SimplePartsItem simplePartsItem = partsItemService.getPartsItem(simplePartsInventory.getPartsItemId(),simplePartsInventory.getName());
-        if(simplePartsItem != null){
+        if(simplePartsItem != null && simplePartsItem.getUnitPrice() != null){
             return simplePartsItem.getUnitPrice().doubleValue();
         }
-        return null;
+        return 0.00;
     }
 }
