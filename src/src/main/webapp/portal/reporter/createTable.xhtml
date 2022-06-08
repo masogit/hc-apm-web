@@ -458,7 +458,7 @@
                             </p:panelGrid>
                         </p:fieldset>
                         <p:fieldset legend="公式计算"  rendered="#{'FormulaValue' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <p class="label">说明： [key] 表示引用表中已经填充的数据 支持函数： sum,avg,max,min,if,abs,eq,not,and,or,stdev  </p>
+                            <p class="label">说明： [key] 表示引用表中已经填充的数据 支持函数： sum,avg,max,min,if,abs,eq,not,and,or,stdev,power,sqrt,degrees,correl,slope,intercept,atan,tan  </p>
                             <h:panelGroup>
                                     <label class="label">公式</label>
                                     <p:inputTextarea  cols="90"  value="#{tableCreateController.editTableItem.exp['formula']}" required="true" requiredMessage="公式#{msg.ValidationRequire}" />
