@@ -24,6 +24,9 @@
                     <a id="menu-button" class="menu-button flex flex--row flex--middle flex--center u-mv--" href="javascript:;" style="text-decoration:none;">
                         <i class="material-icons">play_circle_outlined</i>
                     </a>
+                    <c:if test="${userContextService.siteOrgInfoChild != null}">
+                        <ui:include src="./campus-switching.xhtml" />
+                    </c:if>
                     <c:choose>
                         <c:when test="${userContextService.ztbTenant}">
                             <ui:fragment>

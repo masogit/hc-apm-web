@@ -1,0 +1,22 @@
+<ui:composition
+xmlns="http://www.w3.org/1999/xhtml"
+xmlns:f="http://java.sun.com/jsf/core"
+xmlns:h="http://java.sun.com/jsf/html"
+xmlns:ui="http://java.sun.com/jsf/facelets"
+xmlns:p="http://primefaces.org/ui"
+xmlns:pu="http://primefaces.org/ultima"
+xmlns:svg="http://www.w3.org/2000/svg">
+	<div class=" flex flex--row flex--middle flex--center">
+			<label  style="font-size:14px;color: #ffffff;font-weight: inherit">当前院区：</label>
+			<h:selectOneMenu   id="txt3" value="#{userContextService.selectedSiteUid}" style="width:50%">
+				<p:ajax  listener="#{userContextService.updateSiteUid()}" oncomplete="refreshPage();" />
+				<f:selectItem itemLabel="" itemValue=""/>
+				<f:selectItems value="#{userContextService.siteOrgInfoChild}" var="fieldItem" itemLabel="#{fieldItem.name}"  itemValue="#{fieldItem.uid}" />
+			</h:selectOneMenu>
+	</div>
+	<script type="text/javascript">
+		function refreshPage() {
+			window.location.reload();
+		}
+	</script>
+</ui:composition>
