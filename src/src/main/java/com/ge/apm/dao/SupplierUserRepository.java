@@ -11,6 +11,9 @@ public interface SupplierUserRepository extends GenericRepositoryUUID<SupplierUs
 
     List<SupplierUser> findBySupplierIDAndStatus(Integer supplierID, String status);
 
+    @Query(value ="SELECT user_uid FROM supplier_user WHERE supplier_uid = ?1" ,nativeQuery = true)
+    List<String> findSupplierUsersBySupplierUID(String supplierUid);
+
     List<SupplierUser> findBySupplierIDAndUserIDAndStatus(Integer supplierID, Integer userID, String status);
 
     List<SupplierUser> findByStatus(String status);

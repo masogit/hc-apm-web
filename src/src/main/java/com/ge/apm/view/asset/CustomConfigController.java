@@ -112,6 +112,14 @@ public class CustomConfigController {
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsDetailpageBasicFields().contains(item)).collect(Collectors.toList());
                 break;
+            case "SupplierViewFields":
+                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !customConfigObject.getSupplierViewFields().contains(item)).collect(Collectors.toList());
+                break;
+            case "SupplierEditFields":
+                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !customConfigObject.getSupplierEditFields().contains(item)).collect(Collectors.toList());
+                break;
             case "DetailFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsDetailpageDetailFields().contains(item)).collect(Collectors.toList());
@@ -132,6 +140,12 @@ public class CustomConfigController {
                 break;
             case "UsingFields":
                 addFieldsList = allFields.keySet().stream().filter(item -> !customConfigObject.getAssetFields().containsKey(item)).collect(Collectors.toList());
+                break;
+            case "RemoveSuppplierViewFields":
+                addFieldsList.addAll(customConfigObject.getSupplierViewFields());
+                break;
+            case "RemoveSupplierEditFields":
+                addFieldsList.addAll(customConfigObject.getSupplierEditFields());
                 break;
             case "RemoveBasicFields":
                 addFieldsList.addAll(customConfigObject.getAssetsDetailpageBasicFields());
@@ -215,6 +229,12 @@ public class CustomConfigController {
             case "BasicFields":
             case "RemoveBasicFields":
                 return ":customConfigForm:tabView:BasicFieldsList";
+            case "SupplierViewFields":
+            case "RemoveSuppplierViewFields":
+                return ":customConfigForm:tabView:SupplierViewFieldsList";
+            case "SupplierEditFields":
+            case "RemoveSupplierEditFields":
+                return ":customConfigForm:tabView:SupplierEditFieldsList";
             case "MobileHeaderFields":
             case "RemoveMobileHeaderFields":
                 return ":customConfigForm:tabView:MobileHeaderFieldsList";
@@ -268,6 +288,14 @@ public class CustomConfigController {
             case "BasicFields":
                 customConfigObject.getAssetsDetailpageBasicFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "SupplierViewFields":
+                customConfigObject.getSupplierViewFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getSupplierViewFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "SupplierEditFields":
+                customConfigObject.getSupplierEditFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getSupplierEditFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "DetailFields":
                 customConfigObject.getAssetsDetailpageDetailFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
