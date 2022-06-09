@@ -826,6 +826,8 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_active_supplier")
     private Boolean isActiveSupplier = Boolean.FALSE;//是否激活供应商流程
 
+    @Column(name = "aa_enable_hospital_adjustment")
+    private Boolean enableHospitalAdjustment = Boolean.FALSE;//是否开启医院调剂
 
     @Column(name = "aa_default_maintain_man_hour")
     private Double defaultMaintainManHour = 0.0D;
@@ -1550,6 +1552,17 @@ public class WorkflowConfig implements Serializable {
 
     public void setDefaultMaintainManHour(Double defaultMaintainManHour) {
         this.defaultMaintainManHour = defaultMaintainManHour;
+    }
+
+    public Boolean getEnableHospitalAdjustment() {
+        return enableHospitalAdjustment;
+    }
+
+    public void setEnableHospitalAdjustment(Boolean enableHospitalAdjustment) {
+        if(enableHospitalAdjustment == null){
+            enableHospitalAdjustment=Boolean.FALSE;
+        }
+        this.enableHospitalAdjustment = enableHospitalAdjustment;
     }
 
     @Override

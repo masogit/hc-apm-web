@@ -1480,9 +1480,15 @@ public class UserContextService implements Serializable {
     }
 
     public List<OrgInfo> getSiteOrgInfoChild(){
-        if(child == null){
+            if(CollectionUtils.isNotEmpty(child)) return child;
             String hospitalUID = userAccount.getHospitalUID();
             if(userAccount.getOrgLevel() == 2 && hospitalUID.equals(userAccount.getSiteUID())){
+                WorkflowConfigRepository workflowConfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+                List<WorkflowConfig> workflowConfigList = workflowConfigDao.findBySiteUID(hospitalUID);
+                WorkflowConfig hospitaWorkflowConfig=null;
+                if(CollectionUtils.isNotEmpty(workflowConfigList) && (hospitaWorkflowConfig=workflowConfigList.get(0)) != null && !hospitaWorkflowConfig.getEnableHospitalAdjustment()){
+                    return null;
+                }
                 OrgInfoRepository orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
                 child= orgInfoRepository.getHospitalByTenantUIDAndType(hospitalUID);
                 if(child.size() > 0){
@@ -1494,7 +1500,6 @@ public class UserContextService implements Serializable {
                     }).collect(Collectors.toList());
                 }
             }
-        }
         return  child;
     }
 }
