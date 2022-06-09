@@ -582,6 +582,12 @@
                             <label class="label">维护消毒工时默认值</label>
                             <p:inputNumber  value="#{workflowConfigController.selected.defaultMaintainManHour}" minValue="0.0" decimalPlaces="1"/>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{workflowConfigController.selectedUserOrg.orgLevel ==2}">
+                            <label class="label">是否开启医院调剂</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableHospitalAdjustment}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 

@@ -334,6 +334,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "device_status")
     private Integer deviceStatus;//资产状态
 
+    //null   1 empowerment  //这个字段不需要编辑和展示，所以只存null 和1
+    @Column(name = "empowerment_status")
+    private Integer empowermentStatus;
+
     @Column(name = "parent_asset_id")
     private Integer parentAssetId;
 
@@ -2476,4 +2480,8 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setContractType(String contractType) {
         this.contractType = contractType;
     }
+
+    public Integer getEmpowermentStatus() { return empowermentStatus; }
+
+    public void setEmpowermentStatus(Integer empowermentStatus) { this.empowermentStatus = empowermentStatus; }
 }
