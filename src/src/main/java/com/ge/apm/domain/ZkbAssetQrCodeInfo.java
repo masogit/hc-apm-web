@@ -116,6 +116,12 @@ public class ZkbAssetQrCodeInfo {
     @Column(name = "ibqrcodetemporary")
     private Boolean ibQrCodeTemporary;
 
+    /**
+     * 装机状态 0-Installed 1-Shipped 2-Deinstalled
+     */
+    @Column(name = "install_status")
+    private Integer installStatus;
+
     public String getId() {
         return id;
     }
@@ -266,6 +272,14 @@ public class ZkbAssetQrCodeInfo {
 
     public void setGeFlag(String geFlag) {
         this.geFlag = geFlag;
+    }
+
+    public Integer getInstallStatus() {
+        return installStatus;
+    }
+
+    public void setInstallStatus(Integer installStatus) {
+        this.installStatus = installStatus;
     }
 
     @Override
