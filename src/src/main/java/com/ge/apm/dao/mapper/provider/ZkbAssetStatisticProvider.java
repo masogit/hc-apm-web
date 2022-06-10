@@ -145,7 +145,8 @@ public class ZkbAssetStatisticProvider {
                 " qr_code_info.reason_date,"+
                 " qr_code_info.qr_code_count_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date," +
                 " case when ib_qr_code.is_qr_code=true then 'Y' end as ib_qr_code_state," +
-                " case when ib_qr_code.ge_upload_flag='t' then 'Y' when ib_qr_code.ge_upload_flag='f' then 'N' end as ge_flag"+
+                " case when ib_qr_code.ge_upload_flag='t' then 'Y' when ib_qr_code.ge_upload_flag='f' then 'N' end as ge_flag," +
+                " ib_qr_code.install_status" +
                 " FROM" +
                 " zkb_contract ac" +
                 " INNER JOIN zkb_contract_asset zca ON zca.contract_id=ac.id" +
