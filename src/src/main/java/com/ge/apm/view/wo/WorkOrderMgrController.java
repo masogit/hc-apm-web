@@ -2226,6 +2226,7 @@ public void test1(){
         selectedObjectMap = new HashMap();
         itemDetail= vwd;
         itemDetail.setPartUseType(null);
+        itemDetail.setPartsDescription(null);
         saveCountyAreaAddressInfo();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
     }

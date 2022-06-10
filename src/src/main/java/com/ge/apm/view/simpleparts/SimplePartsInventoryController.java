@@ -205,6 +205,6 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
         if(simplePartsItem != null && simplePartsItem.getUnitPrice() != null){
             return simplePartsItem.getUnitPrice().doubleValue();
         }
-        return 0.00;
+        return null;
     }
 }

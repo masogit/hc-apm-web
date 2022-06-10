@@ -101,6 +101,7 @@ public class ZkbAssetStatisticService {
             SearchFilter systemIdFilter = new SearchFilter("canNotPastQrCode", SearchFilter.Operator.EQ, canNotPastQrCode);
             searchFilters.add(systemIdFilter);
         }
+        searchFilters.add(new SearchFilter("installStatus", SearchFilter.Operator.NE, 2));
         List<ZkbAssetStatistic> assetList = zkbAssetStatisticMapper.loadAllAsset(searchFilters);
         if(CollectionUtils.isEmpty(assetList))
         {
