@@ -4,11 +4,13 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.Stack;
 
 public class Functions {
 
+    private static final int SCALE = 4;
 
     public static final Map<String,String> FUNCTION_MAP = ImmutableMap.<String,String>builder()
             .put("sum","sumFunction")
@@ -43,7 +45,7 @@ public class Functions {
         while (!stack.isEmpty()) {
             sum = sum.add(new BigDecimal(stack.pop().toString()));
         }
-        return sum;
+        return sum.setScale(4, RoundingMode.HALF_UP);
     }
 
     /**
@@ -58,7 +60,7 @@ public class Functions {
         while (!stack.isEmpty()) {
             sum = sum.add(new BigDecimal(stack.pop().toString()));
         }
-        return sum.divide(new BigDecimal(count), 7, BigDecimal.ROUND_HALF_UP);
+        return sum.divide(new BigDecimal(count), SCALE, BigDecimal.ROUND_HALF_UP);
     }
 
     /**
@@ -72,7 +74,7 @@ public class Functions {
         while (!stack.isEmpty()) {
             res = Math.max(res.doubleValue() , Double.parseDouble(stack.pop().toString()));
         }
-        return new BigDecimal(res);
+        return new BigDecimal(res).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     /**
@@ -86,7 +88,7 @@ public class Functions {
         while (!stack.isEmpty()) {
             res = Math.min(res.doubleValue() , Double.parseDouble(stack.pop().toString()));
         }
-        return new BigDecimal(res);
+        return new BigDecimal(res).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     /**
@@ -97,7 +99,7 @@ public class Functions {
      */
     public static BigDecimal absFunction(Stack stack) {
         Double res =  Double.parseDouble(stack.pop().toString());
-        return new BigDecimal(Math.abs(res.doubleValue()));
+        return new BigDecimal(Math.abs(res.doubleValue())).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     /**
@@ -205,13 +207,13 @@ public class Functions {
         for(BigDecimal i : valueList){
             sum = sum.add(i);
         }
-        BigDecimal avg = sum.divide(new BigDecimal(valueList.size()), 7, BigDecimal.ROUND_HALF_UP);
+        BigDecimal avg = sum.divide(new BigDecimal(valueList.size()), SCALE, BigDecimal.ROUND_HALF_UP);
         sum= new BigDecimal(0);
         for(BigDecimal i : valueList){
             sum = sum.add(i.subtract(avg).multiply(i.subtract(avg)));
         }
 
-        return new BigDecimal(Math.sqrt(sum.divide(new BigDecimal(valueList.size()-1), 7, BigDecimal.ROUND_HALF_UP).doubleValue()));
+        return new BigDecimal(Math.sqrt(sum.divide(new BigDecimal(valueList.size()-1), SCALE, BigDecimal.ROUND_HALF_UP).doubleValue()));
 
     }
 
@@ -226,7 +228,7 @@ public class Functions {
         }
         double base = Double.parseDouble(stack.pop().toString());
         double pow = Double.parseDouble(stack.pop().toString());
-        return new BigDecimal(Math.pow(base, pow));
+        return new BigDecimal(Math.pow(base, pow)).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
 
@@ -234,28 +236,28 @@ public class Functions {
         if(stack.size()!=1){
             return new BigDecimal(0);
         }
-        return new BigDecimal(Math.sqrt(Double.parseDouble(stack.pop().toString())));
+        return new BigDecimal(Math.sqrt(Double.parseDouble(stack.pop().toString()))).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     public static BigDecimal tanFunction(Stack stack){
         if(stack.size()!=1){
             return new BigDecimal(0);
         }
-        return new BigDecimal(Math.tan(Double.parseDouble(stack.pop().toString())));
+        return new BigDecimal(Math.tan(Double.parseDouble(stack.pop().toString()))).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     public static BigDecimal atanFunction(Stack stack){
         if(stack.size()!=1){
             return new BigDecimal(0);
         }
-        return new BigDecimal(Math.atan(Double.parseDouble(stack.pop().toString())));
+        return new BigDecimal(Math.atan(Double.parseDouble(stack.pop().toString()))).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     public static BigDecimal degreesFunction(Stack stack){
         if(stack.size()!=1){
             return new BigDecimal(0);
         }
-        return new BigDecimal(Math.toDegrees(Double.parseDouble(stack.pop().toString())));
+        return new BigDecimal(Math.toDegrees(Double.parseDouble(stack.pop().toString()))).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     /**
@@ -285,7 +287,7 @@ public class Functions {
             sum2 += (x[i]-averageX)*(x[i]-averageX);
             sum3 += (y[i]-averageY)*(y[i]-averageY);
         }
-        return new BigDecimal(sum1/Math.sqrt(sum2*sum3));
+        return new BigDecimal(sum1/Math.sqrt(sum2*sum3)).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     /**
@@ -314,7 +316,7 @@ public class Functions {
             sum1 += (x[i]-averageX)*(y[i]-averageY);
             sum2 += (y[i]-averageY)*(y[i]-averageY);
         }
-        return new BigDecimal(sum1/sum2);
+        return new BigDecimal(sum1/sum2).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
 
@@ -343,7 +345,7 @@ public class Functions {
             sum1 += (x[i]-averageX)*(y[i]-averageY);
             sum2 += (y[i]-averageY)*(y[i]-averageY);
         }
-        return new BigDecimal(averageX-averageY*sum1/sum2);
+        return new BigDecimal(averageX-averageY*sum1/sum2).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     private static double getAverage(double[] inputData) {
