@@ -1,34 +1,43 @@
 package com.ge.apm.view.pm;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.PmOrderRuleRepository;
+import com.ge.apm.dao.RelRuleAssetRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.pm.RelRuleAssetService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.github.stuxuhai.jpinyin.PinyinException;
+import com.github.stuxuhai.jpinyin.PinyinFormat;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PmOrderRuleRepository;
-import com.ge.apm.dao.RelRuleAssetRepository;
-import com.ge.apm.view.sysutil.UserContextService;
-import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -42,6 +51,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private PmOrderRuleRepository pmOrderRuleRepository;
 	private AssetInfoRepository assetInfoRepository;
 	private String queryCondition;
+    private AssetInfoService assetInfoService;
+    private OrgInfoTreeService orgInfoTreeService;
 	private List<String> assetUids;
 	private OrgInfoRepository orgInfoRepository;
 	private RelRuleAssetService relRuleAssetService;
@@ -53,10 +64,31 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private boolean deleteRule3 = false;
 	private Map<String, Boolean> selectedMap;
 	private List<RelRuleAsset> currentPageAssets;
+    private List<OrgInfo> clinicalDeptList;
+    private  List<PmOrderRule> pmOrderRuleList;
+    //选定科室过滤
+    @Getter @Setter
+    private String filterClinicalDeptOrg;
+    @Getter@Setter
+    private String filterRuleUIDInspectionName;
+    @Getter@Setter
+    private String filterRuleUID2Name;
+    @Getter@Setter
+    private String filterRuleUIDName;
+    @Getter@Setter
+    private String filterRuleUID4Name;
+    private String filterPmOrderRuleUid=null;
+    private Integer filterRuleLevel=null;
+    private Set<String> clinicalDeptOrgUidSet;
 	@Getter @Setter
 	private StreamedContent excelFile;
     private ConfigService configService;
-	
+    @Getter @Setter
+    private String startUsingDateFormatTime = null;
+    @Getter @Setter
+    private String startPurchaseDateFormatTime = null;
+    @Getter @Setter
+    private String startConfigurationDateFormatTime = null;
 	@Override
 	protected void init() {
 		this.filterByHospital = false;
@@ -70,12 +102,15 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		relRuleAssetService = WebUtil.getBean(RelRuleAssetService.class);
         configService = WebUtil.getBean(ConfigService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 		assetMap = new HashMap<>();
 		ruleMap = new HashMap<>();
 		this.selectedMap = new HashMap();
 		this.currentPageAssets = new ArrayList<>();
 		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
+        loadClinicalDeptList();
 	}
 
 	@Override
@@ -87,26 +122,209 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	protected Page<RelRuleAsset> loadData(PageRequest pageRequest) {
 		assetMap.clear();
 		ruleMap.clear();
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        if (filterPmOrderRuleUid!= null && filterRuleLevel!=null) {
+            String ruleUID =null;
+            switch (filterRuleLevel) {
+                case 1:ruleUID="ruleUIDInspection"; break;
+                case 2:ruleUID="ruleUID2"; break;
+                case 3:ruleUID="ruleUID"; break;
+                case 4:ruleUID="ruleUID4"; break;
+            }
+            searchFilterList.add(new SearchFilter(ruleUID, SearchFilter.Operator.EQ, filterPmOrderRuleUid));
 
-		if(searchFilters != null) {
-			searchFilters.clear();
-		}else{
-			searchFilters = new ArrayList<>();
-		}
+        }
+        searchFilterList.addAll(searchFilters);
 		if(StringUtils.isNotEmpty(queryCondition)){
-			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, findAssetUidBySearchFilter(getAssetInfoByFilter())));
+            searchFilterList.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, findAssetUidBySearchFilter(getAssetInfoByFilter())));
 		}else {
-			searchFilters.addAll(getOrgFilter(user.getSiteUID()));
-			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, getInvalidAssets(user.getTenantUID())));
+            searchFilterList.addAll(getOrgFilter(user.getSiteUID()));
+            searchFilterList.add(new SearchFilter("assetUID", SearchFilter.Operator.NotIN, getInvalidAssets(user.getTenantUID())));
 		}
+        String assetName=null;//资产名称
+        String departNum=null;//设备编号
+        Integer assetGroup=null;//设备分类
+        String nationalStandardCode=null;//2010国家编码
+        String makerShortName=null;//品牌/制造商简称
+        String manufacture=null;//制造商
+        String qrCode=null;//二维码
+        String startUsingDate=null;
+        String purchaseDate=null;
+        if (CollectionUtils.isNotEmpty(searchFilters)){
+            for (SearchFilter searchFilter :searchFilters) {
+                if ("assetName".equals(searchFilter.fieldName)) assetName = (String)searchFilter.value;
+                if ("departNum".equals(searchFilter.fieldName)) departNum = (String)searchFilter.value;
+                if ("assetGroup".equals(searchFilter.fieldName)) assetGroup =Integer.valueOf((String)searchFilter.value);
+                if ("nationalStandardCode".equals(searchFilter.fieldName)) nationalStandardCode = (String)searchFilter.value;
+                if ("makerShortName".equals(searchFilter.fieldName)) makerShortName = (String)searchFilter.value;
+                if ("manufacture".equals(searchFilter.fieldName)) manufacture = (String)searchFilter.value;
+                if ("qrCode".equals(searchFilter.fieldName)) qrCode = (String)searchFilter.value;
+                if ("startUsingDate".equals(searchFilter.fieldName)) {
+                    startUsingDate = (String)searchFilter.value;
+                }
+                if ("purchaseDate".equals(searchFilter.fieldName)) {
+                    purchaseDate = (String)searchFilter.value;
+                }
+            }
+        }
+        searchFilterList.removeIf(e -> e.fieldName.equals("assetName"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("departNum"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("assetGroup"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("clinicalDeptName"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("nationalStandardCode"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("makerShortName"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("manufacture"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("qrCode"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("startUsingDate"));
+        searchFilterList.removeIf(e -> e.fieldName.equals("purchaseDate"));
 		Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
-		Page<RelRuleAsset> result = dao.findBySearchFilter(searchFilters, pageRequest);
-		currentPageAssets = result.getContent();
-		initMap(result);
-		return result;
+        List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(searchFilterList);
+        List<RelRuleAsset> relRuleAssetList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(relRuleAssets) && (StringUtils.isNotEmpty(assetName)|| StringUtils.isNotEmpty(departNum)|| assetGroup!=null || CollectionUtils.isNotEmpty(clinicalDeptOrgUidSet)||
+                StringUtils.isNotEmpty(nationalStandardCode)|| StringUtils.isNotEmpty(makerShortName)|| StringUtils.isNotEmpty(manufacture)|| StringUtils.isNotEmpty(qrCode)||
+                StringUtils.isNotEmpty(startUsingDate) || StringUtils.isNotEmpty(purchaseDate))){
+            for(RelRuleAsset relRuleAsset :relRuleAssets){
+                String assetUID = relRuleAsset.getAssetUID();
+                AssetInfo assetInfo = assetInfoService.selectAssetInfos(assetUID, assetName, departNum, assetGroup,  clinicalDeptOrgUidSet, nationalStandardCode, makerShortName, manufacture, qrCode,
+                        startUsingDate,purchaseDate);
+                if(assetInfo!=null){
+                    relRuleAssetList.add(relRuleAsset);
+                }
+            }
+             assetName=null;
+             departNum=null;
+             assetGroup=null;
+             filterPmOrderRuleUid=null;
+             filterRuleLevel=null;
+             nationalStandardCode=null;
+             makerShortName=null;
+             manufacture=null;
+             qrCode=null;
+        }else {
+            relRuleAssetList.addAll(relRuleAssets);
+        }
+		currentPageAssets = relRuleAssetList;
+        int size = relRuleAssetList.size();
+        relRuleAssetList= this.pageNum(relRuleAssetList, pageRequest);
+        Page<RelRuleAsset>  assetInfoPage = new PageImpl<RelRuleAsset>(relRuleAssetList, pageRequest, size);
+		initMap(relRuleAssetList);
+		return assetInfoPage;
 	}
+    private List<RelRuleAsset> pageNum(List<RelRuleAsset> relRuleAssetList,PageRequest pageRequest){
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize() - 1;
+        int numStart = pageNumber * pageSize;
+        numStart = numStart + pageNumber;
+        int numEnd = numStart + pageSize + 1;
+        int size = relRuleAssetList.size();
+        if(size > numEnd){
+            relRuleAssetList = relRuleAssetList.subList(numStart ,numEnd);
+        }else {
+            relRuleAssetList = relRuleAssetList.subList(numStart ,size);
+        }
+        return relRuleAssetList;
+    }
+    private void loadClinicalDeptList() {
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+    }
+    public void getRuleList() {
+        List<SearchFilter> filter = new ArrayList<>();
+        filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+        filter.add(new SearchFilter("status", SearchFilter.Operator.IN, Lists.newArrayList(1, 2, 3)));
+        pmOrderRuleList = pmOrderRuleRepository.findBySearchFilter(filter);
+        pmOrderRuleList.sort(new Comparator<PmOrderRule>() {
+            @Override
+            public int compare(PmOrderRule o1, PmOrderRule o2) {
+                try {
+                    String name1 = PinyinHelper.convertToPinyinString(o1.getName(), "", PinyinFormat.WITHOUT_TONE);
+                    String name2 = PinyinHelper.convertToPinyinString(o2.getName(), "", PinyinFormat.WITHOUT_TONE);
+                    return name1.compareTo(name2);
+                } catch (PinyinException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+    }
+    public List<String> autoLevelRulePMName(Integer level) {
+	    getRuleList();
+        if(level!=null){
+            filterRuleLevel=level;
+            pmOrderRuleList = pmOrderRuleList.stream().filter(s -> s.getLevel() ==level).collect(Collectors.toList());
+        }
+        return pmOrderRuleList.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+    public void onLevelRulePMNameFilterChange(AjaxBehaviorEvent event) {
+	    String filterLevelRulePMName;
+        if (event instanceof SelectEvent) {
+            filterLevelRulePMName=(String) ((SelectEvent) event).getObject();
+            if(StringUtils.isNotEmpty(filterLevelRulePMName)){
+                switch (filterRuleLevel) {
+                    case 1:
+                        filterRuleUIDInspectionName = filterLevelRulePMName;
+                        filterRuleUID2Name=null;
+                        filterRuleUIDName=null;
+                        filterRuleUID4Name=null;
+                    break;
+                    case 2:
+                        filterRuleUID2Name = filterLevelRulePMName;
+                        filterRuleUIDInspectionName=null;
+                        filterRuleUIDName=null;
+                        filterRuleUID4Name=null;
+                        break;
+                    case 3:
+                        filterRuleUIDName = filterLevelRulePMName;
+                        filterRuleUIDInspectionName=null;
+                        filterRuleUID2Name=null;
+                        filterRuleUID4Name=null;
+                        break;
+                    case 4:
+                        filterRuleUID4Name = filterLevelRulePMName;
+                        filterRuleUIDInspectionName=null;
+                        filterRuleUID2Name=null;
+                        filterRuleUID4Name=null;
+                        break;
+                }
+                filterPmOrderRuleUid = this.pmOrderRuleList.stream().filter(item -> item.getName().equals(filterLevelRulePMName)).collect(Collectors.toList()).get(0).getUid();
+            }
+        }
 
+    }
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+            filterClinicalDeptOrg = null;
+        }
+        if (filterClinicalDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
 	public void onSelectAllOfPage() {
 		boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getAssetUID()) || !selectedMap.get(item.getAssetUID()));
 		for (RelRuleAsset item : currentPageAssets) {
@@ -149,9 +367,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		return uids;
 	}
 
-	public void initMap(Page<RelRuleAsset> result) {
-		if (result.hasContent()) {
-			List<RelRuleAsset> rels = result.getContent();
+	public void initMap(List<RelRuleAsset> rels) {
+		if (CollectionUtils.isNotEmpty(rels)) {
 			List<String> assetUids = new ArrayList<>();
 			List<String> ruleUids = new ArrayList<>();
 			for (RelRuleAsset relRuleAsset : rels) {
