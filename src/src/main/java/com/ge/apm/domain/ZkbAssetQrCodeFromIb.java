@@ -60,6 +60,20 @@ public class ZkbAssetQrCodeFromIb {
     @Column(name = "ge_upload_flag")
     private String geUploadFlag;
 
+    /**
+     * 装机状态  0-Installed 1-Shipped  2-Deinstalled
+     */
+    @Column(name = "install_status")
+    private Integer installStatus;
+
+    public Integer getInstallStatus() {
+        return installStatus;
+    }
+
+    public void setInstallStatus(Integer installStatus) {
+        this.installStatus = installStatus;
+    }
+
     public String getGeUploadFlag() {
         return geUploadFlag;
     }

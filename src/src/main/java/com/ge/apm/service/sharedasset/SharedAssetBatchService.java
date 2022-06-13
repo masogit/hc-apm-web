@@ -3,6 +3,7 @@ package com.ge.apm.service.sharedasset;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.dao.mapper.SharedAssetMapper;
 import com.ge.apm.domain.AssetInfo;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import webapp.framework.web.WebUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,7 +43,8 @@ public class SharedAssetBatchService {
 
     @Autowired
     private SharedAssetService sharedAssetService;
-
+    @Autowired
+    private OrgInfoRepository orgInfoRepository;
     public void buildDefaultFilters(Wrapper<AssetInfo> ew) {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -97,15 +100,23 @@ public class SharedAssetBatchService {
     }
 
     public List<OrgInfo> getOrgDeptList() {
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<OrgInfo> orgInfos = uaaService.getOrgDeptList(user.getSiteUID(), user.getUid());
-        if(orgInfos.size() == 0) {
-            List<String> allocationDepts = uaaService.getRegulatorUidsBySiteUid(user.getSiteUID());
-            orgInfos = uaaService.getClinicalDeptListBySiteUID(user.getSiteUID());
-            if(allocationDepts != null && allocationDepts.size() > 0) {
-                orgInfos = orgInfos.stream()
-                                    .filter(item -> !allocationDepts.contains(item.getUid()))
-                                    .collect(Collectors.toList());
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        List<OrgInfo> orgInfos =new ArrayList<>();
+        if(selectSite != null){
+            List<String> orgInfoUidsByparentUid = orgInfoRepository.getOrgInfoUidsByparentUid(selectSite.getUid());
+            orgInfos = orgInfoUidsByparentUid.stream().map(orgInfoRepository::findByUid).filter(item->item.getOrgType() == 4).collect(Collectors.toList());
+        }else{
+            UserAccount user = UserContextService.getCurrentUserAccount();
+             orgInfos = uaaService.getOrgDeptList(user.getSiteUID(), user.getUid());
+            if(orgInfos.size() == 0) {
+                List<String> allocationDepts = uaaService.getRegulatorUidsBySiteUid(user.getSiteUID());
+                orgInfos = uaaService.getClinicalDeptListBySiteUID(user.getSiteUID());
+                if(allocationDepts != null && allocationDepts.size() > 0) {
+                    orgInfos = orgInfos.stream()
+                            .filter(item -> !allocationDepts.contains(item.getUid()))
+                            .collect(Collectors.toList());
+                }
             }
         }
         orgInfos.sort(TreeNodeUtil.orgInfoComparator);

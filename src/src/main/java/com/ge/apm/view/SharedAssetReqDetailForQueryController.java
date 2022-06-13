@@ -11,6 +11,7 @@ import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.datatable.DataTable;
 import org.springframework.data.domain.Page;
@@ -125,11 +126,20 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uuaService.getUserAccessibleSiteListWithClinicalDept(user.getUid()).stream()
-																					                .filter(item -> item.getOrgType() == 4)
-																					                .map(item -> item.getUid())
-																					                .collect(Collectors.toList());
+        List<String> orgUidList =new ArrayList<>();
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite != null){
+            orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(selectSite.getUid());
+
+        }else{
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            orgUidList = uuaService.getUserAccessibleSiteListWithClinicalDept(user.getUid()).stream()
+                    .filter(item -> item.getOrgType() == 4)
+                    .map(item -> item.getUid())
+                    .collect(Collectors.toList());
+        }
+
         this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
