@@ -30,7 +30,7 @@
             <h:form id="RelRuleAssetListForm">
                 <p:dataTable id="datalist" value="#{relRuleAssetManagerController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{relRuleAssetManagerController.selected}"
-                    lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                    lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                     rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
@@ -39,7 +39,7 @@
 
                      <p:ajax event="rowSelect" update="editButton"/>
                      <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
-
+                    <p:ajax event="filter" listener="#{relRuleAssetManagerController.onFilter}"/>
                     <p:column width="36" id="checkBoxColumn">
                         <p:selectBooleanCheckbox value="#{relRuleAssetManagerController.selectedMap[item.assetUID]}"  class="selectCheckBox">
                             <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
@@ -50,58 +50,120 @@
                             </p:selectBooleanCheckbox>
                         </f:facet>
                     </p:column>
-                    <p:column headerText="#{msg.StartUsingDate}">
+                    <p:column headerText="#{msg.StartUsingDate}" width="6%" filterBy="#{item.startUsingDate}" filterMatchMode="GTE">
                         <h:outputText value="#{relRuleAssetManagerController.getInstallDate(item.assetUID)}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                        </h:outputText>
+                        <f:facet name="filter">
+                            <p:inputText id="filterStartUsingDate" widgetVar="varFilterStartUsingDat" value="#{relRuleAssetManagerController.startUsingDateFormatTime}"/>
+                        </f:facet>
+                        <h:outputText  >
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                         </h:outputText>
                     </p:column>
-
-                    <p:column headerText="#{msg.PurchaseDate}">
+                    <p:column headerText="#{msg.PurchaseDate}" width="6%" filterBy="#{item.purchaseDate}" filterMatchMode="GTE">
                         <h:outputText value="#{relRuleAssetManagerController.getPurchaseDate(item.assetUID)}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                        </h:outputText>
+                        <f:facet name="filter">
+                            <p:inputText id="filterPurchaseDate" widgetVar="varFilterPurchaseDateDat" value="#{relRuleAssetManagerController.startPurchaseDateFormatTime}"/>
+                        </f:facet>
+                        <h:outputText  >
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{msg.AssetName}"  filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.AssetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getAssetName(item.assetUID)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.Level1RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE" rendered="#{relRuleAssetManagerController.getPmRule()}">
+                    <p:column headerText="#{msg.Level1RulePM}"    rendered="#{relRuleAssetManagerController.getPmRule()}">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.Level1RulePM}"/><br/>
+                            <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterRuleUIDInspectionName}" appendTo="@(Body)"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName(1)}" size="3">
+                                <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
+                                <p:ajax process="@this" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                            </p:autoComplete>
+                        </f:facet>
                         <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUIDInspection)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.Level2RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
-                    		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID2)}"/>
-                    		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID2))}"/> -->
+                    <p:column headerText="#{msg.Level2RulePM}"   >
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.Level2RulePM}"/><br/>
+                            <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterRuleUID2Name}" appendTo="@(Body)"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName(2)}" size="3">
+                                <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
+                                <p:ajax process="@this" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                            </p:autoComplete>
+                        </f:facet>
+                        <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID2)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.Level3RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
-                    		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID)}"/>
-                    		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID))}"/> -->
+                    <p:column headerText="#{msg.Level3RulePM}"   >
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.Level3RulePM}"/><br/>
+                            <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterRuleUIDName}" appendTo="@(Body)"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName(3)}" size="3">
+                                <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
+                                <p:ajax process="@this" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                            </p:autoComplete>
+                        </f:facet>
+                        <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.Level4RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE" rendered="#{relRuleAssetManagerController.getPmRule()}">
-                    		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID4)}"/>
+                    <p:column headerText="#{msg.Level4RulePM}"    rendered="#{relRuleAssetManagerController.getPmRule()}">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.Level4RulePM}"/><br/>
+                            <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterRuleUID4Name}" appendTo="@(Body)"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName(4)}" size="3">
+                                <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
+                                <p:ajax process="@this" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                            </p:autoComplete>
+                        </f:facet>
+                        <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID4)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.departNum}"  filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.departNum}"  filterBy="#{item.departNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getDepartNum(item.assetUID)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.assetGroup}"  filterMatchMode="LIKE">
-                    	<h:outputText value="#{fieldMsg.fieldValue('assetGroup',relRuleAssetManagerController.getAssetGroup(item.assetUID))}"/>
+                    <p:column  headerText="#{msg.assetGroup}"  filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                        <h:outputText value="#{fieldMsg.fieldValue('assetGroup',relRuleAssetManagerController.getAssetGroup(item.assetUID))}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="handleAssetGroupChange()"  autoWidth="false" style="max-width: 150px;" height="300" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                     </p:column>
-                    <p:column headerText="#{msg.clinicalDeptName}" filterMatchMode="EQ">
+                    <p:column headerText="#{msg.clinicalDeptName}"   >
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                            <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoCompleteDeptName}" size="3">
+                                <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onClinicalDeptNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
+                                <p:ajax process="@this" listener="#{relRuleAssetManagerController.onClinicalDeptNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                            </p:autoComplete>
+                        </f:facet>
                         <h:outputText value="#{relRuleAssetManagerController.getClinicalDeptName(item.assetUID)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.nationalStandardCode}"  filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.nationalStandardCode}"  filterBy="#{item.nationalStandardCode}" filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getNationalStandardCode(item.assetUID)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.makerShortName}"  filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.makerShortName}"  filterBy="#{item.makerShortName}" filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getBrand(item.assetUID)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.manufacture}"  filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getManufacture(item.assetUID)}"/>
                     </p:column>
-                    <p:column headerText="#{msg.ConfigurationDate}"  filterMatchMode="GTE">
-                            <h:outputText value="#{item.createdDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                            </h:outputText>
-                     </p:column>
-                     <p:column headerText="#{msg.QRCode}" exportable="true" width="150"  filterMatchMode="LIKE">
+
+                    <p:column headerText="#{msg.ConfigurationDate}" width="6%" filterBy="#{item.createdDate}" filterMatchMode="GTE">
+                        <h:outputText value="#{item.createdDate}">
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                        </h:outputText>
+                        <f:facet name="filter">
+                            <p:inputText id="filterConfigurationDate" widgetVar="varFilterConfigurationDateDat" value="#{relRuleAssetManagerController.startConfigurationDateFormatTime}"/>
+                        </f:facet>
+                        <h:outputText  >
+                            <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                        </h:outputText>
+                    </p:column>
+                     <p:column headerText="#{msg.QRCode}" exportable="true" width="150"  filterBy="#{item.qrCode}"  filterMatchMode="LIKE">
                      	<h:outputText value="#{relRuleAssetManagerController.getQrCode(item.assetUID)}"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
@@ -130,14 +192,58 @@
                     </f:facet>
                 </p:dataTable>
             </h:form>
-
+                <p:overlayPanel id="idPanelFiltertartUsingDat" widgetVar="panelFiltertartUsingDat" for=":RelRuleAssetListForm:datalist:filterStartUsingDate" dismissable="false"  >
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="vartartUsingDatFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="vartartUsingDatTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('varDataList', 'varFilterStartUsingDat', 'vartartUsingDatFrom', 'vartartUsingDatTo'); PF('panelFiltertartUsingDat').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFiltertartUsingDat').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+                <p:overlayPanel id="idPanelFiltertartPurchaseDateDat" widgetVar="panelFiltertartPurchaseDateDat" for=":RelRuleAssetListForm:datalist:filterPurchaseDate" dismissable="false"  >
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="vartartPurchaseDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="vartartPurchaseDateDatTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('varDataList', 'varFilterPurchaseDateDat', 'vartartPurchaseDateFrom', 'vartartPurchaseDateDatTo'); PF('panelFiltertartPurchaseDateDat').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFiltertartPurchaseDateDat').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+                <p:overlayPanel id="idPanelFiltertartConfigurationDateDat" widgetVar="panelFiltertartConfigurationDateDat" for=":RelRuleAssetListForm:datalist:filterConfigurationDate" dismissable="false"  >
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="vartartConfigurationDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="vartartConfigurationDateDatTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('varDataList', 'varFilterConfigurationDateDat', 'vartartConfigurationDateFrom', 'vartartConfigurationDateDatTo'); PF('panelFiltertartConfigurationDateDat').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFiltertartConfigurationDateDat').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
             <ui:include src="Edit.xhtml"/>
             <ui:include src="View.xhtml"/>
 				</div>
             </div>
         </div>
+        <script type="text/javascript">
+            function handleAssetGroupChange(selection) {
+                var ct = document.getElementById('RelRuleAssetListForm:datalist');
+                if (ct) {
+                    ct.value = '';
+                }
 
+                PF('varDataList').filter();
+            }
+        </script>
         <script>
+            function afterLoadRender(){
+                // $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            }
             //<![CDATA[
             function updateSelectAllCheckBox() {
                 var checkboxlist = $(".selectCheckBox");
@@ -154,6 +260,7 @@
             }
             //]]>
         </script>
+
     </ui:define>
 
 </ui:composition>

@@ -357,7 +357,7 @@
                             </p:dataTable>
                         </p:tab>
 
-                        <p:tab title="供应商授权字段页面">
+                        <p:tab title="供应商授权字段页面" rendered="#{customConfigController.showSupplierViewAndEditFieldsTable()}">
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <p:fieldset legend="可查看字段">
                                     <p:orderList id="SupplierViewFieldsList" value="#{customConfigController.customConfigObject.supplierViewFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />

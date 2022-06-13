@@ -9,24 +9,20 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.CustomConfig;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.TenantOptionConfigRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -53,7 +49,8 @@ public class CustomConfigController {
     private CustomConfigService ccService;
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
-
+    private ConfigService configService;
+    private TenantOptionConfigRepository tenantOptionConfigRepository;
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
     private Map<String, Boolean> selectedAddFields;
@@ -78,6 +75,8 @@ public class CustomConfigController {
         ccService = WebUtil.getBean(CustomConfigService.class);
         userService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        configService = WebUtil.getBean(ConfigService.class);
+        tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
         configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
@@ -691,5 +690,16 @@ public class CustomConfigController {
     private String getUsernameFromUid(String uid) {
         UserAccount userAccount  = userService.getUserByUid(uid);
         return userAccount == null ? "" : userAccount.getName();
+    }
+
+    public Boolean showSupplierViewAndEditFieldsTable() {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
+        if (!tenantOptionConfigOptional.isPresent()) return false;
+        TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        if(workflowConfig==null) return false;
+        if(workflowConfig.getActiveSupplier() && tenantOptionConfig.getActiveSupplier()) return true;
+        return false;
     }
 }
