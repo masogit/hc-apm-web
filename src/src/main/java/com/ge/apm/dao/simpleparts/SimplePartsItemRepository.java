@@ -25,4 +25,6 @@ public interface SimplePartsItemRepository extends GenericRepositoryUUID<SimpleP
     @Modifying
     @Query(value = "UPDATE simple_parts_item SET category_name = ?2,category_code = ?3 WHERE id IN ?1", nativeQuery = true)
     void updatePartsItemPartsCategoryByIds(Set<String> partsItemIds,String categoryName,String categoryCode);
+
+    List<SimplePartsItem> findByName(String name);
 }

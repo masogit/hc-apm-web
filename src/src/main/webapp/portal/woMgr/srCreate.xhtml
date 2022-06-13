@@ -80,14 +80,17 @@
                         </h:panelGroup>
 
                         <c:if test="#{userContextService.countyArea}">
-                            <h:panelGroup>
-                                <label class="label">#{msg.siebleNumber}</label>
-                                <p:inputText value="#{workOrderMgrController.newServiceRequest.siebleNumber}" maxlength="12"  requiredMessage="sieble单号 #{msg.ValidationRequire}"/>
+                            <h:panelGroup id="siebleNumber">
+                                <label class="label">#{msg.siebleNumber}（如填写，长度必须填为13位）</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.siebleNumber}" maxlength="13">
+                                    <p:ajax process="@this" update="@this" listener="#{workOrderMgrController.verifyDatalength(workOrderMgrController.newServiceRequest.siebleNumber,msg.siebleNumber,13)}"></p:ajax>
+                                </p:inputText>
                             </h:panelGroup>
-
                             <h:panelGroup>
-                                <label class="label">#{msg.callCenterNumber}</label>
-                                <p:inputText value="#{workOrderMgrController.newServiceRequest.callCenterNumber}" maxlength="12" requiredMessage="呼叫中心单号 #{msg.ValidationRequire}"/>
+                                <label class="label">#{msg.callCenterNumber}（如填写，长度必须填为10位）</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.callCenterNumber}" maxlength="10">
+                                    <p:ajax process="@this" update="@this" listener="#{workOrderMgrController.verifyDatalength(workOrderMgrController.newServiceRequest.callCenterNumber,msg.callCenterNumber,10)}"></p:ajax>
+                                </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.countyAreaOrderType}</label>
@@ -96,6 +99,18 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('countyAreaOrderType')}" var="item"
                                                    itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">客户联系人</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.customerName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">客户电话</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.customerTel}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">医院名称</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.hospitalName}" readonly="true"/>
                             </h:panelGroup>
                         </c:if>
                     </p:panelGrid>

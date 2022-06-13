@@ -1884,6 +1884,21 @@ public void test1(){
     }
 
     public void saveServiceRequest() {
+        if(userContextService.isCountyArea()){
+            String msg = null;
+            if(newServiceRequest.getSiebleNumber() != null && newServiceRequest.getSiebleNumber().length() != 13){
+                msg = WebUtil.getMessage("siebleNumber")+"长度必须填为13位";
+            }
+            if(newServiceRequest.getCallCenterNumber() != null && newServiceRequest.getCallCenterNumber().length() != 10){
+                msg = WebUtil.getMessage("callCenterNumber")+"长度必须填为10位";
+            }
+            if(StringUtils.isNotBlank(msg)){
+                WebUtil.addErrorMessage(msg);
+                //前端弹窗不退出并提示错误信息
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+        }
         WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(selectedAsset.getId());
         if (woc != null && woc.getIsWoSupplierAutoEnabled() !=null && woc.getIsWoSupplierAutoEnabled()) {
             this.saveServiceRequestSupplier();
@@ -1971,6 +1986,13 @@ public void test1(){
         }
         asset.setLocationName(lName);
         locationName = lName;
+
+        if(userContextService.isCountyArea() && newServiceRequest != null){
+            OrgInfo orgInfo = orgDao.findByUid(asset.getSiteUID());
+            newServiceRequest.setCustomerName(orgInfo.getContactPerson());
+            newServiceRequest.setCustomerTel(orgInfo.getContactPhone());
+            newServiceRequest.setHospitalName(orgInfo.getName());
+        }
     }
 
     @Override
@@ -2204,6 +2226,7 @@ public void test1(){
         selectedObjectMap = new HashMap();
         itemDetail= vwd;
         itemDetail.setPartUseType(null);
+        itemDetail.setPartsDescription(null);
         saveCountyAreaAddressInfo();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
     }
@@ -3005,6 +3028,29 @@ public void test1(){
                     .append("联系电话：").append(userAccount.getTelephone()==null?"":userAccount.getTelephone());
             itemDetail.setComment(sb.toString());
         }
+    }
+
+    public void verifyDatalength(String data,String labelName,int len){
+        if(StringUtils.isNotBlank(data)){
+            if(data.length() != len){
+                WebUtil.addErrorMessage(labelName +"长度必须为："+len+"位");
+                return;
+            }
+        }
+    }
+
+    public String getPartsItemCode(V2_WorkOrder_Detail v2WorkOrderDetail) {
+        if(v2WorkOrderDetail == null){
+            if(partsItem != null){
+                return partsItem.getItemCode();
+            }
+        }else{
+            SimplePartsItem simplePartsItem = partsItemService.getPartsItem(v2WorkOrderDetail.getPartsItemId(),v2WorkOrderDetail.getParts());
+            if(simplePartsItem != null){
+                return simplePartsItem.getItemCode();
+            }
+        }
+        return null;
     }
 }
 

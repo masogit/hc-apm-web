@@ -81,6 +81,9 @@
 
                 <p:column headerText="#{msg.ManufacturerSerialNumber}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.serialNum}"/>
                 </p:column>
+                <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE" rendered="#{userContextService.isCountyArea()}">
+                    <h:outputText value="#{item.assetInfo.systemId}"/>
+                </p:column>
 
                         <p:column headerText="#{msg.EquipmentIDHospital}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
@@ -397,6 +400,20 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('pmTypeWeb')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+                    <c:if test="#{userContextService.countyArea}">
+                        <h:panelGroup>
+                            <label class="label">客户联系人</label>
+                            <p:inputText value="#{v2PmOrderController.customerName}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">客户电话</label>
+                            <p:inputText value="#{v2PmOrderController.customerTel}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">医院名称</label>
+                            <p:inputText value="#{v2PmOrderController.siteName}" readonly="true"/>
+                        </h:panelGroup>
+                    </c:if>
                 </p:panelGrid>
             </p:fieldset>
             <h:panelGroup >

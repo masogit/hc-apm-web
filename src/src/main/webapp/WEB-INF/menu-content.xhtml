@@ -22,6 +22,7 @@
                 <p:menuitem id="um1001" value="#{msg.AssetBrowser}" url="/geapm/portal/analysis/reports.xhtml#/AssetBrowser" rendered="false"/>
                 <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/ContractList" rendered="#{userContextService.accessContains('asset.mgt')}"/>
                 <p:menuitem id="um08" value="#{msg.SupplierMgmt}" outcome="/portal/supplier/List.xhtml" rendered="#{userContextService.accessContains('asset.supplierMgt')}"/>
+                <p:menuitem id="um0889" value="供应商负责人赋权" outcome="/portal/supplier/empowerment.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff')}"/>
                 <p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/AssetTerminateEntryList.xhtml" rendered="#{(!userContextService.needScrappedControl() and userContextService.accessContains('asset.scrap')) or userContextService.hasScrappedMenuAuthority()}"/>
                 <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.accessContains('asset.create')}"/>
                 <p:menuitem value="#{msg.AssetApproval}" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.isAssetApprover()) and userContextService.accessContains('asset.audit')}"/>
@@ -50,10 +51,11 @@
                 <p:menuitem value="备件信息" outcome="/portal/parts/PartsItemList.xhtml"/>
                 <p:menuitem value="备件仓库" outcome="/portal/parts/PartsWarehouse.xhtml"/>
                 <p:menuitem value="备件库存配置" outcome="/portal/parts/PartsConfig.xhtml"/>
+                <p:menuitem value="备件报表" outcome="/portal/parts/PartsReport.xhtml"/>
             </p:submenu>
             <!-- 备件管理 end  -->
 
-            <p:submenu id="um073" label="#{msg.EquipmentSwap}" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.isHospitalUser() and userContextService.accessContains('assetAdjust')}">
+            <p:submenu id="um073" label="#{msg.EquipmentSwap}" icon="fa fa-folder-open-o" rendered="#{((not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.isHospitalUser() and userContextService.accessContains('assetAdjust')) or (userContextService.siteOrgInfoChild.size() > 0)}">
                 <p:menuitem id="um901" value="#{msg.RequestForBorrow}" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.borrowApply')}"/>
                 <p:menuitem id="um903" value="#{msg.BorrowAcceptance}" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.accessContains('assetAdjust.borrowAccept')}"/>
                 <p:menuitem id="um902" value="#{msg.RequestForReturn}" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.returnApply')}"/>

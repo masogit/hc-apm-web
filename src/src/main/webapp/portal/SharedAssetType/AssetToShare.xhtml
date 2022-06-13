@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui" xmlns:P="http://java.sun.com/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
@@ -28,6 +29,20 @@
                 <h:form id="AssetInfoListForm">
 
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                      <c:if test="#{userContextService.selectSite != null}">
+                        <p:commandButton id="basic" value="#{empty userContextService.selectSite? msg.AllHospitals:userContextService.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                        <p:overlayPanel widgetVar="varPanelOrg" for="basic" hideEffect="fade" style="width:350px">
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="docs"  class="tree" style="width:98%;border:0;" value="#{userContextService.hospitalTree}" var="node" selectionMode="single"
+                                        selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
+                                    <p:ajax process="@this" event="select" listener="#{userContextService.onSelectSiteTreeNode}" update="AssetInfoListForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                      </c:if>
                         <!--<p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(2)}" rendered="true" disabled="#{sharedAssetInfoController.queryIndex == 2}"/>-->
                         <p:commandButton value="已配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == 1}"/>
                         <p:commandButton value="未配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(-1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == -1}"/>
