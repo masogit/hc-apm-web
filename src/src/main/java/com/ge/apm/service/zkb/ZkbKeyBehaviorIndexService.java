@@ -962,11 +962,10 @@ public class ZkbKeyBehaviorIndexService {
         countAssetWithQRcode = countAssetWithQRcode==null?0:countAssetWithQRcode;
         remark=remark.append("countAssetWithQRcode:").append(countAssetWithQRcode).append(";");
         Integer fullScore = zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore();
-        remark=remark.append("fullScore:").append(fullScore).append(";");
         Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
                 multiply(new BigDecimal(fullScore)).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
-        remark=remark.append("pasteQuickResponseRateScore:").append(pasteQuickResponseRateScore).append(";");
+        logger.info("pasteQuickResponseRateScore，fullScore:", pasteQuickResponseRateScore+","+fullScore);
         if(pasteQuickResponseRateScore>fullScore)
         {
             zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(fullScore);
