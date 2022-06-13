@@ -948,26 +948,31 @@ public class ZkbKeyBehaviorIndexService {
         {
             assetId.add(item.getAssetId());
         }
-        Integer count =  this.zkbAssetQrCodeInfoRepository.findCount(assetId,tenantUID,yes);
+        /*Integer count =  this.zkbAssetQrCodeInfoRepository.findCount(assetId,tenantUID,yes);
         Integer countAssetWithQRcode = this.assetInfoMapper.countAssetWithQRcode(assetId,tenantUID);
         if(countAssetWithQRcode==null)
         {
             countAssetWithQRcode=0;
         }
         count=count==null?0:count;
-        countAssetWithQRcode=countAssetWithQRcode+count;
+        countAssetWithQRcode=countAssetWithQRcode+count;*/
+        //二维码是否已实施 or 是否设备无法粘贴二维码    拆机是  否
+        //新逻辑    22.6.9
+        Integer countAssetWithQRcode = this.zkbAssetQrCodeInfoRepository.qrCodePasteCount(assetId,tenantUID);
+        countAssetWithQRcode = countAssetWithQRcode==null?0:countAssetWithQRcode;
         remark=remark.append("countAssetWithQRcode:").append(countAssetWithQRcode).append(";");
         Integer fullScore = zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore();
+        remark=remark.append("fullScore:").append(fullScore).append(";");
         Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
                 multiply(new BigDecimal(fullScore)).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
+        remark=remark.append("pasteQuickResponseRateScore:").append(pasteQuickResponseRateScore).append(";");
         if(pasteQuickResponseRateScore>fullScore)
         {
             zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(fullScore);
-        }else
-            {
+        }else{
                 zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(pasteQuickResponseRateScore);
-            }
+        }
         return totalIbNumber;
     }
 
