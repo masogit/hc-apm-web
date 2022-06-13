@@ -25,6 +25,20 @@
                 </div>
                 <div class="ui-g-12 card">
             <h:form id="SwapTypeListForm">
+                <h:panelGrid id="buttonSet" columns="12" cellpadding="5" rendered="#{userContextService.selectSite != null}">
+                    <p:commandButton id="basic" value="#{empty userContextService.selectSite? msg.AllHospitals:userContextService.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:overlayPanel widgetVar="varPanelOrg" for="basic" hideEffect="fade" style="width:350px">
+                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="docs"  class="tree" style="width:98%;border:0;" value="#{userContextService.hospitalTree}" var="node" selectionMode="single"
+                                    selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
+                                <p:ajax process="@this" event="select" listener="#{userContextService.onSelectSiteTreeNode}" update="SwapTypeListForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                <p:treeNode type="org">
+                                    <h:outputText value="#{node.name}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
+                </h:panelGrid>
                 <p:dataTable id="datalist" value="#{sharedAssetTypeController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{sharedAssetTypeController.selected}"
                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"

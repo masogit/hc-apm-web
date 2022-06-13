@@ -192,6 +192,15 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     @Override
     public void onBeforeSave(SharedAssetType object) {
         object.setAccessoryList(object.getAccessoryList());
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        if(selectSite != null){
+            object.setTenantUID(selectSite.getTenantUID());
+            object.setHospitalUID(selectSite.getHospitalUID());
+            object.setInstitutionUID(selectSite.getInstitutionUID());
+            object.setSiteUID(selectSite.getSiteUID());
+            object.setCreateBy(selectSite.getName());
+        }
     }
 
     @Override
@@ -255,8 +264,14 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
          * Since access control for shared_asset_type is in site_uid level, so retrieve site_uid from current user for access check
          * List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
          */
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
         List<String> orgUidList = new ArrayList<>();
-        orgUidList.add(user.getSiteUID());
+        if(selectSite != null){
+            orgUidList= orgInfoDao.getOrgInfoUidsByparentUid(selectSite.getUid());
+        }else{
+            orgUidList.add(user.getSiteUID());
+        }
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
