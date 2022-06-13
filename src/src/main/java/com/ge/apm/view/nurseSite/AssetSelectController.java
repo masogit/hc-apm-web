@@ -13,6 +13,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -176,10 +177,19 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         }
         else{
         	assets4Maintain = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
+            //assetInfosFilter();
         }
         this.searchFilters.clear();
     }
-    
+    private void  assetInfosFilter(){
+        if(CollectionUtils.isEmpty(assets4Maintain) || CollectionUtils.isEmpty(listCheckOrgInfo) )return;
+        List<String> collect = listCheckOrgInfo.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        assets4Maintain=assets4Maintain.stream().filter(item->{
+            String assetDeptUID = item.getAssetDeptUID();
+            if(StringUtils.isBlank(assetDeptUID)) return true;
+                return collect.contains(assetDeptUID);
+        }).collect(Collectors.toList());
+    }
     public void addAssetInfo(){
         for(AssetInfo assetInfo: selectedAssetsed){
             if(!selectedAssets.contains(assetInfo)){

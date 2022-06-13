@@ -232,8 +232,10 @@ public class Calculator {
         String equation7 = "slope(1,2,3,4,9,8,4,5)";//-0.470588235
         String equation8 = "slope(2,5,8,7,3,6,-2,0,3,5,2,-3)";//0.366548
         String equation9 = "intercept(2,5,8,7,3,6,-2,0,3,5,2,-3)";//4.861209964
+        String equation10 = "degrees(6)";//4.861209964
 
-        String result = calculator.calculate(equation9);
+        String result = calculator.calculate(equation10);
+
         System.out.println(result);
     }
 }
