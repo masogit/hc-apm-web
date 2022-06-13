@@ -69,16 +69,24 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     //选定科室过滤
     @Getter @Setter
     private String filterClinicalDeptOrg;
+    //选定过滤规则
+    private Integer filterRuleLevel=null;
     @Getter@Setter
     private String filterRuleUIDInspectionName;
+    private Integer filterRuleUIDInspectionLevel=null;
+    private String filterRuleUIDInspectionRuleUid=null;
     @Getter@Setter
     private String filterRuleUID2Name;
+    private Integer filterRuleUID2Level=null;
+    private String filterRuleUID2RuleUid=null;
     @Getter@Setter
     private String filterRuleUIDName;
+    private Integer filterRuleUIDLevel=null;
+    private String filterRuleUIDRuleUid=null;
     @Getter@Setter
     private String filterRuleUID4Name;
-    private String filterPmOrderRuleUid=null;
-    private Integer filterRuleLevel=null;
+    private Integer filterRuleUID4Level=null;
+    private String filterRuleUID4RuleUid=null;
     private Set<String> clinicalDeptOrgUidSet;
 	@Getter @Setter
 	private StreamedContent excelFile;
@@ -126,16 +134,17 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        if (filterPmOrderRuleUid!= null && filterRuleLevel!=null) {
-            String ruleUID =null;
-            switch (filterRuleLevel) {
-                case 1:ruleUID="ruleUIDInspection"; break;
-                case 2:ruleUID="ruleUID2"; break;
-                case 3:ruleUID="ruleUID"; break;
-                case 4:ruleUID="ruleUID4"; break;
-            }
-            searchFilterList.add(new SearchFilter(ruleUID, SearchFilter.Operator.EQ, filterPmOrderRuleUid));
-
+        if (filterRuleUIDInspectionLevel!=null) {
+            searchFilterList.add(new SearchFilter("ruleUIDInspection", SearchFilter.Operator.EQ, filterRuleUIDInspectionRuleUid));
+        }
+        if (filterRuleUID2Level!=null) {
+            searchFilterList.add(new SearchFilter("ruleUID2", SearchFilter.Operator.EQ, filterRuleUID2RuleUid));
+        }
+        if (filterRuleUIDLevel!=null) {
+            searchFilterList.add(new SearchFilter("ruleUID", SearchFilter.Operator.EQ, filterRuleUIDRuleUid));
+        }
+        if (filterRuleUID4Level!=null) {
+            searchFilterList.add(new SearchFilter("ruleUID4", SearchFilter.Operator.EQ, filterRuleUID4RuleUid));
         }
         searchFilterList.addAll(searchFilters);
 		if(StringUtils.isNotEmpty(queryCondition)){
@@ -198,8 +207,6 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
              assetName=null;
              departNum=null;
              assetGroup=null;
-             filterPmOrderRuleUid=null;
-             filterRuleLevel=null;
              nationalStandardCode=null;
              makerShortName=null;
              manufacture=null;
@@ -255,6 +262,20 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	    getRuleList();
         if(level!=null){
             filterRuleLevel=level;
+            switch (level) {
+                case 1:
+                    filterRuleUIDInspectionLevel = level;
+                    break;
+                case 2:
+                    filterRuleUID2Level= level;
+                    break;
+                case 3:
+                    filterRuleUIDLevel = level;
+                    break;
+                case 4:
+                    filterRuleUID4Level = level;
+                    break;
+            }
             pmOrderRuleList = pmOrderRuleList.stream().filter(s -> s.getLevel() ==level).collect(Collectors.toList());
         }
         return pmOrderRuleList.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
@@ -267,30 +288,21 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                 switch (filterRuleLevel) {
                     case 1:
                         filterRuleUIDInspectionName = filterLevelRulePMName;
-                        filterRuleUID2Name=null;
-                        filterRuleUIDName=null;
-                        filterRuleUID4Name=null;
-                    break;
+                        filterRuleUIDInspectionRuleUid = this.pmOrderRuleList.stream().filter(item -> item.getName().equals(filterLevelRulePMName)).collect(Collectors.toList()).get(0).getUid();
+                        break;
                     case 2:
                         filterRuleUID2Name = filterLevelRulePMName;
-                        filterRuleUIDInspectionName=null;
-                        filterRuleUIDName=null;
-                        filterRuleUID4Name=null;
+                        filterRuleUID2RuleUid= this.pmOrderRuleList.stream().filter(item -> item.getName().equals(filterLevelRulePMName)).collect(Collectors.toList()).get(0).getUid();
                         break;
                     case 3:
                         filterRuleUIDName = filterLevelRulePMName;
-                        filterRuleUIDInspectionName=null;
-                        filterRuleUID2Name=null;
-                        filterRuleUID4Name=null;
+                        filterRuleUIDRuleUid = this.pmOrderRuleList.stream().filter(item -> item.getName().equals(filterLevelRulePMName)).collect(Collectors.toList()).get(0).getUid();
                         break;
                     case 4:
                         filterRuleUID4Name = filterLevelRulePMName;
-                        filterRuleUIDInspectionName=null;
-                        filterRuleUID2Name=null;
-                        filterRuleUID4Name=null;
+                        filterRuleUID4RuleUid = this.pmOrderRuleList.stream().filter(item -> item.getName().equals(filterLevelRulePMName)).collect(Collectors.toList()).get(0).getUid();
                         break;
                 }
-                filterPmOrderRuleUid = this.pmOrderRuleList.stream().filter(item -> item.getName().equals(filterLevelRulePMName)).collect(Collectors.toList()).get(0).getUid();
             }
         }
 
