@@ -38,8 +38,8 @@ public class SupplierEmpowermentController extends JpaCRUDController<AssetInfo> 
     private AssetInfoMgrService aimService;
     private AutoCompleteService autoCompleteService;
     private SupplierUserRepository supplierUserRepository;
-    private SupplierFEAssetJoinRepository supplierFEAssetJoinRepository;
     private AssetEmpowermentRepostory assetEmpowermentRepostory;
+    private SupplierRepository supplierRepository;
     private UserAccountRepository userAccountRepository;
     private OrgInfoRepository orgInfoRepository;
     private OrgInfoTreeService orgInfoTreeService;
@@ -97,7 +97,7 @@ public class SupplierEmpowermentController extends JpaCRUDController<AssetInfo> 
         supplierUserRepository = WebUtil.getBean(SupplierUserRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         supplierUserRepository = WebUtil.getBean(SupplierUserRepository.class);
-        supplierFEAssetJoinRepository = WebUtil.getBean(SupplierFEAssetJoinRepository.class);
+        supplierRepository = WebUtil.getBean(SupplierRepository.class);
         assetEmpowermentRepostory = WebUtil.getBean(AssetEmpowermentRepostory.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
@@ -158,7 +158,8 @@ public class SupplierEmpowermentController extends JpaCRUDController<AssetInfo> 
         if(selectedSupplierUid!=null) {
 /*            List assetUids =  supplierFEAssetJoinRepository.findAssetUidsByUserUid(selectedUserUid);
             this.updateSearchFilter(new SearchFilter("uid", SearchFilter.Operator.IN, assetUids));*/
-            this.updateSearchFilter(new SearchFilter("supplierNewUID", SearchFilter.Operator.EQ, selectedSupplierUid));
+            this.removeFilterOnField("uid"); //把首次进入页面的空列表查询条件移除
+            this.updateSearchFilter(new SearchFilter("supplierId", SearchFilter.Operator.EQ,supplierRepository.getByUid(selectedSupplierUid).getId()));
             if(empowermentSearch!=null && empowermentSearch==1) {
                 this.updateSearchFilter(new SearchFilter("empowermentStatus", SearchFilter.Operator.EQ, empowermentSearch));
             } else if(empowermentSearch!=null && empowermentSearch==0) {
