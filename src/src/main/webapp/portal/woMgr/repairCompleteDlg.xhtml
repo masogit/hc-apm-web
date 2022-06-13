@@ -199,6 +199,9 @@
                                         <p:column headerText="#{msg.partUseType}">
                                             <h:outputText value="#{fieldMsg.fieldValue('partUseType', item.partUseType)}" />
                                         </p:column>
+                                        <p:column headerText="备件描述">
+                                            <h:outputText value="#{item.partsDescription}" />
+                                        </p:column>
                                     </c:if>
                                     <p:column headerText="#{msg.Actions}"><!--操作-->
                                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditAccDetail('new')}" update="@(.moreAccDialogDlg)" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
