@@ -155,9 +155,10 @@ public class SupplierEmpowermentController extends JpaCRUDController<AssetInfo> 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         if (searchFilters == null) { searchFilters = new ArrayList<SearchFilter>();}
-        if(selectedUserUid!=null) {
-            List assetUids =  supplierFEAssetJoinRepository.findAssetUidsByUserUid(selectedUserUid);
-            this.updateSearchFilter(new SearchFilter("uid", SearchFilter.Operator.IN, assetUids));
+        if(selectedSupplierUid!=null) {
+/*            List assetUids =  supplierFEAssetJoinRepository.findAssetUidsByUserUid(selectedUserUid);
+            this.updateSearchFilter(new SearchFilter("uid", SearchFilter.Operator.IN, assetUids));*/
+            this.updateSearchFilter(new SearchFilter("supplierNewUID", SearchFilter.Operator.EQ, selectedSupplierUid));
             if(empowermentSearch!=null && empowermentSearch==1) {
                 this.updateSearchFilter(new SearchFilter("empowermentStatus", SearchFilter.Operator.EQ, empowermentSearch));
             } else if(empowermentSearch!=null && empowermentSearch==0) {
