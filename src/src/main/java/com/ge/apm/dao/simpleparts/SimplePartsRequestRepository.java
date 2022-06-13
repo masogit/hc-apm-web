@@ -40,4 +40,5 @@ public interface SimplePartsRequestRepository extends GenericRepositoryUUID<Simp
             "SELECT MAX (A .request_code) FROM ( SELECT MAX ( to_number( B.request_code, '99999999999999' )) request_code FROM simple_parts_request B WHERE B.request_code IN ( SELECT C .request_code FROM simple_parts_request C WHERE C .request_code LIKE ?1% AND C .type = ?2)) A",nativeQuery = true)
     String fetchMaxAssetFinacingNum(String format,Integer type);
 
+    List<SimplePartsRequest> findByMaintenanceWorkOrderNumberLike(String maintenanceWorkOrderNumber);
 }

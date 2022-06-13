@@ -160,6 +160,11 @@ public class WorkOrderExportPojo {
     //多级审核签名
     private List<String> auditSignatureList;
 
+    // 县域需求字段sieble单号
+    private String siebleNumber;
+    // 县域需求call center单号
+    private String callCenterNumber;
+
     public List<String> getAuditSignatureList() {
         return auditSignatureList;
     }
@@ -758,4 +763,20 @@ public class WorkOrderExportPojo {
     public Boolean getMVSWorkOrder() { return isMVSWorkOrder; }
 
     public void setMVSWorkOrder(Boolean MVSWorkOrder) { isMVSWorkOrder = MVSWorkOrder; }
+
+    public String getSiebleNumber() {
+        return siebleNumber;
+    }
+
+    public void setSiebleNumber(String siebleNumber) {
+        this.siebleNumber = siebleNumber;
+    }
+
+    public String getCallCenterNumber() {
+        return callCenterNumber;
+    }
+
+    public void setCallCenterNumber(String callCenterNumber) {
+        this.callCenterNumber = callCenterNumber;
+    }
 }

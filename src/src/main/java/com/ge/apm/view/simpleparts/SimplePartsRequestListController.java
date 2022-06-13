@@ -146,6 +146,9 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
 //            this.updateSearchFilter(new SearchFilter("createdBy", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("requestCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            if(userContextService.isCountyArea()){
+                this.updateSearchFilter(new SearchFilter("maintenanceWorkOrderNumber", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            }
         }
 
         pageRequest = addRequiredSortByRequestCode(pageRequest);

@@ -287,6 +287,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private SimplePartsItemService partsItemService;
     private BlobObjectRepository blobObjectRepository;
     private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
+
+    @Getter @Setter
+    public String customerName;
+    @Getter @Setter
+    public String customerTel;
+    @Getter @Setter
+    public String siteName;
     public boolean downloadButton(){
         if(queryIndex==10){
             return false;
@@ -1344,6 +1351,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
             formData.setPmType(pmType);
+            formData.setCustomerName(customerName);
+            formData.setCustomerTel(customerName);
+            formData.setSiteName(siteName);
             Map<String, Object> res = pmOrderService.createPMrequestApi(selectedAsset.getUid(), formData);
             if (res != null && res.get("bizStatusCode") != null) {
                 if (res.get("bizStatusCode").equals("INVALID_PARAM")) {
@@ -2504,6 +2514,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             currentStatus = 3;
         }
         needConfirmTime = false;
+        if(userContextService.isCountyArea()){
+            OrgInfo orgInfo = orgDao.findByUid(asset.getSiteUID());
+            customerName = orgInfo.getContactPerson();
+            customerTel = orgInfo.getContactPhone();
+            siteName = orgInfo.getName();
+        }
     }
 
 
@@ -3226,4 +3242,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
+    public String getPartsItemCode(V2_WorkOrder_Detail v2WorkOrderDetail) {
+        if(v2WorkOrderDetail == null){
+            if(partsItem != null){
+                return partsItem.getItemCode();
+            }
+        }else{
+            SimplePartsItem simplePartsItem = partsItemService.getPartsItem(v2WorkOrderDetail.getPartsItemId(),v2WorkOrderDetail.getParts());
+            if(simplePartsItem != null){
+                return simplePartsItem.getItemCode();
+            }
+        }
+        return null;
+    }
 }
