@@ -3031,7 +3031,7 @@ public void test1(){
     }
 
     public void verifyDatalength(String data,String labelName,int len){
-        if(data != null){
+        if(StringUtils.isNotBlank(data)){
             if(data.length() != len){
                 WebUtil.addErrorMessage(labelName +"长度必须为："+len+"位");
                 return;
