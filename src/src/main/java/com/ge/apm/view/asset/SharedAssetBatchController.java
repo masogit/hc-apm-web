@@ -12,12 +12,14 @@ import com.ge.apm.service.sharedasset.SharedAssetBatchService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.RequestType;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
@@ -317,6 +319,7 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
     }
 
     public List<String> autoCompleteDeptName(String query) {
+        leaseDeptList = sharedAssetBatchService.getOrgDeptList();
         List<OrgInfo> res = leaseDeptList.stream().filter(item -> Strings.isNullOrEmpty(query)
                                             || item.getName().contains(query)
                                             || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
@@ -432,5 +435,12 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
          }
          return result;
     }
-    
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            bean.setSelectSite( (OrgInfo) event.getTreeNode().getData());
+            this.leaseDeptName=null;
+        }
+
+    }
 }
