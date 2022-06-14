@@ -61,6 +61,8 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
     @Setter
     private StreamedContent exportFile;
 
+    private UserContextService userContextService;
+
     public void searchList(Long queryIndex){
         this.queryIndex = queryIndex;
         this.oneSearchStr = "";
@@ -85,6 +87,7 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
         partsRequestService = WebUtil.getBean(SimplePartsRequestService.class);
         partsRequestLineItemRepository = WebUtil.getBean(SimplePartsRequestLineItemRepository.class);
         partsRequestRepository = WebUtil.getBean(SimplePartsRequestRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
     }
 
     @Override
@@ -116,12 +119,14 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("requestCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            List<SimplePartsRequest> simplePartsRequestList = partsRequestRepository.findByMaintenanceWorkOrderNumberLike(oneSearchStr + "%");
-            if(simplePartsRequestList != null){
-                List<String> partsRequestIds = new ArrayList<>();
-                simplePartsRequestList.stream().forEach(item -> partsRequestIds.add(item.getId()));
-                if(partsRequestIds != null && partsRequestIds.size() > 0){
-                    this.updateSearchFilter(new SearchFilter("partsRequestId", SearchFilter.Operator.IN,partsRequestIds));
+            if(userContextService.isCountyArea()){
+                List<SimplePartsRequest> simplePartsRequestList = partsRequestRepository.findByMaintenanceWorkOrderNumberLike(oneSearchStr + "%");
+                if(simplePartsRequestList != null){
+                    List<String> partsRequestIds = new ArrayList<>();
+                    simplePartsRequestList.stream().forEach(item -> partsRequestIds.add(item.getId()));
+                    if(partsRequestIds != null && partsRequestIds.size() > 0){
+                        this.updateSearchFilter(new SearchFilter("partsRequestId", SearchFilter.Operator.IN,partsRequestIds));
+                    }
                 }
             }
         }

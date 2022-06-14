@@ -27,12 +27,17 @@
 
                     <h:panelGrid id="buttonSearchList" columns="12" cellpadding="5">
                         <p:inputText id="searchText" value="#{simplePartsTransactionController.oneSearchStr}"
-                                     placeholder="备件名称/申请单编号/工单编号"
-                                     maxlength="105" style="width: 360px">
+                                     placeholder="备件名称/申请单编号"
+                                     maxlength="105" style="width: 360px" rendered="#{!userContextService.countyArea}">
                             <p:ajax event="keyup"
                                     update=":SparePartsInventoryListForm:datalist searchButtons"/>
                         </p:inputText>
-
+                        <p:inputText id="searchText2" value="#{simplePartsTransactionController.oneSearchStr}"
+                                     placeholder="备件名称/申请单编号/工单编号"
+                                     maxlength="105" style="width: 360px" rendered="#{userContextService.countyArea}">
+                            <p:ajax event="keyup"
+                                    update=":SparePartsInventoryListForm:datalist searchButtons"/>
+                        </p:inputText>
                         <h:panelGroup id='searchButtons'>
                             <p:commandButton style="zoom:0.8" icon="ui-icon-search"
                                              class="btn btn-sm btn-gray"
