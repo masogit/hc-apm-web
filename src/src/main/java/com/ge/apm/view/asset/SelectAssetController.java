@@ -41,6 +41,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     private String oneSearchStr;
     private ZkbContractAssetRepository zkbContractAssetRepository;
     private ZkbContractRepository zkbContractRepository;
+    private UserContextService userContextService;
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -50,6 +51,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         zkbContractAssetRepository= WebUtil.getBean(ZkbContractAssetRepository.class);
         this.filterBySite = false;
         this.filterByHospital = false;
+        userContextService = WebUtil.getBean(UserContextService.class);
     }
 
 
@@ -287,7 +289,9 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("systemId", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            if(userContextService.isCountyArea()){
+                this.updateSearchFilter(new SearchFilter("systemId", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            }
         }
     }
 
