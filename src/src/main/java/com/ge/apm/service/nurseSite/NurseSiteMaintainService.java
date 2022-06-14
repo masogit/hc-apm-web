@@ -394,6 +394,15 @@ public class NurseSiteMaintainService {
 				obj.put("key", item.getKey());
 				obj.put("description", item.getDescription());
 				obj.put("id", item.getId());
+				String fieldType = item.getFieldType();
+				String defaultValue = item.getDefaultValue();
+				if(StringUtils.isEmpty(fieldType)){
+					fieldType="Switch";
+					defaultValue="false";
+				}
+				obj.put("fieldType",fieldType);
+				obj.put("defaultValue",defaultValue);
+				obj.put("options",item.getOptions());
 				arr.add(obj);
 			}
 		}
