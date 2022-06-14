@@ -54,7 +54,7 @@
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.assetLocation}" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{userContextService.countyArea}">
-                            <label class="label">医院名称</label>
+                            <label class="label">院区名称</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.hospitalName}" />
                         </h:panelGroup>
                         <h:panelGroup>
@@ -297,6 +297,9 @@
                                     <p:column headerText="#{msg.accessory}#{msg.Name}">
                                         <h:outputText value="#{detailItem.parts}" />
                                     </p:column>
+                                    <p:column headerText="#{msg.PartsItemCode}" rendered="#{userContextService.countyArea}">
+                                        <h:outputText value="#{workOrderMgrController.getPartsItemCode(detailItem)}"/>
+                                    </p:column>
                                     <p:column headerText="#{msg.accessoryQuantity}">
                                         <h:outputText value="#{detailItem.apartsQuantity}" />
                                     </p:column>
@@ -345,7 +348,9 @@
                                     <p:column headerText="#{msg.arrival}">
                                         <h:outputText value="#{detailItem.arrived?msg.Arrived:msg.NonArrived}" />
                                     </p:column>
-
+                                    <p:column headerText="备件描述" rendered="#{userContextService.countyArea}">
+                                        <h:outputText value="#{detailItem.partsDescription}" />
+                                    </p:column>
                                     <p:column headerText="#{msg.operation}" >
                                         <p:commandButton rendered="#{workOrderMgrController.allowChanged()}" process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{workOrderMgrController.allowChangedForDisable() or (detailItem.approved==null?'false': not detailItem.approved)}"  actionListener="#{workOrderMgrController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.moreAccDialogPriceDlg)" oncomplete="PF('moreAccDialogPriceDlg').show()"/>
 

@@ -68,15 +68,17 @@
                 <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.functionType}"/>
                 </p:column>
-                <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE" rendered="#{userContextService.isCountyArea()}">
-                    <h:outputText value="#{item.assetInfo.systemId}"/>
-                </p:column>
-                <p:column headerText="#{msg.siebleNumber}" sortBy="#{item.serviceRequest.siebleNumber}" filterBy="#{item.serviceRequest.siebleNumber}" filterMatchMode="LIKE" rendered="#{userContextService.isCountyArea()}">
-                    <h:outputText value="#{item.serviceRequest.siebleNumber}"/>
-                </p:column>
-                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.serviceRequest.hospitalName}" filterBy="#{item.serviceRequest.hospitalName}" filterMatchMode="LIKE" rendered="#{userContextService.countyArea}">
-                    <h:outputText value="#{item.serviceRequest.hospitalName}"/>
-                </p:column>
+                <c:if test="#{userContextService.isCountyArea()}">
+                    <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetInfo.systemId}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.siebleNumber}" sortBy="#{item.siebleNumber}" filterBy="#{item.siebleNumber}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.siebleNumber}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.hospitalId}" sortBy="#{item.serviceRequest.hospitalName}" filterBy="#{item.serviceRequest.hospitalName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.serviceRequest.hospitalName}"/>
+                    </p:column>
+                </c:if>
                 <!--所属科室-->
                 <p:column headerText="#{msg.clinicalDeptName}"  width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <f:facet name="header">
