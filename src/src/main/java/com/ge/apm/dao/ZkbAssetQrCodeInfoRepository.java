@@ -35,7 +35,7 @@ public interface ZkbAssetQrCodeInfoRepository extends GenericRepositoryUUID<ZkbA
      * @param tenantUID
      * @return
      */
-    @Query(value = "SELECT count(zkba.id) from zkb_asset_qr_code_info zkba INNER JOIN asset_info ai on zkba.system_id = ai.system_id WHERE (zkba.qr_code_count_state = 'Y' OR zkba.can_not_past_qr_code = 'Y') and zkba.install_status<>'2' and ai.uid IN ?1 and zkba.tenant_uid= ?2 ", nativeQuery = true)
+    @Query(value = "SELECT count(zkba.id) from zkb_asset_qr_code_info zkba INNER JOIN asset_info ai on zkba.system_id = ai.system_id WHERE (zkba.qr_code_count_state = 'Y' OR zkba.can_not_past_qr_code = 'Y') and not exists(select 1 from zkb_asset_qr_code_info zkbat where zkba.id = zkbat.id and zkbat.install_status = '2') and ai.uid IN ?1 and zkba.tenant_uid= ?2 ", nativeQuery = true)
     Integer qrCodePasteCount(List<String> uidList,String tenantUID);
 
     @Query(value = "SELECT count(zkba.id) from zkb_asset_qr_code_info zkba INNER JOIN asset_info ai on zkba.system_id = ai.system_id where ai.uid IN ?1 and zkba.tenant_uid= ?2 and zkba.can_not_past_qr_code=?3 ", nativeQuery = true)
