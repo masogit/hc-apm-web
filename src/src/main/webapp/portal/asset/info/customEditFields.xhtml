@@ -39,6 +39,15 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetDisposalResults')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetDisposalResults}</label>
+            <p:selectOneMenu id="assetDisposalResults" value="#{assetInfoEditController.selected.assetDisposalResults}"  disabled="#{!assetInfoEditController.needEdit('assetDisposalResults')}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetDisposalResultsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetClass')}" ><!--设备分类-->
         <h:panelGroup>
             <label class="label">#{msg.assetClass}</label>

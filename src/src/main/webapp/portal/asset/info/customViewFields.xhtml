@@ -217,6 +217,12 @@
             <p:inputText id="powerOnThreshold" value="#{assetInfoDetailController.selected.powerOnThreshold}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetDisposalResults')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetDisposalResults}</label>
+            <p:inputText id="assetDisposalResults" value="#{fieldMsg.fieldValue('assetDisposalResultsType', assetInfoDetailController.selected.assetDisposalResults)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
 
     <!--计量负责人-->
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'measuringOwner')}" >
