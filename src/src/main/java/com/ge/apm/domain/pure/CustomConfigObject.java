@@ -94,14 +94,14 @@ public class CustomConfigObject {
     }
 
     public List<String> getSupplierViewFields() {
-        if(supplierViewFields == null) supplierViewFields = new ArrayList<>();
+        if(supplierViewFields == null) supplierViewFields = CustomConfigConstant.getAssetsListPageFields();
         return supplierViewFields;
     }
 
     public void setSupplierViewFields(List<String> supplierViewFields) { this.supplierViewFields = supplierViewFields; }
 
     public List<String> getSupplierEditFields() {
-        if(supplierEditFields == null) supplierEditFields = new ArrayList<>();
+        if(supplierEditFields == null) supplierEditFields = CustomConfigConstant.getAssetsListPageFields();
         return supplierEditFields;
     }
 

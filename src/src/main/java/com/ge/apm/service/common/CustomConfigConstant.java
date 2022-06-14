@@ -185,6 +185,7 @@ public class CustomConfigConstant {
         allFields.put("rfGroup", WebUtil.getMessage("rfGroup"));
         allFields.put("currentId", WebUtil.getMessage("currentId"));
         allFields.put("assetQuality", WebUtil.getMessage("assetQuality"));
+        allFields.put("assetDisposalResults", WebUtil.getMessage("assetDisposalResults"));
         return allFields;
     }
 
@@ -270,7 +271,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsImportantFieldsAll() {
         return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
-                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType","status","isValid");
+                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType","status","isValid","assetDisposalResults");
     }
 
     public static List<String> getTemplateEnableList() {

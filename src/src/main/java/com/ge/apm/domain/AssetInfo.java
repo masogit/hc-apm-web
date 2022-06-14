@@ -567,6 +567,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "current_id")
     private String currentId;
 
+    @Column(name = "asset_disposal_results")
+    private Integer assetDisposalResults;
+
     @Size(max = 256)
     @Column(name = "one_qr_code")
     private String oneQrCode;
@@ -719,6 +722,13 @@ public class AssetInfo implements ChineseName,Serializable {
     @Transient
     private String sharedAssetSwapIndexId;
 
+    public Integer getAssetDisposalResults() {
+        return assetDisposalResults;
+    }
+
+    public void setAssetDisposalResults(Integer assetDisposalResults) {
+        this.assetDisposalResults = assetDisposalResults;
+    }
 
     public String getCurrentId() {
         return currentId;

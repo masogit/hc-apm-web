@@ -17,6 +17,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import com.ge.apm.domain.pure.TableOption;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -34,7 +35,9 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 	private String name;
 	private String description;
 	private String id;
-	
+	private String fieldType;
+	private String defaultValue;
+	private List<TableOption> options=new ArrayList<>();
 
 	public String getId() {
 		return id;
@@ -93,4 +96,28 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
     public String toString() {
         return "NurseSiteMaintainConfigCheckItem [ key=" + key + " ]";
     }
+
+	public String getFieldType() {
+		return fieldType;
+	}
+
+	public void setFieldType(String fieldType) {
+		this.fieldType = fieldType;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	public List<TableOption> getOptions() {
+		return options;
+	}
+
+	public void setOptions(List<TableOption> options) {
+		this.options = options;
+	}
 }
