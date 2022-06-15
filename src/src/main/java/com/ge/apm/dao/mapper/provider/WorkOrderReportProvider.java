@@ -277,8 +277,9 @@ public class WorkOrderReportProvider {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.uid as assetUid,ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
-            "wo.status as status, " +
+        sb.append("select wo.id as id,sr.sr_num as srNum,ai.depart_num as assetDepartNum,ai.uid as assetUid," +
+                "ai.financing_num as assetFinancingNum,ai.serial_num as assetSerialNum,ai.name as assetName, " +
+            "wo.status as status, ai.id as assetId , " +
             "wo.sub_status as subStatus, " +
             "sr.hospital_name as hospitalName,ai.manufacture as assetManufacture, " +
             "ai.make_short_name as assetMakerShortName,ai.qr_code as assetInfoQrCode,sr.asset_location as locationName, " +

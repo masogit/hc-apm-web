@@ -31,4 +31,6 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
     String selectMaxApprovalNum(String format);
 
     public List<MultiLevelApproval> findByBusinessUid(String businessUid);
+
+    public List<MultiLevelApproval> findByBusinessUidIn(List<String> woId);
 }
