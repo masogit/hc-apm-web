@@ -98,10 +98,10 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
         searchFilters.removeIf(e->e.fieldName.equals("siteId"));
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uaaService.getOrgListByUser(currentUserAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 //        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         setUserSearchFilters();
 
@@ -120,12 +120,13 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("requestCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             if(userContextService.isCountyArea()){
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "partsRequestId".equals(item.fieldName)).collect(Collectors.toList()));
                 List<SimplePartsRequest> simplePartsRequestList = partsRequestRepository.findByMaintenanceWorkOrderNumberLike(oneSearchStr);
-                if(simplePartsRequestList != null){
+                if(simplePartsRequestList != null && simplePartsRequestList.size() > 0){
                     List<String> partsRequestIds = new ArrayList<>();
                     simplePartsRequestList.stream().forEach(item -> partsRequestIds.add(item.getId()));
                     if(partsRequestIds != null && partsRequestIds.size() > 0){
-                        this.updateSearchFilter(new SearchFilter("partsRequestId", SearchFilter.Operator.IN,partsRequestIds));
+                        this.updateSearchFilter(new SearchFilter("partsRequestId", SearchFilter.Operator.IN,partsRequestIds, "1*3+"));
                     }
                 }
             }
