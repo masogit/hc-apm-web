@@ -121,7 +121,7 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
             this.updateSearchFilter(new SearchFilter("requestCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             if(userContextService.isCountyArea()){
                 List<SimplePartsRequest> simplePartsRequestList = partsRequestRepository.findByMaintenanceWorkOrderNumberLike(oneSearchStr);
-                if(simplePartsRequestList != null){
+                if(simplePartsRequestList != null && simplePartsRequestList.size() > 0){
                     List<String> partsRequestIds = new ArrayList<>();
                     simplePartsRequestList.stream().forEach(item -> partsRequestIds.add(item.getId()));
                     if(partsRequestIds != null && partsRequestIds.size() > 0){
