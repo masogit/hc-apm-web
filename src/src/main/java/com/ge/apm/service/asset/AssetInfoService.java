@@ -255,8 +255,8 @@ public class AssetInfoService {
             sqlStringBuffer.append(" and a.install_date <= '"+startUsingDateEnd.replace("/","-")+"'");
         }
         if (StringUtils.isNotEmpty(purchaseDate)){
-            String purchaseDateStart = startUsingDate.substring(0, 10);
-            String purchaseDateEnd = startUsingDate.substring(11, purchaseDate.length());
+            String purchaseDateStart = purchaseDate.substring(0, 10);
+            String purchaseDateEnd = purchaseDate.substring(11, purchaseDate.length());
             sqlStringBuffer.append(" and a.purchase_date >=   '"+purchaseDateStart.replace("/","-")+"'");
             sqlStringBuffer.append(" and a.purchase_date <=  '"+purchaseDateEnd.replace("/","-")+"'");
         }

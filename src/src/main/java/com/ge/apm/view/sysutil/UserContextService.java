@@ -1080,14 +1080,11 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isYiMaiYangGuangTenant() {
-        TenantInfo tenantInfo = getTenantInfo();
-        //这期上线，暂时写死，下个版本改成动态配置
-        if("齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName()) || "南阳市张仲景医院有限公司".equals(tenantInfo.getName()) || "洛阳仁大医院有限公司".equals(tenantInfo.getName())){
-            return true;
-        }else{
-            return false;
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
+        if (tenantOptionConfigOptional.isPresent()) {
+            return tenantOptionConfigOptional.get().getSynchronizeWorkOrder()!=null? tenantOptionConfigOptional.get().getSynchronizeWorkOrder():false;
         }
-//        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
+        return false;
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
