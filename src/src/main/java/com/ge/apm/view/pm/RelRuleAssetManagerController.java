@@ -304,8 +304,27 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                         break;
                 }
             }
-        }
+        }else {
+            switch (filterRuleLevel) {
+                case 1:
+                    filterRuleUIDInspectionName = null;
+                    filterRuleUIDInspectionLevel = null;
+                    break;
+                case 2:
+                    filterRuleUID2Name = null;
+                    filterRuleUID2Level= null;
 
+                    break;
+                case 3:
+                    filterRuleUIDName = null;
+                    filterRuleUIDLevel = null;
+                    break;
+                case 4:
+                    filterRuleUID4Name = null;
+                    filterRuleUID4Level = null;
+                    break;
+            }
+        }
     }
     public List<String> autoCompleteDeptName(String query) {
         if (clinicalDeptList == null) {
@@ -402,7 +421,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                 if(relRuleAsset.getRuleUID4() != null) {
                     ruleUids.add(relRuleAsset.getRuleUID4());
                 }
-				
+
 			}
 			if(CollectionUtils.isNotEmpty(assetUids)){
 				List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUids);
@@ -613,7 +632,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}
 		return filter;
 	}
-	
+
 	public List<String> getAssetInfoUids(){
 		List<SearchFilter> filters = getFilter(user.getSiteUID());
 		List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(filters);
@@ -623,7 +642,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}
 		return uids;
 	}
-	
+
     public void setOneSearchStr() {
     		queryCondition = null;
     }
@@ -718,22 +737,22 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	}
 	/*
 	 * @Override public void onBeforeNewObject(RelRuleAsset object) { }
-	 * 
+	 *
 	 * @Override public void onAfterNewObject(RelRuleAsset object, boolean isOK)
 	 * { }
-	 * 
+	 *
 	 * @Override public void onBeforeUpdateObject(RelRuleAsset object) { }
-	 * 
+	 *
 	 * @Override public void onAfterUpdateObject(RelRuleAsset object, boolean
 	 * isOK) { }
-	 * 
+	 *
 	 * @Override public void onBeforeDeleteObject(RelRuleAsset object) { }
-	 * 
+	 *
 	 * @Override public void onAfterDeleteObject(RelRuleAsset object, boolean
 	 * isOK) { }
-	 * 
+	 *
 	 * @Override public void onBeforeSave(RelRuleAsset object) { }
-	 * 
+	 *
 	 * @Override public void onAfterDataChanged(){ };
 	 */
 }
