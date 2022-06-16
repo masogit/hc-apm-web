@@ -157,7 +157,7 @@
                             </p:dataList>
 
                         </h:panelGroup>
-                        <p:fieldset legend="#{msg.PaymentInformation}">
+                        <p:fieldset legend="#{msg.PaymentPlan}">
 
                             <h:panelGroup >
                                 <p:dataTable id="paymentList"  value="#{contractInfoEditController.getPaymentList()}" var="item" 
@@ -170,6 +170,11 @@
                                     </p:column>
                                     <p:column headerText="#{msg.PaymentTime}">
                                         <h:outputText value="#{item.paymentDate}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.EstimatedPaymentDate}">
+                                        <h:outputText value="#{item.estimatedPaymentDate}">
                                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                         </h:outputText>
                                     </p:column>
@@ -188,7 +193,7 @@
                                     </p:column>
 
                                     <f:facet name="{Toolbar}">
-                                        <p:commandLink value="#{msg.AddPaymentInformation}" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPaymentInfo()}" process="@this" rendered="#{contractInfoEditController.canBeEdit}"
+                                        <p:commandLink value="#{msg.AddPaymentPlan}" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPaymentInfo()}" process="@this" rendered="#{contractInfoEditController.canBeEdit}"
                                                        update=":addPaymentForm" oncomplete="PF('addPaymentDlg').show()" />
                                     </f:facet>
 
@@ -291,6 +296,26 @@
                                 <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.tenderOpenDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">预算申请时间</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.budgetRequestTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">审批时间</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.approvalTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">论证通过时间</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.argumentThroughTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">上报管理部门时间</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.reportToManagementTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">立项时间</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.projectEstablishmentTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">中标时间</label>
                                 <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.bidDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup>
@@ -349,6 +374,10 @@
                             <h:panelGroup>
                                 <label class="label">应到货时间</label>
                                 <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.expectArrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">到货时间</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.arrivalTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup>
                         </p:panelGrid>
 
@@ -673,7 +702,7 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog id="addPaymentDlg" widgetVar="addPaymentDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.AddPaymentInformation}">
+        <p:dialog id="addPaymentDlg" widgetVar="addPaymentDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.AddPaymentPlan}">
             <h:form id="addPaymentForm" >
                 <h:panelGroup id="display" >
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -685,6 +714,11 @@
                         <h:panelGroup>
                             <label class="label" >#{msg.PaymentTime}</label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.paymentInfo.paymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+                            </p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label" >#{msg.EstimatedPaymentDate}</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.paymentInfo.estimatedPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
                             </p:calendar>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{contractInfoEditController.isYunNanFuWai()}">
