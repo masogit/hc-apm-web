@@ -429,8 +429,9 @@ public class WorkOrderExportService {
             if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
                 m.put("partsSignature", partsSignatureMap.get(woid));
                 m.put("medicalWorkerApproverSignature",medicalWorkerApproverSignatureMap.get(woid));
-                m.put("approverSignatureList",approverSignatureObjMap.get(woid).stream()
-                            .map(AuditGroupConfigurationDetail::getApproverSignature).collect(Collectors.toList()));
+                m.put("approverSignatureList",Optional.ofNullable(approverSignatureObjMap.get(woid))
+                        .map(o-> o.stream().map(AuditGroupConfigurationDetail::getApproverSignature).collect(Collectors.toList()))
+                        .orElse(Collections.emptyList()));
             }else if(tenantInfo.getType() != null && tenantInfo.getType() == 6){//县域新增
                 m.put(WebUtil.getMessage("siebleNumber"), m.get("siebleNumber"));
                 m.put(WebUtil.getMessage("callCenterNumber"), m.get("callCenterNumber"));
