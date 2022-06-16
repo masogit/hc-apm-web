@@ -294,7 +294,7 @@
                                 <p:inputTextarea value="#{tableCreateController.editTableItem.defaultValue}"  placeholder="#{tableCreateController.editTableItem.defaultValue}"/>
                             </c:if>
                             <c:if test="#{tableCreateController.editTableItem.component eq 'Date'}" >
-                                <p:calendar value="#{tableCreateController.editTableItem.defaultValue}"  placeholder="#{tableCreateController.editTableItem.defaultValue}"/>
+                                <p:calendar value="#{tableCreateController.editTableItem.defaultValue}" timeZone="GMT+8"  pattern="yyyy/MM/dd"  placeholder="#{tableCreateController.editTableItem.defaultValue}"/>
                             </c:if>
                             <c:if test="#{tableCreateController.editTableItem.component eq 'Label'}" >
                                 <h:outputText value="#{tableCreateController.editTableItem.defaultValue}"  />
