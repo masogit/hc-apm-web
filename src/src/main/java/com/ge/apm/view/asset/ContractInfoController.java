@@ -1,12 +1,16 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.druid.util.StringUtils;
+import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.ContractInfoRepository;
+import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ContractInfo;
+import com.ge.apm.domain.ContractInfoItem;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +20,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +56,8 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         if (!StringUtils.isEmpty(assetUid)) {
             List<ContractInfo> contractInfos = contractService.getContractListByAssetUid(assetUid);
             PageImpl page = new PageImpl(contractInfos);
+            List<ContractInfo> list = page.getContent();
+            calcPercentage(list);
             return page;
         }
 
@@ -70,7 +77,38 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<ContractInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<ContractInfo> list = page.getContent();
+        calcPercentage(list);
+        return page;
+    }
+
+    public void calcPercentage(List<ContractInfo> list){
+        for (ContractInfo contractInfo : list) {
+            double totalPaymentPrice = 0.0;
+            List<ContractInfoItem> itemList = contractService.getContractItems(contractInfo.getId());
+            if(CollectionUtils.isNotEmpty(itemList)){
+                for (ContractInfoItem contractInfoItem : itemList) {
+                    if(contractInfoItem.getPaymentPrice() != null){
+                        totalPaymentPrice += contractInfoItem.getPaymentPrice();
+                    }
+                }
+                if(totalPaymentPrice > 0){
+                    if(contractInfo.getAmount() != null){
+                        totalPaymentPrice = totalPaymentPrice / contractInfo.getAmount() * 100;
+                        String percentage = new BigDecimal(totalPaymentPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "%";
+                        contractInfo.setPaymentProgress(percentage);
+                    }else{
+                        contractInfo.setPaymentProgress("0%");
+                    }
+                }else{
+                    contractInfo.setPaymentProgress("0%");
+
+                }
+            }else{
+                contractInfo.setPaymentProgress("0%");
+            }
+        }
     }
 
     protected long countValidContracts(ContractInfo contractInfo) {
