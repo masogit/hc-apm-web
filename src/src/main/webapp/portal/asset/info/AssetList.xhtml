@@ -558,6 +558,31 @@
                                     <h:outputText value="#{item.registrationNo}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'systemNum1'}">
+                                <p:column headerText="#{msg.systemNum1}" sortBy="#{item.systemNum1}" filterBy="#{item.systemNum1}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum1}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemNum2'}">
+                                <p:column headerText="#{msg.systemNum2}" sortBy="#{item.systemNum2}" filterBy="#{item.systemNum2}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum2}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemNum3'}">
+                                <p:column headerText="#{msg.systemNum3}" sortBy="#{item.systemNum3}" filterBy="#{item.systemNum3}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum3}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemNum4'}">
+                                <p:column headerText="#{msg.systemNum4}" sortBy="#{item.systemNum4}" filterBy="#{item.systemNum4}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum4}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemNum5'}">
+                                <p:column headerText="#{msg.systemNum5}" sortBy="#{item.systemNum5}" filterBy="#{item.systemNum5}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum5}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'deviceStatus'}">
                                 <p:column id="deviceStatus" headerText="#{msg.deviceStatus}" sortBy="#{item.deviceStatus}" filterBy="#{item.deviceStatus}" filterMatchMode="EQ">
                                     <h:outputText value="#{fieldMsg.fieldValue('deviceStatus', item.deviceStatus)}"/>
