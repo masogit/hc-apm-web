@@ -250,6 +250,9 @@ public class ContractInfo implements Serializable {
     @Column(name = "extension_status")
     private String extensionStatus;
 
+    //付款进度
+    @Transient
+    private String paymentProgress;
 
     //excel行数
     @Transient
@@ -281,6 +284,84 @@ public class ContractInfo implements Serializable {
 
     @Column(name = "contract_status")
     private String contractStatus;
+
+    //预算申请时间
+    @Column(name = "budget_request_time")
+    @Temporal(TemporalType.DATE)
+    private Date budgetRequestTime;
+
+    //审批时间
+    @Column(name = "approval_time")
+    @Temporal(TemporalType.DATE)
+    private Date approvalTime;
+
+    //论证通过时间
+    @Column(name = "argument_through_time")
+    @Temporal(TemporalType.DATE)
+    private Date argumentThroughTime;
+
+    //上报管理部门时间
+    @Column(name = "report_to_management_time")
+    @Temporal(TemporalType.DATE)
+    private Date reportToManagementTime;
+
+    //立项时间
+    @Column(name = "project_establishment_time")
+    @Temporal(TemporalType.DATE)
+    private Date projectEstablishmentTime;
+
+    //到货时间
+    @Column(name = "arrival_time")
+    @Temporal(TemporalType.DATE)
+    private Date arrivalTime;
+
+    public Date getBudgetRequestTime() {
+        return budgetRequestTime;
+    }
+
+    public void setBudgetRequestTime(Date budgetRequestTime) {
+        this.budgetRequestTime = budgetRequestTime;
+    }
+
+    public Date getApprovalTime() {
+        return approvalTime;
+    }
+
+    public void setApprovalTime(Date approvalTime) {
+        this.approvalTime = approvalTime;
+    }
+
+    public Date getArgumentThroughTime() {
+        return argumentThroughTime;
+    }
+
+    public void setArgumentThroughTime(Date argumentThroughTime) {
+        this.argumentThroughTime = argumentThroughTime;
+    }
+
+    public Date getReportToManagementTime() {
+        return reportToManagementTime;
+    }
+
+    public void setReportToManagementTime(Date reportToManagementTime) {
+        this.reportToManagementTime = reportToManagementTime;
+    }
+
+    public Date getProjectEstablishmentTime() {
+        return projectEstablishmentTime;
+    }
+
+    public void setProjectEstablishmentTime(Date projectEstablishmentTime) {
+        this.projectEstablishmentTime = projectEstablishmentTime;
+    }
+
+    public Date getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(Date arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
 
     public String getTenderType() {
         return tenderType;
@@ -696,6 +777,14 @@ public class ContractInfo implements Serializable {
 
     public void setExtensionStatus(String extensionStatus) {
         this.extensionStatus = extensionStatus;
+    }
+
+    public String getPaymentProgress() {
+        return paymentProgress;
+    }
+
+    public void setPaymentProgress(String paymentProgress) {
+        this.paymentProgress = paymentProgress;
     }
 
     @Override

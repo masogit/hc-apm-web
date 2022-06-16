@@ -25,7 +25,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5");
     }
 
     //只读字段
@@ -186,6 +186,11 @@ public class CustomConfigConstant {
         allFields.put("currentId", WebUtil.getMessage("currentId"));
         allFields.put("assetQuality", WebUtil.getMessage("assetQuality"));
         allFields.put("assetDisposalResults", WebUtil.getMessage("assetDisposalResults"));
+        allFields.put("systemNum1", WebUtil.getMessage("systemNum1"));
+        allFields.put("systemNum2", WebUtil.getMessage("systemNum2"));
+        allFields.put("systemNum3", WebUtil.getMessage("systemNum3"));
+        allFields.put("systemNum4", WebUtil.getMessage("systemNum4"));
+        allFields.put("systemNum5", WebUtil.getMessage("systemNum5"));
         return allFields;
     }
 
