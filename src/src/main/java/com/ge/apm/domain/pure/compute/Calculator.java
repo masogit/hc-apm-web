@@ -234,7 +234,7 @@ public class Calculator {
         String equation9 = "intercept(2,5,8,7,3,6,-2,0,3,5,2,-3)";//4.861209964
         String equation10 = "degrees(6)";//4.861209964
 
-        String result = calculator.calculate(equation10);
+        String result = calculator.calculate(equation2);
 
         System.out.println(result);
     }
