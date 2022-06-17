@@ -679,9 +679,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 		return objPairCheckItem;
 	}
-	public void  createObjCheckItem(){
-		this.objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
-	}
+//	public void  createObjCheckItem(){
+//		this.objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
+//	}
 	public void setObjCheckItem(NurseSiteMaintainConfigCheckItem objCheckItem) {
 		this.objPairCheckItem = objCheckItem;
 	}
@@ -860,52 +860,52 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.listSelectedCheckItems = listSelectedCheckItems;
 	}
 
-	public TableOption getTableOption() {
-		return tableOption;
-	}
-
-	public void setTableOption(TableOption tableOption) {
-		this.tableOption = tableOption;
-	}
-	public void addOption() {
-		List<TableOption> options = objPairCheckItem.getOptions();
-		for (TableOption tableOption1 : options) {
-			if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
-				tableOption1.setValue(tableOption.getValue());
-				tableOption=null;
-				return ;
-			}
-		}
-		options.add(tableOption);
-		tableOption=null;
-	}
-	public void prepareAddOption(){
-		tableOption=new TableOption();
-	}
-	public void prepareEditOption(TableOption option) {
-		tableOption = option;
-	}
-
-	public void removeOption(TableOption option) {
-		List<TableOption> options = objPairCheckItem.getOptions();
-		List<TableOption> collect = options.stream().filter(item -> {
-			String key = item.getKey();
-			return key != null && !key.equals(option.getKey());
-		}).collect(Collectors.toList());
-		objPairCheckItem.setOptions(collect);
-	}
-	public void onRuleChange(){
-		objPairCheckItem.setDefaultValue(null);
-	}
-	public boolean dateType(){
-    	if(objPairCheckItem != null){
-			return "Date".equals(objPairCheckItem.getFieldType());
-		}else{
-    		return false;
-		}
-	}
-
-	public void recover(){
-    	BeanUtils.copyProperties(objPairCheckItemEdit,objPairCheckItem);
-	}
+//	public TableOption getTableOption() {
+//		return tableOption;
+//	}
+//
+//	public void setTableOption(TableOption tableOption) {
+//		this.tableOption = tableOption;
+//	}
+//	public void addOption() {
+//		List<TableOption> options = objPairCheckItem.getOptions();
+//		for (TableOption tableOption1 : options) {
+//			if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
+//				tableOption1.setValue(tableOption.getValue());
+//				tableOption=null;
+//				return ;
+//			}
+//		}
+//		options.add(tableOption);
+//		tableOption=null;
+//	}
+//	public void prepareAddOption(){
+//		tableOption=new TableOption();
+//	}
+//	public void prepareEditOption(TableOption option) {
+//		tableOption = option;
+//	}
+//
+//	public void removeOption(TableOption option) {
+//		List<TableOption> options = objPairCheckItem.getOptions();
+//		List<TableOption> collect = options.stream().filter(item -> {
+//			String key = item.getKey();
+//			return key != null && !key.equals(option.getKey());
+//		}).collect(Collectors.toList());
+//		objPairCheckItem.setOptions(collect);
+//	}
+//	public void onRuleChange(){
+//		objPairCheckItem.setDefaultValue(null);
+//	}
+//	public boolean dateType(){
+//    	if(objPairCheckItem != null){
+//			return "Date".equals(objPairCheckItem.getFieldType());
+//		}else{
+//    		return false;
+//		}
+//	}
+//
+//	public void recover(){
+//    	BeanUtils.copyProperties(objPairCheckItemEdit,objPairCheckItem);
+//	}
 }
