@@ -198,12 +198,30 @@ public class ZkbKeyBehaviorIndexService {
         New, Exist, Created, Failure, CheckFail
     }
 
-    public List<TenantInfo> getSourceTenantInfoList(String loginName){
+    public List<TenantInfo> getSourceTenantInfoList(String loginName,Date kpiDate){
         if(StringUtils.isNotBlank(loginName)&&loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
             return this.tenantInfoDao.findByType(3);
-        return this.tenantInfoDao.findByTypeAndNameNotLike(3,"ZKB%");
+        //return this.tenantInfoDao.findByTypeAndNameNotLike(3,"ZKB%");
+        //结束时间不能小于startdate 开始时间不能大于结束时间
+        return this.tenantInfoDao.findByAnyContractDate(getFirstDay(kpiDate),getLastDay(kpiDate),3);
     }
-
+    private Date getFirstDay(final Date date){
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        final int last = cal.getActualMinimum(Calendar.DAY_OF_MONTH);
+        cal.set(Calendar.DAY_OF_MONTH, last);
+        String lastDay = format.format(cal.getTime());
+        lastDay = lastDay+"000000";
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+        Date date1 = null;
+        try {
+            date1 = formatter.parse(lastDay);
+        } catch (ParseException e) {
+            logger.info(e.getMessage());
+        }
+        return date1;
+    }
     /**
      * 根据租户UID获取所有合同列表
      * @param tenantUID 租户UID
@@ -759,7 +777,7 @@ public class ZkbKeyBehaviorIndexService {
 
     public void generateSingleKpiData(TenantInfo item,Date kpiDate)
     {
-        Date lastDay = this.getLastDay(kpiDate);
+        Date lastDay = this.getLastDay(kpiDate);//最后一体天
         Date monthOfFirstDay = this.getMonthOfFirstDay(kpiDate);
         SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexService.monthDateFormat_two);
         String dateStry = formatter.format(kpiDate);
