@@ -25,7 +25,7 @@ import java.util.logging.SimpleFormatter;
  */
 @Service
 public class ZkbContractQuotaLogService {
- 
+
     private static final Logger logger = LoggerFactory.getLogger(ZkbContractQuotaLogService.class);
 
     @Autowired

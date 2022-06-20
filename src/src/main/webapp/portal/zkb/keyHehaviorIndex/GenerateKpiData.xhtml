@@ -15,13 +15,16 @@
                 <h:form id="searchForm">
                     <p:fieldset id="zkbTenantFieldset"  legend="生成条件" >
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:commandButton id="batchCreateButton" value="选择供应商" title="选择供应商" update=":selectTenantBatchDlg" oncomplete="PF('selectTenantBatchDialog').show()"/>
-                            </h:panelGroup>
+
                             <h:panelGroup>
                                 <label class="label">生成月份</label>
-                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM" value="#{zkbKeyBehaviorIndexController.kpiDate}"
-                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                                <p:calendar id="kpiDate" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" pattern="yyyy-MM" value="#{zkbKeyBehaviorIndexController.kpiDate}" requiredMessage="生成月份#{msg.ValidationRequire}"
+                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"  >
+                                 </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:commandButton id="batchCreateButton" value="选择供应商" title="选择供应商"   update=":growl :selectTenantBatchDlg"     action="#{zkbKeyBehaviorIndexController.updateTenantInfoList}"   oncomplete="openForceLeaseDialog(xhr, status, args)">
+                                </p:commandButton>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <p:commandButton value="生成" update=":growl :searchForm" action="#{zkbKeyBehaviorIndexController.generateKpiData}"></p:commandButton>
@@ -95,5 +98,16 @@
                 <ui:include src="selectTenant.xhtml"/>
             </div>
         </div>
+        <script>
+            function openForceLeaseDialog(xhr, status, args) {
+                console.log("openForceLeaseDialog: " + args.validationFailed);
+                if (args.validationFailed) {
+                    console.log(args.validationFailed);
+                } else {
+                    PF('selectTenantBatchDialog').show()
+                }
+            }
+
+        </script>
     </ui:define>
 </ui:composition>
