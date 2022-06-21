@@ -20,7 +20,7 @@ import java.util.Date;
 @FacesConverter("date2StringConverter")
 public class Date2StringConverter implements Converter {
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
