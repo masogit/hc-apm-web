@@ -1,9 +1,11 @@
 package com.ge.apm.view.simpleparts;
 
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.domain.simpleparts.SimplePartsReportVo;
 import com.ge.apm.service.simpleparts.SimplePartsItemService;
 import com.ge.apm.service.simpleparts.SimplePartsReportService;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -27,6 +29,8 @@ public class SimplePartsReportController extends GenericCRUDUUIDController<Simpl
 
     private SimplePartsReportService simplePartsReportService;
 
+    private UserContextService userContextService;
+
     private Date startTime;
     private Date endTime;
 
@@ -40,10 +44,16 @@ public class SimplePartsReportController extends GenericCRUDUUIDController<Simpl
     @Override
     protected void init() {
         simplePartsReportService = WebUtil.getBean(SimplePartsReportService.class);
+        userContextService =  WebUtil.getBean(UserContextService.class);
     }
 
     public void previewData(){
-        simplePartsReportVoList = this.simplePartsReportService.querySimplePartsReportList(startTime, endTime);
+        String tenantInfoUid = new String();
+        TenantInfo tenantInfo = userContextService.getCurrentUserTenantInfo();
+        if(userContextService.isCountyArea()){
+            tenantInfoUid = tenantInfo.getUid();
+        }
+        simplePartsReportVoList = this.simplePartsReportService.querySimplePartsReportList(startTime, endTime,tenantInfoUid);
     }
 
     public List<SimplePartsReportVo> getSimplePartsReportVoList() {
