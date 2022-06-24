@@ -12,6 +12,8 @@ public class WorkOrderExportPojo {
     private String Id;
     //报修单号
     private String srNum;
+    //报修Id
+    private String srId;
     //设备UID
     private Integer assetId;
     //设备编号
@@ -779,4 +781,8 @@ public class WorkOrderExportPojo {
     public void setCallCenterNumber(String callCenterNumber) {
         this.callCenterNumber = callCenterNumber;
     }
+
+    public String getSrId() { return srId; }
+
+    public void setSrId(String srId) { this.srId = srId; }
 }
