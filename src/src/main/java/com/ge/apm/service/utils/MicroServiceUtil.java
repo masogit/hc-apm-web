@@ -314,4 +314,27 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             return map;
         }
     }
+
+    public Map<String, Object> uploadSingleCompressFile(String token, File file) {
+        HttpHeaders headers = new HttpHeaders();
+        MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
+        headers.setContentType(type);
+        headers.add("Authorization", token);
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        FileSystemResource resource = new FileSystemResource(file);
+        body.add("file", resource);
+
+        HttpEntity<Map> requestEntity = new HttpEntity<Map>(body, headers);
+
+        String gatewayURL = getGatewayURL(GatewayURL.UPLOAD_SINGLE_COMPRESS_FILE);
+
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
+            return data;
+        }
+
+        return null;
+    }
 }

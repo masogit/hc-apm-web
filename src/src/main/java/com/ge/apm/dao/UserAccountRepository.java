@@ -1,17 +1,18 @@
 package com.ge.apm.dao;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.view.sysutil.UserInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.view.sysutil.UserInfo;
 import webapp.framework.dao.GenericRepository;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
@@ -158,11 +159,20 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value= "update user_account set active_time = null,is_active = false where tenant_uid = ?1 and id not in(select user_id from user_role where role_id = 9)",nativeQuery=true)
     public void deactiveTenantMembersStatus(String tenantUid);
 
+
+    @Transactional
+    @Modifying
+    @Query(value= "update user_account set is_deleted = true, wechat_id = null, wechat_nickname = null, wx_union_id = null, ma_ib_open_id = null where tenant_uid = ?1 ",nativeQuery=true)
+    public void deleteTenantUser(String tenantUid);
+
+
     @Transactional
     @Modifying
     @Query(value= "update user_account set active_time= now(),is_active=true where id = ?1",nativeQuery=true)
     public void activeSingleUser(Integer userId);
 
+    @Query(value="select * from user_account where  hospital_uid = ?2 and id in ?1",nativeQuery = true)
+    List<UserAccount> getUserAccounts(List<Integer> id,String hospitalUID );
 
     @Transactional
     @Modifying
@@ -247,4 +257,6 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     UserAccount findByLoginName(String loginName);
 
+    @Query(value= "SELECT sys_role.NAME FROM user_role INNER JOIN user_account ON user_role.user_id = user_account.id INNER JOIN sys_role ON user_role.role_id = sys_role.id WHERE user_account.ID =?1",nativeQuery=true)
+    List<String> findUsname(Integer id);
 }

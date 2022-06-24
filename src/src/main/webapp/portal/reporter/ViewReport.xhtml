@@ -52,12 +52,18 @@
                                         </h:panelGroup>
                                     </c:if>
                                     <c:if test="#{fieldItem.component eq 'Date'}" >
-                                        <p:calendar value="#{editReportController.tableValue[fieldItem.key]}"  />
+                                        <p:calendar value="#{editReportController.tableValue[fieldItem.key]}" pattern="yyyy-MM-dd" converter="date2StringConverter" />
                                     </c:if>
                                     <c:if test="#{fieldItem.component eq 'Label'}" >
                                         <h:panelGroup>
                                             <label class="label">#{fieldItem.label}</label>
                                             <h:outputText value="#{fieldMsg.fieldValue('TableReportResult',editReportController.tableValue[fieldItem.resKey])}" style="#{editReportController.tableValue[fieldItem.resKey] eq 'Normal'?'':'color:red'}" />
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Compute'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <h:outputText value="#{editReportController.tableValue[fieldItem.key]}"  />
                                         </h:panelGroup>
                                     </c:if>
                                 </c:forEach>

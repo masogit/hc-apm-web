@@ -29,6 +29,13 @@
                                 <label class="label">#{msg.FaultyDesc}*</label>
                                 <p:inputTextarea value="#{workOrderMgrController.comments}" rows="3"  cols="40"  queryDelay="750" minQueryLength="4" required="true" requiredMessage="#{msg.FaultyDesc} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
+                            <h:panelGroup rendered="#{userContextService.countyArea}">
+                                <label class="label">#{msg.siebleNumber}</label>
+                                <p:inputText value="#{workOrderMgrController.selectedWorkOrder.siebleNumber}" maxlength="12"  requiredMessage="sieble单号 #{msg.ValidationRequire}"/>
+                                <br/><br/>
+                                <label class="label">#{msg.callCenterNumber}</label>
+                                <p:inputText value="#{workOrderMgrController.selectedWorkOrder.callCenterNumber}" maxlength="12" requiredMessage="呼叫中心单号 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
                         </p:panelGrid>
                         <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">
                         <f:facet name="header">#{msg.RequestImage}</f:facet>

@@ -617,7 +617,7 @@
             <label class="label">#{msg.riskGrade}</label>
             <p:selectOneMenu id="riskGrade" value="#{assetInfoBulkEditController.selected.riskGrade}">
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}"
+                <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}"
                                itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
         </h:panelGroup>

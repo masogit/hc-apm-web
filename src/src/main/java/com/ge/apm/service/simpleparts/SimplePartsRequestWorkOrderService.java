@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.web.WebUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -110,6 +111,10 @@ public class SimplePartsRequestWorkOrderService {
             SimplePartsRequestLineItem partsRequestLineItem = new SimplePartsRequestLineItem();
             partsRequestLineItem.setTotalPrice(oneTotalPrice);
             partsRequestLineItem.setRequestQty(apartsQuantity);
+            if(isCountyArea()){//保存县域租户备件表拼凑的收货信息
+                partsRequestLineItem.setAddressInfo(item.getComment());
+                partsRequestLineItem.setPartsDescription(item.getPartsDescription());
+            }
             assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, userAccount);
             // 未入库
             partsRequestLineItem.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);
@@ -192,7 +197,10 @@ public class SimplePartsRequestWorkOrderService {
             SimplePartsRequestLineItem partsRequestLineItem = new SimplePartsRequestLineItem();
             partsRequestLineItem.setTotalPrice(oneTotalPrice);
             partsRequestLineItem.setRequestQty(apartsQuantity);
-
+            if(isCountyArea()){//保存县域租户备件表拼凑的收货信息
+                partsRequestLineItem.setAddressInfo(item.getComment());
+                partsRequestLineItem.setPartsDescription(item.getPartsDescription());
+            }
             assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, userAccount);
             // 未出库
             partsRequestLineItem.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);
@@ -294,7 +302,14 @@ public class SimplePartsRequestWorkOrderService {
      * @param firstMultiLevelApproval
      */
     private void assignmentPartsRequestLineItem(V2_WorkOrder_Detail item, SimplePartsRequest partsRequest, SimplePartsRequestLineItem partsRequestLineItem, UserAccount currentUserAccount){
-        SimplePartsItem foundPartsItem = partsItemRepository.findById(item.getPartsItemId());
+        String partsitemid=null;
+        if (item.getPartsItemId()==null){
+            partsitemid="";
+        }
+        else {
+            partsitemid=item.getPartsItemId();
+        }
+        SimplePartsItem foundPartsItem = partsItemRepository.findById(partsitemid);
         if(foundPartsItem == null){
             log.error("备件申请单详情未查询到备件信息. PartsItemId : "+item.getPartsItemId());
             throw new RuntimeException("备件申请单详情未查询到备件信息. PartsItemId : "+item.getPartsItemId());
@@ -372,4 +387,8 @@ public class SimplePartsRequestWorkOrderService {
         return isPartsRequestValid;
     }
 
+    public boolean isCountyArea(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.isCountyArea();
+    }
 }

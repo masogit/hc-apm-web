@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <h:form id="ItemDetailViewForm">
+            <h:panelGroup rendered="#{not empty approveScheduleController.selected}">
+                <label class="label">核心成员审核记录</label>
+                <p:dataTable id="accessList" class="accessList" value="#{approveScheduleController.auditGroupConfigurationDetails}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                    <p:column headerText="工单号">
+                        <h:outputText value="#{item.srNum}"/>
+                    </p:column>
+                    <p:column headerText="审核批次">
+                        <h:outputText value="#{item.approveNum}"/>
+                    </p:column>
+                    <p:column headerText="审核人">
+                        <h:outputText value="#{approveScheduleController.getUserName(item.actualAuditUid)}"/>
+                    </p:column>
+                    <p:column headerText="审核状态">
+                        <h:outputText value="#{fieldMsg.fieldValue('auditNodeStatus',item.auditNodeStatus)}"/>
+                    </p:column>
+                    <p:column headerText="审批时间">
+                        <h:outputText value="#{item.actualAuditDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+
+                </p:dataTable>
+            </h:panelGroup>
+        </h:form>
+    </ui:composition>
+</html>

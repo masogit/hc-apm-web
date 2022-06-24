@@ -76,4 +76,17 @@ public class SimplePartsItemService {
     public void saveSelectedPartsEdit(Set<String> partsItemIds,SimplePartsCategory partsCategory) {
         partsItemRepository.updatePartsItemPartsCategoryByIds(partsItemIds,partsCategory.getName(),partsCategory.getEncoded());
     }
+
+    public SimplePartsItem getPartsItem(String partsItemId,String parts) {
+        if(partsItemId != null){
+            return partsItemRepository.findById(partsItemId);
+        }else {
+            List<SimplePartsItem> list = partsItemRepository.findByName(parts);
+            if(list != null && list.size()>0){
+                return list.get(0);
+            }
+        }
+        return null;
+    }
+
 }

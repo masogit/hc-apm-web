@@ -23,8 +23,14 @@ public class QueryAsset {
 	private String queryLevel;//查询规则级别
     private Double purchasePriceStart;//采购价格(元)Start
     private Double purchasePriceEnd;//采购价格(元)end
+	private boolean generate;
+	private Integer riskGrade;
 
-    public Double getPurchasePriceStart() {
+	public Integer getRiskGrade() { return riskGrade; }
+
+	public void setRiskGrade(Integer riskGrade) { this.riskGrade = riskGrade; }
+
+	public Double getPurchasePriceStart() {
         return purchasePriceStart;
     }
 
@@ -153,5 +159,13 @@ public class QueryAsset {
 
 	public void setEndInstallDate(Date endInstallDate) {
 		this.endInstallDate = endInstallDate;
+	}
+
+	public boolean getGenerate() {
+		return generate;
+	}
+
+	public void setGenerate(boolean generate) {
+		this.generate = generate;
 	}
 }

@@ -33,8 +33,17 @@ public interface RelRuleAssetRepository extends GenericRepositoryUUID<RelRuleAss
 	@Query(value = "select r.asset_uid from rel_rule_asset r where r.tenant_uid = ?1 and r.rule_uid is not null",nativeQuery = true)
 	public List<String> findRuleUid3ByLevelAndTenantUID(String tenantUID);
 
+	@Query(value = "select r.asset_uid from rel_rule_asset r where r.tenant_uid = ?1 and r.rule_uid1 = ?2",nativeQuery = true)
+	public List<String> findRuleUid1ByLevelAndTenantUID(String tenantUID,String ruleUid);
 
-	@Query(value = "select r.* from rel_rule_asset r where (r.rule_uid = ?1 or r.rule_uid2 = ?1)",nativeQuery = true)
+	@Query(value = "select r.asset_uid from rel_rule_asset r where r.tenant_uid = ?1 and r.rule_uid2=?2",nativeQuery = true)
+	public List<String> findRuleUid2ByLevelAndTenantUID(String tenantUID,String ruleUid);
+
+	@Query(value = "select r.asset_uid from rel_rule_asset r where r.tenant_uid = ?1 and r.rule_uid=?2",nativeQuery = true)
+	public List<String> findRuleUid3ByLevelAndTenantUID(String tenantUID,String ruleUid);
+
+
+	@Query(value = "select r.* from rel_rule_asset r where (r.rule_uid = ?1 or r.rule_uid2 = ?1 or r.rule_uid4 = ?1 or r.rule_uid_inspection = ?1 )",nativeQuery = true)
     List<RelRuleAsset> findRelRuleAssets(String uid);
 
 	@Modifying

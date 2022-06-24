@@ -1,18 +1,17 @@
 package com.ge.apm.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
+import com.ge.apm.domain.AssetInfo;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.domain.AssetInfo;
-
 import webapp.framework.dao.GenericRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
@@ -28,6 +27,12 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select 1 from AssetInfo o where o.systemId=?1")
     public Integer checkExistsBySystemId(String systemId);
+
+    @Query(value="select o.* from asset_info o where o.system_id=?1 and o.is_deleted = false and o.is_valid = true",nativeQuery=true)
+    public List<AssetInfo> getBySystemIdNoConditionGefe(String systemId);
+
+    @Query(value="select o.* from asset_info o where o.system_id=?1 limit 1",nativeQuery=true)
+    public AssetInfo getBySystemIdNoCondition(String systemId);
 
     @Query(value="select o.* from asset_info o where o.system_id=?1 and o.is_deleted = false and o.is_valid = true limit 1",nativeQuery=true)
     public AssetInfo getBySystemId(String systemId);
@@ -92,8 +97,23 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select a from AssetInfo a where a.isDeleted = false and a.financingNum = ?1 and a.siteUID=?2 and (a.measureGrade <> 4 or a.measureGrade is null) order by a.id desc ")
     public List<AssetInfo> getByFinancingNumAndSiteUID(String financingNum, String siteUID);
 
+    //excel 报表导出需要忽略大小写 所以使用jpa原生sql 加了ILIKE关键字( getBySerialNumAndSiteUID 方法是原本的业务)
+    @Query(value = "select * from asset_info a where a.is_deleted = false and a.financing_num ILIKE ?1 and a.site_uid=?2 " +
+            " and (a.measure_grade <> 4 or a.measure_grade is null) order by a.id desc " , nativeQuery = true)
+    public List<AssetInfo> getByFinancingNumAndSiteUID_ForDbTable(String financingNum, String siteUID);
+
     @Query("select a from AssetInfo a where a.isDeleted = false and a.serialNum = ?1 and a.siteUID=?2 and (a.measureGrade <> 4 or a.measureGrade is null) order by a.id desc ")
     public List<AssetInfo> getBySerialNumAndSiteUID(String serialNum, String siteUID);
+
+    //excel 报表导出需要忽略大小写 所以使用jpa原生sql 加了ILIKE关键字( getBySerialNumAndSiteUID 方法是原本的业务)
+    @Query(value = "select * from asset_info a where a.is_deleted = false and a.serial_num ILIKE ?1 and a.site_uid=?2 " +
+            "and (a.measure_grade <> 4 or a.measure_grade is null) order by a.id desc " , nativeQuery = true)
+    public List<AssetInfo> getBySerialNumAndSiteUID_ForDbTable(String serialNum, String siteUID);
+
+    //excel 报表导出需要忽略大小写 所以使用jpa原生sql 加了ILIKE关键字( getBySerialNumAndSiteUID 方法是原本的业务)
+    @Query(value = "select * from asset_info a where a.is_deleted = false and a.qr_code ILIKE ?1 and a.site_uid=?2 " +
+            "and (a.measure_grade <> 4 or a.measure_grade is null) order by a.id desc " , nativeQuery = true)
+    public List<AssetInfo> getByQrCodeAndSiteUID_ForDbTable(String serialNum, String siteUID);
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and (a.name like concat('%',?2,'%') or a.name_py_code like concat('%',?2,'%'))order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);
@@ -164,6 +184,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value="select o.* from asset_info o where o.uid in (select b.asset_uid from nurse_site_maintain_config_item b where b.parent_id=?1) order by o.name_py_code asc",nativeQuery=true)
     public List<AssetInfo> findAssetByMaintainConfigParentId(String configParentId);
 
+    @Query(value="select o.* from asset_info o where o.uid in (select b.asset_uid from nurse_site_maintain_config_item_jn b where b.parent_id=?1) order by o.name_py_code asc",nativeQuery=true)
+    public List<AssetInfo> findAssetByMaintainConfigJNParentId(String configParentId);
+
     @Query("select w.deptForSharedAsset from WorkflowConfig w where w.siteUID = :siteUID")
     public List<String> getOrgId(@Param("siteUID") String siteUID);
 
@@ -174,7 +197,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
 
     //给出当前用户能够访问到的资产
-    @Query(value = "select assetinfo0_.* from asset_info assetinfo0_ where assetinfo0_.is_deleted=false and assetinfo0_.is_valid=true and (assetinfo0_.institution_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)or assetinfo0_.hospital_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid)  or assetinfo0_.site_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.clinical_dept_uid in(select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid) or assetinfo0_.tenant_uid in (select uo.org_uid from user_org uo,user_account ua where ua.id=?1 and ua.uid = uo.user_uid))",nativeQuery = true)
+    @Query(value = "select distinct ai.* from asset_info ai,user_org uo,user_account ua where ua.uid=uo.user_uid and uo.org_uid in(ai.tenant_uid, ai.institution_uid,ai.hospital_uid,ai.site_uid) and  ua.id =? and ai.is_deleted=false and ai.is_valid=true ",nativeQuery = true)
     public ArrayList<AssetInfo> getUserListByAsset(Integer userId);
 
     @Query(value= "select u.* from asset_info u where u.uid in ?1 ",nativeQuery=true)
@@ -280,4 +303,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
             "left join tenant_info t on t.uid = a.tenant_uid " +
             "where t.type ='3' and (q.is_qr_code != true or q.is_qr_code is null) and a.system_id like '0824%' and a.tenant_uid = ?1", nativeQuery = true)
     List<AssetInfo> queryAssetByZkbQrCode(String tenantUid);
+
+    //@Query(value = "with recursive cte as ( select id, name, parent_asset_id as pid, cast(id as text )as branch,function_type,serial_num,depart_num,asset_group,asset_dept_id,clinical_dept_name,manufacture,vendor from asset_info a where id in (?1) union all select origin.id, origin.name, cte.id as pid, cast(cte.branch as text) || '~' || origin.id,origin.function_type,origin.serial_num,origin.depart_num,origin.asset_group,origin.asset_dept_id,origin.clinical_dept_name,origin.manufacture,origin.vendor from cte join asset_info as origin on origin.parent_asset_id = cte.id ) select id,name, pid, branch, (length(branch)-length(replace(branch, '~', ''))) as rank,function_type,serial_num,depart_num,asset_group,asset_dept_id,clinical_dept_name,manufacture,vendor from cte order by branch; ",nativeQuery = true)
+    @Query(value = "with recursive cte as ( select id, name, parent_asset_id as pid, cast(id as text )as branch from asset_info a where id in (?1) union all select origin.id, origin.name, cte.id as pid, cast(cte.branch as text) || '~' || origin.id from cte join asset_info as origin on origin.parent_asset_id = cte.id ) select id,name, pid, branch, (length(branch)-length(replace(branch, '~', ''))) as rank from cte order by branch; ",nativeQuery = true)
+    List<Object> findParentAndChildrenAsset1(Set<Integer> rootIds);
 }

@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
  * @author : 503189362
@@ -17,7 +18,7 @@ public class ZkbContractAsset {
     private static final long serialVersionUID = 1L;
 
     public enum AssetTypeEnum{
-        highMachine,lowMachine,empty
+        highMachine,lowMachine,empty,depot
     }
 
     @Id
@@ -75,6 +76,53 @@ public class ZkbContractAsset {
      */
     @Column(name = "train_reason_flag")
     private String trainReasonFlag;
+
+    /**
+     * t f
+     */
+    @Column(name = "support_maintain_flag")
+    private String supportMaintainFlag;
+
+    @Column(name = "maintain_start_date")
+    private Date maintainStartDate;
+
+    @Column(name = "maintain_end_date")
+    private Date maintainEndDate;
+
+    @Column(name = "last_support_maintain_date")
+    private Date lastSupportMaintainDate;
+
+    public Date getMaintainStartDate() {
+        return maintainStartDate;
+    }
+
+    public void setMaintainStartDate(Date maintainStartDate) {
+        this.maintainStartDate = maintainStartDate;
+    }
+
+    public Date getMaintainEndDate() {
+        return maintainEndDate;
+    }
+
+    public void setMaintainEndDate(Date maintainEndDate) {
+        this.maintainEndDate = maintainEndDate;
+    }
+
+    public Date getLastSupportMaintainDate() {
+        return lastSupportMaintainDate;
+    }
+
+    public void setLastSupportMaintainDate(Date lastSupportMaintainDate) {
+        this.lastSupportMaintainDate = lastSupportMaintainDate;
+    }
+
+    public String getSupportMaintainFlag() {
+        return supportMaintainFlag;
+    }
+
+    public void setSupportMaintainFlag(String supportMaintainFlag) {
+        this.supportMaintainFlag = supportMaintainFlag;
+    }
 
     public String getTrainReasonFlag() {
         return trainReasonFlag;

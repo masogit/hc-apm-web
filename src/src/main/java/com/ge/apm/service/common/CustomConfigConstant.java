@@ -25,7 +25,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5");
     }
 
     //只读字段
@@ -65,7 +65,7 @@ public class CustomConfigConstant {
                 "lastMeteringDate", "acceptDate", "warrantyMonth","maitanance", "maitananceTel", "qrCode",
                 "locationCode", "locationName", "comments", "locationNotes","assetUsage", "capitalSource",
                 "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
-                "accountingCategory", "status","isPm", "isChecked", "assetValueCategory", "deviceStatus",
+                "accountingCategory", "status","isPm", "isFixed","isChecked", "assetValueCategory", "deviceStatus",
                 "warranty", "subjectProject", "proprietaryClass", "assetTags", "UCMID", "createdDate",
                 "createdBy","mainDirectory","secondDirectory","geDeviceType","UUID"
         );
@@ -155,6 +155,7 @@ public class CustomConfigConstant {
         allFields.put("lifecycle", WebUtil.getMessage("lifecycle"));
         allFields.put("depreciationMethod", WebUtil.getMessage("depreciationMethod"));
         allFields.put("isPm", WebUtil.getMessage("isAssetPMed"));
+        allFields.put("isFixed", WebUtil.getMessage("isFixed"));
         allFields.put("isChecked", WebUtil.getMessage("isAssetChecked"));
         allFields.put("lastPmDate", WebUtil.getMessage("lastPmDate"));
         allFields.put("lastQaDate", WebUtil.getMessage("lastQaDate"));
@@ -182,6 +183,14 @@ public class CustomConfigConstant {
         allFields.put("powerOnThreshold", WebUtil.getMessage("powerOnThreshold"));
         allFields.put("rfId", WebUtil.getMessage("rfId"));
         allFields.put("rfGroup", WebUtil.getMessage("rfGroup"));
+        allFields.put("currentId", WebUtil.getMessage("currentId"));
+        allFields.put("assetQuality", WebUtil.getMessage("assetQuality"));
+        allFields.put("assetDisposalResults", WebUtil.getMessage("assetDisposalResults"));
+        allFields.put("systemNum1", WebUtil.getMessage("systemNum1"));
+        allFields.put("systemNum2", WebUtil.getMessage("systemNum2"));
+        allFields.put("systemNum3", WebUtil.getMessage("systemNum3"));
+        allFields.put("systemNum4", WebUtil.getMessage("systemNum4"));
+        allFields.put("systemNum5", WebUtil.getMessage("systemNum5"));
         return allFields;
     }
 
@@ -194,13 +203,13 @@ public class CustomConfigConstant {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
                 "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
-                "maitanance", "maitananceTel", "nationalStandardCode");
+                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality");
     }
 
     public static List<String> getAssetsDetailpageDetailFields() {
         return Arrays.asList("parentAssetId", "deviceName", "systemId", "financingNum", "departNum",
                 "barcode", "registrationNo", "modalityId", "qrCode", "functionType", "functionGroup", "assetCode68", "medicalApparatusClassification","functionGrade",
-                "repairForm", "locationCode", "locationName", "status", "deviceStatus", "isPm", "isChecked", "comments", "assetUsage",
+                "repairForm", "locationCode", "locationName", "status", "deviceStatus", "isPm","isFixed", "isChecked", "comments", "assetUsage",
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
@@ -210,7 +219,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
-                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID");
+                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID","assetQuality");
     }
 
     public static List<String> getAssetsEditpageCodesFields() {
@@ -220,7 +229,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsEditpageStatusFields() {
         return Arrays.asList("functionType", "functionGroup", "assetCode68", "medicalApparatusClassification","functionGrade", "repairForm",
-                "locationCode", "locationName", "status", "deviceStatus", "isPm", "isChecked", "comments", "locationNotes");
+                "locationCode", "locationName", "status", "deviceStatus", "isPm", "isFixed","isChecked", "comments", "locationNotes");
     }
 
     public static List<String> getAssetsEditpageCatalogFields() {
@@ -248,7 +257,7 @@ public class CustomConfigConstant {
         return Arrays.asList("aliasName", "systemId", "manufacture", "vendor", "maitanance", "maitananceTel", "assetOwnerName", "assetOwnerTel",
                 "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "serialNum", "nationalStandardCode", "repairForm", "assetUsage",
                 "functionGrade", "functionGroup", "assetCode68","medicalApparatusClassification", "capitalSource", "riskGrade", "measureGrade", "emergencyEquipment", "importEquipment",
-                "isPm", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
+                "isPm","isFixed", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
                 "locationName", "functionType", "manufactDate", "purchaseDate", "warrantyDate", "arriveDate", "installDate", "factoryWarrantyDate", "terminateDate",
                 "lastPmDate", "lastQaDate", "lastMeteringDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod","createdBy");
     }
@@ -267,7 +276,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsImportantFieldsAll() {
         return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
-                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType","status","isValid");
+                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType","status","isValid","assetDisposalResults");
     }
 
     public static List<String> getTemplateEnableList() {

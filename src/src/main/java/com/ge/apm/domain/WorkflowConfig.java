@@ -69,6 +69,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_auto_enabled")
     private Boolean isAutoEnabled; //是否自动派工
 
+    @Column(name = "when_auto_enabled_is_auto_accept")
+    private Boolean whenAutoEnabledIsAutoAccept; //自动派工时是否自动接单
+
     @Column(name = "is_wo_supplier_auto_enabled")
     private Boolean isWoSupplierAutoEnabled; //是否供应商自动抢单(维修)
 
@@ -138,6 +141,12 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "wo_direct_reception")
     private Boolean woDirectReception ; // 设备直接验收(接收)
+
+    @Column(name = "wo_spare_parts_sign")
+    private Boolean woSparePartsSign ; // 新增备件是否需要签名
+
+    @Column(name = "is_jump_to_work_bench_after_orders")
+    private Boolean isJumpToWorkBenchAfterOrders ; // 接单后是否跳转至工作台
 
     @Column(name = "is_mobile_phone_file_review")
     private Boolean isMobilePhoneFileReview ; // 手机建档是否需要审核
@@ -220,6 +229,12 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_measure_manual_enabled")
     private Boolean isMeasureManualEnabled; //是否人工派工
 
+    @Column(name = "measurement_repair")
+    private Boolean measurementRepair; //是否开启计量报修
+
+    @Column(name = "supplier_qualification_certification")
+    private Boolean supplierQualificationCertification=true; //是否资质认证
+
     @Column(name = "is_measure_auto_enabled")
     private Boolean isMeasureAutoEnabled; //是否自动派工
 
@@ -244,8 +259,29 @@ public class WorkflowConfig implements Serializable {
     //是否启用无人值守
     @Column(name = "whether_to_enable_unattended ")
     private Boolean whethertoenableunattended;
+    //是否启用院间借调
+    @Column(name = "enable_site_to_site_allocation")
+    private Boolean enableSiteToSiteAllocation;
+    @Setter
+    @Getter
+    @Column(name = "enable_asset_preview")
+    private Boolean enableAssetPreview;
+    //是否启用小型物联网设备(急救类)服务
+    @Column(name = "is_io_tenabled")
+    private Boolean isiotenabled;
+
+    public Boolean getIsiotenabled() {
+        return isiotenabled;
+    }
+
+    public void setIsiotenabled(Boolean isiotenabled) {
+        this.isiotenabled = isiotenabled;
+    }
 
     public Boolean getWhethertoenableunattended() {
+        if(whethertoenableunattended ==null){
+            return false;
+        }
         return whethertoenableunattended;
     }
 
@@ -340,6 +376,40 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "other_clinical_dept_head_weight")
     private Integer otherClinicalDeptHeadWeight = 1;//院区下的其他科室主任
 
+    @Column(name = "external_expenses")
+    private Boolean externalExpenses ; // 外修费用
+
+    @Column(name = "other_expenses")
+    private Boolean otherExpenses ; // 其他费用
+
+    public Boolean getExternalExpenses() {
+        return externalExpenses == null ? false : externalExpenses;
+    }
+
+    public Boolean getOtherExpenses() {
+        return otherExpenses == null ? false : otherExpenses;
+    }
+
+    public void setExternalExpenses(Boolean externalExpenses) {
+        this.externalExpenses = externalExpenses;
+    }
+
+    public void setOtherExpenses(Boolean otherExpenses) {
+        this.otherExpenses = otherExpenses;
+    }
+
+    public Boolean getWoSparePartsSign() {
+        return woSparePartsSign;
+    }
+
+    public void setWoSparePartsSign(Boolean woSparePartsSign) {
+        this.woSparePartsSign = woSparePartsSign;
+    }
+
+    public Boolean getIsJumpToWorkBenchAfterOrders() { return isJumpToWorkBenchAfterOrders; }
+
+    public void setIsJumpToWorkBenchAfterOrders(Boolean jumpToWorkBenchAfterOrders) { isJumpToWorkBenchAfterOrders = jumpToWorkBenchAfterOrders; }
+
     public Boolean getIsMobilePhoneFileReview() {
         return isMobilePhoneFileReview == null ? false : isMobilePhoneFileReview;
     }
@@ -357,6 +427,13 @@ public class WorkflowConfig implements Serializable {
         this.isNursingStaffCodeLedger = isNursingStaffCodeLedger;
     }
 
+    public Boolean getSupplierQualificationCertification() {
+        return supplierQualificationCertification;
+    }
+
+    public void setSupplierQualificationCertification(Boolean supplierQualificationCertification) {
+        this.supplierQualificationCertification = supplierQualificationCertification;
+    }
 
     public Integer getOutboundstatuscheckinterval() {
         return outboundstatuscheckinterval;
@@ -409,6 +486,10 @@ public class WorkflowConfig implements Serializable {
     public void setEnableScrappedControl(boolean enableScrappedControl) {
         this.enableScrappedControl = enableScrappedControl;
     }
+
+    public Boolean getWhenAutoEnabledIsAutoAccept() { return whenAutoEnabledIsAutoAccept; }
+
+    public void setWhenAutoEnabledIsAutoAccept(Boolean whenAutoEnabledIsAutoAccept) { this.whenAutoEnabledIsAutoAccept = whenAutoEnabledIsAutoAccept; }
 
     public Boolean getIiMobileEnable() {
         return iiMobileEnable;
@@ -698,6 +779,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "parts_need_sign")
     private Boolean partsNeedSign; //备件审核是否需要签名
 
+    @Column(name = "use_new_risk_grade")
+    private Boolean useNewRiskGrade; //风险等级是否沿用高中低
+
     @Column(name = "ack_need_sign")
     private Boolean ackNeedSign; //验收是否需要签名
 
@@ -741,6 +825,98 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "is_active_supplier")
     private Boolean isActiveSupplier = Boolean.FALSE;//是否激活供应商流程
+
+    @Column(name = "aa_enable_hospital_adjustment")
+    private Boolean enableHospitalAdjustment = Boolean.FALSE;//是否开启医院调剂
+
+    @Column(name = "aa_default_maintain_man_hour")
+    private Double defaultMaintainManHour = 0.0D;
+
+    //供应商资质证书管理
+    @Column(name = "supplier_certificate_manage")
+    private Boolean supplierCertificateManage = Boolean.FALSE;;
+    //生产许可证到期提醒提前天数
+    @Column(name = "production_license_expire_days")
+    private Integer productionLicenseExpireDays;
+    //生产许可证到期提醒提前次数
+    @Column(name = "production_license_expire_times")
+    private Integer productionLicenseExpireTimes;
+    //经营许可证到期提醒提前天数
+    @Column(name = "business_license_expire_days")
+    private Integer businessLicenseExpireDays;
+    //经营许可证到期提醒提前次数
+    @Column(name = "business_license_expire_times")
+    private Integer businessLicenseExpireTimes;
+    //注册证到期提醒提前天数
+    @Column(name = "registration_certificate_expire_days")
+    private Integer registrationCertificateExpireDays;
+    //注册证到期提醒提前次数
+    @Column(name = "registration_certificate_expire_times")
+    private Integer registrationCertificateExpireTimes;
+
+    public Boolean getMeasurementRepair() {
+        return measurementRepair;
+    }
+
+    public void setMeasurementRepair(Boolean measurementRepair) {
+        this.measurementRepair = measurementRepair;
+    }
+
+    public Boolean getSupplierCertificateManage() {
+        return supplierCertificateManage;
+    }
+
+    public void setSupplierCertificateManage(Boolean supplierCertificateManage) {
+        this.supplierCertificateManage = supplierCertificateManage;
+    }
+
+    public Integer getProductionLicenseExpireDays() {
+        return productionLicenseExpireDays;
+    }
+
+    public void setProductionLicenseExpireDays(Integer productionLicenseExpireDays) {
+        this.productionLicenseExpireDays = productionLicenseExpireDays;
+    }
+
+    public Integer getProductionLicenseExpireTimes() {
+        return productionLicenseExpireTimes;
+    }
+
+    public void setProductionLicenseExpireTimes(Integer productionLicenseExpireTimes) {
+        this.productionLicenseExpireTimes = productionLicenseExpireTimes;
+    }
+
+    public Integer getBusinessLicenseExpireDays() {
+        return businessLicenseExpireDays;
+    }
+
+    public void setBusinessLicenseExpireDays(Integer businessLicenseExpireDays) {
+        this.businessLicenseExpireDays = businessLicenseExpireDays;
+    }
+
+    public Integer getBusinessLicenseExpireTimes() {
+        return businessLicenseExpireTimes;
+    }
+
+    public void setBusinessLicenseExpireTimes(Integer businessLicenseExpireTimes) {
+        this.businessLicenseExpireTimes = businessLicenseExpireTimes;
+    }
+
+    public Integer getRegistrationCertificateExpireDays() {
+        return registrationCertificateExpireDays;
+    }
+
+    public void setRegistrationCertificateExpireDays(Integer registrationCertificateExpireDays) {
+        this.registrationCertificateExpireDays = registrationCertificateExpireDays;
+    }
+
+    public Integer getRegistrationCertificateExpireTimes() {
+        return registrationCertificateExpireTimes;
+    }
+
+    public void setRegistrationCertificateExpireTimes(Integer registrationCertificateExpireTimes) {
+        this.registrationCertificateExpireTimes = registrationCertificateExpireTimes;
+    }
 
     public Integer getShareAutoConfirm() {
         return shareAutoConfirm;
@@ -1009,6 +1185,10 @@ public class WorkflowConfig implements Serializable {
     public void setOrderReopenTimeframe(Integer orderReopenTimeframe) {
         this.orderReopenTimeframe = orderReopenTimeframe;
     }
+
+    public Boolean getUseNewRiskGrade() { return useNewRiskGrade; }
+
+    public void setUseNewRiskGrade(Boolean useNewRiskGrade) { this.useNewRiskGrade = useNewRiskGrade; }
 
     public Integer getMaxMessageCount() {
         return maxMessageCount;
@@ -1296,6 +1476,14 @@ public class WorkflowConfig implements Serializable {
         this.enableUpdateSwitchingTime = enableUpdateSwitchingTime;
     }
 
+    public Boolean getEnableSiteToSiteAllocation() {
+        return enableSiteToSiteAllocation;
+    }
+
+    public void setEnableSiteToSiteAllocation(Boolean enableSiteToSiteAllocation) {
+        this.enableSiteToSiteAllocation = enableSiteToSiteAllocation;
+    }
+
     /**
      * 工单完工不需要验收? 默认 *打勾*
      * @return
@@ -1358,6 +1546,24 @@ public class WorkflowConfig implements Serializable {
         this.isWoSupplierAutoEnabled = isWoSupplierAutoEnabled;
     }
 
+    public Double getDefaultMaintainManHour() {
+        return defaultMaintainManHour==null?0.0D:defaultMaintainManHour;
+    }
+
+    public void setDefaultMaintainManHour(Double defaultMaintainManHour) {
+        this.defaultMaintainManHour = defaultMaintainManHour;
+    }
+
+    public Boolean getEnableHospitalAdjustment() {
+        return enableHospitalAdjustment;
+    }
+
+    public void setEnableHospitalAdjustment(Boolean enableHospitalAdjustment) {
+        if(enableHospitalAdjustment == null){
+            enableHospitalAdjustment=Boolean.FALSE;
+        }
+        this.enableHospitalAdjustment = enableHospitalAdjustment;
+    }
 
     @Override
     public int hashCode() {

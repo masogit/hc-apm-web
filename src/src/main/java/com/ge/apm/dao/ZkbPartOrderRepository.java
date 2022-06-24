@@ -26,6 +26,9 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT sum(qty) from zkb_part_order where contract_id in ?1", nativeQuery = true)
     Integer fetchQty(List<String> contractIdList);
 
+    @Query(value = "SELECT sum(qty) from zkb_part_order where contract_id = ?1", nativeQuery = true)
+    Integer fetchQty(String contractId);
+
     /**
      * 根据多个合同ID，获取总申请数
      * @param contractIdList
@@ -71,7 +74,8 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @return
      */
     @Query(value = "SELECT sum(qty) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where zkbp.order_type = ?2 and zkbp.ordered_date< ?1 and " +
-            "zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') ", nativeQuery = true)
+            "zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') " +
+            " and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' and zkbp.status != 'DirectorReject'", nativeQuery = true)
     Integer fetchApplyPartsQty(Date orderedDate,String orderType,String tenantUID);
 
     @Query(value = "SELECT * from zkb_part_order where order_type = ?3 and ordered_date< ?1  and contract_id in ?2 and (status = 'PartReturned' or status = 'Returned' or status = 'Closed')", nativeQuery = true)

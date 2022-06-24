@@ -4,7 +4,7 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.service.api.UserApiService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.zkb.LoginVerificationCodeService;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -62,7 +62,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     private MessageUtil messageUtil;
     protected UserAccountRepository userAccountDao;
     private ApplicationEventPublisher applicationEventPublisher;
-    private MicroServiceUtil msUtil;
+    private UserApiService userApi;
     private GeSsoService geSsoService;
     protected TenantInfoRepository tenantInfoDao;
     private LoginVerificationCodeService loginVerificationCodeService;
@@ -111,7 +111,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         sessionAuthenticationStrategy = ctx.getBean(SessionAuthenticationStrategy.class);
         securityContextRepository = ctx.getBean(SecurityContextRepository.class);
         messageUtil = ctx.getBean(MessageUtil.class);
-        msUtil = ctx.getBean(MicroServiceUtil.class);
+        userApi = ctx.getBean(UserApiService.class);
         loginVerificationCodeService = WebUtil.getBean(LoginVerificationCodeService.class);
         telephone = null;
         verificationCode = null;
@@ -315,7 +315,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         else{
         	user.setPlainPassword(passwordPlain);
         }
-        if(user==null){
+        if(user==null || Boolean.TRUE.equals(user.getIsDeleted())){
             addErrorMessage(response, 401, "login_error");
             return;
         }
@@ -458,6 +458,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
                 user.setIsLocked(true);
                 user.setLockTime(new Date());
                 userAccountDao.save(user);
+                userApi.removeUser(user.getLoginName());
                 logger.error("user:{} is locked because of password error times reach the limit !", userName);
                 messageUtil.error("AccountLocked");
                 return;

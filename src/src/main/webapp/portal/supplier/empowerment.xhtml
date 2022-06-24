@@ -1,0 +1,241 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <style>
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="供应商负责人赋权修改设备"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="AssetEmpowermentForm">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup><!--供应商 下拉-->
+                            <label class="label">#{msg.vendor}</label>
+                            <p:autoComplete id="supplier" dropdown="true" value="#{supplierEmpowermentController.selectedSupplierUid}" scrollHeight="300" forceSelection="true"
+                                            completeMethod="#{supplierEmpowermentController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" class="inputVendor">
+                                <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onSupplierChange()}" update="AssetEmpowermentForm:datalist selectedUser"/>
+                                <p:ajax listener="#{supplierEmpowermentController.onSupplierChange()}" />
+                            </p:autoComplete>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}" id="siteUid">
+                            <p:commandButton id="btnOrg" value="#{empty supplierEmpowermentController.selectSite? msg.AllHospitals:supplierEmpowermentController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process="AssetEmpowermentForm:treeNodeNameFilter @this" update="orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{supplierEmpowermentController.onSelectSiteTreeNode}" update="AssetEmpowermentForm:datalist AssetEmpowermentForm:siteUid #{true ?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:dataTable id="datalist" value="#{supplierEmpowermentController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false" selection="#{assetInfoListController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowStyleClass="#{item.warrantyAlertStatus}"
+                                 rowKey="#{item.id}" sortMode="single"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="filter" listener="#{supplierEmpowermentController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                        <p:column width="36"  id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{supplierEmpowermentController.selectedMap[item.uid]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{supplierEmpowermentController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetEmpowermentForm:datalist" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column  headerText="授权状态" filterBy="#{item.empowermentStatus}" filterMatchMode="EQ">
+                            <h:outputText value="#{supplierEmpowermentController.getEmpowermentStatus(item)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="empowerStatusChange()" value="#{supplierEmpowermentController.empowermentSearch}"  autoWidth="false" style="max-width: 300px;" height="300" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{supplierEmpowermentController.getListForEmpowerment()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column  headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.namePyCode}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.hospitalId}" filterBy="#{item.hospitalId}" filterMatchMode="EQ">
+                            <h:outputText value="#{supplierEmpowermentController.getSiteOrgName(item.siteUID)}"/>
+                            <f:facet name="filter">
+                                <p:inputText id="btnOrg2" readonly="true" value="#{empty supplierEmpowermentController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" widgetVar="varPanelOrg2"/>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.assetDeptName}"> <!--使用科室-->
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.assetDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{supplierEmpowermentController.filterAssetDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{supplierEmpowermentController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onAssetDeptNameFilterChange}" process="@this"  update="datalist " oncomplete="afterLoadRender()"/>
+                                    <p:ajax process="@this" listener="#{supplierEmpowermentController.onAssetDeptNameFilterChange}" update="datalist" oncomplete="afterLoadRender()"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.assetDeptOrg.shortName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}">  <!--所属科室-->
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{supplierEmpowermentController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{supplierEmpowermentController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onClinicalDeptNameFilterChange}" process="@this"  update="datalist" oncomplete="afterLoadRender()" />
+                                    <p:ajax process="@this" listener="#{supplierEmpowermentController.onClinicalDeptNameFilterChange}" update="datalist"  oncomplete="afterLoadRender()"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="handleAssetGroupChange()"  autoWidth="false" style="max-width: 150px;" height="300" value="#{supplierEmpowermentController.assetGroup}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <p:ajax listener="#{supplierEmpowermentController.assetGroupChangeListener}" update="datalist" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.manufacture}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.vendor}" sortBy="#{item.vendor}" filterBy="#{item.vendor}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.vendor}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.serialNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.financingNum}" exportable="true" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.financingNum}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.purchaseDate}" sortBy="#{item.purchaseDate}" filterBy="#{item.purchaseDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterPurchaseDate" widgetVar="varFilterInstallDate" value="#{supplierEmpowermentController.installDateFormatTime}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.purchaseDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="#{msg.arriveDate}" sortBy="#{item.arriveDate}" filterBy="#{item.arriveDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterArriveDate" widgetVar="varFilterArriveDate" value="#{supplierEmpowermentController.arriveDateFormatTime}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.arriveDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="#{msg.installDate}" sortBy="#{item.installDate}" filterBy="#{item.installDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterInstallDate" widgetVar="varFilterInstallDate" value="#{supplierEmpowermentController.installDateFormatTime}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.installDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="#{msg.purchaseDate}" sortBy="#{item.purchaseDate}">
+                            <h:outputText value="#{item.purchaseDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column  headerText="#{msg.assetClass}" sortBy="#{item.assetClass}" filterBy="#{item.assetClass}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetClass',item.assetClass)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="300" value="#{supplierEmpowermentController.assetClass}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <p:ajax listener="#{supplierEmpowermentController.assetClassChangeListener}" update="datalist" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.QRCode}" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <h:panelGroup>
+                        <label class="label">供应商负责人</label>
+                        <p:autoComplete id="selectedUser" dropdown="true" value="#{supplierEmpowermentController.selectedUserUid}" scrollHeight="300" forceSelection="true"
+                                        completeMethod="#{supplierEmpowermentController.supplierUsers}" var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" class="inputVendor">
+                            <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onSupplierUserChange()}" update=""/>
+                            <p:ajax listener="#{supplierEmpowermentController.onSupplierUserChange()}" />
+                        </p:autoComplete>
+                    </h:panelGroup>
+                </h:form>
+                <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{supplierEmpowermentController.doEmpowerment()}" value="授权" update=":AssetEmpowermentForm:datalist"/>
+            </div>
+        </div>
+        <script>
+            function handleAssetGroupChange(selection) {
+                var ct = document.getElementById('AssetEmpowermentForm:datalist:assetGroupSeconday_input');
+                if (ct) {
+                    ct.value = '';
+                }
+
+                PF('varDataList').filter();
+            }
+
+            function afterLoadRender(){
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            }
+            function empowerStatusChange(selection) {
+                var ct = document.getElementById('AssetEmpowermentForm:datalist:assetGroupSeconday_input');
+                if (ct) {
+                    ct.value = '';
+                }
+
+                PF('varDataList').filter();
+            }
+            //<![CDATA[
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>

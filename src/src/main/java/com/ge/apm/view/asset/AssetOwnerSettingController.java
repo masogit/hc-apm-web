@@ -15,13 +15,12 @@ import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.AssetOwnerService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -29,9 +28,13 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 
 import com.google.common.base.Strings;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TransferEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.TreeNode;
+import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import webapp.framework.web.WebUtil;
 
@@ -75,6 +78,15 @@ public class AssetOwnerSettingController {
     private List<OrgInfo> clinicalDeptList;
     private OrgInfo deptOrg;
 
+    //
+    private OrgInfo selectedOrg;
+    private UploadedFile file;
+    private TreeNode orgTree;
+    private TreeNode selectedNode;
+    private UaaService uaaService;
+
+
+
     @PostConstruct
     protected void init() {
 
@@ -84,6 +96,7 @@ public class AssetOwnerSettingController {
         customConfigService = WebUtil.getBean(CustomConfigService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 
         queryAsset = new AssetInfo();
         queryAsset.setSiteId(currentUser.getSiteId());
@@ -102,13 +115,110 @@ public class AssetOwnerSettingController {
 
         userAccountList = userCommonService.getWorkerList(null,null);
         clinicalDeptList = getClinicalDeptList();
+        initOrgTree();
         //not display data initially
 //        getQueryAssetsList();
 
     }
+//新增 ------------------------------------
+    public String getSelectedOrgName() {
+        if (selectedOrg == null) {
+            return "";
+        } else {
+            return selectedOrg.getName();
+        }
+    }
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+    public UploadedFile getFile() {
+        return file;
+    }
+
+    public void setFile(UploadedFile file) {
+        this.file = file;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
+    public TreeNode getOrgTree() {
+
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public boolean getIsSelect46Account() {
+        if (UserContextService.getCurrentUserAccount().getSiteId()==46&&UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
+            return true;
+        }
+        return false;
+    }
+
+    public void initOrgTree() {
+        if(getIsSelect46Account()){
+            return;
+        }
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        }
+        rootNode.setExpanded(true);
+
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+
+        if (orgInfo == null || orgInfo.getId() == -1) {
+            selectedOrg = null;
+        } else {
+            selectedOrg = orgInfo;
+            if(selectedOrg.getOrgLevel()==0 && selectedOrg.getOrgType()!=4){
+                queryAsset.setTenantUID(selectedOrg.getUid());
+                clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(), 0);
+            }
+            if(selectedOrg.getOrgLevel()==1 && selectedOrg.getOrgType()!=4){
+                queryAsset.setInstitutionUID(selectedOrg.getUid());
+                clinicalDeptList = assetInfoService. getClinicalDeptList(selectedOrg.getUid(),1);
+            }
+            if(selectedOrg.getOrgLevel()==2 && selectedOrg.getOrgType()!=4){
+                queryAsset.setHospitalUID(selectedOrg.getUid());
+                clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(),2);
+            }
+            if(selectedOrg.getOrgLevel()==3 && selectedOrg.getOrgType()!=4){
+                queryAsset.setSiteUID(selectedOrg.getUid());
+                clinicalDeptList =  assetInfoService.getClinicalDeptList(selectedOrg.getUid(),3);
+            }
+            if(selectedOrg.getOrgType()==4){
+                queryAsset.setClinicalDeptUID(selectedOrg.getUid());
+                clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(),4);
+            }
+        }
+        getQueryAssetsList();
+    }
 
     public void getQueryAssetsList() {
-        if(queryAsset.getAssetGroup() == null && queryAsset.getClinicalDeptUID() == null && queryAsset.getAssetOwnerId() == null && queryAsset.getAssetOwnerId2() == null && queryAsset.getAssetOwnerId3() == null){
+        if(queryAsset.getTenantUID()==null&&queryAsset.getInstitutionUID()==null&&queryAsset.getHospitalUID()==null&&queryAsset.getClinicalDeptUID()==null&&queryAsset.getSiteUID()==null&&queryAsset.getAssetGroup() == null && queryAsset.getClinicalDeptUID() == null && queryAsset.getAssetOwnerId() == null && queryAsset.getAssetOwnerId2() == null && queryAsset.getAssetOwnerId3() == null){
             availableAssets = new DualListModel<>(Collections.emptyList(), targetAssets);
             return;
         }
@@ -130,6 +240,8 @@ public class AssetOwnerSettingController {
         this.queryAsset.setAssetGroupSecondary(null);
     }
 
+
+
     public void onAssetsTransfer(TransferEvent event) {
 
         for(Object item : event.getItems()) {
@@ -143,7 +255,22 @@ public class AssetOwnerSettingController {
 
     public List<OrgInfo> getClinicalDeptList() {
         //return acServie.getClinicalDeptList(queryAsset.getSiteUID());
-        return assetInfoService.getClinicalDeptList(currentUser.getSiteUID());
+        if(currentUser.getOrgLevel()==0){
+            return assetInfoService.getClinicalDeptList(currentUser.getTenantUID(),0);
+        }
+        if(currentUser.getOrgLevel()==1){
+            return assetInfoService.getClinicalDeptList(currentUser.getInstitutionUID(),1);
+        }
+        if(currentUser.getOrgLevel()==2){
+            return assetInfoService.getClinicalDeptList(currentUser.getHospitalUID(),2);
+        }
+        if(currentUser.getOrgLevel()==3){
+            return assetInfoService.getClinicalDeptList(currentUser.getSiteUID(),3);
+        }
+        if(currentUser.getOrgType()==4){
+            return assetInfoService.getClinicalDeptList(currentUser.getClinicalDeptUID(),4);
+        }
+        return null;
     }
 
     public List<UserAccount> getOwnerList() {
@@ -214,6 +341,9 @@ public class AssetOwnerSettingController {
     }
 
     public void saveChange() {
+        if(queryAsset.getAssetGroup() == null && queryAsset.getAssetGroupSecondary() == null && deptOrg == null && ownerSearch == null && ownerSearch2 == null && ownerSearch3 == null ){
+            WebUtil.addErrorMessage(WebUtil.getMessage("相关设备查询条件([所属院区]为必选条件，其它查询条件最少要填写或选择一个)"));
+        }
         if (targetAssets.isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
         } else if (!(isChanegeOwner || isChanegeOwner2)) {

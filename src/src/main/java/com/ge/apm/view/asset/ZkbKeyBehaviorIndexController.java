@@ -12,6 +12,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.zkb.ZkbPartOrderController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -148,7 +149,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             isZkbadmin=ZkbKeyBehaviorIndexService.no;
         }
         this.rankMap = this.zkbKeyBehaviorIndexService.initRankingMap();
-        this.tenantInfoList=this.zkbKeyBehaviorIndexService.getSourceTenantInfoList(currentUser.getLoginName());
+       // this.tenantInfoList=this.zkbKeyBehaviorIndexService.getSourceTenantInfoList(currentUser.getLoginName(),kpiDate);
         loadData();
     }
     /**
@@ -197,6 +198,18 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         }
     }
 
+    public void updateTenantInfoList(){
+        if(kpiDate==null){
+            WebUtil.addErrorMessage("生成月份 输入不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+
+            return;
+        }
+        this.tenantInfoList=this.zkbKeyBehaviorIndexService.getSourceTenantInfoList(currentUser.getLoginName(),kpiDate);
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+    }
+
+
     /**
      * 生效
      */
@@ -225,16 +238,13 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
     /**
      * 生成报表
      */
-    public void generateKpiData()
-    {
-        if(CollectionUtils.isEmpty(selectTenantInfoList))
-        {
-            WebUtil.addErrorMessage("请选择代理商");
+    public void generateKpiData(){
+        if(kpiDate==null){
+            WebUtil.addErrorMessage("生成月份 输入不可为空！");
             return;
         }
-        if(kpiDate==null)
-        {
-            WebUtil.addErrorMessage("生成月份 输入不可为空！");
+        if(CollectionUtils.isEmpty(selectTenantInfoList)){
+            WebUtil.addErrorMessage("请选择代理商");
             return;
         }
         for(TenantInfo item:selectTenantInfoList) {

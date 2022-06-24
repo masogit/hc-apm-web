@@ -3,7 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="preRenderView">
         <f:metadata>
@@ -28,11 +29,16 @@
                         <h:panelGrid id="searchPanel" columns="3">
                             <p:inputText id="searchText" value="#{simplePartsRequestListController.oneSearchStr}"
                                          placeholder="申购单编号"
-                                         maxlength="105" style="width: 360px">
+                                         maxlength="105" style="width: 360px" rendered="#{!userContextService.countyArea}">
                                 <p:ajax event="keyup"
                                         update=":sparePartsClaimForm searchButtons "/>
                             </p:inputText>
-
+                            <p:inputText id="searchText2" value="#{simplePartsRequestListController.oneSearchStr}"
+                                         placeholder="申购单编号/工单编号"
+                                         maxlength="105" style="width: 360px" rendered="#{userContextService.countyArea}">
+                                <p:ajax event="keyup"
+                                        update=":sparePartsClaimForm searchButtons "/>
+                            </p:inputText>
                             <h:panelGroup id='searchButtons'>
                                 <p:commandButton style="zoom:0.8" icon="ui-icon-search"
                                                  class="btn btn-sm btn-gray"
@@ -248,7 +254,6 @@
                             <p:column headerText="备件总价">
                                 <h:outputText value="#{item.totalPrice}"/>
                             </p:column>
-
                             <p:column headerText="#{msg.Actions}">
                                 <p:commandButton validateClient="true"
                                                  actionListener="#{simplePartsRequestEditController.deleteCurrentPartsLineItem(item)}"

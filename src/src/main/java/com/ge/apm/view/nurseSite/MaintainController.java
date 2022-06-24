@@ -81,11 +81,13 @@ public class MaintainController implements ServerEventInterface{
 	private SearchController searchController;
 	private MaintainItemController maintainItemController;
 	private UserAuth customRoleAuth;
+	private UserContextService userContextService;
 
 	private boolean isSelectAll = Boolean.FALSE;
 
 	@PostConstruct
 	protected void init() {
+		userContextService = WebUtil.getBean(UserContextService.class);
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		nurseSiteMaintainService.init();
 		searchController = WebUtil.getBean(SearchController.class);
@@ -394,9 +396,10 @@ public class MaintainController implements ServerEventInterface{
 
 	public void saveMaintain() {
 		Date currentDate = new Date();
-		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain, currentDate, currentUser);
-		lazyEventModel.updateEvent(event);
-		addMessage("工单已保存");
+		if (nurseSiteMaintainService.saveMaintain(nurseSiteMaintain, currentDate, currentUser)) {
+			lazyEventModel.updateEvent(event);
+			addMessage("工单已保存");
+		}
 	}
 
 	public void createMaintain() {
@@ -589,6 +592,9 @@ public class MaintainController implements ServerEventInterface{
 		startCalendar.setTime(startBatchDate);
 		Calendar endCalendar = Calendar.getInstance();
 		endCalendar.setTime(endBatchDate);
+		if(userContextService.accessContainsOfJiangNing() && !userContextService.hasRole("AssetHead")) {
+
+	    }
 		Integer type = nurseSiteMaintainConfig.getType();
 		String typeValue = nurseSiteMaintainConfig.getTypeValue();
 		List<NurseSiteMaintain> listMaintainData = new ArrayList<NurseSiteMaintain>();
@@ -710,6 +716,13 @@ public class MaintainController implements ServerEventInterface{
 			endBatchDate = new Date();
 		}
 		Date currentDate = new Date();
+		Calendar calendar1 = Calendar.getInstance();
+		Calendar calendar2 = Calendar.getInstance();
+		calendar1.setTime(currentDate); calendar2.setTime(startBatchDate);
+		if(calendar1.get(Calendar.MONTH)>calendar2.get(Calendar.MONTH) && userContextService.accessContainsOfJiangNing() && !userContextService.hasRole("AssetHead")) {
+			WebUtil.addErrorMessage("只能批量完成当月的单子！");
+			return "maintainMain?faces-redirect=true";
+		}
 		List<NurseSiteMaintain> listNewNurseSiteMaintain = null;
 		if (listCheckClinicalOrgInfo == null || listCheckClinicalOrgInfo.size() == 0) {
 			listNewNurseSiteMaintain = findDefaultMaintain(startBatchDate, endBatchDate);

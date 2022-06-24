@@ -192,6 +192,27 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //保存配置
     public void save() {
+        //判断是否已经存在审批流
+        Integer minAmountNew = selected.getMinAmount() != null ?selected.getMinAmount() : 0;
+        Integer maxAmountNew = selected.getMaxAmount() != null ?selected.getMaxAmount() : 0;
+        String configrationOld = selected.getConfigration();
+        boolean enable=true;
+        if(selected.getId() != null){
+            MultiLevelApprovalConfig multiLevelApprovalConfig = configDao.findById(selected.getId());
+            enable = multiLevelApprovalConfig.getEnable();
+        }
+        if (null != configrationOld) {
+            Map map = JSON.parseObject(configrationOld, Map.class);
+            Integer minAmount = (Integer) map.get("minAmount");
+            Integer maxAmount = (Integer) map.get("maxAmount");
+            if (minAmountNew != minAmount || maxAmountNew != maxAmount || !enable){
+                if(this.check(minAmountNew, maxAmountNew ,enable)) return;
+            }
+        }else {
+            if(this.check(minAmountNew, maxAmountNew,enable)) return;
+        }
+
+
         List<ApprovalNode> collect = nodesList.stream().filter(item -> item.getId() != SimplePartsConstant.PARTS_LOCAL_ORG_ID).collect(Collectors.toList());
         collect.stream().forEach(item -> {
             if (item.getUsingRole()) {
@@ -213,6 +234,57 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         super.save();
     }
 
+    public Boolean check(Integer minAmountNew,Integer maxAmountNew,boolean enable){
+        List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = configDao.findByHierOrgUidAndBusinessTypeAndEnable(selected.getHierOrgUid(),selected.getBusinessType(),true);
+        if(!multiLevelApprovalConfigs.isEmpty() && multiLevelApprovalConfigs != null){
+            String approvalMsg ="已存在同级别审批流";
+            for (MultiLevelApprovalConfig multiLevelApprovalConfig :multiLevelApprovalConfigs){
+                String configration = multiLevelApprovalConfig.getConfigration();
+                if (minAmountNew != null && maxAmountNew != null && null != configration) {
+                    if(!multiLevelApprovalConfig.getId().equals(selected.getId()) || !enable){
+                        Map map = JSON.parseObject(configration, Map.class);
+                        Integer minAmount = ((Integer) map.get("minAmount"));
+                        Integer maxAmount = ((Integer) map.get("maxAmount"));
+                        if( minAmountNew > minAmount && minAmountNew < maxAmount){
+                            WebUtil.addWarnMessage(approvalMsg);
+                            return true;
+                        }
+                        if( maxAmountNew > minAmount && maxAmountNew <= maxAmount){
+                            WebUtil.addWarnMessage(approvalMsg);
+                            return true;
+                        }
+                        if( minAmount != 0 && minAmountNew <= minAmount && maxAmountNew >= maxAmount){
+                            WebUtil.addWarnMessage(approvalMsg);
+                            return true;
+                        }
+                    }
+
+                }else {
+                    WebUtil.addWarnMessage(approvalMsg);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Boolean enable(Boolean enable){
+        if(enable != null && enable){
+            //判断是否已经存在审批流
+            Integer minAmountNew = selected.getMinAmount() != null ?selected.getMinAmount() : 0;
+            Integer maxAmountNew = selected.getMaxAmount() != null ?selected.getMaxAmount() : 0;
+            String configrationOld = selected.getConfigration();
+            if (null != configrationOld) {
+                Map map = JSON.parseObject(configrationOld, Map.class);
+                Integer minAmount = ((Integer) map.get("minAmount"));
+                Integer maxAmount = ((Integer) map.get("maxAmount"));
+                if(this.check(minAmount, maxAmount,true)) return true;
+            }else {
+                if(this.check(minAmountNew, maxAmountNew,true)) return true;
+            }
+        }
+        return false;
+    }
     //初始化审批节点
     public List<ApprovalNode> getNodesList() {
         ApprovalNode node = new ApprovalNode();
@@ -256,11 +328,13 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //配置信息是否展示
     public void setConfigEnable(){
-        configEnable = "partsStock".contains(selected.getBusinessType());
+        List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR, ApprovalConstant.APPROVAL_ASSET_MAINTAIN, ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT);//设备维修/设备保养/预算管理
+        configEnable = list.contains(selected.getBusinessType());
     }
 
     public void setToUsing(String uid) {
         selected = configDao.findById(uid);
+        if(this.enable(true)) return;
         selected.setEnable(true);
         super.save();
     }

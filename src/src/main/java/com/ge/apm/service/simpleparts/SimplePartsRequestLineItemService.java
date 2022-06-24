@@ -132,6 +132,16 @@ public class SimplePartsRequestLineItemService {
         partsTransaction.setPartsWarehouseId(partsRequestLineItem.getPartsWarehouseId());
         partsTransaction.setPartsLocatorId(partsRequestLineItem.getPartsLocatorId());
 
+        partsTransaction.setTransportNo(partsRequestLineItem.getTransportNo());//运单号
+        partsTransaction.setTransportCompany(partsRequestLineItem.getTransportCompany());//运输公司
+        partsTransaction.setComments(partsRequestLineItem.getComments());//备注
+        partsTransaction.setStorageType(partsRequestLineItem.getStorageType());//入库类型
+        partsTransaction.setAddressInfo(partsRequestLineItem.getAddressInfo());//地址信息
+        partsTransaction.setPartsDescription(partsRequestLineItem.getPartsDescription());//备件描述
+
+
+
+
         partsTransaction.setRequestType(partsRequest.getType());
         partsTransaction.setTransactionType(partsRequest.getType() == 1? SimplePartsConstant.TRANSACTION_TYPE_OUT_STOCK : SimplePartsConstant.TRANSACTION_TYPE_IN_STOCK);
 

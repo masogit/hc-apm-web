@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
@@ -19,10 +21,6 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
 import com.baomidou.mybatisplus.toolkit.StringUtils;
-import com.ge.apm.dao.ArrivalListItemRepository;
-import com.ge.apm.dao.ArrivalListRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -53,7 +51,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private Supplier supplier;
     private Supplier maitanance;
     private Supplier manufacture;
-
+    private String copyFrom = "";
     private TreeNode selectedNode;
 
     private ArrivalListItem easyInstallItem;
@@ -112,6 +110,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     @Setter
     private String newSupplierType;
 
+    private UserContextService userContextService;
+    private TenantInfoRepository tenantInfoRepository;
+
     @Override
     protected void init() {
 
@@ -120,6 +121,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         aiService = WebUtil.getBean(AssetInstallationService.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 //        orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -137,7 +139,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         currentUser=UserContextService.getCurrentUserAccount();
         configService = WebUtil.getBean(ConfigService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
-
+        userContextService = WebUtil.getBean(UserContextService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
 
@@ -147,6 +149,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 prepareCreate();
                 if (!Strings.isNullOrEmpty(copyFrom)) {
                     copyFiledsValueById(copyFrom);
+                    setCopyFrom(copyFrom);
                 }
                 contractList = contractService.getContractListByUser(currentUser);
                 //移除标记为已完成的设备合同
@@ -174,13 +177,20 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
             initEasyInstallItem();
             this.changeFunctionGroup();
-            attachList = aiService.getPicList(selected.getId());
+            if(activeSupplier() && selected.getContractNum() != null){
+                Set<String> ids = new HashSet<>();
+                ids.add(selected.getId());
+                ids.add(selected.getContractNum());
+                attachList = aiService.getPartPictures(ids);
+            }else{
+                attachList = aiService.getPicList(selected.getId());
+            }
 //            if (ArrivalList.ProcessType.Easy.toString().equals(selected.getProcessType())) {
 //                initEasyInstallItem();
 //                this.changeFunctionGroup();
 //
 //            }
-            if(activeSupplier() && null == selected.getBoxInstallationDate()) {
+            if(null == selected.getBoxInstallationDate()) {
                 selected.setBoxInstallationDate(selected.getArrivalDate());
             }
             prepareEdit();
@@ -190,7 +200,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         suppliersList = aiService.getSupplierListBySiteUid(currentUser.getSiteUID());
         maintainerList = aiService.getOnlyMaintainListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
         manueList=aiService.getOnlyManuListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 
         needInstorageCheck = userContextService.needInstorageCheck();
     }
@@ -218,6 +227,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void applyChange() {
+        setCopyFrom("");
         onSupplierChange();
         this.save();
     }
@@ -270,6 +280,17 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         if (!Strings.isNullOrEmpty(selected.getContractItemId())) {
             contractService.contractItemArrival(arrivalItemList);
         }
+        if(userContextService.activeSupplier() && selected.getContractNum() != null){
+            Set<String> ids = new HashSet<>();
+            ids.add(selected.getId());
+            ids.add(selected.getContractNum());
+            attachList = aiService.getPartPictures(ids);
+        }
+        setCopyFrom("");
+    }
+
+    public void closecopyForm() {
+        setCopyFrom("");
     }
 
     public void onSelectOrgFromTree(NodeSelectEvent event) {
@@ -480,24 +501,70 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selected.setHospitalUID(srcList.getHospitalUID());
             selected.setAssetName(srcList.getAssetName());
             selected.setAssetGroup(srcList.getAssetGroup());
-            selected.setArrivalDate(srcList.getArrivalDate());
             selected.setFunctionType(srcList.getFunctionType());
+            //制造商
             selected.setManufacture(srcList.getManufacture());
             selected.setOrigin(srcList.getOrigin());
-            selected.setInvoiceNum(srcList.getInvoiceNum());
-            selected.setContractNum(srcList.getContractNum());
-            selected.setContractPrice(srcList.getContractPrice());
+            //供应商
             selected.setVendor(srcList.getVendor());
-            selected.setAgent(srcList.getAgent());
             selected.setTenantUID(srcList.getTenantUID());
             selected.setInstitutionUID(srcList.getInstitutionUID());
             selected.setHospitalUID(srcList.getHospitalUID());
             selected.setSiteUID(srcList.getSiteUID());
+            //设置邵逸夫医院对哪些字段不可见 ContractNum  合同号   contractPrice  合同价格  agent 经办人  ArrivalDate 到货日期
+            //制造商、品牌/制造商简称、供应商
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            String tenantUid = currentUserAccount.getTenantUID();
+            List<TenantInfo> tanentIfos = tenantInfoRepository.findByCustomTenant("3");
+            String tanentInfoUid = tanentIfos.isEmpty() ? null : tanentIfos.get(0).getUid();
+            if(!tenantUid.equals(tanentInfoUid)){
+                selected.setContractNum(srcList.getContractNum());
+                selected.setContractPrice(srcList.getContractPrice());
+                selected.setAgent(srcList.getAgent());
+                selected.setArrivalDate(srcList.getArrivalDate());
+                selected.setInvoiceNum(srcList.getInvoiceNum());
+            }else{
+                selected.setContractNum("");
+                selected.setContractPrice(null);
+                selected.setAgent("");
+                selected.setArrivalDate(null);
+                selected.setInvoiceNum("");
+                selected.setProcessType(srcList.getProcessType());
+                selected.setMakerShortName(srcList.getMakerShortName());
+                String manufactureUid=srcList.getManufactureId();
+                if(StringUtils.isNotEmpty(manufactureUid)){
+                    Supplier manufacture=aiService.getSupplierById(Integer.valueOf(manufactureUid));
+                    if(manufacture!=null){
+                        this.selected.setManufacture(manufacture.getName());
+                        this.selected.setManufactureId(manufacture.getId().toString());
+                        this.manufacture=manufacture;
+                    }
+                }
+                Integer supplierId = srcList.getSupplierId();
+                if(supplierId != null ){
+                    Supplier supplier=aiService.getSupplierById(supplierId);
+                    if(supplier!=null){
+                        this.selected.setVendor(supplier.getName());
+                        this.selected.setSupplierId(supplier.getId());
+                        this.supplier=supplier;
+                    }
+                }
+            }
         }
 
     }
 
     public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
+
+    public void removeAttachmentByIdJiuYuan(String blobId) {
+        String msg = isEditFileJiuYuan();
+        if(msg != null){
+            WebUtil.addErrorMessage(msg);
+            return;
+        }
         blobService.deleteBlobFileById(blobId);
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
@@ -515,12 +582,24 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalList);
             blobObject.setBoUuid(selected.getId());
+            if(activeSupplier()){//已激活的供应商：使用合同号作为BoUuid
+                blobObject.setBoUuid(selected.getContractNum());
+            }
             blobObject.setBoSubType(type);
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
+    }
+
+    public void handleFileUploadJiuYuan(FileUploadEvent event) {
+        String msg = isEditFileJiuYuan();
+        if(msg != null){
+            WebUtil.addErrorMessage(msg);
+            return;
+        }
+        handleFileUpload(event);
     }
 
     public List<V2_BlobObject> getAttachList(String type) {
@@ -636,46 +715,104 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void finishChoseContractItem() {
-        ContractInfoItem selectedContractItem = contractItemList.stream().filter(item -> item.getId().equals(selectedContractItemId)).findAny().orElse(null);
-        this.selected.setContractItemId(selectedContractItem.getId());
-        this.selected.setAssetName(selectedContractItem.getContractAssetName());
-        this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
-        if(selectedContractItem.getContractAssetQuantity() != null && selectedContractItem.getContractAssetPrice() != null){
-            this.selected.setContractPrice(selectedContractItem.getContractAssetQuantity() * selectedContractItem.getContractAssetPrice());
-        }else {
-            this.selected.setContractPrice(0d);
-        }
+//        if(copyFrom.equals("")){
+            ContractInfoItem selectedContractItem = contractItemList.stream().filter(item -> item.getId().equals(selectedContractItemId)).findAny().orElse(null);
+            this.selected.setContractItemId(selectedContractItem.getId());
+            this.selected.setAssetName(selectedContractItem.getContractAssetName());
+            this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+            if(selectedContractItem.getContractAssetQuantity() != null && selectedContractItem.getContractAssetPrice() != null){
+                this.selected.setContractPrice(selectedContractItem.getContractAssetQuantity() * selectedContractItem.getContractAssetPrice());
+            }else {
+                this.selected.setContractPrice(0d);
+            }
 //        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
-        this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
-        this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
-        this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
-        this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
-        this.selected.setTenantUID(selectedContractItem.getContractInfo().getTenantUID());
-        this.selected.setFunctionType(selectedContractItem.getPattern());
-        String manufactureUid=selectedContractItem.getManufacturer();
-        if(StringUtils.isNotEmpty(manufactureUid)){
-            Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
-            if(manufacture!=null){
-                this.selected.setManufacture(manufacture.getName());
-                this.selected.setManufactureId(manufacture.getId().toString());
-                this.manufacture=manufacture;
+            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+            this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
+            this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
+            this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
+            this.selected.setTenantUID(selectedContractItem.getContractInfo().getTenantUID());
+            this.selected.setFunctionType(selectedContractItem.getPattern());
+            String manufactureUid=selectedContractItem.getManufacturer();
+            if(StringUtils.isNotEmpty(manufactureUid)){
+                Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
+                if(manufacture!=null){
+                    this.selected.setManufacture(manufacture.getName());
+                    this.selected.setManufactureId(manufacture.getId().toString());
+                    this.manufacture=manufacture;
+                }
             }
-        }
-        this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
-        this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
-        this.selected.setOrigin(selectedContractItem.getProductionPlace());
-        String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
-        if(StringUtils.isNotEmpty(supplierUid)){
-            Supplier supplier=aiService.getSupplierByUid(supplierUid);
-            if(supplier!=null){
-                this.selected.setVendor(supplier.getName());
-                this.selected.setSupplierId(supplier.getId());
-                this.supplier=supplier;
+            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+            this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+            this.selected.setOrigin(selectedContractItem.getProductionPlace());
+            String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
+            if(StringUtils.isNotEmpty(supplierUid)){
+                Supplier supplier=aiService.getSupplierByUid(supplierUid);
+                if(supplier!=null){
+                    this.selected.setVendor(supplier.getName());
+                    this.selected.setSupplierId(supplier.getId());
+                    this.supplier=supplier;
 
-                this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
+                    this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
+                }
             }
-        }
-        selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
+            selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
+//        }else{
+//            ContractInfoItem selectedContractItem = contractItemList.stream().filter(item -> item.getId().equals(selectedContractItemId)).findAny().orElse(null);
+//            this.selected.setContractItemId(selectedContractItem.getId());
+//            this.selected.setAssetName(selectedContractItem.getContractAssetName());
+//            this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+//            //ContractNum  合同号   contractPrice  合同价格  agent 经办人  ArrivalDate 到货日期
+//            //Manufacture  制造商   Vendor  供应商    品牌/制造商简称  MakerShortName
+//            //如果是邵逸夫医院，将制造商添加进去
+//            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+//            String tenantUid = currentUserAccount.getTenantUID();
+//            List<TenantInfo> tanentIfos = tenantInfoRepository.findByCustomTenant("3");
+//            String tanentInfoUid = tanentIfos.get(0).getUid();
+//            if(!tenantUid.equals(tanentInfoUid)){
+//                this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+//                if(selectedContractItem.getContractAssetQuantity() != null && selectedContractItem.getContractAssetPrice() != null){
+//                    this.selected.setContractPrice(selectedContractItem.getContractAssetQuantity() * selectedContractItem.getContractAssetPrice());
+//                }else {
+//                    this.selected.setContractPrice(0d);
+//                }
+//            }
+//
+////        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
+//            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+//            this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
+//            this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
+//            this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
+//            this.selected.setTenantUID(selectedContractItem.getContractInfo().getTenantUID());
+//            this.selected.setFunctionType(selectedContractItem.getPattern());
+//            String manufactureUid=selectedContractItem.getManufacturer();
+//            if(StringUtils.isNotEmpty(manufactureUid)){
+//                Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
+//                if(manufacture!=null){
+//                    this.selected.setManufacture(manufacture.getName());
+//                    this.selected.setManufactureId(manufacture.getId().toString());
+//                    this.manufacture=manufacture;
+//                }
+//            }
+//            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+//            this.selected.setOrigin(selectedContractItem.getProductionPlace());
+//            String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
+//            if(StringUtils.isNotEmpty(supplierUid)){
+//                Supplier supplier=aiService.getSupplierByUid(supplierUid);
+//                if(supplier!=null){
+//                    this.selected.setVendor(supplier.getName());
+//                    this.selected.setSupplierId(supplier.getId());
+//                    this.supplier=supplier;
+//                    //如果是邵逸夫医院，将制造商添加进去
+//                    if(tenantUid.equals(tanentInfoUid)){
+//                        this.selected.setManufacture(supplier.getSupplierCode());
+//                        this.selected.setMakerShortName(supplier.getSupplierAbbreviation());
+//                    }
+//
+//                    this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
+//                }
+//            }
+//            selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
+//        }
     }
 
     public void showImageZoom(String objectStorageId, String objctName){
@@ -893,8 +1030,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void updateIsEdit(){
-        selected.setIsEdit(true);
-        dao.updateIsEdit(selected.getId());
+        dao.updateIsEdit(selected.getIsEdit(),selected.getId());
     }
 
     public void saveNewSupplier() {
@@ -910,11 +1046,20 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
 
-        if("manufacturer".equals(newSupplierType)){
+/*        if("manufacturer".equals(newSupplierType)){
             manueList.add(newSupplier);
         }else if("supplier".equals(newSupplierType)){
             suppliersList.add(newSupplier);
         }else if("maintainer".equals(newSupplierType)){
+            maintainerList.add(newSupplier);
+        }*/
+        if(newSupplier.getManufacturerT()){
+            manueList.add(newSupplier);
+        }
+        if(newSupplier.getSupplierT()){
+            suppliersList.add(newSupplier);
+        }
+        if(newSupplier.getMaintainerT()){
             maintainerList.add(newSupplier);
         }
 //        supplierList.add(newSupplier);
@@ -956,4 +1101,29 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         dao.updateBatchSupplier(supplier.getName(),supplier.getId(),installCount,selectedIds);
     }
 
+    /**
+     * 验证九院文件是否可以编辑包括：（删除、上传）
+     * 注意条件：九院同院区下并且同合同号的所有到货单已完成安装才可以编辑文件。
+     * @return
+     */
+    public String isEditFileJiuYuan(){
+        String msg = null;
+        if(activeSupplier()){
+            List<ArrivalList> arrivalLists = dao.findByContractNumAndSiteUID(selected.getContractNum(),selected.getSiteUID());
+            for(ArrivalList arrivalList:arrivalLists){
+                if(arrivalList.getStatus() != 3){
+                    msg = "该合同号下有未安装完成的到货单："+ arrivalList.getName() +"，请全部完成后再上传或删除！";
+                }
+            }
+        }
+        return msg;
+    }
+
+    public String getCopyFrom() {
+        return copyFrom;
+    }
+
+    public void setCopyFrom(String copyFrom) {
+        this.copyFrom = copyFrom;
+    }
 }

@@ -6,8 +6,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
-import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
-
 /**
  * @author : 503189362
  * @date : 2020/6/22
@@ -27,13 +25,13 @@ public class ZkbPartOrder implements Serializable {
 
     /**
      * Pending：申请 TechAccept：技术审批通过 TechReject：技术审批不通过 ManageAccept：区域经理审批通过
-     * ManageReject：区域经理审批不通过 Ordered：发货 OrderedReject:发货取消
+     * ManageReject：区域经理审批不通过 Ordered：发货 OrderedReject:发货取消 FourHundredCancel:400取消
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
         Requested,TechnicalAccept,TechnicalReject,
         ManageAccept,ManageReject,UnOrdered,UnOrderedReject,
-        Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject,CommercialAccept,CommercialReject
+        Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject,CommercialAccept,CommercialReject,FourHundredCancel
     }
 
     /**
@@ -575,6 +573,85 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "ssa_key_flag")
     private String ssaKeyFlag;
+
+    @Column(name = "maintain_flag")
+    private String maintainFlag;
+
+    @Column(name = "maintain_first_flag")
+    private String maintainFirstFlag;
+
+    /**
+     * 兑换类型 artificial application
+     */
+    @Column(name = "exchange_type")
+    private String exchangeType;
+
+    @Column(name = "supplement_flag")
+    private String supplementFlag;
+
+    @Transient
+    private String regionalManagerName;//区域经理姓名
+    @Transient
+    private String regionalManagerEmail;//区域经理邮箱
+    @Transient
+    private String regionalManagerPhone;//区域经理电话
+
+
+    public String getRegionalManagerName() {
+        return regionalManagerName;
+    }
+
+    public void setRegionalManagerName(String regionalManagerName) {
+        this.regionalManagerName = regionalManagerName;
+    }
+
+    public String getRegionalManagerEmail() {
+        return regionalManagerEmail;
+    }
+
+    public void setRegionalManagerEmail(String regionalManagerEmail) {
+        this.regionalManagerEmail = regionalManagerEmail;
+    }
+
+    public String getRegionalManagerPhone() {
+        return regionalManagerPhone;
+    }
+
+    public void setRegionalManagerPhone(String regionalManagerPhone) {
+        this.regionalManagerPhone = regionalManagerPhone;
+    }
+
+    public String getSupplementFlag() {
+        return supplementFlag;
+    }
+
+    public void setSupplementFlag(String supplementFlag) {
+        this.supplementFlag = supplementFlag;
+    }
+
+    public String getExchangeType() {
+        return exchangeType;
+    }
+
+    public void setExchangeType(String exchangeType) {
+        this.exchangeType = exchangeType;
+    }
+
+    public String getMaintainFirstFlag() {
+        return maintainFirstFlag;
+    }
+
+    public void setMaintainFirstFlag(String maintainFirstFlag) {
+        this.maintainFirstFlag = maintainFirstFlag;
+    }
+
+    public String getMaintainFlag() {
+        return maintainFlag;
+    }
+
+    public void setMaintainFlag(String maintainFlag) {
+        this.maintainFlag = maintainFlag;
+    }
 
     public String getSsaKeyFlag() {
         return ssaKeyFlag;

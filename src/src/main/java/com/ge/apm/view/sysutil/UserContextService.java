@@ -1,15 +1,19 @@
 package com.ge.apm.view.sysutil;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import javaslang.control.Option;
@@ -17,6 +21,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -27,6 +34,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.Serializable;
@@ -38,29 +46,23 @@ import java.util.stream.Collectors;
 @SessionScoped
 public class UserContextService implements Serializable {
 
+
+
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
     public static final Integer INTERNATIONAL_VERSION = 1;
-    public static List<String> internationalList;
-    {
-        internationalList = Lists.newArrayList("asset","repair","maintain","config");
-    }
+    public static List<String> internationalList= Lists.newArrayList("asset","repair","maintain","config");
 
-//    public static final String MVS_ADMIN="MVSAdmin";
-//    private static final String MVS_FE="MVSFE";
 
     private TenantInfo tenant = null;
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
     private Boolean activeSupplierFlag = null;
-//    private List<RoleMsgInfo> roleMsgInfoList = null;
-//    private  ZkbContractRepository zkbContractRepository;
-
-//    @PostConstruct
-//    public void init(){
-//        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
-//    }
+    private String selectedSiteUid;
+    //选定的院区
+    private OrgInfo selectSite;
+    private List<OrgInfo> child = new ArrayList<>();
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
@@ -203,7 +205,59 @@ public class UserContextService implements Serializable {
         OrgInfo org = WebUtil.getBean(OrgInfoRepository.class).getByUid(getCurrentUserAccount().getOrgInfoUID());
         return  null == org.getOrgType() ? false : 4 == org.getOrgType();
     }
+    /**
+     * 判断当前登录是
+     * 该租户已开启了无人值守服务
+     * 该租户已开启了小型物联网设备(急救类)服务
+     * @return boolean
+     */
+    public boolean accessContain(){
+        List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
+//            for (String s : usname) {
+//                if (s.equals("OpWorker")) {
+//                    return false;
+//                }
+//            }
+        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID!=null&&bySiteUID.size()!=0){
+            if (bySiteUID.get(0).getWhethertoenableunattended()!=null && bySiteUID.get(0).getIsiotenabled()!=null){
+                if (bySiteUID.get(0).getWhethertoenableunattended()==true && bySiteUID.get(0).getIsiotenabled()==true){
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+        return false;
 
+    }
+
+    public boolean enableSiteToSiteAllocation() {
+        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID == null || bySiteUID.isEmpty()) {
+            return false;
+        }
+        WorkflowConfig workflowConfig = bySiteUID.get(0);
+        return workflowConfig.getEnableSiteToSiteAllocation() != null && workflowConfig.getEnableSiteToSiteAllocation();
+    }
+    public boolean enableAssetPreview() {
+        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID == null || bySiteUID.isEmpty()) {
+            return false;
+        }
+        WorkflowConfig workflowConfig = bySiteUID.get(0);
+        return workflowConfig.getEnableAssetPreview() != null && workflowConfig.getEnableAssetPreview();
+    }
+
+    public boolean byOpWorker(){
+        List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
+            for (String s : usname) {
+                if (s.equals("OpWorker")) {
+                    return false;
+                }
+            }
+        return true;
+    }
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
@@ -250,6 +304,44 @@ public class UserContextService implements Serializable {
     	return authContains(menuName)&&versionContains(menuName);
     }
 
+    public boolean accessContainsOfJiangNing(){
+        TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
+        List<TenantInfo> tenantIfos = tenantInfoRepository.findByCustomTenant("2");
+        if(tenantIfos == null || tenantIfos.size() == 0){
+            return false;
+        }
+        TenantInfo tf = tenantIfos.get(0);
+        String jiangNingUid = tf.getUid();
+        String currentTenantUid = userAccount.getTenantUID();
+        if(jiangNingUid.equals(currentTenantUid)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public boolean getUserAccountApprove(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccountRepository userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        userAccount = userContextService.getLoginUser();
+        AuditGroupConfigurationRepository auditGroupConfigurationRepository=WebUtil.getBean(AuditGroupConfigurationRepository.class);
+        AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
+        if(auditGroupConfiguration!=null){
+            String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
+            List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+            if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
+                for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
+                    AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
+                    List<String> userUids = auditGroupConfigurationNode.getUserUids();
+                    UserAccount user = userAccountRepository.getByUid(userUids.get(0));
+                    if (user!=null && userAccount.getUid().equals(user.getUid())){
+                        return true;
+                    }
+                }
+
+            }
+        }
+        return false;
+    }
     public boolean authContains(String menuName){
     	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()||userAccount.getIsGeOp()){
     		return true;
@@ -875,12 +967,19 @@ public class UserContextService implements Serializable {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount currentUser = getLoginUser();
         TenantInfo currentTenantInfo = userContextService.getCurrentUserTenantInfo();
+        List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
+            for (String s : usname) {
+                if (s.equals("OpWorker")) {
+                    return false;
+                }
+            }
         int siteId = currentUser.getSiteId();
         if (siteId == 46 || BooleanUtils.isTrue(currentTenantInfo.getHaveIbDevice())) {
             return true;
         }
         return false;
     }
+
 
     public boolean isHaveIbDeviceUser() {
         return tenant.getHaveIbDevice() == null ? false : tenant.getHaveIbDevice();
@@ -981,9 +1080,11 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isYiMaiYangGuangTenant() {
-        TenantInfo tenantInfo = getTenantInfo();
-        //这期上线，暂时写死，下个版本改成动态配置
-        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
+        if (tenantOptionConfigOptional.isPresent()) {
+            return tenantOptionConfigOptional.get().getSynchronizeWorkOrder()!=null? tenantOptionConfigOptional.get().getSynchronizeWorkOrder():false;
+        }
+        return false;
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
@@ -1206,6 +1307,11 @@ public class UserContextService implements Serializable {
         return cfgService.needScrappedControl();
     }
 
+    public boolean useNewRiskGrade(){
+        ConfigService cfgService = WebUtil.getBean(ConfigService.class);
+        return cfgService.useNewRiskGrade();
+    }
+
     public boolean hasScrappedAuthority(){
         AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
         return acService.hasScrappedAuthority();
@@ -1241,12 +1347,35 @@ public class UserContextService implements Serializable {
             return false;
         }
     }
+    /***
+     *  判断是否是北京积水潭医院
+     * @param tenantName
+     * @return
+     */
+    public static Boolean isHospitalName(String tenantName){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        TenantInfo currentTenantInfo = userContextService.getTenantInfo();
+        if(currentTenantInfo == null){
+            return Boolean.FALSE;
+        }
+        if(StringUtils.isBlank(tenantName)){
+            //tenantName为空则验证下面租户
+            if(WorkOrderConstant.DESIGNATED_USER.equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }else{
+            if(tenantName.equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
 
 
 
     /**
      * 验证租户名称
-     * @param tenantName 非必填，如不填将默认验证指定的租户名称
+     * @param tenantName 非必填，如不填将验证方法中指定的租户是否为当前登录用户所属租户
      * @return
      */
     public static Boolean hasCurrentTenantName(String tenantName){
@@ -1255,13 +1384,14 @@ public class UserContextService implements Serializable {
         if(currentTenantInfo == null){
             return Boolean.FALSE;
         }
+        String name = currentTenantInfo.getName().trim();
         if(StringUtils.isBlank(tenantName)){
             //tenantName为空则验证下面租户
-            if("云南省阜外心血管病医院".equals(currentTenantInfo.getName().trim())){
+            if("云南省阜外心血管病医院".equals(name)){
                 return Boolean.TRUE;
             }
         }else{
-            if(tenantName.equals(currentTenantInfo.getName().trim())){
+            if(tenantName.equals(name)){
                 return Boolean.TRUE;
             }
         }
@@ -1324,5 +1454,128 @@ public class UserContextService implements Serializable {
     public I18nMessage getByMsgTypeAndMsgKey(String msgType, String msgKey) {
         I18nMessageRepository msgRepo = WebUtil.getBean(I18nMessageRepository.class);
         return msgRepo.getByMsgTypeAndMsgKey(msgType, msgKey);
+    }
+
+    /**
+     * 是否是县域租户
+     * @return
+     */
+    public boolean isCountyArea(){
+        TenantInfo tenantInfo = getTenantInfo();
+        if(tenantInfo.getType() != null && tenantInfo.getType() == 6){
+            return true;
+        }
+        return false;
+    }
+    public void updateSiteUid(){
+        if(userAccount == null)return;
+        if(StringUtils.isEmpty(selectedSiteUid)){
+            userAccount.setSiteUID(userAccount.getHospitalUID());
+        }else{
+            userAccount.setSiteUID(selectedSiteUid);
+        }
+    }
+    public String getSelectedSiteUid() {
+        return selectedSiteUid;
+    }
+
+    public void setSelectedSiteUid(String selectedSiteUid) {
+        this.selectedSiteUid = selectedSiteUid;
+    }
+
+    public List<OrgInfo> getSiteOrgInfoChild(){
+            if(CollectionUtils.isNotEmpty(child)) return child;
+            String hospitalUID = userAccount.getHospitalUID();
+            if(userAccount.getOrgLevel() == 2 && hospitalUID.equals(userAccount.getSiteUID())){
+                WorkflowConfigRepository workflowConfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+                OrgInfoRepository orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+                child= orgInfoRepository.getHospitalByTenantUIDAndType(hospitalUID);
+                if(child.size() > 0){
+                    child=child.stream().filter(item->{
+                        if(item == null)return false;
+                        Integer orgLevel = item.getOrgLevel();
+                        Integer orgType = item.getOrgType();
+                        return orgLevel !=null && orgType !=null && orgLevel == 3 && orgType==3;
+                    }).filter(item->{
+                        List<WorkflowConfig> siteWorkflowConfigList = workflowConfigDao.findBySiteUID(item.getUid());
+                        if(CollectionUtils.isEmpty(siteWorkflowConfigList)){
+                            return false;
+                        }
+                        WorkflowConfig workflowConfig = siteWorkflowConfigList.get(0);
+                        return workflowConfig !=null && workflowConfig.getEnableHospitalAdjustment() != null && workflowConfig.getEnableHospitalAdjustment();
+                    }).collect(Collectors.toList());
+                    if(child.size() > 0){
+                            OrgInfo orgInfo = orgInfoRepository.getByUid(hospitalUID);
+                            selectSite=orgInfo;
+                            child.add(orgInfo);
+                    }
+                }
+            }
+        return  child;
+    }
+
+    public OrgInfo getSelectSite() {
+        return selectSite;
+    }
+
+    public void setSelectSite(OrgInfo selectSite) {
+        this.selectSite = selectSite;
+    }
+    public TreeNode getHospitalTree(){
+        List<OrgInfo> orgList = getSiteOrgInfoChild();
+        if(org.springframework.util.CollectionUtils.isEmpty(orgList)){
+            return null;
+        }
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+        expandedByOrgType(rootNode, 2);
+        return rootNode;
+    }
+    private void expandedByOrgType(TreeNode tree, Integer type) {
+        if (tree.getData() != null) {
+            OrgInfo node = (OrgInfo) tree.getData();
+            if (node.getOrgType() > type) {
+                return;
+            }
+        }
+        tree.setExpanded(true);
+        for (TreeNode child : tree.getChildren()) {
+            expandedByOrgType(child, type);
+        }
+
+    }
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
+        }
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+
+    }
+    public List<SelectItem> getOrgInfoNode(){
+        List<SelectItem> selectItems=new ArrayList<>();
+        if(selectSite != null){
+            List<OrgInfo> orgInfos = WebUtil.getBean(OrgInfoRepository.class).getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(selectSite.getUid());
+            if(!org.springframework.util.CollectionUtils.isEmpty(orgInfos)){
+                selectItems = orgInfos.stream().map(item -> {
+                    return new SelectItem(item.getUid(), item.getName(), "", item.getOrgType() != 4);
+                }).collect(Collectors.toList());
+            }
+        }
+        return selectItems;
     }
 }

@@ -111,6 +111,13 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 AssetRow assetRow = new AssetRow(asset, rowMap);
                 // key "name" is used by a lot of modules, the definition is wrong, so use a new key name "EquipmentName" to redefine
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentName")), "setName", false);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("currentId")), "setCurrentId", true);
+
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("rfId")), "setRfId", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("rfGroup")), "setRfGroup", true);
+                assetRow.setFieldDoubleValue(trimMsgKey(WebUtil.getMessage("powerOnThreshold")), "setPowerOnThreshold");
+
+
 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentID")), "setDepartNum", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("AssetID")), "setFinancingNum", true);
@@ -196,6 +203,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("CurrentStatus")), "setStatus", assetStatusList, map, 1);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("AccountingCategory")), "setAccountingCategory", accountingCategoryList, map, null);
                 assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("IsPM")), "setIsPm", true);
+                assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("isFixed")), "setIsFixed", true);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetClass")), "setAssetClass", assetClassList, map, null);
                 assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("IsChecked")), "setIsChecked", true);
 
@@ -211,6 +219,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("QRCode")), "setQrCode", true);
                 assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("ProprietaryClass")), "setProprietaryClass", proprietaryClassList, map, null);
+
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetQuality")), "setAssetQuality", assetQualityList, map, null);
 
                 if (crossSite) {
                     SiteOrgWithDeptOrg siteOrgWithDeptOrg = supportingService.findSiteOrgInAssetExcelRow(rowMap, orgNamesUriCache);

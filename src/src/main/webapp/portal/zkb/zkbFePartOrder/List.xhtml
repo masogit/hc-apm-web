@@ -14,7 +14,7 @@
             <div class="ui-g-12 card">
                 <h:form id="zkbFePartOrderListForm">
 
-                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}">
+                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam') or userContextService.isZkbFeUserConfig('Reviewer')}">
                         <p:outputLabel value="#{msg.zkbContact_tenant}*:"/>
                         <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbFePartOrderController.queryTenantUID}">
                             <p:ajax  update="datalist"/>
@@ -24,7 +24,7 @@
                     </h:panelGrid>
 
                     <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
-                        <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
+                        <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="#{zkbFePartOrderController.showPendingStatusBtn}" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
                         <p:commandButton value="待代理商确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment')}" />
                         <p:commandButton value="待Commercial确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingCommercial'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingCommercial')}" />
                         <p:commandButton value="待400开单/下单"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingApm'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingApm')}" />
@@ -123,6 +123,7 @@
                                     <f:selectItem itemLabel="Commercial同意" itemValue="CommercialAccept"/>
                                     <f:selectItem itemLabel="Commercial不同意" itemValue="CommercialReject"/>
                                     <f:selectItem itemLabel="400已下单/开单" itemValue="FourHundredsAccept"/>
+                                    <f:selectItem itemLabel="400拒绝开单" itemValue="FourHundredsReject"/>
                                     <f:selectItem itemLabel="FE已部分归还" itemValue="GEAdminAcceptPart"/>
                                     <f:selectItem itemLabel="FE已归还" itemValue="GEAdminAccept"/>
                                 </p:selectOneMenu>

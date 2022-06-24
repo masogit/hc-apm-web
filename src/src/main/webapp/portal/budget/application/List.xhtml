@@ -1,0 +1,163 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .zoom-06 {
+                zoom: 0.6;
+            }
+
+            .zoom-08 {
+                zoom: 0.8;
+            }
+
+            .wrap-text {
+                word-break: break-word;
+                word-wrap: break-word;
+                white-space: normal;
+            }
+
+            .width-pct-100 {
+                min-width: 50% !important;
+                max-width: 100% !important;
+            }
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.BudgetApplication}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <p:fieldset legend="#{msg.AdvancedSearch}">
+                        <p:panelGrid id="searchPanel" columns="4" layout="grid"
+                                     styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.ApplicationDept}</label>
+                                <p:inputText id="dept" readonly="true"
+                                             value="#{budgetController.searchForm.dept}"/>
+                                <p:commandButton id="org" process="@this" icon="fa fa-angle-down"
+                                                 class="btn btn-sm popupIconButton"/>
+                                <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade"
+                                                style="position: absolute; left: 0; top: 0; width: 300px;"
+                                                dynamic="false" modal="false" dismissable="true">
+                                    <p:scrollPanel style="height:300px; border: 0" mode="native">
+                                        <p:tree id="orgTree" value="#{budgetController.orgTree}" var="node"
+                                                selectionMode="single" class="tree" style="width:98%; border:0">
+                                            <p:ajax process="@this" event="select" update="searchForm:dept"
+                                                    listener="#{budgetController.onSearchTreeNode}"
+                                                    oncomplete="PF('varOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="#{msg.ApplicationDate}(#{msg.From})"/>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{budgetController.searchForm.dateStart}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            readonlyInput="true" showButtonPanel="true"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="#{msg.ApplicationDate}(#{msg.To})"/>
+                                <p:calendar mode="popup" showOn="button"
+                                            value="#{budgetController.searchForm.dateEnd}"
+                                            timeZone="#{userContextService.getTimeZone()}"
+                                            pattern="#{userContextService.timeFormat()}"
+                                            locale="#{userContextService.getCalendarLocale()}"
+                                            readonlyInput="true" showButtonPanel="true"
+                                            navigator="true" mask="true">
+                                    <p:ajax event="dateSelect" update="@this"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="#{msg.ApplicationNum}"/>
+                                <p:inputText value="#{budgetController.searchForm.applicationNum}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label">#{msg.AssetGroup}</p:outputLabel>
+                                <p:selectOneMenu value="#{budgetController.searchForm.assetGroup}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"
+                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <p:ajax event="change" listener="#{budgetController.onBudgetFilterAssetGroupChange}"
+                                            update="@this assetGroupSecondary"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{budgetController.show('assetGroupSecondary')}">
+                                <p:outputLabel class="label">#{msg.AssetGroupSecondary}</p:outputLabel>
+                                <p:selectOneMenu id="assetGroupSecondary"
+                                                 value="#{budgetController.searchForm.assetGroupSecondary}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{budgetController.budgetFilterAssetGroupSecondaryList}" var="item"
+                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{userContextService.hasAnyRole('AssetHead,DeptHead')}">
+                                <p:outputLabel class="label">#{msg.Applicant}</p:outputLabel>
+                                <!--                                <p:autoComplete dropdown="true" value="#{budgetController.searchForm.applicantId}"-->
+                                <!--                                                scrollHeight="250" forceSelection="false">-->
+                                <!--                                </p:autoComplete>-->
+                                <p:inputText value="#{budgetController.searchForm.applicantName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:outputLabel class="label" value="#{msg.EquipmentName}"/>
+                                <p:inputText value="#{budgetController.searchForm.assetName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup style="display: flex;">
+                                <p:commandButton value="#{msg.Search}"
+                                                 actionListener="#{budgetController.search}"
+                                                 update="budgetTabView"/>
+                                <p:commandButton value="#{msg.Reset}"
+                                                 actionListener="#{budgetController.resetSearch}"
+                                                 update="searchForm budgetTabView"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                </h:form>
+
+                <p:tabView class="ui-g-12" id="budgetTabView" dynamic="true" cache="false"
+                           activeIndex="#{budgetController.tabIndex}">
+                    <p:ajax event="tabChange" listener="#{budgetController.onTabChange}"/>
+                    <p:tab id="s0" title="#{msg.All}">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s1" title="#{msg.PendingApproval}">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s2" title="#{msg.ApprovalInProgress}">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s3" title="#{msg.Approved4}">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                    <p:tab id="s4" title="#{msg.NotApproved}">
+                        <ui:include src="DataList.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+
+                <ui:include src="Edit.xhtml"/>
+                <ui:include src="View.xhtml"/>
+                <ui:include src="AssetSelect.xhtml"/>
+                <ui:include src="AssetEdit.xhtml"/>
+
+            </div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>

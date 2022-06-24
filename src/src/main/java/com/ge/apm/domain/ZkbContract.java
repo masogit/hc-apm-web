@@ -1,8 +1,7 @@
-package com.ge.apm.domain;
+  package com.ge.apm.domain;
 
 import com.ge.apm.service.utils.ChineseName;
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -14,7 +13,7 @@ import java.util.*;
 /**
  * @author : 503189362
  * @date : 2020/4/16
- * @description : 合同实体类
+ * @description : 合同实体类。
  */
 @Entity
 @Table(name = "zkb_contract")
@@ -43,6 +42,10 @@ public class ZkbContract implements ChineseName, Serializable {
 
     public enum YOrNEnum{
         Y,N
+    }
+
+    public enum AssetQuotaTypeEnum{
+        t,f
     }
 
     @Id
@@ -320,6 +323,55 @@ public class ZkbContract implements ChineseName, Serializable {
 
     @Column(name = "renew_flag")
     private String renewFlag;
+
+    @Column(name = "first_year_flag")
+    private String firstYearFlag;
+
+    @Column(name = "link_contract_no")
+    private String linkContractNo;
+
+    @Column(name = "company_code")
+    private String companyCode;
+
+    /**
+     * 2022年起探头高低端名额分类
+     * t:是
+     * f:否
+     */
+    @Column(name = "asset_quota_type")
+    private String assetQuotaType;
+
+    public String getAssetQuotaType() {
+        return assetQuotaType;
+    }
+
+    public void setAssetQuotaType(String assetQuotaType) {
+        this.assetQuotaType = assetQuotaType;
+    }
+
+    public String getCompanyCode() {
+        return companyCode;
+    }
+
+    public void setCompanyCode(String companyCode) {
+        this.companyCode = companyCode;
+    }
+
+    public String getFirstYearFlag() {
+        return firstYearFlag;
+    }
+
+    public void setFirstYearFlag(String firstYearFlag) {
+        this.firstYearFlag = firstYearFlag;
+    }
+
+    public String getLinkContractNo() {
+        return linkContractNo;
+    }
+
+    public void setLinkContractNo(String linkContractNo) {
+        this.linkContractNo = linkContractNo;
+    }
 
     public Date getContractStartDate() {
         return contractStartDate;

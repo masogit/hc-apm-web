@@ -56,8 +56,11 @@
                             <label class="label">#{msg.status}</label>
                             <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
                                 <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
+<!--                                <f:selectItems value="#{workOrderMgrController.initStatus('2','3')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-
+                                <c:if test="#{userContextService.countyArea}">
+                                    <f:selectItem  itemLabel="可正常使用" itemValue="1"/>
+                                </c:if>
                             </p:selectOneRadio>
                             <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.newServiceRequest.confirmedDownTime}" showOn="button" 
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
@@ -76,7 +79,40 @@
                             <p:inputText value="#{workOrderMgrController.newServiceRequest.customerPosition}" maxlength="256" required="true" requiredMessage="医院客户职务 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
 
-
+                        <c:if test="#{userContextService.countyArea}">
+                            <h:panelGroup id="siebleNumber">
+                                <label class="label">#{msg.siebleNumber}（如填写，长度必须填为13位）</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.siebleNumber}" maxlength="13">
+                                    <p:ajax process="@this" update="@this" listener="#{workOrderMgrController.verifyDatalength(workOrderMgrController.newServiceRequest.siebleNumber,msg.siebleNumber,13)}"></p:ajax>
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.callCenterNumber}（如填写，长度必须填为10位）</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.callCenterNumber}" maxlength="10">
+                                    <p:ajax process="@this" update="@this" listener="#{workOrderMgrController.verifyDatalength(workOrderMgrController.newServiceRequest.callCenterNumber,msg.callCenterNumber,10)}"></p:ajax>
+                                </p:inputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.countyAreaOrderType}</label>
+                                <p:selectOneMenu value="#{workOrderMgrController.newServiceRequest.orderType}" >
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('countyAreaOrderType')}" var="item"
+                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">客户联系人</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.customerName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">客户电话</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.customerTel}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">医院名称</label>
+                                <p:inputText value="#{workOrderMgrController.newServiceRequest.hospitalName}" readonly="true"/>
+                            </h:panelGroup>
+                        </c:if>
                     </p:panelGrid>
                     
                     <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">

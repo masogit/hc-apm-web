@@ -122,6 +122,30 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }
     }
 
+    public Boolean qtyRender(String type){
+        if(userContextService.isZkbUser()) {
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType())){
+                if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
+                        ZkbContractQuotaLog.OrderTypeEnum.Probe.toString().equals(type) ||
+                        ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
+                ){
+                    return Boolean.FALSE;
+                }
+            }else if(ZkbContract.ContractType.Biomed.toString().equals(selected.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(selected.getContractType())){
+                if(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString().equals(type)){
+                    return Boolean.FALSE;
+                }
+            }else if(ZkbContract.ContractType.PCB.toString().equals(selected.getContractType()) || "PCB MVS".equals(selected.getContractType())){
+                if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(type) ||
+                        ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(type)
+                ){
+                    return Boolean.FALSE;
+                }
+            }
+        }
+        return Boolean.TRUE;
+    }
+
 
     public TenantInfo getTenantInfo(String tenantInfoUID){
         return zkbContractService.getTenantInfo(tenantInfoUID);
@@ -143,6 +167,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         contractCourseList = new ArrayList<>();
         zkbContractAssetList = new ArrayList<>();
     }
+
 
     public void fourInOneFlagChange(){
         if(fourInOneFlag){

@@ -6,14 +6,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.domain.pure.TableOption;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
@@ -21,6 +24,7 @@ import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -62,6 +66,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     private List<NurseSiteMaintainConfig> listSelected;
     //config
   	private NurseSiteMaintainConfigCheckItem objPairCheckItem;
+  	private NurseSiteMaintainConfigCheckItem objPairCheckItemEdit=new NurseSiteMaintainConfigCheckItem();
   	private List<AssetInfo> listCheckAssets;
   	private List<OrgInfo> listOrgInfo;
   	private List<String> listCheckDate;
@@ -70,7 +75,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<NurseSiteMaintainCheckItem> listWholeCheckItems;
   	private List<NurseSiteMaintainCheckItem> listSelectedCheckItems;
   	private List<NurseSiteMaintainConfigCheckItem> listPairCheckItems;
-  	
+  	private TableOption tableOption;
   	//input
   	private String assetInfoName;
   	private Integer assetGroup;
@@ -140,6 +145,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 		//need list or set
 		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listOrgUid, "1*"));
+		searchFilters.add(new SearchFilter("deleted", SearchFilter.Operator.EQ, false));
         Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
         return pageResult;
     }
@@ -185,16 +191,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     public void delete() {
     	// TODO Auto-generated method stub
   
-    	if(this.listSelected!=null && this.listSelected.size()>0){
-    		for(int i=0;i<listSelected.size();++i){
-    			NurseSiteMaintainConfig tempConfig=listSelected.get(i);
-    			boolean result=nurseSiteMaintainService.deleteMaintainConfig(tempConfig);
-    			if(!result){
-    				WebUtil.addSuccessMessage("配置 "+tempConfig.getName()+" 有工单存在不能删除！");
-    			}
-    		}
-    	}
-    	WebUtil.addSuccessMessage("操作完毕！");
+    	if(CollectionUtils.isEmpty(this.listSelected)){
+			WebUtil.addErrorMessage("请至少选择一条数据！");
+			return;
+		}
+		nurseSiteMaintainService.deleteMaintainConfig(listSelected,currentUser);
+		WebUtil.addSuccessMessage("操作完毕！");
     	if(this.listSelected!=null){
     		this.listSelected.clear();
     	}
@@ -432,6 +434,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			nurseSiteMaintainConfig.setModifyBy(currentUser);
 			nurseSiteMaintainConfig.setModifyByUid(currentUser.getUid());
 			nurseSiteMaintainConfig.setModifyDate(currentDate);
+			nurseSiteMaintainConfig.setDeleted(false);
 		}
 		else{
 			nurseSiteMaintainConfig.setModifyBy(currentUser);
@@ -511,6 +514,17 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			// TODO: handle exception
 			isSaveDisable=true;
 			LOGGER.error("checkSaveDisable"+e.getMessage());
+		}
+	}
+
+	public void applyChange(int type){
+		Boolean applyDirectly = this.selected.getApplyDirectly();
+		Boolean applyFeatureData = this.selected.getApplyFeatureData();
+		if(type == 1 && applyDirectly){
+			this.selected.setApplyFeatureData(false);
+		}
+		if(type == 2 && applyFeatureData){
+			this.selected.setApplyDirectly(false);
 		}
 	}
 	
@@ -662,9 +676,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		if(objPairCheckItem==null){
 			initObjPairCheckItem();
 		}
+
 		return objPairCheckItem;
 	}
-
+//	public void  createObjCheckItem(){
+//		this.objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
+//	}
 	public void setObjCheckItem(NurseSiteMaintainConfigCheckItem objCheckItem) {
 		this.objPairCheckItem = objCheckItem;
 	}
@@ -843,5 +860,52 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.listSelectedCheckItems = listSelectedCheckItems;
 	}
 
-	
+//	public TableOption getTableOption() {
+//		return tableOption;
+//	}
+//
+//	public void setTableOption(TableOption tableOption) {
+//		this.tableOption = tableOption;
+//	}
+//	public void addOption() {
+//		List<TableOption> options = objPairCheckItem.getOptions();
+//		for (TableOption tableOption1 : options) {
+//			if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
+//				tableOption1.setValue(tableOption.getValue());
+//				tableOption=null;
+//				return ;
+//			}
+//		}
+//		options.add(tableOption);
+//		tableOption=null;
+//	}
+//	public void prepareAddOption(){
+//		tableOption=new TableOption();
+//	}
+//	public void prepareEditOption(TableOption option) {
+//		tableOption = option;
+//	}
+//
+//	public void removeOption(TableOption option) {
+//		List<TableOption> options = objPairCheckItem.getOptions();
+//		List<TableOption> collect = options.stream().filter(item -> {
+//			String key = item.getKey();
+//			return key != null && !key.equals(option.getKey());
+//		}).collect(Collectors.toList());
+//		objPairCheckItem.setOptions(collect);
+//	}
+//	public void onRuleChange(){
+//		objPairCheckItem.setDefaultValue(null);
+//	}
+//	public boolean dateType(){
+//    	if(objPairCheckItem != null){
+//			return "Date".equals(objPairCheckItem.getFieldType());
+//		}else{
+//    		return false;
+//		}
+//	}
+//
+//	public void recover(){
+//    	BeanUtils.copyProperties(objPairCheckItemEdit,objPairCheckItem);
+//	}
 }

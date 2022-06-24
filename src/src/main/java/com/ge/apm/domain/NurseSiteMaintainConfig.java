@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * Created by 503035627 on 2018/3/7.
  */
 @Entity
-@Table(name = "nurse_site_maintain_config",indexes = {@Index(columnList = "id"),@Index(columnList = "asset_uid")})
+@Table(name = "nurse_site_maintain_config",indexes = {@Index(columnList = "id")})
 public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainConfig.class);
 	private static final long serialVersionUID = 1L;
@@ -90,6 +90,25 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 	
 	@Column(name="apply_directly")
 	private Boolean applyDirectly=false;
+
+	//修改将来未完成检查
+	@Column(name="apply_feature_data")
+	private Boolean applyFeatureData=false;
+
+	//修改将来未完成检查
+	@Column(name="apply_feature_time")
+	private Date applyFeatureTime;
+
+	// 记录页面选择的是 覆盖历史未完成检查 还是 修改将来未完成检查
+	@Transient
+	private Integer selectApplyType;
+
+	@Column(name = "deleted")
+	private Boolean deleted;
+
+	// 删除结果，用于定时任务删除已创建未完成的将来工单
+	@Column(name = "delete_result")
+	private Boolean deleteResult;
 
 	public String getId() {
 		return id;
@@ -241,6 +260,36 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 		this.applyDirectly = applyDirectly;
 	}
 
+	public Boolean getApplyFeatureData() {
+		if(applyFeatureData==null){
+			applyFeatureData=false;
+		}
+		return applyFeatureData;
+	}
+
+	public void setApplyFeatureData(Boolean applyFeatureData) {
+		if(applyFeatureData==null){
+			applyFeatureData=false;
+		}
+		this.applyFeatureData = applyFeatureData;
+	}
+
+	public Date getApplyFeatureTime() {
+		return applyFeatureTime;
+	}
+
+	public void setApplyFeatureTime(Date applyFeatureTime) {
+		this.applyFeatureTime = applyFeatureTime;
+	}
+
+	public Integer getSelectApplyType() {
+		return selectApplyType;
+	}
+
+	public void setSelectApplyType(Integer selectApplyType) {
+		this.selectApplyType = selectApplyType;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = 0;
@@ -282,5 +331,21 @@ public class NurseSiteMaintainConfig implements Serializable,Cloneable {
 			LOGGER.error(e.getMessage());
 		}
 		return temp;
+	}
+
+	public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public Boolean getDeleteResult() {
+		return deleteResult;
+	}
+
+	public void setDeleteResult(Boolean deleteResult) {
+		this.deleteResult = deleteResult;
 	}
 }

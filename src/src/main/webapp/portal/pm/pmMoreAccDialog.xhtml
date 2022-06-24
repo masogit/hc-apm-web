@@ -19,6 +19,8 @@
                             <label class="label">#{msg.PartQuantity}*</label>
                             <p:inputNumber  maxValue="999"  decimalPlaces="0"  id="apartsQuantity1" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
                             <f:convertNumber pattern="0" type="number"/>
+                                <p:ajax listener="#{v2PmOrderController.partsQuantity1Update()}" update="@(.hetongjia)" >
+                                </p:ajax>
                             </p:inputNumber>
                         </h:panelGroup>
 
@@ -107,8 +109,8 @@
             <!-- =================================启用集成工单时===============================-->
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workOrderMgrController.isEnableIntegrationWithWorkOrder()}">
                         <h:panelGroup>
-                            <label class="label">#{msg.PartType}</label>
-                            <p:selectOneMenu value="#{v2PmOrderController.itemDetail.partsType}">
+                            <label class="label">#{msg.PartType}*</label>
+                            <p:selectOneMenu value="#{v2PmOrderController.itemDetail.partsType}" required="true" requiredMessage="备件类别不能为空！">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                                 <p:ajax event="itemSelect"  update="pmmoreAccDialogForm" listener="#{v2PmOrderController.changeStatus()}"/>
@@ -123,7 +125,7 @@
                                             completeMethod="#{v2PmOrderController.autosparePartName()}"
                                             var="item" itemLabel="#{item.name}"
                                             itemValue="#{item}"
-                                            converter="simplePartsItemConverter">
+                                            converter="simplePartsItemConverter" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
                                 <p:ajax event="itemSelect"
                                         listener="#{v2PmOrderController.onSparePartsValueChange}"
                                         update="pmmoreAccDialogForm"/>
@@ -142,11 +144,16 @@
                                             completeMethod="#{v2PmOrderController.initSparePartsMaster()}"
                                             var="item" itemLabel="#{item.name}"
                                             itemValue="#{item}"
-                                            converter="simplePartsItemConverter">
+                                            converter="simplePartsItemConverter" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
                                 <p:ajax event="itemSelect"
                                         listener="#{v2PmOrderController.onSparePartsMasterValueChange}"
                                         update="pmmoreAccDialogForm"/>
                             </p:autoComplete>
+                        </h:panelGroup>
+                        <h:panelGroup id="itemCode" rendered="#{userContextService.isCountyArea()}">
+                            <label class="label">备件编号</label>
+                            <p:inputText readonly="true"
+                                         value="#{v2PmOrderController.getPartsItemCode(null)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.PartQuantity}*</label>
@@ -235,6 +242,12 @@
                             <p:inputTextarea id="area1" value="#{v2PmOrderController.itemDetail.comment}"/>
                         </h:panelGroup>
 
+                    </p:panelGrid>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userContextService.isCountyArea()}">
+                        <h:panelGroup>
+                            <label class="label">备件描述</label>
+                            <p:inputTextarea rows="1" cols="100" value="#{v2PmOrderController.itemDetail.partsDescription}"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>

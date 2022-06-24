@@ -3,11 +3,10 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.dao.MeasuringTypeConfigRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.MeasuringCertificateDetail;
-import com.ge.apm.domain.MeasuringTypeConfig;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -53,6 +52,7 @@ public class MeasuringService {
     private final String HEADER_REMARK = "备注";
     //private final String HEADER_OVERDUE = "过期否";
     private final String HEADER_FILE_NO = "存档记录";
+    private final String HEADER_QR_CODE = "二维码";
 
     @Autowired
     private MeasuringCertificateDetailRepository measuringCertificateDetailDao;
@@ -60,6 +60,9 @@ public class MeasuringService {
     private AssetInfoRepository assetInfoDao;
     @Autowired
     private MeasuringTypeConfigRepository measuringTypeConfigDao;
+
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -89,6 +92,20 @@ public class MeasuringService {
                     flag = true;
                 }else{
                     errorInfo += "[资产编号匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                }
+            }
+        }
+
+        // YHAAO-13151 如果资产编号和设备序列号都不能匹配到资产设备，使用二维码匹配
+        if(null != measuringCertificateDetail.getQrCode() && !flag){
+            tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                errorInfo += "[二维码不能匹配到设备]";
+            }else{
+                if(tempAssetInfoList.size() == 1){
+                    flag = true;
+                }else{
+                    errorInfo += "[二维码匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
                 }
             }
         }
@@ -149,6 +166,8 @@ public class MeasuringService {
             tempAssetInfo.setNextMeteringDate(nextMeteringDate);
             tempAssetInfo.setLastMeteringDate(checkDate);
             tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
+            // 上次检测单位
+            tempAssetInfo.setLastCheckCompany(needUpdateAssetMcd.getCheckCompany());
             if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
                 tempAssetInfo.setUsageStatus(2);//停用
                 tempAssetInfo.setStatus(5);
@@ -168,11 +187,147 @@ public class MeasuringService {
         }
     }
 
+
+    public MeasuringCertificateDetail operateMeasuringAndAssetInfo_For_ShaoYiFu(MeasuringCertificateDetail measuringCertificateDetail) {
+        boolean flag = false;
+        AssetInfo tempAssetInfo = null;
+        String errorInfo = "";
+        List<AssetInfo> tempAssetInfoList = null;
+
+        if(null != measuringCertificateDetail.getFinanceNo() && !"".equals(measuringCertificateDetail.getFinanceNo())){
+            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList.size() == 1){
+                flag = true;
+            } else {
+                //开始匹配sn号
+                tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
+                if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                    errorInfo += "[资产编号不能匹配到设备]";
+                }else if(tempAssetInfoList.size() == 1){
+                    flag = true;
+                }else{
+                    errorInfo += "[资产编号匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                }
+            }
+        }
+        if(!flag && (null != measuringCertificateDetail.getAssetSN() && !"".equals(measuringCertificateDetail.getAssetSN()))){
+            tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                errorInfo += "[设备序列号SN不能匹配到资产设备]";
+            }else{
+                if(tempAssetInfoList.size() == 1){
+                    errorInfo = "";
+                    flag = true;
+                }else{
+                    errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                }
+            }
+        }
+        // YHAAO-13151 如果资产编号和设备序列号都不能匹配到资产设备，使用二维码匹配
+        if(!flag && (null != measuringCertificateDetail.getQrCode() && !"".equals(measuringCertificateDetail.getQrCode()))){
+            tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                errorInfo += "[二维码不能匹配到资产设备]";
+            }else{
+                if(tempAssetInfoList.size() == 1){
+                    errorInfo = "";
+                    flag = true;
+                }else{
+                    errorInfo += "[二维码匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                }
+            }
+        }
+        else if ((null == measuringCertificateDetail.getFinanceNo() || "".equals(measuringCertificateDetail.getFinanceNo()))
+                && (null == measuringCertificateDetail.getAssetSN() || "".equals(measuringCertificateDetail.getAssetSN()))
+                && null == measuringCertificateDetail.getQrCode() || "".equals(measuringCertificateDetail.getQrCode())){
+            errorInfo += "[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]";
+        }
+
+        if(flag){
+            if(tempAssetInfoList.size() == 1){
+                tempAssetInfo = tempAssetInfoList.get(0);
+            }
+        }
+
+        if(tempAssetInfo != null){
+            List<MeasuringCertificateDetail> mcdList = null;
+            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
+
+            if(measuringCertificateDetail.getCertificateNo() != null){
+                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
+            }
+
+            if(mcdList == null || mcdList.isEmpty()){
+                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
+            }
+
+            //如果查询到具体的计量记录,做更新操作，否则新增计量记录
+            if(mcdList != null && !mcdList.isEmpty()) {
+                MeasuringCertificateDetail tempMcd = mcdList.get(0);
+                measuringCertificateDetail.setId(tempMcd.getId());
+            }
+
+            measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
+            measuringCertificateDetailDao.save(measuringCertificateDetail);
+
+            //目标设备的所有计量记录
+            List<MeasuringCertificateDetail> allMcdList = measuringCertificateDetailDao.findByAssetUIDAndTenantUIDOrderByCheckDateDesc(tempAssetInfo.getUid(), measuringCertificateDetail.getTenantUID());
+            if(allMcdList != null && !allMcdList.isEmpty()){
+                //目标设备的所有计量记录中计量日期最大的记录
+                MeasuringCertificateDetail maxMcd = allMcdList.get(0);
+
+                if(measuringCertificateDetail.getCheckDate().before(maxMcd.getCheckDate())){
+
+                    needUpdateAssetMcd = maxMcd;
+
+                }
+            }
+
+            Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
+            Date checkDate = needUpdateAssetMcd.getCheckDate();
+            if(UserContextService.hasCurrentTenantName("")){
+                if(checkDate != null && nextMeteringDate == null && tempAssetInfo.getMeasuringItemCategory() != null){
+                    MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndSiteUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getSiteUID());
+                    Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
+                    if(measureCycle != null && measureCycle > 0){//云南省阜外心血管病医院 下次计量日期=上次计量日期+周期（月）
+                        nextMeteringDate = DateUtil.addMonth(checkDate,measureCycle);
+                    }
+                }
+            }
+
+            //更新设备台账
+            tempAssetInfo.setNextMeteringDate(nextMeteringDate);
+            tempAssetInfo.setLastMeteringDate(checkDate);
+            tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
+            // 上次检测单位
+            tempAssetInfo.setLastCheckCompany(needUpdateAssetMcd.getCheckCompany());
+            if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
+                tempAssetInfo.setUsageStatus(2);//停用
+                tempAssetInfo.setStatus(5);
+            }
+
+            tempAssetInfo.setMeasuringType(needUpdateAssetMcd.getType());
+
+            assetInfoDao.save(tempAssetInfo);
+
+        }
+
+        if(!flag){
+            measuringCertificateDetail.setErrorInfo(errorInfo);
+            return measuringCertificateDetail;
+        }else{
+            return null;
+        }
+    }
+
+
     private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum, String siteUID){
         List<AssetInfo> tempAssetInfoList = null;
 
         if(!StringHelper.isNullOrEmptyString(financingNum)){
-            tempAssetInfoList = assetInfoDao.getByFinancingNumAndSiteUID(financingNum, siteUID);
+            //getByFinancingNumAndSiteUID 方法暂时废弃 使用getByFinancingNumAndSiteUID_ForDbTable
+//            tempAssetInfoList = assetInfoDao.getByFinancingNumAndSiteUID(financingNum, siteUID);
+            tempAssetInfoList = assetInfoDao.getByFinancingNumAndSiteUID_ForDbTable(financingNum, siteUID);
         }
 
         return tempAssetInfoList;
@@ -182,7 +337,20 @@ public class MeasuringService {
         List<AssetInfo> tempAssetInfoList = null;
 
         if(!StringHelper.isNullOrEmptyString(serialNum)){
-            tempAssetInfoList = assetInfoDao.getBySerialNumAndSiteUID(serialNum, siteUID);
+            //excel 报表导出需要忽略大小写 所以使用jpa原生sql 加了ILIKE关键字( getBySerialNumAndSiteUID 方法是原本的业务，目前改为 getBySerialNumAndSiteUID_ForDbTable 业务)
+//            tempAssetInfoList = assetInfoDao.getBySerialNumAndSiteUID(serialNum, siteUID);
+            tempAssetInfoList = assetInfoDao.getBySerialNumAndSiteUID_ForDbTable(serialNum, siteUID);
+        }
+
+        return tempAssetInfoList;
+    }
+
+    private List<AssetInfo> getAssetInfoByQrCode(String qrCode, String siteUID){
+        List<AssetInfo> tempAssetInfoList = null;
+
+        if(!StringHelper.isNullOrEmptyString(qrCode)){
+            //excel 报表导出需要忽略大小写 所以使用jpa原生sql 加了ILIKE关键字( getByQrCodeAndSiteUID 方法是原本的业务，目前改为 getByQrCodeAndSiteUID_ForDbTable 业务)
+            tempAssetInfoList = assetInfoDao.getByQrCodeAndSiteUID_ForDbTable(qrCode, siteUID);
         }
 
         return tempAssetInfoList;
@@ -285,6 +453,9 @@ public class MeasuringService {
                 if(row.getCell(header.get("FILE_NO_CELL")) != null) {
                     detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
                 }
+                if(row.getCell(header.get("QR_CODE_CELL")) != null) {
+                    detail.setQrCode(CellType.NUMERIC.equals(row.getCell(header.get("QR_CODE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("QR_CODE_CELL")).getNumericCellValue()) : row.getCell(header.get("QR_CODE_CELL")).getStringCellValue());
+                }
                 detail.setStatusDisplay(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue());
                 Integer status = 3;
                 if (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) != null) {
@@ -317,10 +488,11 @@ public class MeasuringService {
                     errorInfo += "[有效期至不能超过99999/12/31]";
                 }
 
-                //检定日期不能为空，设备序列号和资产编号不能全为空
-                if (row == null || !errorInfo.equals("") || row.getCell(header.get("VERIFICATION_DATE_CELL")) == null || (row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null)) {
-                    if(row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null){
-                        errorInfo += "[(设备序列号SN)和(资产编号)不能同时为空]";
+                //检定日期不能为空，设备序列号和资产编号 二维码 不能全为空
+                if (row == null || !errorInfo.equals("") || row.getCell(header.get("VERIFICATION_DATE_CELL")) == null ||
+                        (row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null && row.getCell(header.get("QR_CODE_CELL")) == null)) {
+                    if(row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null && row.getCell(header.get("QR_CODE_CELL")) == null){
+                        errorInfo += "[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]";
                     }
                     if(row.getCell(header.get("VERIFICATION_DATE_CELL")) == null){
                         errorInfo += "[检定日期不能为空]";
@@ -329,13 +501,30 @@ public class MeasuringService {
                     tempMCDList.add(detail);
                     continue;
                 }
-
-                if(operateMeasuringAndAssetInfo(detail) != null){
-                    tempMCDList.add(detail);
+                //如果是邵逸夫医院
+                if(isShaoYiFu()){
+                    if(operateMeasuringAndAssetInfo_For_ShaoYiFu(detail) != null){
+                        tempMCDList.add(detail);
+                    }
+                }else{
+                    //除邵逸夫其他的医院逻辑(其他的医院逻辑不变)
+                    if(operateMeasuringAndAssetInfo(detail) != null){
+                        tempMCDList.add(detail);
+                    }
                 }
             }
         //}
         return tempMCDList;
+    }
+
+
+    //判断是否是邵逸夫医院
+    public Boolean isShaoYiFu(){
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+        if("3".equals(tenantInfo.getCustomTenant())){
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
     private HSSFSheet handleSheet(HSSFSheet sheet) {
@@ -368,6 +557,7 @@ public class MeasuringService {
             boolean hasRemark = false;
             //boolean hasOverdue = false;
             boolean hasFileNo = false;
+            boolean hasQrCode = false;
 
             for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
                 HSSFCell cell = row.getCell(j);
@@ -394,6 +584,7 @@ public class MeasuringService {
                     hasRemark = HEADER_REMARK.equals(cell.getStringCellValue()) ? true : hasRemark;
                     //hasOverdue = HEADER_OVERDUE.equals(cell.getStringCellValue()) ? true : hasOverdue;
                     hasFileNo = HEADER_FILE_NO.equals(cell.getStringCellValue()) ? true : hasFileNo;
+                    hasQrCode = HEADER_QR_CODE.equals(cell.getStringCellValue()) ? true : hasQrCode;
                     switch (cell.getStringCellValue()) {
                         case HEADER_CERTIFICATION_NO:
                             hasCertificationNo = true;
@@ -470,6 +661,10 @@ public class MeasuringService {
                         case HEADER_FILE_NO:
                             hasFileNo = true;
                             header.put("FILE_NO_CELL", j);
+                            break;
+                        case HEADER_QR_CODE:
+                            hasQrCode = true;
+                            header.put("QR_CODE_CELL", j);
                             break;
                         default:
                             break;

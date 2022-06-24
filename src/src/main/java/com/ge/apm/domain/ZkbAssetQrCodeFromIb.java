@@ -54,6 +54,34 @@ public class ZkbAssetQrCodeFromIb {
     @Column(name = "update_date")
     private Date updateDate;
 
+    /**
+     * t:是 f：否  空值表示不确定
+     */
+    @Column(name = "ge_upload_flag")
+    private String geUploadFlag;
+
+    /**
+     * 装机状态  0-Installed 1-Shipped  2-Deinstalled
+     */
+    @Column(name = "install_status")
+    private Integer installStatus;
+
+    public Integer getInstallStatus() {
+        return installStatus;
+    }
+
+    public void setInstallStatus(Integer installStatus) {
+        this.installStatus = installStatus;
+    }
+
+    public String getGeUploadFlag() {
+        return geUploadFlag;
+    }
+
+    public void setGeUploadFlag(String geUploadFlag) {
+        this.geUploadFlag = geUploadFlag;
+    }
+
     public Date getCreatedDate() {
         return createdDate;
     }

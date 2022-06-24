@@ -108,6 +108,10 @@ public class AssetInstallationController {
     @Setter
     private UserAccount useOwner;
     private AutoCompleteService autoCompleteService;
+    @Getter @Setter
+    private Map<String, Object> selectedObjectMap = new HashMap();
+    @Getter
+    private TreeNode orgTree;
 //    private String currentQrCode;
 
     private ConfigService configService;
@@ -141,6 +145,9 @@ public class AssetInstallationController {
     private CustomConfigObject customConfig;
 
     private SupplierService supplierService;
+    private OrgInfoRepository orgInfoRepository;
+
+    private ArrivalList arrivalList;
 
     @PostConstruct
     protected void init() {
@@ -163,7 +170,7 @@ public class AssetInstallationController {
         uaaService = WebUtil.getBean(UaaService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         assetInstallationReportService = WebUtil.getBean(AssetInstallationReportService.class);
-
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
@@ -190,8 +197,18 @@ public class AssetInstallationController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
 
-        deptInfoList = uaaService.getClinicalDeptListBySiteUID(arrivalListItem.getArrivalList().getSiteUID());
-        attachList = aiService.getPicList(arrivalListItem.getArrivalList().getId());
+        arrivalList = arrivalListItem.getArrivalList();
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(arrivalList.getSiteUID());
+        String contractNum = arrivalList.getContractNum();
+        supplierService = WebUtil.getBean(SupplierService.class);
+        if(activeSupplier() && contractNum != null){
+            Set<String> ids = new HashSet<>();
+            ids.add(arrivalList.getId());
+            ids.add(contractNum);
+            attachList = aiService.getPartPictures(ids);
+        }else{
+            attachList = aiService.getPicList(arrivalList.getId());
+        }
         attachList.addAll(aiService.getPicList(arrivalListItem.getId()));
         initGbTree();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -200,7 +217,19 @@ public class AssetInstallationController {
             parentAssetInfo = assetDao.findById(arrivalListItem.getParentAssetId());
         }
         getParentAssetList();
-        supplierService = WebUtil.getBean(SupplierService.class);
+        selectedObjectMap.put("selectedOrg", orgInfoRepository.findByUid(arrivalList.getSiteUID()));
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        selectedObjectMap.put("selectedOrg", orgInfo);
+        arrivalList.setTenantUID(orgInfo.getTenantUID());
+        arrivalList.setInstitutionUID(orgInfo.getInstitutionUID());
+        arrivalList.setHospitalUID(orgInfo.getHospitalUID());
+        arrivalList.setSiteUID(orgInfo.getSiteUID());
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(orgInfo.getUid());
+        clearClinicalDept();
     }
 
     private void initOwner() {
@@ -264,7 +293,7 @@ public class AssetInstallationController {
     }
 
     public String finishInstall() {
-
+        arrivalListDao.save(arrivalList);//由于更新了院区，所以要重新保存一下，供定时任务获取
         Boolean isValidate = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
@@ -424,10 +453,9 @@ public class AssetInstallationController {
                                 //通过assetinfo中的uid值，获取到id值保存到集合
                                 RelRuleAssetController.assetInfoUids=assetIds;
                                 return "/portal/asset/arrived/ItemEdit2?faces-redirect=true";
-                            }else{
-                                return "/portal/reporter/schemaList?faces-redirect=true";
                             }
                         }
+                        return "/portal/reporter/schemaList?faces-redirect=true";
                     }else{
                         return "/portal/reporter/schemaList?faces-redirect=true";
                     }
@@ -651,6 +679,9 @@ public class AssetInstallationController {
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalListItem);
             blobObject.setBoUuid(arrivalListItem.getId());
+//            if(activeSupplier()){//已激活的供应商：使用合同号作为BoUuid
+//                blobObject.setBoUuid(arrivalListItem.getArrivalList().getContractNum());
+//            }
             blobObject.setBoSubType(typeName);
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
@@ -924,6 +955,11 @@ public class AssetInstallationController {
             getClinicalOwnerList();
             parentAssetList = getParentAssetList();
         }
+    }
+
+    public void clearClinicalDept() {
+        deptName = null;
+        arrivalListItem.setClinicalDeptUID(null);
     }
 
     public void onParentAssetInfoChange() {

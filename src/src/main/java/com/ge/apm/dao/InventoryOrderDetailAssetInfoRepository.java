@@ -2,7 +2,9 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.InventoryOrderDetail;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
@@ -38,5 +40,8 @@ public interface InventoryOrderDetailAssetInfoRepository extends GenericReposito
 
     @Query(value = "SELECT * FROM inventory_order_detail   WHERE asset_id =?1 ORDER BY last_modified_date DESC LIMIT 1 ",nativeQuery = true)
     List<InventoryOrderDetail> findProjectionByAssetId(Integer assetId);
-
+    @Modifying
+    @Transactional
+    @Query(value = "delete from inventory_order_detail where id in ?1",nativeQuery = true)
+    Integer deleteById(List<String> ids);
 }

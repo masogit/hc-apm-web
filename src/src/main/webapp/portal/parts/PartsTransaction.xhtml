@@ -27,12 +27,17 @@
 
                     <h:panelGrid id="buttonSearchList" columns="12" cellpadding="5">
                         <p:inputText id="searchText" value="#{simplePartsTransactionController.oneSearchStr}"
-                                     placeholder="备件名称/申请单编"
-                                     maxlength="105" style="width: 360px">
+                                     placeholder="备件名称/申请单编号"
+                                     maxlength="105" style="width: 360px" rendered="#{!userContextService.countyArea}">
                             <p:ajax event="keyup"
                                     update=":SparePartsInventoryListForm:datalist searchButtons"/>
                         </p:inputText>
-
+                        <p:inputText id="searchText2" value="#{simplePartsTransactionController.oneSearchStr}"
+                                     placeholder="备件名称/申请单编号/工单编号"
+                                     maxlength="105" style="width: 360px" rendered="#{userContextService.countyArea}">
+                            <p:ajax event="keyup"
+                                    update=":SparePartsInventoryListForm:datalist searchButtons"/>
+                        </p:inputText>
                         <h:panelGroup id='searchButtons'>
                             <p:commandButton style="zoom:0.8" icon="ui-icon-search"
                                              class="btn btn-sm btn-gray"
@@ -56,6 +61,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="rowSelect" update="exportDocButton" />
                         <p:ajax event="filter" listener="#{simplePartsTransactionController.onFilter}"/>
                         <p:ajax event="page" oncomplete="rc2();"/>
                         <p:column headerText="备件名称" sortBy="#{item.name}" filterBy="#{item.name}"
@@ -67,7 +73,9 @@
                                   filterBy="#{item.requestCode}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.requestCode}"/>
                         </p:column>
-
+                        <p:column headerText="工单号" rendered="#{userContextService.isCountyArea()}">
+                            <h:outputText value="#{simplePartsTransactionController.getMaintenanceWorkOrderNumber(item.partsRequestId)}"/>
+                        </p:column>
                         <p:column headerText="申请单类型" sortBy="#{item.requestType}"
                                   filterBy="#{item.requestType}" filterMatchMode="EQ">
 
@@ -99,7 +107,12 @@
                         <p:column headerText="备件总价" sortBy="#{item.totalPrice}">
                             <h:outputText value="#{item.totalPrice}"/>
                         </p:column>
-
+                        <c:if test="#{userContextService.isCountyArea()}">
+                            <p:column headerText="收货信息" sortBy="#{item.addressInfo}" filterBy="#{item.addressInfo}"
+                                      filterMatchMode="LIKE">
+                                <h:outputText value="#{item.addressInfo}"/>
+                            </p:column>
+                        </c:if>
                         <c:if test="#{simplePartsTransactionController.queryIndex == 1}">
                             <p:column headerText="出库仓库">
                                 <h:outputText
@@ -110,12 +123,23 @@
                                         value="#{simplePartsTransactionController.getLocator(item.partsLocatorId)}"/>
                             </p:column>
                             <p:column headerText="出库时间" sortBy="#{item.createdDate}">
-                                <h:outputText value="#{item.createdDate}"/>
+                                <h:outputText value="#{item.createdDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
                             </p:column>
 
                             <p:column headerText="出库人">
                                 <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
+                            <c:if test="#{userContextService.isCountyArea()}">
+                                <p:column headerText="运单号" >
+                                    <h:outputText value="#{item.transportNo }"/>
+                                </p:column>
+
+                                <p:column headerText="运输公司">
+                                    <h:outputText value="#{item.transportCompany}"/>
+                                </p:column>
+                            </c:if>
                         </c:if>
                         <c:if test="#{simplePartsTransactionController.queryIndex == 0}">
                             <p:column headerText="入库仓库">
@@ -127,16 +151,32 @@
                                         value="#{simplePartsTransactionController.getLocator(item.partsLocatorId)}"/>
                             </p:column>
                             <p:column headerText="入库时间" sortBy="#{item.createdDate}">
-                                <h:outputText value="#{item.createdDate}"/>
+                                <h:outputText value="#{item.createdDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
                             </p:column>
 
                             <p:column headerText="入库人">
                                 <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
+                            <c:if test="#{userContextService.isCountyArea()}">
+                                <p:column headerText="入库类型" >
+                                    <h:outputText value="#{simplePartsTransactionController.switchStorageType(item.storageType)}"/>
+                                </p:column>
+
+                                <p:column headerText="备注">
+                                    <h:outputText value="#{item.comments}"/>
+                                </p:column>
+                            </c:if>
                         </c:if>
                         <p:column headerText="院区" sortBy="#{item.siteUID}">
                             <h:outputText value="#{simplePartsTransactionController.switchSiteName(item.siteUID)}"/>
                         </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="exportDocButton" title="导出选中记录到DOC" icon="ui-icon-arrowstop-1-s" ajax="false" class="btn btn-sm btn-gray" actionListener="#{simplePartsTransactionController.exportReportDocx()}" update="datalist" disabled="#{empty simplePartsTransactionController.selected}" rendered="#{userContextService.isCountyArea() and simplePartsTransactionController.queryIndex == 1}">
+                                <p:fileDownload value="#{simplePartsTransactionController.exportFile}" />
+                            </p:commandButton>
+                        </f:facet>
                     </p:dataTable>
                     <p:remoteCommand name="rc2" update=":SparePartsInventoryListForm:datalist"/>
                 </h:form>

@@ -167,6 +167,9 @@ public class WorkOrderReportExportController implements Serializable {
         if(!userContextService.isLocale()){
              fileName = "APM_WorkOrder_Template_en.xlsx";
         }
+
+        workOrderdata = workOrderExportService.supplementWorkOrder(workOrderdata);
+
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExport/" + fileName);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
@@ -229,6 +232,7 @@ public class WorkOrderReportExportController implements Serializable {
             WebUtil.addErrorMessage(WebUtil.getMessage("NotSelectTheRecordsThatNeedToBeExported"));
             return;
         }
+        data = workOrderExportService.supplementWorkOrder(data);
         try {
             byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(isInsulate, currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
             WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
@@ -289,7 +293,8 @@ public class WorkOrderReportExportController implements Serializable {
 
 
             //workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
-            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId);
+//            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId);
+            workOrderList = workOrderExportService.createPreviewWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId);
         }
 
     }

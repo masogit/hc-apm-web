@@ -44,6 +44,12 @@
                         <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column>
+                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.qrCode}" sortBy="#{item.assetInfo.qrCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.qrCode}"/>
+                        </p:column>
                         <p:column headerText="设备型号" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.functionType}"/>
                         </p:column>
@@ -79,7 +85,8 @@
                             <h:outputText value="#{item.objectName}"/>
                         </p:column>
                         <p:column headerText="#{msg.download}" exportable="false">
-                            <p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}" rendered="#{'vlink' ne item.boSubType}">下载</p:link>
+                            <!--<p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}" rendered="#{'vlink' ne item.boSubType}">下载</p:link>-->
+                            <p:commandLink value="#{msg.download}" ajax="false" actionListener="#{assetFileAttachmentController.downloadDocument(item.objectStorageId)}"/>
                             <p:link href="#{item.extLink}" target="_blank" rendered="#{'vlink' eq item.boSubType}">打开</p:link>
                         </p:column>
                         <f:facet name="{Toolbar}">

@@ -86,6 +86,12 @@ public class ZkbAssetQrCodeInfo {
      */
     @Column(name = "ib_qr_code_state")
     private String ibQrCodeState;
+
+    /**
+     * ib是否GE已贴一机一码（Y/N）
+     */
+    @Column(name = "ge_flag")
+    private String geFlag;
     /**
      * 是否已贴旧二维码（Y/N）
      */
@@ -105,10 +111,16 @@ public class ZkbAssetQrCodeInfo {
     private Date qrCodeDate;
 
     /**
-     * 临时存储
+     * 临时存储（忘记加@Transient注解，导致数据库创建不规范字段ibqrcodetemporary，@Column是后面补上）
      */
     @Column(name = "ibqrcodetemporary")
     private Boolean ibQrCodeTemporary;
+
+    /**
+     * 装机状态 0-Installed 1-Shipped 2-Deinstalled
+     */
+    @Column(name = "install_status")
+    private Integer installStatus;
 
     public String getId() {
         return id;
@@ -252,6 +264,22 @@ public class ZkbAssetQrCodeInfo {
 
     public void setClinicalDeptUID(String clinicalDeptUID) {
         this.clinicalDeptUID = clinicalDeptUID;
+    }
+
+    public String getGeFlag() {
+        return geFlag;
+    }
+
+    public void setGeFlag(String geFlag) {
+        this.geFlag = geFlag;
+    }
+
+    public Integer getInstallStatus() {
+        return installStatus;
+    }
+
+    public void setInstallStatus(Integer installStatus) {
+        this.installStatus = installStatus;
     }
 
     @Override

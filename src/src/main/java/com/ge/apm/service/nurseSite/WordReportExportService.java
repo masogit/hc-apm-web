@@ -47,7 +47,13 @@ public class WordReportExportService {
         List<byte[]> reports= null;
         Map<String,List<NurseSiteMaintain>>listMap = new LinkedHashMap<>();
         for (NurseSiteMaintain maintain : listMaintain) {
-            String name = maintain.getName();
+            String name;
+            Integer sequence = maintain.getSequence();
+            if (sequence==0){
+                 name = maintain.getName();
+            }else {
+                 name = maintain.getName()+"-"+sequence;
+            }
             if(listMap.containsKey(name)){
                 listMap.get(name).add(maintain);
                 listMap.put(name,listMap.get(name));
@@ -155,6 +161,204 @@ public class WordReportExportService {
         }
 
         return zip(reportMapMap);
+    }
+
+    public byte[] writeMaintainHistoryDetailToDocx( List<NurseSiteMaintainHistory> listMaintain) throws IOException {
+
+        if (listMaintain.isEmpty()) {
+            throw new IllegalStateException("所选检查没有完成");
+        }
+        List<NurseSiteMaintainHistory> nurseSiteMaintains =null;
+        Map<Integer,List<byte[]>>reportMap = null;
+        Map<String,Map<Integer,List<byte[]>>> reportMapMap = new LinkedHashMap<>();
+        List<byte[]> reports= null;
+        Map<String,List<NurseSiteMaintainHistory>>listMap = new LinkedHashMap<>();
+        for (NurseSiteMaintainHistory maintain : listMaintain) {
+            String name = maintain.getName();
+            if(listMap.containsKey(name)){
+                listMap.get(name).add(maintain);
+                listMap.put(name,listMap.get(name));
+            }else {
+                nurseSiteMaintains = new ArrayList<>();
+                nurseSiteMaintains.add(maintain);
+                listMap.put(name,nurseSiteMaintains);
+            }
+
+        }
+        String name=null;
+        for (Map.Entry<String, List<NurseSiteMaintainHistory>> a : listMap.entrySet()) {
+            reportMap = new LinkedHashMap<>();
+            name = a.getKey();
+            TreeMap<Date, List<NurseSiteMaintainItemHistory>> map = new TreeMap<>();
+            Map<Date,Map<String,List<String>>> stringMap = new HashMap<>();
+            Map<Date,Map<String,String>> commentMapMap = new HashMap<>();
+            Map<Date,Map<String,String>> updateByMapMap = new HashMap<>();
+            Map<String,List<String>> assetNameMap = null;
+            Map<String,String> commentMap = null;
+            Map<String,String> updateByMap = null;
+            for (NurseSiteMaintainHistory maintain : a.getValue()) {
+                Date scheduleDate = maintain.getScheduleDate();
+                if (scheduleDate == null) {
+                    continue;
+                }
+                List<NurseSiteMaintainItemHistory> items = maintain.getListNurseSiteMaintainItem();
+                assetNameMap = new HashMap<>();
+                commentMap = new HashMap<>();
+                updateByMap = new HashMap<>();
+                for (int i = 0;i < items.size();i++) {
+                    NurseSiteMaintainItemHistory nurseSiteMaintainItem = items.get(i);
+                    AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
+                    List<NurseSiteMaintainDataHistory> listData = nurseSiteMaintainItem.getListData();
+                    List<String> stringList = new ArrayList<>();
+                    for (int j = 0 ;j < listData.size();j++) {
+                        NurseSiteMaintainDataHistory nurseSiteMaintainData = listData.get(j);
+                        Boolean checkValue = nurseSiteMaintainData.getCheckValue();
+                        if(checkValue!=null && checkValue){
+                            stringList.add("√");
+                        }else if(checkValue!=null && !checkValue){
+                            stringList.add("x");
+                        }else {
+                            stringList.add(null);
+                        }
+                    }
+                    assetNameMap.put(assetInfo.getName(),stringList);
+                    commentMap.put(assetInfo.getName(),nurseSiteMaintainItem.getComment());
+                    updateByMap.put(assetInfo.getName(),nurseSiteMaintainItem.getUpdateByUid());
+
+                }
+                map.put(scheduleDate, items);
+                stringMap.put(scheduleDate,assetNameMap);
+                commentMapMap.put(scheduleDate,commentMap);
+                updateByMapMap.put(scheduleDate,updateByMap);
+            }
+            List<NurseSiteMaintainItemHistory> nurseSiteMaintainItemList= null;
+            int num =0;
+            int month=0;
+            Map<Integer ,Date> dataMap = new LinkedHashMap<>();
+            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap();
+            for (Map.Entry<Date, List<NurseSiteMaintainItemHistory>> i : map.entrySet()) {
+                int secondCount =0;
+                nurseSiteMaintainItemList = i.getValue();
+                num++;
+                Date date = i.getKey();
+                if (num==1){
+                    month = date.getMonth()+1;
+                    dataMap.put(num,i.getKey());
+                    stringMapMap.put(month,dataMap);
+                }else {
+                    if(month!=date.getMonth()+1){
+                        dataMap = new LinkedHashMap<>();
+                        secondCount++;
+                        month=date.getMonth()+1;
+                        num=secondCount;
+                        dataMap.put(secondCount,i.getKey());
+                        stringMapMap.put(date.getMonth()+1,dataMap);
+                    }else {
+                        dataMap.put(num,i.getKey());
+                        stringMapMap.put(month,dataMap);
+                    }
+                }
+            }
+            for (Map.Entry<Integer, Map<Integer, Date>> m : stringMapMap.entrySet()) {
+                reports = new ArrayList<>();
+                int count = m.getValue().size();
+                dataMap = m.getValue();
+                XWPFDocument document = new XWPFDocument();
+                for (int i=0;i<nurseSiteMaintainItemList.size();i++) {
+                    if (i > 0) {
+                        //不同设备分页
+                        document.createParagraph().setPageBreak(true);
+                    }
+                    creatPageForHistory(i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap,updateByMapMap);
+                }
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                document.write(outStream);
+                outStream.close();
+                byte[] bytes = outStream.toByteArray();
+                reports.add(bytes);
+                reportMap.put(m.getKey(),reports);
+            }
+            reportMapMap.put(name,reportMap);
+        }
+
+        return zip(reportMapMap);
+    }
+
+    public void creatPageForHistory( int i,int size,Map<Integer ,Date> dataMap,XWPFDocument document, List<NurseSiteMaintainItemHistory> nurseSiteMaintainItemList,
+                           Map<Date,Map<String,List<String>>>  stringMap,Map<Date,Map<String,String>> commentMapMap,Map<Date,Map<String,String>> updateByMapMap){
+        XWPFTable table = document.createTable();
+        XWPFTableRow tableOneRowOne = table.getRow(0);
+        XWPFTableRow tableOneRowTwo = table.createRow();
+        NurseSiteMaintainItemHistory nurseSiteMaintainItem = nurseSiteMaintainItemList.get(i);
+        AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
+        String assetInfoName = assetInfo.getName();
+        tableOneRowOne.getCell(0).setText(assetInfoName +"("+assetInfo.getDepartNum()+")");
+        tableOneRowTwo.getCell(0).setText("日期");
+        List<NurseSiteMaintainDataHistory> listData = nurseSiteMaintainItem.getListData();
+        int num = listData.size();
+        for (int m = 0; m < num; m++) {
+            NurseSiteMaintainDataHistory nurseSiteMaintainData = listData.get(m);
+            String checkItem = nurseSiteMaintainData.getCheckItem();
+            tableOneRowTwo.addNewTableCell().setText(checkItem);
+        }
+        tableOneRowTwo.addNewTableCell().setText("检查者");
+        tableOneRowTwo.addNewTableCell().setText("备注");
+        num = num + 2;
+        for (int n = 1; n <= size; n++) {
+            XWPFTableRow tableOneRow = table.createRow();
+            Date date = dataMap.get(n);
+            String dateStr = DateFormatUtils.format(date, "MM-dd");
+            tableOneRow.getCell(0).setText(dateStr);//时间
+            Map<String, List<String>> stringListMap = stringMap.get(date);
+            List<String> stringList = stringListMap.get(assetInfoName);
+            if (stringList!=null){
+                for (int j = 0; j <stringList.size() ; j++) {
+                    tableOneRow.addNewTableCell().setText(stringList.get(j));
+                }
+                for (int m = 1; m <= 2; m++) {
+                    if( m==1){
+                        Map<String, String> map = updateByMapMap.get(date);
+                        String updateByUid = map.get(assetInfoName);
+                        if(updateByUid == null){
+                            tableOneRow.addNewTableCell().setText(null);
+                        }else {
+                            UserAccount userAccount = userAccountRepository.getByUid(updateByUid);
+                            tableOneRow.addNewTableCell().setText(userAccount.getName());
+                        }
+                    }else if( m==2){
+                        Map<String, String> map = commentMapMap.get(date);
+                        String comment = map.get(assetInfoName);
+                        tableOneRow.addNewTableCell().setText(comment);
+                    }else {
+                        tableOneRow.addNewTableCell().setText(null);
+                    }
+                }
+            }else {
+                for (int m = 1; m <= num; m++) {
+                    tableOneRow.addNewTableCell().setText(null);
+                }
+            }
+
+        }
+        for (int m = 1; m <= num; m++) {
+            tableOneRowOne.addNewTableCell().setText(null);
+        }
+        for (int m = 0; m <= num; m++) {
+            List<XWPFTableCell> tableCells = tableOneRowOne.getTableCells();
+            if (m == 0)
+                tableCells.get(m).getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.RESTART);//这是起点
+            else
+                tableCells.get(m).getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.CONTINUE);//继续合并
+        }
+        //第一行居中
+        CTTc ctTc = tableOneRowOne.getCell(0).getCTTc();
+        CTTcPr ctTcPr = ctTc.addNewTcPr();
+        ctTcPr.addNewVAlign().setVal(STVerticalJc.CENTER);
+        ctTc.getPList().get(0).addNewPPr().addNewJc().setVal(STJc.CENTER);
+        //表格宽度
+        CTTblPr tblPr = table.getCTTbl().getTblPr();
+        tblPr.getTblW().setType(STTblWidth.DXA);
+        tblPr.getTblW().setW(new BigInteger("9370"));
     }
 
     public void creatPage( int i,int size,Map<Integer ,Date> dataMap,XWPFDocument document, List<NurseSiteMaintainItem> nurseSiteMaintainItemList,

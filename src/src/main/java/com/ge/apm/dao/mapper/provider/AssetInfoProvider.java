@@ -50,7 +50,7 @@ public class AssetInfoProvider {
 		String systemId = param.get("systemId");//设备system id
 		String contractId = param.get("contractId");//合同ID
 		StringBuilder sb = new StringBuilder();
-		sb.append(" SELECT ai.asset_group,ai.function_type,zca.asset_type from zkb_contract ac INNER JOIN zkb_contract_asset zca on ac.id = zca.contract_id");
+		sb.append(" SELECT ai.uid,ai.asset_group,ai.function_type,zca.asset_type from zkb_contract ac INNER JOIN zkb_contract_asset zca on ac.id = zca.contract_id");
 		sb.append(" INNER JOIN asset_info ai on ai.uid = zca.asset_id and is_deleted = 'false' ");
 		sb.append(" where ac.id = '"+contractId+"'");
 		sb.append(" and ai.system_id = '"+systemId+"'");
@@ -61,12 +61,12 @@ public class AssetInfoProvider {
 		String orgUidList = getSetValue(param.get("orgList")) ;
 		String tenantUid = (String) param.get("tenantUid");//
 		StringBuilder sb = new StringBuilder();
-		sb.append(" select wo.id from asset_info ai2,v2_work_order wo,asset_info ai where ai.is_deleted ='false' and ai.is_valid = 'true' and ai.system_id like 'MVS-%' ");
+		sb.append(" select wo.id from asset_info ai2,v2_work_order wo,asset_info ai where ai.is_deleted ='false' and ai.is_valid = 'true' and (ai.system_id like 'MVS-%' or ai.system_num1 like 'MVS-%') ");
 		sb.append(" and (ai.institution_uid in "+orgUidList+" or ai.hospital_uid in "+orgUidList+"or ai.site_uid in "+orgUidList);
 		sb.append(" or ai.clinical_dept_uid in "+orgUidList+" or ai.asset_dept_uid in "+orgUidList+" or ai.tenant_uid in "+orgUidList+")");
 		sb.append(" and wo.tenant_uid  = '"+tenantUid+"'");
 		sb.append(" and ai2.id  = wo.asset_id ");
-		sb.append(" and concat('MVS-',ai2.qr_code) = ai.system_id");
+		sb.append(" and (concat('MVS-',ai2.qr_code) = ai.system_id or (concat('MVS-',ai2.qr_code) = ai.system_num1) ");
 		return sb.toString();
 	}
 
@@ -75,29 +75,32 @@ public class AssetInfoProvider {
 		String orgUidList = getSetValue(param.get("orgList")) ;
 		String tenantUid = (String) param.get("tenantUid");//
 		StringBuilder sb = new StringBuilder();
-		sb.append(" select wo.id from asset_info ai2,v2_pm_order wo,asset_info ai where ai.is_deleted ='false' and ai.is_valid = 'true' and ai.system_id like 'MVS-%' ");
-		sb.append(" and (ai.institution_uid in "+orgUidList+" or ai.hospital_uid in "+orgUidList+"or ai.site_uid in "+orgUidList);
-		sb.append(" or ai.clinical_dept_uid in "+orgUidList+" or ai.asset_dept_uid in "+orgUidList+" or ai.tenant_uid in "+orgUidList+")");
-		sb.append(" and wo.tenant_uid  = '"+tenantUid+"'");
-		sb.append(" and ai2.id  = wo.asset_id ");
-		sb.append(" and concat('MVS-',ai2.qr_code) = ai.system_id");
+		sb.append(" select id from v2_pm_order where asset_id in "+orgUidList+"and tenant_uid = '"+tenantUid+"'");
+
+//		sb.append(" select wo.id from asset_info ai2,v2_pm_order wo,asset_info ai where ai.is_deleted ='false' and ai.is_valid = 'true' and ai.system_id like 'MVS-%' ");
+//		sb.append(" and (ai.institution_uid in "+orgUidList+" or ai.hospital_uid in "+orgUidList+"or ai.site_uid in "+orgUidList);
+//		sb.append(" or ai.clinical_dept_uid in "+orgUidList+" or ai.asset_dept_uid in "+orgUidList+" or ai.tenant_uid in "+orgUidList+")");
+//		sb.append(" and wo.tenant_uid  = '"+tenantUid+"'");
+//		sb.append(" and ai2.id  = wo.asset_id ");
+//		sb.append(" and concat('MVS-',ai2.qr_code) = ai.system_id");
 		return sb.toString();
 	}
 
 	private String getSetValue(Object value) {
 		StringBuilder sb = new StringBuilder();
-		Collection<String> set = (Collection<String>) value;
+		Collection<Integer> set = (Collection<Integer>) value;
 		if (set != null) {
-			Iterator<String> it = set.iterator();
+			Iterator<Integer> it = set.iterator();
 			sb.append("(");
 			while (it.hasNext()) {
-				sb.append("'");
+//				sb.append("'");
 				sb.append(it.next());
-				sb.append("'");
+//				sb.append("'");
 				sb.append(",");
 			}
-			sb.append("'");
-			sb.append("'");
+//			sb.append("'");
+//			sb.append("'");
+			sb.deleteCharAt(sb.length()-1);
 			sb.append(")");
 		}
 		return sb.toString();
@@ -105,11 +108,11 @@ public class AssetInfoProvider {
 
 	public String countAssetWithQRcode(Map<String,Object> param){
 		String uidList = getSetValue1(param.get("uidList")) ;
-		String tenantUid = (String) param.get("tenantUid");//
+		String tenantUid = (String) param.get("tenantUid");
 		StringBuilder sb = new StringBuilder();
 		sb.append("SELECT COUNT (ID) FROM ( SELECT DISTINCT ai.* FROM asset_info ai LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code ON ai.uid = ib_qr_code.asset_uid LEFT JOIN " +
 				"            (SELECT COUNT (ID) AS count1,bo_uuid FROM v2_blob_object WHERE bo_sub_type = '1' AND bo_uuid IN "+uidList+" GROUP BY bo_uuid) T " +
-				"            ON T.bo_uuid = ai.uid WHERE (ib_qr_code.is_qr_code = true OR T.count1 == 3)" +
+				"            ON T.bo_uuid = ai.uid WHERE (ib_qr_code.is_qr_code = true OR T.count1 = 3)" +
 				"            AND ai.uid IN "+uidList+") T1");
 
 		return sb.toString();

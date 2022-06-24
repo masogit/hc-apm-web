@@ -5,31 +5,25 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.web.MeasureOrderActionForm;
+import com.ge.apm.view.wo.WorkOrderMgrController;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
-import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.JpaCRUDController;
-import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,12 +38,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     private AssetInfoRepository dao;
     private MeasuringCertificateDetailRepository measuringCertificateDetailDao;
+    private WorkflowService workflowService;
     private I18nMessageRepository i18nMessageDao;
 
     private List<MeasuringCertificateDetail> measuringCertificateList;
 
     private BlobFileService blobService;
     private BlobObjectRepository blobDao;
+    private TenantInfoRepository tenantInfoDao;
 
     private UaaService uaaService;
 
@@ -60,10 +56,13 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private TreeNode selectedNode;
 
     private OrgInfoTreeService orgInfoTreeService;
-
+    private Integer verificationConclusion =null;
     private int currentMonthCount = 0;
     private int nextMonthCount = 0;
-
+    public List<AssetInfo> currentPageAssets;
+    //复选的设备
+    private Map<String, Boolean> selectedMap;
+    private Boolean flag=true;
     @Override
     protected void init() {
 
@@ -72,13 +71,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         i18nMessageDao = WebUtil.getBean(I18nMessageRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
-
+        workflowService = WebUtil.getBean(WorkflowService.class);
         currentUser = UserContextService.getCurrentUserAccount();
 
         attachements = new ArrayList<>();
-
+        this.selectedMap = new HashMap();
         totalMeasureExpireMonths();
     }
 
@@ -88,6 +88,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        List<AssetInfo> assetInfoList = new ArrayList<>();
+
         List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -157,7 +159,39 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
         }
-        return dao.findBySearchFilter(searchFilters, pageRequest);
+        if(this.hasFilterOnField("verificationConclusion")){
+            for (SearchFilter searchFilter :searchFilters) {
+                if ("verificationConclusion".equals(searchFilter.fieldName)) {
+                    verificationConclusion = Integer.valueOf((String)searchFilter.value);
+                }
+            }
+            searchFilters.removeIf(e -> e.fieldName.equals("verificationConclusion"));
+        }
+        List<AssetInfo> assetInfos = dao.findBySearchFilter(searchFilters);
+        if (assetInfos!=null && !assetInfos.isEmpty()){
+            for (AssetInfo assetInfo: assetInfos){
+                List<MeasuringCertificateDetail> measuringCertificateDetails=measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(assetInfo.getUid());
+                Integer status=null;
+                if (measuringCertificateDetails!=null && !measuringCertificateDetails.isEmpty()) {
+                    status = measuringCertificateDetails.get(0).getStatus();
+                }
+                if(verificationConclusion==null){
+                    assetInfo.setVerificationConclusion(status);
+                    assetInfoList.add(assetInfo);
+                }else if (verificationConclusion==status){
+                        assetInfo.setVerificationConclusion(status);
+                        assetInfoList.add(assetInfo);
+                }
+
+
+            }
+            verificationConclusion=null;
+        }
+        currentPageAssets=assetInfoList;
+        int size = assetInfoList.size();
+        assetInfoList= this.pageNum(assetInfoList, pageRequest);
+        Page<AssetInfo>  assetInfoPage = new PageImpl<AssetInfo>(assetInfoList, pageRequest, size);
+        return assetInfoPage;
         /*Specification<AssetInfo> specification=new Specification<AssetInfo>() {
             @Override
             public Predicate toPredicate(Root<AssetInfo> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -175,11 +209,67 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
         return dao.findBySpecification(specification, pageRequest);*/
     }
+    private List<AssetInfo> pageNum(List<AssetInfo> assetInfoList,PageRequest pageRequest){
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize() - 1;
+        int numStart = pageNumber * pageSize;
+        numStart = numStart + pageNumber;
+        int numEnd = numStart + pageSize + 1;
+        int size = assetInfoList.size();
+        if(size > numEnd){
+            assetInfoList = assetInfoList.subList(numStart ,numEnd);
+        }else {
+            assetInfoList = assetInfoList.subList(numStart ,size);
+        }
+        return assetInfoList;
+    }
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+        for (AssetInfo item : currentPageAssets) {
+            selectedMap.put(item.getUid(), !isSelectedAll);
+        }
+    }
+
+    public void setSelectedAssetsUids() {
+        flag=true;
+        List<String> selectedAssetUids = new ArrayList<>();
+        selectedMap.keySet().stream().forEach(assetUid -> { if(selectedMap.get(assetUid)) selectedAssetUids.add(assetUid); });
+        if (selectedAssetUids.isEmpty()) {
+            if (currentPageAssets==null){
+                currentPageAssets = dao.findBySearchFilter(searchFilters);
+            }
+        } else {
+            currentPageAssets = dao.findByUidIn(selectedAssetUids);
+        }
+        if (currentPageAssets!=null && !currentPageAssets.isEmpty()){
+            for (AssetInfo assetInfo: currentPageAssets){
+                List<MeasuringCertificateDetail>  measuringCertificateDetails = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(assetInfo.getUid());
+                if (measuringCertificateDetails!=null && !measuringCertificateDetails.isEmpty() && 2==measuringCertificateDetails.get(0).getStatus()) {
+                }else {
+                    WebUtil.addErrorMessage("有设备检定结论,不符合要求,暂不支持报修");
+                    flag=false;
+                    return;
+                }
+            }
+        }else {
+            WebUtil.addErrorMessage("请选择设备,暂不支持报修");
+            flag=false;
+            return;
+        }
+        WorkOrderMgrController.assetInfos = currentPageAssets;
+
+    }
 
     public void onSelectMeasureAsset(){
         measuringCertificateList = measuringCertificateDetailDao.findByAssetUIDOrderByCheckDateDesc(this.selected.getUid());
     }
-
+    public boolean judgeMeasurementRepair(){
+        WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
+        if (woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair()) {
+            return true;
+        }
+        return false;
+    }
     public void handleFileUpload(FileUploadEvent event) {
 
         V2_BlobObject blobObject = blobService.uploadFile(event);
@@ -372,6 +462,27 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
         this.searchFilters.removeAll(searchFilters);
     }
+    @Override
+    public void onFilter(FilterEvent event) {
+        super.onFilter(event);
+        this.selectedMap.clear();
+    }
+
+    public Boolean isYunNanFuWai(){
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+        if("云南省阜外心血管病医院".equals(tenantInfo.getName().trim())){
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
+    public Boolean getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Boolean flag) {
+        this.flag = flag;
+    }
 
     public int getCurrentMonthCount() {
         return currentMonthCount;
@@ -387,5 +498,21 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public void setNextMonthCount(int nextMonthCount) {
         this.nextMonthCount = nextMonthCount;
+    }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
+    }
+
+    public List<AssetInfo> getCurrentPageAssets() {
+        return currentPageAssets;
+    }
+
+    public void setCurrentPageAssets(List<AssetInfo> currentPageAssets) {
+        this.currentPageAssets = currentPageAssets;
     }
 }

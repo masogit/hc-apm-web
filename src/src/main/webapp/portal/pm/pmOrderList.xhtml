@@ -81,6 +81,9 @@
 
                 <p:column headerText="#{msg.ManufacturerSerialNumber}" sortBy="#{item.assetInfo.serialNum}" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.serialNum}"/>
                 </p:column>
+                <p:column headerText="System ID" sortBy="#{item.assetInfo.systemId}" filterBy="#{item.assetInfo.systemId}" filterMatchMode="LIKE" rendered="#{userContextService.isCountyArea()}">
+                    <h:outputText value="#{item.assetInfo.systemId}"/>
+                </p:column>
 
                         <p:column headerText="#{msg.EquipmentIDHospital}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
@@ -123,7 +126,7 @@
                             </f:facet>
                             <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                         </p:column>
-                        <p:column>
+                        <p:column filterBy="#{item.ruleName}" filterMatchMode="LIKE">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.PmOrderRule}"/><br/>
                                 <!--<p:autoComplete dropdown="true" value="#{v2PmOrderController.filterRule}" appendTo="@(Body)"
@@ -136,7 +139,7 @@
 
                         </p:column>
 
-                        <p:column headerText="保养周期(月)">
+                        <p:column headerText="保养周期(月)" filterBy="#{item.period}" filterMatchMode="EQ">
                             <h:outputText value="#{v2PmOrderController.getRulePm(item).period}"/>
                         </p:column>
 
@@ -154,7 +157,7 @@
                 </p:column>
                 <p:column headerText="#{msg.CurrentProcessingStep}"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
                     <f:facet name="filter" >
-                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.stepFileter}"  rendered="#{v2PmOrderController.queryIndex==-1}">
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.stepFileter}" >
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                             <f:selectItems value="#{pmOrderGlobalController.stepsInTableFilter}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
                         </p:selectOneMenu>
@@ -397,6 +400,20 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('pmTypeWeb')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+                    <c:if test="#{userContextService.countyArea}">
+                        <h:panelGroup>
+                            <label class="label">客户联系人</label>
+                            <p:inputText value="#{v2PmOrderController.customerName}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">客户电话</label>
+                            <p:inputText value="#{v2PmOrderController.customerTel}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">医院名称</label>
+                            <p:inputText value="#{v2PmOrderController.siteName}" readonly="true"/>
+                        </h:panelGroup>
+                    </c:if>
                 </p:panelGrid>
             </p:fieldset>
             <h:panelGroup >
