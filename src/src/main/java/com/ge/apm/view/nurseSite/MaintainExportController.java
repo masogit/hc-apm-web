@@ -16,18 +16,20 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.uaa.UaaService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ge.apm.domain.UserAuth;
-import com.ge.apm.domain.CustomRoleAuthConstant;
-import com.ge.apm.domain.NurseSiteMaintain;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -39,11 +41,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 @ManagedBean
 @ViewScoped
-public class MaintainExportController implements ServerEventInterface{
+public class MaintainExportController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MaintainExportController.class);
     private NurseSiteMaintainService nurseSiteMaintainService;
     private UserAccount currentUser;
-    private List<OrgInfo> listCheckClinicalOrgInfo;
     private List<NurseSiteMaintain> listMaintainData;
     private List<NurseSiteMaintain> selectedListMaintain;
     private OrgInfo selectedParentOrgInfo;
@@ -54,23 +55,30 @@ public class MaintainExportController implements ServerEventInterface{
     private Date startDate;
     private Date endDate;
     private List<OrgInfo> checkListParentOrgInfo;
-    private SearchController searchController;
     private WordReportExportService wordReportExportService;
     private UserAuth customRoleAuth;
+
+    private UaaService uaaService;
+    private AssetInstallationService aiService;
+    private OrgInfo selectedOrg;
+    private TreeNode orgTree;
+    private TreeNode selectedNode;
+    List<OrgInfo> listOrgDept;
+    OrgInfo selectedOrgDepart;
+
+
     @PostConstruct
     protected void init() {
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         nurseSiteMaintainService.init();
-        searchController = WebUtil.getBean(SearchController.class);
-        searchController.setType(3);
-        searchController.setBlnDepartOrgUpdate(true);
-        searchController.updateData();
-        searchController.setCallingController(this);
         currentUser = UserContextService.getCurrentUserAccount();
         orgUidList = nurseSiteMaintainService.findAccessOrgUidListByUserUid(currentUser.getUid());
         wordReportExportService = WebUtil.getBean(WordReportExportService.class);
         loadUserParentOrgInfo();
         customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN_EXPORT);
+        aiService = WebUtil.getBean(AssetInstallationService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        fetchOrgTree();
     }
 
     private void initValue() {
@@ -87,12 +95,24 @@ public class MaintainExportController implements ServerEventInterface{
             ca.add(Calendar.MONTH, 1);
             end = ca.getTime();
         }
-        if (listCheckClinicalOrgInfo == null || listCheckClinicalOrgInfo.size() == 0) {
+        if (this.selectedOrg == null && (this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1)) {
             listMaintainData = findDefaultMaintain(start, end);
         } else {
             List<String> listUidTemp = new ArrayList<String>();
-            for (int i = 0; i < listCheckClinicalOrgInfo.size(); ++i) {
-                listUidTemp.add(listCheckClinicalOrgInfo.get(i).getUid());
+
+            if(this.selectedOrg != null){
+                listUidTemp.add(this.selectedOrg.getUid());
+                // 如果只选择了医院/院区，就获取到下属科室列表，查询下属科室的所有数据
+                if(this.selectedOrgDepart == null || this.selectedOrgDepart.getId() == -1){
+                    if(CollectionUtils.isNotEmpty(listOrgDept)){
+                        for (OrgInfo orgInfo : listOrgDept) {
+                            listUidTemp.add(orgInfo.getUid());
+                        }
+                    }
+                }
+            }
+            if(this.selectedOrgDepart != null && this.selectedOrgDepart.getId() != -1){
+                listUidTemp.add(this.selectedOrgDepart.getUid());
             }
             listMaintainData = nurseSiteMaintainService.getDataByClinicalOrgUid(listUidTemp, start, end);
         }
@@ -111,7 +131,6 @@ public class MaintainExportController implements ServerEventInterface{
         if (orgUidList.size() > 0) {
             checkListParentOrgInfo = nurseSiteMaintainService.getListParentSiteByUid(orgUidList);
             listOrgInfo = new ArrayList<OrgInfo>();
-            listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
         }
     }
 
@@ -119,7 +138,6 @@ public class MaintainExportController implements ServerEventInterface{
         if (orgUidList.size() > 0) {
 //			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(orgUidList);
             listOrgInfo = nurseSiteMaintainService.getListClinicalByUidAndParent(orgUidList, selectedParentOrgInfo.getUid());
-            listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
         }
     }
 
@@ -279,14 +297,6 @@ public class MaintainExportController implements ServerEventInterface{
         this.listOrgInfo = listOrgInfo;
     }
 
-    public List<OrgInfo> getListCheckClinicalOrgInfo() {
-        return listCheckClinicalOrgInfo;
-    }
-
-    public void setListCheckClinicalOrgInfo(List<OrgInfo> listCheckClinicalOrgInfo) {
-        this.listCheckClinicalOrgInfo = listCheckClinicalOrgInfo;
-    }
-
     public List<NurseSiteMaintain> getListMaintainData() {
         return listMaintainData;
     }
@@ -366,21 +376,75 @@ public class MaintainExportController implements ServerEventInterface{
         exportFile = null;
     }
 
-	@Override
-    public void onServerEvent(String eventName, Object eventObject) {
-        // TODO Auto-generated method stub
-        try {
-            if (eventObject != null) {
-                if (listCheckClinicalOrgInfo == null) {
-                    listCheckClinicalOrgInfo = new ArrayList<OrgInfo>();
-                } else {
-                    listCheckClinicalOrgInfo.clear();
-                }
-                listCheckClinicalOrgInfo.add((OrgInfo) eventObject);
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-            LOGGER.error(e.getMessage());
+    private void fetchOrgTree() {
+        String siteUid = currentUser.getSiteUID();
+        String uid = currentUser.getUid();
+        TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(siteUid, uid);
+        orgTree = new DefaultTreeNode("org", null, null);
+        orgTree.getChildren().add(subTree);
+        selectedOrg = aiService.getOrgInfoByUid(siteUid);
+        fetchDeptOrgList(selectedOrg);
+    }
+
+    public void onSelectOrgTree(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        selectedOrg = (OrgInfo) node.getData();
+        if (null != selectedOrg) {
+            fetchDeptOrgList(selectedOrg);
         }
+    }
+
+    public void fetchDeptOrgList(OrgInfo orgInfo) {
+        listOrgDept = uaaService.findAccessClinicalUidByUserUid(currentUser.getUid(),orgInfo.getSiteUID());
+        if(listOrgDept==null){
+            listOrgDept=new ArrayList<>();
+        }
+        OrgInfo tempOrgInfo=new OrgInfo();
+        tempOrgInfo.setId(-1);
+        tempOrgInfo.setName("请选择...");
+        listOrgDept.add(0,tempOrgInfo);
+    }
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
+
+    public TreeNode getOrgTree() {
+        if (orgTree == null) {
+            fetchOrgTree();
+        }
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public List<OrgInfo> getListOrgDept() {
+        return listOrgDept;
+    }
+
+    public void setListOrgDept(List<OrgInfo> listOrgDept) {
+        this.listOrgDept = listOrgDept;
+    }
+
+    public OrgInfo getSelectedOrgDepart() {
+        return selectedOrgDepart;
+    }
+
+    public void setSelectedOrgDepart(OrgInfo selectedOrgDepart) {
+        this.selectedOrgDepart = selectedOrgDepart;
     }
 }

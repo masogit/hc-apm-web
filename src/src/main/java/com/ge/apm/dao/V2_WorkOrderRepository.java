@@ -1,18 +1,17 @@
 package com.ge.apm.dao;
 
+import com.ge.apm.domain.V2_WorkOrder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.GenericRepositoryUUID;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
-import com.ge.apm.domain.V2_BlobObject;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-
-import com.ge.apm.domain.V2_WorkOrder;
-
-import webapp.framework.dao.GenericRepositoryUUID;
 
 public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrder> {
 
@@ -95,4 +94,8 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
             " where to_char(v2.created_date, ?1)=?2 " +
             " and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd') ) T", nativeQuery = true)
     Integer fetchCount(String dateFormat,String date,String tenantUID);
+    @Modifying
+    @Transactional
+    @Query(value = "delete from v2_work_order where id in ?1",nativeQuery = true)
+    Integer deleteById(List<String> woIds);
 }

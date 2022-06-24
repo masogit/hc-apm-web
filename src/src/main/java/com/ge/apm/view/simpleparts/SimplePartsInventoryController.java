@@ -4,15 +4,13 @@ import com.ge.apm.dao.mapper.simpleparts.SimplePartsInventoryMapper;
 import com.ge.apm.dao.simpleparts.SimplePartsInventoryRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseLocatorRepository;
 import com.ge.apm.domain.simpleparts.SimplePartsInventory;
+import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.domain.simpleparts.SimplePartsWareHouseLocator;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.SimplePartsConstant;
-import com.ge.apm.service.simpleparts.SimplePartsConfigService;
-import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
-import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
-import com.ge.apm.service.simpleparts.SimplePartsWarehouseUserService;
+import com.ge.apm.service.simpleparts.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
@@ -53,6 +51,7 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
     private UaaService uuaService;
     private SimplePartsConfigService partsConfigService;
     private UserContextService userContextService;
+    private SimplePartsItemService partsItemService;
 
     /**
      * @author csh
@@ -188,5 +187,24 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
         return pageRequest;
     }
 
-
+    public String getPartsItemCode(SimplePartsInventory simplePartsInventory) {
+        if(partsItemService == null){
+            partsItemService = WebUtil.getBean(SimplePartsItemService.class);
+        }
+        SimplePartsItem simplePartsItem = partsItemService.getPartsItem(simplePartsInventory.getPartsItemId(),simplePartsInventory.getName());
+        if(simplePartsItem != null){
+            return simplePartsItem.getItemCode();
+        }
+        return null;
+    }
+    public Double getPartsItemUnitPrice(SimplePartsInventory simplePartsInventory) {
+        if(partsItemService == null){
+            partsItemService = WebUtil.getBean(SimplePartsItemService.class);
+        }
+        SimplePartsItem simplePartsItem = partsItemService.getPartsItem(simplePartsInventory.getPartsItemId(),simplePartsInventory.getName());
+        if(simplePartsItem != null && simplePartsItem.getUnitPrice() != null){
+            return simplePartsItem.getUnitPrice().doubleValue();
+        }
+        return null;
+    }
 }

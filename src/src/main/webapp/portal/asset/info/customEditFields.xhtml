@@ -39,6 +39,15 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetDisposalResults')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetDisposalResults}</label>
+            <p:selectOneMenu id="assetDisposalResults" value="#{assetInfoEditController.selected.assetDisposalResults}"  disabled="#{!assetInfoEditController.needEdit('assetDisposalResults')}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetDisposalResultsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetClass')}" ><!--设备分类-->
         <h:panelGroup>
             <label class="label">#{msg.assetClass}</label>
@@ -412,7 +421,14 @@
         </h:panelGroup>
     </c:if>
 
-
+    <!--    电流ID-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'currentId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.currentId}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['currentId'].required? '*':''}</span></label>
+            <p:inputText  id="currentId" value="#{assetInfoEditController.selected.currentId}" required="#{assetInfoEditController.customConfig.assetFields['currentId'].required}"
+                          readonly="#{!assetInfoEditController.needEdit('currentId')}" />
+        </h:panelGroup>
+    </c:if>
 
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'parentAssetId')}" >
         <h:panelGroup>
@@ -444,6 +460,41 @@
             <label class="label">#{msg.systemId}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemId'].required? '*':''}</span></label>
             <p:inputText id="systemId" value="#{assetInfoEditController.selected.systemId}" required="#{assetInfoEditController.customConfig.assetFields['systemId'].required}"
                          requiredMessage="#{msg.systemId} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemId')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum1')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum1}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum1'].required? '*':''}</span></label>
+            <p:inputText id="systemNum1" value="#{assetInfoEditController.selected.systemNum1}" required="#{assetInfoEditController.customConfig.assetFields['systemNum1'].required}"
+                         requiredMessage="#{msg.systemNum1} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum1')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum2')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum2}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum2'].required? '*':''}</span></label>
+            <p:inputText id="systemNum2" value="#{assetInfoEditController.selected.systemNum2}" required="#{assetInfoEditController.customConfig.assetFields['systemNum2'].required}"
+                         requiredMessage="#{msg.systemNum2} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum2')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum3')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum3}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum3'].required? '*':''}</span></label>
+            <p:inputText id="systemNum3" value="#{assetInfoEditController.selected.systemNum3}" required="#{assetInfoEditController.customConfig.assetFields['systemNum3'].required}"
+                         requiredMessage="#{msg.systemNum3} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum3')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum4')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum4}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum4'].required? '*':''}</span></label>
+            <p:inputText id="systemNum4" value="#{assetInfoEditController.selected.systemNum4}" required="#{assetInfoEditController.customConfig.assetFields['systemNum4'].required}"
+                         requiredMessage="#{msg.systemNum4} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum4')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum5')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum5}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum5'].required? '*':''}</span></label>
+            <p:inputText id="systemNum5" value="#{assetInfoEditController.selected.systemNum5}" required="#{assetInfoEditController.customConfig.assetFields['systemNum5'].required}"
+                         requiredMessage="#{msg.systemNum5} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum5')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'financingNum')}" >
@@ -611,6 +662,16 @@
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'isFixed')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.isFixed}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['isFixed'].required? '*':''}</span></label>
+            <p:selectOneRadio value="#{assetInfoEditController.selected.isFixed}" required="#{assetInfoEditController.customConfig.assetFields['isFixed'].required}"
+                              requiredMessage="#{msg.isFixed} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('isFixed')}" >
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'isChecked')}" >
         <h:panelGroup >
             <label class="label">#{msg.isAssetChecked}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['isChecked'].required? '*':''}</span></label>
@@ -692,7 +753,7 @@
             <p:selectOneMenu id="riskGrade" value="#{assetInfoEditController.selected.riskGrade}" required="#{assetInfoEditController.customConfig.assetFields['riskGrade'].required}"
                              requiredMessage="#{msg.riskGrade} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('riskGrade')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
@@ -880,6 +941,14 @@
         <h:panelGroup>
             <label class="label">#{msg.creatorUID}</label>
             <p:autoComplete id="createdBy" value="#{assetInfoEditController.selectCreatedBy(assetInfoEditController.selected.createdBy)}"  readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetQuality') and assetInfoEditController.countyArea}" ><!--设备性质-->
+        <h:panelGroup>
+            <label class="label">#{msg.assetQuality}</label>
+            <p:selectOneMenu id="assetQuality" value="#{assetInfoEditController.selected.assetQuality}" requiredMessage="#{msg.assetQuality} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetQuality')}">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetQuality')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
 </ui:composition>

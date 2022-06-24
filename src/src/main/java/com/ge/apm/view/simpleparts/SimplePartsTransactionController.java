@@ -3,20 +3,20 @@ package com.ge.apm.view.simpleparts;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsTransactionRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsWarehouseLocatorRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
+import com.ge.apm.dao.simpleparts.*;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.simpleparts.SimplePartsTransaction;
-import com.ge.apm.domain.simpleparts.SimplePartsWareHouseLocator;
-import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
+import com.ge.apm.domain.simpleparts.*;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.simpleparts.SimplePartsRequestService;
+import com.ge.apm.service.simpleparts.SimplePartsTransactionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -26,8 +26,11 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
@@ -47,10 +50,18 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
     private I18nMessageService i18nMessageService;
     private UaaService uaaService;
     private long queryIndex = SimplePartsConstant.TRANSACTION_TYPE_IN_STOCK;
-
+    private SimplePartsRequestService partsRequestService;
+    private SimplePartsRequestLineItemRepository partsRequestLineItemRepository;
+    private SimplePartsRequestRepository partsRequestRepository;
     @Getter
     @Setter
     private String oneSearchStr;
+
+    @Getter
+    @Setter
+    private StreamedContent exportFile;
+
+    private UserContextService userContextService;
 
     public void searchList(Long queryIndex){
         this.queryIndex = queryIndex;
@@ -73,6 +84,10 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
         i18nDao= WebUtil.getBean(I18nMessageRepository.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        partsRequestService = WebUtil.getBean(SimplePartsRequestService.class);
+        partsRequestLineItemRepository = WebUtil.getBean(SimplePartsRequestLineItemRepository.class);
+        partsRequestRepository = WebUtil.getBean(SimplePartsRequestRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
     }
 
     @Override
@@ -83,10 +98,10 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
         searchFilters.removeIf(e->e.fieldName.equals("siteId"));
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uaaService.getOrgListByUser(currentUserAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 //        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         setUserSearchFilters();
 
@@ -104,6 +119,17 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("requestCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            if(userContextService.isCountyArea()){
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "partsRequestId".equals(item.fieldName)).collect(Collectors.toList()));
+                List<SimplePartsRequest> simplePartsRequestList = partsRequestRepository.findByMaintenanceWorkOrderNumberLike(oneSearchStr);
+                if(simplePartsRequestList != null && simplePartsRequestList.size() > 0){
+                    List<String> partsRequestIds = new ArrayList<>();
+                    simplePartsRequestList.stream().forEach(item -> partsRequestIds.add(item.getId()));
+                    if(partsRequestIds != null && partsRequestIds.size() > 0){
+                        this.updateSearchFilter(new SearchFilter("partsRequestId", SearchFilter.Operator.IN,partsRequestIds, "1*3+"));
+                    }
+                }
+            }
         }
     }
 
@@ -113,6 +139,10 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
 
     public String switchRequestType(int requestType){
            return i18nDao.getByTypeAndKey(SimplePartsConstant.I18N_REQUEST_TYPE,String.valueOf(requestType));
+    }
+
+    public String switchStorageType(String storageType){
+        return i18nDao.getByTypeAndKey(SimplePartsConstant.I18N_STORAGE_TYPE,storageType);
     }
 
     public String switchSiteName(String siteUID){
@@ -140,6 +170,22 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
         return  null;
     }
 
+    public void exportReportDocx() {
+        List<SimplePartsTransaction> simplePartsTransactions = partsTransactionRepository.findByPartsRequestIdAndRequestCode(selected.getPartsRequestId(),selected.getRequestCode());
+        SimplePartsRequest simplePartsRequest = partsRequestRepository.findById(selected.getPartsRequestId());
+        try {
+            Map<String, Object> data = partsRequestService.createReportData(simplePartsRequest,simplePartsTransactions);
+            byte[] templateBytes = partsRequestService.buildReportTemplate();
+
+            if (templateBytes != null) {
+                exportFile = partsRequestService.exportDocx(data, templateBytes);
+            }
+        } catch (IOException e) {
+            java.util.logging.Logger.getLogger(SimplePartsTransactionController.class.getName()).log(Level.SEVERE, null, e);
+            WebUtil.addErrorMessage("导出失败");
+        }
+    }
+
     public String switchAccountName(String loginname){
         return userDao.getNameByLoginName(loginname);
     }
@@ -154,5 +200,19 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
 
     public void setQueryIndex(long queryIndex) {
         this.queryIndex = queryIndex;
+    }
+
+    @Override
+    public void onFilter(FilterEvent event) {
+        selected = null;
+        super.onFilter(event);
+    }
+
+    public String getMaintenanceWorkOrderNumber(String partsRequestId){
+        SimplePartsRequest simplePartsRequest = partsRequestRepository.findById(partsRequestId);
+        if(simplePartsRequest != null){
+            return simplePartsRequest.getMaintenanceWorkOrderNumber();
+        }
+        return null;
     }
 }

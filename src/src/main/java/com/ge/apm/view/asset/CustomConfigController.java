@@ -9,24 +9,20 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.CustomConfig;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.TenantOptionConfigRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -53,7 +49,8 @@ public class CustomConfigController {
     private CustomConfigService ccService;
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
-
+    private ConfigService configService;
+    private TenantOptionConfigRepository tenantOptionConfigRepository;
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
     private Map<String, Boolean> selectedAddFields;
@@ -78,6 +75,8 @@ public class CustomConfigController {
         ccService = WebUtil.getBean(CustomConfigService.class);
         userService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        configService = WebUtil.getBean(ConfigService.class);
+        tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
         configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
@@ -112,6 +111,14 @@ public class CustomConfigController {
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsDetailpageBasicFields().contains(item)).collect(Collectors.toList());
                 break;
+            case "SupplierViewFields":
+                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !customConfigObject.getSupplierViewFields().contains(item)).collect(Collectors.toList());
+                break;
+            case "SupplierEditFields":
+                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !customConfigObject.getSupplierEditFields().contains(item)).collect(Collectors.toList());
+                break;
             case "DetailFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsDetailpageDetailFields().contains(item)).collect(Collectors.toList());
@@ -132,6 +139,12 @@ public class CustomConfigController {
                 break;
             case "UsingFields":
                 addFieldsList = allFields.keySet().stream().filter(item -> !customConfigObject.getAssetFields().containsKey(item)).collect(Collectors.toList());
+                break;
+            case "RemoveSuppplierViewFields":
+                addFieldsList.addAll(customConfigObject.getSupplierViewFields());
+                break;
+            case "RemoveSupplierEditFields":
+                addFieldsList.addAll(customConfigObject.getSupplierEditFields());
                 break;
             case "RemoveBasicFields":
                 addFieldsList.addAll(customConfigObject.getAssetsDetailpageBasicFields());
@@ -215,6 +228,12 @@ public class CustomConfigController {
             case "BasicFields":
             case "RemoveBasicFields":
                 return ":customConfigForm:tabView:BasicFieldsList";
+            case "SupplierViewFields":
+            case "RemoveSuppplierViewFields":
+                return ":customConfigForm:tabView:SupplierViewFieldsList";
+            case "SupplierEditFields":
+            case "RemoveSupplierEditFields":
+                return ":customConfigForm:tabView:SupplierEditFieldsList";
             case "MobileHeaderFields":
             case "RemoveMobileHeaderFields":
                 return ":customConfigForm:tabView:MobileHeaderFieldsList";
@@ -268,6 +287,14 @@ public class CustomConfigController {
             case "BasicFields":
                 customConfigObject.getAssetsDetailpageBasicFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "SupplierViewFields":
+                customConfigObject.getSupplierViewFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getSupplierViewFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "SupplierEditFields":
+                customConfigObject.getSupplierEditFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getSupplierEditFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "DetailFields":
                 customConfigObject.getAssetsDetailpageDetailFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
@@ -663,5 +690,16 @@ public class CustomConfigController {
     private String getUsernameFromUid(String uid) {
         UserAccount userAccount  = userService.getUserByUid(uid);
         return userAccount == null ? "" : userAccount.getName();
+    }
+
+    public Boolean showSupplierViewAndEditFieldsTable() {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
+        if (!tenantOptionConfigOptional.isPresent()) return false;
+        TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        if(workflowConfig==null) return false;
+        if(workflowConfig.getActiveSupplier() && tenantOptionConfig.getActiveSupplier()) return true;
+        return false;
     }
 }

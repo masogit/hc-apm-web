@@ -1,6 +1,7 @@
 package com.ge.apm.domain.pure;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by 212605082 on 2018/11/20.
@@ -11,6 +12,10 @@ public class WorkOrderExportPojo {
     private String Id;
     //报修单号
     private String srNum;
+    //报修Id
+    private String srId;
+    //设备UID
+    private Integer assetId;
     //设备编号
     private String assetDepartNum;
     //工单状态
@@ -154,6 +159,21 @@ public class WorkOrderExportPojo {
     //是否是MVS工单
     private Boolean isMVSWorkOrder;
 
+    //多级审核签名
+    private List<String> auditSignatureList;
+
+    // 县域需求字段sieble单号
+    private String siebleNumber;
+    // 县域需求call center单号
+    private String callCenterNumber;
+
+    public List<String> getAuditSignatureList() {
+        return auditSignatureList;
+    }
+
+    public void setAuditSignatureList(List<String> auditSignatureList) {
+        this.auditSignatureList = auditSignatureList;
+    }
     public Integer getSubStatus() { return subStatus; }
 
     public void setSubStatus(Integer subStatus) { this.subStatus = subStatus; }
@@ -185,6 +205,10 @@ public class WorkOrderExportPojo {
     public void setSrNum(String srNum) {
         this.srNum = srNum;
     }
+
+    public Integer getAssetId() { return assetId; }
+
+    public void setAssetId(Integer assetId) { this.assetId = assetId; }
 
     public String getAssetDepartNum() {
         return assetDepartNum;
@@ -741,4 +765,24 @@ public class WorkOrderExportPojo {
     public Boolean getMVSWorkOrder() { return isMVSWorkOrder; }
 
     public void setMVSWorkOrder(Boolean MVSWorkOrder) { isMVSWorkOrder = MVSWorkOrder; }
+
+    public String getSiebleNumber() {
+        return siebleNumber;
+    }
+
+    public void setSiebleNumber(String siebleNumber) {
+        this.siebleNumber = siebleNumber;
+    }
+
+    public String getCallCenterNumber() {
+        return callCenterNumber;
+    }
+
+    public void setCallCenterNumber(String callCenterNumber) {
+        this.callCenterNumber = callCenterNumber;
+    }
+
+    public String getSrId() { return srId; }
+
+    public void setSrId(String srId) { this.srId = srId; }
 }

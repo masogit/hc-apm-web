@@ -201,9 +201,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
 
     @Override
     public void save() {
-        if(selected.getReason() != null){
-            selected.setReasonDate(new Date());
-        }
+        selected.setReasonDate(new Date());
         zkbAssetQrCodeInfoRepository.save(selected);
     }
 

@@ -2,12 +2,14 @@ package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
@@ -37,10 +39,12 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private OrgInfoService orgInfoService;
     private OrgInfoClinicalDeptService clinicalDeptService;
     private UserOrgInfoRepository userOrgDao;
-
+    private UserContextService userContextService;
+    private BlobFileService blobObjectService;
     private boolean acShow = false;
     private boolean isShow = false;
     private boolean isShjyDept = false;
+    private boolean countyArea = false;
 
     private String orgName;
     private String orgNameEn;
@@ -48,7 +52,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private UserAccount loginUser;
     private String hospitalUcmid;
     private Integer status;
-
+    private String  address;
+    private String  contactPerson;
+    private String  contactPhone;
+    private Integer failureType;
     private UserCommonService userCommonService;
 
     private OrgInfo currentOrg;
@@ -66,11 +73,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
         clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-
+        userContextService = WebUtil.getBean(UserContextService.class);
+        blobObjectService = WebUtil.getBean(BlobFileService.class);
         findPerson();
         loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
         currentOrg = dao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+        countyArea = userContextService.isCountyArea();
         buildOrdTree();
     }
 
@@ -177,6 +186,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         isShow = false;
         orgName = null;
         orgNameEn = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
         OrgInfo org = new OrgInfo();
         org.setSiteId(tenantId);
 
@@ -200,6 +212,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgName = null;
         orgNameEn = null;
         hospitalUcmid = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
         if (selected == null) {
             return;
         }
@@ -227,6 +242,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         isShow = false;
         orgName = null;
         orgNameEn = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
         if (selected == null) {
             return;
         }
@@ -254,6 +272,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         isShow = false;
         orgName = null;
         orgNameEn = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
         if (selected == null) {
             return;
         }
@@ -332,6 +353,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         selected.setNameEn(orgNameEn);
         selected.setHospitalUcmid(hospitalUcmid);
         selected.setStatus(status);
+        selected.setAddress(address);
+        selected.setContactPerson(contactPerson);
+        selected.setContactPhone(contactPhone);
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
 
@@ -367,6 +391,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgName = null;
         orgNameEn = null;
         hospitalUcmid = null;
+        address = null;
+        contactPerson = null;
+        contactPhone = null;
     }
 
     public void buildOrdTree46AfterSave(String institutionUID) {
@@ -416,6 +443,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void deleteSelectedOrg() {
+        failureType=null;
         if (canDelete()) {
             int tenantId = selected.getSiteId();
             String institutionUID = selected.getInstitutionUID();
@@ -466,6 +494,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         List<UserOrgInfo> userOrgInfoList = userOrgDao.findBySearchFilter(checkFilters);
         if (!userOrgInfoList.isEmpty()) {
+            failureType=2;
             WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
             return false;
         }
@@ -499,6 +528,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
         if (qrcodeList != null && !qrcodeList.isEmpty()) {
             WebUtil.addErrorMessage("该组织下有二维码存在,不能删除.");
+            failureType=1;
             return false;
         }
 
@@ -539,7 +569,51 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
         return true;
     }
+    public void deleteFailureCode(){
+        try {
+            List<SearchFilter> checkFilters = new ArrayList<>();
+             if(failureType == 1){
+                 checkFilters.clear();
+                checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
+                checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
+                checkFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
+                checkFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getUid(), "1+"));
+                checkFilters.add(new SearchFilter("orgId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
+                QrCodeLibRepository qrcodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
+                List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
+                for (QrCodeLib qrCodeLib : qrcodeList) {
+                    qrcodeLibDao.deleteQrCodeLib(qrCodeLib.getUid());
+                    List<V2_BlobObject> blobObjectsList = blobObjectService.findBlobObjectsByBoUid(qrCodeLib.getUid());
+                    blobObjectsList.forEach(item -> {
+                        try {
+                            blobObjectService.deleteBlobFile(item);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
 
+                failureType=null;
+                WebUtil.addErrorMessage("该组织下二维码已删除");
+            }else if(failureType == 2){
+                UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+                userOrgDao.deleteByOrgUId(selected.getUid());
+                 failureType=null;
+                 WebUtil.addErrorMessage("该组织下用户权限关联已解除");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Integer type=failureType;
+            failureType=null;
+            String msg="";
+            if(type == 1){
+                msg="删除组织下二维码失败";
+            }else if(type == 2){
+                msg="解除组织下用户关联失败";
+            }
+            WebUtil.addErrorMessage(msg);
+        }
+    }
     private String preName;
 
     public void onSelectTreeNode(NodeSelectEvent event) {
@@ -550,6 +624,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgNameEn = selected.getNameEn();
         hospitalUcmid = selected.getHospitalUcmid();
         status = selected.getStatus();
+        address = selected.getAddress();
+        contactPerson = selected.getContactPerson();
+        contactPhone = selected.getContactPhone();
         if (selected != null) {
             isShow = selected.getOrgType() == 2;
             acShow = selected.getOrgType() == 4;
@@ -669,5 +746,45 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void setShjyDept(boolean shjyDept) {
         isShjyDept = shjyDept;
+    }
+
+    public boolean getCountyArea() {
+        return countyArea;
+    }
+
+    public void setCountyArea(boolean countyArea) {
+        countyArea = countyArea;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
+    }
+
+    public Integer getFailureType() {
+        return failureType;
+    }
+
+    public void setFailureType(Integer failureType) {
+        this.failureType = failureType;
     }
 }

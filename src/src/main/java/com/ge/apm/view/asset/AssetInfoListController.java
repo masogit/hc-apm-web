@@ -14,6 +14,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -73,6 +74,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private Set<String> clinicalDeptOrgUidSet;
     private Set<String> assetDeptOrgUidSet;
     //复选的设备
+    @Getter
+    @Setter
     private Map<String, Boolean> selectedMap;
 
     //搜索字串
@@ -80,6 +83,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     //是否保养
     @Getter @Setter
     private String isPmSearch;
+    @Getter @Setter
+    private Boolean isOrderByForParentAndChildren = false;
 
     //显示子设备，主设备，或者全部类型的设备
     @Getter
@@ -140,6 +145,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private SupplierRepository supplierDao;
     private UserAccountRepository userDao;
     private String oneQrCodeStatus;
+    private boolean countyArea = false;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -172,6 +178,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         loadClinicalDeptList();
         getRelRuleAssetUids();
         warrantyAlertDays = getWarrantyAlertDaysConfig();
+        countyArea = userContextService.isCountyArea();
     }
     
     private Integer getWarrantyAlertDaysConfig(){
@@ -213,6 +220,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        isOrderByForParentAndChildren = false;
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -338,8 +346,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    private void setUserSearchFilters() {
-        this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+    public void setUserSearchFilters() {
+        boolean assetStatus = "-1".equals(filterAssetStatus);
+        if(assetStatus){
+            this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, true));
+            this.removeFilterOnField("status");
+        }else{
+            this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        }
         if(isPmSearch!=null) {
             if(isPmSearch.equals("ypz")) {
                 this.updateSearchFilter(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
@@ -354,10 +368,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.removeFilterOnField("isPm");
             this.removeFilterOnField("uid");
         }
-        if (terminate) {
-            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
-        } else {
-            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        if(!assetStatus){
+            if (terminate) {
+                this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
+            } else {
+                this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+            }
         }
 
         if (!UserContextService.isMVSRole()) {
@@ -509,7 +525,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
         String url = "actionName=View&selectedid="
-                + selected.getId().toString()
+                + selected.getUid()
                 + "&asset_name=" + selected.getName()
                 + "&terminate=" + this.terminate;
         url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
@@ -525,8 +541,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public String getEditPage(String assetId, String assetName) {
-        String operation = "AssetCreate.xhtml?actionName=Edit&selectedid=" + assetId
+    public String getEditPage(String assetUid, String assetName) {
+        String operation = "AssetCreate.xhtml?actionName=Edit&selectedid=" + assetUid
                 + "&asset_name=" + assetName
                 + "&terminate=" + this.terminate;
         return UrlEncryptController.encodeUrlParam(operation);
@@ -546,7 +562,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             dao.save(ai);
         }
     }
+    public void deleteAssetForever(AssetInfo asset){
 
+        try {
+        aiMgrService.deleteAssetForever(asset);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void exportExcel() throws IOException {
 
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
@@ -656,9 +680,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
         }
-
+            if(isOrderByForParentAndChildren){
+                resultList =  orderByForParentAndChildren(resultList);
+            }
         return resultList;
     }
+
+    private List<AssetInfo> orderByForParentAndChildren(List<AssetInfo> resultList) {
+        if(CollectionUtils.isNotEmpty(resultList)) {
+            resultList.stream().forEach(e -> {
+                if (e.getParentAssetId() == null) {
+                    e.setBranchIds("" + e.getId());
+                } else {
+                    e.setBranchIds("" + e.getParentAssetId() + e.getId());
+                }
+        });
+            return resultList.stream().sorted(Comparator.comparing(AssetInfo::getBranchIds)).collect(Collectors.toList());
+        }
+        return resultList;
+    }
+
     public void getAssetInfoBatchEdit() {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
         List<AssetInfo> resultList;
@@ -1120,5 +1161,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setOneQrCodeStatus(String oneQrCodeStatus) {
         this.oneQrCodeStatus = oneQrCodeStatus;
+    }
+
+    public boolean getCountyArea() {
+        return countyArea;
+    }
+
+    public void setCountyArea(boolean countyArea) {
+        this.countyArea = countyArea;
     }
 }

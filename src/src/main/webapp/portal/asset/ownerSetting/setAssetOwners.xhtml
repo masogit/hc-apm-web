@@ -12,10 +12,33 @@
     </div>-->
     <div class="ui-g-12 card">
         <h:form id="SetOwner">
-            <p:fieldset legend="#{msg.FilterCondition}">
+            <p:fieldset legend="#{msg.assetSearchingConditions}">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.hospitalId}*</label>
+                        <p:inputText id="selectedOrgName" value="#{assetOwnerSettingController.selectedOrg==null ? '': assetOwnerSettingController.selectedOrg.name}" readonly="true" required="true"/>
+                        <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                        <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="hospitalId" class="tree" style="width:98%;border:0;" value="#{assetOwnerSettingController.orgTree}" selection="#{assetOwnerSettingController.selectedNode}" var="node" selectionMode="single">
+                                    <p:ajax process="@this" event="select"  listener="#{assetOwnerSettingController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();" update="ownerConfigTab:SetOwner:AssetsPickList ownerConfigTab:SetOwner:selectedOrgName"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                                <p:treeNode type="hidden" rendered="false"/>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+
+
                     <h:panelGroup >
-                        <label class="label">#{msg.assetGroup}*</label>
+                        <label class="label">#{msg.assetGroup}</label>
                         <p:selectOneMenu id="assetGroup" value="#{assetOwnerSettingController.queryAsset.assetGroup}">
                             <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList assetGroupSecondary" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>

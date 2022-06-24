@@ -25,11 +25,12 @@ public class ZkbFePartOrder {
      * CommercialAccept Commercial审批通过
      * CommercialReject Commercial拒绝
      * FourHundredsAccept:400回填
+     * FourHundredsAccept:400拒绝
      * GEAdminAccept GEAdmin 全部归还
      * GEAdminAcceptPart GEAdmin 部分归还
      */
     public enum workFlowStatus {
-        Requested, TenantAccept, TenantReject, CommercialAccept, CommercialReject, FourHundredsAccept, GEAdminAccept, GEAdminAcceptPart
+        Requested, TenantAccept, TenantReject, CommercialAccept, CommercialReject, FourHundredsAccept, FourHundredsReject, GEAdminAccept, GEAdminAcceptPart
     }
 
     /**
@@ -44,10 +45,11 @@ public class ZkbFePartOrder {
     /**
      * WaitingAssignment:待租户审批
      * WaitingApm:待400团队回填APM
+     * 400团队 拒绝
      * Complete:完成
      */
     public enum workFlowSteps {
-        Requested, WaitingAssignment, WaitingCommercial, WaitingApm, WaitingGEAdmin, Complete
+        Requested, WaitingAssignment, WaitingCommercial, WaitingApm,WaitingGEAdmin, Complete
     }
 
     public enum zkbPoProbeQuotaType {
@@ -134,6 +136,11 @@ public class ZkbFePartOrder {
      */
     @Column(name = "system_id")
     private String systemId;
+    /**
+     * 设备Uid
+     */
+    @Column(name = "asset_id")
+    private String assetId;
 
     /**
      * 当前位置
@@ -212,6 +219,7 @@ public class ZkbFePartOrder {
      */
     @Column(name = "contract_id")
     private String contractId;
+
 
     /**
      * 派工信息SR#
@@ -1339,5 +1347,13 @@ public class ZkbFePartOrder {
 
     public void setContractCatSnNo(String contractCatSnNo) {
         this.contractCatSnNo = contractCatSnNo;
+    }
+
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 }

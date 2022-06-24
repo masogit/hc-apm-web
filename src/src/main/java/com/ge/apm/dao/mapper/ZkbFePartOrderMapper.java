@@ -1,8 +1,10 @@
 package com.ge.apm.dao.mapper;
 
 import com.ge.apm.dao.mapper.provider.ZkbFePartOrderProvider;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.ZkbFePartOrder;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import webapp.framework.dao.SearchFilter;
 
@@ -22,6 +24,39 @@ public interface ZkbFePartOrderMapper {
     @SelectProvider(type = ZkbFePartOrderProvider.class,method="loadAssetInfo")
     List<ZkbFePartOrder> loadAssetInfo(@Param("systemId") String systemId);
 
+    /**
+     * 根据systemId和用户tenantUID获取设备信息
+     * @param uid uid
+     * @return
+     */
+    @SelectProvider(type = ZkbFePartOrderProvider.class,method="loadAssetInfoByUid")
+    List<AssetInfo> loadAssetInfoByUid(@Param("uid") String uid);
+    /**
+     * 根据SYSTEM ID 和 contract_id tenant_uid 获取设备信息
+     */
+    @SelectProvider(type = ZkbFePartOrderProvider.class,method="loadAssetInfoForHisData")
+    List<AssetInfo> loadAssetInfoForHisData(@Param("systemId") String systemId,@Param("contractId") String contractId,@Param("tenantUid") String tenantUid);
+
+
+
+    /**
+     * 根据systemId和用户tenantUID获取设备信息
+     * @param uid uid
+     * @return
+     */
+    @SelectProvider(type = ZkbFePartOrderProvider.class,method="loadAssetInfoBuildByUid")
+    List<ZkbFePartOrder> loadAssetInfoBuildByUid(@Param("uid") String uid);
+
+
+
+
+    /**
+     * 根据systemId和用户tenantUID获取设备信息
+     * @param systemId 设备systemId
+     * @return
+     */
+    @SelectProvider(type = ZkbFePartOrderProvider.class,method="loadAssetInfoBySysId")
+    List<AssetInfo> loadAssetInfoBySysId(@Param("systemId") String systemId);
 
     @SelectProvider(type = ZkbFePartOrderProvider.class, method = "queryZkbFePart")
     List<ZkbFePartOrder> queryZkbFePart(@Param("filters") List<SearchFilter> filters);
@@ -47,4 +82,17 @@ public interface ZkbFePartOrderMapper {
      */
     @SelectProvider(type = ZkbFePartOrderProvider.class, method = "batchExport")
     List<ZkbFePartOrder> batchExport(@Param("testLogin")String testLogin,@Param("tenantUid")String tenantUid);
+
+
+    /**
+     * 校验合同中设备是否有效
+     * @param contractId
+     * @param systemId
+     * @return
+     */
+    @Select("select count(t.asset_id) from zkb_contract_asset t where t.contract_id =#{contractId}" +
+            "and exists(select 1 from asset_info ai where ai.uid = t.asset_id and ai.system_id=#{systemId})")
+    int checkAssetInfoInContract(@Param("contractId") String contractId,@Param("systemId") String systemId);
+
+
 }

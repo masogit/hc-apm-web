@@ -283,6 +283,11 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name = "supplier_uid")
     private String supplierUid;
     /**
+     * 核心组是否审核通过 0 未审批 1 医工审批 2 核心审批
+     */
+    @Column(name = "is_core_member_approval")
+    private Integer isCoreMemberApproval;
+    /**
      * 工单创建类型  1:医院创建   2:供应商创建
      */
     @Column(name = "create_type",columnDefinition=" integer default 1 ")
@@ -290,7 +295,25 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Transient
     private Integer orderCount;
+    @Transient
+    private BigDecimal totalPriceToBigDecimal;
+    @Column(name="sieble_number") // 县域需求字段sieble单号
+    private String siebleNumber;
 
+    @Column(name="call_center_number") // 县域需求call center单号
+    private String callCenterNumber;
+
+    /**县域 开单类型： 1主动开单、2被动开单**/
+    @Column(name="order_type")
+    private String orderType;
+
+    public Integer getIsCoreMemberApproval() {
+        return isCoreMemberApproval;
+    }
+
+    public void setIsCoreMemberApproval(Integer isCoreMemberApproval) {
+        this.isCoreMemberApproval = isCoreMemberApproval;
+    }
     public Integer getCreateType() {
         return createType;
     }
@@ -301,7 +324,11 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
-        return totalPrice == null ? null : new BigDecimal(totalPrice);
+        return totalPriceToBigDecimal;
+    }
+
+    public void setTotalPriceToBigDecimal(BigDecimal totalPriceToBigDecimal) {
+        this.totalPriceToBigDecimal = totalPriceToBigDecimal;
     }
 
     @Override
@@ -901,5 +928,29 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setOrderCount(Integer orderCount) {
         this.orderCount = orderCount;
+    }
+
+    public String getSiebleNumber() {
+        return siebleNumber;
+    }
+
+    public void setSiebleNumber(String siebleNumber) {
+        this.siebleNumber = siebleNumber;
+    }
+
+    public String getCallCenterNumber() {
+        return callCenterNumber;
+    }
+
+    public void setCallCenterNumber(String callCenterNumber) {
+        this.callCenterNumber = callCenterNumber;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 }

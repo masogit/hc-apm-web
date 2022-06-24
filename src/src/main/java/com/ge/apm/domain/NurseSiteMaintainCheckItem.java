@@ -2,19 +2,9 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
@@ -77,6 +67,13 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 	@Column(name="key")
 	private Long key;
 
+//	@Column(name="field_type")
+//	private String fieldType;
+//
+//	@Column(name="default_value")
+//	private String defaultValue;
+//	@Column(name="options",columnDefinition = "TEXT")
+//	private String options;
 	public String getId() {
 		return id;
 	}
@@ -215,4 +212,28 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 		}
 		return temp;
 	}
+
+//	public String getFieldType() {
+//		return fieldType;
+//	}
+//
+//	public void setFieldType(String fieldType) {
+//		this.fieldType = fieldType;
+//	}
+//
+//	public String getDefaultValue() {
+//		return defaultValue;
+//	}
+//
+//	public void setDefaultValue(String defaultValue) {
+//		this.defaultValue = defaultValue;
+//	}
+//
+//	public String getOptions() {
+//		return options;
+//	}
+//
+//	public void setOptions(String options) {
+//		this.options = options;
+//	}
 }

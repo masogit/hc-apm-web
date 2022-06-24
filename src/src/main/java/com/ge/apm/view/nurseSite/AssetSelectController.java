@@ -1,9 +1,6 @@
 package com.ge.apm.view.nurseSite;
 
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetSelectService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -16,6 +13,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -49,6 +47,8 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private String functionType;
 
     private String departNum;
+
+    private String emergencyEquipment;
 
     private Boolean isAllSelected = Boolean.FALSE;
     
@@ -119,6 +119,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.assets5Maintain=new ArrayList<>();
         this.assetGroup = null;
         this.assetName = null;
+        this.emergencyEquipment = null;
         this.listCheckOrgInfo=new ArrayList<OrgInfo>();
         this.is4Edit = Boolean.FALSE;
     }
@@ -127,6 +128,12 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.is4Edit = Boolean.TRUE;
         this.orgTree = assetSelectService.loadOrgTree();
         this.selectedOrg = assetSelectService.loadSelectedOrg();
+        // 页面 资产查询列表的复选框用
+        this.selectedAssetUids.clear();
+        // 编辑时，之前编辑的时候已经勾选了的资产
+        this.selectedAssets.clear();
+        // 本次编辑时勾选的资产
+        this.selectedAssetsed.clear();
 
         this.selectedAssets = assetSelectService.loadSelectedAssetByConfig(config.getId()).stream().collect(Collectors.toSet());
         this.selectedAssets.stream().forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
@@ -170,10 +177,19 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         }
         else{
         	assets4Maintain = assetSelectService.loadAssetsBySearchFilter(this.searchFilters);
+            //assetInfosFilter();
         }
         this.searchFilters.clear();
     }
-    
+    private void  assetInfosFilter(){
+        if(CollectionUtils.isEmpty(assets4Maintain) || CollectionUtils.isEmpty(listCheckOrgInfo) )return;
+        List<String> collect = listCheckOrgInfo.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        assets4Maintain=assets4Maintain.stream().filter(item->{
+            String assetDeptUID = item.getAssetDeptUID();
+            if(StringUtils.isBlank(assetDeptUID)) return true;
+                return collect.contains(assetDeptUID);
+        }).collect(Collectors.toList());
+    }
     public void addAssetInfo(){
         for(AssetInfo assetInfo: selectedAssetsed){
             if(!selectedAssets.contains(assetInfo)){
@@ -340,6 +356,10 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
             }
             if(StringUtils.isNotBlank(this.getFunctionType())) {
                 searchFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, this.getFunctionType(), "1*"));
+                ++count;
+            }
+            if(StringUtils.isNotBlank(this.getEmergencyEquipment())) {
+                searchFilters.add(new SearchFilter("emergencyEquipment", SearchFilter.Operator.EQ, this.getEmergencyEquipment(), "1*"));
                 ++count;
             }
             

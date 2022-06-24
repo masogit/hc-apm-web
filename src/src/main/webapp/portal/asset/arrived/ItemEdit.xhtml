@@ -154,7 +154,7 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                 <label class="label">#{msg.riskGrade}</label>
-                                <h:outputText  value="#{fieldMsg.fieldValue('riskGrade', assetInstallationController.arrivalListItem.riskGrade)}"/>
+                                <h:outputText  value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', assetInstallationController.arrivalListItem.riskGrade) : fieldMsg.fieldValue('riskGrade', assetInstallationController.arrivalListItem.riskGrade)}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.emergencyEquipment}</label>
@@ -196,7 +196,30 @@
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.itemNum}" />
                             </h:panelGroup>
 
-                            <h:panelGroup>
+                            <h:panelGroup id = "hospitalId">
+                                <label class="label">#{msg.hospitalId}*</label>
+                                <p:inputText id="selectedUserOrgName" value="#{assetInstallationController.selectedObjectMap['selectedOrg']}" readonly="true" class="SiteUIDChange"/>
+                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                                <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                    <c:if test="#{assetInfoEditController.isSelect46Account}">
+                                        <p:inputText id="assetEditTreeNodeNameFilter" class="treeNodeNameFilter" value="#{assetInfoEditController.treeNodeNameFilter}"/>
+                                        <p:commandButton partialSubmit="true" icon="ui-icon-search" process="@this" update="@this" actionListener="#{assetInfoEditController.filterTreeNode()}" value="#{msg.Search2}"/>
+                                    </c:if>
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.orgTree}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update="ItemEditDlgForm:hospitalId ItemEditDlgForm:clinicalDeptName"
+                                                    listener="#{assetInstallationController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+
+                            <h:panelGroup id = "clinicalDeptName">
                                 <label class="label">#{msg.clinicalDeptName}*</label>
                                 <p:autoComplete dropdown="true" value="#{assetInstallationController.deptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInstallationController.autoCompleteDept}">
                                     <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="@(.clinicalOwnerName) @(.parentAssetList)" />
@@ -370,10 +393,10 @@
                                     </p:autoComplete>
                                 </h:panelGroup>
                             </c:if>
-                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['clinicalOwnerName']}">
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['clinicalOwnerName'] and !userContextService.activeSupplier()}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.clinicalOwnerName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired? '*':''}</span></label>
-                                    <p:autoComplete class="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired}" 
+                                    <p:autoComplete class="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="#{assetInstallationController.customConfig.assetFields['clinicalOwnerName'].arrivalRequired}"
                                                     requiredMessage="#{msg.clinicalOwnerName} #{msg.ValidationRequire}" var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeClinicalOwnerList}">
                                         <p:ajax event="blur" listener="#{assetInstallationController.onUseOwnerNameChange}" process="@this"/>
                                         <p:column>
@@ -487,16 +510,9 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                 <p:dataList id="accessoryList" value="#{assetInstallationController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <c:choose>
-                                        <c:when test="#{userContextService.activeSupplier()}">
-                                            <f:facet name="header">临床验收确认</f:facet>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
-                                        </c:otherwise>
-                                    </c:choose>
+                                    <f:facet name="header">临床验收确认</f:facet>
                                     <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                    <h:panelGroup rendered="#{assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                         <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />

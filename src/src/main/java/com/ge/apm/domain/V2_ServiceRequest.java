@@ -202,6 +202,13 @@ public class V2_ServiceRequest implements Serializable {
 
     @Transient
     private String clinicalDeptName;
+    @Transient
+    private String siebleNumber;
+    @Transient
+    private String callCenterNumber;
+    /**县域 开单类型： 1主动开单、2被动开单**/
+    @Transient
+    private String orderType;
 
     public String getTenantUID() {
         return tenantUID;
@@ -538,6 +545,31 @@ public class V2_ServiceRequest implements Serializable {
     public void setAssetLocation(String assetLocation) {
         this.assetLocation = assetLocation;
     }
+
+    public String getSiebleNumber() {
+        return siebleNumber;
+    }
+
+    public void setSiebleNumber(String siebleNumber) {
+        this.siebleNumber = siebleNumber;
+    }
+
+    public String getCallCenterNumber() {
+        return callCenterNumber;
+    }
+
+    public void setCallCenterNumber(String callCenterNumber) {
+        this.callCenterNumber = callCenterNumber;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;

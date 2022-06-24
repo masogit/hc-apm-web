@@ -36,10 +36,10 @@ public interface PmOrderRuleRepository extends GenericRepository<PmOrderRule> {
 	@Query(value= "select * from pm_order_rule por where por.tenant_uid = ?1" ,nativeQuery = true)
 	List<PmOrderRule> findPmRuleByTenant(String tenantUid);
 
-	@Query(value= "select por.* from v2_pm_order vpo inner join rel_rule_asset rra on vpo.pm_num=?1 and vpo.tenant_uid=?2 and vpo.asset_uid = rra.asset_uid inner join pm_order_rule por on por.uid in (rra.rule_uid,rra.rule_uid1,rra.rule_uid2) and vpo.rule_level = por.level" ,nativeQuery = true)
+	@Query(value= "select por.* from v2_pm_order vpo inner join rel_rule_asset rra on vpo.pm_num=?1 and vpo.tenant_uid=?2 and vpo.asset_uid = rra.asset_uid inner join pm_order_rule por on por.uid in (rra.rule_uid,rra.rule_uid1,rra.rule_uid2,rra.rule_uid4) and vpo.rule_level = por.level" ,nativeQuery = true)
 	List<PmOrderRule> findPmRuleByPmNum(String pmNum,String TenantUID);
 
-	@Query(value= "select por.* from v2_pm_order vpo inner join rel_rule_asset rra on vpo.pm_num in (?1) and vpo.tenant_uid=?2 and vpo.asset_uid = rra.asset_uid inner join pm_order_rule por on por.uid in (rra.rule_uid,rra.rule_uid1,rra.rule_uid2) and vpo.rule_level = por.level" ,nativeQuery = true)
+	@Query(value= "select por.* from v2_pm_order vpo inner join rel_rule_asset rra on vpo.pm_num in (?1) and vpo.tenant_uid=?2 and vpo.asset_uid = rra.asset_uid inner join pm_order_rule por on por.uid in (rra.rule_uid,rra.rule_uid1,rra.rule_uid2,rra.rule_uid4) and vpo.rule_level = por.level" ,nativeQuery = true)
 	List<PmOrderRule> findPmRuleByPmNumBatch(List<String> pmNums,String TenantUID);
 
 }

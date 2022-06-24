@@ -4,12 +4,10 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.simpleparts.SimplePartsInventoryRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseOrgRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
+import com.ge.apm.dao.simpleparts.SimplePartsWarehouseLocatorRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseUserRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.simpleparts.SimplePartsInventory;
-import com.ge.apm.domain.simpleparts.SimplePartsWareHouseOrg;
-import com.ge.apm.domain.simpleparts.SimplePartsWareHouseUser;
-import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
+import com.ge.apm.domain.simpleparts.*;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -48,6 +46,9 @@ public class SimplePartsWarehouseService {
 
     private static final Integer START_USING = 1;
     private static final Integer STOP_USING = 0;
+
+    @Autowired
+    private SimplePartsWarehouseLocatorRepository simplePartsWarehouseLocatorRepository;
 
     /**
      * @param
@@ -249,5 +250,9 @@ public class SimplePartsWarehouseService {
             return Collections.emptyList();
         }
 
+    }
+
+    public SimplePartsWareHouseLocator findWarehouseLocatorNameById(String id) {
+        return simplePartsWarehouseLocatorRepository.findById(id);
     }
 }

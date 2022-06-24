@@ -406,11 +406,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        
+        List<String> orgUidList =new ArrayList<>();
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite == null){
+            UserAccount user = UserContextService.getCurrentUserAccount();
+             orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        }else{
+            orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(selectSite.getUid());
+        }
 
-       
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));

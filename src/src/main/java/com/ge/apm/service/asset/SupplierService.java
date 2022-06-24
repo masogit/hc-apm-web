@@ -293,6 +293,27 @@ public class SupplierService {
         return false;
     }
 
+    public boolean activeSupplierCertificateManage(){
+        UserAccount user = UserContextService.getCurrentUserAccount();
+
+        List<WorkflowConfig> workflowConfigList = workflowConfigDao.findBySiteUID(user.getSiteUID());
+        if(workflowConfigList.isEmpty()){
+            workflowConfigList = workflowConfigDao.findBySiteUID(user.getHospitalUID());
+        }
+        if(workflowConfigList.isEmpty()){
+            workflowConfigList = workflowConfigDao.findBySiteUID(user.getInstitutionUID());
+        }
+        if(workflowConfigList.isEmpty()){
+            workflowConfigList = workflowConfigDao.findBySiteUID(user.getTenantUID());
+        }
+        if(!workflowConfigList.isEmpty()){
+            if (workflowConfigList.get(0).getSupplierCertificateManage() != null && workflowConfigList.get(0).getSupplierCertificateManage()){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isValidPic(byte[] bts){
 
         if (bts == null || bts.length < 4){

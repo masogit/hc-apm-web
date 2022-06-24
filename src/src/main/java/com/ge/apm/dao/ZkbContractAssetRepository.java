@@ -58,4 +58,10 @@ public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbCon
     @Transactional
     @Query(value = "UPDATE zkb_contract_asset SET apply_num=(select coalesce(apply_num,0)-1) WHERE contract_id=?1 and asset_id=?2 and asset_type=?3", nativeQuery = true)
     public void subtractContractAssetApplyNum(String contractId,String assetId,String assetType);
+
+    @Query(value = "SELECT zca.* from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and zkbc.end_date =?2", nativeQuery = true)
+    List<ZkbContractAsset> findByEndDateAsset(String tenantUID, Date endDate);
+
+    @Query(value = "SELECT zca.* from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and zkbc.start_date =?2", nativeQuery = true)
+    List<ZkbContractAsset> findByStartDateAsset(String tenantUID, Date startDate);
 }

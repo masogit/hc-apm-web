@@ -6,15 +6,19 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.*;
+
+import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
 
 @Entity
 @Table(name = "v2_work_order_detail")
@@ -92,6 +96,17 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
 
     @Column(name = "parts_type")
     private String partsType;
+    /**
+     * 添加备件签名
+     */
+    @Column(name = "parts_signature")
+    private String partsSignature;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'PartAttachment'")
+    private List<V2_BlobObject> attachments = new ArrayList<>();
 
     @Column(name = "approved")
     private Boolean approved;
@@ -177,6 +192,51 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
      */
     @Column(name = "detail_review_signature")
     private String detailReviewSignature;
+    /**
+     * 审批签名(医工组)
+     */
+    @Column(name = "medical_worker_approver_signature")
+    private String medicalWorkerApproverSignature;
+
+    /**
+     * 审批签名(核心组)
+     */
+    @Transient
+    private List<String> approverSignatureList;
+
+    public String getMedicalWorkerApproverSignature() {
+        return medicalWorkerApproverSignature;
+    }
+
+    public void setMedicalWorkerApproverSignature(String medicalWorkerApproverSignature) {
+        this.medicalWorkerApproverSignature = medicalWorkerApproverSignature;
+    }
+
+    public List<String> getApproverSignatureList() {
+        return approverSignatureList;
+    }
+
+    public void setApproverSignatureList(List<String> approverSignatureList) {
+        this.approverSignatureList = approverSignatureList;
+    }
+
+
+    /**
+     * 县域用件类型 “1保内用件”，“2保外用件”
+     */
+    @Column(name = "part_use_type")
+    private String partUseType;
+
+    @Column(name = "parts_description")
+    private String partsDescription;
+
+    public String getPartsSignature() {
+        return partsSignature;
+    }
+
+    public void setPartsSignature(String partsSignature) {
+        this.partsSignature = partsSignature;
+    }
 
     public String getCreatedBy() {
         return createdBy;
@@ -497,6 +557,26 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     public void setDetailReviewSignature(String detailReviewSignature) {
         this.detailReviewSignature = detailReviewSignature;
     }
+
+    public String getPartUseType() {
+        return partUseType;
+    }
+
+    public void setPartUseType(String partUseType) {
+        this.partUseType = partUseType;
+    }
+
+    public String getPartsDescription() {
+        return partsDescription;
+    }
+
+    public void setPartsDescription(String partsDescription) {
+        this.partsDescription = partsDescription;
+    }
+
+    public List<V2_BlobObject> getAttachments() { return attachments; }
+
+    public void setAttachments(List<V2_BlobObject> attachments) { this.attachments = attachments; }
 
     @Override
     public boolean equals(Object object) {

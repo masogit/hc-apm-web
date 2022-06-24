@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.AuditEvent}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="auditConfigItemListForm">
+                    <p:dataTable id="datalist" class="datalist" value="#{auditEventController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{auditEventController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.uid}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="filter" listener="#{auditEventController.onFilter}" />
+
+                        <p:column headerText="#{msg.eventType}" sortBy="#{item.eventType}" filterBy="#{item.eventType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('auditEvent',item.eventType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{auditEventController.eventType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.Content}" filterBy="#{item.content}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.content}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.eventResult}" sortBy="#{item.result}" filterBy="#{item.result}" filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('auditEventResult',item.result)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{auditEventController.eventResult}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.operator}" filterBy="#{item.operator}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.operator}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.eventTime}" sortBy="#{item.eventTime}">
+                            <h:outputText value="#{item.eventTime}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat14()}"  />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>

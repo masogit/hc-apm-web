@@ -20,8 +20,18 @@
                              rowsPerPageTemplate="20,50,100,500">
 
                     <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm"/>
-                    <p:ajax event="filter" listener="#{measureAssetListController.onFilter}"/>
-
+                    <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
+                    <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                    <p:column width="36"  id="checkBoxColumn" rendered="#{measureAssetListController.judgeMeasurementRepair()}">
+                        <p:selectBooleanCheckbox value="#{measureAssetListController.selectedMap[item.uid]}"  class="selectCheckBox">
+                            <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                        </p:selectBooleanCheckbox>
+                        <f:facet name="header"  >
+                            <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                <p:ajax listener="#{measureAssetListController.onSelectAllOfPage()}" update="@(.selectCheckBox) measuringTab:measuringAssetListForm:datalist_measuringAsset " oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                        </f:facet>
+                    </p:column>
                     <p:column headerText="设备名称" filterBy="#{item.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.name}"/>
                     </p:column>
@@ -30,6 +40,10 @@
                     </p:column>
                     <p:column headerText="资产编号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.financingNum}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.QRCode}" width="150" sortBy="#{item.qrCode}"
+                              filterBy="#{item.qrCode}" filterMatchMode="LIKE" rendered="#{measureAssetListController.isYunNanFuWai()}">
+                        <h:outputText value="#{item.qrCode}"/>
                     </p:column>
                     <p:column headerText="设备型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.functionType}"/>
@@ -71,8 +85,20 @@
                     <p:column headerText="计量证书编号" filterBy="#{item.meteringNO}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.meteringNO}"/>
                     </p:column>
+                    <p:column headerText="检定结论" filterBy="#{item.verificationConclusion}" filterMatchMode="EQ">
+                     <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()" autoWidth="false" style="max-width: 150px;">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('measuringStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.verificationConclusion)}"/>
+                    </p:column>
                     <p:column headerText="计量种别" filterBy="#{item.measuringType}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.measuringType}"/>
+                    </p:column>
+                    <p:column headerText="检测单位" filterBy="#{item.lastCheckCompany}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.lastCheckCompany}"/>
                     </p:column>
                     <p:column headerText="最后计量日期" sortBy="#{item.lastMeteringDate}" filterBy="#{item.lastMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
@@ -92,6 +118,8 @@
                     </p:column>
 
                     <f:facet name="{Toolbar}">
+                        <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.judgeMeasurementRepair()}"/>
+
                         <!--<p:commandButton id="uploadButton" icon="ui-icon-file-upload" class="btn btn-sm btn-gray" title="上传附件" disabled="#{empty measureAssetListController.selected}" update="measuringTab:measuringUploadDlg" oncomplete="PF('measuringUploadDialog').show()"/>-->
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export"/>
@@ -100,7 +128,37 @@
                 </p:dataTable>
             </h:form>
             <ui:include src="measuringResultList.xhtml"/>
+            <p:dialog id="BatchRepairDlg" widgetVar="BatchRepairDialog" modal="true" resizable="true" draggable="true" width="1050"
+                      height="600" header="批量报修设备">
+                <h:form id="BatchRepairForm">
+                    <p:dataTable id="nodeInfoList" value="#{measureAssetListController.currentPageAssets}" var="item"
+                                     lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
+                                     emptyMessage="#{msg.noRecordFound}">
 
+                            <p:column headerText="设备的名称">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column headerText="设备编号">
+                                <h:outputText value="#{item.financingNum}"/>
+                            </p:column>
+                            <p:column headerText="设备序列号">
+                                <h:outputText value="#{item.serialNum}"/>
+                            </p:column>
+                            <p:column headerText="设备型号">
+                                <h:outputText value="#{item.functionType}"/>
+                            </p:column>
+                        </p:dataTable>
+
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.createBatchServiceRequest()}" disabled="#{!measureAssetListController.flag}"
+                                     value="确认" update="measuringTab:ServiceRequestCreateForm" icon="ui-icon-check"
+                                     oncomplete="PF('createSRDialog').show()" onclick="PF('BatchRepairDialog').hide()"/>
+
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                     onclick="PF('BatchRepairDialog').hide()"/>
+                </h:form>
+            </p:dialog>
+            <ui:include src="BatchSrCreate.xhtml"/>
             <p:overlayPanel widgetVar="panelFilterLastMeteringDate" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:filterLastMeteringDate" dismissable="false">
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{msg.From}"/>

@@ -79,7 +79,7 @@
                 </p:column>
                 <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
                     <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
-                        <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}">
+                        <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}">
                             <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                         </p:link>
                         <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
@@ -304,7 +304,7 @@
                     </c:if>
                     <c:if test="#{columnItem eq 'riskGrade'}">
                         <p:column headerText="#{msg.riskGrade}" >
-                            <h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
+                            <h:outputText value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', item.riskGrade) : fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
                         </p:column>
                     </c:if>
                     <c:if test="#{columnItem eq 'emergencyEquipment'}">

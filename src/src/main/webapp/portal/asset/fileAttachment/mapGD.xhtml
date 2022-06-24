@@ -1,0 +1,512 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.AssetDocMgmt}"/>
+            </div>
+            <div id="container"></div>
+        </div>
+        <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode:'47e3fdc76bf22aae303bbfafd0b8f858'
+        }
+        </script>
+        <script src="https://webapi.amap.com/maps?v=2.0&amp;key=310fe1664204837b2297df7fb5fa4dae&amp;plugin=AMap.DistrictSearch,AMap.PlaceSearch,AMap.Icon,AMap.ElasticMarker,AMap.Driving,AMap.Ellipse,AMap.MoveAnimation"></script>
+        <script type="text/javascript">
+        var hosps=[{'name':'上蔡县人民医院','lng':'114.271922','lat':'33.263226'},
+{'name':'上蔡县中医院','lng':'114.285667','lat':'33.281342'},
+{'name':'平舆县中医院','lng':'114.634758','lat':'32.95024'},
+{'name':'平舆县妇幼保健院','lng':'114.651775','lat':'32.966055'},
+{'name':'平舆县第二人民医院','lng':'114.875758','lat':'33.049297'},
+{'name':'平舆县人民医院','lng':'114.630423','lat':'32.951433'},
+{'name':'新蔡县中医院','lng':'114.979264','lat':'32.741788'},
+{'name':'新蔡县人民医院','lng':'114.952849','lat':'32.743564'},
+{'name':'新蔡县骨结核医院','lng':'114.971552','lat':'32.748933'},
+{'name':'新蔡县第二人民医院','lng':'114.979998','lat':'32.7511'},
+{'name':'正阳县中医院','lng':'114.3925','lat':'32.599416'},
+{'name':'汝南县中医院','lng':'114.353381','lat':'32.99572'},
+{'name':'汝南县人民医院','lng':'114.332633','lat':'33.004424'},
+{'name':'汝南县第二人民医院','lng':'114.360602','lat':'33.001723'},
+{'name':'泌阳县人民医院','lng':'113.339731','lat':'32.730321'},
+{'name':'泌阳县妇幼保健院','lng':'113.310778','lat':'32.741066'},
+{'name':'确山县中医院','lng':'114.042221','lat':'32.79826'},
+{'name':'确山县公疗医院','lng':'114.026909','lat':'32.798987'},
+{'name':'确山县人民医院','lng':'114.020894','lat':'32.79825'},
+{'name':'西平县中医院','lng':'114.002083','lat':'33.395217'},
+{'name':'遂平县中医院','lng':'114.002376','lat':'33.151179'},
+{'name':'西平县人民医院','lng':'114.02931','lat':'33.39042'},
+{'name':'遂平县人民医院','lng':'114.006516','lat':'33.144129'},
+{'name':'遂平县妇幼保健院','lng':'113.991805','lat':'33.144475'},
+{'name':'遂平县第二人民医院','lng':'114.007864','lat':'33.144496'},
+{'name':'驻马店丽人妇科医院','lng':'114.018139','lat':'32.9719'},
+{'name':'驻马店市中医院','lng':'114.009887','lat':'32.975055'},
+{'name':'驻马店市中心医院','lng':'114.023834','lat':'32.97174'},
+{'name':'驻马店市铁东医院','lng':'114.054383','lat':'32.967062'},
+{'name':'驻马店市妇幼保健院','lng':'114.026393','lat':'32.984028'},
+{'name':'驻马店市第四人民医院','lng':'114.029752','lat':'32.996793'},
+{'name':'驻马店泌尿专科医院','lng':'114.019174','lat':'32.962785'}]
+        var markers=[];
+        var backupPos=[114.083694,32.599312];
+        var zoomStyleMapping2 = {
+        8: 0,
+        9: 0,
+        10: 0,
+        11: 0,
+        12: 0,
+        13: 0,
+        14: 0,
+        15: 0,
+        16: 0,
+        17: 0,
+        18: 0,
+        19: 0,
+        20: 0
+    }
+        var polygons=[];
+        var subIndex=0;
+        var colors = [
+        "#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00",
+        "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707",
+        "#651067", "#329262", "#5574a6", "#3b3eac"
+    ];
+
+        var outer = [
+                            new AMap.LngLat(-360,90,true),
+                            new AMap.LngLat(-360,-90,true),
+                            new AMap.LngLat(360,-90,true),
+                            new AMap.LngLat(360,90,true)
+                     ];
+
+
+        function buildPolygon(pathArray,sub){
+
+             var polygon = new AMap.Polygon( {
+                            pathL:pathArray,
+                            //线条颜色，使用16进制颜色代码赋值。默认值为#006600
+                            strokeColor: 'rgb(255,255,0)',
+                            strokeWeight: 2,
+                            //轮廓线透明度，取值范围[0,1]，0表示完全透明，1表示不透明。默认为0.9
+                            strokeOpacity:0.5,
+                            //多边形填充颜色，使用16进制颜色代码赋值，如：#FFAA00
+                            fillColor: sub?colors[subIndex++%colors.length]:'rgb(0,0,0)',
+                            //多边形填充透明度，取值范围[0,1]，0表示完全透明，1表示不透明。默认为0.9
+                            fillOpacity: sub?0.1:0.9,
+                            //轮廓线样式，实线:solid，虚线:dashed
+                            strokeStyle:'solid'
+                        });
+                        polygon.setPath(pathArray);
+            return polygon;
+
+            }
+
+function  drawSubDis(pathArray,dist){
+         new AMap.DistrictSearch({
+         extensions:'all',
+         level:'district',
+         subdistrict:0
+    }).search(dist.adcode,function(status,result){
+
+        var subholes=result.districtList[0].boundaries;
+         pathArray.push.apply(pathArray,subholes)
+
+        var polygon=buildPolygon(pathArray,true);
+        polygon.setMap(map);
+
+
+    });
+}
+
+var mapOpts={
+                        mapStyle: 'amap://styles/b67fa9f5ec1e5b3e5d3497800d02a884',
+                        zoom:9.7,
+                       // zoom:18,
+                        pitch: 30,
+                       center:[114.201132,32.741385],
+                       // center:[121.572694 ,31.267932],
+                        viewMode:'3D'
+            };
+
+
+                    $("#container").css("height","700px");
+                    $("#container").css("width","1300px");
+                    var map = new AMap.Map('container', mapOpts);
+
+
+var infoWindow = new AMap.InfoWindow({
+   content: 'CT设备运行异常\n',
+   anchor: 'top-left',
+});
+// 在地图上打开信息窗体
+setTimeout(function(){
+    infoWindow.open(map, [114.3925   ,32.599416]);
+},4000);
+
+var hospsMarker=[];
+
+
+                   $.each(hosps,function(i,hos){
+                    var marker = new AMap.ElasticMarker({
+                    position: [hos.lng ,hos.lat],
+                    zooms: [8, 20],
+                    styles: [{
+                        icon: {
+                            img: '/geapm/resources/icons/add2.png',
+                           // title: hos.name,
+                            size: [16,16],//可见区域的大小
+                            anchor: 'bottom-center',//锚点
+                            fitZoom: 8,//最合适的级别
+                            scaleFactor: 2,//地图放大一级的缩放比例系数
+                            maxScale: 2,//最大放大比例
+                            minScale: 1//最小放大比例
+                        },
+                        label: {
+                            content: hos.name,
+                            position: 'MR',
+                           // minZoom: 19
+                        }
+                    }],
+                    zoomStyleMapping: zoomStyleMapping2
+                })
+                hospsMarker.push(marker);
+                 map.add(marker);
+ });
+
+  //路线
+var driving = new AMap.Driving({
+    // 驾车路线规划策略，AMap.DrivingPolicy.LEAST_TIME是最快捷模式
+    policy: AMap.DrivingPolicy.LEAST_TIME,
+    map: map,
+    hideMarkers :true,
+    isOutline:false,
+    autoFitView:false
+    // panel 指定将结构化的路线详情数据显示的对应的DOM上，传入值需是DOM的ID
+
+   // panel: 'container'
+  })
+
+  var startLngLat = [hosps[10].lng, hosps[10].lat];
+  var endLngLat = [hosps[18].lng, hosps[18].lat];
+
+  driving.search(startLngLat, endLngLat, function (status, result) {
+
+  })
+//贝塞尔曲线
+
+                        var path = [
+                            [114.201132,32.741385],
+                            [114.151132,32.751385],
+                            [114.101132,32.741385]
+                        ];
+
+
+
+
+<!--
+  var bezierCurve = new AMap.BezierCurve({
+        path: path,
+        isOutline: true,
+        outlineColor: '#ffeeff',
+        borderWeight: 3,
+        strokeColor: "#3366FF",
+        strokeOpacity: 1,
+        strokeWeight: 6,
+        // 线样式还支持 'dashed'
+        strokeStyle: "solid",
+        // strokeStyle是dashed时有效
+        strokeDasharray: [10, 10],
+        lineJoin: 'round',
+        lineCap: 'round',
+        zIndex: 50,
+    })
+
+    bezierCurve.setMap(map)
+    // 缩放地图到合适的视野级别
+    map.setFitView([ bezierCurve ]);
+-->
+
+//区域轮廓
+var districts;
+var cityZMD=new AMap.DistrictLayer.Province({
+           zIndex: 12,
+            adcode: '411700',
+            depth: 2,
+            opacity: 0.5,
+            styles: {
+                'fill': function (properties) {
+                    var adcode = properties.adcode;
+                    return getColorByAdcode(adcode);
+                },
+                'province-stroke': 'cornflowerblue',
+                'city-stroke': 'white', // 中国地级市边界
+                'county-stroke': 'rgba(255,255,255,0.5)' // 中国区县边界
+            }
+        });
+
+        cityZMD.setMap(map);
+
+        map.on('click', function (ev) {
+            if(districts!=null){
+                districts.setMap(null);
+                districts=null;
+            };
+            console.log(ev.lnglat.lng,ev.lnglat.lat);
+            var px = ev.pixel;
+
+
+        // 拾取所在位置的行政区
+        var props = cityZMD.getDistrictByContainerPos(px);
+       // console.log(props);
+
+        if (props) {
+        var selected=new AMap.DistrictLayer.Province({
+           //zIndex: 12,
+            adcode:props.adcode,
+            depth: 2,
+            //opacity: 0.5,
+            styles: {
+            'fill': 'yellow',
+                'province-stroke': 'rgb(255，255，0)',
+                'city-stroke': 'rgb(255，255，0)', // 中国地级市边界
+                'county-stroke': 'rgb(255，255，0)' // 中国区县边界
+
+            }
+        });
+
+        districts=selected;
+
+        setInterval(function(){
+             districts.setMap(map);
+                setTimeout(function(){
+                districts.setMap(null);
+                },700);
+        },1400);
+
+
+        }
+        });
+
+
+ var colors = {};
+    var getColorByAdcode = function (adcode) {
+        if (!colors[adcode]) {
+            var gb = Math.random() * 155 + 50;
+            colors[adcode] = 'rgb(' + gb + ',' + gb + ',255)';
+        }
+
+        return colors[adcode];
+    };
+
+<!--
+                  new AMap.DistrictSearch({
+                            extensions:'all',
+                            level:'city',
+                            subdistrict:1
+                             }).search('驻马店市',function(status,result){
+
+
+
+            //子区域
+            var subDis=result.districtList[0].districtList;
+            $.each(subDis,function(i,dis){
+                drawSubDis( [],dis);
+            });
+
+               var holes = result.districtList[0].boundaries;
+               var pathArray=[outer];
+               pathArray.push.apply(pathArray,holes)
+
+                var polygon=buildPolygon(pathArray,false);
+                polygon.setMap(map);
+                 });-->
+
+
+ <!--     var placeSearch = new AMap.PlaceSearch({
+  // city 指定搜索所在城市，支持传入格式有：城市名、citycode和adcode
+  city: '0396'  ,
+  citylimit:'true',
+  type:'综合医院|专科医院',
+  pageSize:50
+});
+placeSearch.search("遂平县中医院", function (status, result) {
+
+
+});
+-->
+var backupCenter = new AMap.ElasticMarker({
+                map: map,
+                zooms:[8,20],
+                position: backupPos,
+                styles: [
+                    {
+                        icon: {
+                            img: '/geapm/resources/img/ajaxloader.gif',
+                            //title: '备件中心',
+                            size: [16,16],//可见区域的大小
+                            anchor: 'bottom-center',//锚点
+                            fitZoom: 8,//最合适的级别
+                            scaleFactor: 2,//地图放大一级的缩放比例系数
+                            maxScale: 2,//最大放大比例
+                            minScale: 1//最小放大比例
+                        },
+                        label: {
+                            content: '备件中心',
+                            position: 'MR',
+                        }
+                    }],
+                    zoomStyleMapping: zoomStyleMapping2
+            });
+var kit1 = new AMap.ElasticMarker({
+                map: map,
+                zooms:[8,20],
+                position: [114.052294,32.698781],
+                styles: [
+                    {
+                        icon: {
+                            img: '/geapm/resources/img/ajaxloader.gif',
+                            title: '备件中心',
+                            size: [16,16],//可见区域的大小
+                            anchor: 'bottom-center',//锚点
+                            fitZoom: 8,//最合适的级别
+                            scaleFactor: 2,//地图放大一级的缩放比例系数
+                            maxScale: 2,//最大放大比例
+                            minScale: 1//最小放大比例
+                        },
+                        label: {
+                            content: '备件1',
+                            position: 'MR',
+                        }
+                    }],
+                    zoomStyleMapping: zoomStyleMapping2
+            });
+
+
+            var kitsTo = new AMap.Polyline({
+                map: map,
+                path: [backupPos,[114.020894,32.79825]],//[114.083694,32.599312]
+                isOutline: true,
+      outlineColor: '#ffeeff',
+      borderWeight: 3,
+      strokeColor: "#3366FF",
+      strokeOpacity: 1,
+      strokeWeight: 6,
+      // 折线样式还支持 'dashed'
+      strokeStyle: "solid",
+      // strokeStyle是dashed时有效
+      strokeDasharray: [10, 5],
+      lineJoin: 'round',
+      lineCap: 'round',
+      zIndex: 50
+            });
+
+//中心医院
+            var marker;
+            var lineArr =
+            [[121.572694 ,31.267932],
+            [121.573005 ,31.268174],
+            [121.573351 ,31.268409],
+            [121.573521 ,31.268529],
+            [121.573705 ,31.268243],
+            [121.573986 ,31.267902],
+            [121.573687 ,31.267677],
+            [121.573585 ,31.267529],
+            [121.5735   ,31.267357],
+            [121.573642 ,31.267189],
+            [121.573776 ,31.267078],
+            [121.573891 ,31.267071],
+            [121.574027 ,31.266943],
+            [121.574173 ,31.266799],
+            [121.574273 ,31.266652],
+            [121.574553 ,31.266731],
+            [121.574855 ,31.266899]];
+kit1.on('click',showMovingObj);
+function showMovingObj(){
+            let pos = lineArr[0];
+            let car = new AMap.Marker({
+                map: map,
+                position: pos,
+                icon: "https://a.amap.com/jsapi_demos/static/demo-center-v2/car.png",
+                offset: new AMap.Pixel(-13, -26),
+            });
+            map.setFitView(car);
+
+            // 绘制轨迹
+            var polyline = new AMap.Polyline({
+                map: map,
+                path: lineArr,
+                showDir: true,
+                strokeColor: "#28F",  //线颜色
+                // strokeOpacity: 1,     //线透明度
+                strokeWeight: 6,      //线宽
+                // strokeStyle: "solid"  //线样式
+            });
+
+            var passedPolyline = new AMap.Polyline({
+                map: map,
+                strokeColor: "#AF5",  //线颜色
+                strokeWeight: 6,      //线宽
+            });
+
+
+            car.on('moving', function (e) {
+                passedPolyline.setPath(e.passedPath);
+                map.setCenter(e.target.getPosition(), true)
+            });
+
+            let dura=1000;
+            let delay=80;
+            let interv=(lineArr.length-1)*(dura+delay);
+
+            car.moveAlong(lineArr, {
+                    duration: dura,
+                    autoRotation: true,
+                    delay: delay
+            });
+            setTimeout(function(){
+                map.setFitView(hospsMarker);
+                map.remove(car);
+            },interv);
+
+};
+
+
+
+
+<!--
+//菜单
+                     var contextMenu = new AMap.ContextMenu();
+                    //右键添加Marker标记
+                    contextMenu.addItem("添加标记", function (e) {
+
+                    //标记渲染
+                        var marker = new AMap.Marker({
+                            map: map,
+                            position: contextMenuPositon //基点位置
+                        });
+
+
+                    }, 3);
+
+                    //地图绑定鼠标右击事件——弹出右键菜单
+                    map.on('rightclick', function (e) {
+                        contextMenu.open(map, e.lnglat);
+                        contextMenuPositon = e.lnglat;
+                    });
+
+                    //contextMenu.open(map, lnglat);-->
+
+
+  function showInfoZoom(){
+        console.log(document.getElementById('container').amap.getZoom())
+    }
+    window.onmousewheel = document.onmousewheel = showInfoZoom;
+        </script>
+
+    </ui:define>
+</ui:composition>

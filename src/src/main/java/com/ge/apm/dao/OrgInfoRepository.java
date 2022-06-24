@@ -122,6 +122,17 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc(String siteUID, Integer orgType);
 
+    @Query(value = "select o.* from org_info o where o.tenant_uid=?1 and o.org_type=4 ", nativeQuery = true)
+    public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc1(String siteUID);
+    @Query(value = "select o.* from org_info o where o.institution_uid=?1 and o.org_type=4", nativeQuery = true)
+    public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc2(String siteUID);
+    @Query(value = "select o.* from org_info o where o.hospital_uid=?1 and o.org_type=4", nativeQuery = true)
+    public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc3(String siteUID);
+    @Query(value = "select o.* from org_info o where o.site_uid=?1 and o.org_type=4", nativeQuery = true)
+    public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc4(String siteUID);
+    @Query(value = "select o.* from org_info o where o.uid=?1 and o.org_type=4", nativeQuery = true)
+    public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc5(String siteUID);
+
     public List<OrgInfo> findBySiteUIDAndOrgTypeIn(String siteUID, Integer[] orgTypes);
 
     public OrgInfo findByTenantUIDAndName(String tenantUID, String name);
@@ -280,4 +291,11 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     @Query(value = "select o.uid from org_info o where o.org_type=4 and o.site_uid in (?1) ", nativeQuery = true)
     public List<String> findClinicalUidBySiteUid(Set<String> orgUid);
+
+//    @Query(value = "select * from org_info  where name= ?1 and site_uid =?2 ", nativeQuery = true)
+     OrgInfo findByNameAndSiteUID(String Name, String siteUID);
+
+    @Query(value = "select o.* from org_info o where o.tenant_uid = ?1 and o.uid = o.site_uid " +
+            "and o.uid != o.hospital_uid and o.uid != o.institution_uid and o.uid != o.tenant_uid", nativeQuery = true)
+    List<OrgInfo> findAllSiteByTenantUid(String tenantUid);
 }

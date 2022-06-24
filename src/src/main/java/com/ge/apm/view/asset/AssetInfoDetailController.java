@@ -5,6 +5,7 @@
  */
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AeMapper;
@@ -24,6 +25,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
@@ -82,6 +84,10 @@ public class AssetInfoDetailController {
     @Getter
     private List<JSONObject> changeHistoryList = Collections.emptyList();
     private SysAuthGroup selectedAuthGroup;
+    @Getter
+    private boolean countyArea = false;
+
+    private UserContextService userContextService;
 
     @PostConstruct
     protected void init() {
@@ -107,37 +113,43 @@ public class AssetInfoDetailController {
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
-        selected = assetDao.findById(Integer.parseInt(selectedId));
+        if(selectedId!=null) selected = assetDao.findByUid(selectedId);
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
-        if (selected.getSupplierId() != null) {
-            Supplier supplier = supplierDao.findById(selected.getSupplierId());
-            if (supplier != null) {
-                selected.setVendorTel(supplier.getTel());
+        userContextService = WebUtil.getBean(UserContextService.class);
+        countyArea = userContextService.isCountyArea();
+
+        if(selected!=null) {
+            if (selected.getSupplierId() != null) {
+                Supplier supplier = supplierDao.findById(selected.getSupplierId());
+                if (supplier != null) {
+                    selected.setVendorTel(supplier.getTel());
+                }
             }
-        }
 
-        maintanceType = aimService.getMaintanceType(selected);
-        assetEvents  = aimService.getAssetEventsList(selected);
+            maintanceType = aimService.getMaintanceType(selected);
+            assetEvents  = aimService.getAssetEventsList(selected);
 
-        if (null != selected.getMedicalApparatusClassification()) {
-            selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
-        }
-
-        //ge mvc data
-        if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
-            mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
-            MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
-            if (found != null) {
-                mvsAssetInfo = found;
+            if (null != selected.getMedicalApparatusClassification()) {
+                selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
             }
+
+            //ge mvc data
+            if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
+                mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
+                MvsAssetInfo found = mvsAssetInfoDao.findById(selected.getUid());
+                if (found != null) {
+                    mvsAssetInfo = found;
+                }
+            }
+
+            List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
+            this.selected.setTags(existingTags);
+
+            changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
         }
 
-        List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
-        this.selected.setTags(existingTags);
-
-        changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {
@@ -319,7 +331,7 @@ public class AssetInfoDetailController {
         return null;
     }
     public String getCustomConfigString() {
-        return JSONObject.toJSONString(customConfig);
+        return JSON.toJSONString(customConfig);
     }
 
     public TreeNode getParentsRelationTree() {
@@ -341,7 +353,7 @@ public class AssetInfoDetailController {
     public String getDetailPageLink(String uid) {
         AssetInfo viewAsset = assetDao.findByUid(uid);
         String url = "actionName=View&selectedid="
-                + viewAsset.getId().toString()
+                + viewAsset.getUid().toString()
                 + "&asset_name=" + viewAsset.getName()
                 + "&terminate=" + this.terminate;
         url = "AssetDetail.xhtml?faces-redirect=true&str=" + UrlParamUtil.encodeUrlQueryString(url);

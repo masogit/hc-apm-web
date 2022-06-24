@@ -8,13 +8,11 @@ import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Formula;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.format.annotation.DateTimeFormat;
 import webapp.framework.util.TimeUtil;
 
 import javax.persistence.*;
@@ -29,7 +27,7 @@ import java.util.*;
  * @author 212547631
  */
 @Entity
-@Table(name = "asset_info")
+@Table(name = "asset_info",indexes = {@Index(columnList = "asset_dept_uid"),@Index(columnList = "shared_asset_type")})
 public class AssetInfo implements ChineseName,Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -336,6 +334,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "device_status")
     private Integer deviceStatus;//资产状态
 
+    //null   1 empowerment  //这个字段不需要编辑和展示，所以只存null 和1
+    @Column(name = "empowerment_status")
+    private Integer empowermentStatus;
+
     @Column(name = "parent_asset_id")
     private Integer parentAssetId;
 
@@ -468,6 +470,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "is_pm")
     private Boolean isPm = Boolean.TRUE;//是否保养
 
+    @Column(name = "is_fixed")
+    private Boolean isFixed = Boolean.TRUE;//是否固定资产
+
     @Column(name = "is_checked")
     private Boolean isChecked = Boolean.TRUE;//是否盘点
 
@@ -558,7 +563,12 @@ public class AssetInfo implements ChineseName,Serializable {
     //开机电流阈值
     @Column(name = "power_on_threshold")
     private Double powerOnThreshold;
+    //电源ID
+    @Column(name = "current_id")
+    private String currentId;
 
+    @Column(name = "asset_disposal_results")
+    private Integer assetDisposalResults;
 
     @Size(max = 256)
     @Column(name = "one_qr_code")
@@ -608,6 +618,22 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "annual_maintenance_times")
     private Integer annualMaintenanceTimes;
 
+    // 设备性质
+    @Column(name = "asset_quality")
+    private Integer assetQuality;
+
+    //无人值守设备状态  0:关机  1:待机 2:在用
+    @Column(name = "running_status")
+    private Integer runningStatus;
+
+    //1- 正常可借用， 2-入库待保洁
+    @Column(name = "shared_status")
+    private Integer sharedStatus;
+
+    //县域ib合同类别
+    @Column(name = "contract_type")
+    private String contractType;
+
     @Transient
     private int lineNum;
 
@@ -633,6 +659,12 @@ public class AssetInfo implements ChineseName,Serializable {
     private Boolean canReturn;
 
     @Transient
+    private Boolean canEdit;
+
+    @Transient
+    private Integer verificationConclusion;
+
+    @Transient
     private OrgInfo clinicalDeptOrg;
 
     @Transient
@@ -648,7 +680,15 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     private String errorMessage;
     @Transient
+    @Getter
+    @Setter
+    private String branchIds;
+    @Transient
     private String aet;
+    @Transient
+    @Getter
+    @Setter
+    private Integer rank;
     @Transient
     private Date studydate;
     @Transient
@@ -663,6 +703,8 @@ public class AssetInfo implements ChineseName,Serializable {
     private Double energyConsumption;
     @Transient
     private String dashboardPage;
+    @Transient
+    private String assetGroupName;//设备分类名称
     @Transient
     private List<String> tags = new ArrayList<>();
 
@@ -679,6 +721,22 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private String sharedAssetSwapIndexId;
+
+    public Integer getAssetDisposalResults() {
+        return assetDisposalResults;
+    }
+
+    public void setAssetDisposalResults(Integer assetDisposalResults) {
+        this.assetDisposalResults = assetDisposalResults;
+    }
+
+    public String getCurrentId() {
+        return currentId;
+    }
+
+    public void setCurrentId(String currentId) {
+        this.currentId = currentId;
+    }
 
     public String getDashboardPage() {
         return dashboardPage;
@@ -844,7 +902,18 @@ public class AssetInfo implements ChineseName,Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name="asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Set<AssetTags> assetTags;
-    
+
+    @Column(name = "last_check_company")
+    private String lastCheckCompany;
+
+    public String getLastCheckCompany() {
+        return lastCheckCompany;
+    }
+
+    public void setLastCheckCompany(String lastCheckCompany) {
+        this.lastCheckCompany = lastCheckCompany;
+    }
+
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;
 	}
@@ -888,6 +957,17 @@ public class AssetInfo implements ChineseName,Serializable {
     public Boolean getCanReturn() {
         Boolean rst = Boolean.FALSE;
         if(!this.clinicalDeptUID.equals(this.assetDeptUID)) {
+            rst = Boolean.TRUE;
+            if (this.sharedAssetReqDetail!=null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())){
+                rst = Boolean.FALSE;
+            }
+        }
+        return rst;
+    }
+    //
+    public Boolean getCanEdit() {
+        Boolean rst = Boolean.FALSE;
+        if (this.sharedAssetReqDetail!=null && "调剂无人值守".equals(this.sharedAssetReqDetail.getClinicalDeptName())){
             rst = Boolean.TRUE;
         }
         return rst;
@@ -1003,6 +1083,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setMeasuringItemCategory(Integer measuringItemCategory) {
         this.measuringItemCategory = measuringItemCategory;
+    }
+
+    public Integer getVerificationConclusion() {
+        return verificationConclusion;
+    }
+
+    public void setVerificationConclusion(Integer verificationConclusion) {
+        this.verificationConclusion = verificationConclusion;
     }
 
     public Integer getUsageStatus() {
@@ -1955,6 +2043,10 @@ public class AssetInfo implements ChineseName,Serializable {
         this.isPm = isPm;
     }
 
+    public Boolean getIsFixed() { return isFixed; }
+
+    public void setIsFixed(Boolean isFixed) { this.isFixed = isFixed; }
+
     public Boolean getIsChecked() {
         return isChecked;
     }
@@ -2142,7 +2234,12 @@ public class AssetInfo implements ChineseName,Serializable {
     public Map<String, Object> buildLeaseReqHeader() {
         Map<String, Object> reqHeader = new HashMap<>();
         reqHeader.put("clinicalDeptUID", this.getAssetDeptUID());
-        reqHeader.put("type", this.getSharedAssetReqDetail().getLeaseRequest().getType());
+        if (this.getSharedAssetReqDetail().getLeaseRequest()==null){
+            reqHeader.put("type", "2");
+        }
+        else {
+            reqHeader.put("type", this.getSharedAssetReqDetail().getLeaseRequest().getType());
+        }
         reqHeader.put("details", new LinkedList<Map<String, String>>());
         return reqHeader;
     }
@@ -2353,4 +2450,48 @@ public class AssetInfo implements ChineseName,Serializable {
     public String getSharedAssetSwapIndex() { return sharedAssetSwapIndex; }
 
     public void setSharedAssetSwapIndex(String sharedAssetSwapIndex) { this.sharedAssetSwapIndex = sharedAssetSwapIndex; }
+
+    public Integer getRunningStatus() {
+        return runningStatus;
+    }
+
+    public void setRunningStatus(Integer runningStatus) {
+        this.runningStatus = runningStatus;
+    }
+
+    public Integer getAssetQuality() {
+        return assetQuality;
+    }
+
+    public void setAssetQuality(Integer assetQuality) {
+        this.assetQuality = assetQuality;
+    }
+
+    public Integer getSharedStatus() {
+        return sharedStatus;
+    }
+
+    public void setSharedStatus(Integer sharedStatus) {
+        this.sharedStatus = sharedStatus;
+    }
+
+    public String getAssetGroupName() {
+        return assetGroupName;
+    }
+
+    public void setAssetGroupName(String assetGroupName) {
+        this.assetGroupName = assetGroupName;
+    }
+
+    public String getContractType() {
+        return contractType;
+    }
+
+    public void setContractType(String contractType) {
+        this.contractType = contractType;
+    }
+
+    public Integer getEmpowermentStatus() { return empowermentStatus; }
+
+    public void setEmpowermentStatus(Integer empowermentStatus) { this.empowermentStatus = empowermentStatus; }
 }

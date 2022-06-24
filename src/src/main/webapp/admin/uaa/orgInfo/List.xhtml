@@ -3,9 +3,23 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
+        <script type="text/javascript">
+            function deleteAfter() {
+               var failureType=document.getElementById("editForm:failureType");
+               if(failureType!= null ){
+                   let vl = failureType.value;
+                   if(vl == null || vl==''){
+                       return ;
+                   }else{
+                       PF('failureModal').show();
+                   }
+               }
+            }
+        </script>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{msg.OrgAdmin}"/>
@@ -50,7 +64,7 @@
                                     <p:commandButton id="createHospital" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Hospital}" actionListener="#{orgInfoController.prepareCreateHospital}" update=":editForm:editPanel" disabled="#{orgInfoController.isCreateHospitalDisabled}"/>
                                     <p:commandButton id="createSite" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Site}" actionListener="#{orgInfoController.prepareCreateSite}" update=":editForm:editPanel" disabled="#{orgInfoController.isCreateSiteDisabled}"/>
                                     <p:commandButton id="createDept" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Department}" actionListener="#{orgInfoController.prepareCreateDepartment}" update=":editForm:editPanel" disabled="#{orgInfoController.isCreateDepartmentDisabled}"/>
-                                    <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{orgInfoController.deleteSelectedOrg}" update=":editForm" disabled="#{empty orgInfoController.selected or empty orgInfoController.selected.id}">
+                                    <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{orgInfoController.deleteSelectedOrg}" update=":editForm" oncomplete="deleteAfter();" disabled="#{empty orgInfoController.selected or empty orgInfoController.selected.id}">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                 </h:panelGrid>
@@ -100,7 +114,20 @@
                                         <label class="label">#{msg.nameEn}</label>
                                         <p:inputText id="nameEn" value="#{orgInfoController.orgNameEn}" />
                                     </h:panelGroup>
-                                    <br/>
+                                    <h:panelGroup rendered="#{orgInfoController.countyArea}">
+                                        <label class="label">#{msg.address}</label>
+                                        <p:inputText id="address" value="#{orgInfoController.address}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{orgInfoController.countyArea}">
+                                        <label class="label">#{msg.contactPerson}</label>
+                                        <p:inputText id="contactPerson" value="#{orgInfoController.contactPerson}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{orgInfoController.countyArea}">
+                                        <label class="label">#{msg.contactPhone}</label>
+                                        <p:inputText id="contactPhone" value="#{orgInfoController.contactPhone}" validatorMessage="联系电话格式错误">
+                                            <f:validateRegex pattern="(^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$)|(^0\d{2,3}-?\d{7,8}$)" />
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <h:panelGroup rendered="#{orgInfoController.isShow}">
                                         <label class="label">#{msg.hospitalUcmid}</label>
                                         <p:inputText id="hospitalUcmid" value="#{orgInfoController.hospitalUcmid}" required="false" requiredMessage="#{msg.hospitalUcmid} #{msg.ValidationRequire}">
@@ -109,8 +136,8 @@
                                     </h:panelGroup>
                                     <br/>
                                     <p:spacer></p:spacer>
-                                    <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
-
+                                    <p:commandButton style="width: 90px;margin-top: -10px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
+                                    <h:inputHidden id="failureType" value="#{orgInfoController.failureType}"/>
                                 </p:panelGrid>
 
                                 <h:panelGroup>
@@ -123,6 +150,24 @@
                             </h:panelGroup>
                         </div>
                     </div>
+                    <p:dialog id="Active" widgetVar="failureModal" width="350" height="100" modal="true" resizable="true" draggable="true" header="删除确认" closable="true">
+
+                        <c:choose>
+                            <c:when test="#{orgInfoController.failureType == 1}">
+                                <p class="p-m-0" >该组织下有二维码存在,是否要先删除二维码?</p>
+                            </c:when>
+                            <c:when test="#{orgInfoController.failureType == 2}">
+                                <p class="p-m-0" >该组织下有用户权限关联,是否要先解除关联?</p>
+                            </c:when>
+                            <c:otherwise>
+                                <p class="p-m-0" >出错了！</p>
+                            </c:otherwise>
+                        </c:choose>
+                        <h:panelGrid columns="3">
+                            <p:commandButton process="@this" icon="ui-icon-close" value="#{orgInfoController.failureType == 1?'删除':'解除'}" actionListener="#{orgInfoController.deleteFailureCode}" update=":editForm" oncomplete="PF('failureModal').hide()" />
+                            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('failureModal').hide()"/>
+                        </h:panelGrid>
+                    </p:dialog>
                 </h:form>
             </div>
         </div>

@@ -56,6 +56,11 @@
                             <p:selectBooleanCheckbox value="#{tenantOptionConfigController.selected.showIsPm}" itemLabel="台账列表是否显示”是否已配置保养规则“列" />
                         </h:panelGrid>
                     </p:fieldset>
+                    <p:fieldset legend="MVS工单同步配置">
+                        <h:panelGrid columns="6" style="margin-bottom:10px" cellpadding="20">
+                            <p:selectBooleanCheckbox value="#{tenantOptionConfigController.selected.synchronizeWorkOrder}" itemLabel="启用MVS工单同步" />
+                        </h:panelGrid>
+                    </p:fieldset>
 
                     <p:commandButton value="保存" actionListener="#{tenantOptionConfigController.save()}"   update="basic" icon="pi pi-check"/>
 

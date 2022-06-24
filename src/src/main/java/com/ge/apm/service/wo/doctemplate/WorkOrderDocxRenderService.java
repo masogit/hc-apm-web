@@ -9,9 +9,12 @@ import com.ge.apm.domain.ServiceRequestMsg;
 import com.ge.apm.domain.V2_WorkOrderCoworker;
 import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.wo.WorkOrderExportService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
@@ -26,8 +29,7 @@ import java.util.*;
 @Component
 public class WorkOrderDocxRenderService {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorkOrderDocxRenderService.class);
-
+    private final Logger log = LoggerFactory.getLogger(WorkOrderExportService.class);
     private static final PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, ".jpg", new byte[0]);
 
 
@@ -121,7 +123,104 @@ public class WorkOrderDocxRenderService {
 
         mapESign(source, target, "signature", "signature_title", "审核人签名： ");
         mapESign(source, target, "ack_signature", "ack_signature_title", "验收人签名： ");
+        int size=0;
+        if (source.containsKey("auditSignatureList")) {
+           List<String> auditSignatures= (List)source.get("auditSignatureList");
+            log.info("auditSignatures:{}",auditSignatures.size());
+           if (auditSignatures!=null && !auditSignatures.isEmpty()){
+                size = auditSignatures.size();
+               for (int i = 0; i < size; i++) {
+                   String storageId = auditSignatures.get(i);
+                   if (storageId !=null){
+                       log.info("storageId:{}",storageId);
+                       mapESignSignature(storageId, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
+                   }
+               }
+           }
+        }
+        if(size<5){
+            for (int i = size; i < 5; i++) {
+                mapESignSignature(null, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
+            }
+        }
+        size=0;
+        if (source.containsKey("serviceRequestPicture")) {
+            List<String> serviceRequestPicture= (List)source.get("serviceRequestPicture");
+            if (serviceRequestPicture!=null && !serviceRequestPicture.isEmpty()){
+                size = serviceRequestPicture.size();
+                for (int i = 0; i < size; i++) {
+                    String storageId = serviceRequestPicture.get(i);
+                    if (storageId !=null){
+                        mapESignSignature(storageId, target,"serviceRequestPicture"+i, "service_request_picture_title"+i, "报修图片： ");
+                    }
+                }
+            }
+        }
+        if(size<5){
+            for (int i = size; i < 5; i++) {
+                mapESignSignature(null, target,"serviceRequestPicture"+i, "service_request_picture_title"+i, "报修图片： ");
+            }
+        }
+        size=0;
+        if (source.containsKey("workOrderPicture")) {
+            List<String> workOrderPicture= (List)source.get("workOrderPicture");
+            if (workOrderPicture!=null && !workOrderPicture.isEmpty()){
+                size = workOrderPicture.size();
+                for (int i = 0; i < size; i++) {
+                    String storageId = workOrderPicture.get(i);
+                    if (storageId !=null){
+                        mapESignSignature(storageId, target,"workOrderPicture"+i, "workorder_picture_title"+i, "维修图片： ");
+                    }
+                }
+            }
+        }
+        if(size<5){
+            for (int i = size; i < 5; i++) {
+                mapESignSignature(null, target,"workOrderPicture"+i, "workorder_picture_title"+i, "维修图片： ");
+            }
+        }
+        size=0;
+        if (source.containsKey("partsPicture")) {
+            List<String> partsPicture= (List)source.get("partsPicture");
+            if (partsPicture!=null && !partsPicture.isEmpty()){
+                size = partsPicture.size();
+                for (int i = 0; i < size; i++) {
+                    String storageId = partsPicture.get(i);
+                    if (storageId !=null){
+                        mapESignSignature(storageId, target,"partsPicture"+i, "parts_picture_title"+i, "备件图片： ");
+                    }
+                }
+            }
+        }
+        if(size<5){
+            for (int i = size; i < 5; i++) {
+                mapESignSignature(null, target,"partsPicture"+i, "parts_picture_title"+i, "备件图片： ");
+            }
+        }
 
+        mapESign(source, target, "partsSignature", "partsSignature_title", "新增备件签名： ");
+        mapESign(source, target, "medicalWorkerApproverSignature", "medicalWorkerApproverSignature_title", "医工组长签名： ");
+        int num=0;
+        if (source.containsKey("approverSignatureList")) {
+            List<String> approverSignatures= (List)source.get("approverSignatureList");
+            log.info("approverSignatureList:{}",approverSignatures.size());
+            if (approverSignatures!=null && !approverSignatures.isEmpty()){
+                num = approverSignatures.size();
+                for (int i = 0; i < num; i++) {
+                    String storageId = approverSignatures.get(i);
+                    if (storageId !=null){
+                        log.info("核心组storageId:{}",storageId);
+                        int serialNumber=i+1;
+                        mapESignSignature(storageId, target,"approverSignatureList"+i, "approverSignatureList_title"+i, "核心组签名"+serialNumber+"： ");
+                    }
+                }
+            }
+        }
+        if(num<9){
+            for (int i = num; i < 9; i++) {
+                mapESignSignature(null, target,"approverSignatureList"+i, "approverSignatureList_title"+i, "核心组签名"+i+"： ");
+            }
+        }
         putWorkOrderStep(target, (String) source.get("woId"));
         putServiceRequestMessage(target, (String) source.get("woId"));
         putWorkOrderCoworker(target, (String) source.get("woId"));
@@ -144,6 +243,16 @@ public class WorkOrderDocxRenderService {
             target.put(eSignTitleKey, "");
         }
     }
+    private void mapESignSignature(String storageId,Map<String, Object> target, String key, String eSignTitleKey, String eSignTitleValue) {
+        byte[] blob = getBlobSignature( storageId);
+        if (blob != null) {
+            target.put(key, new PictureRenderData(100, 75, "mock.png", blob));
+            target.put(eSignTitleKey, eSignTitleValue);
+        } else {
+            target.put(key, EMPTY_PICTURE);
+            target.put(eSignTitleKey, "");
+        }
+    }
 
     private byte[] getBlob(Map<String, Object> map, String key) {
         if (map.containsKey(key)) {
@@ -154,6 +263,16 @@ public class WorkOrderDocxRenderService {
                 } catch (IOException ignore) {
                     //ignore
                 }
+            }
+        }
+        return null;
+    }
+    private byte[] getBlobSignature(String storageId) {
+        if (StringUtils.isNotEmpty(storageId)) {
+            try (InputStream stream = blobService.getBlobObjectByStorageId(storageId).getStream();) {
+                return IOUtils.toByteArray(stream);
+            } catch (IOException ignore) {
+                //ignore
             }
         }
         return null;

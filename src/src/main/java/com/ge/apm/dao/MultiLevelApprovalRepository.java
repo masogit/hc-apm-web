@@ -29,4 +29,8 @@ public interface MultiLevelApprovalRepository extends GenericRepositoryUUID<Mult
     @Query(value=
             "SELECT MAX (A .approva_number) FROM ( SELECT MAX ( to_number( B.approva_number, '99999999999999' )) approva_number FROM multi_level_approval B WHERE B.approva_number IN ( SELECT C .approva_number FROM multi_level_approval C WHERE C .approva_number LIKE ?1% )) A",nativeQuery = true)
     String selectMaxApprovalNum(String format);
+
+    public List<MultiLevelApproval> findByBusinessUid(String businessUid);
+
+    public List<MultiLevelApproval> findByBusinessUidIn(List<String> woId);
 }

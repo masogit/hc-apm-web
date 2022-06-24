@@ -7,10 +7,16 @@ package com.ge.apm.service.report;
 
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.domain.pure.compute.Calculator;
 import com.google.common.base.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -18,7 +24,11 @@ import java.util.Optional;
  */
 public class TableResultReportService {
 
-    public static final Double MINIMUM = .00001;
+    private static final Logger logger = LoggerFactory.getLogger(TableResultReportService.class);
+
+    private static final Double MINIMUM = .00001;
+
+    private static final Pattern FORMULA_PATTERN = Pattern.compile("(?<=\\[).+?(?=\\])");
 
     /**
      *
@@ -28,29 +38,75 @@ public class TableResultReportService {
      */
     public static Map<String, Object> getRuleResultData(Map<String, Object> tableValue, TableSchema table) {
         Map<String, Object> resMap = new HashMap<>();
-        table.getGroups().forEach(group -> {
-            group.getItems().stream().filter(item -> !Strings.isNullOrEmpty(item.getResKey()) && item.getExp() != null && !Strings.isNullOrEmpty(item.getExp().get("rule"))).forEach(item -> {
-                switch (item.getExp().get("rule")) {
-                    case "RangeRule": {
-                        resMap.put(item.getResKey(), getResultForRangeRule(tableValue, item));
-                        break;
-                    }
-                    case "ScopeRule": {
-                        resMap.put(item.getResKey(), getResultForScopeRule(tableValue, item));
-                        break;
-                    }
-                    case "VerifyRule": {
-                        resMap.put(item.getResKey(), getResultForVerifyRule(tableValue, item));
-                        break;
-                    }
-                    case "DeltaRule": {
-                        resMap.put(item.getResKey(), getResultForDeltaVerifyRule(tableValue, item));
-                        break;
-                    }
-                }
-            });
-        });
+        table.getGroups().stream().flatMap(group-> group.getItems().stream())
+                        .filter(item-> item.getExp() != null && !Strings.isNullOrEmpty(item.getExp().get("rule")))
+                                .forEach(item-> {
+                                    switch (item.getExp().get("rule")) {
+                                        case "RangeRule":
+                                            if(!Strings.isNullOrEmpty(item.getResKey())) {
+                                                resMap.put(item.getResKey(), getResultForRangeRule(tableValue, item));
+                                            }
+                                            break;
+                                        case "ScopeRule":
+                                            if(!Strings.isNullOrEmpty(item.getResKey())) {
+                                                resMap.put(item.getResKey(), getResultForScopeRule(tableValue, item));
+                                            }
+                                            break;
+                                        case "VerifyRule":
+                                            if(!Strings.isNullOrEmpty(item.getResKey())) {
+                                                resMap.put(item.getResKey(), getResultForVerifyRule(tableValue, item));
+                                            }
+                                            break;
+                                        case "DeltaRule":
+                                            if(!Strings.isNullOrEmpty(item.getResKey())) {
+                                                resMap.put(item.getResKey(), getResultForDeltaVerifyRule(tableValue, item));
+                                            }
+                                            break;
+                                        case "FormulaValue":
+                                            resMap.put(item.getKey(), getResultForFormulaValue(tableValue, item));
+                                            break;
+                                        case "FormulaRule": {
+                                            if(!Strings.isNullOrEmpty(item.getResKey())) {
+                                                resMap.put(item.getKey(), getResultForFormulaRule(tableValue, item));
+                                            }
+                                            break;
+                                        }
+                                    }
+                                });
+
+
         return resMap;
+    }
+
+    private static String getResultForFormulaRule(Map<String, Object> tableValue, TableItem item) {
+
+         String resultForFormulaValue = getResultForFormulaValue(tableValue, item);
+         if(!Strings.isNullOrEmpty(resultForFormulaValue)){
+             return  resultForFormulaValue;
+         }
+         return "";
+    }
+
+    private static String getResultForFormulaValue(Map<String, Object> tableValue, TableItem item) {
+
+        String formula = item.getExp().get("formula");
+
+        Matcher matcher = FORMULA_PATTERN.matcher(formula);
+        while (matcher.find()){
+            String key = matcher.group(0);
+            formula = formula.replace("[".concat(key).concat("]"), String.valueOf(tableValue.get(key)));
+        }
+
+        Calculator calculator = new Calculator();
+
+        String res = "";
+        try{
+            res = calculator.calculate(formula).toString();
+        }catch (Exception e){
+            logger.error("formula compute error ",e);
+        }
+        return res;
+
     }
 
     /**

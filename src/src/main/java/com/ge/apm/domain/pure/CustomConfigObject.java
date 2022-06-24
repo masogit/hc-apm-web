@@ -27,6 +27,8 @@ public class CustomConfigObject {
     Map<String, CustomConfigAssetField> assetFields;
 
     List<String> assetsListPageFields;
+    List<String> supplierViewFields;
+    List<String> supplierEditFields;
     List<String> assetsDetailpageBasicFields;
     List<String> assetsDetailpageDetailFields;
 
@@ -89,6 +91,22 @@ public class CustomConfigObject {
 
     public void setAssetsListPageFields(List<String> assetsListPageFields) {
         this.assetsListPageFields = assetsListPageFields;
+    }
+
+    public List<String> getSupplierViewFields() {
+        if(supplierViewFields == null) supplierViewFields = CustomConfigConstant.getAssetsListPageFields();
+        return supplierViewFields;
+    }
+
+    public void setSupplierViewFields(List<String> supplierViewFields) { this.supplierViewFields = supplierViewFields; }
+
+    public List<String> getSupplierEditFields() {
+        if(supplierEditFields == null) supplierEditFields = CustomConfigConstant.getAssetsListPageFields();
+        return supplierEditFields;
+    }
+
+    public void setSupplierEditFields(List<String> supplierEditFields) {
+        this.supplierEditFields = supplierEditFields;
     }
 
     public List<String> getAssetsDetailpageBasicFields() {

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+
+    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag eq 14}">
+        <label class="label">#{msg.BudgetInfo}</label>
+        <p:dataTable id="budgetlist" value="#{multiLevelApprovalController.primaryApprovalData}"
+                     var="item" widgetVar="varbudgetDatalist"
+                     lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+            <p:column headerText="#{msg.ApplicationNum}">
+                <h:outputText value="#{item.applicationNum}"/>
+            </p:column>
+            <p:column headerText="#{msg.Applicant}">
+                <h:outputText value="#{item.applicant.name}"/>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationDept}">
+                <h:outputText value="#{item.applicationDept.name}"/>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationTotalAmount}">
+                <h:outputText value="#{item.totalAmount}">
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationDate}">
+                <h:outputText value="#{item.applicationDate}">
+                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                       locale="#{userContextService.getCalendarLocale()}"
+                                       pattern="#{userContextService.timeFormat14()}"/>
+                </h:outputText>
+            </p:column>
+        </p:dataTable>
+        <br/>
+
+        <label class="label">#{msg.BudgetAssetInfo}</label>
+        <p:dataTable id="budgetAssetlist" value="#{multiLevelApprovalController.secondaryApprovalData}"
+                     var="item" widgetVar="varbudgetAssetDatalist"
+                     lazy="true" rowKey="#{item.id}" sortOrder="descending"
+                     sortBy="#{item.createdDate}" emptyMessage="#{msg.noRecordFound}">
+            <p:column headerText="#{msg.StockType}">
+                <h:outputText value="#{fieldMsg.fieldValue('budgetStockType', item.stockType)}"/>
+            </p:column>
+            <p:column headerText="#{msg.ProductNumber}">
+                <h:outputText value="#{item.asset.financingNum}"/>
+            </p:column>
+            <p:column headerText="#{msg.EquipmentName}">
+                <h:outputText value="#{item.asset.name}"/>
+            </p:column>
+            <p:column headerText="#{msg.AssetBrand}">
+                <h:outputText value="#{item.asset.assetBrand}"/>
+            </p:column>
+            <p:column headerText="#{msg.EquipmentModel}">
+                <h:outputText value="#{item.asset.assetModel}"/>
+            </p:column>
+            <p:column headerText="#{msg.Unit}">
+                <h:outputText value="#{item.asset.unit}"/>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationQuantity}">
+                <h:outputText converter="javax.faces.Number" value="#{item.applicationQuantity}"/>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationPrice}">
+                <h:outputText value="#{item.applicationPrice}">
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="#{msg.ApplicationAmount}">
+                <h:outputText value="#{item.applicationAmount}">
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+                </h:outputText>
+            </p:column>
+        </p:dataTable>
+    </h:panelGroup>
+
+</ui:composition>
+</html>

@@ -8,7 +8,6 @@ import javax.faces.bean.ViewScoped;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UnstructuredData;
@@ -17,7 +16,6 @@ import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.service.asset.ElectricSafetyService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.google.common.base.Strings;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -68,6 +66,15 @@ public class EditReportController {
                 tableValue.put(item.getKey(),item.getValueSerialized());
             }
         });
+        table.getGroups().stream().flatMap(i-> i.getItems().stream())
+                .filter(i-> !Strings.isNullOrEmpty(i.getDefaultValue()))
+                .filter(i-> !tableValue.containsKey(i.getKey()))
+                .forEach(i-> tableValue.put(i.getKey(), i.getDefaultValue()));
+
+    }
+
+    public void computeFormula(){
+        tableValue.putAll(tableService.getRuleResultData(tableValue,table));
     }
 
     public void save() {
@@ -85,7 +92,7 @@ public class EditReportController {
     }
     
     public String getOptionValue(TableItem fieldItem){
-        String optionKey = (String)tableValue.get(fieldItem.getKey());
+        String optionKey = String.valueOf(tableValue.get(fieldItem.getKey()));
         if(!Strings.isNullOrEmpty(optionKey)){
             TableOption option = fieldItem.getOptions().stream().filter(item-> optionKey.equals(item.getKey())).findAny().orElse(null);
             return option==null?null:option.getValue();

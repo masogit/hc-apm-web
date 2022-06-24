@@ -101,6 +101,7 @@ public class ZkbAssetStatisticService {
             SearchFilter systemIdFilter = new SearchFilter("canNotPastQrCode", SearchFilter.Operator.EQ, canNotPastQrCode);
             searchFilters.add(systemIdFilter);
         }
+        searchFilters.add(new SearchFilter("installStatus", SearchFilter.Operator.NE, 2));
         List<ZkbAssetStatistic> assetList = zkbAssetStatisticMapper.loadAllAsset(searchFilters);
         if(CollectionUtils.isEmpty(assetList))
         {
@@ -171,6 +172,7 @@ public class ZkbAssetStatisticService {
     public void regenerateZkbAssetQrCodeInfo(List<SearchFilter> searchFilter){
         //先清除已过期的合同中关联的设备、已修改system_id和已失效的设备数据
         zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo(new Date());
+        // TODO 查出所有合同有效内关联设备的贴码数据，兼顾历史数据的更新。只限于WEB端，Schedule微服务那边只查询为"NULL"、"N"的数据
         List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(null);
         if(zkbAssetQrCodeInfoList == null || zkbAssetQrCodeInfoList.size() == 0){
             WebUtil.addErrorMessage("没有新的二维码记录需要生成");
@@ -179,13 +181,6 @@ public class ZkbAssetStatisticService {
         for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList){
             handleQRCodeInfo(zkbAssetQrCodeInfo);
         }
-        //这里主要是针对历史数据的数据补全
-//        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList2 = zkbAssetStatisticMapper.getZkbAssetQrCode();
-//        if(zkbAssetQrCodeInfoList2 != null || zkbAssetQrCodeInfoList2.size() > 0){
-//            for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList2){
-//                zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
-//            }
-//        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -196,26 +191,32 @@ public class ZkbAssetStatisticService {
         String qrCodeCountState = zkbAssetQrCodeInfo.getQrCodeCountState();
         Date date = new Date();
         if(qrCodeCountState == null || qrCodeCountState.equals("N")){
-            if(zkbAssetQrCodeInfo.getCanNotPastQrCode() != null && zkbAssetQrCodeInfo.getCanNotPastQrCode().equals("Y")){
-                zkbAssetQrCodeInfo.setQrCodeCountState("N");
-                zkbAssetQrCodeInfo.setCreatedDate(date);
-            }else if(zkbAssetQrCodeInfo.getIbQrCodeTemporary() != null && zkbAssetQrCodeInfo.getIbQrCodeTemporary() == true){
-                zkbAssetQrCodeInfo.setIbQrCodeState("Y");
+            if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
                 zkbAssetQrCodeInfo.setQrCodeDate(date);
                 zkbAssetQrCodeInfo.setQrCodeCountState("Y");
-                zkbAssetQrCodeInfo.setCreatedDate(date);
+                zkbAssetQrCodeInfo.setQrCodeState(null);
             }else{
+                zkbAssetQrCodeInfo.setQrCodeState(null);
                 Integer qrCodeCount = zkbAssetQrCodeInfoRepository.findAttachedCount(zkbAssetQrCodeInfo.getAssetUid());
                 if(qrCodeCount != null && qrCodeCount == 3){
                     zkbAssetQrCodeInfo.setQrCodeState("Y");
                     zkbAssetQrCodeInfo.setQrCodeDate(date);
                     zkbAssetQrCodeInfo.setQrCodeCountState("Y");
-                    zkbAssetQrCodeInfo.setCreatedDate(date);
-                }else if(zkbAssetQrCodeInfo.getId() == null || qrCodeCountState == null){//ID == null 则新增记录
-                    zkbAssetQrCodeInfo.setQrCodeCountState("N");
-                    zkbAssetQrCodeInfo.setCreatedDate(date);
                 }
             }
+            if(zkbAssetQrCodeInfo.getId() == null){//ID == null 则新增记录
+                zkbAssetQrCodeInfo.setQrCodeCountState("N");
+                zkbAssetQrCodeInfo.setCreatedDate(date);
+            }
+        }
+        if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
+            zkbAssetQrCodeInfo.setQrCodeState(null);
+        }else{
+            zkbAssetQrCodeInfo.setGeFlag(null);
+        }
+        if("Y".equals(zkbAssetQrCodeInfo.getQrCodeState())){
+            zkbAssetQrCodeInfo.setIbQrCodeState(null);
+            zkbAssetQrCodeInfo.setGeFlag(null);
         }
         zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
     }

@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -162,4 +163,66 @@ public class SimplePartsTransaction implements Serializable {
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUid;
 
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 收货信息
+     */
+    @Column(name = "address_info")
+    private String addressInfo;
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 备注
+     */
+    @Column(name = "comments")
+    @Size(max = 2000)
+    private String comments;
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 入库类型
+     * @description 新货入库newgoods   虚拟入库virtual   好还入库Okay
+     */
+    @Column(name = "storage_type")
+    private String storageType;
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 运单号
+     */
+    @Column(name = "transport_no")
+    private String transportNo;
+
+    /**
+     * @autor by lyj 503277717
+     * @date 2021/12/21
+     * 运输公司
+     */
+
+    @Column(name = "transport_company")
+    private String transportCompany;
+
+    //备件描述
+    @Column(name = "parts_description")
+    private String partsDescription;
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof SimplePartsTransaction)) {
+            return false;
+        }
+        SimplePartsTransaction other = (SimplePartsTransaction) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
 }

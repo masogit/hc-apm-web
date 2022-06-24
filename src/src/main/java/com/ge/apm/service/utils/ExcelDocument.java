@@ -159,6 +159,18 @@ public class ExcelDocument implements AutoCloseable{
     	sheet.addMergedRegion(new CellRangeAddress(firstRow-1,lastRow-1,firstCol-1,lastCol-1));
     }
 
+    public void cellWithAndHeightSet(String sheetName,int setRow, int setCol){
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row row = sheet.getRow(setRow);
+        Cell cell = row.getCell(setCol);
+        if(cell == null){
+            cell=row.createCell(setCol);
+        }
+        row.setHeightInPoints(200);
+        sheet.setColumnWidth(setCol,31*256);
+//        writeCellData(cell, "aa");
+    }
+
     public static String[] getKeyRow(Sheet sheet, int keyRowNum) {
         Row keyRow = sheet.getRow(keyRowNum - 1);
 
@@ -634,6 +646,17 @@ public class ExcelDocument implements AutoCloseable{
     	ClientAnchor anchor = helper.createClientAnchor();
     	anchor.setCol1(col-1);
         anchor.setRow1(row-1);
+        Picture pict = drawing.createPicture(anchor, pictureIndex);
+        pict.resize(scaleX,scaleY);
+    }
+
+    public void drawUploadPicture(int pictureIndex,String sheetName,int row,int col,double scaleX,double scaleY){
+        Sheet sheet=workBook.getSheet(sheetName);
+        Drawing drawing = sheet.createDrawingPatriarch();
+        CreationHelper helper = workBook.getCreationHelper();
+        ClientAnchor anchor = helper.createClientAnchor();
+        anchor.setCol1(col);
+        anchor.setRow1(row);
         Picture pict = drawing.createPicture(anchor, pictureIndex);
         pict.resize(scaleX,scaleY);
     }
