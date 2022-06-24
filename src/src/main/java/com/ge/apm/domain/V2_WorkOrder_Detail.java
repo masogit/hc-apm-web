@@ -6,15 +6,19 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.*;
+
+import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
 
 @Entity
 @Table(name = "v2_work_order_detail")
@@ -97,6 +101,12 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
      */
     @Column(name = "parts_signature")
     private String partsSignature;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'PartAttachment'")
+    private List<V2_BlobObject> attachments = new ArrayList<>();
 
     @Column(name = "approved")
     private Boolean approved;
@@ -563,6 +573,10 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     public void setPartsDescription(String partsDescription) {
         this.partsDescription = partsDescription;
     }
+
+    public List<V2_BlobObject> getAttachments() { return attachments; }
+
+    public void setAttachments(List<V2_BlobObject> attachments) { this.attachments = attachments; }
 
     @Override
     public boolean equals(Object object) {
