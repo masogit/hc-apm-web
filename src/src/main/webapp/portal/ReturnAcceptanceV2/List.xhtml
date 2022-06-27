@@ -33,7 +33,18 @@
             <h:form id="IouListForm">
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                         <c:if test="#{userContextService.selectSite != null}">
-                            <ui:include src="../BorrowAcceptanceV2/site-switching.xhtml"/>
+                            <p:commandButton id="basic" value="#{empty userContextService.selectSite? msg.AllHospitals:userContextService.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="basic" hideEffect="fade" style="width:350px">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="docs"  class="tree" style="width:98%;border:0;" value="#{userContextService.hospitalTree}" var="node" selectionMode="single"
+                                            selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{sharedAssetRequestV2Controller.onSelectSiteTreeNode}" update="IouListForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
                         </c:if>
                         <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(-3)}" rendered="true" disabled="#{sharedAssetRequestV2Controller.queryIndex == -3}"/>
                         <p:commandButton value="归还待受理"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(7)}"  rendered="true" disabled="#{sharedAssetRequestV2Controller.queryIndex == 7}"/>

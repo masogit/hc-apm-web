@@ -19,6 +19,7 @@ import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -2020,7 +2021,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
         return result;
     }
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        searchFilters.clear();
+        bean.onSelectSiteTreeNode(event);
 
+    }
 }
     
     
