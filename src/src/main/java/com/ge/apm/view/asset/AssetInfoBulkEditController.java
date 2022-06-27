@@ -369,6 +369,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                     assetInfoList.removeAll(assetList);
                 }
             }
+            if(CollectionUtils.isNotEmpty(assetInfoList)){
+                List<AssetInfo> collect = assetInfoList.stream().filter(item -> dao.secondment(item.getUid()) > 0).map(item->{
+                    item.setErrorMessage("设备借调中，不能修改所属科室!");
+                    return item;
+                }).collect(Collectors.toList());
+                assetInfos.addAll(collect);
+                assetInfoList.removeAll(collect);
+            }
         }
         String assetDeptUID = selected.getAssetDeptUID();
         if(assetDeptUID != null){
@@ -383,6 +391,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                     assetInfoList.removeAll(assets);
                 }
 
+            }
+            if(CollectionUtils.isNotEmpty(assetInfoList)){
+                List<AssetInfo> collect = assetInfoList.stream().filter(item -> dao.secondment(item.getUid()) > 0).map(item->{
+                    item.setErrorMessage("设备借调中，不能修改使用科室!");
+                    return item;
+                }).collect(Collectors.toList());
+                assetInfos.addAll(collect);
+                assetInfoList.removeAll(collect);
             }
         }
         if(assetInfoList == null && assetInfoList.isEmpty()){

@@ -678,6 +678,11 @@ public class AssetFileImportBaseService {
                         result.add(Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备有未完成的日常检查工单,不能修改科室");
                     }
+                    if(assetDao.secondment(asset.getUid())>0){
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 设备正在科室借调中,不能修改科室");
+                    }
                 }
             }
 

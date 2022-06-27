@@ -55,7 +55,7 @@
             </p:submenu>
             <!-- 备件管理 end  -->
 
-            <p:submenu id="um073" label="#{msg.EquipmentSwap}" icon="fa fa-folder-open-o" rendered="#{((not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.isHospitalUser() and userContextService.accessContains('assetAdjust'))}">
+            <p:submenu id="um073" label="#{msg.EquipmentSwap}" icon="fa fa-folder-open-o" rendered="#{(userContextService.siteOrgInfoChild.size() > 0) or ((not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.isHospitalUser() and userContextService.accessContains('assetAdjust')) }">
                 <p:menuitem id="um901" value="#{msg.RequestForBorrow}" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.borrowApply')}"/>
                 <p:menuitem id="um903" value="#{msg.BorrowAcceptance}" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.accessContains('assetAdjust.borrowAccept')}"/>
                 <p:menuitem id="um902" value="#{msg.RequestForReturn}" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.returnApply')}"/>
