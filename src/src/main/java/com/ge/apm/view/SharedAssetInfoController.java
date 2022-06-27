@@ -83,15 +83,23 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         wfcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
-        WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(user.getSiteUID());
-        if(workflowConfig.getWhethertoenableunattended() == null || workflowConfig.getWhethertoenableunattended() == false){
-            whethertoenableunattended = false;
-        }else {
-            whethertoenableunattended = true;
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite != null){
+            deptids = wfcDao.findDeptForSharedAsset(selectSite.getUid());
+            WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(selectSite.getUid());
+            whethertoenableunattended=workflowConfig.getWhethertoenableunattended();
+        }else{
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
+            WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(user.getSiteUID());
+            if(workflowConfig.getWhethertoenableunattended() == null || workflowConfig.getWhethertoenableunattended() == false){
+                whethertoenableunattended = false;
+            }else {
+                whethertoenableunattended = true;
+            }
         }
+
         sharedAssetSwapIndexDao = WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         this.selectedMap = new HashMap();
 
