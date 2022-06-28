@@ -14,7 +14,7 @@ public interface SimplePartsReportMapper {
 
 
     @SelectProvider(type = SimplePartsReportProvider.class,method="querySimplePartsReportList")
-    List<SimplePartsReportVo> querySimplePartsReportList(String startDate, String endDate);
+    List<SimplePartsReportVo> querySimplePartsReportList(String startDate, String endDate,String tenantUID);
 
 
 }

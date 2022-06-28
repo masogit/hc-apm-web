@@ -143,6 +143,61 @@ public class WorkOrderDocxRenderService {
                 mapESignSignature(null, target,"auditSignatureList"+i, "audit_signature_title"+i, "备件审核签名： ");
             }
         }
+        size=0;
+        if (source.containsKey("serviceRequestPicture")) {
+            List<String> serviceRequestPicture= (List)source.get("serviceRequestPicture");
+            if (serviceRequestPicture!=null && !serviceRequestPicture.isEmpty()){
+                size = serviceRequestPicture.size();
+                for (int i = 0; i < size; i++) {
+                    String storageId = serviceRequestPicture.get(i);
+                    if (storageId !=null){
+                        mapESignSignature(storageId, target,"serviceRequestPicture"+i, "service_request_picture_title"+i, "报修图片： ");
+                    }
+                }
+            }
+        }
+        if(size<5){
+            for (int i = size; i < 5; i++) {
+                mapESignSignature(null, target,"serviceRequestPicture"+i, "service_request_picture_title"+i, "报修图片： ");
+            }
+        }
+        size=0;
+        if (source.containsKey("workOrderPicture")) {
+            List<String> workOrderPicture= (List)source.get("workOrderPicture");
+            if (workOrderPicture!=null && !workOrderPicture.isEmpty()){
+                size = workOrderPicture.size();
+                for (int i = 0; i < size; i++) {
+                    String storageId = workOrderPicture.get(i);
+                    if (storageId !=null){
+                        mapESignSignature(storageId, target,"workOrderPicture"+i, "workorder_picture_title"+i, "维修图片： ");
+                    }
+                }
+            }
+        }
+        if(size<5){
+            for (int i = size; i < 5; i++) {
+                mapESignSignature(null, target,"workOrderPicture"+i, "workorder_picture_title"+i, "维修图片： ");
+            }
+        }
+        size=0;
+        if (source.containsKey("partsPicture")) {
+            List<String> partsPicture= (List)source.get("partsPicture");
+            if (partsPicture!=null && !partsPicture.isEmpty()){
+                size = partsPicture.size();
+                for (int i = 0; i < size; i++) {
+                    String storageId = partsPicture.get(i);
+                    if (storageId !=null){
+                        mapESignSignature(storageId, target,"partsPicture"+i, "parts_picture_title"+i, "备件图片： ");
+                    }
+                }
+            }
+        }
+        if(size<5){
+            for (int i = size; i < 5; i++) {
+                mapESignSignature(null, target,"partsPicture"+i, "parts_picture_title"+i, "备件图片： ");
+            }
+        }
+
         mapESign(source, target, "partsSignature", "partsSignature_title", "新增备件签名： ");
         mapESign(source, target, "medicalWorkerApproverSignature", "medicalWorkerApproverSignature_title", "医工组长签名： ");
         int num=0;

@@ -44,6 +44,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.ge.apm.domain.V2_BlobObject.BO_SUB_TYPE_IMG;
+
 /**
  * Created by 212605082 on 2017/7/25.
  */
@@ -92,6 +94,8 @@ public class WorkOrderExportService {
     private ServiceRequestApiService serviceRequestApiService;
     @Autowired
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
+    @Autowired
+    private V2_WorkOrderService woService;
 
     public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg,OrgInfo clinicalDepte){
         String token = UserContextService.getAccessToken();
@@ -745,6 +749,24 @@ public class WorkOrderExportService {
                     log.info("auditSignatureList:{}",list.size());
                     workOrderMap.put("auditSignatureList",list );
                 }
+            }
+
+            List<V2_BlobObject> pictureList = woService.getAttachByBoSubType(workOrderExportPojo.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
+            if(pictureList!=null) {
+                List<V2_BlobObject> serviceRequestPicture = new ArrayList<>();  //报修图片
+                List<V2_BlobObject> workOrderPicture = new ArrayList<>();    //维修图片
+                List<V2_BlobObject> partsPicture = new ArrayList<>();        //备件图片，目前只有mobile端可以上传图片
+                serviceRequestPicture = pictureList.stream().filter(item -> "ServiceRequest".equals(item.getBoType())).collect(Collectors.toList());
+                workOrderPicture = pictureList.stream().filter(item -> "WorkOrder".equals(item.getBoType())).collect(Collectors.toList());
+                List<V2_WorkOrder_Detail> details = workOrderDetailDao.getByWoIdOrderByCreatedDateDesc(workOrderExportPojo.getId());
+                if (details != null && !details.isEmpty()) {
+                    for(V2_WorkOrder_Detail detail : details) {
+                        partsPicture.addAll(detail.getAttachments());
+                    }
+                }
+                workOrderMap.put("serviceRequestPicture",serviceRequestPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                workOrderMap.put("workOrderPicture",workOrderPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                workOrderMap.put("partsPicture",partsPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
             }
 
             if(workOrderExportPojo.getId()!=null){

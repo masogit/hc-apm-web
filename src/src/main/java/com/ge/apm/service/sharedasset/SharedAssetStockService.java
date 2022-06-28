@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import javax.faces.model.SelectItem;
 
+import com.ge.apm.domain.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.TreeNode;
@@ -32,11 +33,6 @@ import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.dao.mapper.SharedAssetMapper;
 import com.ge.apm.dao.mapper.SharedAssetRequestMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SharedAssetReqDetail;
-import com.ge.apm.domain.SharedAssetRequest;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
@@ -402,6 +398,12 @@ public class SharedAssetStockService {
     }
 
     public Boolean isLogPatientInfoEnabled() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite != null){
+            WorkflowConfig workflowConfig = wfCfigDao.findFirstBySiteUID(selectSite.getUid());
+            return workflowConfig==null?false:workflowConfig.getEnableLogPatientInfo();
+        }
         return wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID()).getEnableLogPatientInfo();
     }
     private List<String> getWorkflowConfig(){

@@ -11,6 +11,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -41,10 +42,22 @@ public class Date2StringConverter implements Converter {
             if (object instanceof Date) {
                 return sdf.format(object);
             }
-            return sdf.format(new Date(object.toString()));
+            return parseDate(object.toString());
         } else {
             return null;
         }
+    }
+
+    private String parseDate(String dateString){
+
+        if(dateString.matches("[0-9]{4}/[0-9]{2}/[0-9]{2}")){
+            return dateString.replaceAll("/", "-");
+        }
+        if(dateString.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")){
+            return dateString;
+        }
+        return sdf.format(new Date(dateString));
+
     }
 
 }

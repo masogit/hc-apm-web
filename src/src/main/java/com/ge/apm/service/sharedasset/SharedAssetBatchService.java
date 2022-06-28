@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.dao.mapper.SharedAssetMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SharedAssetReqDetail;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -173,6 +170,12 @@ public class SharedAssetBatchService {
     }
 
     public Boolean isLogPatientInfoEnabled() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite != null){
+            WorkflowConfig workflowConfig = wfCfigDao.findFirstBySiteUID(selectSite.getUid());
+            return workflowConfig==null?false:workflowConfig.getEnableLogPatientInfo();
+        }
         return wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID()).getEnableLogPatientInfo();
     }
 
