@@ -213,7 +213,8 @@ public class Functions {
             sum = sum.add(i.subtract(avg).multiply(i.subtract(avg)));
         }
 
-        return new BigDecimal(Math.sqrt(sum.divide(new BigDecimal(valueList.size()-1), SCALE, BigDecimal.ROUND_HALF_UP).doubleValue()));
+        return new BigDecimal(Math.sqrt(sum.divide(new BigDecimal(valueList.size() - 1),SCALE, RoundingMode.HALF_UP).doubleValue()))
+                .setScale(SCALE, RoundingMode.HALF_UP);
 
     }
 

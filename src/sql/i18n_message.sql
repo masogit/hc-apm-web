@@ -509,7 +509,10 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairType','2','送到维修中心','To The Service Center',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairType','3','返厂维修','Return Factory For Repair',NULL,-1);
     --县域新增维修类型“远程修复”
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairType','4','远程修复','Remote Repair',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairTypeCountyArea','1','上门维修','On-site Repair',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairTypeCountyArea','2','送到维修中心','To The Service Center',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairTypeCountyArea','3','返厂维修','Return Factory For Repair',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairTypeCountyArea','4','远程修复','Remote Repair',NULL,-1);
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('alertType','1','压缩机状态报警(常开报警)','Compressor Status Alarm (Normally Open)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('alertType','2','压缩机报警状态报警(常开报警)','Compressor Alarm Status Alarm (Normally Open)',NULL,-1);
@@ -4682,6 +4685,16 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PartsItemCode', '备件编号', 'Part Item Code', NULL, '-1');
 
+
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reasonCategorize', 'scrapped', '已拆机或已报废', 'scrapped', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reasonCategorize', 'notAllowed', '有三方保，医院不允许贴码', 'not allowed', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reasonCategorize', 'notFind', '设备找不到', 'not find', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reasonCategorize', 'other', '其他', 'other', NULL, -1);
+
+
+
+
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetDisposalResults','资产处置结果',' asset Disposal Results',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetDisposalResultsType','1','产权注销','Cancellation of property rights',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetDisposalResultsType','2','产权转让','transfer of property rights',NULL,-1);
@@ -4691,3 +4704,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','systemNum3','系统编号3',' system Num 3',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','systemNum4','系统编号4',' system Num 4',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','systemNum5','系统编号5',' system Num 5',NULL,-1);
+
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','PaymentPlan','付款计划','Payment Plan',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','AddPaymentPlan','添加付款计划','Add Payment Plan',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','EstimatedPaymentDate','预计付款日期','Estimated payment date',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','PaymentProgress','付款进度','Payment progress',NULL,	-1	);

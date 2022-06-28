@@ -130,7 +130,8 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         OrgInfo selectSite = userContextService.getSelectSite();
         if(selectSite != null){
-            orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(selectSite.getUid());
+            List<OrgInfo> deptListBySiteUid = orgInfoDao.getDeptListBySiteUid(selectSite.getUid());
+            orgUidList = deptListBySiteUid.stream().map(OrgInfo::getUid).collect(Collectors.toList());
 
         }else{
             UserAccount user = UserContextService.getCurrentUserAccount();

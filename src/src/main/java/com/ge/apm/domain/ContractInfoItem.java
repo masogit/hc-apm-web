@@ -160,6 +160,12 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "payment_date")
     @Temporal(TemporalType.DATE)
     private Date paymentDate;
+
+    //预计付款日期
+    @Basic(optional = true)
+    @Column(name = "estimated_payment_date")
+    @Temporal(TemporalType.DATE)
+    private Date estimatedPaymentDate;
     
     //付款金额
     @Basic(optional = true)
@@ -428,6 +434,14 @@ public class ContractInfoItem implements Serializable {
 
     public void setPaymentMode(String paymentMode) {
         this.paymentMode = paymentMode;
+    }
+
+    public Date getEstimatedPaymentDate() {
+        return estimatedPaymentDate;
+    }
+
+    public void setEstimatedPaymentDate(Date estimatedPaymentDate) {
+        this.estimatedPaymentDate = estimatedPaymentDate;
     }
 
     @Override
