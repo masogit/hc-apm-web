@@ -25,7 +25,7 @@ public class V2_WorkOrderManHours implements Serializable, Cloneable{
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
-    //报修单号
+    //工单id
     @Column(name = "wo_id")
     private String woId;
 
