@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -408,5 +409,12 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setBatchSharedAssetTypeUid(String batchSharedAssetTypeUid) {
         this.batchSharedAssetTypeUid = batchSharedAssetTypeUid;
     }
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        removeFilterOnField("siteUID");
+        removeFilterOnField("institutionUID");
+        removeFilterOnField("hospitalUID");
+        bean.onSelectSiteTreeNode(event);
 
+    }
 }
