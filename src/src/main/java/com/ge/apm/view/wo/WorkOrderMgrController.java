@@ -1184,11 +1184,12 @@ public void test1(){
         currentStatus = selected.getAssetInfo().getStatus();
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
-        audioList = getServiceRequestPicList(selected.getSrId(), 2, null);
-        picList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
-
-
-        attachList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
+//        audioList = getServiceRequestPicList(selected.getSrId(), 2, null);
+//        picList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
+//        attachList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
+        audioList = new ArrayList<>();
+        picList = new ArrayList<>();
+        attachList = new ArrayList<>();
     }
 
     public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type, String boSubType) { //type 1:picture 2:audio
@@ -3060,16 +3061,6 @@ public void test1(){
         return null;
     }
 
-    private V2_WorkOrderManHours selectedManHours;
-
-    public V2_WorkOrderManHours getSelectedManHours() {
-        return selectedManHours;
-    }
-
-    public void setSelectedManHours(V2_WorkOrderManHours selectedManHours) {
-        this.selectedManHours = selectedManHours;
-    }
-
     public List<V2_WorkOrderManHours> getV2WorkOrderManHoursList() {
         return this.v2WorkOrderManHoursList;
     }
@@ -3087,6 +3078,7 @@ public void test1(){
             //初始化默认新增一行
             V2_WorkOrderManHours workOrderManHours = new V2_WorkOrderManHours();
             workOrderManHours.setId("000");
+//            v2WorkOrderManHoursList.add(0,workOrderManHours);
             v2WorkOrderManHoursList.add(workOrderManHours);
         }
         this.v2WorkOrderManHoursList = v2WorkOrderManHoursList;
@@ -3097,21 +3089,30 @@ public void test1(){
         setV2WorkOrderManHoursList(v2WorkOrderManHoursList);
     }
 
+    /**
+     * 包括新增和修改
+     * @param event
+     */
     public void onRowEdit(RowEditEvent event) {
         V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-        if(workOrderManHours.getId().equals("000")){
-            V2_WorkOrderManHours v2_workOrderManHours = manHoursDao.findByManHoursOwnerAndManHoursDateAndWoId(workOrderManHours.getManHoursOwner(),workOrderManHours.getManHoursDate(),selected.getId());
+        if(workOrderManHours.getId().equals("000")){//新增时保存记录处理
+            V2_WorkOrderManHours v2_workOrderManHours = manHoursDao.findByManHoursOwnerAndManHoursDateAndWoId(
+                    workOrderManHours.getManHoursOwner(),workOrderManHours.getManHoursDate(),selected.getId());
             if(v2_workOrderManHours != null){
                 WebUtil.addErrorMessage("当前日期工时所属人"+workOrderManHours.getManHoursOwner()+"已有记录，请选择其他日期");
                 return;
             }
-            workOrderManHours.setId(null);
             workOrderManHours.setCreatedBy(userContextService.getUserLoginName());
             workOrderManHours.setCreatedTime(new Date());
         }else{
             workOrderManHours.setModifiedBy(userContextService.getUserLoginName());
             workOrderManHours.setModifiedTime(new Date());
+        }
+        if(workOrderManHours.getWorkHours() == null && workOrderManHours.getTravelHours() == null
+                && workOrderManHours.getWaitingHours() == null){
+            WebUtil.addErrorMessage("工作工时、差旅工时和等待工时三者必须填一个！！！");
+            return;
         }
         if (workOrderManHours.getWorkHours() != null && workOrderManHours.getWorkHours() < 0.01) {
             WebUtil.addErrorMessage("工作工时不能小于0.01");
@@ -3125,27 +3126,46 @@ public void test1(){
             WebUtil.addErrorMessage("等待工时不能小于0.01");
             return;
         }
-        manHoursDao.save(workOrderManHours);
-        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+        if(workOrderManHours.getId().equals("000")){
+            workOrderManHours.setId(null);//这个不能提前设null，否则异常情况页面显示不对。
+        }
+        saveWorkOrderManHours(workOrderManHours);
         v2WorkOrderManHoursList = manHoursDao.findByWoId(workOrderManHours.getWoId());
         setV2WorkOrderManHoursList(v2WorkOrderManHoursList);
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+    }
+
+    @Transactional
+    public void saveWorkOrderManHours(V2_WorkOrderManHours workOrderManHours){
+        manHoursDao.save(workOrderManHours);
     }
 
     public void onRowCancel(RowEditEvent event) {
         V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
-        if(v2WorkOrderManHoursList.contains(workOrderManHours)){
-            if(workOrderManHours.getId().equals("000")){//如果还没保存数据库的，则清空对象。
-                workOrderManHours = new V2_WorkOrderManHours();
-                workOrderManHours.setId("000");
-            }
+        if(workOrderManHours.getId().equals("000")){
+            v2WorkOrderManHoursList.stream().forEach(item -> {
+                if(item.getId().equals("000")){
+                    item.setWoId(null);
+                    item.setSrNum(null);
+                    item.setComment(null);
+                    item.setWaitingHours(null);
+                    item.setTravelHours(null);
+                    item.setWorkHours(null);
+                    item.setManHoursDate(null);
+                    item.setManHoursOwner(null);
+                }
+            });
+        }else{
+            prepareMoreManHoursView();
         }
     }
 
     public void initManHours() {
         v2WorkOrderManHoursList.stream().forEach(item -> {
-            if(item.getId().equals("000"))
-            item.setWoId(selected.getId());
-            item.setSrNum(selected.getServiceRequest().getSrNum());
+            if(item.getId().equals("000")){
+                item.setWoId(selected.getId());
+                item.setSrNum(selected.getServiceRequest().getSrNum());
+            }
         });
     }
 
@@ -3153,5 +3173,15 @@ public void test1(){
         manHoursDao.delete(v2_workOrderManHours.getId());
         v2WorkOrderManHoursList.remove(v2_workOrderManHours);
     }
+
+    public V2_WorkOrderManHours getSelectedManHours() {
+        return selectedManHours;
+    }
+
+    public void setSelectedManHours(V2_WorkOrderManHours selectedManHours) {
+        this.selectedManHours = selectedManHours;
+    }
+
+    private V2_WorkOrderManHours selectedManHours;
 }
 

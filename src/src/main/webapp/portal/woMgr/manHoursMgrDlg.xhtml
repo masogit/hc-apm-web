@@ -4,24 +4,27 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+      xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
 
-    <p:dialog class="moreManHoursDialog" id="moreManHoursDialog" widgetVar="moreManHoursDialog" modal="true" height="500" width="1100"  resizable="true" draggable="true" appendTo="@(body)" header="工时管理">
+    <p:dialog class="moreManHoursDialog" id="moreManHoursDialog" widgetVar="moreManHoursDialog" modal="true" height="600" width="1100"  resizable="true" draggable="true" appendTo="@(body)" header="工时管理">
         <h:form id="moreManHoursDialogForm">
             <h:panelGroup>
-                <p:dataTable id="datalist" value="#{workOrderMgrController.v2WorkOrderManHoursList}" var="item" widgetVar="varDataList"
+                <p:dataTable id="manHoursDataList" value="#{workOrderMgrController.v2WorkOrderManHoursList}" var="item" widgetVar="varManHoursDataList"
                              selectionMode="single" selection="#{workOrderMgrController.selectedManHours}" editable="true"
                              lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.manHoursDate}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
-                    <p:ajax event="rowEdit" listener="#{workOrderMgrController.onRowEdit}" update="datalist"/>
-                    <p:ajax event="rowEditCancel" listener="#{workOrderMgrController.onRowCancel}" update="datalist"/>
+                    <p:ajax event="rowEdit"  listener="#{workOrderMgrController.onRowEdit}" update="manHoursDataList"/>
+                    <p:ajax event="rowEditCancel" listener="#{workOrderMgrController.onRowCancel}" update="manHoursDataList"/>
+                    <p:ajax event="filter" listener="#{workOrderMgrController.v2WorkOrderManHoursList}" update="manHoursDataList"/>
+                    <p:column headerText="工单编号">
+                        <h:outputText value="#{item.srNum}"/>
+                    </p:column>
                     <p:column headerText="工时所属人">
                         <p:cellEditor>
                             <f:facet name="output">
@@ -36,7 +39,9 @@
                     <p:column headerText="工时日期">
                         <p:cellEditor>
                             <f:facet name="output">
-                                <h:outputText value="#{item.manHoursDate}"/>
+                                <h:outputText value="#{item.manHoursDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd" />
+                                </h:outputText>
                             </f:facet>
                             <f:facet name="input">
                                 <p:calendar timeZone="GMT+8" pattern="yyyy-MM-dd" value="#{item.manHoursDate}"
@@ -46,9 +51,6 @@
                                 <span style="color: red;">*</span>
                             </f:facet>
                         </p:cellEditor>
-                    </p:column>
-                    <p:column headerText="工单编号">
-                        <h:outputText value="#{item.srNum}"/>
                     </p:column>
                     <p:column headerText="工作工时">
                         <p:cellEditor>
@@ -91,9 +93,9 @@
                         </p:cellEditor>
                     </p:column>
                     <p:column headerText="操作">
-                        <p:commandLink process="@this" actionListener="#{workOrderMgrController.initManHours}" title="#{msg.Add}" update="datalist" rendered="#{item.id eq '000' and empty item.woId}"><span class="ui-icon ui-icon-plusthick" /></p:commandLink>
-                        <p:rowEditor cancelTitle="取消" editTitle="修改" saveTitle="保存" rendered="#{item.id ne '000' or (item.id eq '000' and item.woId != null)}" />
-                        <p:commandLink process="@this" actionListener="#{workOrderMgrController.deleteManHours(item)}" title="#{msg.Delete}" update="datalist" rendered="#{item.id ne '000'}"><span class="ui-icon ui-icon-trash" /></p:commandLink>
+                        <p:commandLink process="@this" actionListener="#{workOrderMgrController.initManHours}" title="#{msg.Add}" update="manHoursDataList" rendered="#{item.id eq '000' and empty item.woId}"><span class="ui-icon ui-icon-plusthick" /></p:commandLink>
+                        <p:rowEditor cancelTitle="取消" editTitle="修改" saveTitle="保存" rendered="#{item.id ne '000' or (item.id eq '000' and item.woId != null)}" update="manHoursDataList"/>
+                        <p:commandLink process="@this" actionListener="#{workOrderMgrController.deleteManHours(item)}" title="#{msg.Delete}" update="manHoursDataList" rendered="#{item.id ne '000'}"><span class="ui-icon ui-icon-trash" /></p:commandLink>
                     </p:column>
                 </p:dataTable>
             </h:panelGroup>
