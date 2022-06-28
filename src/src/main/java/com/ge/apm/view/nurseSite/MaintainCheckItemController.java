@@ -1,11 +1,7 @@
 package com.ge.apm.view.nurseSite;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
@@ -13,6 +9,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.alibaba.fastjson.JSON;
+import com.ge.apm.domain.pure.TableOption;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -56,8 +54,8 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     private UserAccount currentUser;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private NurseSiteMaintainCheckItemRepository dao;
-  	
-
+  	private List<TableOption> option=new ArrayList<>();
+	private TableOption tableOption;
     @Override
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -134,4 +132,70 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 		FacesMessage message = new FacesMessage(str,null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
+//	public List<TableOption> getOptions(){
+//		String selected = this.selected.getOptions();
+//		if(StringUtils.isNotBlank(selected)){
+//			try {
+//				List<TableOption> listObjectSec=JSONArray.parseArray(selected,TableOption.class);
+//				option = listObjectSec;
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		return option;
+//	}
+//
+//	public void addOption() {
+//		for (TableOption tableOption1 : option) {
+//			if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
+//				tableOption1.setValue(tableOption.getValue());
+//				this.selected.setOptions(JSONArray.toJSONString(option));
+//				tableOption=null;
+//				return ;
+//			}
+//		}
+//		if(option.add(tableOption)){
+//			this.selected.setOptions(JSONArray.toJSONString(option));
+//		}
+//
+//	}
+//
+//	public void prepareAddOption(){
+//		tableOption=new TableOption();
+//	}
+//	public void prepareEditOption(TableOption option) {
+//		tableOption = option;
+//	}
+//
+//	public void removeOption(TableOption option) {
+//		String selected = this.selected.getOptions();
+//		if(StringUtils.isNotBlank(selected)){
+//			try {
+//				List<TableOption> listObjectSec=JSONArray.parseArray(selected,TableOption.class);
+//				List<TableOption> collect = listObjectSec.stream().filter(item -> !item.getKey().equals(option.getKey())).collect(Collectors.toList());
+//				this.selected.setOptions(JSONArray.toJSONString(collect));
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+//
+//	public TableOption getTableOption() {
+//		return tableOption;
+//	}
+//
+//	public void setTableOption(TableOption tableOption) {
+//		this.tableOption = tableOption;
+//	}
+//
+//	public void onRuleChange(){
+//    	selected.setDefaultValue(null);
+//	}
+//	public boolean dateType(){
+//		if(selected != null){
+//			return "Date".equals(selected.getFieldType());
+//		}else{
+//			return false;
+//		}
+//	}
 }

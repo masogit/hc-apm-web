@@ -25,16 +25,8 @@
                             <label class="label">#{msg.vendor}</label>
                             <p:autoComplete id="supplier" dropdown="true" value="#{supplierEmpowermentController.selectedSupplierUid}" scrollHeight="300" forceSelection="true"
                                             completeMethod="#{supplierEmpowermentController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" class="inputVendor">
-                                <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onSupplierChange()}" update="selectedUser"/>
+                                <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onSupplierChange()}" update="AssetEmpowermentForm:datalist selectedUser"/>
                                 <p:ajax listener="#{supplierEmpowermentController.onSupplierChange()}" />
-                            </p:autoComplete>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">供应商负责人</label>
-                            <p:autoComplete id="selectedUser" dropdown="true" value="#{supplierEmpowermentController.selectedUserUid}" scrollHeight="300" forceSelection="true"
-                                            completeMethod="#{supplierEmpowermentController.supplierUsers}" var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" class="inputVendor">
-                                <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onSupplierUserChange()}" update="AssetEmpowermentForm:datalist"/>
-                                <p:ajax listener="#{supplierEmpowermentController.onSupplierUserChange()}" />
                             </p:autoComplete>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}" id="siteUid">
@@ -193,6 +185,14 @@
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
                     </p:dataTable>
+                    <h:panelGroup>
+                        <label class="label">供应商负责人</label>
+                        <p:autoComplete id="selectedUser" dropdown="true" value="#{supplierEmpowermentController.selectedUserUid}" scrollHeight="300" forceSelection="true"
+                                        completeMethod="#{supplierEmpowermentController.supplierUsers}" var="t" itemLabel="#{t.name}" itemValue="#{t.uid}" class="inputVendor">
+                            <p:ajax event="itemSelect" listener="#{supplierEmpowermentController.onSupplierUserChange()}" update=""/>
+                            <p:ajax listener="#{supplierEmpowermentController.onSupplierUserChange()}" />
+                        </p:autoComplete>
+                    </h:panelGroup>
                 </h:form>
                 <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{supplierEmpowermentController.doEmpowerment()}" value="授权" update=":AssetEmpowermentForm:datalist"/>
             </div>

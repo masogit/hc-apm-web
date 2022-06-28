@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import javax.faces.model.SelectItem;
 
+import com.ge.apm.domain.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -31,17 +33,13 @@ import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.dao.mapper.SharedAssetMapper;
 import com.ge.apm.dao.mapper.SharedAssetRequestMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SharedAssetReqDetail;
-import com.ge.apm.domain.SharedAssetRequest;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import javaslang.Tuple3;
+import webapp.framework.web.WebUtil;
 
 @Service
 public class SharedAssetStockService {
@@ -73,9 +71,7 @@ public class SharedAssetStockService {
     private SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
 
     public void buildDefaultFilters(Wrapper<AssetInfo> ew) {
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-
+        List<String> orgUidList = getOrgInfo();
         ew.andNew()
             .in("asset_tenant_uid", orgUidList)
             .or().in("asset_institution_uid", orgUidList)
@@ -86,13 +82,12 @@ public class SharedAssetStockService {
             .eq("asset_is_deleted", false)
             .and().eq("asset_is_valid", true);
 
-        List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
+        List<String> allocationCenterUids =getWorkflowConfig();
         ew.andNew().in("clinical_dept_uid", allocationCenterUids);
     }
 
     public void addFiltersByQueryType(Wrapper<AssetInfo> ew, int queryType) {
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
+        List<String> allocationCenterUids = getWorkflowConfig();
         switch (queryType) {
             case 1 :
                 ew.andNew().eq("asset_status", 1).or().eq("asset_status", 3);
@@ -134,9 +129,14 @@ public class SharedAssetStockService {
 
     public List<SelectItem> getAllAccessibleOrgDeptListNestedByOrgLevel() {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
-
-        TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(user.getSiteUID(), user.getUid());
+        List<String> allocationCenterUids = getWorkflowConfig();
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        String siteUID = user.getSiteUID();
+        if(selectSite != null){
+            siteUID=selectSite.getSiteUID();
+        }
+        TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(siteUID, user.getUid());
 
         TreeNodeUtil.sortTreeNodeByName(rootNode);
 
@@ -294,7 +294,10 @@ public class SharedAssetStockService {
     }
 
     private String getVoucherTitle4Print(UserAccount currentUser, String flag) {
-        List<String> orgUids = wfCfigDao.findDeptForSharedAsset(currentUser.getSiteUID());
+        List<String> orgUids = getWorkflowConfig();
+        if(CollectionUtils.isEmpty(orgUids)){
+            return "";
+        }
         List<OrgInfo> allocDeptList = orgInfoRepository.findByUids(new HashSet<>(orgUids));
         OrgInfo allocDept = null;
         if (allocDeptList.stream().findFirst().isPresent()){
@@ -337,7 +340,7 @@ public class SharedAssetStockService {
     private void processAssets(List<AssetInfo> assets) {
         // hide deptName if asset is owned by allocation center
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
+        List<String> allocationCenterUids =getWorkflowConfig();
         for(AssetInfo asset : assets) {
             if(allocationCenterUids.contains(asset.getAssetDeptUID())) {
                 asset.getAssetDeptOrg().setName("");
@@ -395,7 +398,47 @@ public class SharedAssetStockService {
     }
 
     public Boolean isLogPatientInfoEnabled() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite != null){
+            WorkflowConfig workflowConfig = wfCfigDao.findFirstBySiteUID(selectSite.getUid());
+            return workflowConfig==null?false:workflowConfig.getEnableLogPatientInfo();
+        }
         return wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID()).getEnableLogPatientInfo();
     }
-
+    private List<String> getWorkflowConfig(){
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        List<String> workflowConfigList=new ArrayList<>();
+        if(selectSite != null){
+            List<String> orgInfoUidsByparentUid = orgInfoRepository.getOrgInfoUidsByparentUid(selectSite.getUid());
+            for (String s : orgInfoUidsByparentUid) {
+                List<String> deptForSharedAsset = wfCfigDao.findDeptForSharedAsset(s);
+                if(CollectionUtils.isNotEmpty(deptForSharedAsset)){
+                    workflowConfigList.addAll(deptForSharedAsset);
+                }
+            }
+        }else{
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
+            if(CollectionUtils.isNotEmpty(allocationCenterUids)){
+                workflowConfigList.addAll(allocationCenterUids);
+            }
+        }
+        return workflowConfigList;
+    }
+    private List<String> getOrgInfo(){
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        List<String> orgInfList=new ArrayList<>();
+        if(selectSite != null){
+            List<String> orgInfoUidsByparentUid = orgInfoRepository.getOrgInfoUidsByparentUid(selectSite.getUid());
+            orgInfList.addAll(orgInfoUidsByparentUid);
+        }else{
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            orgInfList.addAll(orgUidList);
+        }
+        return orgInfList;
+    }
 }

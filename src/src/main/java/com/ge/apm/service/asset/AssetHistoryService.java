@@ -40,6 +40,7 @@ public class AssetHistoryService {
     public static final String FILED_DEVICE_STATUS = "deviceStatus";
     public static final String FILED_STATUS = "status";
     public static final String IS_VALID = "isValid";
+    public static final String ASSET_DISPOSAL_RESULTS = "assetDisposalResults";
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -196,6 +197,23 @@ public class AssetHistoryService {
             if (null != newFieldValue) {
                 newFieldValue = Boolean.valueOf(String.valueOf(newFieldValue)) ? "是" : "否";
             }
+        }else if(ASSET_DISPOSAL_RESULTS.equals(fieldName)) {
+            Field field = oldAsset.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+
+            oldFieldValue = field.get(oldAsset);
+            newFieldValue = field.get(newAsset);
+
+            if (Objects.equals(oldFieldValue, newFieldValue)) {
+                return Optional.empty();
+            }
+
+            if (null != oldFieldValue) {
+                oldFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("assetDisposalResultsType", String.valueOf(oldFieldValue));
+            }
+            if (null != newFieldValue) {
+                newFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("assetDisposalResultsType", String.valueOf(newFieldValue));
+            }
         }
 
         if (Objects.equals(oldFieldValue, newFieldValue)) {
@@ -267,6 +285,7 @@ public class AssetHistoryService {
                     case FILED_DEVICE_STATUS:
                     case FILED_STATUS:
                     case IS_VALID:
+                    case ASSET_DISPOSAL_RESULTS:
                         optionalResult = getSpecialFieldValue(oldAsset, newAsset, fieldName);
                         break;
                     case FIELD_ASSET_DEPT_NAME:

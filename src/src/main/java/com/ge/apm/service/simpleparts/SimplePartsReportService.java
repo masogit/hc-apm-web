@@ -21,7 +21,9 @@ public class SimplePartsReportService {
     private SimplePartsReportMapper simplePartsReportMapper;
 
 
-    public List<SimplePartsReportVo> querySimplePartsReportList(Date startTime, Date endTime) {
+
+
+    public List<SimplePartsReportVo> querySimplePartsReportList(Date startTime, Date endTime,String tenantUID) {
         String startDate = null;
         String endDate = null;
         if(startTime != null){
@@ -30,6 +32,6 @@ public class SimplePartsReportService {
         if(endTime != null){
             endDate = TimeUtils.getStrDate(endTime, null) + " 23:59:59";
         }
-        return simplePartsReportMapper.querySimplePartsReportList(startDate,endDate);
+        return simplePartsReportMapper.querySimplePartsReportList(startDate,endDate,tenantUID);
     }
 }

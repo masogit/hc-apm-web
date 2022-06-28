@@ -1490,5 +1490,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
         }
     }
-
+    public boolean secondment(){
+        if(StringUtils.isBlank(selected.getUid())){
+            return false;
+        }
+        return dao.secondment(selected.getUid())>0;
+    }
 }

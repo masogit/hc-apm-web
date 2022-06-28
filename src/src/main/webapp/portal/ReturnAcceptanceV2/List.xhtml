@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
@@ -31,6 +32,20 @@
                 <div class="ui-g-12 card">
             <h:form id="IouListForm">
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                        <c:if test="#{userContextService.selectSite != null}">
+                            <p:commandButton id="basic" value="#{empty userContextService.selectSite? msg.AllHospitals:userContextService.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="basic" hideEffect="fade" style="width:350px">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="docs"  class="tree" style="width:98%;border:0;" value="#{userContextService.hospitalTree}" var="node" selectionMode="single"
+                                            selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{sharedAssetRequestV2Controller.onSelectSiteTreeNode}" update="IouListForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </c:if>
                         <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(-3)}" rendered="true" disabled="#{sharedAssetRequestV2Controller.queryIndex == -3}"/>
                         <p:commandButton value="归还待受理"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(7)}"  rendered="true" disabled="#{sharedAssetRequestV2Controller.queryIndex == 7}"/>
                         <p:commandButton value="归还待交付"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(8)}"  rendered="true" disabled="#{sharedAssetRequestV2Controller.queryIndex == 8}"/>
@@ -57,7 +72,7 @@
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
+                                <f:selectItems value="#{empty userContextService.selectSite?assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel():userContextService.getOrgInfoNode()}" />
                             </p:selectOneMenu>
                         </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
