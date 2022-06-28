@@ -122,6 +122,24 @@ public class ZkbAssetQrCodeInfo {
     @Column(name = "install_status")
     private Integer installStatus;
 
+    /**
+     * 无法贴码原因归类
+     * scrapped 已拆机或已报废
+     * notAllowed 有三方保，医院不允许贴码
+     * notFind 设备找不到
+     * other  其他
+     */
+    @Column(name = "reason_categorize")
+    private String reasonCategorize;
+
+    public String getReasonCategorize() {
+        return reasonCategorize;
+    }
+
+    public void setReasonCategorize(String reasonCategorize) {
+        this.reasonCategorize = reasonCategorize;
+    }
+
     public String getId() {
         return id;
     }
