@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class SimplePartsReportProvider {
 
-    public String querySimplePartsReportList(String startDate,String endDate){
+    public String querySimplePartsReportList(String startDate,String endDate,String tenantUID ){
         StringBuilder sb = new StringBuilder();
         sb.append("select spr.maintenance_work_order_number as workOrderNo,vsr.status as workOrderStatus,t.total_prices as partsPrice,t.transaction_qty as partQuantity,t.name as partsName, ");
         sb.append(" spi.item_code as partsCode, t.parts_description as partsDescribe,t.created_date as outbounddate,spw.name as OutboundWarehouse, spwl.name as OutboundPosition ");
@@ -23,6 +23,9 @@ public class SimplePartsReportProvider {
         }
         if(StringUtils.isNotBlank(endDate)){
             sb.append(" and t.created_date<='"+endDate+"'");
+        }
+        if(StringUtils.isNotBlank(tenantUID)){
+            sb.append(" and t.tenant_uid ='"+tenantUID+"'");
         }
         sb.append(" order by t.created_date desc");
         return sb.toString();
