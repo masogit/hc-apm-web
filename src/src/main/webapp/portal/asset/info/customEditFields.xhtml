@@ -237,7 +237,7 @@
 
         <h:panelGroup>
             <label class="label">#{msg.assetDeptName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetDeptName'].required? '*':''}</span></label>
-            <p:autoComplete dropdown="true" value="#{assetInfoEditController.selectedObjectMap['assetDept']}"  readonly="#{!assetInfoEditController.needEdit('assetDeptName') or not empty assetInfoEditController.selected.sharedAssetTypeUid}"
+            <p:autoComplete dropdown="true" value="#{assetInfoEditController.selectedObjectMap['assetDept']}"  readonly="#{assetInfoEditController.secondment() or (!assetInfoEditController.needEdit('assetDeptName') or not empty assetInfoEditController.selected.sharedAssetTypeUid)}"
                             scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['assetDeptName'].required}" requiredMessage="#{msg.assetDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteDept}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>
@@ -249,7 +249,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'clinicalDeptName')}" >
         <h:panelGroup>
             <label class="label">#{msg.clinicalDeptName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['clinicalDeptName'].required? '*':''}</span></label>
-            <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['clinicalDept']}"  readonly="#{!assetInfoEditController.needEdit('clinicalDeptName') or not empty assetInfoEditController.selected.sharedAssetTypeUid}"
+            <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['clinicalDept']}"  readonly="#{assetInfoEditController.secondment() or (!assetInfoEditController.needEdit('clinicalDeptName') or not empty assetInfoEditController.selected.sharedAssetTypeUid)}"
                             scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['clinicalDeptName'].required}" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteDept}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onAssetDeptChange('clinicalDept')}" update="@(.clinicalDeptNameChange)" />
@@ -460,6 +460,41 @@
             <label class="label">#{msg.systemId}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemId'].required? '*':''}</span></label>
             <p:inputText id="systemId" value="#{assetInfoEditController.selected.systemId}" required="#{assetInfoEditController.customConfig.assetFields['systemId'].required}"
                          requiredMessage="#{msg.systemId} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemId')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum1')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum1}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum1'].required? '*':''}</span></label>
+            <p:inputText id="systemNum1" value="#{assetInfoEditController.selected.systemNum1}" required="#{assetInfoEditController.customConfig.assetFields['systemNum1'].required}"
+                         requiredMessage="#{msg.systemNum1} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum1')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum2')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum2}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum2'].required? '*':''}</span></label>
+            <p:inputText id="systemNum2" value="#{assetInfoEditController.selected.systemNum2}" required="#{assetInfoEditController.customConfig.assetFields['systemNum2'].required}"
+                         requiredMessage="#{msg.systemNum2} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum2')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum3')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum3}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum3'].required? '*':''}</span></label>
+            <p:inputText id="systemNum3" value="#{assetInfoEditController.selected.systemNum3}" required="#{assetInfoEditController.customConfig.assetFields['systemNum3'].required}"
+                         requiredMessage="#{msg.systemNum3} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum3')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum4')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum4}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum4'].required? '*':''}</span></label>
+            <p:inputText id="systemNum4" value="#{assetInfoEditController.selected.systemNum4}" required="#{assetInfoEditController.customConfig.assetFields['systemNum4'].required}"
+                         requiredMessage="#{msg.systemNum4} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum4')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'systemNum5')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum5}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['systemNum5'].required? '*':''}</span></label>
+            <p:inputText id="systemNum5" value="#{assetInfoEditController.selected.systemNum5}" required="#{assetInfoEditController.customConfig.assetFields['systemNum5'].required}"
+                         requiredMessage="#{msg.systemNum5} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemNum5')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'financingNum')}" >

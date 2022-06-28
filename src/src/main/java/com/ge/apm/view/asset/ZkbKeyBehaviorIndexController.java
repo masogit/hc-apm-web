@@ -7,11 +7,11 @@ import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.domain.ZkbKeyBehaviorIndex;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbKeyBehaviorIndexService;
-import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.zkb.ZkbPartOrderController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -126,6 +126,8 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     private List<TenantInfo> tenantInfoList;
 
+    private List<TenantInfo> tenantInfoListForExcel;
+
     private List<TenantInfo> selectTenantInfoList;
 
     @Override
@@ -148,7 +150,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             isZkbadmin=ZkbKeyBehaviorIndexService.no;
         }
         this.rankMap = this.zkbKeyBehaviorIndexService.initRankingMap();
-        this.tenantInfoList=this.zkbKeyBehaviorIndexService.getSourceTenantInfoList(currentUser.getLoginName());
+        this.tenantInfoListForExcel=this.zkbKeyBehaviorIndexService.getSourceTenantInfoListForExcel(currentUser.getLoginName());
         loadData();
     }
     /**
@@ -185,17 +187,28 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
     /**
      * 导出租户信息
      */
-    public void exportTenantInfo()
-    {
+    public void exportTenantInfo() {
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(ZkbKeyBehaviorIndexService.excelTenant);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            zkbKeyBehaviorIndexService.exportTenantData(doc,this.tenantInfoList);
+            zkbKeyBehaviorIndexService.exportTenantData(doc,this.tenantInfoListForExcel);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Generate_KPI_DATA.xlsx");
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    public void updateTenantInfoList(){
+        if(kpiDate==null){
+            WebUtil.addErrorMessage("生成月份 输入不可为空！");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+
+            return;
+        }
+        this.tenantInfoList=this.zkbKeyBehaviorIndexService.getSourceTenantInfoList(currentUser.getLoginName(),kpiDate);
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+    }
+
 
     /**
      * 生效
@@ -225,16 +238,13 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
     /**
      * 生成报表
      */
-    public void generateKpiData()
-    {
-        if(CollectionUtils.isEmpty(selectTenantInfoList))
-        {
-            WebUtil.addErrorMessage("请选择代理商");
+    public void generateKpiData(){
+        if(kpiDate==null){
+            WebUtil.addErrorMessage("生成月份 输入不可为空！");
             return;
         }
-        if(kpiDate==null)
-        {
-            WebUtil.addErrorMessage("生成月份 输入不可为空！");
+        if(CollectionUtils.isEmpty(selectTenantInfoList)){
+            WebUtil.addErrorMessage("请选择代理商");
             return;
         }
         for(TenantInfo item:selectTenantInfoList) {
@@ -571,4 +581,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         this.selectTenantInfoList = selectTenantInfoList;
     }
 
+    public List<TenantInfo> getTenantInfoListForExcel() {
+        return tenantInfoListForExcel;
+    }
+
+    public void setTenantInfoListForExcel(List<TenantInfo> tenantInfoListForExcel) {
+        this.tenantInfoListForExcel = tenantInfoListForExcel;
+    }
 }

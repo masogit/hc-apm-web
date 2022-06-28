@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -83,15 +84,23 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         wfcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
-        WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(user.getSiteUID());
-        if(workflowConfig.getWhethertoenableunattended() == null || workflowConfig.getWhethertoenableunattended() == false){
-            whethertoenableunattended = false;
-        }else {
-            whethertoenableunattended = true;
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite != null){
+            deptids = wfcDao.findDeptForSharedAsset(selectSite.getUid());
+            WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(selectSite.getUid());
+            whethertoenableunattended=workflowConfig.getWhethertoenableunattended();
+        }else{
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
+            WorkflowConfig workflowConfig = wfcDao.findFirstBySiteUID(user.getSiteUID());
+            if(workflowConfig.getWhethertoenableunattended() == null || workflowConfig.getWhethertoenableunattended() == false){
+                whethertoenableunattended = false;
+            }else {
+                whethertoenableunattended = true;
+            }
         }
+
         sharedAssetSwapIndexDao = WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         this.selectedMap = new HashMap();
 
@@ -400,5 +409,12 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setBatchSharedAssetTypeUid(String batchSharedAssetTypeUid) {
         this.batchSharedAssetTypeUid = batchSharedAssetTypeUid;
     }
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        removeFilterOnField("siteUID");
+        removeFilterOnField("institutionUID");
+        removeFilterOnField("hospitalUID");
+        bean.onSelectSiteTreeNode(event);
 
+    }
 }
