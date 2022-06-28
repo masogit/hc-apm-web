@@ -35,7 +35,7 @@
                             <p:scrollPanel style="height:300px;border: 0" mode="native">
                                 <p:tree id="docs"  class="tree" style="width:98%;border:0;" value="#{userContextService.hospitalTree}" var="node" selectionMode="single"
                                         selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
-                                    <p:ajax process="@this" event="select" listener="#{userContextService.onSelectSiteTreeNode}" update="AssetInfoListForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                    <p:ajax process="@this" event="select" listener="#{sharedAssetInfoController.onSelectSiteTreeNode}" update="AssetInfoListForm" oncomplete="PF('varPanelOrg').hide();"/>
                                     <p:treeNode type="org">
                                         <h:outputText value="#{node.name}"/>
                                     </p:treeNode>
