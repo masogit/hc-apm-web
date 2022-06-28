@@ -205,6 +205,12 @@ public class ZkbKeyBehaviorIndexService {
         //结束时间不能小于startdate 开始时间不能大于结束时间
         return this.tenantInfoDao.findByAnyContractDate(getFirstDay(kpiDate),getLastDay(kpiDate),3);
     }
+
+    public List<TenantInfo> getSourceTenantInfoListForExcel(String loginName){
+        if(StringUtils.isNotBlank(loginName)&&loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+            return this.tenantInfoDao.findByType(3);
+        return this.tenantInfoDao.findByTypeAndNameNotLike(3,"ZKB%");
+    }
     private Date getFirstDay(final Date date){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         Calendar cal = Calendar.getInstance();
