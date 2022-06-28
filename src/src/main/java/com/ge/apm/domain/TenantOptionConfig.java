@@ -32,4 +32,7 @@ public class TenantOptionConfig implements Serializable {
 
     @Column(name = "show_is_pm")
     private Boolean showIsPm;
+
+    @Column(name = "synchronize_work_order")
+    private Boolean synchronizeWorkOrder;
 }

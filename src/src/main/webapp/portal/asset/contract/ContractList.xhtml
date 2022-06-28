@@ -71,6 +71,9 @@
                             <!-- <h:outputText  value="#{item.contractAmount}"/> -->
                             <p:inputNumber value="#{item.amount}" readonly="true"> </p:inputNumber>
                         </p:column>
+                        <p:column headerText="#{msg.PaymentProgress}">
+                            <h:outputText value="#{item.paymentProgress}"/>
+                        </p:column>
                         <p:column headerText="#{msg.Actions}">
                             <p:commandButton value="#{msg.ContractComplete}"
                                              rendered="#{item.contractType == 'Equipment'}"

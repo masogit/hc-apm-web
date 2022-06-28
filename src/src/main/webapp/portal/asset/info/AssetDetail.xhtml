@@ -429,10 +429,12 @@
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoDetailController.selected.qrCode}">
 <!--                        <img id="codeImg" src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" />-->
-                        <p:graphicImage id="qrcode" value="#{qrCodeShowController.getImg(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" stream="false" />
-                        <h:commandButton id="btn" value="#{msg.print}">
-                            <p:printer target="qrcode" />
-                        </h:commandButton>
+                        <p:panelGrid columns="2" layout="grid" styleClass="showcase-text-align-center">
+                            <p:graphicImage id="qrcode" value="#{qrCodeShowController.getImg(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" stream="false" />
+                            <p:commandButton id="btn" value="打印" icon="ui-icon-print" style="margin-top: 41px;margin-left: 30px">
+                                <p:printer target="qrcode" />
+                            </p:commandButton>
+                        </p:panelGrid>
                     </p:tab>
                 </p:tabView>
             </h:form>

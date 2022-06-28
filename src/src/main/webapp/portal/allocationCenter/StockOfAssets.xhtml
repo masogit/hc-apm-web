@@ -27,7 +27,21 @@
                 </h:form>
 
                 <h:form id="sharedAssetListForm">
-                    <h:panelGrid id="filterTab" columns="4">
+                    <h:panelGrid id="filterTab" columns="12">
+                        <c:if test="#{userContextService.selectSite != null}">
+                            <p:commandButton id="basic" value="#{empty userContextService.selectSite? msg.AllHospitals:userContextService.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="basic" hideEffect="fade" style="width:350px">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="docs"  class="tree" style="width:98%;border:0;" value="#{userContextService.hospitalTree}" var="node" selectionMode="single"
+                                            selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{userContextService.onSelectSiteTreeNode}" update="sharedAssetListForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </c:if>
                         <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(-1)}" rendered="true" disabled="#{sharedAssetStockController.queryType == -1}" value="#{msg.All}"/>
                         <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(1)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 1}" value="正常可借用"/>
                         <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(2)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 2}" value="正常已借出"/>

@@ -1,17 +1,9 @@
 package com.ge.apm.domain;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "rel_rule_asset")
@@ -58,6 +50,106 @@ public class RelRuleAsset {
 
 	@Column(name="site_uid",columnDefinition = "CHAR(32)")
 	private String siteUID;
+
+    @Transient
+    private String assetName;//资产名称
+
+    @Transient
+    private String ruleName;//保养规则
+
+    @Transient
+    private String departNum;//设备编号
+
+    @Transient
+    private Integer assetGroup;//设备分类
+
+    @Transient
+    private String clinicalDeptName;//所属科室
+
+    @Transient
+    private String nationalStandardCode;//2010国家编码
+
+    @Transient
+    private String makerShortName;//品牌/制造商简称
+
+    @Transient
+    private String manufacture;//制造商
+
+    @Transient
+    private String qrCode;//二维码
+
+
+    public String getAssetName() {
+        return assetName;
+    }
+
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
+    }
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
+
+    public String getDepartNum() {
+        return departNum;
+    }
+
+    public void setDepartNum(String departNum) {
+        this.departNum = departNum;
+    }
+
+    public Integer getAssetGroup() {
+        return assetGroup;
+    }
+
+    public void setAssetGroup(Integer assetGroup) {
+        this.assetGroup = assetGroup;
+    }
+
+    public String getClinicalDeptName() {
+        return clinicalDeptName;
+    }
+
+    public void setClinicalDeptName(String clinicalDeptName) {
+        this.clinicalDeptName = clinicalDeptName;
+    }
+
+    public String getNationalStandardCode() {
+        return nationalStandardCode;
+    }
+
+    public void setNationalStandardCode(String nationalStandardCode) {
+        this.nationalStandardCode = nationalStandardCode;
+    }
+
+    public String getMakerShortName() {
+        return makerShortName;
+    }
+
+    public void setMakerShortName(String makerShortName) {
+        this.makerShortName = makerShortName;
+    }
+
+    public String getManufacture() {
+        return manufacture;
+    }
+
+    public void setManufacture(String manufacture) {
+        this.manufacture = manufacture;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
 
     public String getRuleUIDInspection() {
         return ruleUIDInspection;

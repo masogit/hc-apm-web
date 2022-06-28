@@ -40,6 +40,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
@@ -221,6 +222,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Setter@Getter
     private String highlevelApprovalComments;
     List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
+
+    private V2_WorkOrderManHoursRepository manHoursDao;
+
+    List<V2_WorkOrderManHours> v2WorkOrderManHoursList;
+
     @Override
     protected void init() {
         super.init();
@@ -264,6 +270,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
             multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
             detailReturnDao = WebUtil.getBean(WorkOrderDetailReturnRepository.class);
+            manHoursDao = WebUtil.getBean(V2_WorkOrderManHoursRepository.class);
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -3031,7 +3038,7 @@ public void test1(){
     }
 
     public void verifyDatalength(String data,String labelName,int len){
-        if(data != null){
+        if(StringUtils.isNotBlank(data)){
             if(data.length() != len){
                 WebUtil.addErrorMessage(labelName +"长度必须为："+len+"位");
                 return;
@@ -3051,6 +3058,100 @@ public void test1(){
             }
         }
         return null;
+    }
+
+    private V2_WorkOrderManHours selectedManHours;
+
+    public V2_WorkOrderManHours getSelectedManHours() {
+        return selectedManHours;
+    }
+
+    public void setSelectedManHours(V2_WorkOrderManHours selectedManHours) {
+        this.selectedManHours = selectedManHours;
+    }
+
+    public List<V2_WorkOrderManHours> getV2WorkOrderManHoursList() {
+        return this.v2WorkOrderManHoursList;
+    }
+
+    public void setV2WorkOrderManHoursList(List<V2_WorkOrderManHours> v2WorkOrderManHoursList) {
+        String flag = null;
+        if(v2WorkOrderManHoursList != null && v2WorkOrderManHoursList.size() > 0){
+            for (V2_WorkOrderManHours v2_workOrderManHours : v2WorkOrderManHoursList){
+                if (v2_workOrderManHours.getId().equals("000")) {
+                    flag = "new";
+                }
+            }
+        }
+        if(flag == null){
+            //初始化默认新增一行
+            V2_WorkOrderManHours workOrderManHours = new V2_WorkOrderManHours();
+            workOrderManHours.setId("000");
+            v2WorkOrderManHoursList.add(workOrderManHours);
+        }
+        this.v2WorkOrderManHoursList = v2WorkOrderManHoursList;
+    }
+
+    public void prepareMoreManHoursView(){
+        List<V2_WorkOrderManHours> v2WorkOrderManHoursList = manHoursDao.findByWoId(selected.getId());
+        setV2WorkOrderManHoursList(v2WorkOrderManHoursList);
+    }
+
+    public void onRowEdit(RowEditEvent event) {
+        V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        if(workOrderManHours.getId().equals("000")){
+            V2_WorkOrderManHours v2_workOrderManHours = manHoursDao.findByManHoursOwnerAndManHoursDateAndWoId(workOrderManHours.getManHoursOwner(),workOrderManHours.getManHoursDate(),selected.getId());
+            if(v2_workOrderManHours != null){
+                WebUtil.addErrorMessage("当前日期工时所属人"+workOrderManHours.getManHoursOwner()+"已有记录，请选择其他日期");
+                return;
+            }
+            workOrderManHours.setId(null);
+            workOrderManHours.setCreatedBy(userContextService.getUserLoginName());
+            workOrderManHours.setCreatedTime(new Date());
+        }else{
+            workOrderManHours.setModifiedBy(userContextService.getUserLoginName());
+            workOrderManHours.setModifiedTime(new Date());
+        }
+        if (workOrderManHours.getWorkHours() != null && workOrderManHours.getWorkHours() < 0.01) {
+            WebUtil.addErrorMessage("工作工时不能小于0.01");
+            return;
+        }
+        if (workOrderManHours.getTravelHours() != null && workOrderManHours.getTravelHours() < 0.01) {
+            WebUtil.addErrorMessage("差旅工时不能小于0.01");
+            return;
+        }
+        if (workOrderManHours.getWaitingHours() != null && workOrderManHours.getWaitingHours() < 0.01) {
+            WebUtil.addErrorMessage("等待工时不能小于0.01");
+            return;
+        }
+        manHoursDao.save(workOrderManHours);
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+        v2WorkOrderManHoursList = manHoursDao.findByWoId(workOrderManHours.getWoId());
+        setV2WorkOrderManHoursList(v2WorkOrderManHoursList);
+    }
+
+    public void onRowCancel(RowEditEvent event) {
+        V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
+        if(v2WorkOrderManHoursList.contains(workOrderManHours)){
+            if(workOrderManHours.getId().equals("000")){//如果还没保存数据库的，则清空对象。
+                workOrderManHours = new V2_WorkOrderManHours();
+                workOrderManHours.setId("000");
+            }
+        }
+    }
+
+    public void initManHours() {
+        v2WorkOrderManHoursList.stream().forEach(item -> {
+            if(item.getId().equals("000"))
+            item.setWoId(selected.getId());
+            item.setSrNum(selected.getServiceRequest().getSrNum());
+        });
+    }
+
+    public void deleteManHours(V2_WorkOrderManHours v2_workOrderManHours) {
+        manHoursDao.delete(v2_workOrderManHours.getId());
+        v2WorkOrderManHoursList.remove(v2_workOrderManHours);
     }
 }
 

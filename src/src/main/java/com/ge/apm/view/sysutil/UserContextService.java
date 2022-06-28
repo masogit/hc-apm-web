@@ -13,6 +13,7 @@ import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import javaslang.control.Option;
@@ -20,6 +21,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -30,6 +34,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.Serializable;
@@ -55,7 +60,9 @@ public class UserContextService implements Serializable {
     private List<SysRole> listSysRole=null;
     private Boolean activeSupplierFlag = null;
     private String selectedSiteUid;
-    private List<OrgInfo> child;
+    //选定的院区
+    private OrgInfo selectSite;
+    private List<OrgInfo> child = new ArrayList<>();
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
@@ -1073,14 +1080,11 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isYiMaiYangGuangTenant() {
-        TenantInfo tenantInfo = getTenantInfo();
-        //这期上线，暂时写死，下个版本改成动态配置
-        if("齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName()) || "南阳市张仲景医院有限公司".equals(tenantInfo.getName()) || "洛阳仁大医院有限公司".equals(tenantInfo.getName())){
-            return true;
-        }else{
-            return false;
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
+        if (tenantOptionConfigOptional.isPresent()) {
+            return tenantOptionConfigOptional.get().getSynchronizeWorkOrder()!=null? tenantOptionConfigOptional.get().getSynchronizeWorkOrder():false;
         }
-//        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
+        return false;
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
@@ -1500,8 +1504,83 @@ public class UserContextService implements Serializable {
                         WorkflowConfig workflowConfig = siteWorkflowConfigList.get(0);
                         return workflowConfig !=null && workflowConfig.getEnableHospitalAdjustment() != null && workflowConfig.getEnableHospitalAdjustment();
                     }).collect(Collectors.toList());
+                    if(child.size() > 0){
+                        List<WorkflowConfig> siteWorkflowConfigList = workflowConfigDao.findBySiteUID(hospitalUID);
+                        if (CollectionUtils.isNotEmpty(siteWorkflowConfigList) && siteWorkflowConfigList.get(0).getEnableHospitalAdjustment()) {
+                            OrgInfo orgInfo = orgInfoRepository.getByUid(hospitalUID);
+                            selectSite=orgInfo;
+                            child.add(orgInfo);
+                        }else{
+                            selectSite=child.get(0);
+                        }
+                    }
                 }
             }
         return  child;
+    }
+
+    public OrgInfo getSelectSite() {
+        return selectSite;
+    }
+
+    public void setSelectSite(OrgInfo selectSite) {
+        this.selectSite = selectSite;
+    }
+    public TreeNode getHospitalTree(){
+        List<OrgInfo> orgList = getSiteOrgInfoChild();
+        if(org.springframework.util.CollectionUtils.isEmpty(orgList)){
+            return null;
+        }
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+        expandedByOrgType(rootNode, 2);
+        return rootNode;
+    }
+    private void expandedByOrgType(TreeNode tree, Integer type) {
+        if (tree.getData() != null) {
+            OrgInfo node = (OrgInfo) tree.getData();
+            if (node.getOrgType() > type) {
+                return;
+            }
+        }
+        tree.setExpanded(true);
+        for (TreeNode child : tree.getChildren()) {
+            expandedByOrgType(child, type);
+        }
+
+    }
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
+        }
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+
+    }
+    public List<SelectItem> getOrgInfoNode(){
+        List<SelectItem> selectItems=new ArrayList<>();
+        if(selectSite != null){
+            List<OrgInfo> orgInfos = WebUtil.getBean(OrgInfoRepository.class).getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(selectSite.getUid());
+            if(!org.springframework.util.CollectionUtils.isEmpty(orgInfos)){
+                selectItems = orgInfos.stream().map(item -> {
+                    return new SelectItem(item.getUid(), item.getName(), "", item.getOrgType() != 4);
+                }).collect(Collectors.toList());
+            }
+        }
+        return selectItems;
     }
 }

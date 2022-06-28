@@ -49,7 +49,7 @@
                                                     <p:inputTextarea value="#{fieldItem.defaultValue}"  placeholder="#{fieldItem.ref}"/>
                                                 </c:if>
                                                 <c:if test="#{fieldItem.component eq 'Date'}" >
-                                                    <p:calendar value="#{fieldItem.defaultValue}"  placeholder="#{fieldItem.ref}"/>
+                                                    <p:calendar value="#{fieldItem.defaultValue}" pattern="yyyy-MM-dd" converter="date2StringConverter" placeholder="#{fieldItem.ref}" />
                                                 </c:if>
                                                 <c:if test="#{fieldItem.component eq 'Label'}" >
                                                     <h:outputText value="#{fieldItem.defaultValue}"  />
@@ -294,7 +294,7 @@
                                 <p:inputTextarea value="#{tableCreateController.editTableItem.defaultValue}"  placeholder="#{tableCreateController.editTableItem.defaultValue}"/>
                             </c:if>
                             <c:if test="#{tableCreateController.editTableItem.component eq 'Date'}" >
-                                <p:calendar value="#{tableCreateController.editTableItem.defaultValue}"  placeholder="#{tableCreateController.editTableItem.defaultValue}"/>
+                                <p:calendar value="#{tableCreateController.editTableItem.defaultValue}" pattern="yyyy-MM-dd" converter="date2StringConverter" placeholder="#{tableCreateController.editTableItem.defaultValue}"/>
                             </c:if>
                             <c:if test="#{tableCreateController.editTableItem.component eq 'Label'}" >
                                 <h:outputText value="#{tableCreateController.editTableItem.defaultValue}"  />

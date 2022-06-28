@@ -19,6 +19,7 @@ import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -406,11 +407,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        
+        List<String> orgUidList =new ArrayList<>();
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite == null){
+            UserAccount user = UserContextService.getCurrentUserAccount();
+             orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        }else{
+            orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(selectSite.getUid());
+        }
 
-       
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -2015,7 +2021,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
         return result;
     }
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        searchFilters.clear();
+        bean.onSelectSiteTreeNode(event);
 
+    }
 }
     
     
