@@ -392,8 +392,8 @@ public class NurseSiteMaintainService {
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
 			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
 		}
-		Set<String> setItemIds=nurseSiteMaintainItemRepository.findIdsByParentId(maintain.getId());
-		List<V2_BlobObject> listV2Obj=blobObjectRepository.fetchListByBoUUIds(setItemIds);
+		//Set<String> setItemIds=nurseSiteMaintainItemRepository.findIdsByParentId(maintain.getId());
+		List<V2_BlobObject> listV2Obj=blobObjectRepository.fetchListByMaintainId(maintain.getId());
 		blobFileService.deleteBlobFile(listV2Obj);
 		simpleDeleteNurseSiteMaintain(maintain);
 //		addBatchJob("delete", null, null, null, userUid, maintain.getId());
