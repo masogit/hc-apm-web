@@ -1951,6 +1951,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         StringBuilder orgLoc = new StringBuilder();
         if(this.selected != null) {
             String orgUid = this.selected.getClinicalDeptUid();
+            if(StringUtils.isBlank(orgUid))return orgLoc.toString();
             OrgInfo orgInfo = orgInfoDao.findByUid(orgUid);
             if(StringUtils.isNotBlank(orgInfo.getBuildingNum())) {
                 orgLoc.append(orgInfo.getBuildingNum());
@@ -2015,7 +2016,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     public Boolean isLogPatientInfoEnabled() {
         Boolean result = Boolean.FALSE;
-        WorkflowConfig wfConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        WorkflowConfig wfConfig=null;
+        if(selectSite != null){
+             wfConfig = wfCfigDao.findFirstBySiteUID(selectSite.getUid());
+        }else{
+             wfConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        }
         if(wfConfig != null) {
             result = (wfConfig.getEnableLogPatientInfo() != null) ? wfConfig.getEnableLogPatientInfo() : Boolean.FALSE;
         }
