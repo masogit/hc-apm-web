@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
@@ -18,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.Date;
 
 @Entity
 @Cacheable(false)
@@ -50,10 +53,14 @@ public class NurseSiteMaintainData {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JsonIgnore
     private NurseSiteMaintainItem item;
-	
+
+	@Column(name="variable_text",columnDefinition = "TEXT")
+	private String variableText;
 	//0:null,1:true,2:false
 	@Transient
 	private Integer checkValueWeb;
+	@Transient
+	private Date dateValue;
 
 	public String getId() {
 		return id;
@@ -172,5 +179,37 @@ public class NurseSiteMaintainData {
 	@Override
 	public String toString() {
 		return "NurseSiteMaintainData [ id=" + id + " ]";
+	}
+
+	public String getVariableText() {
+		return variableText;
+	}
+
+	public void setVariableText(String variableText) {
+		this.variableText = variableText;
+	}
+
+	public Date getDateValue() {
+
+		try {
+			if(StringUtils.isNotBlank(variableText)){
+				Long aLong = Long.valueOf(variableText);
+				return new Date(aLong);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return dateValue;
+	}
+
+	public void setDateValue(Date dateValue) {
+		try {
+			if(dateValue != null){
+				long time = dateValue.getTime();
+				this.variableText=String.valueOf(time);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
