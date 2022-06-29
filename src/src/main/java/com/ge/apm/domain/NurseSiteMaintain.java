@@ -115,11 +115,12 @@ public class NurseSiteMaintain implements Serializable {
     private String clinicalDeptName;//使用科室
 	
 	@Transient
-	private List<String> showLables;
+	private List<NurseSiteMaintainConfigCheckItem> showLables;
 	
 	@Transient
 	private List<String> checkData;
-	
+	@Transient
+	private List<NurseSiteMaintainConfigCheckItem> listCheckData;
 	public NurseSiteMaintain() {
 		super();
 	}
@@ -269,11 +270,11 @@ public class NurseSiteMaintain implements Serializable {
 		this.signatureId = signatureId;
 	}
 
-	public List<String> getShowLables() {
+	public List<NurseSiteMaintainConfigCheckItem> getShowLables() {
 		return showLables;
 	}
 
-	public void setShowLables(List<String> showLables) {
+	public void setShowLables(List<NurseSiteMaintainConfigCheckItem> showLables) {
 		this.showLables = showLables;
 	}
 
@@ -394,5 +395,13 @@ public class NurseSiteMaintain implements Serializable {
 	@Override
 	public String toString() {
 		return "NurseSiteMaintain [ id=" + id + " ]";
+	}
+
+	public List<NurseSiteMaintainConfigCheckItem> getListCheckData() {
+		return listCheckData;
+	}
+
+	public void setListCheckData(List<NurseSiteMaintainConfigCheckItem> listCheckData) {
+		this.listCheckData = listCheckData;
 	}
 }
