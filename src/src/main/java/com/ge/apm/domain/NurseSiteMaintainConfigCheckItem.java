@@ -1,6 +1,12 @@
 package com.ge.apm.domain;
 
+import com.ge.apm.domain.pure.TableOption;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by 503035627 on 2018/3/7.
@@ -13,10 +19,11 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 	private String name;
 	private String description;
 	private String id;
-//	private String fieldType;
-//	private String defaultValue;
-//	private List<TableOption> options=new ArrayList<>();
-
+	private String fieldType;
+	private String defaultValue;
+	private List<TableOption> options=new ArrayList<>();
+	private Boolean checkValue=Boolean.TRUE;
+	private Date dateValue;
 	public String getId() {
 		return id;
 	}
@@ -75,27 +82,59 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
         return "NurseSiteMaintainConfigCheckItem [ key=" + key + " ]";
     }
 
-//	public String getFieldType() {
-//		return fieldType;
-//	}
-//
-//	public void setFieldType(String fieldType) {
-//		this.fieldType = fieldType;
-//	}
-//
-//	public String getDefaultValue() {
-//		return defaultValue;
-//	}
-//
-//	public void setDefaultValue(String defaultValue) {
-//		this.defaultValue = defaultValue;
-//	}
-//
-//	public List<TableOption> getOptions() {
-//		return options;
-//	}
-//
-//	public void setOptions(List<TableOption> options) {
-//		this.options = options;
-//	}
+	public String getFieldType() {
+		return fieldType;
+	}
+
+	public void setFieldType(String fieldType) {
+		this.fieldType = fieldType;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	public List<TableOption> getOptions() {
+		return options;
+	}
+
+	public void setOptions(List<TableOption> options) {
+		this.options = options;
+	}
+
+	public Boolean getCheckValue() {
+		return checkValue;
+	}
+
+	public void setCheckValue(Boolean checkValue) {
+		this.checkValue = checkValue;
+	}
+
+	public Date getDateValue() {
+
+		try {
+			if(StringUtils.isNotBlank(defaultValue)){
+				Long aLong = Long.valueOf(defaultValue);
+				return new Date(aLong);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return dateValue;
+	}
+
+	public void setDateValue(Date dateValue) {
+		try {
+			if(dateValue != null){
+				long time = dateValue.getTime();
+				this.defaultValue=String.valueOf(time);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

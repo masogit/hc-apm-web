@@ -1513,6 +1513,7 @@ public class UserContextService implements Serializable {
                         }else{
                             selectSite=child.get(0);
                         }
+                        UserContextService.getCurrentUserAccount().setSiteUID(selectSite.getUid());
                     }
                 }
             }
@@ -1559,7 +1560,7 @@ public class UserContextService implements Serializable {
 
     }
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
-
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
         if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             selectSite = (OrgInfo) event.getTreeNode().getData();
         } else {
@@ -1569,7 +1570,7 @@ public class UserContextService implements Serializable {
         if (selectSite != null && selectSite.getId() == -1) {
             selectSite = null;
         }
-
+        UserContextService.getCurrentUserAccount().setSiteUID(selectSite.getUid());
     }
     public List<SelectItem> getOrgInfoNode(){
         List<SelectItem> selectItems=new ArrayList<>();

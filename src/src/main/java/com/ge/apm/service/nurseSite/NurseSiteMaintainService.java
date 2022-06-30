@@ -19,7 +19,10 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -47,18 +50,6 @@ import com.ge.apm.dao.NurseSiteMaintainRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.BatchJob;
-import com.ge.apm.domain.CustomRole;
-import com.ge.apm.domain.NurseSiteMaintain;
-import com.ge.apm.domain.NurseSiteMaintainCheckItem;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.NurseSiteMaintainConfigItem;
-import com.ge.apm.domain.NurseSiteMaintainData;
-import com.ge.apm.domain.NurseSiteMaintainItem;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -153,7 +144,8 @@ public class NurseSiteMaintainService {
 			if (setMaintainIds.size() > 0) {
 				setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId0(setMaintainIds);
 				if (setMaintainItemIds!=null && setMaintainItemIds.size() > 0) {
-                    nurseSiteMaintainDataRepository.completeMaintainDataByParent(setMaintainItemIds);
+//					nurseSiteMaintainDataRepository.completeMaintainDataByParent(setMaintainItemIds);
+					getListPairCheckItems(maintain,setMaintainItemIds);
 					nurseSiteMaintainItemRepository.completeMaintainItem2(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
 					nurseSiteMaintainItemRepository.completeMaintainItem5(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
 					nurseSiteMaintainItemRepository.completeMaintainItem6(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
@@ -162,7 +154,52 @@ public class NurseSiteMaintainService {
 			}
 		}
 	}
-
+	public void getListPairCheckItems(NurseSiteMaintain maintain,Set<String> setMaintainItemIds) {
+		NurseSiteMaintainConfig byId = nurseSiteMaintainConfigRepository.findById(maintain.getConfigId());
+		Set<NurseSiteMaintainData> maintainDataByParentIds = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainItemIds);
+		Map<String,NurseSiteMaintainConfigCheckItem> map=new HashMap<>();
+		if(byId!=null){
+			String strTemp=byId.getCheckItemsDetail();
+			if(StringUtils.isNotEmpty(strTemp)){
+				JSONArray jsonArray=JSONObject.parseArray(strTemp);
+				for(int i=0;i<jsonArray.size();++i){
+					NurseSiteMaintainCheckItem p1= JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
+					NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(p1);
+					map.put(p.getName(),p);
+				}
+			}
+		}
+		List<NurseSiteMaintainData> collect = maintainDataByParentIds.stream().map(item -> {
+			NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = map.get(item.getCheckItem());
+			item.setCheckValue(true);
+			if (nurseSiteMaintainConfigCheckItem != null) {
+				item.setVariableText(nurseSiteMaintainConfigCheckItem.getDefaultValue());
+			}
+			return item;
+		}).collect(Collectors.toList());
+		nurseSiteMaintainDataRepository.save(collect);
+	}
+	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem){
+		NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
+		String fieldType = checkItem.getFieldType();
+		if(StringUtils.isBlank(fieldType)){
+			fieldType="Text";
+		}
+		p.setId(checkItem.getId());
+		p.setName(checkItem.getName());
+		p.setDefaultValue(checkItem.getDefaultValue());
+		p.setDescription(checkItem.getDescription());
+		p.setFieldType(fieldType);
+		String options = checkItem.getOptions();
+		if(StringUtils.isBlank(options) || options.contains("[]")){
+			p.setOptions(null);
+		}else{
+			JSONArray objects = JSONArray.parseArray(options);
+			List<TableOption> tableOptions = objects.toJavaList(TableOption.class);
+			p.setOptions(tableOptions);
+		}
+		return p;
+	}
 	@Transactional
 	public void nativeDeleteMaintain(String id) {
 		Set<String> setMaintainItemIds = null;
@@ -355,8 +392,8 @@ public class NurseSiteMaintainService {
 		if (StringUtils.isNotEmpty(maintain.getSignatureId())) {
 			blobFileService.deleteBlobFilesByStorageId(maintain.getSignatureId());
 		}
-		Set<String> setItemIds=nurseSiteMaintainItemRepository.findIdsByParentId(maintain.getId());
-		List<V2_BlobObject> listV2Obj=blobObjectRepository.fetchListByBoUUIds(setItemIds);
+		//Set<String> setItemIds=nurseSiteMaintainItemRepository.findIdsByParentId(maintain.getId());
+		List<V2_BlobObject> listV2Obj=blobObjectRepository.fetchListByMaintainId(maintain.getId());
 		blobFileService.deleteBlobFile(listV2Obj);
 		simpleDeleteNurseSiteMaintain(maintain);
 //		addBatchJob("delete", null, null, null, userUid, maintain.getId());
@@ -394,15 +431,15 @@ public class NurseSiteMaintainService {
 				obj.put("key", item.getKey());
 				obj.put("description", item.getDescription());
 				obj.put("id", item.getId());
-//				String fieldType = item.getFieldType();
-//				String defaultValue = item.getDefaultValue();
-//				if(StringUtils.isEmpty(fieldType)){
-//					fieldType="Switch";
-//					defaultValue="false";
-//				}
-//				obj.put("fieldType",fieldType);
-//				obj.put("defaultValue",defaultValue);
-//				obj.put("options",item.getOptions());
+				String fieldType = item.getFieldType();
+				String defaultValue = item.getDefaultValue();
+				if(StringUtils.isEmpty(fieldType)){
+					fieldType="Switch";
+					defaultValue="false";
+				}
+				obj.put("fieldType",fieldType);
+				obj.put("defaultValue",defaultValue);
+				obj.put("options",item.getOptions());
 				arr.add(obj);
 			}
 		}
@@ -1266,20 +1303,35 @@ public class NurseSiteMaintainService {
 		Set<String> setMaintainIds = new HashSet<String>();
 		Set<String> setMaintainItemIds = new HashSet<String>();
 		Set<String> setMaintainDataIds = new HashSet<String>();
+		List<NurseSiteMaintainData> listMaintainDataByParentIds =new ArrayList<>();
 		setMaintainIds.add(tempNurseSiteMaintain.getId());
 		if (setMaintainIds.size() > 0) {
 			setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
 		}
 		if (setMaintainItemIds.size() > 0) {
 			setMaintainDataIds = nurseSiteMaintainDataRepository.findIdsByParentIds(setMaintainItemIds);
+			listMaintainDataByParentIds = nurseSiteMaintainDataRepository.findListMaintainDataByParentIds(setMaintainItemIds);
 		}
 		if (setMaintainDataIds.size() > 0) {
-			List<String> listCheckData=tempNurseSiteMaintain.getCheckData();
-			if(listCheckData!=null && listCheckData.size()>0){
-				nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds,listCheckData);
-			}
-			else{
-				nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds);
+//			List<String> listCheckData=tempNurseSiteMaintain.getCheckData();
+//			if(listCheckData!=null && listCheckData.size()>0){
+//				nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds,listCheckData);
+//			}
+//			else{
+//				nurseSiteMaintainDataRepository.completeMaintainData(setMaintainDataIds);
+//			}
+			List<NurseSiteMaintainConfigCheckItem> listCheckData = tempNurseSiteMaintain.getListCheckData();
+			if(CollectionUtils.isNotEmpty(listCheckData) && CollectionUtils.isNotEmpty(listMaintainDataByParentIds)){
+				Map<String, NurseSiteMaintainConfigCheckItem> collect = listCheckData.stream().collect(Collectors.toMap(NurseSiteMaintainConfigCheckItem::getName, (item) -> item));
+				List<NurseSiteMaintainData> collect1 = listMaintainDataByParentIds.stream().map(item -> {
+					NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = collect.get(item.getCheckItem());
+						item.setCheckValue(true);
+					if(nurseSiteMaintainConfigCheckItem != null){
+						item.setVariableText(nurseSiteMaintainConfigCheckItem.getDefaultValue());
+					}
+					return item;
+				}).collect(Collectors.toList());
+				nurseSiteMaintainDataRepository.save(collect1);
 			}
 		}
 		supplementMaintain(tempNurseSiteMaintain, 0, 0, true);
@@ -1984,6 +2036,9 @@ public class NurseSiteMaintainService {
 							find=true;
 							jsonObj.put("name", item.getName());
 							jsonObj.put("description", item.getDescription());
+							jsonObj.put("fieldType", item.getFieldType());
+							jsonObj.put("defaultValue", item.getDefaultValue());
+							jsonObj.put("options", item.getOptions());
 						}
 					}
 					if(find){
