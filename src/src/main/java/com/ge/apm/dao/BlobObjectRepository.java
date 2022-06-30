@@ -48,6 +48,9 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
 	@Query(value="select o.* from v2_blob_object o where o.bo_uuid in ?1",nativeQuery=true)
 	public List<V2_BlobObject> fetchListByBoUUIds(Set<String> ids);
 
+	@Query(value="select o.* from v2_blob_object o where o.bo_uuid in (select t1.id from nurse_site_maintain_item t1 where t1.parent_id = ?1)",nativeQuery=true)
+	public List<V2_BlobObject> fetchListByMaintainId(String maintainId);
+
     @Query(value="select vb from V2_BlobObject vb where vb.boUuid in (?1)")
     List<V2_BlobObject> getPartPictures(Set<String> ids);
 
