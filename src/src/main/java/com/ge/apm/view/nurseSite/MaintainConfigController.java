@@ -568,6 +568,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		initObjPairCheckItem();
 		checkSaveDisable();
 	}
+	public void closeDlg(){
+		objPairCheckItem=null;
+	}
 	public void deleteItemDetail(NurseSiteMaintainConfigCheckItem item){
 		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
 			listPairCheckItems.remove(item);
@@ -890,6 +893,10 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	public void addOption() {
 		List<TableOption> options = objPairCheckItem.getOptions();
+		if(options==null){
+			objPairCheckItem.setOptions(new ArrayList<>());
+			options = objPairCheckItem.getOptions();
+		}
 		for (TableOption tableOption1 : options) {
 			if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
 				tableOption1.setValue(tableOption.getValue());

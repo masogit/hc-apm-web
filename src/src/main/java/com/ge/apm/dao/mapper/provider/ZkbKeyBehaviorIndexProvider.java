@@ -23,7 +23,7 @@ public class ZkbKeyBehaviorIndexProvider {
                 " 1 = 1");
         String filter = buildFilter_zkbOrderHistoryDetail(searchFilterList);
         sb.append(filter);
-        sb.append(" order by kbi_date asc , tenant_name asc");
+        sb.append(" order by kbi_date desc , tenant_name asc");
         return sb.toString();
     }
 
