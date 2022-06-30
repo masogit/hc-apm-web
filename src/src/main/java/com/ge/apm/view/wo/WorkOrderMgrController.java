@@ -3078,6 +3078,7 @@ public void test1(){
         if(tempManHoursList == null || tempManHoursList.size() < 1){
             V2_WorkOrderManHours workOrderManHours = new V2_WorkOrderManHours();
             workOrderManHours.setId("000");
+            workOrderManHours.setCreatedTime(new Date());
             this.v2WorkOrderManHoursList.add(0,workOrderManHours);
         }
     }
@@ -3153,19 +3154,36 @@ public void test1(){
         });
         V2_WorkOrderManHours workOrderManHours = new V2_WorkOrderManHours();
         workOrderManHours.setId("000");
+        workOrderManHours.setCreatedTime(new Date());//这里加时间只为了后续删除记录时定位删除。
         v2WorkOrderManHoursList.add(0,workOrderManHours);
     }
 
     public void deleteManHours(V2_WorkOrderManHours v2_workOrderManHours) {
         if(!v2_workOrderManHours.getId().equals("000")){
             manHoursDao.delete(v2_workOrderManHours.getId());
+            v2WorkOrderManHoursList.remove(v2_workOrderManHours);
+        }else{
+            for(int i=0;i<v2WorkOrderManHoursList.size();i++){
+                V2_WorkOrderManHours item = v2WorkOrderManHoursList.get(i);
+                if(item.getCreatedTime().getTime() == v2_workOrderManHours.getCreatedTime().getTime()){
+                    v2WorkOrderManHoursList.remove(i);
+                    return;
+                }
+            }
         }
-        v2WorkOrderManHoursList.remove(v2_workOrderManHours);
     }
 
     public Double totalManHours(String woId){
-        List<V2_WorkOrderManHours> v2WorkOrderManHoursList = manHoursDao.findByWoIdSort(selected.getId());
-        Double totalManHours = v2WorkOrderManHoursList.stream().mapToDouble(p->p.getWorkHours()+p.getTravelHours()+p.getWaitingHours()).sum();
+        Double totalManHours = 0.0;
+                List<V2_WorkOrderManHours> v2WorkOrderManHoursList = manHoursDao.findByWoIdSort(selected.getId());
+        if(v2WorkOrderManHoursList != null && v2WorkOrderManHoursList.size()>0){
+            for(V2_WorkOrderManHours item : v2WorkOrderManHoursList){
+                Double workHours = item.getWorkHours()==null?0.00:item.getWorkHours();
+                Double travelHours = item.getTravelHours()==null?0.00:item.getTravelHours();
+                Double waitingHours = item.getWaitingHours()==null?0.00:item.getWaitingHours();
+                totalManHours = totalManHours + workHours + travelHours + waitingHours;
+            }
+        }
         return totalManHours;
     }
 
