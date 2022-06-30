@@ -205,6 +205,16 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
         zkbAssetQrCodeInfoRepository.save(selected);
     }
 
+    public String installStatusRender(Integer value){
+        if(value == null){
+            return "";
+        }else if(value == 2){
+            return "已拆机";
+        }else{
+            return "未拆机";
+        }
+    }
+
     public String getSystemId() {
         return systemId;
     }
