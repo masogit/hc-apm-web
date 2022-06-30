@@ -67,13 +67,13 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 	@Column(name="key")
 	private Long key;
 
-//	@Column(name="field_type")
-//	private String fieldType;
-//
-//	@Column(name="default_value")
-//	private String defaultValue;
-//	@Column(name="options",columnDefinition = "TEXT")
-//	private String options;
+	@Column(name="field_type")
+	private String fieldType;
+
+	@Column(name="default_value")
+	private String defaultValue;
+	@Column(name="options",columnDefinition = "TEXT")
+	private String options;
 	public String getId() {
 		return id;
 	}
@@ -213,27 +213,27 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 		return temp;
 	}
 
-//	public String getFieldType() {
-//		return fieldType;
-//	}
-//
-//	public void setFieldType(String fieldType) {
-//		this.fieldType = fieldType;
-//	}
-//
-//	public String getDefaultValue() {
-//		return defaultValue;
-//	}
-//
-//	public void setDefaultValue(String defaultValue) {
-//		this.defaultValue = defaultValue;
-//	}
-//
-//	public String getOptions() {
-//		return options;
-//	}
-//
-//	public void setOptions(String options) {
-//		this.options = options;
-//	}
+	public String getFieldType() {
+		return fieldType;
+	}
+
+	public void setFieldType(String fieldType) {
+		this.fieldType = fieldType;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	public String getOptions() {
+		return options;
+	}
+
+	public void setOptions(String options) {
+		this.options = options;
+	}
 }

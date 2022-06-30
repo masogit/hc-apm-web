@@ -205,6 +205,12 @@ public class ZkbKeyBehaviorIndexService {
         //结束时间不能小于startdate 开始时间不能大于结束时间
         return this.tenantInfoDao.findByAnyContractDate(getFirstDay(kpiDate),getLastDay(kpiDate),3);
     }
+
+    public List<TenantInfo> getSourceTenantInfoListForExcel(String loginName){
+        if(StringUtils.isNotBlank(loginName)&&loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+            return this.tenantInfoDao.findByType(3);
+        return this.tenantInfoDao.findByTypeAndNameNotLike(3,"ZKB%");
+    }
     private Date getFirstDay(final Date date){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         Calendar cal = Calendar.getInstance();
@@ -976,12 +982,14 @@ public class ZkbKeyBehaviorIndexService {
         countAssetWithQRcode=countAssetWithQRcode+count;*/
         //二维码是否已实施 or 是否设备无法粘贴二维码    拆机是  否
         //新逻辑    22.6.9
-        Integer countAssetWithQRcode = this.zkbAssetQrCodeInfoRepository.qrCodePasteCount(assetId,tenantUID);
-        countAssetWithQRcode = countAssetWithQRcode==null?0:countAssetWithQRcode;
-        remark=remark.append("countAssetWithQRcode:").append(countAssetWithQRcode).append(";");
+        Integer qrCodePasteCount = this.zkbAssetQrCodeInfoRepository.qrCodePasteCount(assetId,tenantUID);//已经贴码设备
+        Integer qrCodePasteScrappedCount = this.zkbAssetQrCodeInfoRepository.qrCodePasteScrappedCount(assetId,tenantUID);//贴码状态的拆机设备
+        Integer scrappedCount = this.zkbAssetQrCodeInfoRepository.scrappedCount(assetId,tenantUID);//拆机设备
+        logger.info("qrCodePasteCount", qrCodePasteCount+";qrCodePasteScrappedCount"+qrCodePasteScrappedCount+";scrappedCount"+scrappedCount);
+        remark=remark.append("RateScore:").append(qrCodePasteCount).append(";").append(qrCodePasteScrappedCount).append(";").append(scrappedCount).append(";");
         Integer fullScore = zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore();
-        Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
-                divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
+        Integer pasteQuickResponseRateScore = new BigDecimal(qrCodePasteCount-qrCodePasteScrappedCount).
+                divide(new BigDecimal(totalIbNumber-scrappedCount),2,BigDecimal.ROUND_HALF_DOWN).
                 multiply(new BigDecimal(fullScore)).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
         logger.info("pasteQuickResponseRateScore，fullScore:", pasteQuickResponseRateScore+","+fullScore);
         if(pasteQuickResponseRateScore>fullScore)
