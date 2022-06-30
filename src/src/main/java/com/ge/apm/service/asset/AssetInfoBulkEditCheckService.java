@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ReceiveBorrowConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 
@@ -40,6 +41,8 @@ public class AssetInfoBulkEditCheckService {
 
     @Autowired
     private WorkflowConfigRepository workflowConfigRepository;
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
 
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
@@ -197,7 +200,17 @@ public class AssetInfoBulkEditCheckService {
 
         return Optional.empty();
     }
-
+    public boolean verifySiteToSite(List<AssetInfo> assets){
+        boolean flag=true;
+        if(CollectionUtils.isEmpty(assets)) return flag;
+        for (AssetInfo asset : assets) {
+            if(assetInfoRepository.secondment(asset.getUid()) > 0){
+                flag=false;
+                break;
+            }
+        }
+        return flag;
+    }
     /**
      * 批量导入资产时
      * @param assets

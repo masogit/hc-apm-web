@@ -10,6 +10,6 @@ public interface V2_WorkOrderManHoursRepository extends GenericRepositoryUUID<V2
 
     V2_WorkOrderManHours findByManHoursOwnerAndManHoursDateAndWoId(String manHoursOwner, Date manHoursDate, String woId);
 
-    @Query(value = "select * from v2_work_order_man_hours where wo_id=?1 order by man_hours_date", nativeQuery = true)
-    List<V2_WorkOrderManHours> findByWoId(String woId);
+    @Query(value = "select * from v2_work_order_man_hours where wo_id=?1 order by man_hours_date desc", nativeQuery = true)
+    List<V2_WorkOrderManHours> findByWoIdSort(String woId);
 }

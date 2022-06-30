@@ -4481,7 +4481,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- 县域租户工单为签到提示
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','NotSignedInTips','维修工单未签到','Not Signed In',NULL,-1);
 -- 县域租户工单添加新字段
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','siebleNumber','sieble单号','Sieble Number',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','siebleNumber','siebel单号','Siebel Number',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','callCenterNumber','呼叫中心单号','Call Center Number',NULL,-1);
 --县域租户用件类型
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','partUseType','用件类型','Part use type',NULL,-1);

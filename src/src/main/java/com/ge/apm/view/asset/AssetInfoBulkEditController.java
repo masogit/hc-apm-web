@@ -1440,7 +1440,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             WebUtil.addErrorMessage(optionalResult.get());
             return;
         }
-
+        if(!assetInfoBulkEditCheckService.verifySiteToSite(selectedAssets)){
+            WebUtil.addErrorMessage("有设备科室借调中，不能更换院区!");
+            return;
+        }
         try {
             assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
 

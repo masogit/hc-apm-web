@@ -8,7 +8,7 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
-    <p:dialog id="zkbAssetQrCodeInfo" widgetVar="zkbAssetQrCodeInfo" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbAssetStatisticController.CRUDActionName}" height="580px" width="350px">
+    <p:dialog id="zkbAssetQrCodeInfo" widgetVar="zkbAssetQrCodeInfo" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbAssetStatisticController.CRUDActionName}" height="680px" width="350px">
         <h:form id="zkbAssetQrCodeInfoEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{not empty zkbFileDirectoryController.selected}">
 
@@ -50,8 +50,29 @@
                     <p:inputTextarea   value="#{zkbAssetStatisticController.selected.reason}"  maxlength="100"/>
                 </h:panelGroup>
                 <h:panelGroup rendered="#{zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y'}">
-                    <label class="label">#{msg.zkbAssetStatistic_canNotPastReason}</label>
+                    <label class="label">#{msg.zkbAssetStatistic_canNotPastReason}*</label>
                     <p:inputTextarea   value="#{zkbAssetStatisticController.selected.reason}" required="true" requiredMessage="#{msg.zkbAssetStatistic_canNotPastReason} #{msg.ValidationRequire}"  maxlength="100"/>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y'}">
+                    <label class="label">无法贴码原因归类*</label>
+                    <p:selectOneMenu  value="#{zkbAssetStatisticController.selected.reasonCategorize}" required="true" requiredMessage="无法贴码原因归类 #{msg.ValidationRequire}">
+                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItem itemLabel="已拆机或已报废" itemValue="scrapped"/>
+                        <f:selectItem itemLabel="有三方保，医院不允许贴码" itemValue="notAllowed"/>
+                        <f:selectItem itemLabel="设备找不到" itemValue="notFind"/>
+                        <f:selectItem itemLabel="其他" itemValue="other"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!(zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y')}">
+                    <label class="label">无法贴码原因归类</label>
+                    <p:selectOneMenu  value="#{zkbAssetStatisticController.selected.reasonCategorize}" >
+                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItem itemLabel="已拆机或已报废" itemValue="scrapped"/>
+                        <f:selectItem itemLabel="有三方保，医院不允许贴码" itemValue="notAllowed"/>
+                        <f:selectItem itemLabel="设备找不到" itemValue="notFind"/>
+                        <f:selectItem itemLabel="其他" itemValue="other"/>
+                    </p:selectOneMenu>
                 </h:panelGroup>
             </p:panelGrid>
             <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="float:left" rendered="#{empty zkbAssetStatisticController.selected.qrCodeCountState or zkbAssetStatisticController.selected.qrCodeCountState eq 'N'}"/>

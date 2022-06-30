@@ -56,6 +56,7 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     private NurseSiteMaintainCheckItemRepository dao;
   	private List<TableOption> option=new ArrayList<>();
 	private TableOption tableOption;
+	private Boolean edit;
     @Override
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -124,6 +125,7 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 		this.selected.setSiteUID(currentUser.getSiteUID());
 		this.selected.setCreateByUid(currentUser.getUid());
 		this.selected.setCreateDate(new Date());
+		this.option.clear();
 	}
 	
 	
@@ -132,70 +134,92 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 		FacesMessage message = new FacesMessage(str,null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
-//	public List<TableOption> getOptions(){
-//		String selected = this.selected.getOptions();
-//		if(StringUtils.isNotBlank(selected)){
-//			try {
-//				List<TableOption> listObjectSec=JSONArray.parseArray(selected,TableOption.class);
-//				option = listObjectSec;
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		return option;
-//	}
-//
-//	public void addOption() {
-//		for (TableOption tableOption1 : option) {
-//			if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
-//				tableOption1.setValue(tableOption.getValue());
-//				this.selected.setOptions(JSONArray.toJSONString(option));
-//				tableOption=null;
-//				return ;
-//			}
-//		}
-//		if(option.add(tableOption)){
-//			this.selected.setOptions(JSONArray.toJSONString(option));
-//		}
-//
-//	}
-//
-//	public void prepareAddOption(){
-//		tableOption=new TableOption();
-//	}
-//	public void prepareEditOption(TableOption option) {
-//		tableOption = option;
-//	}
-//
-//	public void removeOption(TableOption option) {
-//		String selected = this.selected.getOptions();
-//		if(StringUtils.isNotBlank(selected)){
-//			try {
-//				List<TableOption> listObjectSec=JSONArray.parseArray(selected,TableOption.class);
-//				List<TableOption> collect = listObjectSec.stream().filter(item -> !item.getKey().equals(option.getKey())).collect(Collectors.toList());
-//				this.selected.setOptions(JSONArray.toJSONString(collect));
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
-//
-//	public TableOption getTableOption() {
-//		return tableOption;
-//	}
-//
-//	public void setTableOption(TableOption tableOption) {
-//		this.tableOption = tableOption;
-//	}
-//
-//	public void onRuleChange(){
-//    	selected.setDefaultValue(null);
-//	}
-//	public boolean dateType(){
-//		if(selected != null){
-//			return "Date".equals(selected.getFieldType());
-//		}else{
-//			return false;
-//		}
-//	}
+	public List<TableOption> getOptions(){
+		String selected = this.selected.getOptions();
+		if(StringUtils.isNotBlank(selected)){
+			try {
+				List<TableOption> listObjectSec=JSONArray.parseArray(selected,TableOption.class);
+				option = listObjectSec;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return option;
+	}
+
+	public void addOption() {
+    	if(edit){
+    		//修改
+			for (TableOption tableOption1 : option) {
+				if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
+					tableOption1.setValue(tableOption.getValue());
+					this.selected.setOptions(JSONArray.toJSONString(option));
+					tableOption=null;
+					return ;
+				}
+			}
+		}else{
+    		// 新建
+			for (TableOption tableOption1 : option) {
+				if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
+					WebUtil.addErrorMessage("添加失败，请勿重复添加");
+					return;
+				}
+			}
+			if(option.add(tableOption)){
+				this.selected.setOptions(JSONArray.toJSONString(option));
+			}
+		}
+
+
+	}
+
+	public void prepareAddOption(){
+		tableOption=new TableOption();
+		edit=false;
+	}
+	public void prepareEditOption(TableOption option) {
+		tableOption = option;
+		edit=true;
+	}
+
+	public void removeOption(TableOption option) {
+		String selected = this.selected.getOptions();
+		if(StringUtils.isNotBlank(selected)){
+			try {
+				List<TableOption> listObjectSec=JSONArray.parseArray(selected,TableOption.class);
+				List<TableOption> collect = listObjectSec.stream().filter(item -> !item.getKey().equals(option.getKey())).collect(Collectors.toList());
+				this.selected.setOptions(JSONArray.toJSONString(collect));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public TableOption getTableOption() {
+		return tableOption;
+	}
+
+	public void setTableOption(TableOption tableOption) {
+		this.tableOption = tableOption;
+	}
+
+	public void onRuleChange(){
+    	selected.setDefaultValue(null);
+	}
+	public boolean dateType(){
+		if(selected != null){
+			return "Date".equals(selected.getFieldType());
+		}else{
+			return false;
+		}
+	}
+
+	public Boolean getEdit() {
+		return edit;
+	}
+
+	public void setEdit(Boolean edit) {
+		this.edit = edit;
+	}
 }
