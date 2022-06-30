@@ -11,17 +11,10 @@
     <p:dialog class="moreManHoursDialog" id="moreManHoursDialog" widgetVar="moreManHoursDialog" modal="true" height="600" width="1100"  resizable="true" draggable="true" appendTo="@(body)" header="工时管理">
         <h:form id="moreManHoursDialogForm">
             <h:panelGroup>
-                <p:dataTable id="manHoursDataList" value="#{workOrderMgrController.v2WorkOrderManHoursList}" var="item" widgetVar="varManHoursDataList"
-                             selectionMode="single" selection="#{workOrderMgrController.selectedManHours}" editable="true"
-                             lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.manHoursDate}"
-                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                             rows="20" emptyMessage="#{msg.noRecordFound}"
-                             rowsPerPageTemplate="20,50,100,500">
-                    <p:ajax event="rowEdit"  listener="#{workOrderMgrController.onRowEdit}" update="manHoursDataList"/>
-                    <p:ajax event="rowEditCancel" listener="#{workOrderMgrController.onRowCancel}" update="manHoursDataList"/>
-                    <p:ajax event="filter" listener="#{workOrderMgrController.v2WorkOrderManHoursList}" update="manHoursDataList"/>
+                <p:dataTable id="manHoursDataList" class="manHoursDataList" value="#{workOrderMgrController.v2WorkOrderManHoursList}" var="item" widgetVar="varManHoursDataList"
+                             lazy="false" paginator="false" editable="true" rowKey="#{item.id}" rows="50" emptyMessage="#{msg.noRecordFound}">
+                    <p:ajax event="rowEdit"  listener="#{workOrderMgrController.onRowEdit}" process="@this" update="@this"/>
+                    <p:ajax event="rowEditCancel" listener="#{workOrderMgrController.onRowCancel}" process="@this" update="@this"/>
                     <p:column headerText="工单编号">
                         <h:outputText value="#{item.srNum}"/>
                     </p:column>
@@ -93,9 +86,9 @@
                         </p:cellEditor>
                     </p:column>
                     <p:column headerText="操作">
-                        <p:commandLink process="@this" actionListener="#{workOrderMgrController.initManHours}" title="#{msg.Add}" update="manHoursDataList" rendered="#{item.id eq '000' and empty item.woId}"><span class="ui-icon ui-icon-plusthick" /></p:commandLink>
-                        <p:rowEditor cancelTitle="取消" editTitle="修改" saveTitle="保存" rendered="#{item.id ne '000' or (item.id eq '000' and item.woId != null)}" update="manHoursDataList"/>
-                        <p:commandLink process="@this" actionListener="#{workOrderMgrController.deleteManHours(item)}" title="#{msg.Delete}" update="manHoursDataList" rendered="#{item.id ne '000'}"><span class="ui-icon ui-icon-trash" /></p:commandLink>
+                        <p:commandLink id="createButton" process="@this" actionListener="#{workOrderMgrController.initManHours}" title="#{msg.Add}" update="manHoursDataList" rendered="#{item.id eq '000' and empty item.woId}"><span class="ui-icon ui-icon-plusthick" /></p:commandLink>
+                        <p:rowEditor process="@this" cancelTitle="取消" editTitle="修改" saveTitle="保存" rendered="#{item.id ne '000' or (item.id eq '000' and item.woId != null)}" update="manHoursDataList"/>
+                        <p:commandLink process="@this" actionListener="#{workOrderMgrController.deleteManHours(item)}" title="#{msg.Delete}" update="manHoursDataList" rendered="#{item.id ne '000' or (item.id eq '000' and item.woId != null)}"><span class="ui-icon ui-icon-trash" /></p:commandLink>
                     </p:column>
                 </p:dataTable>
             </h:panelGroup>
