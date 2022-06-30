@@ -1,12 +1,8 @@
 package com.ge.apm.view.nurseSite;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -14,19 +10,21 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.TableOption;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.domain.NurseSiteMaintain;
-import com.ge.apm.domain.NurseSiteMaintainData;
-import com.ge.apm.domain.NurseSiteMaintainItem;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ibm.icu.util.Calendar;
 
+import org.springframework.beans.BeanUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
@@ -46,6 +44,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	private boolean blnPre;
 	private boolean blnNext;
 	private Map<String,Boolean> mapCheckData;
+	private List<NurseSiteMaintainConfigCheckItem> listCheckData=new ArrayList<>();
 	private MaintainController maintainController;
 	@PostConstruct
 	public void init() {
@@ -97,23 +96,31 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		}
 	}
 	public void saveCheckData(){
-		List<String> listCheckData=new ArrayList<String>();
-		for(String label: mapCheckData.keySet()){
-			if(mapCheckData.get(label)){
-				listCheckData.add(label);
-			}
-		}
-		nurseSiteMaintain.setCheckData(listCheckData);
+//		List<String> listCheckData=new ArrayList<String>();
+//		for(String label: mapCheckData.keySet()){
+//			if(mapCheckData.get(label)){
+//				listCheckData.add(label);
+//			}
+//		}
+
+		//nurseSiteMaintain.setCheckData(listCheckData);
+		nurseSiteMaintain.setListCheckData(this.listCheckData);
 		completeMaintain();
 	}
 	public void resetCheckData(){
-		for(String label: mapCheckData.keySet()){
-			mapCheckData.put(label, true);
+//		for(String label: mapCheckData.keySet()){
+//			mapCheckData.put(label, true);
+//		}
+		for (NurseSiteMaintainConfigCheckItem listCheckDatum : listCheckData) {
+			listCheckDatum.setCheckValue(true);
 		}
 	}
 	public void resetCheckData2(){
-		for(String label: mapCheckData.keySet()){
-			mapCheckData.put(label, false);
+//		for(String label: mapCheckData.keySet()){
+//			mapCheckData.put(label, false);
+//		}
+		for (NurseSiteMaintainConfigCheckItem listCheckDatum : listCheckData) {
+			listCheckDatum.setCheckValue(false);
 		}
 	}
 	private void pageButtonChange(){
@@ -147,29 +154,62 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		lazyModel = nurseSiteMaintain.getListNurseSiteMaintainItem();
 	}
 	private void generateLabel(){
-		List<String> showLables = nurseSiteMaintain.getShowLables();
+		List<NurseSiteMaintainConfigCheckItem> showLables = nurseSiteMaintain.getShowLables();
 		if (showLables == null) {
-			showLables = new ArrayList<String>();
+			showLables = new ArrayList<>();
 		} else {
 			showLables.clear();
+			listCheckData.clear();
 		}
 		try {
 			List<NurseSiteMaintainData> listTempData = lazyModel.iterator().next().getListData();
 			if (listTempData != null) {
-				Iterator<NurseSiteMaintainData> it = listTempData.iterator();
-				while (it.hasNext()) {
-					NurseSiteMaintainData tempData = it.next();
-					showLables.add(tempData.getCheckItem());
+				List<String> collect = listTempData.stream().map(NurseSiteMaintainData::getCheckItem).collect(Collectors.toList());
+				NurseSiteMaintainConfig maintainConfigById = nurseSiteMaintainService.getMaintainConfigById(nurseSiteMaintain.getConfigId());
+				String strTemp = maintainConfigById.getCheckItemsDetail();
+				if(StringUtils.isNotEmpty(strTemp)){
+					JSONArray jsonArray= JSONObject.parseArray(strTemp);
+					for(int i=0;i<jsonArray.size();++i){
+						NurseSiteMaintainCheckItem checkItem= JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
+						if(collect.contains(checkItem.getName())){
+							NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(checkItem);
+							showLables.add(p);
+							NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = new NurseSiteMaintainConfigCheckItem();
+							BeanUtils.copyProperties(p,nurseSiteMaintainConfigCheckItem);
+							listCheckData.add(nurseSiteMaintainConfigCheckItem);
+						}
+					}
 				}
 			}
 			nurseSiteMaintain.setShowLables(showLables);
-			for(int i=0;i<showLables.size();++i){
-				mapCheckData.put(showLables.get(i), true);
-			}
+//			for(int i=0;i<showLables.size();++i){
+//				mapCheckData.put(showLables.get(i).getName(), true);
+//			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error("getLables error" + e.getMessage());
 		}
+	}
+	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem){
+		NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
+		String fieldType = checkItem.getFieldType();
+		if(StringUtils.isBlank(fieldType)){
+			fieldType="Text";
+		}
+		p.setId(checkItem.getId());
+		p.setName(checkItem.getName());
+		p.setDefaultValue(checkItem.getDefaultValue());
+		p.setDescription(checkItem.getDescription());
+		p.setFieldType(fieldType);
+		String options = checkItem.getOptions();
+		if(StringUtils.isBlank(options) || options.contains("[]")){
+			p.setOptions(null);
+		}else{
+			JSONArray objects = JSONArray.parseArray(options);
+			List<TableOption> tableOptions = objects.toJavaList(TableOption.class);
+			p.setOptions(tableOptions);
+		}
+		return p;
 	}
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str, null);
@@ -215,5 +255,19 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	public void setMapCheckData(Map<String, Boolean> mapCheckData) {
 		this.mapCheckData = mapCheckData;
 	}
-	
+
+	public List<NurseSiteMaintainConfigCheckItem> getListCheckData() {
+		if(CollectionUtils.isNotEmpty(listCheckData)){
+			Map<String,NurseSiteMaintainConfigCheckItem> result=new HashMap<>();
+			for (NurseSiteMaintainConfigCheckItem listCheckDatum : listCheckData) {
+				result.put(listCheckDatum.getName(),listCheckDatum);
+			}
+			return new ArrayList<>(result.values());
+		}
+		return listCheckData;
+	}
+
+	public void setListCheckData(List<NurseSiteMaintainConfigCheckItem> listCheckData) {
+		this.listCheckData = listCheckData;
+	}
 }

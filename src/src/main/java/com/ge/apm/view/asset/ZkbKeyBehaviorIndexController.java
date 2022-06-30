@@ -7,7 +7,6 @@ import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.domain.ZkbKeyBehaviorIndex;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbKeyBehaviorIndexService;
-import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.zkb.ZkbPartOrderController;
 import org.apache.commons.collections.CollectionUtils;
@@ -127,6 +126,8 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     private List<TenantInfo> tenantInfoList;
 
+    private List<TenantInfo> tenantInfoListForExcel;
+
     private List<TenantInfo> selectTenantInfoList;
 
     @Override
@@ -149,7 +150,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             isZkbadmin=ZkbKeyBehaviorIndexService.no;
         }
         this.rankMap = this.zkbKeyBehaviorIndexService.initRankingMap();
-       // this.tenantInfoList=this.zkbKeyBehaviorIndexService.getSourceTenantInfoList(currentUser.getLoginName(),kpiDate);
+        this.tenantInfoListForExcel=this.zkbKeyBehaviorIndexService.getSourceTenantInfoListForExcel(currentUser.getLoginName());
         loadData();
     }
     /**
@@ -186,12 +187,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
     /**
      * 导出租户信息
      */
-    public void exportTenantInfo()
-    {
+    public void exportTenantInfo() {
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(ZkbKeyBehaviorIndexService.excelTenant);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            zkbKeyBehaviorIndexService.exportTenantData(doc,this.tenantInfoList);
+            zkbKeyBehaviorIndexService.exportTenantData(doc,this.tenantInfoListForExcel);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Generate_KPI_DATA.xlsx");
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
@@ -581,4 +581,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         this.selectTenantInfoList = selectTenantInfoList;
     }
 
+    public List<TenantInfo> getTenantInfoListForExcel() {
+        return tenantInfoListForExcel;
+    }
+
+    public void setTenantInfoListForExcel(List<TenantInfo> tenantInfoListForExcel) {
+        this.tenantInfoListForExcel = tenantInfoListForExcel;
+    }
 }
