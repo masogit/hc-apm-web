@@ -93,7 +93,7 @@ public class NurseSiteMaintainItem implements Serializable {
 	
 	@Transient
 	private List<NurseSiteMaintainData> listCopyData;
-	
+
 	@Transient
 	private boolean needGetItem=true;
 	
@@ -348,9 +348,7 @@ public class NurseSiteMaintainItem implements Serializable {
 		if(listCopyData==null){
 			listCopyData=new ArrayList<NurseSiteMaintainData>();
 		}
-		if(listCopyData.size()==0){
-			listCopyData.addAll(listData);
-		}
+		listCopyData.addAll(listData);
 		if(StringUtils.isNotEmpty(label)){
 			for(int i=0;i<listCopyData.size();++i){
 				NurseSiteMaintainData tempData=listCopyData.get(i);

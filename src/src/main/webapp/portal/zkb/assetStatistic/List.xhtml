@@ -101,6 +101,9 @@
                         <p:column  headerText="一机一码(是否GE贴码)" >
                             <h:outputText value="#{item.geFlag}"/>
                         </p:column>
+                        <p:column  headerText="拆机状态" >
+                            <h:outputText value="#{zkbAssetStatisticController.installStatusRender(item.installStatus)}"/>
+                        </p:column>
                         <p:column  headerText="是否已贴旧二维码" >
                             <h:outputText value="#{item.qrCodeState}"/>
                         </p:column>
@@ -109,6 +112,9 @@
                         </p:column>
                         <p:column  headerText="#{msg.zkbAssetStatistic_canNotPastReason}" >
                             <h:outputText value="#{item.reason}"/>
+                        </p:column>
+                        <p:column  headerText="无法贴码原因归类" >
+                            <h:outputText value="#{fieldMsg.fieldValue('reasonCategorize',item.reasonCategorize)}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="editButton" rendered="#{!userContextService.zkbAdmin}" actionListener="#{zkbAssetStatisticController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":zkbAssetQrCodeInfo :zkbAssetQrCodeInfoEditForm" oncomplete="PF('zkbAssetQrCodeInfo').show()" disabled="#{empty zkbAssetStatisticController.selected}"/>
