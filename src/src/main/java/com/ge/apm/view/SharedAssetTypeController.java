@@ -192,15 +192,6 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     @Override
     public void onBeforeSave(SharedAssetType object) {
         object.setAccessoryList(object.getAccessoryList());
-        UserContextService bean = WebUtil.getBean(UserContextService.class);
-        OrgInfo selectSite = bean.getSelectSite();
-        if(selectSite != null){
-            object.setTenantUID(selectSite.getTenantUID());
-            object.setHospitalUID(selectSite.getHospitalUID());
-            object.setInstitutionUID(selectSite.getInstitutionUID());
-            object.setSiteUID(selectSite.getSiteUID());
-            object.setCreateBy(selectSite.getName());
-        }
     }
 
     @Override

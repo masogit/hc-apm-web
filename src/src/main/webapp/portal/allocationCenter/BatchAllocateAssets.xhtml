@@ -23,7 +23,7 @@
                         <p:fieldset legend="借入明细信息"
                                     style="margin-bottom:20px">
                             <h:form id="batchLeaseForm">
-                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup>
                                         <label class='label'>请求类型*</label>
                                         <p:selectOneRadio id="chargingType" value="#{sharedAssetBatchController.requestType}" required="true" requiredMessage="#{msg.ValidationRequire}">
@@ -46,13 +46,15 @@
                                                     navigator="true"
                                                     required="true"/>
                                     </h:panelGroup>
+                                </p:panelGrid>
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup rendered="#{userContextService.selectSite != null}">
                                         <p:commandButton id="basic" value="#{empty userContextService.selectSite? msg.AllHospitals:userContextService.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                                         <p:overlayPanel widgetVar="varPanelOrg" for="basic" hideEffect="fade" style="width:350px">
                                             <p:scrollPanel style="height:300px;border: 0" mode="native">
                                                 <p:tree id="docs"  class="tree" style="width:98%;border:0;" value="#{userContextService.hospitalTree}" var="node" selectionMode="single"
                                                         selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
-                                                    <p:ajax process="@this" event="select" listener="#{sharedAssetBatchController.onSelectSiteTreeNode}" update="tabView:batchLeaseForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                                    <p:ajax process="@this" event="select" listener="#{sharedAssetBatchController.onSelectSiteTreeNode}" update="tabView:batchLeaseForm tabView:batchLeaseForm:datalist" oncomplete="PF('varPanelOrg').hide();"/>
                                                     <p:treeNode type="org">
                                                         <h:outputText value="#{node.name}"/>
                                                     </p:treeNode>
@@ -222,7 +224,7 @@
                                         <p:inputText value="#{sharedAssetBatchController.patientBedNum}" required="true" requiredMessage="床号 #{msg.ValidationRequire}"/>
                                     </h:panelGroup>-->
                                 </p:panelGrid>
-                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup >
                                         <p:inputText value="#{sharedAssetBatchController.searchCriteria}"
                                                      placeholder="资产编号/设备编号/二维码"
@@ -236,6 +238,20 @@
                                                          update="batchReturnForm:datalist batchReturnForm:confirm batchReturnForm:assetDept4Return returnAssetValidator"
                                                          actionListener="#{sharedAssetBatchController.findAndSelectAsset2Return()}"
                                                          oncomplete="openReturnAssetValidator(xhr, status, args)"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{userContextService.selectSite != null}">
+                                        <p:commandButton id="basic1" value="#{empty userContextService.selectSite? msg.AllHospitals:userContextService.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                                        <p:overlayPanel widgetVar="varPanelOrg1" for="basic1" hideEffect="fade" style="width:350px">
+                                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                                <p:tree id="docs1"  class="tree" style="width:98%;border:0;" value="#{userContextService.hospitalTree}" var="node" selectionMode="single"
+                                                        selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
+                                                    <p:ajax process="@this" event="select" listener="#{sharedAssetBatchController.onSelectSiteTreeNode}" update="tabView:batchReturnForm tabView:batchReturnForm:datalist" oncomplete="PF('varPanelOrg1').hide();"/>
+                                                    <p:treeNode type="org">
+                                                        <h:outputText value="#{node.name}"/>
+                                                    </p:treeNode>
+                                                </p:tree>
+                                            </p:scrollPanel>
+                                        </p:overlayPanel>
                                     </h:panelGroup>
                                     <h:panelGroup id="assetDept4Return">
                                         <label class='label'>借用科室: </label>
