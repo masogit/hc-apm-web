@@ -440,6 +440,9 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             bean.setSelectSite( (OrgInfo) event.getTreeNode().getData());
             this.leaseDeptName=null;
+            this.searchCriteria=null;
+            this.leaseAssets.clear();
+            this.returnAssets.clear();
         }
 
     }

@@ -1455,9 +1455,6 @@ public void test1(){
         if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
         }
-        if(userContextService.isCountyArea()){
-            selectedWorkOrder.setManHours(totalManHours(woid));
-        }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
         statusStartTime=selectedWorkOrder.getStatusStartTime();
         statusCloseTime=selectedWorkOrder.getStatusCloseTime();
@@ -3124,6 +3121,7 @@ public void test1(){
             workOrderManHours.setId(null);//这个不能提前设null，否则异常情况页面显示不对。
         }
         manHoursDao.save(workOrderManHours);
+        updateManHours(selected.getId());
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
     }
 
@@ -3159,10 +3157,7 @@ public void test1(){
     }
 
     public void deleteManHours(V2_WorkOrderManHours v2_workOrderManHours) {
-        if(!v2_workOrderManHours.getId().equals("000")){
-            manHoursDao.delete(v2_workOrderManHours.getId());
-            v2WorkOrderManHoursList.remove(v2_workOrderManHours);
-        }else{
+        if(v2_workOrderManHours.getId().equals("000")){
             for(int i=0;i<v2WorkOrderManHoursList.size();i++){
                 V2_WorkOrderManHours item = v2WorkOrderManHoursList.get(i);
                 if(item.getCreatedTime().getTime() == v2_workOrderManHours.getCreatedTime().getTime()){
@@ -3170,12 +3165,21 @@ public void test1(){
                     return;
                 }
             }
+        }else{
+            manHoursDao.delete(v2_workOrderManHours.getId());
+            v2WorkOrderManHoursList.remove(v2_workOrderManHours);
+            updateManHours(selected.getId());
         }
     }
 
-    public Double totalManHours(String woId){
-        Double totalManHours = 0.0;
-                List<V2_WorkOrderManHours> v2WorkOrderManHoursList = manHoursDao.findByWoIdSort(selected.getId());
+    /**
+     * 县域需求：每次操作工时必须同步更新workOrder工时。
+     * @param woId
+     */
+    @Transactional
+    public void updateManHours(String woId){
+        Double totalManHours = 0.00;
+                List<V2_WorkOrderManHours> v2WorkOrderManHoursList = manHoursDao.findByWoIdSort(woId);
         if(v2WorkOrderManHoursList != null && v2WorkOrderManHoursList.size()>0){
             for(V2_WorkOrderManHours item : v2WorkOrderManHoursList){
                 Double workHours = item.getWorkHours()==null?0.00:item.getWorkHours();
@@ -3184,7 +3188,9 @@ public void test1(){
                 totalManHours = totalManHours + workHours + travelHours + waitingHours;
             }
         }
-        return totalManHours;
+        if(totalManHours > 0.00){
+            dao.updateManHours(totalManHours,woId);
+        }
     }
 
     public List<V2_WorkOrderManHours> getWorkOrderManHours(String woId){

@@ -127,10 +127,9 @@
                             <h:panelGroup >
                                 <label class="label">#{workOrderMgrController.getManHourShow()}</label>
 
-                                <p:inputNumber id="manHours_input" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}" rendered="#{!userContextService.countyArea}">
+                                <p:inputNumber id="manHours_input" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}" readonly="#{userContextService.countyArea}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
                                     <!--<f:validateDoubleRange minimum="0.01"/>-->
                                 </p:inputNumber>
-                                <h:outputText value="#{workOrderMgrController.selectedWorkOrder.manHours}" rendered="#{userContextService.countyArea}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.otherExpense}</label><!--其它费用-->

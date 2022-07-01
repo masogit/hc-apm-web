@@ -10,6 +10,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +44,15 @@ public class SharedAssetBatchService {
     @Autowired
     private OrgInfoRepository orgInfoRepository;
     public void buildDefaultFilters(Wrapper<AssetInfo> ew) {
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        List<String> orgUidList =new ArrayList<>();
+        if(selectSite != null){
+            orgUidList.add(selectSite.getUid());
+        }else{
+            UserAccount user = bean.getLoginUser();
+            orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        }
         ew.andNew().in("ai.tenant_uid", orgUidList)
             .or().in("ai.institution_uid", orgUidList)
             .or().in("ai.hospital_uid", orgUidList)
@@ -102,7 +110,13 @@ public class SharedAssetBatchService {
         List<OrgInfo> orgInfos =new ArrayList<>();
         if(selectSite != null){
             List<String> orgInfoUidsByparentUid = orgInfoRepository.getOrgInfoUidsByparentUid(selectSite.getUid());
-            orgInfos = orgInfoUidsByparentUid.stream().map(orgInfoRepository::findByUid).filter(item->item.getOrgType() == 4).collect(Collectors.toList());
+            List<String>  allocationDepts= wfCfigDao.findDeptForSharedAsset(selectSite.getUid());
+            orgInfos = orgInfoUidsByparentUid.stream().map(orgInfoRepository::findByUid).filter(item->item.getOrgType() == 4)
+                    .filter(item->{
+                        if(CollectionUtils.isEmpty(allocationDepts))return true;
+                        return !allocationDepts.contains(item.getUid());
+                    })
+                    .collect(Collectors.toList());
         }else{
             UserAccount user = UserContextService.getCurrentUserAccount();
              orgInfos = uaaService.getOrgDeptList(user.getSiteUID(), user.getUid());
