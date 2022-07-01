@@ -43,8 +43,15 @@ public class SharedAssetBatchService {
     @Autowired
     private OrgInfoRepository orgInfoRepository;
     public void buildDefaultFilters(Wrapper<AssetInfo> ew) {
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        List<String> orgUidList =new ArrayList<>();
+        if(selectSite != null){
+            orgUidList.add(selectSite.getUid());
+        }else{
+            UserAccount user = bean.getLoginUser();
+            orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        }
         ew.andNew().in("ai.tenant_uid", orgUidList)
             .or().in("ai.institution_uid", orgUidList)
             .or().in("ai.hospital_uid", orgUidList)
