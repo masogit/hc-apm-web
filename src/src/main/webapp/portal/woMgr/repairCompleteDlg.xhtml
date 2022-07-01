@@ -127,9 +127,10 @@
                             <h:panelGroup >
                                 <label class="label">#{workOrderMgrController.getManHourShow()}</label>
 
-                                <p:inputNumber id="manHours_input" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}">
+                                <p:inputNumber id="manHours_input" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="false" requiredMessage="#{msg.manhours} #{msg.ValidationRequire}" rendered="#{!userContextService.countyArea}">
                                     <!--<f:validateDoubleRange minimum="0.01"/>-->
                                 </p:inputNumber>
+                                <h:outputText value="#{workOrderMgrController.selectedWorkOrder.manHours}" rendered="#{userContextService.countyArea}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.otherExpense}</label><!--其它费用-->
@@ -213,7 +214,7 @@
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{!userContextService.countyArea}">
                                 <label class="label">#{msg.addworker}</label>
                                 <p:dataTable id="coworkerList" class="coworkerList" value="#{workOrderMgrController.coWorkerList}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
                                              rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
