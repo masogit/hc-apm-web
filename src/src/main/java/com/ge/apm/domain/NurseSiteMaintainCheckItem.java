@@ -2,10 +2,15 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.persistence.*;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.domain.pure.TableOption;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
@@ -223,6 +228,10 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 	}
 
 	public String getDefaultValue() {
+		if(StringUtils.isEmpty(defaultValue) ) return "";
+		if(StringUtils.isNotBlank(fieldType) && "Select".equals(fieldType)){
+			return initConfigCheckItem();
+		}
 		return defaultValue;
 	}
 
@@ -257,5 +266,20 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 
 		}
 		return fieldTypeStr;
+	}
+
+	private String initConfigCheckItem(){
+		if(StringUtils.isBlank(options) || options.contains("[]")){
+			return "";
+		}else{
+			JSONArray objects = JSONArray.parseArray(options);
+			List<TableOption> tableOptions = objects.toJavaList(TableOption.class);
+			Optional<TableOption> first = tableOptions.stream().filter(item -> defaultValue.equals(item.getKey())).findFirst();
+			if(first.isPresent()){
+				return first.get().getValue();
+			}else{
+				return "";
+			}
+		}
 	}
 }
