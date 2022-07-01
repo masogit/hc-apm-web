@@ -142,7 +142,6 @@ public class ZkbAssetStatisticProvider {
                 " ac.contract_no,"+
                 " qr_code_info.reason AS reason," +
                 " qr_code_info.reason_categorize AS reason_categorize," +
-                " ib_qr_code.install_status AS install_status," +
                 " qr_code_info.can_not_past_qr_code," +
                 " qr_code_info.reason_date,"+
                 " qr_code_info.qr_code_count_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date," +
