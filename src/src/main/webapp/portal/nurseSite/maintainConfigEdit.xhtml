@@ -36,7 +36,7 @@
 						</p:column>
 						<p:column headerText="#{msg.Actions}">
 							<p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" update=":checkItemEditDlg"
-								 oncomplete="PF('checkItemEditDlg').show()" rendered="#{empty item.name}" />
+								 actionListener="#{maintainConfigController.createObjCheckItem}" oncomplete="PF('checkItemEditDlg').show()" rendered="#{empty item.name}" />
 							<p:commandButton process="@this" icon="ui-icon-edit" style="zoom:0.8;" title="#{msg.Edit}"
 								actionListener="#{maintainConfigController.setObjCheckItem(item)}" update=":checkItemEditDlg" oncomplete="PF('checkItemEditDlg').show()"
 								rendered="#{not empty item.name}" />
@@ -194,7 +194,7 @@
 					update=":growl,:maintainConfigEditForm:addCheckItem,:maintainConfigEditForm:saveButtonId" value="#{msg.Save}" icon="ui-icon-check"
 					oncomplete="handleSubmit(args, 'checkItemEditDlg');" />
                  &nbsp;&nbsp;
-                 <p:commandButton    value="#{msg.Cancel}" update=":growl,:maintainConfigEditForm:addCheckItem,:maintainConfigEditForm:saveButtonId" icon="ui-icon-cancel" onclick="PF('checkItemEditDlg').hide()" />
+                 <p:commandButton  immediate="true"  value="#{msg.Cancel}" update=":growl,:maintainConfigEditForm:addCheckItem,:maintainConfigEditForm:saveButtonId" icon="ui-icon-cancel" onclick="PF('checkItemEditDlg').hide()" />
 			</h:panelGroup>
 		</h:form>
 	</p:dialog>

@@ -360,47 +360,75 @@
                                 </p:dataTable>
                             </h:panelGroup>
 
-                            <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderCoworker(woItem.id)}">
-                                <label class="label">#{msg.CorworkerManhours}</label>
-                                <p:dataTable  value="#{workOrderMgrController.getWorkOrderCoworker(woItem.id)}" var="coWorkerItem" lazy="false" paginator="false"
-                                              rowKey="#{coWorkerItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}" >
-                                    <p:column headerText="#{msg.coworker}">
-                                        <h:outputText value="#{coWorkerItem.cowokerUserName}"/>
-                                    </p:column>
-                                    <p:column headerText="#{msg.manHours}">
-                                        <h:outputText value="#{coWorkerItem.manHours}" />
-                                    </p:column>
-                                </p:dataTable>
-                            </h:panelGroup>
-
-                            <h:panelGroup rendered="#{userContextService.isCountyArea() and not empty workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}">
-                                <label class="label" >县域租户备件归还</label>
-
-                                <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}"
-                                             var="item"  lazy="false" paginator="false" rowKey="#{item.id}" rows="100" emptyMessage="#{msg.noRecordFound}">
-                                    <p:column headerText="#{msg.accessory}">
-                                        <h:outputText value="#{item.partName}"/>
-                                    </p:column>
-                                    <p:column headerText="#{msg.assetsDashboardclm2}">
-                                        <h:outputText value="#{item.serialNum}" />
-                                    </p:column>
-                                    <p:column headerText="#{msg.returnNum}">
-                                        <h:outputText value="#{item.returnNum}"/>
-                                    </p:column>
-                                    <p:column headerText="#{msg.returnType}">
-                                        <p:selectOneMenu id="partReturnType" value="#{item.returnType}" disabled="true">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('partReturnType')}" var="item1" itemLabel="#{item1.value}" itemValue="#{item1.msgKey}"/>
-                                            <p:ajax listener="#{workOrderMgrController.savePartReturnInfo(item)}" update="detailReturnList"/>
-                                        </p:selectOneMenu>
-                                    </p:column>
-                                    <p:column headerText="#{msg.returnTime}">
-                                        <h:outputText value="#{item.returnTime}">
-                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                                        </h:outputText>
-                                    </p:column>
-                                </p:dataTable>
-                            </h:panelGroup>
+                            <c:choose>
+                                <c:when test="#{userContextService.isCountyArea()}">
+                                    <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderManHours(woItem.id)}">
+                                        <label class="label">#{msg.CorworkerManhours}</label>
+                                        <p:dataTable  value="#{workOrderMgrController.getWorkOrderManHours(woItem.id)}" var="manHoursItem" lazy="false" paginator="false"
+                                                      rowKey="#{manHoursItem.id}" rows="100" emptyMessage="#{msg.noRecordFound}" >
+                                            <p:column headerText="工时所属人">
+                                                <h:outputText value="#{manHoursItem.manHoursOwner}"/>
+                                            </p:column>
+                                            <p:column headerText="工时日期">
+                                                <h:outputText value="#{manHoursItem.manHoursDate}"/>
+                                            </p:column>
+                                            <p:column headerText="工作工时">
+                                                <h:outputText value="#{manHoursItem.workHours}"/>
+                                            </p:column>
+                                            <p:column headerText="差旅工时">
+                                                <h:outputText value="#{manHoursItem.travelHours}"/>
+                                            </p:column>
+                                            <p:column headerText="等待工时">
+                                                <h:outputText value="#{manHoursItem.waitingHours}"/>
+                                            </p:column>
+                                            <p:column headerText="工时描述">
+                                                <h:outputText value="#{manHoursItem.comment}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}">
+                                        <label class="label" >县域租户备件归还</label>
+                                        <p:dataTable id="detailReturnList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetailReturnView(woItem.id)}"
+                                                     var="item"  lazy="false" paginator="false" rowKey="#{item.id}" rows="100" emptyMessage="#{msg.noRecordFound}">
+                                            <p:column headerText="#{msg.accessory}">
+                                                <h:outputText value="#{item.partName}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.assetsDashboardclm2}">
+                                                <h:outputText value="#{item.serialNum}" />
+                                            </p:column>
+                                            <p:column headerText="#{msg.returnNum}">
+                                                <h:outputText value="#{item.returnNum}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.returnType}">
+                                                <p:selectOneMenu id="partReturnType" value="#{item.returnType}" disabled="true">
+                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                                    <f:selectItems value="#{fieldMsg.getFieldValueList('partReturnType')}" var="item1" itemLabel="#{item1.value}" itemValue="#{item1.msgKey}"/>
+                                                    <p:ajax listener="#{workOrderMgrController.savePartReturnInfo(item)}" update="detailReturnList"/>
+                                                </p:selectOneMenu>
+                                            </p:column>
+                                            <p:column headerText="#{msg.returnTime}">
+                                                <h:outputText value="#{item.returnTime}">
+                                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                                </h:outputText>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </h:panelGroup>
+                                </c:when>
+                                <c:otherwise>
+                                    <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderCoworker(woItem.id)}">
+                                        <label class="label">#{msg.CorworkerManhours}</label>
+                                        <p:dataTable  value="#{workOrderMgrController.getWorkOrderCoworker(woItem.id)}" var="coWorkerItem" lazy="false" paginator="false"
+                                                      rowKey="#{coWorkerItem.id}" rows="1000" emptyMessage="#{msg.noRecordFound}" >
+                                            <p:column headerText="#{msg.coworker}">
+                                                <h:outputText value="#{coWorkerItem.cowokerUserName}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.manHours}">
+                                                <h:outputText value="#{coWorkerItem.manHours}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                    </h:panelGroup>
+                                </c:otherwise>
+                            </c:choose>
 
                             <p:dataGrid id="partPictureList" var="fileitem" value="#{workOrderMgrController.getPartPictures(woItem.id)}" columns="5" layout="grid">
                                 <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
