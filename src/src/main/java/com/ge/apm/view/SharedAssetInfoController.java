@@ -16,10 +16,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -120,10 +117,12 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             this.searchFilters = new ArrayList<>();
         }
         setUserSearchFilters();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
         List<SharedAssetSwapIndex> sharedAssetSwapIndexList = new ArrayList<>();
         //1、使用科室：调剂中心  所属科室：空
-        searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNull,null));
-        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,deptids));
+        updateSearchFilter(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNull,null));
+        updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,deptids));
 //        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IsNull,null));
 
         if (queryIndex == 1){
@@ -134,7 +133,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         if (filterSatId != null && !filterSatId.equals("")){
-            searchFilters.add(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.EQ,filterSatId));
+            updateSearchFilter(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.EQ,filterSatId));
         }
 
         for(int i = 0 ; i < this.searchFilters.size() ; i++){
@@ -242,12 +241,18 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<SharedAssetType> allType(){
         ArrayList<SearchFilter> satSearchFilters = new ArrayList<>();
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        satSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        satSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        satSearchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        satSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        if(selectSite != null){
+            satSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, Arrays.asList(selectSite.getUid())));
+        }else{
+            UserAccount user = bean.getLoginUser();
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            satSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            satSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            satSearchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            satSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
 
         return swapDao.findBySearchFilter(satSearchFilters);
     }
