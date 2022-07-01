@@ -363,7 +363,7 @@
                             <c:choose>
                                 <c:when test="#{userContextService.isCountyArea()}">
                                     <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderManHours(woItem.id)}">
-                                        <label class="label">#{msg.CorworkerManhours}</label>
+                                        <label class="label">县域工时信息</label>
                                         <p:dataTable  value="#{workOrderMgrController.getWorkOrderManHours(woItem.id)}" var="manHoursItem" lazy="false" paginator="false"
                                                       rowKey="#{manHoursItem.id}" rows="100" emptyMessage="#{msg.noRecordFound}" >
                                             <p:column headerText="工时所属人">

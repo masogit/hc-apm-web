@@ -98,4 +98,10 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
     @Transactional
     @Query(value = "delete from v2_work_order where id in ?1",nativeQuery = true)
     Integer deleteById(List<String> woIds);
+
+    /**县域工时实时更新**/
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE v2_work_order SET man_hours=?1 WHERE id=?2", nativeQuery = true)
+    public void updateManHours(Double manHours, String id);
 }
