@@ -1,12 +1,15 @@
 package com.ge.apm.domain;
 
+import com.alibaba.fastjson.JSONArray;
 import com.ge.apm.domain.pure.TableOption;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by 503035627 on 2018/3/7.
@@ -121,6 +124,7 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 				Long aLong = Long.valueOf(defaultValue);
 				return new Date(aLong);
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -135,6 +139,40 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public String fieldTypeStr(){
+		String fieldTypeStr="";
+		if(StringUtils.isEmpty(fieldType)) return fieldTypeStr;
+		switch (fieldType){
+			case "Text":
+				fieldTypeStr="文本输入";
+				break;
+			case "Number":
+				fieldTypeStr="数字输入";
+				break;
+			case "Select":
+				fieldTypeStr="下拉选择";
+				break;
+			case "Date":
+				fieldTypeStr="日期输入";
+				break;
+
+		}
+		return fieldTypeStr;
+	}
+
+	public String optionStr(){
+		if(CollectionUtils.isEmpty(options)){
+			return "";
+		}else{
+			Optional<TableOption> first = options.stream().filter(item -> item.getKey().equals(defaultValue)).findFirst();
+			if(first.isPresent()){
+				return first.get().getValue();
+			}else{
+				return "";
+			}
 		}
 	}
 }

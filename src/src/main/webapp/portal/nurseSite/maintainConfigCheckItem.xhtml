@@ -37,7 +37,8 @@
                              <h:outputText value="#{item.fieldTypeStr()}" />
                          </p:column>
                         <p:column headerText="默认值">
-                            <h:outputText value="#{item.defaultValue}" />
+                            <h:outputText rendered="#{(item.fieldType ne 'Select')}" value="#{item.defaultValue}" />
+                            <h:outputText rendered="#{item.fieldType eq 'Select'}" value="#{item.optionStr()}" />
                         </p:column>
                         <p:column headerText="创建日期">
                             <h:outputText value="#{item.createDate}" >

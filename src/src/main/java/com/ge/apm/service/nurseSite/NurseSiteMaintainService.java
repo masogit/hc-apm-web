@@ -5,16 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -1821,6 +1812,7 @@ public class NurseSiteMaintainService {
 						mapCheckItemSequence.clear();
 						NurseSiteMaintainItem tempItem = tempListItem.get(i);
 						List<NurseSiteMaintainData> listData = tempItem.getListData();
+						Map<String,NurseSiteMaintainConfigCheckItem> configMap=initConfig(tempItem);
 						String keyName = "";
 						if (listData != null && listData.size() > 0) {
 							Iterator<NurseSiteMaintainData> itData = listData.iterator();
@@ -1854,8 +1846,9 @@ public class NurseSiteMaintainService {
 								} else {
 									keyName += ",";
 								}
+								String VariableText=initVariableText(tempData,configMap);
 								headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
-								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
+								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue()+VariableText);
 								doc.writeRowData(SHEET_Maintain, keyRow, modifyByRow, keyName, tempItem.getModifyBy().getName());
 								doc.writeRowData(SHEET_Maintain, keyRow, checkDateRow, keyName, tempItem.getCheckDate());
 								doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName, tempData.getCheckItem());
@@ -1908,7 +1901,54 @@ public class NurseSiteMaintainService {
 			return null;
 		}
 	}
-
+	private Map<String,NurseSiteMaintainConfigCheckItem> initConfig(NurseSiteMaintainItem item){
+		NurseSiteMaintainConfig byId = nurseSiteMaintainConfigRepository.findById(item.getConfigId());
+		Map<String,NurseSiteMaintainConfigCheckItem> map=new HashMap<>();
+		if(byId!=null){
+			String strTemp=byId.getCheckItemsDetail();
+			if(StringUtils.isNotEmpty(strTemp)){
+				JSONArray jsonArray=JSONObject.parseArray(strTemp);
+				for(int i=0;i<jsonArray.size();++i){
+					NurseSiteMaintainCheckItem p1= JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
+					NurseSiteMaintainConfigCheckItem p = initConfigCheckItem(p1);
+					map.put(p.getName(),p);
+				}
+			}
+		}
+		return map;
+	}
+	private String initVariableText(NurseSiteMaintainData tempData,Map<String,NurseSiteMaintainConfigCheckItem> configMap){
+		String variableTextData = tempData.getVariableText();
+		String variableText=variableTextData;
+		if(StringUtils.isEmpty(variableTextData))return "";
+		if(configMap == null || configMap.isEmpty())return variableTextData;
+		NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = configMap.get(tempData.getCheckItem());
+		if(nurseSiteMaintainConfigCheckItem == null)return variableTextData;
+		String fieldType = nurseSiteMaintainConfigCheckItem.getFieldType();
+		List<TableOption> options = nurseSiteMaintainConfigCheckItem.getOptions();
+		if(StringUtils.isEmpty(fieldType)) return variableTextData;
+		switch (fieldType){
+			case "Text":
+				break;
+			case "Number":
+				break;
+			case "Select":
+				Optional<TableOption> first = options.stream().filter(item -> item.getKey().equals(variableText)).findFirst();
+				if(first.isPresent()){
+					variableTextData=first.get().getValue();
+				}
+				break;
+			case "Date":
+				try {
+					SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					variableTextData = format.format(new Date(Long.valueOf(variableTextData)));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				break;
+		}
+		return StringUtils.isEmpty(variableTextData)?"":"-"+variableTextData;
+	}
 	private void writeSignatureToExcel(ExcelDocument doc, int row, int columnIndex, int width, int height, Set<String> signatureIds, Map<String, Integer> mapSignature) {
 		try {
 			Iterator<String> it = signatureIds.iterator();
