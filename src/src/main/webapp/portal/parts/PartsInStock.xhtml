@@ -28,12 +28,17 @@
                     <h:form id="searchFormOut">
                         <h:panelGrid id="searchPanel1" columns="3">
                             <p:inputText id="searchText1" value="#{simplePartsRequestListController.oneSearchStr}"
-                                         placeholder="申购单编号"
+                                         placeholder="申购单编号" rendered="#{!userContextService.countyArea}"
                                          maxlength="105" style="width: 360px">
                                 <p:ajax event="keyup"
                                         update=":sparePartsBuyIngForm searchButtons1 "/>
                             </p:inputText>
-
+                            <p:inputText id="searchText2" value="#{simplePartsRequestListController.oneSearchStr}"
+                                         placeholder="申购单编号/工单编号" rendered="#{userContextService.countyArea}"
+                                         maxlength="105" style="width: 360px">
+                                <p:ajax event="keyup"
+                                        update=":sparePartsBuyIngForm searchButtons1 "/>
+                            </p:inputText>
                             <h:panelGroup id='searchButtons1'>
                                 <p:commandButton style="zoom:0.8" icon="ui-icon-search"
                                                  class="btn btn-sm btn-gray"

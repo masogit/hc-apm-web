@@ -64,9 +64,29 @@ public class MaintenanceTemplate {
             this.content.put(Component.ACCESSORY_SIGNATURE.toString(), Component.ACCESSORY_SIGNATURE.value());
             this.content.put(Component.ACK_SIGNATURE.toString(), Component.ACK_SIGNATURE.value());
             this.content.put(Component.WC_SIGNATURE.toString(), Component.WC_SIGNATURE.value());
+            this.content.put(Component.PM_PICTURE0.toString(), Component.PM_PICTURE0.value());
+            this.content.put(Component.PM_PICTURE1.toString(), Component.PM_PICTURE1.value());
+            this.content.put(Component.PM_PICTURE2.toString(), Component.PM_PICTURE2.value());
+            this.content.put(Component.PM_PICTURE3.toString(), Component.PM_PICTURE3.value());
+            this.content.put(Component.PM_PICTURE4.toString(), Component.PM_PICTURE4.value());
+            this.content.put(Component.PARTS_PICTURE0.toString(), Component.PARTS_PICTURE0.value());
+            this.content.put(Component.PARTS_PICTURE1.toString(), Component.PARTS_PICTURE1.value());
+            this.content.put(Component.PARTS_PICTURE2.toString(), Component.PARTS_PICTURE2.value());
+            this.content.put(Component.PARTS_PICTURE3.toString(), Component.PARTS_PICTURE3.value());
+            this.content.put(Component.PARTS_PICTURE4.toString(), Component.PARTS_PICTURE4.value());
             this.content.put(Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.value());
             this.content.put(Component.ACK_SIGNATURE_PLACE_HOLDER.toString(), Component.ACK_SIGNATURE_PLACE_HOLDER.value());
             this.content.put(Component.WC_SIGNATURE_PLACE_HOLDER.toString(), Component.WC_SIGNATURE_PLACE_HOLDER.value());
+            this.content.put(Component.PM_PICTURE_HOLDER0.toString(), Component.PM_PICTURE_HOLDER0.value());
+            this.content.put(Component.PM_PICTURE_HOLDER1.toString(), Component.PM_PICTURE_HOLDER1.value());
+            this.content.put(Component.PM_PICTURE_HOLDER2.toString(), Component.PM_PICTURE_HOLDER2.value());
+            this.content.put(Component.PM_PICTURE_HOLDER3.toString(), Component.PM_PICTURE_HOLDER3.value());
+            this.content.put(Component.PM_PICTURE_HOLDER4.toString(), Component.PM_PICTURE_HOLDER4.value());
+            this.content.put(Component.PARTS_PICTURE_HOLDER0.toString(), Component.PARTS_PICTURE_HOLDER0.value());
+            this.content.put(Component.PARTS_PICTURE_HOLDER1.toString(), Component.PARTS_PICTURE_HOLDER1.value());
+            this.content.put(Component.PARTS_PICTURE_HOLDER2.toString(), Component.PARTS_PICTURE_HOLDER2.value());
+            this.content.put(Component.PARTS_PICTURE_HOLDER3.toString(), Component.PARTS_PICTURE_HOLDER3.value());
+            this.content.put(Component.PARTS_PICTURE_HOLDER4.toString(), Component.PARTS_PICTURE_HOLDER4.value());
             this.content.put(Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), Component.MAINTENANCE_COMPLETION_SIGNATURE.value());
             this.content.put(Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.value());
             this.content.put(Component.ACCEPTANCE_SIGNATURE.toString(), Component.ACCEPTANCE_SIGNATURE.value());
@@ -195,9 +215,29 @@ public class MaintenanceTemplate {
         ACCESSORY_SIGNATURE("accessory_signature", Widget.PICTURE),
         WC_SIGNATURE("wc_signature", Widget.PICTURE),
         ACK_SIGNATURE("ack_signature", Widget.PICTURE),
+        PM_PICTURE0("pm_picture0",Widget.PICTURE),
+        PM_PICTURE1("pm_picture1",Widget.PICTURE),
+        PM_PICTURE2("pm_picture2",Widget.PICTURE),
+        PM_PICTURE3("pm_picture3",Widget.PICTURE),
+        PM_PICTURE4("pm_picture4",Widget.PICTURE),
+        PARTS_PICTURE0("parts_picture0",Widget.PICTURE),
+        PARTS_PICTURE1("parts_picture1",Widget.PICTURE),
+        PARTS_PICTURE2("parts_picture2",Widget.PICTURE),
+        PARTS_PICTURE3("parts_picture3",Widget.PICTURE),
+        PARTS_PICTURE4("parts_picture4",Widget.PICTURE),
         ACCESSORY_SIGNATURE_PLACE_HOLDER("accessory_signature_place_holder", Widget.TEXT),
         ACK_SIGNATURE_PLACE_HOLDER("ack_signature_place_holder", Widget.TEXT),
         WC_SIGNATURE_PLACE_HOLDER("wc_signature_place_holder", Widget.TEXT),
+        PM_PICTURE_HOLDER0("pm_picture_holder0",Widget.TEXT),
+        PM_PICTURE_HOLDER1("pm_picture_holder1",Widget.TEXT),
+        PM_PICTURE_HOLDER2("pm_picture_holder2",Widget.TEXT),
+        PM_PICTURE_HOLDER3("pm_picture_holder3",Widget.TEXT),
+        PM_PICTURE_HOLDER4("pm_picture_holder4",Widget.TEXT),
+        PARTS_PICTURE_HOLDER0("parts_picture_holder0",Widget.TEXT),
+        PARTS_PICTURE_HOLDER1("parts_picture_holder1",Widget.TEXT),
+        PARTS_PICTURE_HOLDER2("parts_picture_holder2",Widget.TEXT),
+        PARTS_PICTURE_HOLDER3("parts_picture_holder3",Widget.TEXT),
+        PARTS_PICTURE_HOLDER4("parts_picture_holder4",Widget.TEXT),
         MAINTENANCE_COMPLETION_SIGNATURE("maintenance_completion_signature", Widget.PICTURE),
         MAINTENANCE_COMPLETION_SIGNATURE_TITLE("maintenance_completion_signature_title", Widget.TEXT),
         ACCEPTANCE_SIGNATURE("acceptance_signature", Widget.PICTURE),
