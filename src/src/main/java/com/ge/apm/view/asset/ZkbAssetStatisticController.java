@@ -202,6 +202,10 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
     @Override
     public void save() {
         selected.setReasonDate(new Date());
+        if("N".equals(selected.getCanNotPastQrCode())){
+            selected.setReasonCategorize(null);
+            selected.setReason(null);
+        }
         zkbAssetQrCodeInfoRepository.save(selected);
     }
 
