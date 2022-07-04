@@ -45,10 +45,10 @@
                         <f:selectItem itemLabel="N" itemValue="N"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
-                <h:panelGroup rendered="#{!(zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y')}">
+                <!--<h:panelGroup rendered="#{!(zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y')}">
                     <label class="label">#{msg.zkbAssetStatistic_canNotPastReason}</label>
                     <p:inputTextarea   value="#{zkbAssetStatisticController.selected.reason}"  maxlength="100"/>
-                </h:panelGroup>
+                </h:panelGroup>-->
                 <h:panelGroup rendered="#{zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y'}">
                     <label class="label">#{msg.zkbAssetStatistic_canNotPastReason}*</label>
                     <p:inputTextarea   value="#{zkbAssetStatisticController.selected.reason}" required="true" requiredMessage="#{msg.zkbAssetStatistic_canNotPastReason} #{msg.ValidationRequire}"  maxlength="100"/>
@@ -64,7 +64,7 @@
                         <f:selectItem itemLabel="其他" itemValue="other"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
-                <h:panelGroup rendered="#{!(zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y')}">
+               <!-- <h:panelGroup rendered="#{!(zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y')}">
                     <label class="label">无法贴码原因归类</label>
                     <p:selectOneMenu  value="#{zkbAssetStatisticController.selected.reasonCategorize}" >
                         <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -73,7 +73,7 @@
                         <f:selectItem itemLabel="设备找不到" itemValue="notFind"/>
                         <f:selectItem itemLabel="其他" itemValue="other"/>
                     </p:selectOneMenu>
-                </h:panelGroup>
+                </h:panelGroup>-->
             </p:panelGrid>
             <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="float:left" rendered="#{empty zkbAssetStatisticController.selected.qrCodeCountState or zkbAssetStatisticController.selected.qrCodeCountState eq 'N'}"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbAssetQrCodeInfo').hide()"/>

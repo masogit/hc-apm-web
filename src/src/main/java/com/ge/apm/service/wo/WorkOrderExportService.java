@@ -356,6 +356,9 @@ public class WorkOrderExportService {
             if(workOrderExportPojo.getAckSignature() != null){
                 workOrderMap.put("ack_signature", workOrderExportPojo.getAckSignature());
             }
+            if(workOrderExportPojo.getSrId()!=null) {
+                workOrderMap.put("srId",workOrderExportPojo.getSrId());
+            }
             resultList.add(workOrderMap);
         }
         return resultList;
@@ -444,6 +447,24 @@ public class WorkOrderExportService {
                     (String) m.get(WebUtil.getMessage("srNum_xlsx")),
                     (String) m.get(WebUtil.getMessage("EquipmentName_xlsx")),
                     (String) m.get(WebUtil.getMessage("EquipmentID_xlsx")) ));
+
+            List<V2_BlobObject> pictureList = woService.getAttachByBoSubType((String) m.get("srId"), V2_BlobObject.BO_SUB_TYPE_IMG);
+            if(pictureList!=null) {
+                List<V2_BlobObject> serviceRequestPicture = new ArrayList<>();  //报修图片
+                List<V2_BlobObject> workOrderPicture = new ArrayList<>();    //维修图片
+                List<V2_BlobObject> partsPicture = new ArrayList<>();        //备件图片，目前只有mobile端可以上传图片
+                serviceRequestPicture = pictureList.stream().filter(item -> "ServiceRequest".equals(item.getBoType())).collect(Collectors.toList());
+                workOrderPicture = pictureList.stream().filter(item -> "WorkOrder".equals(item.getBoType())).collect(Collectors.toList());
+                List<V2_WorkOrder_Detail> details = workOrderDetailDao.getByWoIdOrderByCreatedDateDesc((String) m.get("srId"));
+                if (details != null && !details.isEmpty()) {
+                    for(V2_WorkOrder_Detail detail : details) {
+                        partsPicture.addAll(detail.getAttachments());
+                    }
+                }
+                m.put("serviceRequestPicture",serviceRequestPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                m.put("workOrderPicture",workOrderPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                m.put("partsPicture",partsPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+            }
         });
 
         return workOrderdata;
