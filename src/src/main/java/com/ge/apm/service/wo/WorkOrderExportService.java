@@ -36,6 +36,7 @@ import webapp.framework.web.WebUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -356,6 +357,9 @@ public class WorkOrderExportService {
             if(workOrderExportPojo.getAckSignature() != null){
                 workOrderMap.put("ack_signature", workOrderExportPojo.getAckSignature());
             }
+            if(workOrderExportPojo.getSrId()!=null) {
+                workOrderMap.put("srId",workOrderExportPojo.getSrId());
+            }
             resultList.add(workOrderMap);
         }
         return resultList;
@@ -420,9 +424,8 @@ public class WorkOrderExportService {
         workOrderdata.stream().forEach(m->{
 
             String woid = (String) m.get("woId");
-            m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get(assetId)))
-                    .map(a->a.getPurchasePrice()).orElse(null));
-            m.put("采购日期",  Optional.ofNullable(assetMap.get((Integer) m.get(assetId)))
+            m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get("assetId"))).map(a->new BigDecimal(a.getPurchasePrice())).orElse(null));
+            m.put("采购日期",  Optional.ofNullable(assetMap.get((Integer) m.get("assetId")))
                     .map(a->a.getPurchaseDate()).orElse(null));
 
             m.put("auditSignatureList",Optional.ofNullable(approvalsMap.get(woid))
@@ -444,6 +447,24 @@ public class WorkOrderExportService {
                     (String) m.get(WebUtil.getMessage("srNum_xlsx")),
                     (String) m.get(WebUtil.getMessage("EquipmentName_xlsx")),
                     (String) m.get(WebUtil.getMessage("EquipmentID_xlsx")) ));
+
+            List<V2_BlobObject> pictureList = woService.getAttachByBoSubType((String) m.get("srId"), V2_BlobObject.BO_SUB_TYPE_IMG);
+            if(pictureList!=null) {
+                List<V2_BlobObject> serviceRequestPicture = new ArrayList<>();  //报修图片
+                List<V2_BlobObject> workOrderPicture = new ArrayList<>();    //维修图片
+                List<V2_BlobObject> partsPicture = new ArrayList<>();        //备件图片，目前只有mobile端可以上传图片
+                serviceRequestPicture = pictureList.stream().filter(item -> "ServiceRequest".equals(item.getBoType())).collect(Collectors.toList());
+                workOrderPicture = pictureList.stream().filter(item -> "WorkOrder".equals(item.getBoType())).collect(Collectors.toList());
+                List<V2_WorkOrder_Detail> details = workOrderDetailDao.getByWoIdOrderByCreatedDateDesc((String) m.get("srId"));
+                if (details != null && !details.isEmpty()) {
+                    for(V2_WorkOrder_Detail detail : details) {
+                        partsPicture.addAll(detail.getAttachments());
+                    }
+                }
+                m.put("serviceRequestPicture",serviceRequestPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                m.put("workOrderPicture",workOrderPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                m.put("partsPicture",partsPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+            }
         });
 
         return workOrderdata;
