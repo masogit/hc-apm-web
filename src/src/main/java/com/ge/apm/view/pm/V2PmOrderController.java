@@ -2842,7 +2842,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.stepFileter = stepFileter;
     }
 
-    public List<V2_BlobObject> getPicList() {
+    public List<V2_BlobObject> getpicList() {
         return picList;
     }
 
