@@ -228,10 +228,7 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 	}
 
 	public String getDefaultValue() {
-		if(StringUtils.isEmpty(defaultValue) ) return "";
-		if(StringUtils.isNotBlank(fieldType) && "Select".equals(fieldType)){
-			return initConfigCheckItem();
-		}
+
 		return defaultValue;
 	}
 
@@ -268,13 +265,13 @@ public class NurseSiteMaintainCheckItem implements Serializable,Cloneable {
 		return fieldTypeStr;
 	}
 
-	private String initConfigCheckItem(){
+	public String optionStr(){
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			return "";
 		}else{
 			JSONArray objects = JSONArray.parseArray(options);
 			List<TableOption> tableOptions = objects.toJavaList(TableOption.class);
-			Optional<TableOption> first = tableOptions.stream().filter(item -> defaultValue.equals(item.getKey())).findFirst();
+			Optional<TableOption> first = tableOptions.stream().filter(item -> item.getKey().equals(defaultValue)).findFirst();
 			if(first.isPresent()){
 				return first.get().getValue();
 			}else{

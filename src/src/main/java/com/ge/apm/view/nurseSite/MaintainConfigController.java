@@ -100,7 +100,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private SearchController searchController;
   	private AssetSelectController assetSelectController;
   	private UserAuth customRoleAuth;
-
+	private boolean internalCreate=false;
+	private boolean createOption=false;
 	//选定的院区
 	@Setter
 	@Getter
@@ -560,10 +561,24 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	public void saveCheckListItem(){
-		if(listPairCheckItems.contains(objPairCheckItem)){
-		}
-		else{
+    	if(this.internalCreate){
+			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
+				if(listPairCheckItem.getName().equals(objPairCheckItem.getName())){
+					WebUtil.addErrorMessage("添加失败，请勿重复添加");
+					initObjPairCheckItem();
+					checkSaveDisable();
+					return;
+				}
+			}
 			listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
+		}else{
+			for (NurseSiteMaintainConfigCheckItem listPairCheckItem : listPairCheckItems) {
+				String name = listPairCheckItem.getName();
+				if(name.equals(objPairCheckItem.getName())){
+					BeanUtils.copyProperties(objPairCheckItem,listPairCheckItem);
+					break;
+				}
+			}
 		}
 		initObjPairCheckItem();
 		checkSaveDisable();
@@ -684,9 +699,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	public void  createObjCheckItem(){
 		this.objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
+		this.internalCreate=true;
 	}
 	public void setObjCheckItem(NurseSiteMaintainConfigCheckItem objCheckItem) {
 		this.objPairCheckItem = objCheckItem;
+		this.internalCreate=false;
 	}
 	
 	private boolean containsCheckItem(List<NurseSiteMaintainCheckItem> list,NurseSiteMaintainConfigCheckItem p){
@@ -897,21 +914,34 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			objPairCheckItem.setOptions(new ArrayList<>());
 			options = objPairCheckItem.getOptions();
 		}
-		for (TableOption tableOption1 : options) {
-			if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
-				tableOption1.setValue(tableOption.getValue());
-				tableOption=null;
-				return ;
+		if(createOption){
+			// 新建
+			for (TableOption tableOption1 : options) {
+				if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
+					WebUtil.addErrorMessage("添加失败，请勿重复添加");
+					return;
+				}
+			}
+			options.add(tableOption);
+		}else{
+			for (TableOption tableOption1 : options) {
+				if(tableOption1.getKey() != null && tableOption1.getKey().equals(tableOption.getKey())){
+					tableOption1.setValue(tableOption.getValue());
+					tableOption=null;
+					return ;
+				}
 			}
 		}
-		options.add(tableOption);
+
 		tableOption=null;
 	}
 	public void prepareAddOption(){
 		tableOption=new TableOption();
+		this.createOption=true;
 	}
 	public void prepareEditOption(TableOption option) {
 		tableOption = option;
+		this.createOption=false;
 	}
 
 	public void removeOption(TableOption option) {
@@ -935,5 +965,21 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 	public void recover(){
     	BeanUtils.copyProperties(objPairCheckItemEdit,objPairCheckItem);
+	}
+
+	public boolean getInternalCreate() {
+		return internalCreate;
+	}
+
+	public void setInternalCreate(boolean internalCreate) {
+		this.internalCreate = internalCreate;
+	}
+
+	public boolean getCreateOption() {
+		return createOption;
+	}
+
+	public void setCreateOption(boolean createOption) {
+		this.createOption = createOption;
 	}
 }
