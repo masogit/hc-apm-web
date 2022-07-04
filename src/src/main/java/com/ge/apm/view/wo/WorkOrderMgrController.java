@@ -1803,6 +1803,12 @@ public void test1(){
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
+        if(selectedAsset != null && userContextService.isCountyArea()){
+            OrgInfo orgInfo = orgDao.findByUid(selectedAsset.getSiteUID());
+            newServiceRequest.setCustomerName(orgInfo.getContactPerson());
+            newServiceRequest.setCustomerTel(orgInfo.getContactPhone());
+            newServiceRequest.setHospitalName(orgInfo.getName());//这里只需要开单页面显示，asset微服务会保存医院Uid和名称。
+        }
         faultReason=WebUtil.getMessage("EquipmentFault");
         selected = null;
     }
@@ -1841,6 +1847,12 @@ public void test1(){
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
+        if(selectedAsset != null && userContextService.isCountyArea()){
+            OrgInfo orgInfo = orgDao.findByUid(selectedAsset.getSiteUID());
+            newServiceRequest.setCustomerName(orgInfo.getContactPerson());
+            newServiceRequest.setCustomerTel(orgInfo.getContactPhone());
+            newServiceRequest.setHospitalName(orgInfo.getName());//这里只需要开单页面显示，asset微服务会保存医院Uid和名称。
+        }
         faultReason=WebUtil.getMessage("FailedToMeasure");
         selected = null;
     }
@@ -1995,7 +2007,7 @@ public void test1(){
         asset.setLocationName(lName);
         locationName = lName;
 
-        if(userContextService.isCountyArea() && newServiceRequest != null){
+        if(newServiceRequest != null && userContextService.isCountyArea()){
             OrgInfo orgInfo = orgDao.findByUid(asset.getSiteUID());
             newServiceRequest.setCustomerName(orgInfo.getContactPerson());
             newServiceRequest.setCustomerTel(orgInfo.getContactPhone());
