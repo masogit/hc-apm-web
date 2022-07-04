@@ -36,6 +36,7 @@ import webapp.framework.web.WebUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -423,9 +424,8 @@ public class WorkOrderExportService {
         workOrderdata.stream().forEach(m->{
 
             String woid = (String) m.get("woId");
-            m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get(assetId)))
-                    .map(a->a.getPurchasePrice()).orElse(null));
-            m.put("采购日期",  Optional.ofNullable(assetMap.get((Integer) m.get(assetId)))
+            m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get("assetId"))).map(a->new BigDecimal(a.getPurchasePrice())).orElse(null));
+            m.put("采购日期",  Optional.ofNullable(assetMap.get((Integer) m.get("assetId")))
                     .map(a->a.getPurchaseDate()).orElse(null));
 
             m.put("auditSignatureList",Optional.ofNullable(approvalsMap.get(woid))
