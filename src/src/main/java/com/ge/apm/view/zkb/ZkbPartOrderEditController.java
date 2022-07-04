@@ -347,7 +347,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 initHighList(selectedContract.getId());
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
                 selected.setSsaKeyFlag(CopyByInvok.F);
-                if(!"2".equals(artificialType)){
+                /*if(!"2".equals(artificialType)){
                     if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
                         if(selectedContract.getGeArtificialSupportTimes() == null || selectedContract.getGeArtificialSupportTimes() <= 0){
                             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于0，请检查！", "");
@@ -363,7 +363,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                             return;
                         }
                     }
-                }
+                }*/
             }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
                 if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
                     if(selectedContract.getSpareQuota() == null || selectedContract.getSpareQuota() < 0){
