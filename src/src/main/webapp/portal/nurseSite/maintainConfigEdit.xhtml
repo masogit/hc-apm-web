@@ -34,6 +34,13 @@
 						<p:column headerText="备注">
 							<h:outputText value="#{item.description}" />
 						</p:column>
+						<p:column headerText="类型">
+							<h:outputText value="#{item.fieldTypeStr()}" />
+						</p:column>
+						<p:column headerText="默认值">
+							<h:outputText rendered="#{(item.fieldType ne 'Select')}" value="#{item.defaultValue}" />
+							<h:outputText rendered="#{item.fieldType eq 'Select'}" value="#{item.optionStr()}" />
+						</p:column>
 						<p:column headerText="#{msg.Actions}">
 							<p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" update=":checkItemEditDlg"
 								 actionListener="#{maintainConfigController.createObjCheckItem}" oncomplete="PF('checkItemEditDlg').show()" rendered="#{empty item.name}" />
@@ -110,7 +117,7 @@
 				<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					<h:panelGroup >
 						<label class="label">#{msg.key}</label>
-						<p:inputText value="#{maintainConfigController.tableOption.key}" required="true" requiredMessage="#{msg.name}#{msg.ValidationRequire}" />
+						<p:inputText disabled="#{!maintainConfigController.createOption}" value="#{maintainConfigController.tableOption.key}" required="true" requiredMessage="#{msg.name}#{msg.ValidationRequire}" />
 					</h:panelGroup>
 					<h:panelGroup >
 						<label class="label">#{msg.value}</label>
@@ -133,7 +140,7 @@
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					<h:panelGroup>
 						<label>#{msg.name} *：</label>
-						<p:inputText id="name" value="#{maintainConfigController.objCheckItem.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" />
+						<p:inputText disabled="#{!maintainConfigController.internalCreate}" id="name" value="#{maintainConfigController.objCheckItem.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" />
 					</h:panelGroup>
 					<h:panelGroup>
 						<label>备注：</label>
@@ -183,7 +190,7 @@
 								<h:outputText value="#{optionItem.value}"/>
 							</p:column>
 							<p:column headerText="#{msg.Operation}" width="64" >
-								<p:commandLink actionListener="#{maintainConfigController.prepareEditOption(optionItem)}" process="@this"  oncomplete="PF('editOptionDialog1').show()" update=":checkItemEditForm " rendered="#{not empty optionItem.key}"><span class="ui-icon ui-icon-pencil" /></p:commandLink>
+								<p:commandLink actionListener="#{maintainConfigController.prepareEditOption(optionItem)}" process="@this"  oncomplete="PF('editOptionDialog1').show()" update=":checkItemEditForm editOptionDialogForm1" rendered="#{not empty optionItem.key}"><span class="ui-icon ui-icon-pencil" /></p:commandLink>
 								<p:commandLink actionListener="#{maintainConfigController.removeOption(optionItem)}" process="@this" update=":checkItemEditForm:optionsTable :checkItemEditForm:DefaultValue" rendered="#{not empty optionItem.key}"><span class="ui-icon ui-icon-trash" /></p:commandLink>
 							</p:column>
 						</p:dataTable>
