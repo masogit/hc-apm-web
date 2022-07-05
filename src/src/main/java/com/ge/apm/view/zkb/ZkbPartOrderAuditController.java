@@ -1225,6 +1225,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
             saveTips = "备件归还信息已添加，提交申请后流程才会进入Admin确认阶段，请在添加完需要已归还的备件信息后提交申请，以免影响您后续的进度，感谢您的配合！";
         }else if("ModifyCreate".equals(actionReturnName)){
+            zkbPartOrderReturn.setId(UUID.randomUUID().toString());
             zkbPartOrderReturnModifyList.add(zkbPartOrderReturn);
         }
         zkbPartOrderReturn = null;
