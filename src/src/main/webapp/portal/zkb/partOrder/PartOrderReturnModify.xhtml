@@ -12,7 +12,7 @@
             <p:fieldset rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}" style="margin-top: 5px;">
                 <p:dataTable id="zkbPoReturnModifyList" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModifyList}" var="item"
                              widgetVar="zkbPoReturnModifyList" selectionMode="single"  selection="#{zkbPartOrderAuditController.zkbPartOrderReturn}"
-                             lazy="false" paginator="true" rowKey="#{item.waybillNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.returnDate}"
+                             lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.returnDate}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
                     <p:ajax event="rowSelect" update="editReturnModifyButton deleteReturnModifyButton"/>
 
