@@ -134,6 +134,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "is_locked")
 	private Boolean isLocked;
 
+	@Column(name = "is_disable")
+	private Boolean isDisable;
+
 	@Column(name = "lock_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lockTime;
@@ -364,7 +367,17 @@ public class UserAccount implements ChineseName, Serializable {
 		isOnline = false;
 	}
 
-	public String getDefaultLanguage() {
+    public Boolean getIsDisable() {
+        if(isDisable==null)
+            return false;
+        else
+            return isDisable;
+    }
+    public void setIsDisable(Boolean disable) {
+        isDisable = disable;
+    }
+
+    public String getDefaultLanguage() {
 		return defaultLanguage;
 	}
 
