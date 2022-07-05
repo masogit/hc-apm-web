@@ -422,9 +422,8 @@ public class WorkOrderExportService {
         });
 
         workOrderdata.stream().forEach(m->{
-
             String woid = (String) m.get("woId");
-            m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get("assetId"))).map(a->new BigDecimal(a.getPurchasePrice())).orElse(null));
+            m.put("设备价格", Optional.ofNullable(assetMap.get((Integer) m.get("assetId"))).map(a-> a.getPurchasePrice()==null ? a.getPurchasePrice() : new BigDecimal(a.getPurchasePrice())).orElse(null));
             m.put("采购日期",  Optional.ofNullable(assetMap.get((Integer) m.get("assetId")))
                     .map(a->a.getPurchaseDate()).orElse(null));
 
