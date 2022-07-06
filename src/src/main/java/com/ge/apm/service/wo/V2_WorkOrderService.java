@@ -151,7 +151,9 @@ public class V2_WorkOrderService {
     public List<V2_BlobObject> getAttachByBoSubType(String srUid,String bosubType) {
         List<SearchFilter> blobSearchFilters = new ArrayList();
         blobSearchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, srUid));
+/*
         blobSearchFilters.add(new SearchFilter("boType", SearchFilter.Operator.EQ, "WorkOrder"));
+*/
         blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, bosubType));
         return blobDao.findBySearchFilter(blobSearchFilters);
     }
