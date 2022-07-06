@@ -427,12 +427,13 @@ public class WorkOrderExportService {
                     (String) m.get(WebUtil.getMessage("EquipmentName_xlsx")),
                     (String) m.get(WebUtil.getMessage("EquipmentID_xlsx")) ));
 
-            List<V2_BlobObject> pictureList = woService.getAttachByBoSubType((String) m.get("srId"), V2_BlobObject.BO_SUB_TYPE_IMG);
+            List<V2_BlobObject> pictureList = woService.getAttachByBoSubType((String) m.get("srId"), null); //微信端之前上传的图片没有 boSubType区分
             if(pictureList!=null) {
                 List<V2_BlobObject> serviceRequestPicture = new ArrayList<>();  //报修图片
                 List<V2_BlobObject> workOrderPicture = new ArrayList<>();    //维修图片
                 List<V2_BlobObject> partsPicture = new ArrayList<>();        //备件图片，目前只有mobile端可以上传图片
                 serviceRequestPicture = pictureList.stream().filter(item -> "ServiceRequest".equals(item.getBoType())).collect(Collectors.toList());
+                pictureList = woService.getAttachByBoSubType((String) m.get("srId"), V2_BlobObject.BO_SUB_TYPE_IMG);
                 workOrderPicture = pictureList.stream().filter(item -> "WorkOrder".equals(item.getBoType())).collect(Collectors.toList());
                 Set<String> ids = workOrderDetailDao.findByWoId(woid).stream().map(p -> p.getId()).collect(Collectors.toSet());
                 if(!ids.isEmpty()) partsPicture.addAll(blobObjectRepository.getPartPictures(ids));
