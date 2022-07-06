@@ -434,12 +434,11 @@ public class WorkOrderExportService {
                 List<V2_BlobObject> partsPicture = new ArrayList<>();        //备件图片，目前只有mobile端可以上传图片
                 serviceRequestPicture = pictureList.stream().filter(item -> "ServiceRequest".equals(item.getBoType())).collect(Collectors.toList());
                 workOrderPicture = pictureList.stream().filter(item -> "WorkOrder".equals(item.getBoType())).collect(Collectors.toList());
-                List<V2_WorkOrder_Detail> details = Optional.ofNullable(workOrderDetails.get(woid)).orElse(Collections.emptyList());
-                Set<String> ids = details.stream().map(p -> p.getId()).collect(Collectors.toSet());
-                if(!ids.isEmpty()) partsPicture.addAll(blobObjectRepository.getPartPictures(ids).stream().filter(blob -> (".jpg,.jpeg,.png".contains(blob.getObjectName().substring(blob.getObjectName().lastIndexOf(".") + 1).toLowerCase())) ).collect(Collectors.toList()));
-                m.put("serviceRequestPicture",serviceRequestPicture.stream().map(v2_blobObject -> { if((".jpg,.jpeg,.png".contains(v2_blobObject.getObjectName().substring(v2_blobObject.getObjectName().lastIndexOf(".") + 1).toLowerCase()))) return v2_blobObject.getObjectStorageId();return null; }).collect(Collectors.toList()));
-                m.put("workOrderPicture",workOrderPicture.stream().map(v2_blobObject -> { if((".jpg,.jpeg,.png".contains(v2_blobObject.getObjectName().substring(v2_blobObject.getObjectName().lastIndexOf(".") + 1).toLowerCase()))) return v2_blobObject.getObjectStorageId();return null; }).collect(Collectors.toList()));
-                m.put("partsPicture",partsPicture.stream().map(v2_blobObject -> { if((".jpg,.jpeg,.png".contains(v2_blobObject.getObjectName().substring(v2_blobObject.getObjectName().lastIndexOf(".") + 1).toLowerCase()))) return v2_blobObject.getObjectStorageId();return null; }).collect(Collectors.toList()));
+                Set<String> ids = workOrderDetailDao.findByWoId(woid).stream().map(p -> p.getId()).collect(Collectors.toSet());
+                if(!ids.isEmpty()) partsPicture.addAll(blobObjectRepository.getPartPictures(ids));
+                m.put("serviceRequestPicture",serviceRequestPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                m.put("workOrderPicture",workOrderPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
+                m.put("partsPicture",partsPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
             }
         });
 
