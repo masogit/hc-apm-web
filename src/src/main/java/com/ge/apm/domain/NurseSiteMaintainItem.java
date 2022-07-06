@@ -2,10 +2,7 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.*;
 
@@ -134,8 +131,8 @@ public class NurseSiteMaintainItem implements Serializable {
 
     @Column(name = "update_by")
     private String updateByUid;
-
-
+	@Transient
+	private Map<String, NurseSiteMaintainConfigCheckItem> configMap;
     public String getUpdateByUid() {
         return updateByUid;
     }
@@ -348,12 +345,20 @@ public class NurseSiteMaintainItem implements Serializable {
 		if(listCopyData==null){
 			listCopyData=new ArrayList<NurseSiteMaintainData>();
 		}
+		Map<String, NurseSiteMaintainConfigCheckItem> configMap = this.getConfigMap();
 		listCopyData.addAll(listData);
 		if(StringUtils.isNotEmpty(label)){
 			for(int i=0;i<listCopyData.size();++i){
 				NurseSiteMaintainData tempData=listCopyData.get(i);
 				if(tempData.getCheckItem().equals(label)){
 					listCopyData.remove(i);
+					String variableText = tempData.getVariableText();
+					if(StringUtils.isEmpty(variableText)){
+						NurseSiteMaintainConfigCheckItem nurseSiteMaintainConfigCheckItem = configMap.get(tempData.getCheckItem());
+						if(nurseSiteMaintainConfigCheckItem != null && StringUtils.isNotEmpty(nurseSiteMaintainConfigCheckItem.getFieldType())){
+							tempData.setVariableText(nurseSiteMaintainConfigCheckItem.getDefaultValue());
+						}
+					}
 					return tempData;
 				}
 			}
@@ -403,5 +408,13 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Override
 	public String toString() {
 		return "NurseSiteMaintainItem [ id=" + id + " ]";
+	}
+
+	public Map<String, NurseSiteMaintainConfigCheckItem> getConfigMap() {
+		return configMap;
+	}
+
+	public void setConfigMap(Map<String, NurseSiteMaintainConfigCheckItem> configMap) {
+		this.configMap = configMap;
 	}
 }
