@@ -68,7 +68,7 @@
                 </h:form>
             </div>
         </div>
-        <p:dialog id="editOptionDialog" widgetVar="editOptionDialog"  modal="false" width="500" resizable="true" draggable="true"  appendTo="@(body)" header="#{msg.EditOption}">
+        <p:dialog id="editOptionDialog" widgetVar="editOptionDialog"  modal="true" width="500" resizable="true" draggable="true"  appendTo="@(body)" header="#{msg.EditOption}">
             <h:form id="editOptionDialogForm" >
                 <h:panelGroup id="display" >
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -116,7 +116,7 @@
                         </h:panelGroup>
                         <h:panelGroup id="DefaultValue" >
                             <c:if test="#{!maintainCheckItemController.dateType()}">
-                             <label >默认值*：</label>
+                             <label >默认值：</label>
                             </c:if>
                             <c:if test="#{maintainCheckItemController.selected.fieldType eq 'Switch'}" >
                                 <p:selectBooleanButton onLabel="#{msg.True2Yes}" offLabel="#{msg.False2No}"  value="#{maintainCheckItemController.selected.defaultValue}"/>

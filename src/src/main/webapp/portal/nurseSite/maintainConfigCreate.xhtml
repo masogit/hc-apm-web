@@ -99,7 +99,7 @@
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainConfigCreateDialog').hide()" />
 		</h:form>
 	</p:dialog>
-	<p:dialog id="editOptionDialog" widgetVar="editOptionDialog"  modal="false" width="500" resizable="true" draggable="true"  appendTo="@(body)" header="#{msg.EditOption}">
+	<p:dialog id="editOptionDialog" widgetVar="editOptionDialog"  modal="true" width="500" resizable="true" draggable="true"  appendTo="@(body)" header="#{msg.EditOption}">
 		<h:form id="editOptionDialogForm" >
 			<h:panelGroup id="display1" >
 				<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -147,7 +147,7 @@
 					</h:panelGroup>
 					<h:panelGroup id="DefaultValue" >
 						<c:if test="#{!maintainConfigController.dateType()}">
-							<label >默认值*：</label>
+							<label >默认值：</label>
 						</c:if>
 						<c:if test="#{maintainConfigController.objCheckItem.fieldType eq 'Switch'}" >
 							<p:selectBooleanButton onLabel="#{msg.True2Yes}" offLabel="#{msg.False2No}"  value="#{maintainConfigController.objCheckItem.defaultValue}"/>

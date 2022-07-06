@@ -120,7 +120,7 @@ public class NurseSiteMaintainConfigCheckItem implements Serializable {
 	public Date getDateValue() {
 
 		try {
-			if(StringUtils.isNotBlank(defaultValue)){
+			if("Date".equals(fieldType) &&StringUtils.isNotBlank(defaultValue)){
 				Long aLong = Long.valueOf(defaultValue);
 				return new Date(aLong);
 			}
