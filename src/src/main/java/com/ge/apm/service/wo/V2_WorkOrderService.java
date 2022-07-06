@@ -154,7 +154,7 @@ public class V2_WorkOrderService {
 /*
         blobSearchFilters.add(new SearchFilter("boType", SearchFilter.Operator.EQ, "WorkOrder"));
 */
-        blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, bosubType));
+        if(bosubType!=null) blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, bosubType));
         return blobDao.findBySearchFilter(blobSearchFilters);
     }
 
