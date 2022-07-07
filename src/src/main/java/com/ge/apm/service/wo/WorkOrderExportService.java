@@ -1,41 +1,27 @@
 package com.ge.apm.service.wo;
 
-import ca.uhn.hl7v2.model.v24.datatype.ST;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
-import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -44,8 +30,6 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.ge.apm.domain.V2_BlobObject.BO_SUB_TYPE_IMG;
 
 /**
  * Created by 212605082 on 2017/7/25.
@@ -66,10 +50,6 @@ public class WorkOrderExportService {
     @Autowired
     ServiceRequestRepository serviceRequestDao;
     @Autowired
-    private V2_WorkOrderRepository v2WorkOrderDao;
-    @Autowired
-    private V2_WorkOrderStepRepository v2WorkOrderStepDao;
-    @Autowired
     WorkOrderDetailRepository workOrderDetailDao;
     @Autowired
     AssetInfoRepository assetInfoDao;
@@ -84,8 +64,6 @@ public class WorkOrderExportService {
     @Autowired
     private TenantInfoRepository tenantInfoRepository;
     @Autowired
-    private WorkAuditRepository workAuditRepository;
-    @Autowired
     private AuditGroupConfigurationDetailRepository auditGroupConfigurationDetailRepository;
     @Autowired
     private OrgInfoTreeService orgInfoTreeService;
@@ -97,6 +75,8 @@ public class WorkOrderExportService {
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     @Autowired
     private V2_WorkOrderService woService;
+    @Autowired
+    private BlobObjectRepository blobObjectRepository;
 
     public List<Integer> getVisableMvAssetIds(OrgInfo siteOrg,OrgInfo clinicalDepte){
         String token = UserContextService.getAccessToken();
@@ -447,19 +427,16 @@ public class WorkOrderExportService {
                     (String) m.get(WebUtil.getMessage("EquipmentName_xlsx")),
                     (String) m.get(WebUtil.getMessage("EquipmentID_xlsx")) ));
 
-            List<V2_BlobObject> pictureList = woService.getAttachByBoSubType((String) m.get("srId"), V2_BlobObject.BO_SUB_TYPE_IMG);
+            List<V2_BlobObject> pictureList = woService.getAttachByBoSubType((String) m.get("srId"), null); //微信端之前上传的图片没有 boSubType区分
             if(pictureList!=null) {
                 List<V2_BlobObject> serviceRequestPicture = new ArrayList<>();  //报修图片
                 List<V2_BlobObject> workOrderPicture = new ArrayList<>();    //维修图片
                 List<V2_BlobObject> partsPicture = new ArrayList<>();        //备件图片，目前只有mobile端可以上传图片
                 serviceRequestPicture = pictureList.stream().filter(item -> "ServiceRequest".equals(item.getBoType())).collect(Collectors.toList());
+                pictureList = woService.getAttachByBoSubType((String) m.get("srId"), V2_BlobObject.BO_SUB_TYPE_IMG);
                 workOrderPicture = pictureList.stream().filter(item -> "WorkOrder".equals(item.getBoType())).collect(Collectors.toList());
-                List<V2_WorkOrder_Detail> details = workOrderDetailDao.getByWoIdOrderByCreatedDateDesc((String) m.get("srId"));
-                if (details != null && !details.isEmpty()) {
-                    for(V2_WorkOrder_Detail detail : details) {
-                        partsPicture.addAll(detail.getAttachments());
-                    }
-                }
+                Set<String> ids = workOrderDetailDao.findByWoId(woid).stream().map(p -> p.getId()).collect(Collectors.toSet());
+                if(!ids.isEmpty()) partsPicture.addAll(blobObjectRepository.getPartPictures(ids));
                 m.put("serviceRequestPicture",serviceRequestPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
                 m.put("workOrderPicture",workOrderPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
                 m.put("partsPicture",partsPicture.stream().map(v2_blobObject -> v2_blobObject.getObjectStorageId()).collect(Collectors.toList()));
