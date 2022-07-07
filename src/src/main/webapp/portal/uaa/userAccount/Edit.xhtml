@@ -110,7 +110,9 @@
                             <p:autoComplete id="tags" multiple="true" value="#{userAccountController.selected.tags}" completeMethod="#{userAccountController.autoCompleteTags}"
                                             var="tag" itemLabel="#{tag}" itemValue="#{tag}" forceSelection="false" styleClass="user-tags" />
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <p:selectBooleanCheckbox itemLabel="停用?" value="#{userAccountController.selected.isDisable}"/>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.comments}</label>
                             <p:inputText id="comment" label="#{msg.comments}" value="#{userAccountController.selected.comment}" required="false" requiredMessage="#{msg.comments} #{msg.ValidationRequire}" />
