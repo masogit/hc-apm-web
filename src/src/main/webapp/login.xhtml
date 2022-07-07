@@ -142,6 +142,9 @@
                     if(xhr.status===403){
                         PF("dlgAccountLocked").show();
                     }
+                    if(xhr.status===406){
+                        PF("dlgAccountDisable").show();
+                    }
                 }
 
                 function handleSuccess(data, status, xhr) {
@@ -199,6 +202,13 @@
                 <h:outputText value="用户名或密码错误。请重新输入用户名和密码！"/>
                 <br/><br/>
                 <p:commandButton value="#{msg.Confirm}" onclick="PF('dlgLoginError').hide()"/>
+            </p:dialog>
+
+            <p:dialog modal="true" widgetVar="dlgAccountDisable" header="登录失败" appendTo="@(body)">
+                <i class="ui-icon ui-icon-error"></i>&nbsp;&nbsp;
+                <h:outputText value="该账号已被停用，请联系系统管理员!"/>
+                <br/><br/>
+                <p:commandButton value="#{msg.Confirm}" onclick="PF('dlgAccountDisable').hide()"/>
             </p:dialog>
 
             <p:dialog modal="true" widgetVar="dlgAccountLocked" header="登录失败" appendTo="@(body)">

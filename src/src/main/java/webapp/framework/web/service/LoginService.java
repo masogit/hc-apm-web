@@ -319,7 +319,10 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             addErrorMessage(response, 401, "login_error");
             return;
         }
-
+        if(user==null || user.getIsDisable()){
+            addErrorMessage(response, 406, "login_disable_error");
+            return;
+        }
         if(user.getIsLocked()!=null && user.getIsLocked()==true){
             if(TimeUtil.timeNow().minusHours(24).isBefore(TimeUtil.toJodaDate(user.getLockTime()))){
                 addErrorMessage(response, 403, "AccountLocked");
