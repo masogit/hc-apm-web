@@ -711,6 +711,8 @@ public class NurseSiteMaintainService {
 				List<NurseSiteMaintainData> tempListData=mapData.get(tempItem.getId());
 				if(tempListData!=null){
 					tempItem.setListData(tempListData);
+					Map<String, NurseSiteMaintainConfigCheckItem> configMap = initConfig(tempItem);
+					tempItem.setConfigMap(configMap);
 				}
 			}
 		}
@@ -962,10 +964,12 @@ public class NurseSiteMaintainService {
                     }
                 }
             }
+			int nullNum=0;
 			while (itData.hasNext()) {
 				NurseSiteMaintainData tempData = itData.next();
 				Boolean value = tempData.getCheckValue();
 				if (value == null) {
+					nullNum++;
 					hasNotChecked = true;
 					if (itemStatus == 2 || itemStatus == 5|| itemStatus == 6|| itemStatus == 7) {
 						itemStatus = 4;
@@ -994,6 +998,9 @@ public class NurseSiteMaintainService {
 					}
 					break;
 				}
+			}
+			if(nullNum > 0){
+				itemStatus=nullNum==listData.size()?0:4;
 			}
 			tempItem.setStatus(itemStatus);
 		}
@@ -1846,9 +1853,9 @@ public class NurseSiteMaintainService {
 								} else {
 									keyName += ",";
 								}
-								String VariableText=initVariableText(tempData,configMap);
+								//String VariableText=initVariableText(tempData,configMap);
 								headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
-								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue()+VariableText);
+								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
 								doc.writeRowData(SHEET_Maintain, keyRow, modifyByRow, keyName, tempItem.getModifyBy().getName());
 								doc.writeRowData(SHEET_Maintain, keyRow, checkDateRow, keyName, tempItem.getCheckDate());
 								doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName, tempData.getCheckItem());
