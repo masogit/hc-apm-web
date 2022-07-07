@@ -159,8 +159,9 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 			showLables = new ArrayList<>();
 		} else {
 			showLables.clear();
-			listCheckData.clear();
+
 		}
+		listCheckData.clear();
 		try {
 			List<NurseSiteMaintainData> listTempData = lazyModel.iterator().next().getListData();
 			if (listTempData != null) {
@@ -192,15 +193,11 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	}
 	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem){
 		NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
-		String fieldType = checkItem.getFieldType();
-		if(StringUtils.isBlank(fieldType)){
-			fieldType="Text";
-		}
 		p.setId(checkItem.getId());
 		p.setName(checkItem.getName());
 		p.setDefaultValue(checkItem.getDefaultValue());
 		p.setDescription(checkItem.getDescription());
-		p.setFieldType(fieldType);
+		p.setFieldType(checkItem.getFieldType());
 		String options = checkItem.getOptions();
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
