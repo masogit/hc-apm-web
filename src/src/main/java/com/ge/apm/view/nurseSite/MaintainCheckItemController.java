@@ -209,7 +209,7 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 	}
 	public boolean dateType(){
 		if(selected != null){
-			return "Date".equals(selected.getFieldType());
+			return StringUtils.isEmpty(selected.getFieldType()) || "Date".equals(selected.getFieldType());
 		}else{
 			return false;
 		}

@@ -104,9 +104,10 @@
 							<p:inputText id="description" value="#{maintainCheckItemController.selected.description}" />
 						</h:panelGroup>
                         <h:panelGroup >
-                            <label >#{msg.fieldType} *：</label>
-                            <p:selectOneMenu value="#{maintainCheckItemController.selected.fieldType}" required="true">
+                            <label >#{msg.fieldType}：</label>
+                            <p:selectOneMenu value="#{maintainCheckItemController.selected.fieldType}" >
                                 <p:ajax listener="#{maintainCheckItemController.onRuleChange}"  update="optionsTable   DefaultValue"  />
+                                <f:selectItem itemLabel="无类型" itemValue="#{''}"/>
                                 <f:selectItem itemLabel="#{msg.ComponentTypeInputText}" itemValue="#{'Text'}"/>
 <!--                                <f:selectItem itemLabel="#{msg.ComponentTypeSwitch}" itemValue="#{'Switch'}"/>-->
                                 <f:selectItem itemLabel="#{msg.ComponentTypeNumber}" itemValue="#{'Number'}"/>
@@ -118,10 +119,7 @@
                             <c:if test="#{!maintainCheckItemController.dateType()}">
                              <label >默认值：</label>
                             </c:if>
-                            <c:if test="#{maintainCheckItemController.selected.fieldType eq 'Switch'}" >
-                                <p:selectBooleanButton onLabel="#{msg.True2Yes}" offLabel="#{msg.False2No}"  value="#{maintainCheckItemController.selected.defaultValue}"/>
-                            </c:if>
-                            <c:if test="#{empty maintainCheckItemController.selected.fieldType or maintainCheckItemController.selected.fieldType eq 'Text'}" >
+                            <c:if test="#{ maintainCheckItemController.selected.fieldType eq 'Text'}" >
                                 <p:inputText value="#{maintainCheckItemController.selected.defaultValue}" placeholder="#{maintainCheckItemController.selected.defaultValue}"/>
                             </c:if>
                             <c:if test="#{maintainCheckItemController.selected.fieldType eq 'Number'}" >
