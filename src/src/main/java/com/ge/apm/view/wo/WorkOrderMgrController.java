@@ -2540,7 +2540,7 @@ public void test1(){
                         AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
                         List<String> userUids = auditGroupConfigurationNode.getUserUids();
                         if(userUids!=null){
-                            UserAccount userAccount = userDao.getByUid(userUids.get(0));
+                            UserAccount userAccount = userDao.getUsers(userUids.get(0));
                             uaList.add(userAccount);
                         }
                     }
