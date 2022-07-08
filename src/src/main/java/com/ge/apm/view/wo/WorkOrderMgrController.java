@@ -1187,9 +1187,6 @@ public void test1(){
         audioList = getServiceRequestPicList(selected.getSrId(), 2, null);
         picList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
-        audioList = new ArrayList<>();
-        picList = new ArrayList<>();
-        attachList = new ArrayList<>();
     }
 
     public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type, String boSubType) { //type 1:picture 2:audio
