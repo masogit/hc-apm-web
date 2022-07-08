@@ -999,7 +999,7 @@ public class NurseSiteMaintainService {
 					break;
 				}
 			}
-			if(nullNum > 0){
+			if(nullNum > 0 && !(itemStatus ==3 || itemStatus ==8 )){
 				itemStatus=nullNum==listData.size()?0:4;
 			}
 			tempItem.setStatus(itemStatus);
