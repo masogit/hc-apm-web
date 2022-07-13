@@ -56,9 +56,9 @@
             <!-- 备件管理 end  -->
 
             <p:submenu id="um073" label="#{msg.EquipmentSwap}" icon="fa fa-folder-open-o" rendered="#{(userContextService.siteOrgInfoChild.size() > 0) or ((not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.isHospitalUser() and userContextService.accessContains('assetAdjust')) }">
-                <p:menuitem id="um901" value="#{msg.RequestForBorrow}" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.borrowApply')}"/>
+                <p:menuitem id="um901" value="#{msg.RequestForBorrow}" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.siteOrgInfoChild.size()==0 and userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.borrowApply')}"/>
                 <p:menuitem id="um903" value="#{msg.BorrowAcceptance}" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.accessContains('assetAdjust.borrowAccept')}"/>
-                <p:menuitem id="um902" value="#{msg.RequestForReturn}" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.returnApply')}"/>
+                <p:menuitem id="um902" value="#{msg.RequestForReturn}" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.siteOrgInfoChild.size()==0 and userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.returnApply')}"/>
                 <p:menuitem id="um904" value="#{msg.ReturnAcceptance}" outcome="/portal/ReturnAcceptanceV2/List.xhtml" rendered="#{userContextService.accessContains('assetAdjust.returnAccept')}"/>
                 <p:menuitem id="um190" value="#{msg.BorrowAndReturnMaintenance}" outcome="/portal/sharedAssetRequest/List.xhtml" rendered="false"/>
                 <p:menuitem id="um910" value="#{msg.BatchEquipmentSwap}" outcome="/portal/allocationCenter/BatchAllocateAssets.xhtml" rendered="#{userContextService.accessContains('assetAdjust.batch')}"/>
