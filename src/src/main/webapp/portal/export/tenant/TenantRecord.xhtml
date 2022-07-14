@@ -1,0 +1,269 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="导出记录信息"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="TenantRecordListForm">
+                    <p:dataTable id="datalist" value="#{exportRecordController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{exportRecordController.selected}"
+                                 disabledSelection="true"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortBy="#{item.id}" sortOrder="descending"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {JumpToPageDropdown} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 emptyMessage="#{msg.noRecordFound}" rows="20"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="filter" listener="#{exportRecordController.onFilter}"
+                                oncomplete="updateSelectAllCheckBox();"/>
+
+                        <p:column width="36" id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{exportRecordController.selectedMap[item.id]}"
+                                                     class="selectCheckBox" disabled="#{item.status eq 'RUN'}">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)"
+                                        oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{exportRecordController.onSelectAllOfPage}"
+                                            update="@(.selectCheckBox) batchToBeTerminatedButton"
+                                            oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column exportable="false" width="70" id="operatorColumn">
+                            <p:commandLink id="editButton" disabled="#{item.status eq 'RUN' or item.status eq 'AUDIT'}" title="#{msg.Edit}"
+                                           update=":addRecordForm"
+                                           actionListener="#{exportRecordController.setItem(item)}"
+                                           oncomplete="PF('addRecordDlg').show()">
+                                <p:graphicImage name="icons/edit.png" style="width: 20px; height: 20px;"/>
+                            </p:commandLink>
+                            <p:commandLink id="deleteButton" disabled="#{item.status eq 'RUN' or item.status eq 'AUDIT'}" title="#{msg.Delete}"
+                                           actionListener="#{exportRecordController.deleteById(item.id)}"
+                                           update=":TenantRecordListForm:datalist">
+                                <p:graphicImage name="icons/delete.png" style="width: 20px; height: 20px;"/>
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                           icon="ui-icon-warning"/>
+                            </p:commandLink>
+                        </p:column>
+
+                        <p:column headerText="状态" filterBy="#{item.status}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('exportRecordStatus', item.status)}"
+                                          style="color: #{exportRecordController.getStatusColor(item.status)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
+                                                  noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('exportRecordStatus')}"
+                                                   var="item"
+                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.remark}"/>
+                        </p:column>
+
+                        <p:column headerText="创建时间" sortBy="#{item.createDate}">
+                            <h:outputText value="#{item.createDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="修改时间" sortBy="#{item.updateDate}">
+                            <h:outputText value="#{item.updateDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="操作"/>
+                            </f:facet>
+                            <p:commandLink value="申请审核" style="padding: 5px;display: #{item.status eq 'NEW' or item.status eq 'REFUSE' ? 'inline' : 'none'}"
+                                           actionListener="#{exportRecordController.setItem(item)}"
+                                           update=":addApplyForm" styleClass="p-mr-2"
+                                           oncomplete="PF('addApplyDlg').show()"/>
+                            <p:commandLink value="#{msg.download}" ajax="false" style="padding: 5px;display: #{item.status eq 'FINISHED' ? 'inline' : 'none'}"
+                                           action="#{exportRecordController.downloadRedirect}"
+                                           actionListener="#{exportRecordController.downloadDocument(item.id)}"
+                                           styleClass="p-mr-2"/>
+                            <p:commandLink value="获取密码" style="padding: 5px;display: #{item.status eq 'FINISHED' ? 'inline' : 'none'}"
+                                           actionListener="#{exportRecordController.setPassword(item.id)}"
+                                           update=":getPasswordText" oncomplete="PF('getPasswordDlg').show()"
+                                           styleClass="p-mr-2"/>
+                            <p:commandLink value="审核详情" style="padding: 5px;display: #{item.status ne 'NEW' and item.status ne 'AUDIT' ? 'inline': 'none'}"
+                                           actionListener="#{exportRecordController.setItem(item)}"
+                                           update=":auditDetailsForm" oncomplete="PF('auditDetailsDlg').show()"
+                                           styleClass="p-mr-2"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
+                                             title="#{msg.Create}" update=":addRecordForm"
+                                             actionListener="#{exportRecordController.setItem(null)}"
+                                             oncomplete="PF('addRecordDlg').show()"/>
+                            <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete"
+                                             class="btn btn-sm btn-gray batch-terminated" title="批量删除"
+                                             actionListener="#{exportRecordController.deleteBatch}"
+                                             update=":TenantRecordListForm"
+                                             disabled="#{not exportRecordController.isChecked()}">
+                                <p:confirm header="批量删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+
+            <p:dialog id="addRecordDlg" widgetVar="addRecordDlg" modal="true" width="500" resizable="true"
+                      draggable="true" appendTo="@(body)" header="save">
+                <h:form id="addRecordForm">
+                    <h:panelGroup id="display">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">备注</label>
+                                <p:inputText value="#{exportRecordController.item.remark}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p:commandButton id="saveButton" immediate="false" validateClient="true"
+                                             actionListener="#{exportRecordController.saveItem('save')}"
+                                             value="#{msg.Confirm}"
+                                             icon="ui-icon-check" update=":TenantRecordListForm:datalist"
+                                             oncomplete="handleSubmit(args, 'addRecordDlg');"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                             update=":TenantRecordListForm:datalist"
+                                             onclick="PF('addRecordDlg').hide()"/>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:form>
+            </p:dialog>
+
+            <p:dialog id="addApplyDlg" widgetVar="addApplyDlg" modal="true" width="500" resizable="true"
+                      draggable="true" appendTo="@(body)" header="申请">
+                <h:form id="addApplyForm">
+                    <h:panelGroup>
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">申请描述<span style="color:red">*</span></label>
+                                    <p:inputTextarea value="#{exportRecordController.item.applyDescription}" style="width: 80%" required="true" requiredMessage="申请描述不可为空！"/>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p:commandButton immediate="false" validateClient="true"
+                                             actionListener="#{exportRecordController.saveItem('apply')}"
+                                             value="#{msg.Confirm}"
+                                             icon="ui-icon-check" update=":TenantRecordListForm:datalist"
+                                             oncomplete="handleSubmit(args, 'addApplyDlg');"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                             update=":TenantRecordListForm:datalist"
+                                             onclick="PF('addApplyDlg').hide()"/>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:form>
+            </p:dialog>
+
+            <p:dialog id="auditDetailsDlg" widgetVar="auditDetailsDlg" modal="true" width="500" resizable="true"
+                      draggable="true" appendTo="@(body)" header="审核详情">
+                <h:form id="auditDetailsForm">
+                    <h:panelGroup>
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">审核人</label>
+                                <h:outputText value="#{exportRecordController.getUserName(exportRecordController.item.auditBy)}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">审核状态</label>
+                                <h:outputText value="#{exportRecordController.item.auditStatus eq 'PASS' ? '通过' : '不通过'}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">审核描述</label>
+                                <h:outputText value="#{exportRecordController.item.auditDescription}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">审核时间</label>
+                                <h:outputText value="#{exportRecordController.item.auditDate}">
+                                    <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                       locale="#{userContextService.getCalendarLocale()}"
+                                                       pattern="#{userContextService.timeFormat14()}"/>
+                                </h:outputText>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p:commandButton immediate="true" value="关闭" icon="ui-icon-cancel"
+                                             update=":TenantRecordListForm:datalist"
+                                             onclick="PF('auditDetailsDlg').hide()"/>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:form>
+            </p:dialog>
+
+            <p:dialog id="getPasswordDlg" widgetVar="getPasswordDlg" modal="true" width="500" resizable="true"
+                      draggable="true" appendTo="@(body)" header="Password">
+                <h:form id="getPasswordText">
+                    <h:panelGroup>
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <output id="pwd">#{exportRecordController.filePassword}</output>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p:commandButton value="点此复制" onclick="copyText()"
+                                             oncomplete="PF('getPasswordDlg').hide()"/>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:form>
+            </p:dialog>
+
+        </div>
+
+        <script type="text/javascript">
+            //<![CDATA[
+            function copyText() {
+                let pwd = document.getElementById("pwd").innerText;
+                let input = document.createElement("input");
+                input.setAttribute('id', 'copyInput');
+                input.setAttribute('value', pwd);
+                document.getElementsByTagName('body')[0].appendChild(input);
+                document.getElementById('copyInput').select();
+                document.execCommand("copy");
+                document.getElementById('copyInput').remove();
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                debugger
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#TenantRecordListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>
