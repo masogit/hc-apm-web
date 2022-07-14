@@ -41,6 +41,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ArrivalListItem = "ArrivalListItem";
     public static final String BO_TYPE_ArrivalList = "ArrivalList";
     public static final String BO_TYPE_TableDefinition = "TableDefinition";
+    public static final String BO_TYPE_EXPORT_RECORD = "ExportRecord";
     public static final String BO_TYPE_ZKB = "ZKB";
     public static final String BO_SUB_TYPE_DOCS = "Docs";
     public static final String BO_SUB_TYPE_IMG = "Image";
