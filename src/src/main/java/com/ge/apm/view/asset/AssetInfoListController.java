@@ -154,6 +154,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected void init() {
+        long l = System.currentTimeMillis();
+        logger.info("AssetInfoListController.init start time:{}",l);
         dao = WebUtil.getBean(AssetInfoRepository.class);
         aiMgrService = WebUtil.getBean(AssetInfoMgrService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
@@ -179,6 +181,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         getRelRuleAssetUids();
         warrantyAlertDays = getWarrantyAlertDaysConfig();
         countyArea = userContextService.isCountyArea();
+        logger.info("AssetInfoListController.init end time cost:{}ms",(System.currentTimeMillis()-l));
     }
     
     private Integer getWarrantyAlertDaysConfig(){
@@ -220,6 +223,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        long l = System.currentTimeMillis();
+        logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
@@ -285,7 +290,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setWarrantyAlerts(currentPageAssets);
 
         setSupplier(currentPageAssets);
-
+        logger.info("AssetInfoListController.loadData end time cost:{}ms",(System.currentTimeMillis()-l));
         return res;
     }
 
