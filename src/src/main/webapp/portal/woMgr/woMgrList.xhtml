@@ -142,10 +142,6 @@
                     <!--6 表示 step_name 是待关单-->
                     <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,6)}"/>
                 </p:column>
-                <p:column headerText="#{msg.Assignee}"  rendered="#{workOrderMgrController.queryIndex==8 and !userContextService.hasCurrentTenantName('')}">
-                    <!--6 表示 step_name 是待关单-->
-                    <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,6)}"/>
-                </p:column>
 
                 <!--当前处理步骤 for 待办-->
                 <p:column rendered="#{workOrderMgrController.queryIndex eq 0}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
