@@ -285,7 +285,7 @@ public class TableDefinitionService {
             groupItem.getItems().stream().filter(item-> TableItem.ComponentType.Select.equals(item.getComponent()))
                     .filter(item -> tableValue.containsKey(item.getKey()))
                     .forEach(item->{
-                        item.getOptions().stream().filter(optionItem -> Objects.equals(optionItem.getKey(), tableValue.get(item.getKey())))
+                        item.getOptions().stream().filter(optionItem -> Objects.equals(String.valueOf(optionItem.getKey()), String.valueOf(tableValue.get(item.getKey()))))
                                 .findAny().ifPresent(option -> tableValue.put(item.getKey(), option.getValue()));
                     });
                 });

@@ -36,7 +36,7 @@ public interface ZkbAssetQrCodeInfoRepository extends GenericRepositoryUUID<ZkbA
      * @param tenantUID
      * @return
      */
-    @Query(value = "SELECT count(zkba.id) from zkb_asset_qr_code_info zkba INNER JOIN asset_info ai on zkba.system_id = ai.system_id WHERE (zkba.qr_code_count_state = 'Y' OR zkba.can_not_past_qr_code = 'Y') and ai.uid IN ?1 and zkba.tenant_uid= ?2 ", nativeQuery = true)
+    @Query(value = "SELECT count(zkba.id) from zkb_asset_qr_code_info zkba INNER JOIN asset_info ai on zkba.system_id = ai.system_id WHERE zkba.qr_code_count_state = 'Y' and ai.uid IN ?1 and zkba.tenant_uid= ?2 ", nativeQuery = true)
     Integer qrCodePasteCount(List<String> uidList,String tenantUID);
 
     /**
@@ -45,7 +45,7 @@ public interface ZkbAssetQrCodeInfoRepository extends GenericRepositoryUUID<ZkbA
      * @param tenantUID
      * @return
      */
-    @Query(value = "SELECT count(zkba.id) from zkb_asset_qr_code_info zkba INNER JOIN asset_info ai on zkba.system_id = ai.system_id WHERE (zkba.qr_code_count_state = 'Y' OR zkba.can_not_past_qr_code = 'Y') and exists(select 1 from zkb_asset_qr_code_info zkbat where zkba.id = zkbat.id and (zkbat.install_status = '2' or zkbat.reason_categorize = 'scrapped')) and ai.uid IN ?1 and zkba.tenant_uid= ?2 ", nativeQuery = true)
+    @Query(value = "SELECT count(zkba.id) from zkb_asset_qr_code_info zkba INNER JOIN asset_info ai on zkba.system_id = ai.system_id WHERE zkba.qr_code_count_state = 'Y'  and exists(select 1 from zkb_asset_qr_code_info zkbat where zkba.id = zkbat.id and (zkbat.install_status = '2' or zkbat.reason_categorize = 'scrapped')) and ai.uid IN ?1 and zkba.tenant_uid= ?2 ", nativeQuery = true)
     Integer qrCodePasteScrappedCount(List<String> uidList,String tenantUID);
 
     /**

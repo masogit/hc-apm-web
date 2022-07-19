@@ -35,7 +35,7 @@
                         <p:column headerText="租户" filterBy="#{item.tenantUid}" filterMatchMode="LIKE">
                             <h:outputText value="#{auditUserCaseController.getTenantName(item.tenantUid)}"/>
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{auditUserCaseController.selectedTenant.uid}" filter="true" autoWidth="false" style="max-width: 150px;">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{auditUserCaseController.selectedTenant.uid}" filter="true" filterMatchMode="contains" autoWidth="false" style="max-width: 150px;">
                                     <p:ajax process="@this" event="change" update="siteSelect" listener="#{auditUserCaseController.setSelectTenantInfo()}"/>
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                     <f:selectItems value="#{auditUserCaseController.getAllTenant()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
