@@ -53,9 +53,9 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
     private UserContextService userContextService;
     private SimplePartsItemService partsItemService;
 
-    private String itemCode;
-    private Double unitPrice;
-    private String partsDescription;
+    private String itemCode = null;
+    private Double unitPrice = null;
+    private String partsDescription = null;
 
     /**
      * @author csh
