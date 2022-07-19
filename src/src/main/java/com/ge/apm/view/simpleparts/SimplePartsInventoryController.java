@@ -53,10 +53,6 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
     private UserContextService userContextService;
     private SimplePartsItemService partsItemService;
 
-    private String itemCode = null;
-    private Double unitPrice = null;
-    private String partsDescription = null;
-
     /**
      * @author csh
      * @createTime 2020/6/11 15:00
@@ -192,47 +188,38 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
     }
 
     /***
-     * 获取ItemCode时，其他备件字段也带出来，避免重复查询。
+     * 获取ItemCode
      * @param simplePartsInventory
      * @return
      */
     public String getPartsItemCode(SimplePartsInventory simplePartsInventory) {
+        SimplePartsItem simplePartsItem = getSimplePartsItem(simplePartsInventory);
+        if(simplePartsItem != null){
+            return simplePartsItem.getItemCode();
+        }
+        return null;
+    }
+
+    public Double getPartsUnitPrice(SimplePartsInventory simplePartsInventory) {
+        SimplePartsItem simplePartsItem = getSimplePartsItem(simplePartsInventory);
+        if(simplePartsItem != null){
+            return simplePartsItem.getUnitPrice().doubleValue();
+        }
+        return null;
+    }
+
+    public String getPartsDescription(SimplePartsInventory simplePartsInventory) {
+        SimplePartsItem simplePartsItem = getSimplePartsItem(simplePartsInventory);
+        if(simplePartsItem != null){
+            return simplePartsItem.getPartsDescription();
+        }
+        return null;
+    }
+
+    public SimplePartsItem getSimplePartsItem(SimplePartsInventory simplePartsInventory) {
         if(partsItemService == null){
             partsItemService = WebUtil.getBean(SimplePartsItemService.class);
         }
-        itemCode = null;
-        unitPrice = null;
-        partsDescription = null;
-        SimplePartsItem simplePartsItem = partsItemService.getPartsItem(simplePartsInventory.getPartsItemId(),simplePartsInventory.getName());
-        if(simplePartsItem != null){
-            itemCode = simplePartsItem.getItemCode();
-            unitPrice = simplePartsItem.getUnitPrice().doubleValue();
-            partsDescription = simplePartsItem.getPartsDescription();
-        }
-        return itemCode;
-    }
-
-    public String getItemCode() {
-        return itemCode;
-    }
-
-    public void setItemCode(String itemCode) {
-        this.itemCode = itemCode;
-    }
-
-    public Double getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(Double unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
-    public String getPartsDescription() {
-        return partsDescription;
-    }
-
-    public void setPartsDescription(String partsDescription) {
-        this.partsDescription = partsDescription;
+        return partsItemService.getPartsItem(simplePartsInventory.getPartsItemId(),simplePartsInventory.getName());
     }
 }
