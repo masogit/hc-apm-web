@@ -4,6 +4,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.github.davidmoten.rx.jdbc.ConnectionProvider;
 import com.github.davidmoten.rx.jdbc.Database;
+import com.google.common.collect.ImmutableMap;
 import javaslang.Tuple;
 import javaslang.Tuple6;
 import javaslang.control.Option;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -55,33 +57,20 @@ public class OrgService {
   }
 
   public List<Map<String,String>> getAllOrg(String tenantUID){
-    List<OrgInfo> tempInstitutionList = orgDao.findByTenantUIDAndOrgType(tenantUID,1);
+    long l = System.currentTimeMillis();
+    log.info("getAllOrg start time:{}",l);
     List<Map<String,String>> tempOrgMapList = new ArrayList<>();
-    Map<String,String> tempOrgMap = null;
-    for (OrgInfo oi : tempInstitutionList) {
-      tempOrgMap = new HashMap<>();
-      tempOrgMap.put("id", oi.getId().toString());
-      tempOrgMap.put("name", oi.getName());
-      tempOrgMapList.add(tempOrgMap);
-
-      List<OrgInfo> tempHospitalList = orgDao.findByParentUIDAndOrgTypeOrderByNameAsc(oi.getUid(),2);
-      for (OrgInfo oii : tempHospitalList) {
-        tempOrgMap = new HashMap<>();
-        tempOrgMap.put("id", oii.getId().toString());
-        tempOrgMap.put("name", oi.getName() + "/" + oii.getName());
-        tempOrgMapList.add(tempOrgMap);
-
-        List<OrgInfo> tempSiteList = orgDao.findByParentUIDAndOrgTypeOrderByNameAsc(oii.getUid(),3);
-        for (OrgInfo oiii : tempSiteList) {
-          tempOrgMap = new HashMap<>();
-          tempOrgMap.put("id", oiii.getId().toString());
-          tempOrgMap.put("name", oi.getName() + "/" + oii.getName() + "/" + oiii.getName());
-          tempOrgMapList.add(tempOrgMap);
-        }
-      }
-
-    }
-
+    List<OrgInfo> tempInstitutionList = orgDao.findByTenantUID(tenantUID);
+    Map<Integer, String> orgNameMap = new HashMap<>();
+    tempInstitutionList.stream().filter(o -> 1 == o.getOrgType())
+            .forEach(o -> orgNameMap.put(o.getId(), o.getName()));
+    tempInstitutionList.stream().filter(o -> 2 == o.getOrgType() && orgNameMap.get(o.getParentID()) != null)
+            .forEach(o -> orgNameMap.put(o.getId(), orgNameMap.get(o.getParentID()).concat("/").concat(o.getName())));
+    tempInstitutionList.stream().filter(o -> 3 == o.getOrgType()  && orgNameMap.get(o.getParentID()) != null)
+            .forEach(o -> orgNameMap.put(o.getId(), orgNameMap.get(o.getParentID()).concat("/").concat(o.getName())));
+    tempOrgMapList=orgNameMap.entrySet().stream().map(i -> ImmutableMap.of("id", Integer.toString(i.getKey()), "name", i.getValue()))
+            .collect(Collectors.toList());
+    log.info("getAllOrg end time cost:{}ms",(System.currentTimeMillis()-l));
     return tempOrgMapList;
   }
 
