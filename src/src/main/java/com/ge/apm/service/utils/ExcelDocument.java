@@ -14,6 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFDrawing;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -587,7 +588,26 @@ public class ExcelDocument implements AutoCloseable{
         String[] rowKey = getKeyRow(sheetName, keyRowNum);
         writeRowData(sheetName, rowKey, dataRowNum, key,value);
     }
-
+    public Integer[] writeRowDataImg(String sheetName, Integer keyRowNum, Integer dataRowNum, String key,Object value) {
+        String[] rowKey = getKeyRow(sheetName, keyRowNum);
+       return writeRowDataImg(sheetName, rowKey, dataRowNum, key,value);
+    }
+    public Integer[] writeRowDataImg(String sheetName, String[] rowKey, Integer dataRowNum, String newKey,Object value) {
+        Integer[] coordinate=new Integer[2];
+        for (int index = 0; index < rowKey.length; index++) {
+            String key = rowKey[index];
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+            if(key.equals(newKey)){
+                writeCellData(sheetName, dataRowNum, index + 1, value);
+                coordinate[0]=dataRowNum-1;
+                coordinate[1]=index;
+                return coordinate;
+            }
+        }
+        return null;
+    }
     public void writeCellData(Cell cell, Object data) {
 
         if (data == null) {
@@ -799,5 +819,9 @@ public class ExcelDocument implements AutoCloseable{
 
     public Workbook getWorkBook() {
         return workBook;
+    }
+
+    public XSSFDrawing getPatriarch(String sheetName){
+        return ((XSSFWorkbook) workBook).getSheet(sheetName).createDrawingPatriarch();
     }
 }
