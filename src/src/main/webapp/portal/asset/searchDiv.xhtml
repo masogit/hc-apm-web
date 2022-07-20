@@ -32,7 +32,7 @@
 			<h:panelGroup rendered="#{searchController.blnDepartOrg}">
 				<label class="label">所属科室</label>
 				<p:selectOneMenu id="idCSClinicalOrgInfo" value="#{searchController.selectedOrgDepart}" disabled="false" converter="orgInfoColumnFilterConverter"
-					style="width:100%;" filter="true">
+					style="width:100%;" filter="true" filterMatchMode="contains">
 					<p:ajax listener="#{searchController.onOrgDeptChange()}"
 						update="@parent:idCSAssetsPickList,@parent:idCSAssetSelect,#{searchController.blnDepartOrgUpdate?searchController.updateViewIDs:''}" />
 					<f:selectItems value="#{searchController.listOrgDept}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
