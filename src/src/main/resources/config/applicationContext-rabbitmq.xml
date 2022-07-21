@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/rabbit
+    http://www.springframework.org/schema/rabbit/spring-rabbit-1.4.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd"
+
+>
+<!--    &lt;!&ndash;导入配置文件 &ndash;&gt;-->
+<!--    <bean id="mqSource"-->
+<!--          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+<!--        <property name="location" value="classpath:mq.properties"/>-->
+<!--    </bean>-->
+
+<!--     定义RabbitMQ的连接工厂 -->
+<!--    <rabbit:connection-factory id="connectionFactory"-->
+<!--                               username="admin" password="V9o3U9xoBDF1XRXx" host="172.21.2.62" port="5672"-->
+<!--                               virtual-host="/"-->
+<!--                               channel-cache-size="5"-->
+<!--    />-->
+<!--    <context:component-scan base-package="com.ge.apm.listener"/>-->
+    <rabbit:connection-factory id="rabbitConnectionFactory" username="guest" password="guest"
+                               host="localhost"
+                               port="5672"
+                               virtual-host="/" channel-cache-size="50"
+                               publisher-confirms="true"
+                               publisher-returns="true"
+    />
+
+    <rabbit:admin connection-factory="rabbitConnectionFactory"/>
+
+<!--    <bean id="rabbitTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate" ></bean>-->
+
+    <bean id="jackson2JsonMessageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter"/>
+
+    <rabbit:template id="rabbitTemplate" connection-factory="rabbitConnectionFactory" message-converter="jackson2JsonMessageConverter" exchange="assetChange"
+                     confirm-callback="CallBackMQ"
+                     mandatory="true"
+                     return-callback="ReturnCall"
+    />
+    <rabbit:queue id="assetQueue" name="assetQueue" durable="true" auto-delete="false" exclusive="false" auto-declare="true"/>
+
+    <rabbit:topic-exchange  name="assetChange" durable="true" auto-delete="false" auto-declare="true" id="assetChange">
+        <rabbit:bindings>
+            <rabbit:binding queue="assetQueue" pattern="asset.key" ></rabbit:binding>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <rabbit:listener-container connection-factory="rabbitConnectionFactory" acknowledge="manual" message-converter="jackson2JsonMessageConverter" >
+        <!-- 监听一个队列，当队列中有消息，就会自动触发类.方法，传递消息就作为方法的参数，根据方法声明的参数强转 -->
+        <rabbit:listener ref="testConsumer"  queue-names="assetQueue"/>
+    </rabbit:listener-container>
+
+    <bean id="testConsumer" class="com.ge.apm.listener.TestConsumer"/>
+
+
+
+    <!--消息是否成功发送到Exchange 的回调-->
+    <bean id="CallBackMQ" class="com.ge.apm.callback.CallBackMq"></bean>
+    <!--消息从Exchange路由到队列的回调，注意这里只有路由失败的时候才会调此方法-->
+    <bean id="ReturnCall" class="com.ge.apm.callback.ReturnCall"></bean>
+
+</beans>
