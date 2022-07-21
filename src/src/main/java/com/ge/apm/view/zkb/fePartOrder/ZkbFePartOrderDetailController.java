@@ -332,7 +332,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      */
     public void fullInfoBySystemId(String systemId) {
         this.zkbAssetInfo = null;
-        if (ZkbFePartOrder.OrderType.ManMade.equals(this.selected.getOrderType())) {
+        this.zkbAssetInfoList = null;
+        if (StringUtils.isBlank(this.selected.getMaintainFlag())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("错误：请选择是否为保养申请"));
             return;
         }
