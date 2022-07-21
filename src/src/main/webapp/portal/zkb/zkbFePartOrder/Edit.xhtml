@@ -24,7 +24,7 @@
                     <h:panelGroup id="maintainFlagGroup" rendered="#{zkbFePartOrderDetailController.selected.orderType eq 'ManMade'}">
                         <label class="label">保养申请*</label>
                         <p:selectOneMenu id="maintainFlag"  disabled="#{!zkbFePartOrderDetailController.selected.currentStep.equals('Requested')}" value="#{zkbFePartOrderDetailController.selected.maintainFlag}" requiredMessage="保养申请 #{msg.ValidationRequire}">
-                            <p:ajax event="change" update="zkbFeHeadForm"   />
+                            <p:ajax event="change" update="zkbFeHeadForm zkbFePartOrderEditForm:subtractTotalStatus"   />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="是" itemValue="t"/>
                             <f:selectItem itemLabel="否" itemValue="f"/>

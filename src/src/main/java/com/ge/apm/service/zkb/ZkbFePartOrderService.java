@@ -719,11 +719,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbFePartOrder 流程申请数据
      */
     public void moveRemianTimeOfContract(AssetInfo zkbAssetInfo,ZkbContract zkbContract, Integer type, ZkbFePartOrder zkbFePartOrder, UserAccount userAccount, String step) {
-        //KA场地的低端超声机在资产上设置维修类型为外修时，同时400在GEFE申请人工-维修时，机型为低端超声机时，则不扣除积分与名额
-        if("2".equals(zkbAssetInfo.getAssetGroup())//超声
-                &&ZkbFePartOrderService.assetTypeLowMachineValue.equals(getAssetType(zkbContract,zkbFePartOrder))//低端机
-                          &&2 == zkbAssetInfo.getRepairForm()//外修
-                && !"t".equals(zkbFePartOrder.getMaintainFlag())) return;
          if (!"true".equals(zkbFePartOrder.getSubtractTotalStatus())) return;
         String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderDeduct.toString();
         String orderType = null;

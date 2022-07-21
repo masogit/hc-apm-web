@@ -95,6 +95,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     private Boolean contractError = false;
 
     /**
+     * 是否扣除名额是否可用
+     * YHAAO-16438  ZKB-GEFE人工申请中，外修的超声低端机保养申请选否时，是否扣除名额应默认为否且不可编辑
+     */
+    private Boolean subtractTotalStatusDisabled = false;
+
+    /**
      * 主键
      */
     private String id;
@@ -122,6 +128,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      *  代理商确认本次扣除信息
      */
     private String thisDeductionMessage;
+
     @Override
     protected void init() {
         super.init();
@@ -226,10 +233,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         ZkbContract zct = this.contractList.get(0);
         ZkbFePartOrder zfpo = this.selected;
         if("ManMade".equals(this.selected.getOrderType())){//人工  新逻辑扣减     //  旧逻辑扣联合名额
-            if(("false".equals(this.selected.getSubtractTotalStatus()))//是否扣除名额字段第一种情况不扣  第二种  低端超声机在资产上设置维修类型为外修时，同时400在GEFE申请人工-维修时，机型为低端超声机时，则不扣除积分与名额。
-                    ||(2 == zkbAssetInfo.getRepairForm()//外修
-                    &&ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))//低端机
-                    && !"t".equals(this.selected.getMaintainFlag()))){
+            if("false".equals(this.selected.getSubtractTotalStatus())){
                 confirmMessage += "本次申请不扣除名额！";
                 thisDeductionMessage = "本次申请不扣除名额！";
             }else{
@@ -291,6 +295,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         Boolean fiveNineNine = zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             contractError = true;
+        }
+        if(2==zkbAssetInfo.getAssetGroup()//超声
+                &&ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))//低端机
+                &&2 == zkbAssetInfo.getRepairForm()//外修
+                && !"t".equals(this.selected.getMaintainFlag())){
+            this.subtractTotalStatusDisabled = true;
         }
 
     }
@@ -557,5 +567,20 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.zkbAssetInfo = zkbAssetInfo;
     }
 
-
+    public Boolean getSubtractTotalStatusDisabled() {
+        subtractTotalStatusDisabled = false;
+        if(zkbAssetInfo!=null&&this.selected!=null&&CollectionUtils.isNotEmpty(this.contractList)){
+            if(2==zkbAssetInfo.getAssetGroup()//超声
+                    &&ZkbFePartOrderService.assetTypeLowMachineValue.equals(this.zkbFePartOrderService.getAssetType(this.contractList.get(0),this.selected))//低端机
+                    &&2 == zkbAssetInfo.getRepairForm()//外修
+                    && !"t".equals(this.selected.getMaintainFlag())){
+                this.subtractTotalStatusDisabled = true;
+                this.selected.setSubtractTotalStatus("false");
+            }
+        }
+        return subtractTotalStatusDisabled;
+    }
+    public void setSubtractTotalStatusDisabled(Boolean subtractTotalStatusDisabled) {
+        this.subtractTotalStatusDisabled = subtractTotalStatusDisabled;
+    }
 }
