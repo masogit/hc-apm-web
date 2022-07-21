@@ -6,7 +6,9 @@
 package com.ge.apm.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.service.utils.ChargingType;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -193,6 +195,15 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "patient_bed_num")
     private String patientBedNum;
 
+    @Column(name = "is_cleaned")
+    private Boolean isCleaned = Boolean.TRUE; // 本次借用是否清洁消毒
+    @Column(name = "duration")
+    private Double duration;
+
+    @Column(name = "maintain_time")
+    private Date maintainTime;
+    @Formula("(select a.swap_index from shared_asset_swap_index a where a.asset_uid = asset_info_id)")
+    private String swapIndex;
     public String getId() {
         return id;
     }
@@ -250,6 +261,16 @@ public class SharedAssetReqDetail implements Serializable{
 //    }
 
     public String getState() {
+        String state="";
+        if(leaseRequest != null && leaseRequest.getState() == 3){
+            state="已预约";
+        }else if(chargingBeginTime !=null && chargingEndTime == null){
+            state="使用中";
+        }else if(returnRequest != null && chargingEndTime != null && cost != null && cost > 0 && isCleaned !=null && isCleaned == false){
+            state="已归还（未清洁保养）";
+        }else if(isCleaned != null && isCleaned){
+            state="已完成";
+        }
         return state;
     }
 
@@ -920,5 +941,37 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setPatientBedNum(String patientBedNum) {
         this.patientBedNum = patientBedNum;
+    }
+
+    public Boolean getCleaned() {
+        return isCleaned;
+    }
+
+    public void setCleaned(Boolean cleaned) {
+        isCleaned = cleaned;
+    }
+
+    public Double getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Double duration) {
+        this.duration = duration;
+    }
+
+    public Date getMaintainTime() {
+        return maintainTime;
+    }
+
+    public void setMaintainTime(Date maintainTime) {
+        this.maintainTime = maintainTime;
+    }
+
+    public String getSwapIndex() {
+        return swapIndex;
+    }
+
+    public void setSwapIndex(String swapIndex) {
+        this.swapIndex = swapIndex;
     }
 }

@@ -611,6 +611,12 @@ public class ZkbFePartOrder {
     @Column(name = "commercial_assign_date")
     private Date commercialAssignDate;
 
+    /**
+     * 保养申请*
+     */
+    @Column(name = "maintain_flag")
+    private String maintainFlag;
+
     public String getId() {
         return id;
     }
@@ -1355,5 +1361,13 @@ public class ZkbFePartOrder {
 
     public void setAssetId(String assetId) {
         this.assetId = assetId;
+    }
+
+    public String getMaintainFlag() {
+        return maintainFlag;
+    }
+
+    public void setMaintainFlag(String maintainFlag) {
+        this.maintainFlag = maintainFlag;
     }
 }
