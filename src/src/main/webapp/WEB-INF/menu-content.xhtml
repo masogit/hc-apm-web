@@ -121,7 +121,7 @@
             <p:submenu id="um25" label="#{msg.MyTrain}" icon="fa fa-check-square-o" rendered="#{userContextService.isAccessMyTrain()}">
               <p:menuitem value="#{msg.TrainReport}" outcome="/portal/trainreport/trainReport.xhtml"/>
             </p:submenu>
-            <p:submenu id="um5024" label="#{msg.DeviceMetrologyMgmt}" icon="fa fa-check-square-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')  and userContextService.accessContains('measure')}">
+            <p:submenu id="um5024" label="#{msg.DeviceMetrologyMgmt}" icon="fa fa-check-square-o" rendered="#{((not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')) or userContextService.accessContains('measure')}">
 
               <!--  <p:menuitem id="um404" value="计量管理" outcome="/portal/measuring/measureOrderListAll.xhtml" rendered="#{userContextService.accessContains('measure.config')}"/>-->
                 <!--<p:menuitem id="um404" value="#{msg.MeasurementWorkbench}" outcome="/portal/measuring/measureOrderListAll.xhtml" rendered="#{userContextService.accessContains('measure.console')}"/>-->
