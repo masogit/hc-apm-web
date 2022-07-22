@@ -9,4 +9,5 @@ public class CustomRoleAuthConstant {
 	public static final String NURSE_SITE_MAINTAIN_EXPORT="nurseSiteMaintainExportAuth";
 	public static final String NURSE_SITE_MAINTAIN_CONFIG="nurseSiteMaintainConfigAuth";
 	public static final String NURSE_SITE_OPTRECORD="nurseSiteOptRecordAuth";
+	public static final String MEASURE_INFO="measureInfoAuth";
 }

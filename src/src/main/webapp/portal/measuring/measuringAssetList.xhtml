@@ -8,7 +8,7 @@
 
     <ui:composition>
         <div class="ui-g-12 card">
-            <h:form id="measuringAssetListForm">
+            <h:form id="measuringAssetListForm" rendered="#{measureAssetListController.customRoleAuth.authSearch}">
                 <h:outputLabel class="label" style="color: black!important;font-size: 16px!important;" rendered="#{userContextService.hasCurrentTenantName('')}">计量日期到期提醒：本月&nbsp;<span style="color:orange;">#{measureAssetListController.currentMonthCount}</span>&nbsp;台，下月&nbsp;<span style="color: orange;">#{measureAssetListController.nextMonthCount}</span>&nbsp;台</h:outputLabel>
                 <p:dataTable id="datalist_measuringAsset" value="#{measureAssetListController.lazyModel}" var="item" widgetVar="varDataList_measuringAsset"
                              selectionMode="single" selection="#{measureAssetListController.selected}"
