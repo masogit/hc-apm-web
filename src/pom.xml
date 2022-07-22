@@ -843,7 +843,7 @@
     <pluginRepositories>
         <pluginRepository>
             <id>aliyun plugins</id>
-            <url>https://maven.aliyun.com/repository/public/</url>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -852,7 +852,7 @@
     <repositories>
         <repository>
             <id>aliyun</id>
-            <url>https://maven.aliyun.com/repository/public/</url>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
