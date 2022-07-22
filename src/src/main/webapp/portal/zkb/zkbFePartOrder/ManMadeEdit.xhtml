@@ -10,7 +10,7 @@
 
 <ui:composition>
                 <h:form id="zkbFePartOrderEditForm" >
-                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='ManMade'}">
+                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='ManMade'}">text1
                     <p:messages id="manMadeMessages" showDetail="false" closable="false" autoUpdate="true" ></p:messages>
                             <p:fieldset id="zkbAssetInfo" legend="设备信息" style="margin-bottom:20px" rendered="#{zkbFePartOrderDetailController.selected !=null}">
                             <h:panelGroup>
@@ -104,7 +104,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label">#{msg.zkbFePartOrder_subtractTotalStatus}*</label>
-                                    <p:selectOneMenu disabled="#{!zkbFePartOrderDetailController.hasEditRight('Requested')||'highMachine' eq zkbFePartOrderDetailController.selected.assetType}" id="subtractTotalStatus" value="#{zkbFePartOrderDetailController.selected.subtractTotalStatus}"  required="true" requiredMessage="#{msg.zkbFePartOrder_subtractTotalStatus} #{msg.ValidationRequire}">
+                                    <p:selectOneMenu disabled="#{!zkbFePartOrderDetailController.hasEditRight('Requested')||'highMachine' eq zkbFePartOrderDetailController.selected.assetType||zkbFePartOrderDetailController.subtractTotalStatusDisabled}" id="subtractTotalStatus" value="#{zkbFePartOrderDetailController.selected.subtractTotalStatus}"  required="true" requiredMessage="#{msg.zkbFePartOrder_subtractTotalStatus} #{msg.ValidationRequire}">
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>

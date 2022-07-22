@@ -52,7 +52,6 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
     private SimplePartsConfigService partsConfigService;
     private UserContextService userContextService;
     private SimplePartsItemService partsItemService;
-
     /**
      * @author csh
      * @createTime 2020/6/11 15:00
@@ -187,24 +186,39 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
         return pageRequest;
     }
 
+    /***
+     * 获取ItemCode
+     * @param simplePartsInventory
+     * @return
+     */
     public String getPartsItemCode(SimplePartsInventory simplePartsInventory) {
-        if(partsItemService == null){
-            partsItemService = WebUtil.getBean(SimplePartsItemService.class);
-        }
-        SimplePartsItem simplePartsItem = partsItemService.getPartsItem(simplePartsInventory.getPartsItemId(),simplePartsInventory.getName());
+        SimplePartsItem simplePartsItem = getSimplePartsItem(simplePartsInventory);
         if(simplePartsItem != null){
             return simplePartsItem.getItemCode();
         }
         return null;
     }
-    public Double getPartsItemUnitPrice(SimplePartsInventory simplePartsInventory) {
-        if(partsItemService == null){
-            partsItemService = WebUtil.getBean(SimplePartsItemService.class);
-        }
-        SimplePartsItem simplePartsItem = partsItemService.getPartsItem(simplePartsInventory.getPartsItemId(),simplePartsInventory.getName());
+
+    public Double getPartsUnitPrice(SimplePartsInventory simplePartsInventory) {
+        SimplePartsItem simplePartsItem = getSimplePartsItem(simplePartsInventory);
         if(simplePartsItem != null && simplePartsItem.getUnitPrice() != null){
             return simplePartsItem.getUnitPrice().doubleValue();
         }
+        return 0.00;
+    }
+
+    public String getPartsDescription(SimplePartsInventory simplePartsInventory) {
+        SimplePartsItem simplePartsItem = getSimplePartsItem(simplePartsInventory);
+        if(simplePartsItem != null){
+            return simplePartsItem.getPartsDescription();
+        }
         return null;
+    }
+
+    public SimplePartsItem getSimplePartsItem(SimplePartsInventory simplePartsInventory) {
+        if(partsItemService == null){
+            partsItemService = WebUtil.getBean(SimplePartsItemService.class);
+        }
+        return partsItemService.getPartsItem(simplePartsInventory.getPartsItemId(),simplePartsInventory.getName());
     }
 }
