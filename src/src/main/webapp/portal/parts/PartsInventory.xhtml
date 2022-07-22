@@ -54,7 +54,7 @@
                             </p:column>
                             <p:column headerText="备件单价" rendered="#{userContextService.countyArea}">
                                 <h:outputText value="#{simplePartsInventoryController.getPartsUnitPrice(item)}">
-                                    <f:convertNumber  minIntegerDigits="0"  minFractionDigits="2" />
+                                    <f:convertNumber maxFractionDigits="4" maxIntegerDigits="10"/>
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="所属仓库">
