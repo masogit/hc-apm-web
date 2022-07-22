@@ -95,7 +95,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     private Boolean contractError = false;
 
     /**
-     * 是否扣除名额是否可用
+     * 是否扣除名额是否可用pack
      * YHAAO-16438  ZKB-GEFE人工申请中，外修的超声低端机保养申请选否时，是否扣除名额应默认为否且不可编辑
      */
     private Boolean subtractTotalStatusDisabled = false;
