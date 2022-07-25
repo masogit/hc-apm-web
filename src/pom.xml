@@ -771,6 +771,8 @@
             <groupId>org.tiefaces</groupId>
             <artifactId>tiefaces</artifactId>
             <version>1.0.12</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/tiefaces-1.0.12.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
