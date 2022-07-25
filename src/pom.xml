@@ -845,6 +845,7 @@
             <id>aliyun plugins</id>
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
             <snapshots>
+                <updatePolicy>never</updatePolicy>
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
@@ -854,6 +855,7 @@
             <id>aliyun</id>
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
             <snapshots>
+                <updatePolicy>never</updatePolicy>
                 <enabled>false</enabled>
             </snapshots>
         </repository>
