@@ -12,4 +12,6 @@ public class MqContext implements Serializable {
     private Date time;
     private String type;
     private HashMap context;
+    private String routingKey;
+    private String exChange;
 }
