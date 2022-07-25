@@ -205,9 +205,9 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public void prepareEdit() {
         super.prepareEdit();
         this.selected = this.zkbFePartOrderRepository.findById(this.id);
-        if(StringUtils.isBlank(this.selected.getMaintainFlag())){
+       /* if(StringUtils.isBlank(this.selected.getMaintainFlag())){
             this.selected.setMaintainFlag("f");
-        }
+        }*/
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.zkbAssetInfoList = this.zkbFePartOrderService.initAssetInfo(this.selected);
         this.zkbAssetInfo = (this.zkbAssetInfoList!=null&&this.zkbAssetInfoList.size()>0)?this.zkbAssetInfoList.get(0):new AssetInfo();
