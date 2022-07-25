@@ -353,6 +353,25 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         return assetTypeName;
     }
 
+    /**
+     * @autor by lyj 503277717
+     * @date 2022/4/22
+     * 获取当前保修单的 设备类型是高端机还是低端机
+     */
+    public String getAssetType(ZkbContract zkbContract,ZkbFePartOrder zkbFePartOrder) {
+        String assetTypeName = new String ();
+        Set<ZkbContractAsset> zkbContractAsset = zkbContract.getZkbContractAssets().stream().filter(ass -> {
+            if(ass.getAssetInfo()!=null){
+                return ass.getAssetInfo().getSystemId().equals(zkbFePartOrder.getSystemId());
+            }
+            return false;
+        }).collect(Collectors.toSet());
+        if(!zkbContractAsset.isEmpty()){
+            assetTypeName = zkbContractAsset.iterator().next().getAssetType();
+        }
+         return assetTypeName;
+    }
+
 
     /**
      * 给申请单添加单号和索引
@@ -699,9 +718,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param type           1.把剩余名额移入申请名额 2.把申请名额移入已使用名额 3.把申请名额移入剩余名额
      * @param zkbFePartOrder 流程申请数据
      */
-    public void moveRemianTimeOfContract(ZkbContract zkbContract, Integer type, ZkbFePartOrder zkbFePartOrder, UserAccount userAccount, String step) {
-
-        if (!"true".equals(zkbFePartOrder.getSubtractTotalStatus())) return;
+    public void moveRemianTimeOfContract(AssetInfo zkbAssetInfo,ZkbContract zkbContract, Integer type, ZkbFePartOrder zkbFePartOrder, UserAccount userAccount, String step) {
+         if (!"true".equals(zkbFePartOrder.getSubtractTotalStatus())) return;
         String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderDeduct.toString();
         String orderType = null;
         if ("DI".equals(zkbContract.getContractType())
@@ -713,6 +731,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail() - 1);
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() + 1);
                     break;
+
                 case 2:
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply() - 1);//备件/人工/保养申请名额
                     zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse() + 1);//备件/人工/保养已使用名额

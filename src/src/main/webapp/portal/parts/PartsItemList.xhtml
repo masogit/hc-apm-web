@@ -66,6 +66,9 @@
                             <p:column headerText="#{msg.PartsCategory}" >
                                 <h:outputText value="#{item.categoryName}"/>
                             </p:column>
+                            <p:column headerText="备件描述" rendered="#{userContextService.countyArea}">
+                                <h:outputText value="#{item.partsDescription}"/>
+                            </p:column>
 
                             <f:facet name="{Toolbar}">
                                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":basicEditDialog" actionListener="#{simplePartsItemController.prepareCreate}" oncomplete="PF('basicEditDialog').show()"/>
@@ -165,8 +168,13 @@
                                         </p:overlayPanel>
 
                                     </h:panelGroup>
-
                                 </p:panelGrid>
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userContextService.countyArea}">
+                            <h:panelGroup>
+                                <label class="label">备件描述</label>
+                                <p:inputTextarea id="partsDescription" rows="1" cols="100" value="#{simplePartsItemController.selected.partsDescription}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
 
                     </p:fieldset>
 

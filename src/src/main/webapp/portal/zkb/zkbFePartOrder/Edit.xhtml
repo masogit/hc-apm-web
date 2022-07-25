@@ -11,17 +11,27 @@
             <p:outputLabel class="pageTitle" value="#{msg.zkbFePartOrder_ZkbFePartOrder}"/>
         </div>
         <div  class="ui-g-12 card">
-            <h:form>
+            <h:form id="zkbFeHeadForm">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.zkbFePartOrder_orderTypeName}*</label>
                         <p:selectOneMenu id="orderType"  disabled="#{!zkbFePartOrderDetailController.selected.currentStep.equals('Requested')}" value="#{zkbFePartOrderDetailController.selected.orderType}">
-                            <p:ajax event="change"  update=":zkbFePartOrderEditForm :zkbFePartOrderSparePartsEditpanelGroup :zkbFePartOrderProbeEditPanelGroup" />
+                            <p:ajax event="change"  update="zkbFeHeadForm :zkbFePartOrderEditForm :zkbFePartOrderSparePartsEditpanelGroup :zkbFePartOrderProbeEditPanelGroup" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_orderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+                    <h:panelGroup id="maintainFlagGroup" rendered="#{zkbFePartOrderDetailController.selected.orderType eq 'ManMade'}">
+                        <label class="label">保养申请*</label>
+                        <p:selectOneMenu id="maintainFlag"  disabled="#{!zkbFePartOrderDetailController.selected.currentStep.equals('Requested')}" value="#{zkbFePartOrderDetailController.selected.maintainFlag}" requiredMessage="保养申请 #{msg.ValidationRequire}">
+                            <p:ajax event="change" update="zkbFeHeadForm zkbFePartOrderEditForm:subtractTotalStatus"   />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItem itemLabel="是" itemValue="t"/>
+                            <f:selectItem itemLabel="否" itemValue="f"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                 </p:panelGrid>
+
             </h:form>
         </div>
         <div class="ui-g-12 card">

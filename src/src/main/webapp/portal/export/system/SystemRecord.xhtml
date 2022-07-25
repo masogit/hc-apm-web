@@ -1,0 +1,184 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="导出记录信息"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="SystemRecordListForm">
+                    <p:dataTable id="datalist" value="#{exportRecordController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{exportRecordController.selected}"
+                                 disabledSelection="true"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortBy="#{item.id}" sortOrder="descending"
+                                 paginatorTemplate="{CurrentPageReport}  {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {JumpToPageDropdown} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 emptyMessage="#{msg.noRecordFound}" rows="20"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="filter" listener="#{exportRecordController.onFilter}"
+                                oncomplete="updateSelectAllCheckBox();"/>
+
+                        <p:column width="36" id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{exportRecordController.selectedMap[item.id]}"
+                                                     class="selectCheckBox" disabled="#{item.status eq 'RUN'}">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)"
+                                        oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{exportRecordController.onSelectAllOfPage}"
+                                            update="@(.selectCheckBox) batchToBeTerminatedButton"
+                                            oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="状态" filterBy="#{item.status}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('exportRecordStatus', item.status)}"
+                                          style="color: #{exportRecordController.getStatusColor(item.status)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
+                                                  noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('exportRecordStatus')}"
+                                                   var="item"
+                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.remark}"/>
+                        </p:column>
+
+                        <p:column headerText="申请人">
+                            <h:outputText value="#{exportRecordController.getUserName(item.applyBy)}"/>
+                        </p:column>
+
+                        <p:column headerText="申请描述" sortBy="#{item.applyDescription}" filterBy="#{item.applyDescription}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.applyDescription}"/>
+                        </p:column>
+
+                        <p:column headerText="申请时间" sortBy="#{item.applyDate}">
+                            <h:outputText value="#{item.applyDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="创建时间" sortBy="#{item.createDate}">
+                            <h:outputText value="#{item.createDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="修改时间" sortBy="#{item.updateDate}">
+                            <h:outputText value="#{item.updateDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}"
+                                                   locale="#{userContextService.getCalendarLocale()}"
+                                                   pattern="#{userContextService.timeFormat14()}"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="操作"/>
+                            </f:facet>
+                            <p:commandLink value="审核" title="审核" update=":auditForm" style="hight: 20px; display: #{item.status eq 'AUDIT' ? 'inline' : 'none'}"
+                                           actionListener="#{exportRecordController.setItem(item)}"
+                                           oncomplete="PF('auditDlg').show()">
+                            </p:commandLink>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-pencil"
+                                             class="btn btn-sm btn-gray batch-terminated" title="批量审核"
+                                             oncomplete="PF('auditDlg').show()"
+                                             update=":auditForm" actionListener="#{exportRecordController.setItem(null)}"
+                                             disabled="#{not exportRecordController.isChecked()}">
+                            </p:commandButton>
+
+                        </f:facet>
+
+                    </p:dataTable>
+                </h:form>
+            </div>
+
+            <p:dialog id="auditDlg" widgetVar="auditDlg" modal="true" width="500" resizable="true"
+                      draggable="true" appendTo="@(body)" header="审核">
+                <h:form id="auditForm">
+                    <h:panelGroup>
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">审核状态<span style="color:red">*</span></label>
+                                <p:selectOneRadio id="auditStatus" value="#{exportRecordController.item.auditStatus}" required="true" requiredMessage="请选择审核状态">
+                                    <f:selectItem itemLabel="通过" itemValue="PASS"/>
+                                    <f:selectItem itemLabel="不通过" itemValue="REFUSE"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">审核描述<span style="color:red">*</span></label>
+                                <p:inputTextarea value="#{exportRecordController.item.auditDescription}" style="width: 80%" required="true" requiredMessage="审核描述不可为空！"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p:commandButton immediate="false" validateClient="true"
+                                             actionListener="#{exportRecordController.saveItem('audit')}"
+                                             value="#{msg.Confirm}"
+                                             icon="ui-icon-check" update=":SystemRecordListForm:datalist"
+                                             oncomplete="handleSubmit(args, 'auditDlg');"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                             update=":SystemRecordListForm:datalist"
+                                             onclick="PF('auditDlg').hide()"/>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:form>
+            </p:dialog>
+
+        </div>
+
+        <script type="text/javascript">
+            //<![CDATA[
+            function copyText() {
+                let pwd = document.getElementById("pwd").innerText;
+                let input = document.createElement("input");
+                input.setAttribute('id', 'copyInput');
+                input.setAttribute('value', pwd);
+                document.getElementsByTagName('body')[0].appendChild(input);
+                document.getElementById('copyInput').select();
+                document.execCommand("copy");
+                document.getElementById('copyInput').remove();
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                debugger
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#SystemRecordListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>

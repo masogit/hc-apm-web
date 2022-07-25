@@ -411,6 +411,18 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     protected Page<UserAccount> loadData(PageRequest pageRequest) {
         //this.selected = null;
     	generateListSearchFilter();
+        Boolean isDisable =false;
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("isDisable".equals(searchFilter.fieldName)) {
+                isDisable= (Boolean) searchFilter.value;
+                break;
+            }
+        }
+        searchFilters.removeIf(e -> e.fieldName.equals("isDisable"));
+        searchFilters.add(new SearchFilter("isDisable", SearchFilter.Operator.EQ,isDisable,"1*3+"));
+        if(!isDisable){
+            searchFilters.add(new SearchFilter("isDisable", SearchFilter.Operator.IsNull,null,"1*3+"));
+        }
         Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
         for(UserAccount user: pageUserAccount){
             List<OrgInfo> orgListByUid = this.deptList.stream().filter(item -> item.getId().equals(user.getOrgInfoId())).collect(Collectors.toList());

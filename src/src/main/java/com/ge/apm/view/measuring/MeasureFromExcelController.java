@@ -1,7 +1,9 @@
 package com.ge.apm.view.measuring;
 
+import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.MeasuringCertificateDetail;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserAuth;
 import com.ge.apm.service.asset.MeasuringService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
@@ -28,12 +30,13 @@ public class MeasureFromExcelController {
     private UserAccount currentUser;
     private UploadedFile file;
     private List<MeasuringCertificateDetail> noFoundList;
-
+    private UserAuth customRoleAuth;
     @PostConstruct
     protected void init() {
         currentUser = UserContextService.getCurrentUserAccount();
         measuringService = WebUtil.getBean(MeasuringService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.MEASURE_INFO);
     }
 
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
@@ -57,5 +60,13 @@ public class MeasureFromExcelController {
 
     public void setNoFoundList(List<MeasuringCertificateDetail> noFoundList) {
         this.noFoundList = noFoundList;
+    }
+
+    public UserAuth getCustomRoleAuth() {
+        return customRoleAuth;
+    }
+
+    public void setCustomRoleAuth(UserAuth customRoleAuth) {
+        this.customRoleAuth = customRoleAuth;
     }
 }
