@@ -387,8 +387,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             itemDetail.setClosedPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
             itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
             itemDetail.setPartsItemId(partsItem.getId());
-            if(userContextService.isCountyArea() && partsItem.getUnitPrice() != null){
-                itemDetail.setPartsPrice(partsItem.getUnitPrice().doubleValue());
+            if(userContextService.isCountyArea()){
+                itemDetail.setPartsPrice(null);
+                if(partsItem.getUnitPrice() != null){
+                    itemDetail.setPartsPrice(partsItem.getUnitPrice().doubleValue());
+                }
+                itemDetail.setPartsDescription(partsItem.getPartsDescription());
             }
         }
     }
@@ -397,8 +401,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (partsItem == null) return;
         itemDetail.setParts(partsItem.getName());
         itemDetail.setPartsItemId(partsItem.getId());
-        if(userContextService.isCountyArea() && partsItem.getUnitPrice() != null){
-            itemDetail.setPartsPrice(partsItem.getUnitPrice().doubleValue());
+        if(userContextService.isCountyArea()){
+            itemDetail.setPartsPrice(null);
+            if(partsItem.getUnitPrice() != null){
+                itemDetail.setPartsPrice(partsItem.getUnitPrice().doubleValue());
+            }
+            itemDetail.setPartsDescription(partsItem.getPartsDescription());
         }
     }
     public List<SimplePartsItem> autosparePartName() {
@@ -1187,9 +1195,6 @@ public void test1(){
         audioList = getServiceRequestPicList(selected.getSrId(), 2, null);
         picList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = getServiceRequestPicList(selected.getSrId(), 1, V2_BlobObject.BO_SUB_TYPE_DOCS);
-        audioList = new ArrayList<>();
-        picList = new ArrayList<>();
-        attachList = new ArrayList<>();
     }
 
     public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type, String boSubType) { //type 1:picture 2:audio
@@ -2540,7 +2545,7 @@ public void test1(){
                         AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
                         List<String> userUids = auditGroupConfigurationNode.getUserUids();
                         if(userUids!=null){
-                            UserAccount userAccount = userDao.getByUid(userUids.get(0));
+                            UserAccount userAccount = userDao.getUsers(userUids.get(0));
                             uaList.add(userAccount);
                         }
                     }
@@ -3097,15 +3102,22 @@ public void test1(){
      * @param event
      */
     public void onRowEdit(RowEditEvent event) {
-        V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        V2_WorkOrder v2WorkOrder = dao.findById(selected.getId());
+        Integer currentStepId = v2WorkOrder.getCurrentStepId();
+        if(!(v2WorkOrder.getStatus() == 1 && currentStepId > 3)){
+            WebUtil.addErrorMessage("必须是维修中、待验收、待评价或待关单的工单才可以新增或修改工时信息");
+            return;
+        }
+        V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
+        V2_WorkOrderManHours v2_workOrderManHours = manHoursDao.findByManHoursOwnerAndManHoursDateAndWoId(
+                workOrderManHours.getManHoursOwner(),workOrderManHours.getManHoursDate(),selected.getId());
+
+        if(v2_workOrderManHours != null && v2_workOrderManHours.getId() != workOrderManHours.getId()){
+            WebUtil.addErrorMessage("当前日期工时所属人"+workOrderManHours.getManHoursOwner()+"已有记录，请选择其他日期");
+            return;
+        }
         if(workOrderManHours.getId().equals("000")){//新增时保存记录处理
-            V2_WorkOrderManHours v2_workOrderManHours = manHoursDao.findByManHoursOwnerAndManHoursDateAndWoId(
-                    workOrderManHours.getManHoursOwner(),workOrderManHours.getManHoursDate(),selected.getId());
-            if(v2_workOrderManHours != null){
-                WebUtil.addErrorMessage("当前日期工时所属人"+workOrderManHours.getManHoursOwner()+"已有记录，请选择其他日期");
-                return;
-            }
             workOrderManHours.setCreatedBy(userContextService.getUserLoginName());
             workOrderManHours.setCreatedTime(new Date());
         }else{

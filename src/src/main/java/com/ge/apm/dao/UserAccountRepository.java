@@ -27,6 +27,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     UserAccount getByUid(String userUid);
 
+    @Query(value = "select ua.* from user_account ua where ua.uid=?1 and (ua.is_disable =false or ua.is_disable is null )",nativeQuery = true)
+    UserAccount getUsers(String userUid);
+
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     List<UserAccount> getByHospitalId(int hospitalId);
 

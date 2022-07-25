@@ -1,9 +1,7 @@
 package com.ge.apm.service.nurseSite;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,11 +10,18 @@ import java.util.zip.ZipOutputStream;
 
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.TableOption;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFDrawing;
+import org.apache.poi.xssf.usermodel.XSSFPicture;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -49,6 +54,8 @@ import com.ge.apm.service.utils.NurseSiteMaintainComparator;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
+import javax.imageio.ImageIO;
 
 /**
  * Created by 503035627
@@ -101,7 +108,8 @@ public class NurseSiteMaintainService {
 	
 	@Autowired
 	BlobObjectRepository blobObjectRepository;
-
+	@Autowired
+	private MicroServiceUtil microServiceUtil;
 	private static final String STR_ASSET_NAME = "设备名";
 	private static final String STR_ASSET_DEPTNUM = "设备编号";
 	private static final String STR_SERIAL_NUM = "制造商序列号";
@@ -711,6 +719,8 @@ public class NurseSiteMaintainService {
 				List<NurseSiteMaintainData> tempListData=mapData.get(tempItem.getId());
 				if(tempListData!=null){
 					tempItem.setListData(tempListData);
+					Map<String, NurseSiteMaintainConfigCheckItem> configMap = initConfig(tempItem);
+					tempItem.setConfigMap(configMap);
 				}
 			}
 		}
@@ -962,10 +972,12 @@ public class NurseSiteMaintainService {
                     }
                 }
             }
+			int nullNum=0;
 			while (itData.hasNext()) {
 				NurseSiteMaintainData tempData = itData.next();
 				Boolean value = tempData.getCheckValue();
 				if (value == null) {
+					nullNum++;
 					hasNotChecked = true;
 					if (itemStatus == 2 || itemStatus == 5|| itemStatus == 6|| itemStatus == 7) {
 						itemStatus = 4;
@@ -994,6 +1006,9 @@ public class NurseSiteMaintainService {
 					}
 					break;
 				}
+			}
+			if(nullNum > 0 && !(itemStatus ==3 || itemStatus ==8 )){
+				itemStatus=nullNum==listData.size()?0:4;
 			}
 			tempItem.setStatus(itemStatus);
 		}
@@ -1749,6 +1764,7 @@ public class NurseSiteMaintainService {
 	public byte[] writeMaintainDetailToExcel(ExcelDocument doc, List<NurseSiteMaintain> listMaintain) throws IOException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		XSSFDrawing patriarch = doc.getPatriarch(SHEET_Maintain);
 		listMaintain.sort(new NurseSiteMaintainComparator());
 		Map<String, List<NurseSiteMaintainItem>> mapAssetUidMaintainItem = new HashMap<String, List<NurseSiteMaintainItem>>();
 		Map<String, String> mapAssetInfo = new HashMap<String, String>();
@@ -1846,9 +1862,9 @@ public class NurseSiteMaintainService {
 								} else {
 									keyName += ",";
 								}
-								String VariableText=initVariableText(tempData,configMap);
+								//String VariableText=initVariableText(tempData,configMap);
 								headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
-								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue()+VariableText);
+								doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempData.getStrValue());
 								doc.writeRowData(SHEET_Maintain, keyRow, modifyByRow, keyName, tempItem.getModifyBy().getName());
 								doc.writeRowData(SHEET_Maintain, keyRow, checkDateRow, keyName, tempItem.getCheckDate());
 								doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName, tempData.getCheckItem());
@@ -1871,6 +1887,42 @@ public class NurseSiteMaintainService {
 							}
 							doc.writeRowData(SHEET_Maintain, keyRow, rowIndex, keyName, tempComment);
 							doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName, STR_COMMENT);
+						}
+						List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(tempItem.getId());
+						if(CollectionUtils.isNotEmpty(byBoUuid)){
+							for (int x=0;x<byBoUuid.size();x++) {
+								V2_BlobObject v2_blobObject = byBoUuid.get(x);
+								try {
+									keyName = "";
+									if (tempItem.getScheduleDate() != null) {
+										keyName += sdf.format(tempItem.getScheduleDate()) + ",";
+									} else {
+										keyName += ",";
+									}
+									keyName += tempItem.getConfigId() + ",";
+									keyName += tempItem.getSequenceName() + ",";
+									keyName += "图片"+(x+1)+ ",";
+									headerColumnIndex = writeExcelSheetHeader(header, keyName, doc, headerColumnIndex, keyRow, false);
+									doc.writeRowData(SHEET_Maintain, keyRow, checkNameRow, keyName, "图片"+(x+1));
+									Integer[] integers = doc.writeRowDataImg(SHEET_Maintain, keyRow, rowIndex, keyName, "");
+									if(integers != null) {
+										int x1 = integers[0];
+										int y1 = integers[1];
+										InputStream inputStream = microServiceUtil.downloadRepeatedReadFile(v2_blobObject.getObjectStorageId());
+										//BufferedImage bufferImg = ImageIO.read(new File("C:\\Users\\503263052\\Downloads\\图片2.png"));
+										BufferedImage bufferImg = ImageIO.read(inputStream);
+										ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+										ImageIO.write(bufferImg, "png", byteArrayOut);
+										XSSFClientAnchor anchor = new XSSFClientAnchor(0, 0, 0, 0, ( short) y1,
+										x1, (short) (y1+1), x1 + 1);
+										anchor.setAnchorType(ClientAnchor.AnchorType.MOVE_AND_RESIZE);
+										XSSFPicture picture = patriarch.createPicture(anchor, doc.getWorkBook().addPicture(byteArrayOut.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));
+										byteArrayOut.close();
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
 						}
 					}
 					rowIndex++;

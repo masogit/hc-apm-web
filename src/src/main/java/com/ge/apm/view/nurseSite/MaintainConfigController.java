@@ -588,7 +588,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	public void deleteItemDetail(NurseSiteMaintainConfigCheckItem item){
 		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
-			listPairCheckItems.remove(item);
+			listPairCheckItems = listPairCheckItems.stream().filter(it -> !it.getName().equals(item.getName())).collect(Collectors.toList());
 		}
 		checkSaveDisable();
 	}
@@ -745,15 +745,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	private NurseSiteMaintainConfigCheckItem initConfigCheckItem(NurseSiteMaintainCheckItem checkItem){
 		NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
-		String fieldType = checkItem.getFieldType();
-		if(StringUtils.isBlank(fieldType)){
-			fieldType="Text";
-		}
 		p.setId(checkItem.getId());
 		p.setName(checkItem.getName());
 		p.setDefaultValue(checkItem.getDefaultValue());
 		p.setDescription(checkItem.getDescription());
-		p.setFieldType(fieldType);
+		p.setFieldType(checkItem.getFieldType());
 		String options = checkItem.getOptions();
 		if(StringUtils.isBlank(options) || options.contains("[]")){
 			p.setOptions(null);
@@ -957,7 +953,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	public boolean dateType(){
     	if(objPairCheckItem != null){
-			return "Date".equals(objPairCheckItem.getFieldType());
+			return StringUtils.isEmpty(objPairCheckItem.getFieldType()) || "Date".equals(objPairCheckItem.getFieldType());
 		}else{
     		return false;
 		}

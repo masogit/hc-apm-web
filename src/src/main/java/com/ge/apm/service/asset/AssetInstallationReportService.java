@@ -88,7 +88,7 @@ public class AssetInstallationReportService {
         reportData.put("manufacture", arrivalListItem.getArrivalList().getManufacture());//生产厂家
 
         reportData.put("purchase_price", arrivalListItem.getPurchasePrice());
-        reportData.put("purchase_price", arrivalListItem.getArrivalList().getOrigin());//产地
+        reportData.put("origin", arrivalListItem.getArrivalList().getOrigin());//产地
 
         //技术验收
         reportData.put("technical_third_party_name", "");//第三方检查单位

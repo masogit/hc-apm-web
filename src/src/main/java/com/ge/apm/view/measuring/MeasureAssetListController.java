@@ -63,6 +63,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     //复选的设备
     private Map<String, Boolean> selectedMap;
     private Boolean flag=true;
+    private UserAuth customRoleAuth;
     @Override
     protected void init() {
 
@@ -76,6 +77,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.MEASURE_INFO);
 
         attachements = new ArrayList<>();
         this.selectedMap = new HashMap();
@@ -514,5 +516,13 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     public void setCurrentPageAssets(List<AssetInfo> currentPageAssets) {
         this.currentPageAssets = currentPageAssets;
+    }
+
+    public UserAuth getCustomRoleAuth() {
+        return customRoleAuth;
+    }
+
+    public void setCustomRoleAuth(UserAuth customRoleAuth) {
+        this.customRoleAuth = customRoleAuth;
     }
 }

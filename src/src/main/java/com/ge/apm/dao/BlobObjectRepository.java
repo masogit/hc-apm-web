@@ -61,6 +61,8 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
     @Query(value="select o.object_storage_id from v2_blob_object o where o.bo_uuid in ?1",nativeQuery=true)
     public List<String> fetchObjectIdsByBoUUIds(List<String> ids);
 
+    public V2_BlobObject findByBoIdAndBoType(Integer boId, String boType);
+
     @Modifying
     @Transactional
     void deleteByBoUuid(String boUuid);

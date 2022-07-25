@@ -55,6 +55,9 @@ public class SimplePartsItem implements Serializable {
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
+    @Column(name = "parts_description")
+    private String partsDescription;
+
     @Override
     public int hashCode() {
         int hash = 0;

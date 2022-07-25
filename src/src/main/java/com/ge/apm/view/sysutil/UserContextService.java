@@ -1506,7 +1506,7 @@ public class UserContextService implements Serializable {
                     }).collect(Collectors.toList());
                     if(child.size() > 0){
                         List<WorkflowConfig> siteWorkflowConfigList = workflowConfigDao.findBySiteUID(hospitalUID);
-                        if (CollectionUtils.isNotEmpty(siteWorkflowConfigList) && siteWorkflowConfigList.get(0).getEnableHospitalAdjustment()) {
+                        if (CollectionUtils.isNotEmpty(siteWorkflowConfigList) && StringUtils.isNotEmpty(siteWorkflowConfigList.get(0).getDeptForSharedAsset())) {
                             OrgInfo orgInfo = orgInfoRepository.getByUid(hospitalUID);
                             selectSite=orgInfo;
                             child.add(orgInfo);
