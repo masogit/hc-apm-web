@@ -12,9 +12,7 @@ import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,9 +36,11 @@ public class TableResultReportService {
      */
     public static Map<String, Object> getRuleResultData(Map<String, Object> tableValue, TableSchema table) {
         Map<String, Object> resMap = new HashMap<>();
+        Map<String, Integer> orderMap = getFormulaOrder(table);
         table.getGroups().stream().flatMap(group-> group.getItems().stream())
                         .filter(item-> item.getExp() != null && !Strings.isNullOrEmpty(item.getExp().get("rule")))
-                                .forEach(item-> {
+                        .sorted(Comparator.comparingInt(item->  orderMap.get(item.getKey())))
+                        .forEach(item-> {
                                     switch (item.getExp().get("rule")) {
                                         case "RangeRule":
                                             if(!Strings.isNullOrEmpty(item.getResKey())) {
@@ -85,6 +85,53 @@ public class TableResultReportService {
              return  resultForFormulaValue;
          }
          return "";
+    }
+
+    private static Map<String, Integer> getFormulaOrder(TableSchema table){
+
+        Map<String, Integer> orderMap = new HashMap<>();
+        table.getGroups().stream().flatMap(group-> group.getItems().stream())
+                .filter(item-> item.getExp() != null && !Strings.isNullOrEmpty(item.getExp().get("rule")))
+                .forEach(item-> {
+                        switch (item.getExp().get("rule")) {
+                            case "RangeRule":
+                            case "ScopeRule":
+                            case "VerifyRule":
+                            case "DeltaRule":
+                                orderMap.put(item.getKey(), 0);
+                                break;
+                            case "FormulaValue":
+                            case "FormulaRule":
+                                orderMap.put(item.getKey(), 1);
+                                break;
+                            }
+                    });
+
+        //最多支持3层引用, 循环引用会不确定
+        for(int i=0;i<3;i++) {
+            table.getGroups().stream().flatMap(group -> group.getItems().stream())
+                    .filter(item -> item.getExp() != null && !Strings.isNullOrEmpty(item.getExp().get("rule")))
+                    .filter(item -> orderMap.get(item.getKey()) >= 1)
+                    .forEach(item ->
+                            getSubKeys(item).stream()
+                                    .filter(l-> orderMap.containsKey(l))
+                                    .map(l -> orderMap.get(l))
+                                    .max(Integer::compareTo).ifPresent(max -> orderMap.put(item.getKey(), max + 1))
+                    );
+        }
+        return orderMap;
+    }
+
+    private static List<String> getSubKeys(TableItem item){
+        String formula = item.getExp().get("formula");
+
+        List<String> keyList = new ArrayList<>();
+        Matcher matcher = FORMULA_PATTERN.matcher(formula);
+        while (matcher.find()){
+            keyList.add(matcher.group(0));
+        }
+
+        return keyList;
     }
 
     private static String getResultForFormulaValue(Map<String, Object> tableValue, TableItem item) {
