@@ -13,23 +13,16 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd"
 
 >
-<!--    &lt;!&ndash;导入配置文件 &ndash;&gt;-->
-<!--    <bean id="mqSource"-->
-<!--          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
-<!--        <property name="location" value="classpath:mq.properties"/>-->
-<!--    </bean>-->
+    <bean id="mqSource"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:mq.properties"/>
+    </bean>
 
 <!--     定义RabbitMQ的连接工厂 -->
-<!--    <rabbit:connection-factory id="connectionFactory"-->
-<!--                               username="admin" password="V9o3U9xoBDF1XRXx" host="172.21.2.62" port="5672"-->
-<!--                               virtual-host="/"-->
-<!--                               channel-cache-size="5"-->
-<!--    />-->
-<!--    <context:component-scan base-package="com.ge.apm.listener"/>-->
-    <rabbit:connection-factory id="rabbitConnectionFactory" username="guest" password="guest"
-                               host="localhost"
-                               port="5672"
-                               virtual-host="/" channel-cache-size="50"
+    <rabbit:connection-factory id="rabbitConnectionFactory"
+                               username="${rabbit.username}" password="${rabbit.password}" host="${rabbit.host}" port="${rabbit.port}"
+                               virtual-host="${rabbit.virtual-host}"
+                               channel-cache-size="50"
                                publisher-confirms="true"
                                publisher-returns="true"
     />
@@ -45,17 +38,19 @@
                      mandatory="true"
                      return-callback="ReturnCall"
     />
-    <rabbit:queue id="assetQueue" name="assetQueue" durable="true" auto-delete="false" exclusive="false" auto-declare="true"/>
+    <rabbit:queue id="assetDeleteQueue" name="assetDeleteQueue" durable="true" auto-delete="false" exclusive="false" auto-declare="true"/>
+    <rabbit:queue id="assetUpdateQueue" name="assetUpdateQueue" durable="true" auto-delete="false" exclusive="false" auto-declare="true"/>
 
     <rabbit:topic-exchange  name="assetChange" durable="true" auto-delete="false" auto-declare="true" id="assetChange">
         <rabbit:bindings>
-            <rabbit:binding queue="assetQueue" pattern="asset.key" ></rabbit:binding>
+            <rabbit:binding queue="assetDeleteQueue" pattern="asset.delete" ></rabbit:binding>
+            <rabbit:binding queue="assetUpdateQueue" pattern="asset.update" ></rabbit:binding>
         </rabbit:bindings>
     </rabbit:topic-exchange>
 
     <rabbit:listener-container connection-factory="rabbitConnectionFactory" acknowledge="manual" message-converter="jackson2JsonMessageConverter" >
         <!-- 监听一个队列，当队列中有消息，就会自动触发类.方法，传递消息就作为方法的参数，根据方法声明的参数强转 -->
-        <rabbit:listener ref="testConsumer"  queue-names="assetQueue"/>
+        <rabbit:listener ref="testConsumer"  queue-names="assetDeleteQueue"/>
     </rabbit:listener-container>
 
     <bean id="testConsumer" class="com.ge.apm.listener.TestConsumer"/>
