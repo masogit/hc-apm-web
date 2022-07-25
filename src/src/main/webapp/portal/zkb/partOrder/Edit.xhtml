@@ -194,7 +194,7 @@
                         <h:panelGroup id="scoreFlagGroup" rendered="#{zkbPartOrderEditController.scoreFlagRender()}">
                             <label class="label">是否使用积分抵扣*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.scoreFlag}" required="true" requiredMessage="是否使用积分抵扣 #{msg.ValidationRequire}" disabled="#{zkbPartOrderEditController.currentScoreFlag}">
-                                <p:ajax event="change" update="zkbHeadEditForm:orderType exchangeTypeGroup" listener="#{zkbPartOrderEditController.scoreFlagChange}" />
+                                <p:ajax event="change" update="zkbHeadEditForm:orderType exchangeTypeGroup remainQty" listener="#{zkbPartOrderEditController.scoreFlagChange}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>
                                 <f:selectItem itemLabel="否" itemValue="f"/>
