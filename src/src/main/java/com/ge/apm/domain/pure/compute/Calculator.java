@@ -3,15 +3,16 @@ package com.ge.apm.domain.pure.compute;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class Calculator {
 
-    Map<String, String> functionMap = new HashMap<>();
+    private Map<String, String> functionMap = new HashMap<>();
     //存放后序表达式
-    Queue queue = new ArrayDeque();
+    private Queue queue = new ArrayDeque();
     //含有计算方法的class
-    Class functionClass = null;
+    private Class functionClass = null;
 
     /**
      * 添加方法
@@ -109,8 +110,9 @@ public class Calculator {
         } else if ("*".equals(template)) {
             num = num2.multiply(num1);
         } else if ("/".equals(template)) {
-            num = num2.divide(num1);
+            num = num2.divide(num1,Functions.SCALE, RoundingMode.HALF_UP);
         }
+        num = num.setScale(Functions.SCALE, RoundingMode.HALF_UP);
         return num.toString();
     }
 
@@ -214,10 +216,7 @@ public class Calculator {
      * @return
      */
     public boolean isTrue(String temp) {
-        if ("+".equals(temp) || "-".equals(temp) || "*".equals(temp) || "/".equals(temp) || ",".equals(temp) || "(".equals(temp) || ")".equals(temp)) {
-            return true;
-        }
-        return false;
+        return "+".equals(temp) || "-".equals(temp) || "*".equals(temp) || "/".equals(temp) || ",".equals(temp) || "(".equals(temp) || ")".equals(temp);
     }
 
 
@@ -233,8 +232,9 @@ public class Calculator {
         String equation8 = "slope(2,5,8,7,3,6,-2,0,3,5,2,-3)";//0.366548
         String equation9 = "intercept(2,5,8,7,3,6,-2,0,3,5,2,-3)";//4.861209964
         String equation10 = "degrees(6)";//4.861209964
+        String equation11 = ".003*.007";//4.861209964
 
-        String result = calculator.calculate(equation2);
+        String result = calculator.calculate(equation11);
 
         System.out.println(result);
     }

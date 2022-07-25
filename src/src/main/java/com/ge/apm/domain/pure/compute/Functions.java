@@ -10,7 +10,7 @@ import java.util.Stack;
 
 public class Functions {
 
-    private static final int SCALE = 4;
+    public static final int SCALE = 4;
 
     public static final Map<String,String> FUNCTION_MAP = ImmutableMap.<String,String>builder()
             .put("sum","sumFunction")
