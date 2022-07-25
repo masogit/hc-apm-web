@@ -1,22 +1,5 @@
 package com.ge.apm.view.asset;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jfree.util.Log;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.TabChangeEvent;
-import org.primefaces.model.UploadedFile;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.CaptureDataMessagesRepository;
 import com.ge.apm.dao.I18nMessageRepository;
@@ -27,11 +10,24 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.CaptureDataMessagesService;
 import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.view.sysutil.UserContextService;
-
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.TabChangeEvent;
+import org.primefaces.model.UploadedFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 503035627
@@ -335,7 +331,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			Log.error(e.getMessage());
+			logger.error(e.getMessage());
 			FacesMessage message = new FacesMessage("注意！解析图片失败！");
 			FacesContext.getCurrentInstance().addMessage("other", message);
 			tempImageContent = null;
