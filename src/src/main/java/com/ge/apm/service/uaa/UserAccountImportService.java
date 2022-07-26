@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
@@ -125,8 +126,7 @@ public class UserAccountImportService {
 	}
 	private boolean handleNewUser(UserAccount newUser,String institution,String hospital,String site,String department,String department2,String department3){
 		//get all user
-		telephoneValid(newUser);
-		checkLoginName(newUser);
+		checkNewUser(newUser);
 		if(!supplementUserRole(newUser)){
 			return false;
 		}
@@ -154,8 +154,9 @@ public class UserAccountImportService {
 		return null;
 	}
 	
-	private UserAccount checkLoginName(UserAccount newUser){
+	private UserAccount checkNewUser(UserAccount newUser){
 		String loginName=newUser.getLoginName();
+		String telephone=newUser.getTelephone();
 		String uuid=newUser.getUid();
 		if(StringUtils.isEmpty(uuid)){
 			//create
@@ -169,6 +170,7 @@ public class UserAccountImportService {
 				newUser.setUid(UUID.randomUUID().toString().replace("-", ""));
 			}
 			//create finally
+			telephoneValid(newUser);
 		}
 		else{
 			//update
@@ -183,6 +185,11 @@ public class UserAccountImportService {
 					if(isExistsByLoginName(loginName)){
 						newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME_EXISTS,"用户名已存在;");
 						return newUser;
+					}
+				}
+				if (ObjectUtil.isAllNotEmpty(telephone, user.getTelephone()) || ObjectUtil.isNotEmpty(telephone)) {
+					if(!telephone.equals(user.getTelephone())){
+						telephoneValid(newUser);
 					}
 				}
 			}
@@ -945,7 +952,7 @@ public class UserAccountImportService {
 					pass=false;
 				}
 				
-				if(handleNewUser(newUser, institution, hospital, site, department,department2,department3)==false){
+				if(!handleNewUser(newUser, institution, hospital, site, department, department2, department3)){
 					importFailedDataList.add(newUser);
 					failedCount++;
 				}
