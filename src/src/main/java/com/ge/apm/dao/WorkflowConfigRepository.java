@@ -57,4 +57,6 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
 
 //    @Query(value="select * from workflow_config where site_uid = ?1",nativeQuery = true)
 //    List<WorkflowConfig> findBySiteUID(String siteUID);
+    @Query("select w from WorkflowConfig w where w.siteUID in ?1 or w.institutionUID in ?1 or w.tenantUID in ?1 or w.hospitalUID in ?1")
+    List<WorkflowConfig> findWorkflowConfig(List<String> uids);
 }

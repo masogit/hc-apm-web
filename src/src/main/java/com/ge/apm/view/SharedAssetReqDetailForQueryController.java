@@ -25,6 +25,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -332,5 +333,39 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         searchFilters.add(searchFilter);
     }
 
-
+    public String  jsonFormatDate(int type){
+        Date date=null;
+        try {
+            SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            switch (type){
+                case 1:
+                    date=selected.getLeaseRequest().getApplyTime();
+                    break;
+                case 2:
+                    date=selected.getChargingBeginTime();
+                    break;
+                case 3:
+                    date=selected.getChargingEndTime();;
+                    break;
+                case 4:
+                    date=selected.getMaintainTime();
+                    break;
+            }
+            if(date != null){
+                return  formatter.format(date);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    public boolean  openWhethertoenableunattended(){
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        String siteUID = currentUserAccount.getSiteUID();
+        List<WorkflowConfig> bySiteUID = wfCfigDao.findBySiteUID(siteUID);
+        if(CollectionUtils.isEmpty(bySiteUID)){
+            return false;
+        }
+       return bySiteUID.stream().allMatch(item -> item.getWhethertoenableunattended() != null && item.getWhethertoenableunattended());
+    }
 }
