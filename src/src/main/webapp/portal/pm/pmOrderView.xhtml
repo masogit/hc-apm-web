@@ -119,7 +119,9 @@
                             <p:column headerText="#{msg.PartName}">
                                 <h:outputText value="#{detailItem.parts}"/>
                             </p:column>
-
+                            <p:column headerText="#{msg.PartsItemCode}" rendered="#{userContextService.countyArea}">
+                                <h:outputText value="#{v2PmOrderController.getPartsItemCode(detailItem)}"/>
+                            </p:column>
                             <p:column headerText="#{msg.accessoryQuantity}">
                                 <h:outputText value="#{detailItem.apartsQuantity}"/>
                             </p:column>
@@ -168,6 +170,9 @@
                             </p:column>
                             <p:column headerText="#{msg.Arrival}">
                                 <h:outputText value="#{detailItem.arrived?msg.Arrived:msg.NonArrived}" rendered="#{detailItem.id ne '000'}"/>
+                            </p:column>
+                            <p:column headerText="备件描述" rendered="#{userContextService.countyArea}">
+                                <h:outputText value="#{detailItem.partsDescription}" />
                             </p:column>
                             <p:column headerText="#{msg.Operation}">
                                <!-- <p:commandButton process="@this" rendered="#{userContextService.hasAnyRole('AssetHead')}" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" disabled="#{detailItem.approved==null?'false': not detailItem.approved}" actionListener="#{v2PmOrderController.prepareEditAccDetailonPrice(detailItem.id)}" update="@(.pmMoreAccDialogPriceDlg)" oncomplete="PF('pmMoreAccDialogPriceDlg').show()"/>-->

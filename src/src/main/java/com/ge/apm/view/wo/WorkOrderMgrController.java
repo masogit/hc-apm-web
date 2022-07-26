@@ -17,7 +17,6 @@ import com.ge.apm.domain.simpleparts.SimplePartsInventory;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.*;
-import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
@@ -3103,12 +3102,12 @@ public void test1(){
      */
     public void onRowEdit(RowEditEvent event) {
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-        V2_WorkOrder v2WorkOrder = dao.findById(selected.getId());
-        Integer currentStepId = v2WorkOrder.getCurrentStepId();
-        if(!(v2WorkOrder.getStatus() == 1 && currentStepId > 3)){
-            WebUtil.addErrorMessage("必须是维修中、待验收、待评价或待关单的工单才可以新增或修改工时信息");
-            return;
-        }
+//        V2_WorkOrder v2WorkOrder = dao.findById(selected.getId());
+//        Integer currentStepId = v2WorkOrder.getCurrentStepId();
+//        if(!(v2WorkOrder.getStatus() == 1 && currentStepId > 3 && currentStepId < 7)){
+//            WebUtil.addErrorMessage("必须是维修中、待验收、待评价或待关单的工单才可以新增或修改工时信息");
+//            return;
+//        }
         V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
         V2_WorkOrderManHours v2_workOrderManHours = manHoursDao.findByManHoursOwnerAndManHoursDateAndWoId(
                 workOrderManHours.getManHoursOwner(),workOrderManHours.getManHoursDate(),selected.getId());
