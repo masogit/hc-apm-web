@@ -343,6 +343,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public void fullInfoBySystemId(String systemId) {
         this.zkbAssetInfo = null;
         this.zkbAssetInfoList = null;
+        this.selected.setSystemId(systemId);
         if (StringUtils.isBlank(this.selected.getMaintainFlag())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("错误：请选择是否为保养申请"));
             return;
