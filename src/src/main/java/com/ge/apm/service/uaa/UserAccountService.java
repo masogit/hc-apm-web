@@ -340,7 +340,7 @@ public class UserAccountService {
 		}
 		List<UserAccount> userAccounts = userAccountMapper.getUserAccountByTelephone(telephone);
 		for (int i = 0; i < userAccounts.size(); i++) {
-			if(userId.equals(userAccounts.get(i).getId())){
+			if(userId==(userAccounts.get(i).getId())){
 				userAccounts.remove(userAccounts.get(i));//移除掉自己
 			}
 		}

@@ -21,13 +21,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import webapp.framework.dao.NativeSqlUtil;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.annotation.Resource;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -69,6 +75,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     SharedAssetConfigRepository sharedAssetConfigDao = null;
     UserRoleRepository userRoleRepository = null;
     SysRoleRepository sysRoleDao;
+    JdbcTemplate jdbcTemplate=null;
     String p=null;
     private String operation;
     
@@ -96,6 +103,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private String selectedSartId;
 
     private String workflowConfigJson;
+
 
     public String getFilterApplyTime() {
         return filterApplyTime;
@@ -189,6 +197,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         sharedAssetRequestService = WebUtil.getServiceBean(SharedAssetRequestService.class);
+        jdbcTemplate = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
         String encodeStr = request.getParameter("str");
@@ -595,7 +604,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                 
                                 if(applySwapType.getActualQty() < applySwapType.getApplyQty()){
                                     SharedAssetReqDetail assetDetaiVo = new SharedAssetReqDetail();
-                                    List<SharedAssetReqDetail> detail_list = asdDao.getBorrowInfo(infoVo.getUid());
+                                    String sql="select a.* from shared_asset_req_detail a inner join shared_asset_request b on b.id = a.borrow_id where a.asset_info_id = '"+infoVo.getUid()+" 'and b.state in (3, 6) AND a.return_id is NULL";
+                                    List<Map<String, Object>> data = jdbcTemplate.queryForList(sql);
+                                    ArrayList<SharedAssetReqDetail> detail_list = new ArrayList<>();
+                                    for (int i = 0; i < data.size(); i++) {
+                                        SharedAssetReqDetail request2 = new SharedAssetReqDetail();
+                                        Map<String, Object>list1=data.get(i);
+                                        String s = JSON.toJSONString(list1);
+                                        request2= JSON.parseObject(s,SharedAssetReqDetail.class);
+                                        detail_list.add(request2);
+                                    }
+//                                    List<SharedAssetReqDetail> detail_list = asdDao.getBorrowInfo(infoVo.getUid());
                                     if(detail_list.size()==1){
                                         if(!assetDeptUID.equals(detail_list.get(0).getClinicalDeptUid())){
                                             WebUtil.addErrorMessage("该设备当前使用科室与申请科室不一致，使用科室是:"+ClinicalDeptName);
