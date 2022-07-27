@@ -36,6 +36,7 @@ public class TableResultReportService {
      */
     public static Map<String, Object> getRuleResultData(Map<String, Object> tableValue, TableSchema table) {
         Map<String, Object> resMap = new HashMap<>();
+        resMap.putAll(tableValue);
         Map<String, Integer> orderMap = getFormulaOrder(table);
         table.getGroups().stream().flatMap(group-> group.getItems().stream())
                         .filter(item-> item.getExp() != null && !Strings.isNullOrEmpty(item.getExp().get("rule")))
@@ -44,30 +45,30 @@ public class TableResultReportService {
                                     switch (item.getExp().get("rule")) {
                                         case "RangeRule":
                                             if(!Strings.isNullOrEmpty(item.getResKey())) {
-                                                resMap.put(item.getResKey(), getResultForRangeRule(tableValue, item));
+                                                resMap.put(item.getResKey(), getResultForRangeRule(resMap, item));
                                             }
                                             break;
                                         case "ScopeRule":
                                             if(!Strings.isNullOrEmpty(item.getResKey())) {
-                                                resMap.put(item.getResKey(), getResultForScopeRule(tableValue, item));
+                                                resMap.put(item.getResKey(), getResultForScopeRule(resMap, item));
                                             }
                                             break;
                                         case "VerifyRule":
                                             if(!Strings.isNullOrEmpty(item.getResKey())) {
-                                                resMap.put(item.getResKey(), getResultForVerifyRule(tableValue, item));
+                                                resMap.put(item.getResKey(), getResultForVerifyRule(resMap, item));
                                             }
                                             break;
                                         case "DeltaRule":
                                             if(!Strings.isNullOrEmpty(item.getResKey())) {
-                                                resMap.put(item.getResKey(), getResultForDeltaVerifyRule(tableValue, item));
+                                                resMap.put(item.getResKey(), getResultForDeltaVerifyRule(resMap, item));
                                             }
                                             break;
                                         case "FormulaValue":
-                                            resMap.put(item.getKey(), getResultForFormulaValue(tableValue, item));
+                                            resMap.put(item.getKey(), getResultForFormulaValue(resMap, item));
                                             break;
                                         case "FormulaRule": {
                                             if(!Strings.isNullOrEmpty(item.getResKey())) {
-                                                resMap.put(item.getKey(), getResultForFormulaRule(tableValue, item));
+                                                resMap.put(item.getKey(), getResultForFormulaRule(resMap, item));
                                             }
                                             break;
                                         }
