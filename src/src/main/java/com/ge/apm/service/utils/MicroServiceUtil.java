@@ -43,8 +43,8 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public StreamedContent downloadSingleFile(String fileId) {
-        HttpHeaders headers = new HttpHeaders();
-        String gatewayURL = getGatewayURL(GatewayURL.DOWNLOAD_FILE);
+        HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
+        String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);
         ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
         HttpHeaders responseHeader = response.getHeaders();
         byte[] result = response.getBody();

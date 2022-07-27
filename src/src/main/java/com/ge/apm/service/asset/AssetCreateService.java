@@ -20,6 +20,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -280,10 +281,29 @@ public class AssetCreateService {
         orgList.add(user.getInstitutionUID());
         orgList.add(user.getHospitalUID());
         orgList.add(user.getSiteUID());
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList1(orgList,userUid);
+//        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList1(orgList,userUid);
+        List<WorkflowConfig> wcList =getWWorkflowConfig(orgList,user);
         return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }
-    
+    private List<WorkflowConfig> getWWorkflowConfig(List<String> orgList,UserAccount user){
+        List<WorkflowConfig> bySiteUIDList = wcDao.getBySiteUIDList(orgList);
+        if(!CollectionUtils.isEmpty(bySiteUIDList)){
+            return bySiteUIDList;
+        }
+        List<OrgInfo> byUser = orgDao.getByUser(user.getUid());
+        if(CollectionUtils.isEmpty(byUser)){
+            return new ArrayList<>();
+        }
+        List<String> collect = byUser.stream().filter(item -> item != null && item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(collect)){
+            return wcDao.findWorkflowConfig(collect);
+        }
+        List<String> collectType4 = byUser.stream().filter(item -> item != null && item.getOrgType() == 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(collectType4)){
+            return  wcDao.findWorkflowConfig(collectType4);
+        }
+        return new ArrayList<>();
+    }
     public UserAccount getUserByWechatId(String wechatId){
         return userDao.getByWeChatId(wechatId);
     }

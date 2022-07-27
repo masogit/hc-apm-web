@@ -768,6 +768,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (partsItem == null) return;
         itemDetail.setParts(partsItem.getName());
         itemDetail.setPartsItemId(partsItem.getId());
+        if(userContextService.isCountyArea()){
+            itemDetail.setPartsPrice(null);
+            if(partsItem.getUnitPrice() != null){
+                itemDetail.setPartsPrice(partsItem.getUnitPrice().doubleValue());
+            }
+            itemDetail.setPartsDescription(partsItem.getPartsDescription());
+        }
     }
     public void onSparePartsValueChange(SelectEvent event) {
         Object object = event.getObject();
@@ -780,6 +787,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setClosedPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
             itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
             itemDetail.setPartsItemId(partsItem.getId());
+            if(userContextService.isCountyArea()){
+                itemDetail.setPartsPrice(null);
+                if(partsItem.getUnitPrice() != null){
+                    itemDetail.setPartsPrice(partsItem.getUnitPrice().doubleValue());
+                }
+                itemDetail.setPartsDescription(partsItem.getPartsDescription());
+            }
         }
     }
     public void cancelPMorder() {

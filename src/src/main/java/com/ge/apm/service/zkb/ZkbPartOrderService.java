@@ -1406,6 +1406,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                     return "该申请不扣任何名额";
                 }
+                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), assetInfo.getUid());
+                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                    return "该申请不扣任何名额";
+                }
                 if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
                     return "该申请不扣任何名额";
                 }
@@ -1481,6 +1485,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     return;
                 }
                 if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
+                    return;
+                }
+                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
+                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                     return;
                 }
                 if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
@@ -1675,6 +1683,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                     return;
                 }
+                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
+                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                    return;
+                }
                 if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){
                     return;
                 }
@@ -1843,6 +1855,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }else{
                 if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
+                    return;
+                }
+                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
+                if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                     return;
                 }
                 if(CopyByInvok.T.equals(zkbPartOrder.getSsaKeyFlag())){

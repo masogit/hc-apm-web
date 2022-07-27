@@ -152,15 +152,17 @@
                                         <f:convertNumber pattern="0.00"/>
                                     </h:outputText>
                                 </p:column>
+                            <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
                                 <p:column headerText="状态">
                                     <h:outputText value="#{item.state}" />
                                 </p:column>
                                 <p:column headerText="调剂编码">
                                     <h:outputText value="#{item.swapIndex}" />
                                 </p:column>
-                                <p:column headerText="预约人">
-                                    <h:outputText value="#{item.leaseRequest.applicantName}" />
-                                </p:column>
+<!--                                <p:column headerText="预约人">-->
+<!--                                    <h:outputText value="#{item.leaseRequest.applicantName}" />-->
+<!--                                </p:column>-->
+                            </c:if>
                                 <!--<p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">-->
                                     <!--<h:outputText value="#{item.remark}"/>-->
                                 <!--</p:column>-->
@@ -193,21 +195,21 @@
                                 <!--</p:inputNumber>-->
                             <!--</h:panelGrid>-->
                         <!--</p:overlayPanel>-->
-                         <p:contextMenu for="datalist">
-                             <p:menuitem value="状态与时间" update="productDetail" icon="pi pi-search"
-                                         oncomplete="PF('productDialog').show()"/>
-                         </p:contextMenu>
-                         <p:dialog header="状态与时间" widgetVar="productDialog" modal="true" showEffect="fade"
-                                   hideEffect="fade" resizable="false">
-                             <div class="card" >
-                                         <p:steps id="productDetail" activeIndex="5">
-                                             <p:menuitem  value="已预约:#{sharedAssetReqDetailForQueryController.selected.leaseRequest.applyTime}" />
-                                             <p:menuitem value="使用中:#{sharedAssetReqDetailForQueryController.selected.chargingBeginTime}" />
-                                             <p:menuitem value="已归还（未清洁保养）:#{sharedAssetReqDetailForQueryController.selected.chargingEndTime}" />
-                                             <p:menuitem value="已完成:#{sharedAssetReqDetailForQueryController.selected.returnRequest.modifyDate}" />
-                                         </p:steps>
-                             </div>
-                         </p:dialog>
+<!--                         <p:contextMenu for="datalist" rendered="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">-->
+<!--                             <p:menuitem value="状态与时间" update="productDetail" icon="pi pi-search"-->
+<!--                                         oncomplete="PF('productDialog').show()"/>-->
+<!--                         </p:contextMenu>-->
+<!--                         <p:dialog header="状态与时间" widgetVar="productDialog" modal="true" showEffect="fade"-->
+<!--                                   hideEffect="fade" resizable="false">-->
+<!--                             <div class="card" >-->
+<!--                                         <p:steps id="productDetail" activeIndex="5">-->
+<!--                                             <p:menuitem  value="已预约:#{sharedAssetReqDetailForQueryController.jsonFormatDate(1)}" />-->
+<!--                                             <p:menuitem value="使用中:#{sharedAssetReqDetailForQueryController.jsonFormatDate(2)}" />-->
+<!--                                             <p:menuitem value="已归还（未清洁保养）:#{sharedAssetReqDetailForQueryController.jsonFormatDate(3)}" />-->
+<!--                                             <p:menuitem value="已完成:#{sharedAssetReqDetailForQueryController.jsonFormatDate(4)}" />-->
+<!--                                         </p:steps>-->
+<!--                             </div>-->
+<!--                         </p:dialog>-->
                     </h:form>
                 </div>
             </div>
