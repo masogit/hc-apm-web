@@ -2,6 +2,7 @@ package com.ge.apm.service.uaa;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -124,9 +125,9 @@ public class UserAccountImportService {
 		}
 		return pass;
 	}
-	private boolean handleNewUser(UserAccount newUser,String institution,String hospital,String site,String department,String department2,String department3){
+	private boolean handleNewUser(UserAccount newUser,String institution,String hospital,String site,String department,String department2,String department3,TenantInfo tenantInfo) throws NoSuchAlgorithmException {
 		//get all user
-		checkNewUser(newUser);
+		checkNewUser(newUser, tenantInfo);
 		if(!supplementUserRole(newUser)){
 			return false;
 		}
@@ -154,7 +155,7 @@ public class UserAccountImportService {
 		return null;
 	}
 	
-	private UserAccount checkNewUser(UserAccount newUser){
+	private UserAccount checkNewUser(UserAccount newUser,TenantInfo tenantInfo) throws NoSuchAlgorithmException {
 		String loginName=newUser.getLoginName();
 		String telephone=newUser.getTelephone();
 		String uuid=newUser.getUid();
@@ -171,6 +172,16 @@ public class UserAccountImportService {
 			}
 			//create finally
 			telephoneValid(newUser);
+
+			if (StringUtils.isEmpty(newUser.getPassword()) && StringUtils.isNotEmpty(newUser.getPassword().trim())) {
+				if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
+					newUser.setPlainPassword(PasswordUtil.DEFAULT_PWD);
+					newUser.entryptPassword();
+				} else {
+					newUser.setPassword(tenantInfo.getInitialPassword());
+					newUser.setPwdSalt(tenantInfo.getInitialPasswordSalt());
+				}
+			}
 		}
 		else{
 			//update
@@ -789,6 +800,8 @@ public class UserAccountImportService {
 		Integer passwordIndex=header.get(HEADER_PASSWORD);
 		int uuidIndex=header.get(HEADER_UUID);
 
+		List<String> telephoneList = new ArrayList<>();
+		List<String> loginNameList = new ArrayList<>();
 		for (int j = 1; j <= sheet.getLastRowNum(); j++) {
 			Row row = sheet.getRow(j);
 			if (row == null) {
@@ -866,6 +879,11 @@ public class UserAccountImportService {
 						BigDecimal bd = new BigDecimal(telephone);
 				        telephone=bd.toPlainString();
 					}
+					if (telephoneList.contains(telephone)) {
+						newUser.setStatusDisplay(UploadFileErrorTypeEnum.DUPLICATE_TELEPHONE, "Excel 表中电话号码重复");
+					} else {
+						telephoneList.add(telephone);
+					}
 				}
 				newUser.setTelephone(telephone);
 				newUser.setIsActive(isActive);
@@ -897,17 +915,6 @@ public class UserAccountImportService {
 						newUser.entryptPassword();
 					}
 
-				} else {
-					if (passwordIndex != null) {
-						//only support new user to have password column
-						if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
-							newUser.setPlainPassword(PasswordUtil.DEFAULT_PWD);
-							newUser.entryptPassword();
-						} else {
-							newUser.setPassword(tenantInfo.getInitialPassword());
-							newUser.setPwdSalt(tenantInfo.getInitialPasswordSalt());
-						}
-					}
 				}
 				
 //				if(StringUtils.isEmpty(institution)){
@@ -918,6 +925,12 @@ public class UserAccountImportService {
 				if(StringUtils.isEmpty(loginName)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"登录名不能为空;");
 					pass=false;
+				} else {
+					if (loginNameList.contains(loginName)) {
+						newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"Excel 表中登录名重复;");
+					} else {
+						loginNameList.add(loginName);
+					}
 				}
 				if(StringUtils.isEmpty(name)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.NAME,"姓名不能为空;");
@@ -952,7 +965,7 @@ public class UserAccountImportService {
 					pass=false;
 				}
 				
-				if(!handleNewUser(newUser, institution, hospital, site, department, department2, department3)){
+				if(!handleNewUser(newUser, institution, hospital, site, department, department2, department3, tenantInfo)){
 					importFailedDataList.add(newUser);
 					failedCount++;
 				}
