@@ -173,7 +173,7 @@ public class UserAccountImportService {
 			//create finally
 			telephoneValid(newUser);
 
-			if (StringUtils.isEmpty(newUser.getPassword()) && StringUtils.isNotEmpty(newUser.getPassword().trim())) {
+			if (StringUtils.isEmpty(newUser.getPassword())) {
 				if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
 					newUser.setPlainPassword(PasswordUtil.DEFAULT_PWD);
 					newUser.entryptPassword();
