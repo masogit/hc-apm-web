@@ -43,8 +43,8 @@ public class ExportService {
     @Autowired
     private BlobObjectRepository blobDao;
 
-    @Value("${file_path:/home/temp/data/}")
-    private String filePath;
+    @Value("#{systemEnvironment['BATCH_FILE_FOLDER'] ?: urlProperties.BatchFileFolder}")
+    private String BATCH_FILE_FOLDER;
 
     List<String> tableNameList = Arrays.asList("acc_org_info", "adverse_events", "arrival_list", "asset_contract", "asset_history", "asset_info", "asset_lifecycle", "asset_opt_record", "asset_purchase_list", "asset_seria_num_config", "asset_tag", "asset_termination_report_template", "attribute",
             "biomed_group", "brand", "click_rate", "contract_info", "custom_config", "custom_role", "dept_transaction_category", "dept_transaction_log", "electric_safety_data",
@@ -80,38 +80,13 @@ public class ExportService {
                 for (String assetTableName : assetTableNameList) {
                     writeMap.put(assetTableName, JSONObject.toJSONString(exportMapper.findByAssetInfoTenantUid(assetTableName, tenantUid)));
                 }
-                // shared_asset_req_detail 共享资源需求详细信息
-/*                Map<String, String> writeMap1 = new HashMap<>(200);
-                writeMap1.put("shared_asset_req_detail", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("shared_asset_req_detail", "asset_info", "asset_info_id", "uid", tenantUid)));
 
                 // type -> 3
-                writeMap1.put("adverse_events_file", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("adverse_events_file", "adverse_events", "adverse_events_uid", "uid", tenantUid)));
-                writeMap1.put("arrival_list_item", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("arrival_list_item", "arrival_list", "arrival_list_id", "id", tenantUid)));
-                writeMap1.put("asset_location_info", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("asset_location_info", "org_info", "site_uid", "uid", tenantUid)));
-                writeMap1.put("asset_tag_biomed_group", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("asset_tag_biomed_group", "asset_tag", "tag_id", "id", tenantUid)));
-                writeMap1.put("asset_tag_msg_subscriber", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("asset_tag_msg_subscriber", "asset_tag", "tag_id", "id", tenantUid)));
-                writeMap1.put("asset_tag_rule", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("asset_tag_rule", "asset_tag", "tag_id", "id", tenantUid)));
-                writeMap1.put("attr_desc", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("attr_desc", "attribute", "attribute_id", "id", tenantUid)));
-                writeMap1.put("biomed_group_user", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("biomed_group_user", "biomed_group", "group_id", "id", tenantUid)));
-                writeMap1.put("contract_info_item", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("contract_info_item", "contract_info", "contract_id", "id", tenantUid)));
-                writeMap1.put("login_record", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("login_record", "user_account", "login_name", "login_name", tenantUid)));
-                writeMap1.put("msg_config", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("msg_config", "msg_tenant", "id", "msgconfig_id", tenantUid)));
-                writeMap1.put("nurse_site_maintain_data", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("nurse_site_maintain_data", "nurse_site_maintain", "parent_id", "id", tenantUid)));
-                writeMap1.put("simple_parts_warehouse_locator", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("simple_parts_warehouse_locator", "simple_parts_warehouse", "parts_warehouse_id", "id", tenantUid)));
-                writeMap1.put("simple_parts_warehouse_org", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("simple_parts_warehouse_org", "simple_parts_warehouse", "parts_warehouse_id", "id", tenantUid)));
-                writeMap1.put("simple_parts_warehouse_user", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("simple_parts_warehouse_user", "simple_parts_warehouse", "parts_warehouse_id", "id", tenantUid)));
-                writeMap1.put("supplier_tenant_join", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("supplier_tenant_join", "supplier", "supplier_id", "id", tenantUid)));
-                writeMap1.put("supplier_user", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("supplier_user", "supplier", "supplier_uid", "uid", tenantUid)));
-                writeMap1.put("user_org", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("user_org", "user_account", "user_uid", "uid", tenantUid)));
-                writeMap1.put("user_role", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("user_role", "user_account", "user_id", "id", tenantUid)));
-                writeMap1.put("user_signature", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("user_signature", "user_account", "user_uid", "uid", tenantUid)));
-                writeMap1.put("v2_work_order_detail_return", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("v2_work_order_detail_return", "v2_work_order_detail", "work_order_detail_id", "id", tenantUid)));
-
-                // type -> 4
-                writeMap1.put("unstructured_data_collection", JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid("unstructured_data_collection", "v2_pm_order", "bo_uuid", "id", tenantUid)));*/
                 for (RelationTenantUid relationTenantUid : RelationTenantUid.values()) {
                     writeMap.put(relationTenantUid.getTableA(), JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid(relationTenantUid.getTableA(), relationTenantUid.getTableB(), relationTenantUid.getFieldA(), relationTenantUid.getFieldB(), tenantUid)));
                 }
+
+                // type -> 4
                 writeMap.put("unstructured_data", JSONObject.toJSONString(exportMapper.findByParentRelationTableTenantUid("unstructured_data", "unstructured_data_collection", "collection_id", "id",
                         "bo_uuid", "v2_pm_order", "id", tenantUid)));
 
@@ -148,13 +123,13 @@ public class ExportService {
         // 随机生成文件名
         String fileName = UUID.randomUUID().toString().replace("-", "");
         // 写入文件路径
-        String suffix = filePath.substring(filePath.length() - 1);
-        String src = filePath + fileName + suffix;
+        String suffix = BATCH_FILE_FOLDER.substring(BATCH_FILE_FOLDER.length() - 1);
+        String src = BATCH_FILE_FOLDER + fileName + suffix;
         String dataSrc = src + "data" + suffix;
         String fileSrc = src + "file" + suffix;
         // 存放压缩包路径
         fileName = fileName + ".zip";
-        String dest = filePath + fileName;
+        String dest = BATCH_FILE_FOLDER + fileName;
         // 写文件
         List<String> tableNames = new ArrayList<>(writeMap.keySet());
         FileOutputStream fileOutputStream = null;
@@ -180,8 +155,9 @@ public class ExportService {
                 }
             }
         }
-        assert fileOutputStream != null;
-        fileOutputStream.close();
+        if (fileOutputStream != null) {
+            fileOutputStream.close();
+        }
         // 生成随机密码
         String randomPassword = ZipUtil.getRandomPassword(8);
         // 压缩

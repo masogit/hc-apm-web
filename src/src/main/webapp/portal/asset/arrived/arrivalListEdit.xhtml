@@ -483,7 +483,7 @@
                                                          src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
-                                                <p:commandButton disabled="#{userContextService.activeSupplier()}" actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
@@ -525,7 +525,7 @@
                                                  src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                         </h:panelGroup>
-                                        <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentByIdJiuYuan(fileitem.id)}" update="accessoryFinishedList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                        <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryFinishedList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                         </p:commandButton>
                                     </p:dataList>

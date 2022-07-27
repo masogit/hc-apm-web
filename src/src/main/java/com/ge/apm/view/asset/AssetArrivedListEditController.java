@@ -1,35 +1,31 @@
 package com.ge.apm.view.asset;
 
-import java.io.File;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
+import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
-
-import com.baomidou.mybatisplus.toolkit.StringUtils;
-import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
-
-import lombok.Getter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -1102,7 +1098,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     /**
-     * 验证九院文件是否可以编辑包括：（删除、上传）
+     * 验证九院文件是否可以编辑包括：（上传）
      * 注意条件：九院同院区下并且同合同号的所有到货单已完成安装才可以编辑文件。
      * @return
      */
@@ -1112,7 +1108,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             List<ArrivalList> arrivalLists = dao.findByContractNumAndSiteUID(selected.getContractNum(),selected.getSiteUID());
             for(ArrivalList arrivalList:arrivalLists){
                 if(arrivalList.getStatus() != 3){
-                    msg = "该合同号下有未安装完成的到货单："+ arrivalList.getName() +"，请全部完成后再上传或删除！";
+                    msg = "该合同号下有未安装完成的到货单："+ arrivalList.getName() +"，请全部完成后再上传！";
                 }
             }
         }

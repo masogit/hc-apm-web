@@ -90,7 +90,9 @@
                                     <p:column headerText="#{msg.InvoiceNumber}">
                                         <h:outputText value="#{item.invoiceNum}" />
                                     </p:column>
-
+                                    <p:column headerText="备件描述" rendered="#{userContextService.countyArea}">
+                                        <h:outputText value="#{item.partsDescription}" />
+                                    </p:column>
                                     <p:column headerText="#{msg.Actions}">
                                         <p:commandButton process="@this" icon="ui-icon-add" actionListener="#{v2PmOrderController.prepareEditAccDetail('new')}"  oncomplete="PF('pmmoreAccDialogDlg').show()" update="@(.pmmoreAccDialogDlgCls)" rendered="#{item.id eq '000'}" />
 

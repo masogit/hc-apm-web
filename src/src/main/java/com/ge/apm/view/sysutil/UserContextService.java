@@ -24,6 +24,8 @@ import org.eclipse.jetty.util.B64Code;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -47,6 +49,7 @@ import java.util.stream.Collectors;
 public class UserContextService implements Serializable {
 
 
+    public static  final Logger logger = LoggerFactory.getLogger(UserContextService.class);
 
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
@@ -178,8 +181,9 @@ public class UserContextService implements Serializable {
             }
         }
         //增加自定义角色判断
-        CustomRoleRepository customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
-        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(userId);
+//        CustomRoleRepository customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+//        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(userId);
+        List<CustomRole> customRoles=getListCustomRole(userId);
         List<String> names = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(customRoles)){
             for (CustomRole customRole : customRoles) {
@@ -862,6 +866,8 @@ public class UserContextService implements Serializable {
     }
 
     private List<WorkflowConfig> getSiteConfigurations(){
+        long l = System.currentTimeMillis();
+        logger.info("getSiteConfigurations ：start {}",l);
         /*UaaService uuaService = WebUtil.getBean(UaaService.class);
         List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         orgList.add(userAccount.getTenantUID());
@@ -877,10 +883,33 @@ public class UserContextService implements Serializable {
         orgList.add(userAccount.getInstitutionUID());
         orgList.add(userAccount.getHospitalUID());
         orgList.add(userAccount.getSiteUID());
-        WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
-        return wcDao.getBySiteUIDList1(orgList,userAccount.getUid());
+//        WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
+//        List<WorkflowConfig> bySiteUIDList1 = wcDao.getBySiteUIDList1(orgList, userAccount.getUid());
+        List<WorkflowConfig> bySiteUIDList1 =getWWorkflowConfig(orgList,userAccount);
+       logger.info("getSiteConfigurations ：end {}",System.currentTimeMillis()-l);
+        return bySiteUIDList1;
     }
-
+    private List<WorkflowConfig> getWWorkflowConfig(List<String> orgList,UserAccount user){
+        WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        List<WorkflowConfig> bySiteUIDList = wcDao.getBySiteUIDList(orgList);
+        if(!org.springframework.util.CollectionUtils.isEmpty(bySiteUIDList)){
+            return bySiteUIDList;
+        }
+        OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        List<OrgInfo> byUser = orgDao.getByUser(user.getUid());
+        if(org.springframework.util.CollectionUtils.isEmpty(byUser)){
+            return new ArrayList<>();
+        }
+        List<String> collect = byUser.stream().filter(item -> item != null && item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        if(!org.springframework.util.CollectionUtils.isEmpty(collect)){
+            return wcDao.findWorkflowConfig(collect);
+        }
+        List<String> collectType4 = byUser.stream().filter(item -> item != null && item.getOrgType() == 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        if(!org.springframework.util.CollectionUtils.isEmpty(collectType4)){
+            return  wcDao.findWorkflowConfig(collectType4);
+        }
+        return new ArrayList<>();
+    }
     public String isActive(){
         UserAccount currentUser = getLoginUser();
         if(!currentUser.getIsActive() && currentUser.getId() != 0){

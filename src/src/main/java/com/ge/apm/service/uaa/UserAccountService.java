@@ -340,15 +340,12 @@ public class UserAccountService {
 		}
 		List<UserAccount> userAccounts = userAccountMapper.getUserAccountByTelephone(telephone);
 		for (int i = 0; i < userAccounts.size(); i++) {
-			if(userId==userAccounts.get(i).getId()){
-				userAccounts.remove(i);//移除掉自己
+			if(userId==(userAccounts.get(i).getId())){
+				userAccounts.remove(userAccounts.get(i));//移除掉自己
 			}
 		}
-		if(userAccounts.size()>0){//如果还有大于1条的数据则说明该手机几号存在
-			return true;
-		}else{
-			return false;
-		}
+		//如果还有大于1条的数据则说明该手机几号存在
+		return userAccounts.size() > 0;
 	}
 
 	public List<String> getLoginNameBySiteId(Integer siteId){
