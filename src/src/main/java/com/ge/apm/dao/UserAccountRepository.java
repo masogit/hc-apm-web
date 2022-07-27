@@ -95,7 +95,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value= "select new com.ge.apm.domain.UserAccount(name,uid) from UserAccount where uid = ?1 ")
     public UserAccount getSimpleByUids(String uid);
     
-    @Query(value= "select o.* from user_account o where o.id in ?1 ",nativeQuery=true)
+    @Query(value= "select o.* from user_account o where (o.is_disable =false or o.is_disable is null ) and o.id in ?1 ",nativeQuery=true)
     public List<UserAccount> getByIds(Set<Integer> setIds);
 
     //当前租户下的临时报修人
@@ -116,23 +116,23 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value="select distinct u from UserAccount u, UserOrgInfo o, UserRole ur where u.uid=o.userUid and u.id=ur.userId and ur.roleId=3 and o.orgUid in ?1")
     public List<UserAccount> findByAssetAccess(List<String> uid);
 
-    @Query("select u from UserAccount u where u.orgInfoUID=?1 and u.id not in (select r.userId from UserRole r where r.roleId=9)")
+    @Query("select u from UserAccount u where u.orgInfoUID=?1  and (u.isDisable =false or u.isDisable is null ) and  u.id not in (select r.userId from UserRole r where r.roleId=9)")
     List<UserAccount> findUsersByOrgIdExceptTemporaryAccount(String orgInfoUID);
 
     //subscirber with tag=-999 under  this assetInfo.site_UID
     @Query(value="select ua.* from asset_tag at,asset_tag_biomed_group atbg,biomed_group bg,biomed_group_user bgu,user_account ua where at.id=-999  and at.id=atbg.tag_id and atbg.biomed_group_id=bg.id and bgu.group_id=bg.id and bgu.user_id=ua.id and ua.site_uid=?1",nativeQuery=true)
     List<UserAccount> getResponserwithTag999(String siteUID);
 
-    @Query("select u from UserAccount u, UserRole r where u.tenantUID=?1 and u.id=r.userId and r.roleId=3")
+    @Query("select u from UserAccount u, UserRole r where u.tenantUID=?1 and u.id=r.userId and r.roleId=3 and (u.isDisable =false or u.isDisable is null )")
     List<UserAccount> findByTenantUIDAndStaffRole(String tenantUID);
 
-    @Query("select u from UserAccount u, UserRole r where u.institutionUID=?1 and u.id=r.userId and r.roleId=3")
+    @Query("select u from UserAccount u, UserRole r where u.institutionUID=?1 and u.id=r.userId and r.roleId=3 and (u.isDisable =false or u.isDisable is null )")
     List<UserAccount> findByInstitutionUIDAndStaffRole(String institutionUID);
 
-    @Query("select u from UserAccount u, UserRole r where u.hospitalUID=?1 and u.id=r.userId and r.roleId=3")
+    @Query("select u from UserAccount u, UserRole r where u.hospitalUID=?1 and u.id=r.userId and r.roleId=3 and (u.isDisable =false or u.isDisable is null )")
     List<UserAccount> findByHospitalUIDAndStaffRole(String hospitalUID);
 
-    @Query("select u from UserAccount u, UserRole r where u.siteUID=?1 and u.id=r.userId and r.roleId=3")
+    @Query("select u from UserAccount u, UserRole r where u.siteUID=?1 and u.id=r.userId and r.roleId=3 and (u.isDisable =false or u.isDisable is null )")
     List<UserAccount> findBySiteUIDAndStaffRole(String siteUID);
     
     @Query(value = "select distinct u from UserAccount u where u.tenantUID = ?1 and u.id in (select r.userId from UserRole r where r.roleId=2)")
@@ -140,7 +140,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     
     @Query(value = "select u from UserAccount u, UserOrgInfo o where  u.uid=o.userUid and o.orgUid in ?1")
     List<UserAccount> getByClinicalDept(Collection<String> orgList);
-    
+
+    @Query(value= "select o.* from user_account o where (o.is_disable =false or o.is_disable is null ) and o.org_uid = ?1 ",nativeQuery=true)
     List<UserAccount> findByOrgInfoUID(String orgUid);
 
     UserAccount findFirstByTenantUIDAndName(String tenantUid, String name);
