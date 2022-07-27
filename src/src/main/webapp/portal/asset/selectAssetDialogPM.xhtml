@@ -100,7 +100,7 @@
                     </p:tab>
                 </p:tabView>
                 <br/>
-                <p:commandButton value="#{msg.Confirm}" class="confirmCls" icon="ui-icon-check" update="growl #{selectAssetController.updateViewIDs}" actionListener="#{selectAssetController.confirmSelection()}" disabled="#{selectAssetController.getConfirm()}" oncomplete="handleSubmit(args, 'varSelectAssetDlgPM');"/>
+                <p:commandButton value="#{msg.Confirm}" class="confirmCls" icon="ui-icon-check" update="growl #{selectAssetController.updateViewIDs}" actionListener="#{selectAssetController.confirmSelection('t')}" disabled="#{selectAssetController.getConfirm()}" oncomplete="handleSubmit(args, 'varSelectAssetDlgPM');"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('varSelectAssetDlgPM').hide()"/>
             </h:form>
         </p:dialog>

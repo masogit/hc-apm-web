@@ -21,6 +21,7 @@ public enum GatewayURL {
     UPLOAD_SINGLE_COMPRESS_FILE("/zuul/hcapmobjecthubservice/api/apm/objectHub/objects/compressImageSingle"),
     DELETE_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
     DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/download"),
+    AUTH_DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/auth/download"),
     SEARCH_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
     // Service Request Service
     SERVICE_REQUEST_CREATE("/hcapmassetservice/api/apm/asset/serviceRequests"),

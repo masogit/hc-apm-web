@@ -24,7 +24,7 @@
                                 <h:outputText value="#{item.manHoursOwner}"/>
                             </f:facet>
                             <f:facet name="input">
-                                <p:inputText value="#{item.manHoursOwner}" />
+                                <p:inputText value="#{item.manHoursOwner}" required="true" requiredMessage="工时所属人 #{msg.ValidationRequire}"/>
                                 <span style="color: red;">*</span>
                             </f:facet>
                         </p:cellEditor>
@@ -81,7 +81,7 @@
                                 <h:outputText value="#{item.comment}"/>
                             </f:facet>
                             <f:facet name="input">
-                                <p:inputTextarea rows="1" cols="40" value="#{item.comment}"/>
+                                <p:inputTextarea rows="1" cols="100" value="#{item.comment}"/>
                             </f:facet>
                         </p:cellEditor>
                     </p:column>

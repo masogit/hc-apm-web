@@ -771,6 +771,8 @@
             <groupId>org.tiefaces</groupId>
             <artifactId>tiefaces</artifactId>
             <version>1.0.12</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/tiefaces-1.0.12.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -845,6 +847,7 @@
             <id>aliyun plugins</id>
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
             <snapshots>
+                <updatePolicy>never</updatePolicy>
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
@@ -854,6 +857,7 @@
             <id>aliyun</id>
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
             <snapshots>
+                <updatePolicy>never</updatePolicy>
                 <enabled>false</enabled>
             </snapshots>
         </repository>
