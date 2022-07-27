@@ -1033,7 +1033,18 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     public void getClinicalOwnerList() {
         if (null != selected.getClinicalDeptUID()) {
             clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptUID());
-        } else {
+        }else if(CollectionUtils.isNotEmpty(assetInfoList)){
+            List<String> list = new ArrayList<>();
+            for ( AssetInfo assetInfo:assetInfoList) {
+                String clinicalDeptUID = assetInfo.getClinicalDeptUID();
+                if(list.size()>0 && !list.contains(clinicalDeptUID)){
+                    clinicalOwnerList = Collections.emptyList();
+                    return;
+                }
+                list.add(clinicalDeptUID);
+            }
+            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(list.get(0));
+        }else {
             clinicalOwnerList = Collections.emptyList();
         }
     }
