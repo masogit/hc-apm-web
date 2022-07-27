@@ -366,7 +366,7 @@ public class WorkOrderExportService {
 
         Map<String,String> partsSignatureMap = new HashMap<>();
         Map<String,String> medicalWorkerApproverSignatureMap = new HashMap<>();
-        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
+//        if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
             List<V2_WorkOrder_Detail> v2_workOrder_details = workOrderDetailDao.findByWoIdIn(woId);
             v2_workOrder_details.stream().forEach(i->{
                 workOrderDetails.putIfAbsent(i.getWoId(), new ArrayList<>());
@@ -379,7 +379,7 @@ public class WorkOrderExportService {
                     medicalWorkerApproverSignatureMap.putIfAbsent(i.getWoId(), i.getMedicalWorkerApproverSignature());
                 }
             });
-        }
+//        }
 
         final List<AuditGroupConfigurationDetail> approverSignatureList = auditGroupConfigurationDetailRepository.findByBusinessUidInOrderByApproveNumDesc(woId);
         Map<String, List<AuditGroupConfigurationDetail>> approverSignatureObjMap = new HashMap<>();
