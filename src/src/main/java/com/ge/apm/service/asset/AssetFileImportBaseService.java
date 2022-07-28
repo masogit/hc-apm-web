@@ -301,7 +301,10 @@ public class AssetFileImportBaseService {
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
                 newAsset.setAssetOwnerName(null);
-            } else {
+            } else if (userAccounts.get(0).getIsDisable()) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "此用已停用");
+                newAsset.setAssetOwnerName(null);
+            }else {
                 newAsset.setAssetOwnerId(userAccounts.get(0).getId());
                 newAsset.setAssetOwnerTel(userAccounts.get(0).getTelephone());
             }
@@ -315,7 +318,10 @@ public class AssetFileImportBaseService {
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
                 newAsset.setAssetOwnerName2(null);
-            } else {
+            } else if (userAccounts.get(0).getIsDisable()) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "此用户已停用");
+                newAsset.setAssetOwnerName2(null);
+            }else {
                 newAsset.setAssetOwnerId2(userAccounts.get(0).getId());
                 newAsset.setAssetOwnerTel2(userAccounts.get(0).getTelephone());
             }
@@ -330,7 +336,10 @@ public class AssetFileImportBaseService {
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
                 newAsset.setAssetOwnerName3(null);
-            } else {
+            } else if (userAccounts.get(0).getIsDisable()) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "此用户已停用");
+                newAsset.setAssetOwnerName3(null);
+            }else {
                 newAsset.setAssetOwnerId3(userAccounts.get(0).getId());
                 newAsset.setAssetOwnerTel3(userAccounts.get(0).getTelephone());
             }
@@ -345,7 +354,10 @@ public class AssetFileImportBaseService {
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
                 newAsset.setClinicalOwnerName(null);
-            } else {
+            } else if (userAccounts.get(0).getIsDisable()) {
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "此用户已停用");
+                newAsset.setClinicalOwnerName(null);
+            }else {
                 newAsset.setClinicalOwnerId(userAccounts.get(0).getId());
                 newAsset.setClinicalOwnerTel(userAccounts.get(0).getTelephone());
             }
@@ -360,7 +372,10 @@ public class AssetFileImportBaseService {
             if (userAccounts.size() != 1) {
                 AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + newAsset.getPmOwnerName() + "无此用户/无法关联");
                 newAsset.setPmOwnerName(null);
-            } else {
+            } else if (userAccounts.get(0).getIsDisable()) {
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("pmOwnerName") + newAsset.getPmOwnerName() + "此用户已停用");
+                    newAsset.setPmOwnerName(null);
+            }else {
                 newAsset.setPmOwnerId(userAccounts.get(0).getId());
                 newAsset.setPmOwnerTel(userAccounts.get(0).getTelephone());
             }
