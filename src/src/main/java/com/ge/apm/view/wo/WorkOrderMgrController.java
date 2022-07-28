@@ -3111,8 +3111,7 @@ public void test1(){
         V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
         V2_WorkOrderManHours v2_workOrderManHours = manHoursDao.findByManHoursOwnerAndManHoursDateAndWoId(
                 workOrderManHours.getManHoursOwner(),workOrderManHours.getManHoursDate(),selected.getId());
-
-        if(v2_workOrderManHours != null && v2_workOrderManHours.getId() != workOrderManHours.getId()){
+        if(v2_workOrderManHours != null && !v2_workOrderManHours.getId().equals(workOrderManHours.getId())){
             WebUtil.addErrorMessage("当前日期工时所属人"+workOrderManHours.getManHoursOwner()+"已有记录，请选择其他日期");
             return;
         }
@@ -3149,7 +3148,10 @@ public void test1(){
     }
 
     public void onRowCancel(RowEditEvent event) {
-        V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
+        resetManHoursInfo((V2_WorkOrderManHours) event.getObject());
+    }
+
+    public void resetManHoursInfo(V2_WorkOrderManHours workOrderManHours){
         if(workOrderManHours.getId().equals("000")){
             v2WorkOrderManHoursList.stream().forEach(item -> {
                 if(item.getId().equals("000")){
@@ -3162,7 +3164,17 @@ public void test1(){
                 }
             });
         }else{
-//            prepareMoreManHoursView();
+            V2_WorkOrderManHours v2_workOrderManHoursTemp = manHoursDao.findById(workOrderManHours.getId());
+            v2WorkOrderManHoursList.stream().forEach(item -> {
+                if(item.getId().equals(v2_workOrderManHoursTemp.getId())){
+                    item.setComment(v2_workOrderManHoursTemp.getComment());
+                    item.setWaitingHours(v2_workOrderManHoursTemp.getWaitingHours());
+                    item.setTravelHours(v2_workOrderManHoursTemp.getTravelHours());
+                    item.setWorkHours(v2_workOrderManHoursTemp.getWorkHours());
+                    item.setManHoursDate(v2_workOrderManHoursTemp.getManHoursDate());
+                    item.setManHoursOwner(v2_workOrderManHoursTemp.getManHoursOwner());
+                }
+            });
         }
     }
 
