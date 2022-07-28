@@ -168,7 +168,7 @@
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;assetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
-                            <p:commandButton ajax="false" value="#{msg.ExportAllReports}"
+<!--                            <p:commandButton ajax="false" value="#{msg.ExportAllReports}"
                                              actionListener="#{workOrderReportExportController.exportAllWoByAssetInfoId(assetInfoDetailController.selected.id)}"
                                              icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
                                 <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
@@ -177,7 +177,7 @@
                                              actionListener="#{workOrderReportExportController.exportAllWoDocxByAssetInfoId(assetInfoDetailController.selected.id)}"
                                              icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
                                 <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
-                            </p:commandButton>
+                            </p:commandButton>-->
                         </f:facet>
 
                         <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoDetailController.selected.id, 3)}" emptyMessage="#{msg.noRecordFound}">
