@@ -22,7 +22,7 @@
                 <p:menuitem id="um1001" value="#{msg.AssetBrowser}" url="/geapm/portal/analysis/reports.xhtml#/AssetBrowser" rendered="false"/>
                 <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/ContractList" rendered="#{userContextService.accessContains('asset.mgt')}"/>
                 <p:menuitem id="um08" value="#{msg.SupplierMgmt}" outcome="/portal/supplier/List.xhtml" rendered="#{userContextService.accessContains('asset.supplierMgt')}"/>
-                <p:menuitem id="um0889" value="供应商负责人赋权" outcome="/portal/supplier/empowerment.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff')}"/>
+                <p:menuitem id="um0889" value="供应商负责人赋权" outcome="/portal/supplier/empowerment.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff') && customConfigController.showSupplierViewAndEditFieldsTable()}"/>
                 <p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/AssetTerminateEntryList.xhtml" rendered="#{(!userContextService.needScrappedControl() and userContextService.accessContains('asset.scrap')) or userContextService.hasScrappedMenuAuthority()}"/>
                 <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.accessContains('asset.create')}"/>
                 <p:menuitem value="#{msg.AssetApproval}" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.isAssetApprover()) and userContextService.accessContains('asset.audit')}"/>
