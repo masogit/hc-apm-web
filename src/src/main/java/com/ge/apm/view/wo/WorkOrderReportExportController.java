@@ -1,5 +1,6 @@
 package com.ge.apm.view.wo;
 
+import cn.hutool.core.map.MapUtil;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.OrgInfo;
@@ -194,6 +195,10 @@ public class WorkOrderReportExportController implements Serializable {
         exportWoData(workOrderList);
     }
 
+    public void exportAllWoByAssetInfoId(Integer assetInfoId) {
+        exportWoData(workOrderExportService.createPreviewWorkOrderData(null, null, null, null, null, null,null,null, null, null, null,MapUtil.newHashMap(),null, assetInfoId));
+    }
+
     public void exportSelectedWo() {
         exportWoData(selectedItems);
     }
@@ -220,6 +225,10 @@ public class WorkOrderReportExportController implements Serializable {
     }
     public void exportAllWoDocx() {
         export2Docx(workOrderList);
+    }
+
+    public void exportAllWoDocxByAssetInfoId(Integer assetInfoId) {
+        export2Docx(workOrderExportService.createPreviewWorkOrderData(null, null, null, null, null, null,null,null, null, null, null,MapUtil.newHashMap(),null, assetInfoId));
     }
 
     public void exportSelectedWoDocx() {
@@ -294,7 +303,7 @@ public class WorkOrderReportExportController implements Serializable {
 
             //workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
 //            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId);
-            workOrderList = workOrderExportService.createPreviewWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId);
+            workOrderList = workOrderExportService.createPreviewWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId, null);
         }
 
     }
