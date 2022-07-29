@@ -290,6 +290,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                                 whetherDeductEdit = true;
                                 selected.setWhetherDeduct(CopyByInvok.F);
                             }
+                            ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), selected.getAssetInfo().getUid());
+                            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                                whetherDeductEdit = true;
+                                selected.setWhetherDeduct(CopyByInvok.F);
+                            }
                             if(CopyByInvok.T.equals(selected.getScoreFlag())){
                                 whetherDeductEdit = true;
                                 selected.setWhetherDeduct(CopyByInvok.T);
