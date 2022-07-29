@@ -401,48 +401,64 @@ public class WorkOrderReportProvider {
             Object value = searchFilter.value;
             SearchFilter.Operator op = searchFilter.operator;
 
-            if(tempColumn.equals("orgUID")){
-                sb.append(" and (wo.tenant_uid='" + value + "' or wo.institution_uid='" + value + "' or wo.hospital_uid='" + value + "' or wo.site_uid='" + value + "') ");
-            }else if(tempColumn.equals("assetInfo.clinicalDeptUID")){
-                String str = "";
-                for (Object obj : (List<Object>)value) {
-                    str += "'" + obj + "',";
+            switch (tempColumn) {
+                case "orgUID":
+                    sb.append(" and (wo.tenant_uid='").append(value).append("' or wo.institution_uid='").append(value).append("' or wo.hospital_uid='").append(value).append("' or wo.site_uid='").append(value).append("') ");
+                    break;
+                case "assetInfo.clinicalDeptUID": {
+                    StringBuilder str = new StringBuilder();
+                    for (Object obj : (List<Object>) value) {
+                        str.append("'").append(obj).append("',");
+                    }
+                    str = new StringBuilder(str.substring(0, str.length() - 1));
+                    sb.append(" and ai.clinical_dept_uid in (").append(str).append(") ");
+                    break;
                 }
-                str = str.substring(0, str.length() - 1);
-                sb.append(" and ai.clinical_dept_uid in (" + str + ") ");
-            }else if(tempColumn.equals("currentPersonId")){
-                sb.append(" and wo.current_person_id=" + value);
-            }else if(tempColumn.equals("createdDate")){
-                if(op.equals(SearchFilter.Operator.GTE)){
-                    sb.append(" and wo.created_date>='" + value + "' ");
-                }else if (op.equals(SearchFilter.Operator.LT)) {
-                    sb.append(" and wo.created_date<'" + value + "' ");
+                case "currentPersonId":
+                    sb.append(" and wo.current_person_id=").append(value);
+                    break;
+                case "createdDate":
+                    if (op.equals(SearchFilter.Operator.GTE)) {
+                        sb.append(" and wo.created_date>='").append(value).append("' ");
+                    } else if (op.equals(SearchFilter.Operator.LT)) {
+                        sb.append(" and wo.created_date<'").append(value).append("' ");
+                    }
+                    break;
+                case "closeTime":
+                    if (op.equals(SearchFilter.Operator.GTE)) {
+                        sb.append(" and wo.close_time>='").append(value).append("' ");
+                    } else if (op.equals(SearchFilter.Operator.LT)) {
+                        sb.append(" and wo.close_time<'").append(value).append("' ");
+                    }
+                    break;
+                case "status": {
+                    StringBuilder str = new StringBuilder();
+                    for (Object obj : (List<Object>) value) {
+                        str.append(obj).append(",");
+                    }
+                    str = new StringBuilder(str.substring(0, str.length() - 1));
+                    sb.append(" and wo.status in (").append(str).append(") ");
+                    break;
                 }
-            }else if(tempColumn.equals("closeTime")){
-                if(op.equals(SearchFilter.Operator.GTE)){
-                    sb.append(" and wo.close_time>='" + value + "' ");
-                }else if (op.equals(SearchFilter.Operator.LT)){
-                    sb.append(" and wo.close_time<'" + value + "' ");
-                }
-            }else if(tempColumn.equals("status")){
-                String str = "";
-                for (Object obj : (List<Object>)value) {
-                    str += obj + ",";
-                }
-                str = str.substring(0, str.length() - 1);
-                sb.append(" and wo.status in (" + str + ") ");
-            }else if(tempColumn.equals("filterParts")){
-                if(FILTERPARTS_EXIST.equals(value)){
-                    sb.append(" and (select count(*) from v2_work_order_detail wod where wod.wo_id=wo.id) > 0 ");
-                }else if(FILTERPARTS_UNEXIST.equals(value)){
-                    sb.append(" and (select count(*) from v2_work_order_detail wod where wod.wo_id=wo.id) <= 0 ");
-                }
-            }else if(tempColumn.equals("filterTotalPrice")){
-                if(FILTERTOTALPRICE_EXIST.equals(value)){
-                    sb.append(" and wo.total_price > 0 ");
-                }else if(FILTERTOTALPRICE_UNEXIST.equals(value)){
-                    sb.append(" and wo.total_price <= 0 ");
-                }
+                case "filterParts":
+                    if (FILTERPARTS_EXIST.equals(value)) {
+                        sb.append(" and (select count(*) from v2_work_order_detail wod where wod.wo_id=wo.id) > 0 ");
+                    } else if (FILTERPARTS_UNEXIST.equals(value)) {
+                        sb.append(" and (select count(*) from v2_work_order_detail wod where wod.wo_id=wo.id) <= 0 ");
+                    }
+                    break;
+                case "filterTotalPrice":
+                    if (FILTERTOTALPRICE_EXIST.equals(value)) {
+                        sb.append(" and wo.total_price > 0 ");
+                    } else if (FILTERTOTALPRICE_UNEXIST.equals(value)) {
+                        sb.append(" and wo.total_price <= 0 ");
+                    }
+                    break;
+                case "assetInfoId":
+                    sb.append(" and ai.id = ").append(value);
+                    break;
+                default:
+                    break;
             }
 
         }
