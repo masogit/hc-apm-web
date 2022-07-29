@@ -286,28 +286,27 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                                 }
                             }
                         }else{
-                            if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
-                                whetherDeductEdit = true;
-                                selected.setWhetherDeduct(CopyByInvok.F);
-                            }
                             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), selected.getAssetInfo().getUid());
                             if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
                                 whetherDeductEdit = true;
                                 selected.setWhetherDeduct(CopyByInvok.F);
-                            }
-                            if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                            }else if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                                whetherDeductEdit = true;
+                                selected.setWhetherDeduct(CopyByInvok.F);
+                            }else if(CopyByInvok.T.equals(selected.getScoreFlag())){
                                 whetherDeductEdit = true;
                                 selected.setWhetherDeduct(CopyByInvok.T);
-                            }
-                            if(selected.getAssetInfo().getRepairForm() != null && selected.getAssetInfo().getRepairForm() == 2){
-                                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                                    whetherDeductEdit = true;
-                                    selected.setWhetherDeduct(CopyByInvok.F);
+                            }else{
+                                if(selected.getAssetInfo().getRepairForm() != null && selected.getAssetInfo().getRepairForm() == 2){
+                                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                                        whetherDeductEdit = true;
+                                        selected.setWhetherDeduct(CopyByInvok.F);
+                                    }else{
+                                        selected.setWhetherDeduct(CopyByInvok.T);
+                                    }
                                 }else{
                                     selected.setWhetherDeduct(CopyByInvok.T);
                                 }
-                            }else{
-                                selected.setWhetherDeduct(CopyByInvok.T);
                             }
                         }
                     }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
@@ -1113,7 +1112,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         selected.setSsaKeyFlag(modifySsaKey);
         zkbPartOrderService.saveModifyApply(selected,currentUser);
         selected = zkbPartOrderRepository.findById(selected.getId());
-        if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+        ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), selected.getAssetInfo().getUid());
+        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+            whetherDeductEdit = true;
+            selected.setWhetherDeduct(CopyByInvok.F);
+        }else if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
             whetherDeductEdit = true;
             selected.setWhetherDeduct(CopyByInvok.F);
         }else {
