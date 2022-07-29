@@ -8,9 +8,9 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
-    <p:dialog id="zkbAssetQrCodeInfo" widgetVar="zkbAssetQrCodeInfo" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbAssetStatisticController.CRUDActionName}" height="580px" width="350px">
+    <p:dialog id="zkbAssetQrCodeInfo" widgetVar="zkbAssetQrCodeInfo" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbAssetStatisticController.CRUDActionName}" height="400px" width="650px">
         <h:form id="zkbAssetQrCodeInfoEditForm">
-            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{not empty zkbFileDirectoryController.selected}">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{not empty zkbFileDirectoryController.selected}">
 
                 <h:panelGroup>
                     <label class="label">#{msg.zkbHistory_agent}</label>
@@ -75,7 +75,7 @@
                     </p:selectOneMenu>
                 </h:panelGroup>-->
             </p:panelGrid>
-            <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="float:left" rendered="#{empty zkbAssetStatisticController.selected.qrCodeCountState or zkbAssetStatisticController.selected.qrCodeCountState eq 'N'}"/>
+            <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="margin-left: 200px;" rendered="#{empty zkbAssetStatisticController.selected.qrCodeCountState or zkbAssetStatisticController.selected.qrCodeCountState eq 'N'}"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbAssetQrCodeInfo').hide()"/>
         </h:form>
     </p:dialog>
