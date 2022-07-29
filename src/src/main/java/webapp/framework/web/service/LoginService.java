@@ -320,7 +320,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             return;
         }
         if(user==null || user.getIsDisable()){
-            addErrorMessage(response, 406, "login_disable_error");
+            addErrorMessage(response, 506, "login_disable_error");
             return;
         }
         if(user.getIsLocked()!=null && user.getIsLocked()==true){
