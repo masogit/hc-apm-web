@@ -1,5 +1,6 @@
 package com.ge.apm.service.wo;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
@@ -89,7 +90,7 @@ public class WorkOrderExportService {
         }
     }
 
-    public List<Map<String, Object>> createPreviewWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap,String currentStep){
+    public List<Map<String, Object>> createPreviewWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap,String currentStep, Integer assetInfoId){
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
@@ -155,6 +156,9 @@ public class WorkOrderExportService {
         }
         if(filterTotalPrice != null){
             searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
+        }
+        if(assetInfoId != null){
+            searchFilters.add(new SearchFilter("assetInfoId", SearchFilter.Operator.EQ, assetInfoId));
         }
         List<Integer> assetIds = getVisableMvAssetIds(selectedOrg,clinicalDept);
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
@@ -408,7 +412,7 @@ public class WorkOrderExportService {
                     .map(a->a.getPurchaseDate()).orElse(null));
 
             m.put("auditSignatureList",Optional.ofNullable(approvalsMap.get(woid))
-                    .map(o-> o.stream().map(MultiLevelApproval::getAuditSignature).collect(Collectors.toList()))
+                    .map(o-> o.stream().map(MultiLevelApproval::getAuditSignature).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList()))
                     .orElse(Collections.emptyList()));
 
 
