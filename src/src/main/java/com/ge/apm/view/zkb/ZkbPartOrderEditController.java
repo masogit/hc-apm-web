@@ -651,16 +651,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-                if(CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())) {
-                    if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
-                        Integer contractCount = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
-                        this.selected.setRemainQty(contractCount);
-                    }else{
+                if(CopyByInvok.T.equals(maintainFlag)){
+                    if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                        this.selected.setRemainQty(0);
+                    }else {
                         Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
                         this.selected.setRemainQty(contractCount);
                     }
                 }else{
-                    if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) && "t".equals(selectedContract.getFirstYearFlag())){
+                    if(CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())) {
                         if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
                             Integer contractCount = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
                             this.selected.setRemainQty(contractCount);
@@ -668,29 +667,36 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                             Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
                             this.selected.setRemainQty(contractCount);
                         }
-                    } else if(CopyByInvok.T.equals(selected.getScoreFlag())){
-                        this.selected.setRemainQty(0);
-                    } else{
-                        if(CopyByInvok.NORMAL_ONE.equals(selected.getArtificialType()) && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
-                            if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
-                                Integer contractCount = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
-                                this.selected.setRemainQty(contractCount);
-                            }else{
-                                Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
-                                this.selected.setRemainQty(contractCount);
-                            }
-                        }  else {
-                            if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
-                                Integer contractCount = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
-                                this.selected.setRemainQty(contractCount - this.selected.getQty());
-                            }else{
-                                Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
-                                this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else{
+                        ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(selectedContract.getId(),assetInfo.getUid());
+                        if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                            Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
+                            this.selected.setRemainQty(contractCount);
+
+                        } else if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                            this.selected.setRemainQty(0);
+                        } else{
+                            if(CopyByInvok.NORMAL_ONE.equals(selected.getArtificialType()) && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                                if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+                                    Integer contractCount = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
+                                    this.selected.setRemainQty(contractCount);
+                                }else{
+                                    Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
+                                    this.selected.setRemainQty(contractCount);
+                                }
+                            }  else {
+                                if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+                                    Integer contractCount = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
+                                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                                }else{
+                                    Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
+                                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                                }
                             }
                         }
                     }
-
                 }
+
             }
         }
     }

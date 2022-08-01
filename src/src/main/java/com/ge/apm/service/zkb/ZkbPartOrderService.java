@@ -1229,6 +1229,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrderRepository.save(zkbPartOrder);
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+            ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
+            if(CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
+                return;
+            }
+        }
         if(qty != null && !CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
             String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderDeduct.toString();
             if(qty > 0){
