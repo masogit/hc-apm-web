@@ -699,7 +699,7 @@ public class CustomConfigController {
         TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         if(workflowConfig==null) return false;
-        if(workflowConfig.getActiveSupplier() && tenantOptionConfig.getActiveSupplier()) return true;
+        if(workflowConfig.getActiveSupplier()!=null && tenantOptionConfig.getActiveSupplier()) return true;
         return false;
     }
 }
