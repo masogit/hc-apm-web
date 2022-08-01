@@ -1210,8 +1210,8 @@ public void test1(){
         double detail = 0;
         double detailOld = 0;
         for(V2_WorkOrder_Detail item : WorkOrderDetails){
-            if(item.getApartsQuantity() != null && item.getClosedPrice() != null){
-                detailOld += item.getApartsQuantity() * item.getClosedPrice();
+            if(item.getApartsQuantity() != null && item.getPartsPrice() != null){
+                detailOld += item.getApartsQuantity() * item.getPartsPrice();
             }
             if(item.getClosedPrice() != null){
                 detail += item.getClosedPrice();
