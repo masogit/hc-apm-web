@@ -3109,6 +3109,10 @@ public void test1(){
 //            return;
 //        }
         V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
+        if(StringUtils.isBlank(workOrderManHours.getManHoursOwner())){
+            WebUtil.addErrorMessage("工时所属人不能为空");
+            return;
+        }
         V2_WorkOrderManHours v2_workOrderManHours = manHoursDao.findByManHoursOwnerAndManHoursDateAndWoId(
                 workOrderManHours.getManHoursOwner(),workOrderManHours.getManHoursDate(),selected.getId());
         if(v2_workOrderManHours != null && !v2_workOrderManHours.getId().equals(workOrderManHours.getId())){
