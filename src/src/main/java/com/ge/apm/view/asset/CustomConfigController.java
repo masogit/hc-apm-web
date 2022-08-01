@@ -698,8 +698,7 @@ public class CustomConfigController {
         if (!tenantOptionConfigOptional.isPresent()) return false;
         TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
-        if(workflowConfig==null || tenantOptionConfig==null || workflowConfig.getActiveSupplier()==null || tenantOptionConfig.getActiveSupplier()==null) return false;
-        if(workflowConfig.getActiveSupplier() && tenantOptionConfig.getActiveSupplier()) return true;
+        if(workflowConfig!=null && tenantOptionConfig!=null && workflowConfig.getActiveSupplier()!=null && tenantOptionConfig.getActiveSupplier()!=null && workflowConfig.getActiveSupplier() && tenantOptionConfig.getActiveSupplier()) return true;
         return false;
     }
 }
