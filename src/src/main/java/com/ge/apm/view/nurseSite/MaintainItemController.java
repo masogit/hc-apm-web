@@ -12,6 +12,7 @@ import javax.faces.context.FacesContext;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.TableOption;
 import org.apache.commons.collections.CollectionUtils;
@@ -37,6 +38,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private NurseSiteMaintain nurseSiteMaintain;
 	private List<NurseSiteMaintainItem> lazyModel;
+	private UserAccountRepository userAccountRepository;
 	// config
 	private int page=0;
 	private int pageSize=8;
@@ -53,6 +55,7 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		nurseSiteMaintainService.init();
 		mapCheckData=new HashMap<String,Boolean>();
+		userAccountRepository=WebUtil.getBean(UserAccountRepository.class);
 	}
 
 	public void reset(NurseSiteMaintain nurseSiteMaintain,MaintainController maintainController) {
@@ -266,5 +269,16 @@ public class MaintainItemController implements Serializable, ServerEventInterfac
 
 	public void setListCheckData(List<NurseSiteMaintainConfigCheckItem> listCheckData) {
 		this.listCheckData = listCheckData;
+	}
+	public String getUpdateByName(NurseSiteMaintainItem item){
+		String name="";
+		if(item != null && StringUtils.isNotBlank(item.getUpdateByUid())){
+			String updateByUid=item.getUpdateByUid();
+			UserAccount byUid = userAccountRepository.getByUid(updateByUid);
+			if(byUid != null){
+				name=byUid.getName();
+			}
+		}
+		return name;
 	}
 }
