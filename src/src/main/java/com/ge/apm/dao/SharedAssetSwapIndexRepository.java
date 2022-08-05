@@ -14,6 +14,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import java.util.List;
 
 public interface SharedAssetSwapIndexRepository extends GenericRepositoryUUID<SharedAssetSwapIndex> {
+    @Query(value = "select * from shared_asset_swap_index where asset_uid = ?1 limit 1",nativeQuery = true)
     SharedAssetSwapIndex findByAssetUid(String assetUid);
 
     List<SharedAssetSwapIndex> findBySwapIndexLike(String swapIndex);
@@ -24,5 +25,8 @@ public interface SharedAssetSwapIndexRepository extends GenericRepositoryUUID<Sh
     @Query(value="select * from shared_asset_swap_index sasi join asset_info ai on ai.uid = sasi.asset_uid where swap_index = ?1 and asset_uid != ?2 and clinical_dept_uid = ?3",nativeQuery=true)//shared_asset_type = ?1 and
     SharedAssetSwapIndex findNotData (String swapIndex , String id , String clinicalDeptUid);
 
-
+    @Modifying
+    @Transactional
+    @Query(value = "delete from shared_asset_swap_index where asset_uid = ?1",nativeQuery = true)
+    void deleteByAssetUid(String uid);
 }
