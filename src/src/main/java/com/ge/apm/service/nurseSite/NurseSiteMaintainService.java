@@ -965,9 +965,13 @@ public class NurseSiteMaintainService {
                 for (NurseSiteMaintainData nurseSiteMaintainDataOld : list){
                     if(nurseSiteMaintainDataNew.getId().equals(nurseSiteMaintainDataOld.getId())){
                         Boolean checkValueNew = nurseSiteMaintainDataNew.getCheckValue();
-                        Boolean checkValueOld = nurseSiteMaintainDataOld.getCheckValue();
-                        if(checkValueNew != null && !checkValueNew.equals(checkValueOld)){
+						String variableTextNew = nurseSiteMaintainDataNew.getVariableText();
+						Boolean checkValueOld = nurseSiteMaintainDataOld.getCheckValue();
+						String variableTextOld = nurseSiteMaintainDataNew.getVariableText();
+						if((checkValueNew != null && !checkValueNew.equals(checkValueOld))
+								|| (StringUtils.isNotBlank(variableTextNew) && !variableTextNew.equals(variableTextOld))){
                             tempItem.setUpdateByUid(user.getUid());
+							tempItem.setUpdateDate(date);
                         }
                     }
                 }

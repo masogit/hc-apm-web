@@ -117,8 +117,14 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             this.searchFilters = new ArrayList<>();
         }
         setUserSearchFilters();
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite != null){
+            deptids = wfcDao.findDeptForSharedAsset(selectSite.getUid());
+        }else{
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
+        }
         List<SharedAssetSwapIndex> sharedAssetSwapIndexList = new ArrayList<>();
         //1、使用科室：调剂中心  所属科室：空
         updateSearchFilter(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNull,null));

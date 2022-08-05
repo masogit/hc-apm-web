@@ -131,6 +131,11 @@ public class NurseSiteMaintainItem implements Serializable {
 
     @Column(name = "update_by")
     private String updateByUid;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "update_date")
+	private Date updateDate;
 	@Transient
 	private Map<String, NurseSiteMaintainConfigCheckItem> configMap;
     public String getUpdateByUid() {
@@ -416,5 +421,13 @@ public class NurseSiteMaintainItem implements Serializable {
 
 	public void setConfigMap(Map<String, NurseSiteMaintainConfigCheckItem> configMap) {
 		this.configMap = configMap;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
 	}
 }

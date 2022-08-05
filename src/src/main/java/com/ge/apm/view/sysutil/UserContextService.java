@@ -1542,7 +1542,7 @@ public class UserContextService implements Serializable {
                         }else{
                             selectSite=child.get(0);
                         }
-                        UserContextService.getCurrentUserAccount().setSiteUID(selectSite.getUid());
+                        //UserContextService.getCurrentUserAccount().setSiteUID(selectSite.getUid());
                     }
                 }
             }
@@ -1599,7 +1599,7 @@ public class UserContextService implements Serializable {
         if (selectSite != null && selectSite.getId() == -1) {
             selectSite = null;
         }
-        UserContextService.getCurrentUserAccount().setSiteUID(selectSite.getUid());
+        //UserContextService.getCurrentUserAccount().setSiteUID(selectSite.getUid());
     }
     public List<SelectItem> getOrgInfoNode(){
         List<SelectItem> selectItems=new ArrayList<>();
