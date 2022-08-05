@@ -45,7 +45,7 @@
                         <p:column headerText="院区" filterBy="#{item.siteUid}" filterMatchMode="LIKE">
                             <h:outputText value="#{auditUserCaseController.getSiteNameByUId(item.siteUid)}"/>
                             <f:facet name="filter">
-                                <p:selectOneMenu id="siteSelect" onchange="PF('varDataList').filter()" filter="true" autoWidth="false" style="max-width: 150px;" >
+                                <p:selectOneMenu id="siteSelect" onchange="PF('varDataList').filter()" filter="true" filterMatchMode="contains" autoWidth="false" style="max-width: 150px;" >
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                     <f:selectItems value="#{auditUserCaseController.getSiteByTenantForListPage()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
