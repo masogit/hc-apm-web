@@ -3629,6 +3629,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','Short Life','Short Life','Short Life',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','cancel','cancel','cancel',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','useNoReturn','已使用申请不归还','已使用申请不归还',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoReturnType','damagedShipment','Damaged in shipment','Damaged in shipment',NULL,-1);
 
 -- 归还类型
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_zkbPoReturnType','badReturn','坏还','Bad Return',NULL,-1);
