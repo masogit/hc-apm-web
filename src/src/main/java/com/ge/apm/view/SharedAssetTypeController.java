@@ -203,6 +203,11 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         object.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         object.setCreateBy(UserContextService.getCurrentUserAccount().getName());
         object.setCreateDate(new Date());
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        if(selectSite != null){
+            object.setSiteUID(selectSite.getUid());
+        }
     }
 
     @Override

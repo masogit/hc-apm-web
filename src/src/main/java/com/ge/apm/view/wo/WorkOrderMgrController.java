@@ -1206,24 +1206,27 @@ public void test1(){
 
     public Double getTotalPrice(String id,Double totalPrice){
         List<V2_WorkOrder_Detail> WorkOrderDetails = getWorkOrderDetail(id);
+
         Double totalPriceToTotal = totalPrice != null ? totalPrice : 0;
         double detail = 0;
         double detailOld = 0;
         for(V2_WorkOrder_Detail item : WorkOrderDetails){
-            if(item.getApartsQuantity() != null && item.getClosedPrice() != null){
-                detailOld += item.getApartsQuantity() * item.getClosedPrice();
-            }
-            if(item.getClosedPrice() != null){
-                detail += item.getClosedPrice();
-            }
+//            if(item.getApartsQuantity() != null && item.getPartsPrice() != null){
+//                detailOld += item.getApartsQuantity() * item.getPartsPrice();
+//            }
+            V2_WorkOrder workOrderById = woService.getWorkOrderById(item.getWoId());
+            detail=workOrderById.getTotalPrice();
+//            if(item.getClosedPrice() != null){
+//                detail += item.getClosedPrice();
+//            }
         }
-        double total = 0;
-        if(totalPriceToTotal == 0 ){
-            total= detail;
-        }else{
-            total= totalPriceToTotal - detailOld + detail;
-        }
-        return total;
+//        double total = 0;
+//        if(totalPriceToTotal == 0 ){
+//            total= detail;
+//        }else{
+//            total= totalPriceToTotal - detailOld + detail;
+//        }
+        return detail;
     }
 
     /*
@@ -3109,6 +3112,10 @@ public void test1(){
 //            return;
 //        }
         V2_WorkOrderManHours workOrderManHours = (V2_WorkOrderManHours) event.getObject();
+        if(StringUtils.isBlank(workOrderManHours.getManHoursOwner())){
+            WebUtil.addErrorMessage("工时所属人不能为空");
+            return;
+        }
         V2_WorkOrderManHours v2_workOrderManHours = manHoursDao.findByManHoursOwnerAndManHoursDateAndWoId(
                 workOrderManHours.getManHoursOwner(),workOrderManHours.getManHoursDate(),selected.getId());
         if(v2_workOrderManHours != null && !v2_workOrderManHours.getId().equals(workOrderManHours.getId())){
