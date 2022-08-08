@@ -17,6 +17,7 @@ import org.primefaces.component.datatable.DataTable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -49,6 +50,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     AssetInfoService assetInfoService = null;
     WorkflowConfigRepository wfCfigDao = null;
     SharedAssetTypeRepository sharedAssetTypeRepository = null;
+    SharedAssetSwapIndexRepository swapIndexRepository=null;
     private UaaService uuaService;
 
     private Date filterBeginTime;
@@ -103,6 +105,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         sharedAssetTypeRepository = WebUtil.getBean(SharedAssetTypeRepository.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        swapIndexRepository=WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
         String actionName = (String)UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -205,11 +208,24 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         }
 
 //        searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
+        Page<SharedAssetReqDetail> result=null;
         if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
+            result=dao.findAll(pageRequest);
         } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+            result= dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
+        if(result != null && !CollectionUtils.isEmpty(result.getContent())){
+            for (SharedAssetReqDetail sharedAssetReqDetail : result.getContent()) {
+                String assetInfoId = sharedAssetReqDetail.getAssetInfoId();
+                if(StringUtils.isNotBlank(assetInfoId)){
+                    SharedAssetSwapIndex byAssetUid = swapIndexRepository.findByAssetUid(assetInfoId);
+                    if(byAssetUid != null){
+                        sharedAssetReqDetail.setSwapIndex(byAssetUid.getSwapIndex());
+                    }
+                }
+            }
+        }
+        return result;
     }
 
 
