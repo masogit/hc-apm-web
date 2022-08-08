@@ -202,7 +202,7 @@ public class SharedAssetReqDetail implements Serializable{
 
     @Column(name = "maintain_time")
     private Date maintainTime;
-    @Formula("(select a.swap_index from shared_asset_swap_index a where a.asset_uid = asset_info_id limit 1)")
+    //@Formula("(select a.swap_index from shared_asset_swap_index a where a.asset_uid = asset_info_id limit 1)")
     private String swapIndex;
     public String getId() {
         return id;
