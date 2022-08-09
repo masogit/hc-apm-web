@@ -973,6 +973,11 @@ public class NurseSiteMaintainService {
                             tempItem.setUpdateByUid(user.getUid());
 							tempItem.setUpdateDate(date);
                         }
+						if((checkValueOld != null && !checkValueOld.equals(checkValueNew))
+							   || (StringUtils.isNotBlank(variableTextOld) && !variableTextOld.equals(variableTextNew))){
+							tempItem.setUpdateByUid(user.getUid());
+							tempItem.setUpdateDate(date);
+						}
                     }
                 }
             }
