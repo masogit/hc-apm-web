@@ -49,13 +49,9 @@ public class LoginRecordController extends GenericCRUDController<LoginRecord> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        Integer siteId = currentUser.getSiteId();
-        List<String> loginNameList = userAccountService.getLoginNameBySiteId(siteId);
-
-        //查询和当前用户siteId相同的用户的登陆记录
-        if (!this.hasFilterOnField("loginName")) {
-            searchFilters.add(new SearchFilter("loginName", SearchFilter.Operator.IN, loginNameList));
-        }
+        String siteUid = currentUser.getSiteUID();
+        List<String> loginNameList = userAccountService.getLoginNameBySiteUid(siteUid);
+        searchFilters.add(new SearchFilter("loginName", SearchFilter.Operator.IN, loginNameList));
     }
 
     @Override
