@@ -202,7 +202,7 @@ public class SharedAssetReqDetail implements Serializable{
 
     @Column(name = "maintain_time")
     private Date maintainTime;
-    @Formula("(select a.swap_index from shared_asset_swap_index a where a.asset_uid = asset_info_id limit 1)")
+    //@Formula("(select a.swap_index from shared_asset_swap_index a where a.asset_uid = asset_info_id limit 1)")
     private String swapIndex;
     public String getId() {
         return id;
@@ -266,7 +266,7 @@ public class SharedAssetReqDetail implements Serializable{
             state="已预约";
         }else if(chargingBeginTime !=null && chargingEndTime == null){
             state="使用中";
-        }else if(returnRequest != null && chargingEndTime != null && cost != null && cost > 0 && isCleaned !=null && isCleaned == false){
+        }else if(returnRequest != null && chargingEndTime != null && isCleaned !=null && isCleaned == false){
             state="已归还（未清洁保养）";
         }else if(isCleaned != null && isCleaned){
             state="已完成";
