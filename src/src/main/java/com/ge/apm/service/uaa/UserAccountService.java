@@ -352,6 +352,10 @@ public class UserAccountService {
 		return userAccountMapper.getLoginNameBySiteId(siteId);
 	}
 
+	public List<String> getLoginNameBySiteUid(String siteUid) {
+		return userAccountMapper.getLoginNameBySiteUid(siteUid);
+	}
+
     public String getDefaultLanguage(String loginName) {
 		UserAccount userAccount = userAccountRepository.findByLoginName(loginName);
 		if(userAccount == null){
