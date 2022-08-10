@@ -98,4 +98,7 @@ public interface UserAccountMapper {
 	@Select("select distinct login_name from user_account where site_id = #{siteId}")
 	public List<String> getLoginNameBySiteId(Integer siteId);
 
+	@Select("select distinct login_name from user_account where tenant_uid = #{siteUid} or institution_uid = #{siteUid} or hospital_uid = #{siteUid} or site_uid = #{siteUid}")
+	public List<String> getLoginNameBySiteUid(String siteUid);
+
 }

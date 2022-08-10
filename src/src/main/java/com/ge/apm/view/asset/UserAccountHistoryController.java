@@ -67,13 +67,9 @@ public class UserAccountHistoryController extends GenericCRUDController<UserAcco
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        Integer siteId = currentUser.getSiteId();
-        List<String> loginNameList = userAccountService.getLoginNameBySiteId(siteId);
-
-        //查询和当前用户siteId相同的用户的操作记录
-        if (!this.hasFilterOnField("createdBy")) {
-            searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNameList));
-        }
+        String siteUid = currentUser.getSiteUID();
+        List<String> loginNameList = userAccountService.getLoginNameBySiteUid(siteUid);
+        searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNameList));
     }
 
     @Override
