@@ -872,7 +872,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             List<I18nMessage> removeI18 = new ArrayList<>();
             for(I18nMessage i18nMessage : returnTypeList){
-                if(!"DOA".equals(i18nMessage.getMsgKey()) && !"goodReturn".equals(i18nMessage.getMsgKey()) && !"cancel".equals(i18nMessage.getMsgKey())){
+                if(!"DOA".equals(i18nMessage.getMsgKey()) &&
+                    !"goodReturn".equals(i18nMessage.getMsgKey()) &&
+                    !"cancel".equals(i18nMessage.getMsgKey()) &&
+                    !"damagedShipment".equals(i18nMessage.getMsgKey())
+                ){
                     removeI18.add(i18nMessage);
                 }
             }

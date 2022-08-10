@@ -163,17 +163,15 @@ public class WorkOrderExportService {
         List<Integer> assetIds = getVisableMvAssetIds(selectedOrg,clinicalDept);
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
         if(assetIds.size()>0) {
-            searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, assetIds));
+            List<Integer> orderAssetIds = workOrderList.stream().map(WorkOrderExportPojo::getAssetId).collect(Collectors.toList());
+            List<Integer> mvsAssetIds = assetIds.stream().filter(assetId -> !orderAssetIds.contains(assetId)).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetIds", SearchFilter.Operator.IN, mvsAssetIds));
             workOrderList.addAll(worDao.workOrderExportForMVS(searchFilters));
         }
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
-            if(assetIds.contains(workOrderExportPojo.getAssetId())) {
-                workOrderExportPojo.setMVSWorkOrder(true);
-            } else {
-                workOrderExportPojo.setMVSWorkOrder(false);
-            }
+            workOrderExportPojo.setMVSWorkOrder(assetIds.contains(workOrderExportPojo.getAssetId()));
             boolean isReturn = true;
-            if(isReturn && filterMap.get("srNum")!=null && filterMap.get("srNum").length()>0) {   //报修单号
+            if(filterMap.get("srNum") != null && filterMap.get("srNum").length() > 0) {   //报修单号
                 if(workOrderExportPojo.getSrNum()!=null) {
                     isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("srNum").trim());
                 } else {
