@@ -29,7 +29,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Query(value = "select ua.* from user_account ua where ua.uid=?1 and (ua.is_disable =false or ua.is_disable is null )",nativeQuery = true)
     UserAccount getUsers(String userUid);
-
+    @Query(value = "select ua.* from user_account ua where ua.uid in ?1 and (ua.is_disable =false or ua.is_disable is null )",nativeQuery = true)
+    List<UserAccount> getUserList(List<String> userUid);
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     List<UserAccount> getByHospitalId(int hospitalId);
 
@@ -104,7 +105,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public List<UserAccount> getByTenantUIDStaff(String tenantUID);
 
     //获取关注人--当前租户下除了Guest ClincialStaff Activation..角色以外的其它人 都可以成为关注人
-    @Query(value= "select * from user_account u join user_role r on u.id=r.user_id  left join sys_role sr on sr.id = r.role_Id  where u.id > 0 and  (sr.name !='Guest' or sr.name !='ClinicalStaff' or sr.name !='ActivationPerson') and tenant_uid=?1",nativeQuery=true)
+    @Query(value= "select * from user_account u join user_role r on u.id=r.user_id  left join sys_role sr on sr.id = r.role_Id  where u.id > 0 and  (sr.name !='Guest' or sr.name !='ClinicalStaff' or sr.name !='ActivationPerson') and tenant_uid=?1 and (u.is_disable =false or u.is_disable is null )",nativeQuery=true)
     public List<UserAccount> getByTenantUID(String tenantUID);
     
     public List<UserAccount> getByOrgInfoUID(String orgUID);
@@ -175,7 +176,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value= "update user_account set active_time= now(),is_active=true where id = ?1",nativeQuery=true)
     public void activeSingleUser(Integer userId);
 
-    @Query(value="select * from user_account where  hospital_uid = ?2 and id in ?1",nativeQuery = true)
+    @Query(value="select * from user_account where  hospital_uid = ?2 and id in ?1 and (is_disable =false or is_disable is null )",nativeQuery = true)
     List<UserAccount> getUserAccounts(List<Integer> id,String hospitalUID );
 
     @Transactional
@@ -184,20 +185,20 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public void deactiveTemporaryUser(Integer userId);
 
 
-    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and site_uid=?1 ",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and site_uid=?1 and (u.is_disable =false or u.is_disable is null )",nativeQuery=true)
     public List<UserAccount> getAssetHeadAndStaffBySiteUID(String siteUID);
 
     //    @Query(value= "select * from user_account where id > 0 and hospital_uid=?1 and id not in(select user_id from user_role where role_id=9)",nativeQuery=true)
-    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and hospital_uid=?1 ",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and hospital_uid=?1 and (u.is_disable =false or u.is_disable is null )",nativeQuery=true)
     public List<UserAccount> getAssetHeadAndStaffByHospitalUID(String hospitalUID);
 
     //@Query(value= "select * from user_account where id > 0 and institution_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
-    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and institution_uid=?1 ",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and institution_uid=?1 and (u.is_disable =false or u.is_disable is null )",nativeQuery=true)
     public List<UserAccount> getAssetHeadAndStaffByInstitutionUID(String InsitiUID);
 
     //当前租户下的肥临时报修人
     //@Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
-    @Query(value= "select DISTINCT u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and  (r.role_id=3 or r.role_id=2) and tenant_uid=?1 ",nativeQuery=true)
+    @Query(value= "select DISTINCT u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and  (r.role_id=3 or r.role_id=2) and tenant_uid=?1 and (u.is_disable =false or u.is_disable is null )",nativeQuery=true)
     public List<UserAccount> getAssetHeadAndStaffByTenantUID(String tenantUID);
     
     @Query(value = "select o.uid from user_account o where o.org_uid in ?1",nativeQuery = true)

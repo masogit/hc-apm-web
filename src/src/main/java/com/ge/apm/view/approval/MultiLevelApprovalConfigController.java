@@ -62,13 +62,10 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //获取拥有审核权限的用户
     public void buildApproveUserList() {
-        approveUserList = new ArrayList<>();
         int roleId = roleDao.getIdByName(ApprovalConstant.MULTILEVEL_AUDITOR);
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         List<String> userIds = userRoleDao.findUserUidByRoleId(userAccount.getTenantUID(),roleId);
-        userIds.stream().forEach(uid -> {
-            approveUserList.add(userAccountDao.getByUid(uid));
-        });
+        approveUserList = userAccountDao.getUserList(userIds);
     }
 
     public void onSelectTreeNode(NodeSelectEvent event){
