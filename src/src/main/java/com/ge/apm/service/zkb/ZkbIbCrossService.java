@@ -54,12 +54,17 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
     @Autowired
     UserAccountRepository userAccountRepository;
 
+    @Autowired
+    ZkbIbCrossRelationShipLogRepository zkbIbCrossRelationShipLogRepository;
+
     SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
     List<ZkbIbCrossUser> zkbIbCrossUserList = new ArrayList<>();
     HashMap<String, ZkbIbCrossUser> userHashMap = new HashMap<>();
     List<ZkbIbCrossRelationShip> zkbIbCrossRelationShipList = new ArrayList<>();
     HashMap<String, ZkbIbCrossRelationShip> relationShipHashMap = new HashMap<>();
     HashMap<String, String> tenantMap = new HashMap<>();
+    List<ZkbIbCrossRelationShipLog> zkbIbCrossRelationShipLogList = new ArrayList<>();
+
 
     @Transactional(rollbackFor = Exception.class)
     public void handleIbCrossJob(){
@@ -135,6 +140,13 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
                         r.setSystemId(assetInfo.getSystemId());
                         r.setQrCode(assetInfo.getQrCode());
                         zkbIbCrossRelationShipList.add(r);
+
+                        ZkbIbCrossRelationShipLog l = new ZkbIbCrossRelationShipLog();
+                        l.setLoginName(u.getLoginName());
+                        l.setSystemId(assetInfo.getSystemId());
+                        l.setQrCode(assetInfo.getQrCode());
+                        l.setCreateDate(new Date());
+                        zkbIbCrossRelationShipLogList.add(l);
                         relationShipHashMap.put(u.getLoginName()+"|"+a.getAssetId(),r);
                     }
                 }
@@ -190,6 +202,12 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
                                 r.setSystemId(assetInfo.getSystemId());
                                 r.setQrCode(assetInfo.getQrCode());
                                 zkbIbCrossRelationShipList.add(r);
+                                ZkbIbCrossRelationShipLog l = new ZkbIbCrossRelationShipLog();
+                                l.setLoginName(u.getLoginName());
+                                l.setSystemId(assetInfo.getSystemId());
+                                l.setQrCode(assetInfo.getQrCode());
+                                l.setCreateDate(new Date());
+                                zkbIbCrossRelationShipLogList.add(l);
                                 relationShipHashMap.put(u.getLoginName()+"|"+a.getAssetId(),r);
                             }
                         }
@@ -207,10 +225,14 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
         if(zkbIbCrossUserStatusList.size() > 0){
             zkbIbCrossUserStatusRepository.delete(zkbIbCrossUserStatusList);
         }
+        if(zkbIbCrossRelationShipLogList.size() > 0){
+            zkbIbCrossRelationShipLogRepository.save(zkbIbCrossRelationShipLogList);
+        }
 
         zkbIbCrossUserList.clear();
         userHashMap.clear();
         zkbIbCrossRelationShipList.clear();
+        zkbIbCrossRelationShipLogList.clear();
         relationShipHashMap.clear();
         tenantMap.clear();
     }
@@ -273,7 +295,7 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
 
     public void qRCodeJobTest(){
         try {
-            String url = getGatewayURL(GatewayURL.PART_ORDER_QR_CODE_JOB);
+            String url = getGatewayURL(GatewayURL.PART_ORDER_QR_CODE_JOB_SCHEDULE);
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(header);
