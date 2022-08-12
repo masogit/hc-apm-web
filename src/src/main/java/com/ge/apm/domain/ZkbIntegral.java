@@ -37,6 +37,18 @@ public class ZkbIntegral implements Serializable {
     @Column(name = "validity_date")
     private Date validityDate;
 
+    @Column(name = "modify_reason")
+    @Size(max = 50)
+    private String modifyReason;
+
+    public String getModifyReason() {
+        return modifyReason;
+    }
+
+    public void setModifyReason(String modifyReason) {
+        this.modifyReason = modifyReason;
+    }
+
     public Integer getCoefficient() {
         return coefficient;
     }
