@@ -4,6 +4,7 @@ import com.ge.apm.dao.ZkbContractQuotaLogRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContractQuotaLog;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.zkb.ZkbAssetQrCodeFromIbService;
 import com.ge.apm.service.zkb.ZkbContractQuotaLogService;
 import com.ge.apm.service.zkb.ZkbIbCrossService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -40,6 +41,7 @@ public class ZkbContractQuotaLogController  extends GenericCRUDUUIDController<Zk
     private ZkbContractQuotaLogService zkbContractQuotaLogService;
     private Page<ZkbContractQuotaLog> zkbContractQuotaLogPage;
     private ZkbIbCrossService zkbIbCrossService;
+    private ZkbAssetQrCodeFromIbService zkbAssetQrCodeFromIbService;
     private int count = 0;
     private boolean showBtn = false;
     private UserAccount currentUser;
@@ -51,6 +53,7 @@ public class ZkbContractQuotaLogController  extends GenericCRUDUUIDController<Zk
         zkbContractQuotaLogRepository = WebUtil.getBean(ZkbContractQuotaLogRepository.class);
         zkbContractQuotaLogService = WebUtil.getBean(ZkbContractQuotaLogService.class);
         zkbIbCrossService = WebUtil.getBean(ZkbIbCrossService.class);
+        zkbAssetQrCodeFromIbService = WebUtil.getBean(ZkbAssetQrCodeFromIbService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         userContextService = WebUtil.getBean(UserContextService.class);
     }
@@ -87,6 +90,10 @@ public class ZkbContractQuotaLogController  extends GenericCRUDUUIDController<Zk
 
     public void qRCodeJobTest(){
         zkbIbCrossService.qRCodeJobTest();
+    }
+
+    public void qRCodeJobTest2(){
+        zkbAssetQrCodeFromIbService.handleQRCodeFromIb();
     }
 
     public void rowSelect(){
