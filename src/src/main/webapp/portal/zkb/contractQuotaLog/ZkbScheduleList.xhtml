@@ -9,12 +9,12 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="名额日志管理"/><!--#{msg.ZKBCourseMgt}-->
+                <p:outputLabel class="pageTitle" value="定时任务执行"/><!--#{msg.ZKBCourseMgt}-->
             </div>
             <div  class="ui-g-12 card">
                 <h:form id="zkbPartOrderEditForm" >
                     <p:fieldset legend="ib穿越定时">
-                        <h:panelGroup columns="200" cellpadding="5" >
+                        <h:panelGroup columns="20" cellpadding="5" >
                             <p:commandButton value="执行"  process="@this" action="#{zkbContractQuotaLogController.test}" />
                         </h:panelGroup>
                     </p:fieldset>

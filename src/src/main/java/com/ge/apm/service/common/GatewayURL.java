@@ -120,7 +120,7 @@ public enum GatewayURL {
     COURSE_TRAIN_SEND_WE_CHART("/hcapmassetservice/api/apm/zkb/courseTrain/sendWeChatMessages"),
     COURSE_TRAIN_SEND_EMAIL_AUDIT("/hcapmreportservice/api/apm/report/courseTrain/sendHtmlForAudit"),
     PART_ORDER_QR_CODE_JOB("/hcapmassetservice/api/apm/zkb/partOrder/qrCodeJob"),
-    PART_ORDER_QR_CODE_JOB_SCHEDULE("/hcaomscheduleservice/job/api/929"),
+    PART_ORDER_QR_CODE_JOB_SCHEDULE("/hc-apm-schedule/job/api/929"),
     APPROVAL_TO_SEND_WE_CHAT("/hcapmassetservice/api/apm/approvals/submit/approvalToSendWeChat"),
 
     SUPPLIER_FE_BY_ASSETUID("/hcapmsuppliermanager/api/apm/supplierManager/userAccount/findSupplierFE/{assetUid}"),
