@@ -2104,6 +2104,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }else if(CopyByInvok.EMAIL_URL_TYPE_UNORDER.equals(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_UN_ORDER);
             }
+            logger.info("-------------------------------"+url);
             //String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
