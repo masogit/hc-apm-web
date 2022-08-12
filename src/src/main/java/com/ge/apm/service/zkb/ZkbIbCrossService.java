@@ -18,6 +18,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.web.client.AsyncRestTemplate;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -303,10 +307,22 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
                 url = url.replace("/gateway", "");
             }
             logger.info("-----------------------"+ url);
-            String token = UserContextService.getAccessToken();
+           /* String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(header);
-            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+            ResponseEntity<LinkedHashMap> response = asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);*/
+            AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+            ListenableFuture<ResponseEntity<LinkedHashMap>> forEntity = asyncRestTemplate.getForEntity(url, LinkedHashMap.class);
+            forEntity.addCallback(new ListenableFutureCallback<ResponseEntity<LinkedHashMap>>() {
+                @Override
+                public void onSuccess(ResponseEntity<LinkedHashMap> linkedHashMapResponseEntity) {
+                    logger.info("Ib Cross is done");
+                }
+                @Override
+                public void onFailure(Throwable throwable) {
+                    logger.info("Ib Cross is Failure");
+                }
+            });
         }catch (Exception e){
             e.printStackTrace();
         }
