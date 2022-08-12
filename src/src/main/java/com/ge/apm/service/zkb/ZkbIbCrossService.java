@@ -9,6 +9,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +31,7 @@ import java.util.*;
 @Service
 public class ZkbIbCrossService extends MicroServiceInvoker {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     ZkbIbCrossUserStatusRepository zkbIbCrossUserStatusRepository;
@@ -296,6 +299,10 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
     public void qRCodeJobTest(){
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_QR_CODE_JOB_SCHEDULE);
+            if(url.indexOf("/gateway") > -1){
+                url = url.replace("/gateway", "");
+            }
+            logger.info("-----------------------"+ url);
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(header);
