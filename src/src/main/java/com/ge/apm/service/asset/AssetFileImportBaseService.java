@@ -287,6 +287,10 @@ public class AssetFileImportBaseService {
                 newAsset.setAssetDeptName(null);
             }
 
+        }else{
+            newAsset.setAssetDeptId(null);
+            newAsset.setAssetDeptUID(null);
+            newAsset.setAssetDeptName(null);
         }
 
 //        supportingService.setAssetDeptId(newAsset, siteOrg, item);
@@ -693,10 +697,34 @@ public class AssetFileImportBaseService {
                         result.add(Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备有未完成的日常检查工单,不能修改科室");
                     }
-                    if(assetDao.secondment(asset.getUid())>0){
+                }
+                if(assetDao.secondment(asset.getUid())>0){
+                    boolean flag=false;
+                    if(!StringUtils.isEmpty(assetDeptNameOld) && !assetDeptNameOld.equals(assetDeptName)){
+                        flag=true;
+                    }else if(!StringUtils.isEmpty(assetDeptName) && !assetDeptName.equals(assetDeptNameOld)){
+                        flag=true;
+                    }else{
+                        flag=false;
+                    }
+                    if(flag){
                         item.put("status", ImportStatus.CheckFail);
                         result.add(Boolean.FALSE);
-                        AssetRow.addErrMessage(item, "错误: 设备正在科室借调中,不能修改科室");
+                        AssetRow.addErrMessage(item, "错误: 设备正在科室借调中,不能修改使用科室");
+                    }
+                    String clinicalDeptNameOld = asset.getClinicalDeptName();
+                    String clinicalDeptNameNew = clinicalDeptName;
+                    if(!StringUtils.isEmpty(clinicalDeptNameOld) && !clinicalDeptNameOld.equals(clinicalDeptNameNew)){
+                        flag=true;
+                    }else if(!StringUtils.isEmpty(clinicalDeptNameNew) && !clinicalDeptNameNew.equals(clinicalDeptNameOld)){
+                        flag=true;
+                    }else{
+                        flag=false;
+                    }
+                    if(flag){
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 设备正在科室借调中,不能修改所属科室");
                     }
                 }
             }
