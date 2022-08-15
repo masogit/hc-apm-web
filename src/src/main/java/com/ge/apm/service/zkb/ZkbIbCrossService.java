@@ -303,11 +303,12 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
     public void qRCodeJobTest(){
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_QR_CODE_JOB_SCHEDULE);
-            if(url.indexOf("/gateway") > -1){
-                url = url.replace("/gateway", "");
-            }
-            if(url.indexOf(":8090") > -1){
-                url = url.replace(":8090", "");
+            if(url.indexOf("stg") > -1){
+                url = "https://apm-acct-stg.gehealthcloud.cn/hc-apm-schedule/job/api/929";
+            }else if(url.indexOf("stg") > -1){
+                url = "http://apm-acct-preprd.gehcedison.cn/hc-apm-schedule/job/api/929";
+            }else{
+                url = "https://hcapm.gehealthcloud.cn/hc-apm-schedule/job/api/929";
             }
             logger.info("-----------------------"+ url);
            /* String token = UserContextService.getAccessToken();
