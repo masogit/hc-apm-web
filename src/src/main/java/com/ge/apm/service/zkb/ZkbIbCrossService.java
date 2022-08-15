@@ -306,8 +306,8 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
             if(url.indexOf("/gateway") > -1){
                 url = url.replace("/gateway", "");
             }
-            if(url.indexOf("：8090") > -1){
-                url = url.replace("：8090", "");
+            if(url.indexOf(":8090") > -1){
+                url = url.replace(":8090", "");
             }
             logger.info("-----------------------"+ url);
            /* String token = UserContextService.getAccessToken();
