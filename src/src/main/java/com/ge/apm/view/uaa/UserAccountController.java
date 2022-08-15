@@ -845,6 +845,49 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         return true;
     }
+    private Boolean isDisable() {
+        List<SearchFilter> checkFilters = new ArrayList<>();
+        checkFilters.add(new SearchFilter("dispatchUserId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
+        checkFilters.add(new SearchFilter("dispatchUserId2", SearchFilter.Operator.EQ, selected.getId(), "1+"));
+        WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        List<WorkflowConfig> cfgList = wfDao.findBySearchFilter(checkFilters);
+        if (cfgList != null && !cfgList.isEmpty()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("TheUserIsAssignerAndCannotBeDisable"));
+            return false;
+        }
+        checkFilters.clear();
+        checkFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
+        checkFilters.add(new SearchFilter("assetOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
+        checkFilters.add(new SearchFilter("assetOwnerId2", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
+        checkFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
+        checkFilters.add(new SearchFilter("clinicalOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
+        AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
+        if (assetList != null && !assetList.isEmpty()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("TheUserIsEquipmentOwnerAndCannotBeDisable"));
+            return false;
+        }
+        checkFilters.clear();
+        checkFilters.add(new SearchFilter("userId", SearchFilter.Operator.EQ, selected.getId()));
+        BiomedGroupUserRepository groupDao = WebUtil.getBean(BiomedGroupUserRepository.class);
+        List<BiomedGroupUser> groupList = groupDao.findBySearchFilter(checkFilters);
+        if (groupList != null && !groupList.isEmpty()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ListedInTheGroupOfMintenanceEngineersCannotBeDisable"));
+            return false;
+        }
+
+        checkFilters.clear();
+        checkFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, selected.getId()));
+        checkFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        V2_WorkOrderRepository woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
+        List<V2_WorkOrder> woList = woDao.findBySearchFilter(checkFilters);
+        if (woList != null && !woList.isEmpty()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("TheUserHasAnOnGoingWorkOrderAndCannotBeDisable"));
+            return false;
+        }
+
+        return true;
+    }
 
     @Override
     public void onBeforeSave(UserAccount user) {
@@ -898,6 +941,32 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedUserOrg.getSiteUID())){
                 return;
             }
+        }
+        //判断多级审核是否在用此用户
+        List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.find();
+        if (multiLevelApprovalConfigs!=null && !multiLevelApprovalConfigs.isEmpty()){
+            for (MultiLevelApprovalConfig multiLevelApprovalConfig: multiLevelApprovalConfigs){
+                String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+                if (null != approvalItem) {
+                    List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>(){
+                    });
+                    for (int i = 0; i < approvalNodes.size(); i++) {
+                        ApprovalNode node = approvalNodes.get(i);
+                        List<String> userUids = node.getUserUids();
+                        if (userUids!=null && userUids.contains(selected.getUid())){
+                            WebUtil.addErrorMessage("该用户为多级审核人，不能停用！");
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        if(getApproveByUserAccount()){
+            WebUtil.addErrorMessage("该用户为审核人员，不能停用！");
+            return;
+        }
+        if (!isDisable()) {
+            return;
         }
         if (!StringUtils.isEmpty(selected.getPlainPassword())) {
             String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
