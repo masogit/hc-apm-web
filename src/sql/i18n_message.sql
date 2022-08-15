@@ -3090,9 +3090,13 @@
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DeleteSuccess','删除成功','Delete Success',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','PleaseSetTheDepartment','请设置所属科室','Please set the department',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','TheUserIsAssignerAndCannotBeDeleted','该用户是派工人,不能删除.','The user is assigner and cannot be deleted.',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','TheUserIsAssignerAndCannotBeDisable','该用户是派工人,不能停用.','The user is assigner and cannot be disable.',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','TheUserIsEquipmentOwnerAndCannotBeDeleted','该用户是设备责任人,不能删除.','The user is equipment owner and cannot be deleted.',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','TheUserIsEquipmentOwnerAndCannotBeDisable','该用户是设备责任人,不能停用.','The user is equipment owner and cannot be disable.',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ListedInTheGroupOfMintenanceEngineersCannotBeDeleted','该用户在维修工程师群组中,不能删除.','The user is listed in the group of mintenance engineers and cannot be deleted.',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ListedInTheGroupOfMintenanceEngineersCannotBeDisable','该用户在维修工程师群组中,不能停用.','The user is listed in the group of mintenance engineers and cannot be disable.',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','TheUserHasAnOnGoingWorkOrderAndCannotBeDeleted','该用户有在修工单,不能删除.','The user has an on-going workorder and cannot be deleted.',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','TheUserHasAnOnGoingWorkOrderAndCannotBeDisable','该用户有在修工单,不能停用.','The user has an on-going workorder and cannot be disable.',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ResetSuccess','重置成功','Reset Success!',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ActivateSuccess','激活成功！','Activate Success!',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ForTheSystemActivation','系统激活专用','For the System Activation',NULL,-1);
