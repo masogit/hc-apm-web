@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .ui-selectbooleanbutton{
+                background: #3e464c !important;
+                color: #fff !important;
+                border: none !important;
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.ConfigItemManage}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="configItemForm">
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                        <h:panelGroup>
+                            <p:commandButton id="btnOrg" value="#{superAdminConfigItemController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0;" mode="native">
+                                    <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{superAdminConfigItemController.onSelectSiteTreeNode}" update="configItemForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                    <p:dataTable id="datalist" class="datalist" value="#{superAdminConfigItemController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{superAdminConfigItemController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.uid}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="rowSelect" update="editButton" />
+                        <p:ajax event="filter" listener="#{superAdminConfigItemController.onFilter}" />
+
+                        <p:column headerText="#{msg.ConfigItemName}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ConfigItemKey}" filterBy="#{item.key}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.key}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ConfigItemCategory}" filterBy="#{item.category}" filterMatchMode="EQ">
+                            <h:outputText value="#{systemConfigItemController.categoryMap.get(item.category)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{systemConfigItemController.categoryMap.entrySet()}" var="item" itemLabel="#{item.getValue()}" itemValue="#{item.getKey()}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.ConfigItemDesc}">
+                            <h:outputText value="#{item.description}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ConfigItemValue}">
+                            <h:outputText rendered="#{item.valueType == '3'}"
+                                          value="#{item.showValue == 'true' ? '是' : '否'}"/>
+                            <h:outputText rendered="#{item.valueType != '3'}"
+                                          value="#{item.showValue}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ConfigItemUseParent}">
+                            <h:outputText value="#{item.userParentConfig == 'true' ? '是' : '否'}"/>
+                            <!--<p:selectBooleanButton onLabel="禁用" offLabel="启用" value="#{item.userParentConfig}" style="width:5rem">
+                                <p:ajax event="change" listener="#{configItemController.onSelectSiteTreeNode}" update="datalist" />
+                            </p:selectBooleanButton>-->
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":configItemEditDlg" oncomplete="PF('configItemEditDialog').show()" disabled="#{empty superAdminConfigItemController.selected}" />
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+        <ui:include src="configItemEdit.xhtml"/>
+    </ui:define>
+</ui:composition>
