@@ -304,8 +304,8 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_QR_CODE_JOB_SCHEDULE);
             if(url.indexOf("stg") > -1){
-                url = "https://apm-acct-stg.gehealthcloud.cn/hc-apm-schedule/job/api/929";
-            }else if(url.indexOf("stg") > -1){
+                url = "https://localhost:10001/hc-apm-schedule/job/api/929";
+            }else if(url.indexOf("pre") > -1){
                 url = "http://apm-acct-preprd.gehcedison.cn/hc-apm-schedule/job/api/929";
             }else{
                 url = "https://hcapm.gehealthcloud.cn/hc-apm-schedule/job/api/929";
