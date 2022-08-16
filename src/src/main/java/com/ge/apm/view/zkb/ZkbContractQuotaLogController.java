@@ -84,6 +84,10 @@ public class ZkbContractQuotaLogController  extends GenericCRUDUUIDController<Zk
 
     }
 
+    public void testSchedule(){
+        zkbIbCrossService.testSchedule();
+    }
+
     public void test(){
         zkbIbCrossService.handleIbCrossJob();
     }

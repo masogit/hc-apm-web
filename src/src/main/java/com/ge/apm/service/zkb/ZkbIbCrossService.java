@@ -300,13 +300,41 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
         return d2;
     }
 
+    public void testSchedule(){
+        try {
+            String url = getGatewayURL(GatewayURL.PART_ORDER_QR_CODE_JOB_SCHEDULE);
+            if(url.indexOf("stg") > -1){
+                url = "https://apm-acct-stg.gehealthcloud.cn/hc-apm-schedule/job/api/test";
+            }else if(url.indexOf("pre") > -1){
+                url = "https://apm-acct-preprd.gehcedison.cn/hc-apm-schedule/job/api/test";
+            }else{
+                url = "https://hcapm.gehealthcloud.cn/hc-apm-schedule/job/api/test";
+            }
+            logger.info("-----------------------"+ url);
+            AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+            ListenableFuture<ResponseEntity<LinkedHashMap>> forEntity = asyncRestTemplate.getForEntity(url, LinkedHashMap.class);
+            forEntity.addCallback(new ListenableFutureCallback<ResponseEntity<LinkedHashMap>>() {
+                @Override
+                public void onSuccess(ResponseEntity<LinkedHashMap> linkedHashMapResponseEntity) {
+                    logger.info("Schedule test is done");
+                }
+                @Override
+                public void onFailure(Throwable throwable) {
+                    logger.info("Schedule test is Failure");
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public void qRCodeJobTest(){
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_QR_CODE_JOB_SCHEDULE);
             if(url.indexOf("stg") > -1){
-                url = "http://localhost:8090/hc-apm-schedule/job/api/929";
+                url = "https://apm-acct-stg.gehealthcloud.cn/hc-apm-schedule/job/api/929";
             }else if(url.indexOf("pre") > -1){
-                url = "http://apm-acct-preprd.gehcedison.cn/hc-apm-schedule/job/api/929";
+                url = "https://apm-acct-preprd.gehcedison.cn/hc-apm-schedule/job/api/929";
             }else{
                 url = "https://hcapm.gehealthcloud.cn/hc-apm-schedule/job/api/929";
             }
