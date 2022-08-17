@@ -166,7 +166,7 @@
             <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
             <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="ultima-layout" />
 
-            <h:form prependId="false">
+            <h:form prependId="false" autocomplete="off">
 
                 <p:focus/>
                 <p:graphicImage name="images/ge_logo.svg" library="ultima-layout" class="logo_image"/>
@@ -181,7 +181,7 @@
                             <p:inputText id="j_username" required="true" requiredMessage="#{msg.login_name}: #{msg.ValidationRequire}" placeholder="#{msg.login_name}"/>
                             <i class="fa fa-user" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
                             <br/><br/>
-                            <p:password id="j_password" required="true" requiredMessage="#{msg.password}: #{msg.ValidationRequire}" placeholder="#{msg.password}"/>
+                            <p:password id="j_password" required="true" requiredMessage="#{msg.password}: #{msg.ValidationRequire}" placeholder="#{msg.password}" autocomplete="off"/>
                             <i class="fa fa-lock" style="height: 0px;float: left;left: -20px;top: -20px;position: relative;"/>
                         </div>
                         <div class="ui-g-12" style="margin-bottom: 0px;">
