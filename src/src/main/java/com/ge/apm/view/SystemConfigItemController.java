@@ -1,18 +1,15 @@
 package com.ge.apm.view;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.audit.AuditItemConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -20,8 +17,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by 503266962
@@ -104,6 +102,11 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }else{
                     configItem.setShowValue(configItem.getDefaultValue());
                 }
+                if(7 == configItem.getValueType() && StringUtils.isNotEmpty(configItem.getValidation())){
+                    String validation = configItem.getValidation();
+                    List<Map<String, String>> mapList = JSON.parseObject(validation, new TypeReference<List<Map<String,String>>>(){});
+                    configItem.setEnumList(mapList);
+                }
             }
         }
 
@@ -140,9 +143,59 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 configItemValue.setSiteUid(selectSite.getSiteUID());
                 configItemValue.setKey(this.selected.getKey());
             }
-            configItemValue.setValue(this.selected.getShowValue());
+
+            if(4 == this.selected.getValueType() || 5 == this.selected.getValueType() || 6 == this.selected.getValueType()){
+                try {
+                    configItemValue.setValue(formatDate(this.selected.getShowValue()));
+                } catch (ParseException e) {
+                    logger.error("配置项保存，日期格式化异常：", e);
+                    WebUtil.addErrorMessage("配置项保存异常，请联系系统管理员！");
+                    return;
+                }
+            }else{
+                configItemValue.setValue(this.selected.getShowValue());
+            }
             configItemValueRepository.save(configItemValue);
         }
+    }
+
+    public String formatDate(String value) throws ParseException {
+        String formatValue = "";
+
+        SimpleDateFormat sdf = new SimpleDateFormat();
+
+        switch (this.selected.getValueType()){
+            case 4:
+                sdf = new SimpleDateFormat("yyyy-MM-dd");
+                break;
+            case 5:
+                sdf = new SimpleDateFormat("HH:mm:ss");
+                break;
+            case 6:
+                sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                break;
+            default:
+                sdf = new SimpleDateFormat();
+                break;
+        }
+        Date parse = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.US).parse(value);
+        formatValue = sdf.format(parse);
+
+        return formatValue;
+    }
+
+    public String transferEnum(String value, List<Map<String, String>> list){
+        String str = "";
+        if(CollectionUtils.isNotEmpty(list) && StringUtils.isNotEmpty(value)){
+            for (Map<String, String> map : list) {
+                if(value.equals(map.get("value"))){
+                    str = map.get("key");
+                    break;
+                }
+            }
+        }
+
+        return str;
     }
 
     public OrgInfo getSelectSite() {

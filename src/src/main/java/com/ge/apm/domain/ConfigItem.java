@@ -10,6 +10,8 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author 503266962
@@ -44,14 +46,17 @@ public class ConfigItem implements Serializable {
     private String key;
 
     /**
-     * 值类型 1-text 2-number 3-boolean
+     * 值类型 1-text 2-number 3-boolean 4-date 5-time 6-datetime 7-enum
      * 类型为text时，如果需要做格式校验，需要在 validation 字段中定义正则表达式
+     * 类型为enum时，需要在 validation 字段中定义key-value array
      */
     @Column(name = "value_type")
     private Integer valueType;
 
     /**
      * 合法性验证-正则表达式
+     * 如果是enum类型，则存放enum的array
+     * eg:[{"key":"人员1","value":"person1"},{"key":"人员2","value":"person2"},{"key":"人员3","value":"person3"}]
      */
     @Column(name = "validation")
     private String validation;
@@ -88,4 +93,7 @@ public class ConfigItem implements Serializable {
 
     @Transient
     private String showValue;
+
+    @Transient
+    private List<Map<String, String>> enumList;
 }
