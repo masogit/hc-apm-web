@@ -223,7 +223,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
 
     private V2_WorkOrderManHoursRepository manHoursDao;
-
+    private Date applyTimeFrom = null;
+    private String applyTimeFormatTime = null;
+    private String filterApplyTime = null;
     List<V2_WorkOrderManHours> v2WorkOrderManHoursList;
 
     @Override
@@ -3237,6 +3239,30 @@ public void test1(){
 
     public List<V2_WorkOrderManHours> getWorkOrderManHours(String woId){
         return manHoursDao.findByWoIdSort(woId);
+    }
+
+    public Date getApplyTimeFrom() {
+        return applyTimeFrom;
+    }
+
+    public void setApplyTimeFrom(Date applyTimeFrom) {
+        this.applyTimeFrom = applyTimeFrom;
+    }
+
+    public String getApplyTimeFormatTime() {
+        return applyTimeFormatTime;
+    }
+
+    public void setApplyTimeFormatTime(String applyTimeFormatTime) {
+        this.applyTimeFormatTime = applyTimeFormatTime;
+    }
+
+    public String getFilterApplyTime() {
+        return filterApplyTime;
+    }
+
+    public void setFilterApplyTime(String filterApplyTime) {
+        this.filterApplyTime = filterApplyTime;
     }
 }
 
