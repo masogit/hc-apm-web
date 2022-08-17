@@ -1,5 +1,6 @@
 package com.ge.apm.service.uaa;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
@@ -334,18 +335,12 @@ public class UserAccountService {
 		userAccountHistoryService.save(WebUtil.PersistAction.DELETE, userAccount);
 	}
 
-	public boolean whetherTheCallIsRepeated(String telephone,String userTelephone,Integer userId){
-		if(null == telephone||telephone.equals(userTelephone)){//如果跟登陆电话一样则直接放行
-			return false;
-		}
-		List<UserAccount> userAccounts = userAccountMapper.getUserAccountByTelephone(telephone);
-		for (int i = 0; i < userAccounts.size(); i++) {
-			if(userId==(userAccounts.get(i).getId())){
-				userAccounts.remove(userAccounts.get(i));//移除掉自己
-			}
-		}
-		//如果还有大于1条的数据则说明该手机几号存在
-		return userAccounts.size() > 0;
+	public boolean whetherTheCallIsRepeated(String telephone,UserAccount userAccount){
+		EntityWrapper<UserAccount> wrapper = new EntityWrapper<>();
+		wrapper.eq("telephone", telephone);
+		wrapper.ne("id", userAccount.getId());
+		wrapper.eq(telephone.length() < 11, "tenant_uid", userAccount.getTenantUID());
+		return userAccountMapper.selectCount(wrapper) > 0;
 	}
 
 	public List<String> getLoginNameBySiteId(Integer siteId){

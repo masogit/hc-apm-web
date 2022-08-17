@@ -99,7 +99,7 @@ public class ProfileController implements Serializable {
         if(!myAccount.getIsUnbunding()){
         	myAccount.setWeChatId(null);
         }
-        boolean isRepeated = userAccountService.whetherTheCallIsRepeated(myAccount.getTelephone(),loginUser.getTelephone(),loginUser.getId());
+        boolean isRepeated = userAccountService.whetherTheCallIsRepeated(myAccount.getTelephone(),loginUser);
         if(isRepeated){//重复
             myAccount.setTelephone(originalTelephone);
             userAccountDao.save(myAccount);

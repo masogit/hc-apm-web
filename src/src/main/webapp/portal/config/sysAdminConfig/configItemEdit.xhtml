@@ -42,6 +42,34 @@
                             <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                         </p:selectOneRadio>
                     </h:panelGroup>
+                    <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 4}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:calendar id="valueDate" required="true" value="#{superAdminConfigItemController.selected.showValue}"
+                                    pattern="yyyy-MM-dd" showOn="button" showButtonPanel="true" navigator="true"
+                                    mask="true" defaultHour="23" defaultMinute="59" defaultSecond="59" style="width: 95%;"
+                                    timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 5}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:calendar id="valueTime" required="true" value="#{superAdminConfigItemController.selected.showValue}"
+                                    pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true"
+                                    mask="true" defaultHour="23" defaultMinute="59" defaultSecond="59" style="width: 95%;"
+                                    timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 6}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:calendar id="valueDateTime" required="true" value="#{superAdminConfigItemController.selected.showValue}"
+                                    pattern="yyyy-MM-dd HH:mm:ss" showOn="button" showButtonPanel="true" navigator="true"
+                                    mask="true" defaultHour="23" defaultMinute="59" defaultSecond="59" style="width: 95%;"
+                                    timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 7}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:selectOneMenu value="#{superAdminConfigItemController.selected.showValue}" required="true" style="width: 95%;">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{superAdminConfigItemController.selected.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{superAdminConfigItemController.saveConfig}" update=":growl @(.datalist)" icon="ui-icon-check" oncomplete="handleSubmit(args, 'configItemEditDialog');" />
