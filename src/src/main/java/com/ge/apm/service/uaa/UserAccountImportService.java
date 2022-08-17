@@ -11,6 +11,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
@@ -221,11 +222,10 @@ public class UserAccountImportService {
 	private boolean telephoneValid(UserAccount newUser) {
 		String telephone = newUser.getTelephone();
 		if (StringUtils.isNotEmpty(telephone)) {
-			int count = userAccountMapper.getUserCountByTelephone(telephone);
-			if (count > 0) {
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.DUPLICATE_TELEPHONE, "电话号码已存在");
-				return false;
-			}
+			EntityWrapper<UserAccount> wrapper = new EntityWrapper<>();
+			wrapper.eq("telephone", telephone);
+			wrapper.eq(telephone.length() < 11, "tenant_uid", newUser.getTenantUID());
+			return userAccountMapper.selectCount(wrapper) > 0;
 		}
 		return true;
 	}
