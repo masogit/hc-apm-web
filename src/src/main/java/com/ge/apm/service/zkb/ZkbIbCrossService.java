@@ -6,22 +6,21 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.client.AsyncRestTemplate;
-import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -300,32 +299,27 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
         return d2;
     }
 
-    public void testSchedule(){
+    public String testSchedule(){
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_QR_CODE_JOB_SCHEDULE);
             if(url.indexOf("stg") > -1){
-                url = "https://apm-acct-stg.gehealthcloud.cn/hc-apm-schedule/job/api/test";
+                url = "https://apm-acct-stg.gehealthcloud.cn/hc-apm-schedule/job/zkb/test";
             }else if(url.indexOf("pre") > -1){
-                url = "https://apm-acct-preprd.gehcedison.cn/hc-apm-schedule/job/api/test";
+                url = "https://apm-acct-preprd.gehcedison.cn/hc-apm-schedule/job/zkb/test";
             }else{
-                url = "https://hcapm.gehealthcloud.cn/hc-apm-schedule/job/api/test";
+                url = "https://hcapm.gehealthcloud.cn/hc-apm-schedule/job/zkb/test";
             }
+            //url = "http://localhost:10001/hc-apm-schedule/job/zkb/test";
             logger.info("-----------------------"+ url);
-            AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
-            ListenableFuture<ResponseEntity<LinkedHashMap>> forEntity = asyncRestTemplate.getForEntity(url, LinkedHashMap.class);
-            forEntity.addCallback(new ListenableFutureCallback<ResponseEntity<LinkedHashMap>>() {
-                @Override
-                public void onSuccess(ResponseEntity<LinkedHashMap> linkedHashMapResponseEntity) {
-                    logger.info("Schedule test is done");
-                }
-                @Override
-                public void onFailure(Throwable throwable) {
-                    logger.info("Schedule test is Failure");
-                }
-            });
+            String token = UserContextService.getAccessToken();
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+            ResponseEntity<String> response = template.exchange(url, HttpMethod.GET, requestEntity, String.class);
         }catch (Exception e){
             e.printStackTrace();
+            return "failure";
         }
+        return "success";
     }
 
     public void qRCodeJobTest(){
@@ -343,7 +337,14 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(header);
             ResponseEntity<LinkedHashMap> response = asyncRestTemplate.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);*/
-            AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+            //设置链接超时时间
+            factory.setConnectTimeout(100);
+            //设置读取资料超时时间
+            factory.setReadTimeout(2000000);
+            //设置异步任务（线程不会重用，每次调用时都会重新启动一个新的线程）
+            factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
+            AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate(factory);
             ListenableFuture<ResponseEntity<LinkedHashMap>> forEntity = asyncRestTemplate.getForEntity(url, LinkedHashMap.class);
             forEntity.addCallback(new ListenableFutureCallback<ResponseEntity<LinkedHashMap>>() {
                 @Override
