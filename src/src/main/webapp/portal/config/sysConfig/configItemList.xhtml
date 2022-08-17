@@ -71,7 +71,9 @@
                         <p:column headerText="#{msg.ConfigItemValue}">
                             <h:outputText rendered="#{item.valueType == '3'}"
                                           value="#{item.showValue == 'true' ? '是' : '否'}"/>
-                            <h:outputText rendered="#{item.valueType != '3'}"
+                            <h:outputText rendered="#{item.valueType == '7'}"
+                                          value="#{systemConfigItemController.transferEnum(item.showValue,item.enumList)}"/>
+                            <h:outputText rendered="#{item.valueType != '3' and item.valueType != '7'}"
                                           value="#{item.showValue}"/>
                         </p:column>
                         <p:column headerText="#{msg.ConfigItemUseParent}">

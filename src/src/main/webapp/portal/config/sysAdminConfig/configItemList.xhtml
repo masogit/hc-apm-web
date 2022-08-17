@@ -57,11 +57,11 @@
                             <h:outputText value="#{item.key}"/>
                         </p:column>
                         <p:column headerText="#{msg.ConfigItemCategory}" filterBy="#{item.category}" filterMatchMode="EQ">
-                            <h:outputText value="#{systemConfigItemController.categoryMap.get(item.category)}"/>
+                            <h:outputText value="#{superAdminConfigItemController.categoryMap.get(item.category)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{systemConfigItemController.categoryMap.entrySet()}" var="item" itemLabel="#{item.getValue()}" itemValue="#{item.getKey()}"/>
+                                    <f:selectItems value="#{superAdminConfigItemController.categoryMap.entrySet()}" var="item" itemLabel="#{item.getValue()}" itemValue="#{item.getKey()}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
@@ -71,7 +71,9 @@
                         <p:column headerText="#{msg.ConfigItemValue}">
                             <h:outputText rendered="#{item.valueType == '3'}"
                                           value="#{item.showValue == 'true' ? '是' : '否'}"/>
-                            <h:outputText rendered="#{item.valueType != '3'}"
+                            <h:outputText rendered="#{item.valueType == '7'}"
+                                          value="#{superAdminConfigItemController.transferEnum(item.showValue,item.enumList)}"/>
+                            <h:outputText rendered="#{item.valueType != '3' and item.valueType != '7'}"
                                           value="#{item.showValue}"/>
                         </p:column>
                         <p:column headerText="#{msg.ConfigItemUseParent}">
