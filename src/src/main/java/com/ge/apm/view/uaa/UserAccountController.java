@@ -99,6 +99,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private OrgInfo selectedUserOrg;
 
+    private  String oldIsDisable;
+
     private UserCommonService userCommonService;
 
     private UserAccount loginUser;
@@ -942,31 +944,38 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 return;
             }
         }
-        //判断多级审核是否在用此用户
-        List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.find();
-        if (multiLevelApprovalConfigs!=null && !multiLevelApprovalConfigs.isEmpty()){
-            for (MultiLevelApprovalConfig multiLevelApprovalConfig: multiLevelApprovalConfigs){
-                String approvalItem = multiLevelApprovalConfig.getApprovalItem();
-                if (null != approvalItem) {
-                    List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>(){
-                    });
-                    for (int i = 0; i < approvalNodes.size(); i++) {
-                        ApprovalNode node = approvalNodes.get(i);
-                        List<String> userUids = node.getUserUids();
-                        if (userUids!=null && userUids.contains(selected.getUid())){
-                            WebUtil.addErrorMessage("该用户为多级审核人，不能停用！");
-                            return;
+        Boolean isDisable = selected.getIsDisable()==null ? false : selected.getIsDisable();
+        String newIsDisable="f";
+        if(isDisable){
+            newIsDisable="t";
+        }
+        if(!oldIsDisable.equals(newIsDisable)){
+            //判断多级审核是否在用此用户
+            List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.find();
+            if (multiLevelApprovalConfigs!=null && !multiLevelApprovalConfigs.isEmpty()){
+                for (MultiLevelApprovalConfig multiLevelApprovalConfig: multiLevelApprovalConfigs){
+                    String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+                    if (null != approvalItem) {
+                        List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>(){
+                        });
+                        for (int i = 0; i < approvalNodes.size(); i++) {
+                            ApprovalNode node = approvalNodes.get(i);
+                            List<String> userUids = node.getUserUids();
+                            if (userUids!=null && userUids.contains(selected.getUid())){
+                                WebUtil.addErrorMessage("该用户为多级审核人，不能停用！");
+                                return;
+                            }
                         }
                     }
                 }
             }
-        }
-        if(getApproveByUserAccount()){
-            WebUtil.addErrorMessage("该用户为审核人员，不能停用！");
-            return;
-        }
-        if (!isDisable()) {
-            return;
+            if(getApproveByUserAccount()){
+                WebUtil.addErrorMessage("该用户为审核人员，不能停用！");
+                return;
+            }
+            if (!isDisable()) {
+                return;
+            }
         }
         if (!StringUtils.isEmpty(selected.getPlainPassword())) {
             String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
@@ -1136,6 +1145,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void prepareEdit() {
         super.prepareEdit();
         selectedUserOrg = orgInfoDao.getByUid(selected.getOrgInfoUID());
+        Boolean isDisable = selected.getIsDisable()==null ? false : selected.getIsDisable();
+        oldIsDisable="f";
+        if (isDisable){
+            oldIsDisable="t";
+        }
         filterTreeNodeByUid();
         if(selected.getId() != null){
             List<String> existingTags = userTagsMapper.getTagsByUser(selected.getUid());
