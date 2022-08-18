@@ -1,5 +1,6 @@
 package com.ge.apm.service.uaa;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
@@ -336,6 +337,9 @@ public class UserAccountService {
 	}
 
 	public boolean whetherTheCallIsRepeated(String telephone,UserAccount userAccount){
+		if (ObjectUtil.isEmpty(telephone)) {
+			return false;
+		}
 		EntityWrapper<UserAccount> wrapper = new EntityWrapper<>();
 		wrapper.eq("telephone", telephone);
 		wrapper.ne("id", userAccount.getId());
