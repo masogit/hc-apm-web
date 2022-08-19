@@ -27,7 +27,7 @@ public class Test {
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
-        mqContext.setContext(map);
+//        mqContext.setContext(map);
         mqContext.setRoutingKey("asset.delete");
         mqContext.setExChange("assetChange");
         mqUtils.sendToMq(mqContext);

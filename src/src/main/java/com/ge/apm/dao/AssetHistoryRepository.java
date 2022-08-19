@@ -26,4 +26,7 @@ public interface AssetHistoryRepository extends GenericRepositoryUUID<AssetHisto
      */
     @Query(value = "select * from asset_history where asset_uid = ?1 order by created_date DESC limit 5", nativeQuery = true)
     List<AssetHistory> findByUidOrderByCreatedDateDescAtMostFive(String assetUid);
+
+    @Query(value = "select * from asset_history where asset_uid = ?1 order by created_date DESC limit 1", nativeQuery = true)
+    AssetHistory getAssetHistoryByAssetUidOne(String uid);
 }

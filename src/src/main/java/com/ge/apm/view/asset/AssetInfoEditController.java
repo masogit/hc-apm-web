@@ -1,10 +1,12 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.callback.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
@@ -730,10 +732,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-        if(isStatusAssetHistory){
-            this.saveAssetHistory();
-        }
-
+        this.saveAssetHistory();
         this.save();
 
         if(selected != null && selected.getId() != null && selectedPictures != null){
@@ -1437,8 +1436,22 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
     private void saveAssetHistory() {
-
         AssetInfo oldAsset = dao.findByUid(selected.getUid());
+
+        MqContext mqContext = new MqContext();
+//        JSONObject jsonObject = (JSONObject) JSONObject.toJSON(selected);
+
+        mqContext.setTime(new Date());
+        mqContext.setType("asset");
+        mqContext.setRoutingKey("asset.update");
+        mqContext.setExChange("assetChange");
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        JSONObject jsonObject =new JSONObject();
+        jsonObject.put("assetInfo",selected);
+//        jsonObject.put("oldAssetInfo",oldAsset);
+        jsonObject.put("currentUserAccount",currentUserAccount);
+        mqContext.setJsonObject(jsonObject);
+        MqUtils.sendToMq(mqContext);
         assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
     }
 
