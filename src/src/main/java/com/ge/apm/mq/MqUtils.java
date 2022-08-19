@@ -14,10 +14,10 @@ public class MqUtils {
 
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private static RabbitTemplate rabbitTemplate;
 
-    public  void sendToMq(MqContext mqContext){
-        log.info("send to mq exchange:{},routingKey:{},message:{}",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getContext());
+    public static void sendToMq(MqContext mqContext){
+        log.info("send to mq exchange:{},routingKey:{},message:{}",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject());
         try{
             rabbitTemplate.convertAndSend(mqContext.getExChange(),mqContext.getRoutingKey(),mqContext);
         }catch (Exception e){
