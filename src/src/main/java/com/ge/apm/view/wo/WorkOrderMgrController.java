@@ -1523,7 +1523,7 @@ public void test1(){
                 v2WorkOrder.setManHours(new Double(0.0));
         c_repairManCost=c_woManhourPrice*(tHours+v2WorkOrder.getManHours());
         //备件费用
-        Double accPrice=accessoryList.stream().mapToDouble(p->p.getPartsPrice()*p.getApartsQuantity()).sum();
+        Double accPrice=accessoryList.stream().mapToDouble(p->p.getClosedPrice()).sum();
         //维修总金额=备件费用+维修人工费用+外部费用+其他费用
         if(v2WorkOrder.getOtherExpense()==null){
             v2WorkOrder.setOtherExpense(0.0);
