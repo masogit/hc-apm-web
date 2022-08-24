@@ -343,7 +343,7 @@ public class UserAccountService {
 		EntityWrapper<UserAccount> wrapper = new EntityWrapper<>();
 		wrapper.eq("telephone", telephone);
 		wrapper.ne(ObjectUtil.isNotEmpty(userAccount.getId()), "id", userAccount.getId());
-		wrapper.eq(telephone.length() < 11, "tenant_uid", userAccount.getTenantUID());
+		wrapper.eq(telephone.length() < 11, "tenant_uid", UserContextService.getCurrentUserAccount().getTenantUID());
 		return userAccountMapper.selectCount(wrapper) > 0;
 	}
 
