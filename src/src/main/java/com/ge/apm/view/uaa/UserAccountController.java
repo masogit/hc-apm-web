@@ -949,7 +949,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if(isDisable){
             newIsDisable="t";
         }
-        if(!oldIsDisable.equals(newIsDisable)){
+        if(oldIsDisable!=null && !oldIsDisable.equals(newIsDisable)){
             //判断多级审核是否在用此用户
             List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.find();
             if (multiLevelApprovalConfigs!=null && !multiLevelApprovalConfigs.isEmpty()){
