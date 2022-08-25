@@ -2043,7 +2043,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     arg = (zkbContract.getSpareQuota() + qty)<0? true:arg;
                  }else{
-                    zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) + qty);
                     arg = (zkbContract.getSpareArtificail() + qty)<0? true:arg;
                 }
             }
