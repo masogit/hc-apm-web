@@ -1,9 +1,11 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.*;
 
@@ -39,6 +41,7 @@ public class ZkbSalesPersonInfo implements Serializable {
     /**
      * 邮箱
      */
+    @Pattern(regexp = "^$|^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?", message = "{javax.validation.constraints.Pattern.email.message}")
     @Column(name = "email")
     private String email;
 
@@ -76,11 +79,23 @@ public class ZkbSalesPersonInfo implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedTime;
 
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "zkbSalesPersonInfo", fetch = FetchType.EAGER)
+    private List<ZkbSalesTenantAssociate> zkbSalesTenantAssociateList = new ArrayList<ZkbSalesTenantAssociate>();
+
     /**
      * 订单类型
      */
     @Transient
     private String orderType;
+
+    public List<ZkbSalesTenantAssociate> getZkbSalesTenantAssociateList() {
+        return zkbSalesTenantAssociateList;
+    }
+
+    public void setZkbSalesTenantAssociateList(List<ZkbSalesTenantAssociate> zkbSalesTenantAssociateList) {
+        this.zkbSalesTenantAssociateList = zkbSalesTenantAssociateList;
+    }
 
     public String getOrderType() {
         StringBuilder str = new StringBuilder();

@@ -37,9 +37,29 @@ public class ZkbSalesTenantAssociate implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdTime;
 
+    @JoinColumn(name = "sales_person_id", insertable = false, updatable = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    private ZkbSalesPersonInfo zkbSalesPersonInfo;
+
     //销售人员信息
     @Column(name = "sales_person_id")
     private String salesPersonId;
+
+    public String getSalesPersonId() {
+        return salesPersonId;
+    }
+
+    public void setSalesPersonId(String salesPersonId) {
+        this.salesPersonId = salesPersonId;
+    }
+
+    public ZkbSalesPersonInfo getZkbSalesPersonInfo() {
+        return zkbSalesPersonInfo;
+    }
+
+    public void setZkbSalesPersonInfo(ZkbSalesPersonInfo zkbSalesPersonInfo) {
+        this.zkbSalesPersonInfo = zkbSalesPersonInfo;
+    }
 
     public String getId() {
         return id;
@@ -57,13 +77,6 @@ public class ZkbSalesTenantAssociate implements Serializable {
         this.tenantUid = tenantUid;
     }
 
-    public String getSalesPersonId() {
-        return salesPersonId;
-    }
-
-    public void setSalesPersonId(String salesPersonId) {
-        this.salesPersonId = salesPersonId;
-    }
 
     public String getCreatedBy() {
         return createdBy;

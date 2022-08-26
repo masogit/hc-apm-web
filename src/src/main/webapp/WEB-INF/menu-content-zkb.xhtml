@@ -170,6 +170,8 @@
                 <p:menuitem value="KPI" outcome="/portal/zkb/keyHehaviorIndex/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"  />
                 <p:menuitem value="积分" outcome="/portal/zkb/integral/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"  />
                 <p:menuitem value="权重配置" outcome="/portal/zkb/keyHehaviorIndex/ConfigList.xhtml" rendered="#{userContextService.geAdmin}"/>
+                <p:menuitem value="销售人员信息管理" outcome="/portal/zkb/salesPerson/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>
+
             </p:submenu>
             <!-- 是智康保用户  -->
 
