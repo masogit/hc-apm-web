@@ -4467,6 +4467,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- 探头信息维护
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZkbPartOrderCat','探头信息','ZkbPartOrderCat',NULL,-1);
 
+-- 销售人员信息管理
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZkbSalesPersonInfo','销售人员信息','ZkbSalesPersonInfo',NULL,-1);
+
 -- 无人值守
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WhetherToEnableUnattended', '是否启用无人值守', 'Whether To Enable Unattended', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AppointmentStatusLockedTime', '预约状态锁定时长', 'Appointment Status Locked Time', NULL, '-1');
