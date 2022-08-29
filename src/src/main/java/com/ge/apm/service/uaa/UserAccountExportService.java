@@ -46,6 +46,7 @@ public class UserAccountExportService {
 	private static final String HEADER_TAGS="标签";
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
+	private static final String HEADER_STOPUSE="停用?*";
 	private static Map<String,Integer> sysRoleMap;
 	private Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
 	private Map<String,OrgInfo> mapUidOrgInfo=new HashMap<String,OrgInfo>();
@@ -102,6 +103,15 @@ public class UserAccountExportService {
 			for (int i = 0; i < listUserAccount.size(); ++i) {
 				UserAccount tempUser = listUserAccount.get(i);
 				Map<String, Object> tempMap = new HashMap<String, Object>();
+				if(StringUtils.isNotEmpty(tempUser.getDepartName2())){
+					tempMap.put(HEADER_DEPARTMENT2, tempUser.getDepartName2());
+				}
+				if(StringUtils.isNotEmpty(tempUser.getDepartName3())){
+					tempMap.put(HEADER_DEPARTMENT3, tempUser.getDepartName3());
+				}
+				if(StringUtils.isNotEmpty(tempUser.getDepartName())){
+					tempMap.put(HEADER_DEPARTMENT, tempUser.getDepartNames());
+				}
 				String orgFullName=tempUser.getOrgFullName();
 				if(StringUtils.isNotEmpty(tempUser.getInstitutionName())){
 					tempMap.put(HEADER_INSTITUTION, tempUser.getInstitutionName());
@@ -111,15 +121,6 @@ public class UserAccountExportService {
 				}
 				if(StringUtils.isNotEmpty(tempUser.getSiteName())){
 					tempMap.put(HEADER_SITE, tempUser.getSiteName());
-				}
-				if(StringUtils.isNotEmpty(tempUser.getDepartName())){
-					tempMap.put(HEADER_DEPARTMENT, tempUser.getDepartName());
-				}
-				if(StringUtils.isNotEmpty(tempUser.getDepartName2())){
-					tempMap.put(HEADER_DEPARTMENT2, tempUser.getDepartName2());
-				}
-				if(StringUtils.isNotEmpty(tempUser.getDepartName3())){
-					tempMap.put(HEADER_DEPARTMENT3, tempUser.getDepartName3());
 				}
 				tempMap.put(HEADER_LOGINNAME, tempUser.getLoginName());
 				tempMap.put(HEADER_NAME, tempUser.getName());
