@@ -5,6 +5,7 @@ import com.ge.apm.dao.ZkbSalesPersonInfoRepository;
 import com.ge.apm.dao.ZkbSalesTenantAssociateRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.zkb.ZkbSalesPersonInfoService;
+import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -36,6 +37,8 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
 
     private String tenantInfoUid;
 
+    private UserAccount currentUser;
+
     @Override
     protected GenericRepositoryUUID<ZkbSalesPersonInfo> getDAO() {
         return dao;
@@ -49,7 +52,7 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
         zkbSalesPersonInfoService = WebUtil.getBean(ZkbSalesPersonInfoService.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         tenantInfoList = zkbSalesPersonInfoService.getSourceTenantInfoList();
-
+        currentUser = UserContextService.getCurrentUserAccount();
     }
 
     @Override
@@ -57,8 +60,18 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
         super.prepareCreate();
         this.selected.setSparePartsSelection(true);
         this.selected.setProbeSelection(true);
+        this.selected.setCreatedBy(currentUser.getLoginName());
+        this.selected.setCreatedTime(new Date());
+        this.selected.setModifiedBy(currentUser.getLoginName());
+        this.selected.setModifiedTime(new Date());
     }
 
+    @Override
+    public void prepareEdit(){
+        super.prepareEdit();
+        this.selected.setModifiedBy(currentUser.getLoginName());
+        this.selected.setModifiedTime(new Date());
+    }
     public void prepareAssociateTenant() {
         tenantInfoUids = new ArrayList<String>();
         if (selected == null) {
@@ -82,6 +95,7 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
             zkbSalesTenantAssociates.setZkbSalesPersonInfo(this.selected);
             zkbSalesTenantAssociates.setCreatedTime(new Date());
             zkbSalesTenantAssociates.setSalesPersonId(this.selected.getId());
+            zkbSalesTenantAssociates.setCreatedBy(currentUser.getLoginName());
             zkbSalesTenantAssociatesList.add(zkbSalesTenantAssociates);
          });
         zkbSalesTenantAssociateRepository.save(zkbSalesTenantAssociatesList);
