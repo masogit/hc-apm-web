@@ -9,15 +9,15 @@
 
     <ui:composition>
 
-        <p:dialog id="tenantEditDlg" widgetVar="tenantEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="租户设置">
+        <p:dialog id="tenantEditDlg" widgetVar="tenantEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="关联租户">
             <h:form id="tenantEditForm">
                 <h:panelGroup id="display2"  >
-                    <div   class="ui-tabs " style="height: 362px; overflow: auto;"  >
-                              <p:panelGrid columns="2" rendered="#{zkbSalesPersonInfoController.selected != null}">
+                    <div   class="ui-tabs " style="height: 362px;overflow: auto;width: 450px;"  >
+                              <p:panelGrid  style="width: 100%;" columns="2" rendered="#{zkbSalesPersonInfoController.selected != null}">
                                 <p:outputLabel value="姓名"/>
                                 <p:outputLabel value="#{zkbSalesPersonInfoController.selected.name}"/>
                                 <p:outputLabel value="关联租户" for="tenant" />
-                                <p:selectManyCheckbox id="tenant" value="#{zkbSalesPersonInfoController.tenantInfoUids}"   layout="pageDirection"  >
+                                <p:selectManyCheckbox style="width: 100%;" id="tenant" value="#{zkbSalesPersonInfoController.tenantInfoUids}"   layout="pageDirection"  >
                                     <p:ajax update=":tenantEditForm:tenant"/>
                                     <f:selectItems value="#{zkbSalesPersonInfoController.tenantInfoList}" var="tenantInfo" itemLabel="#{tenantInfo.name}" itemValue="#{tenantInfo.uid}"   />
                                  </p:selectManyCheckbox>
