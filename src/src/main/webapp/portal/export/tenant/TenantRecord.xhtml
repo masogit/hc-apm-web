@@ -251,7 +251,6 @@
             function updateSelectAllCheckBox() {
                 var checkboxlist = $(".selectCheckBox");
                 var selectAllstatus = true;
-                debugger
                 checkboxlist.each(function () {
                     selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
                 });

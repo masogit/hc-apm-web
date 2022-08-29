@@ -28,7 +28,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{workOrderMgrSupplierController.itemDetail.approved == null ? false : true}">
-                        <img src="#{workOrderMgrSupplierController.itemDetail.detailReviewSignature == null ? '' : fileDownloadService.getFileUrl(workOrderMgrSupplierController.itemDetail.detailReviewSignature)}" />
+                        <img src="#{workOrderMgrSupplierController.itemDetail.detailReviewSignature == null ? '' : fileDownloadService.getImgBase64(workOrderMgrSupplierController.itemDetail.detailReviewSignature)}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
@@ -127,7 +127,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{workOrderMgrSupplierController.itemDetail.approved == null ? false : true}">
-                        <img src="#{workOrderMgrSupplierController.itemDetail.detailReviewSignature == null ? '' :  fileDownloadService.getFileUrl(workOrderMgrSupplierController.itemDetail.detailReviewSignature)}" />
+                        <img src="#{workOrderMgrSupplierController.itemDetail.detailReviewSignature == null ? '' :  fileDownloadService.getImgBase64(workOrderMgrSupplierController.itemDetail.detailReviewSignature)}" />
                     </h:panelGroup>
 
                     <h:panelGroup>

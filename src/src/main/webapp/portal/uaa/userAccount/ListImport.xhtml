@@ -15,7 +15,8 @@
 				<h:panelGroup>
 					<p>#{msg.description}</p>
 					<p>
-						1. <a href="UserAccountImport_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
+<!--						1. <a href="UserAccountImport_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>-->
+						1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('USER_ACCOUNT')}" styleClass="p-mr-2"/>
 					</p>
 					<p>2. #{msg.FillInTheFileToBeImported}</p>
 					<p>3. #{msg.upFileImport}</p>

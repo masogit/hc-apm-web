@@ -120,7 +120,7 @@
                         </div>
                         <div class="ui-g-4">
                             <p:galleria value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,1)}" var="attach" panelWidth="300" panelHeight="200" showCaption="false" rendered="#{!empty assetInfoController.getAttachList(assetInfoController.selected.uid,1)}">
-                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;" onclick="javascript:showthis(this);"/>
+                                <p:graphicImage value="#{fileDownloadService.getFile(attach.objectStorageId)}" stream="false" style="max-width: auto;height: 100%;" onclick="javascript:showthis(this);"/>
                             </p:galleria>
                         </div>
                     </div>
@@ -535,17 +535,20 @@
                 <p:tabView>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 1)}">
                         <p:dataList value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 2)}">
                         <p:dataList value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,2)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 3)}">
                         <p:dataList value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,3)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoController.selected.qrCode}">
