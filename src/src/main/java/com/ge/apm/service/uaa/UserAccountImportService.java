@@ -172,7 +172,9 @@ public class UserAccountImportService {
 				newUser.setUid(UUID.randomUUID().toString().replace("-", ""));
 			}
 			//create finally
-			telephoneValid(newUser);
+			if (telephoneValid(newUser)) {
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.DUPLICATE_TELEPHONE,"电话号码已存在");
+			}
 
 			if (StringUtils.isEmpty(newUser.getPassword())) {
 				if (StringUtils.isEmpty(tenantInfo.getInitialPassword())) {
@@ -199,9 +201,11 @@ public class UserAccountImportService {
 						return newUser;
 					}
 				}
-				if (ObjectUtil.isAllNotEmpty(telephone, user.getTelephone()) || ObjectUtil.isNotEmpty(telephone)) {
+				if (ObjectUtil.isNotEmpty(telephone)) {
 					if(!telephone.equals(user.getTelephone())){
-						telephoneValid(newUser);
+						if (telephoneValid(newUser)) {
+							newUser.setStatusDisplay(UploadFileErrorTypeEnum.DUPLICATE_TELEPHONE,"电话号码已存在");
+						}
 					}
 				}
 			}
@@ -227,7 +231,7 @@ public class UserAccountImportService {
 			wrapper.eq(telephone.length() < 11, "tenant_uid", newUser.getTenantUID());
 			return userAccountMapper.selectCount(wrapper) > 0;
 		}
-		return true;
+		return false;
 	}
 
 	private OrgInfo getOrgInfoByMappingUid(String uid){
@@ -798,7 +802,7 @@ public class UserAccountImportService {
 		int positionIndex=header.get(HEADER_POSITION);
 		int tagsIndex=header.get(HEADER_TAGS);
 		Integer passwordIndex=header.get(HEADER_PASSWORD);
-		int uuidIndex=header.get(HEADER_UUID);
+		Integer uuidIndex=header.get(HEADER_UUID);
 
 		List<String> telephoneList = new ArrayList<>();
 		List<String> loginNameList = new ArrayList<>();
@@ -858,13 +862,9 @@ public class UserAccountImportService {
 
 				tagsJoined=ExcelParser.getCellStringValue(row, tagsIndex);
 
-				if (passwordIndex != null) {
-					password = ExcelParser.getCellStringValue(row, passwordIndex);
-				} else {
-					password = null;
-				}
+				password = ObjectUtil.isNotEmpty(passwordIndex) ? ExcelParser.getCellStringValue(row, passwordIndex) : "";
 
-				UUID=ExcelParser.getCellStringValue(row, uuidIndex);
+				UUID = ObjectUtil.isNotEmpty(uuidIndex) ? ExcelParser.getCellStringValue(row, uuidIndex) : "";
 				
 				if(!pass){
 					importFailedDataList.add(newUser);
