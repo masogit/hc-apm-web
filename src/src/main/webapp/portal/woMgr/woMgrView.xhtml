@@ -125,7 +125,7 @@
                         <f:facet name="header">#{msg.RequestImage}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="#{fileDownloadService.getFileUrl(picItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
+                                <p:graphicImage value="#{fileDownloadService.getFile(picItem.objectStorageId)}" stream="false" style="max-width: 100%;height: auto"/>
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
@@ -133,7 +133,7 @@
                         <f:facet name="header">#{msg.RepairImage}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="#{fileDownloadService.getFileUrl(woPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
+                                <p:graphicImage value="#{fileDownloadService.getFile(woPicItem.objectStorageId)}" stream="false" style="max-width: 100%;height: auto"/>
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
@@ -144,7 +144,8 @@
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
                                 #{woAttachItem.objectName}
-                                <p:link href="#{fileDownloadService.getFileUrl(woAttachItem.objectStorageId)}"> #{msg.DownloadFile}</p:link>
+                                <p:commandLink value="#{msg.DownloadFile}" ajax="false" actionListener="#{fileDownloadService.downloadFile(woAttachItem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:link href="#{fileDownloadService.getFileUrl(woAttachItem.objectStorageId)}"> #{msg.DownloadFile}</p:link>-->
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
@@ -434,7 +435,7 @@
                                 <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                                 <p:panel  style="text-align:center">
                                     <h:panelGrid columns="1" style="width:100%" >
-                                        <p:graphicImage   url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" stream="false" height="80"  width="100"/>
                                     </h:panelGrid>
                                 </p:panel>
                             </p:dataGrid>

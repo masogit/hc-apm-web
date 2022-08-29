@@ -422,10 +422,11 @@
                                         <h:panelGroup >
                                             <p:dataList id="pictureList" value="#{assetArrivedListEditController.getAttachList('asset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                    <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -438,10 +439,11 @@
                                         <h:panelGroup >
                                             <p:dataList id="contractList" value="#{assetArrivedListEditController.getAttachList('asset2')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                    <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -454,10 +456,11 @@
                                         <h:panelGroup >
                                             <p:dataList id="manualList" value="#{assetArrivedListEditController.getAttachList('asset3')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
-                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                    <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -477,10 +480,11 @@
                                                         <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
                                                     </c:otherwise>
                                                 </c:choose>
-                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
-                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                    <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -494,10 +498,11 @@
                                             <h:panelGroup >
                                                 <p:dataList id="#{attachmentConfig.boType.concat('List')}" value="#{assetArrivedListEditController.getAttachList(attachmentConfig.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                     <f:facet name="header">#{attachmentConfig.label}</f:facet>
-                                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                                     <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
-                                                        <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                             src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                        <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
                                                     </h:panelGroup>
                                                     <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -519,10 +524,11 @@
                                 <h:panelGroup >
                                     <p:dataList id="accessoryFinishedList" value="#{assetArrivedListEditController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                         <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
-                                        <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                        <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                         <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
-                                            <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                 src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                            <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                 src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                         </h:panelGroup>
                                         <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryFinishedList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">

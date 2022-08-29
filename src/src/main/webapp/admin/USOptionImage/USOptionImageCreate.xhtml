@@ -83,8 +83,8 @@
                                                 <div class="row" id="picDiv">
                                                     <c:forEach items="#{uSOptionImageEditController.getAttachList(uSOptionImageEditController.selected.usSegment,uSOptionImageEditController.selected.productName)}" var="attach" >
                                                         <div>
-                                                            <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
-                                                                 src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                            <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                                                 src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
                                                                  style="opacity:0; width:1px; height:1px"/>
                                                         </div>
                                                     </c:forEach>
@@ -102,7 +102,8 @@
                                     <h:panelGroup >
                                         <p:dataList id="pictureList" value="#{uSOptionImageEditController.getAttachList(uSOptionImageEditController.selected.usSegment,uSOptionImageEditController.selected.productName)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                             <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                             <p:commandButton actionListener="#{uSOptionImageEditController.removeAttachmentById(fileitem.id)}" update="#{uSOptionImageEditController.CRUDActionName.equals('修改')?'pictureList tab:AssetInfoEditForm:pict':'pictureList'}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
