@@ -11,19 +11,25 @@
 
         <p:dialog id="tenantEditDlg" widgetVar="tenantEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="租户设置">
             <h:form id="tenantEditForm">
-                <h:panelGroup id="display2">
-                      <p:panelGrid columns="2" rendered="#{zkbSalesPersonInfoController.selected != null}">
-                        <p:outputLabel value="姓名"/>
-                        <p:outputLabel value="#{zkbSalesPersonInfoController.selected.name}"/>
-                        <p:outputLabel value="关联租户" for="tenant" />
-                        <p:selectManyCheckbox id="tenant" value="#{zkbSalesPersonInfoController.tenantInfoUids}" layout="pageDirection"  >
-                            <p:ajax update=":tenantEditForm:tenant"/>
-                            <f:selectItems value="#{zkbSalesPersonInfoController.tenantInfoList}" var="tenantInfo" itemLabel="#{tenantInfo.name}" itemValue="#{tenantInfo.uid}"   />
-                         </p:selectManyCheckbox>
-                    </p:panelGrid>
+                <h:panelGroup id="display2"  >
+                    <div   class="ui-tabs " style="height: 362px; overflow: auto;"  >
+                              <p:panelGrid columns="2" rendered="#{zkbSalesPersonInfoController.selected != null}">
+                                <p:outputLabel value="姓名"/>
+                                <p:outputLabel value="#{zkbSalesPersonInfoController.selected.name}"/>
+                                <p:outputLabel value="关联租户" for="tenant" />
+                                <p:selectManyCheckbox id="tenant" value="#{zkbSalesPersonInfoController.tenantInfoUids}"   layout="pageDirection"  >
+                                    <p:ajax update=":tenantEditForm:tenant"/>
+                                    <f:selectItems value="#{zkbSalesPersonInfoController.tenantInfoList}" var="tenantInfo" itemLabel="#{tenantInfo.name}" itemValue="#{tenantInfo.uid}"   />
+                                 </p:selectManyCheckbox>
+                            </p:panelGrid>
+                    </div>
                      <br/>
                     <p:commandButton validateClient="true" actionListener="#{zkbSalesPersonInfoController.saveSalesTenantAssociate}" value="#{msg.Save}" update=":salesPersonInfoListForm:datalist, :growl"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'tenantEditDialog');"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" onclick="PF('tenantEditDialog').hide()"/>
+
+
+
+
                 </h:panelGroup>
             </h:form>
         </p:dialog>
