@@ -81,9 +81,10 @@
 
 						<p:column headerText="#{msg.ReportDownload}" exportable="false">
 							<p:repeat value="#{item.reports}" var="report">
-								<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
-									<h:outputText value="#{report.displayName}" />
-								</p:link>
+								<p:commandLink value="#{report.displayName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(report.storageId)}" styleClass="p-mr-2"/>
+<!--								<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">-->
+<!--									<h:outputText value="#{report.displayName}" />-->
+<!--								</p:link>-->
 								<br />
 							</p:repeat>
 						</p:column>

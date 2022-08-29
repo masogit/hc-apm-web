@@ -66,8 +66,8 @@
                                         items="#{assetInfoEditController.pictureList}"
                                         var="attach">
                                     <div>
-                                        <img data-original="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
-                                             src="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
+                                        <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                             src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
                                              style="opacity:0; width:1px; height:1px"/>
                                     </div>
                                 </c:forEach>
@@ -97,9 +97,12 @@
                                         <li><a class="jp-stop" href="#">Stop</a></li>
                                     </ul>
                                 </div>
-                                <c:forEach items="#{assetInfoEditController.audioList}" var="item" varStatus="status">
+                                <c:forEach items="#{assetInfoDetailController.getAttachList('9f44536bcff34c2c8cfd3cee6638c692', 1)}" var="item" varStatus="status">
                                     <h:inputHidden class="mp3Link" value="#{fileDownloadService.getFileUrl(item.objectStorageId)}" id="audio#{status.index}"/>
                                 </c:forEach>
+<!--                                <c:forEach items="#{assetInfoEditController.audioList}" var="item" varStatus="status">-->
+<!--                                    <h:inputHidden class="mp3Link" value="#{fileDownloadService.getFileUrl(item.objectStorageId)}" id="audio#{status.index}"/>-->
+<!--                                </c:forEach>-->
                             </p:panelGrid>
                         </p:fieldset>
 
@@ -151,8 +154,8 @@
                                                 <div class="row" id="assetPagePicDiv">
                                                     <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
                                                         <div>
-                                                            <img data-original="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
-                                                                 src="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
+                                                            <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                                                 src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
                                                                  style="opacity:0; width:1px; height:1px"/>
                                                         </div>
                                                     </c:forEach>
@@ -245,7 +248,8 @@
                                     <h:panelGroup >
                                         <p:dataList id="pictureList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                             <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                             <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{assetInfoEditController.CRUDActionName.equals('修改')?'pictureList tab:AssetInfoEditForm:pict':'pictureList'}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
@@ -256,7 +260,8 @@
                                     <h:panelGroup >
                                         <p:dataList id="contractList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                             <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                             <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
@@ -267,7 +272,8 @@
                                     <h:panelGroup >
                                         <p:dataList id="manualList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                             <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
-                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                             <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
@@ -279,7 +285,8 @@
                                         <h:panelGroup>
                                             <p:dataList id="#{attachmentConfig.boType.concat('List')}" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{attachmentConfig.label}</f:facet>
-                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                                 <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
@@ -296,7 +303,7 @@
                                 </p:selectManyCheckbox>
                                 <c:forEach items="#{assetInfoEditController.pictureList}" var="item" varStatus="status">
                                     <div class="ui-grid-col-2" style="text-align:center">
-                                        <p:graphicImage url="#{fileDownloadService.getFileUrl(item.objectStorageId)}"  height="60"  width="80" />
+                                        <p:graphicImage value="#{fileDownloadService.getFile(item.objectStorageId)}" stream="false" height="60"  width="80" />
                                         <p:checkbox id="opt#{item.id}" for="custom" itemIndex="#{status.index}" />
                                     </div>
                                 </c:forEach>

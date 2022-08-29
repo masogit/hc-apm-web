@@ -144,7 +144,8 @@
                     <h:panelGroup>
                         <p:dataList id="uploadList" value="#{zkbCourseTrainEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">上传确认函</f:facet>
-                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                             <p:commandButton actionListener="#{zkbCourseTrainEditController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -198,7 +199,10 @@
                                <h:outputText value="1"/>
                            </c:forEach>-->
                            <c:forEach var="i" begin="0" end="9" >
-                               <p style="margin: 0px;"><p:link style="color: #0000ff" href="#{fileDownloadService.getFileUrl(item.v2_blobObjectList[i].objectStorageId)}">#{item.v2_blobObjectList[i].objectName}</p:link></p>
+                               <p style="margin: 0px;">
+                                   <p:commandLink value="#{item.v2_blobObjectList[i].objectName}" ajax="false" style="color: #0000ff" actionListener="#{fileDownloadService.downloadFile(item.v2_blobObjectList[i].objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                   <p:link style="color: #0000ff" href="#{fileDownloadService.getFileUrl(item.v2_blobObjectList[i].objectStorageId)}">#{item.v2_blobObjectList[i].objectName}</p:link>-->
+                               </p>
                            </c:forEach>
                         </p:column>
                     </p:dataTable>

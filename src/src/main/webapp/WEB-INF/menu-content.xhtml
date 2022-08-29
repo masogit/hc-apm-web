@@ -101,7 +101,7 @@
                 <p:menuitem id="um30" value="#{msg.DeviceMedicalAccidentMgmt}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um301" value="#{msg.ChecklistAdmin}" outcome="/portal/insp/checkListList.xhtml" rendered="false"/>
                 <p:menuitem id="um302" value="#{msg.PmOrderRuleItem}" outcome="/portal/pm/pmOrderRuleItem/List.xhtml" rendered="false"/>
-                <p:menuitem id="um303" value="#{msg.PmOrderRule}" outcome="/portal/pm/pmOrderRule/List.xhtml" rendered="#{userContextService.accessContains('maintain.rule')}"/>
+                <p:menuitem id="um303" value="#{msg.PmOrderRule}" outcome="/portal/pm/pmOrderRule/List.xhtml"/>
                 <!-- <p:menuitem id="um304" value="#{msg.RelRuleAsset}" outcome="/portal/pm/pmOrderRule/RelRuleAsset.xhtml"/> -->
                 <p:menuitem id="um306" value="#{msg.assetRuleManager}" outcome="/portal/pm/relRuleAsset/List.xhtml" rendered="#{userContextService.accessContains('maintain.assetMgt')}"/>
                 <p:menuitem id="um307" value="#{msg.ElectricSafetyDataImport}" outcome="/portal/electricSafety/measureElectricSafetyMain.xhtml" rendered="#{userContextService.accessContains('maintain.electricDataImport')}"/>

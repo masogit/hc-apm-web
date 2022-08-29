@@ -328,7 +328,7 @@
                         <p:dataGrid var="picItem" value="#{assetInfoApprovalController.getPicList()}" columns="4" layout="grid"  rendered="#{not empty assetInfoApprovalController.getPicList()}">
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%">
-                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(picItem.objectStorageId)}"   style="max-width: 100%;height: auto" onclick="javascript:showthis(this);"/> 
+                                    <p:graphicImage value="#{fileDownloadService.getFile(picItem.objectStorageId)}" stream="false" style="max-width: 100%;height: auto" onclick="javascript:showthis(this);"/>
                                 </h:panelGrid>
                             </p:panel>
                         </p:dataGrid>

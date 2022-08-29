@@ -120,8 +120,8 @@
                                             <div class="row" id="picDiv">
                                                 <c:forEach items="#{sharedAssetTypeController.getAttachList(sharedAssetTypeController.selected.id)}" var="attach" >
                                                     <div>
-                                                        <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
-                                                             src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                        <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                                             src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
                                                              style="opacity:0; width:1px; height:1px"/>
                                                     </div>
                                                 </c:forEach>
@@ -138,7 +138,8 @@
                         <h:panelGroup >
                             <p:dataList id="pictureList" value="#{sharedAssetTypeController.getAttachList(sharedAssetTypeController.selected.id)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                 <p:commandButton actionListener="#{sharedAssetTypeController.removeAttachmentById(fileitem.id)}" update="pictureList SwapTypeEditForm:pict" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>

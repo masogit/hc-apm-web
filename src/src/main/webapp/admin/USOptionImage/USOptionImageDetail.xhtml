@@ -45,8 +45,8 @@
                                 <div class="row" id="picDiv">
                                     <c:forEach items="#{uSOptionImageDetailController.getAttachList(uSOptionImageDetailController.selected.usSegment,uSOptionImageDetailController.selected.productName)}" var="attach" >
                                         <div>
-                                            <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
-                                                 src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                            <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                                 src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
                                                  style="opacity:0; width:1px; height:1px" />
                                         </div>
                                     </c:forEach>
