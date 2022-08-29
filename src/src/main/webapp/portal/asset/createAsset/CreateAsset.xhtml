@@ -51,7 +51,7 @@
                 <p:fieldset legend="#{msg.BasicInformation}" id="accordion" >
                     <div class="ui-g-7">
                         <p:galleria value="#{assetCreateController.pictureList}" var="attach" panelWidth="500" panelHeight="313" showCaption="false"  autoPlay="false">
-                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/>
+                            <p:graphicImage value="#{fileDownloadService.getFile(attach.objectStorageId)}" stream="false" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/>
                         </p:galleria>
                     </div>
                     <div class="ui-g-5">
@@ -323,7 +323,7 @@
                                 </p:selectManyCheckbox>
                                 <c:forEach items="#{assetCreateController.pictureList}" var="item" varStatus="status">
                                     <div class="ui-grid-col-2" style="text-align:center">
-                                        <p:graphicImage url="#{fileDownloadService.getFileUrl(item.objectStorageId)}"  height="60"  width="80" />
+                                        <p:graphicImage value="#{fileDownloadService.getFile(item.objectStorageId)}" stream="false" height="60"  width="80" />
                                         <p:checkbox id="opt#{item.id}" for="custom" itemIndex="#{status.index}" />
                                     </div>
                                 </c:forEach>

@@ -32,7 +32,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
-                        <img src="#{workOrderMgrController.itemDetail.detailReviewSignature == null ? '' : fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
+                        <img src="#{workOrderMgrController.itemDetail.detailReviewSignature == null ? '' : fileDownloadService.getImgBase64(workOrderMgrController.itemDetail.detailReviewSignature)}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
@@ -141,7 +141,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
-                        <img src="#{workOrderMgrController.itemDetail.detailReviewSignature == null ? '' :  fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
+                        <img src="#{workOrderMgrController.itemDetail.detailReviewSignature == null ? '' :  fileDownloadService.getImgBase64(workOrderMgrController.itemDetail.detailReviewSignature)}" />
                     </h:panelGroup>
 
                     <h:panelGroup>

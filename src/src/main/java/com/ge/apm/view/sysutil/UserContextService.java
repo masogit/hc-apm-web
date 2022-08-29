@@ -1210,11 +1210,7 @@ public class UserContextService implements Serializable {
     public boolean isLocale(){
         Locale locale = LocaleHolder.getLocale();
         //System.out.println("locale  is "+locale);
-        if(locale.getLanguage().equalsIgnoreCase("zh")){
-            return true;
-        } else {
-            return false;
-        }
+        return "zh".equalsIgnoreCase(locale.getLanguage());
     }
 
     public String timeFormat(){
