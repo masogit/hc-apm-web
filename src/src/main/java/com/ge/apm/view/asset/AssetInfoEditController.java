@@ -1436,7 +1436,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
     private void saveAssetHistory() {
-        AssetInfo oldAsset = dao.findByUid(selected.getUid());
+//        AssetInfo oldAsset = dao.findByUid(selected.getUid());
 
         MqContext mqContext = new MqContext();
 //        JSONObject jsonObject = (JSONObject) JSONObject.toJSON(selected);
@@ -1452,7 +1452,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         jsonObject.put("currentUserAccount",currentUserAccount);
         mqContext.setJsonObject(jsonObject);
         MqUtils.sendToMq(mqContext);
-        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
+//        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
     }
 
     public int getAssetChangeHistoryCount() {

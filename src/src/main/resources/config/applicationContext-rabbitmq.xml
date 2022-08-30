@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-
        xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
 
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-
-        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-    http://www.springframework.org/schema/rabbit
-    http://www.springframework.org/schema/rabbit/spring-rabbit-1.4.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd"
-
->
     <bean id="mqSource"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:mq.properties"/>
@@ -38,8 +30,9 @@
                      mandatory="true"
                      return-callback="ReturnCall"
     />
-    <rabbit:queue id="assetDeleteQueue" name="assetDeleteQueue" durable="true" auto-delete="false" exclusive="false" auto-declare="true"/>
-    <rabbit:queue id="assetUpdateQueue" name="assetUpdateQueue" durable="true" auto-delete="false" exclusive="false" auto-declare="true"/>
+<!--    exclusive="false" auto-declare="true"-->
+    <rabbit:queue id="assetDeleteQueue" name="assetDeleteQueue" durable="true" auto-delete="false" />
+    <rabbit:queue id="assetUpdateQueue" name="assetUpdateQueue" durable="true" auto-delete="false" />
 
     <rabbit:topic-exchange  name="assetChange" durable="true" auto-delete="false" auto-declare="true" id="assetChange">
         <rabbit:bindings>
@@ -50,10 +43,10 @@
 
     <rabbit:listener-container connection-factory="rabbitConnectionFactory" acknowledge="manual" message-converter="jackson2JsonMessageConverter" >
         <!-- 监听一个队列，当队列中有消息，就会自动触发类.方法，传递消息就作为方法的参数，根据方法声明的参数强转 -->
-        <rabbit:listener ref="testConsumer"  queue-names="assetDeleteQueue"/>
+        <rabbit:listener ref="assetChangeConsumer"  queue-names="assetUpdateQueue"/>
     </rabbit:listener-container>
 
-    <bean id="testConsumer" class="com.ge.apm.listener.TestConsumer"/>
+    <bean id="assetChangeConsumer" class="com.ge.apm.listener.AssetChangeConsumer"/>
 
 
 
