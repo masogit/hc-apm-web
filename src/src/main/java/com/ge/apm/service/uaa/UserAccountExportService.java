@@ -103,14 +103,14 @@ public class UserAccountExportService {
 			for (int i = 0; i < listUserAccount.size(); ++i) {
 				UserAccount tempUser = listUserAccount.get(i);
 				Map<String, Object> tempMap = new HashMap<String, Object>();
+				if(StringUtils.isNotEmpty(tempUser.getDepartName())) {
+					tempMap.put(HEADER_DEPARTMENT, tempUser.getDepartNames(1));
+				}
 				if(StringUtils.isNotEmpty(tempUser.getDepartName2())){
-					tempMap.put(HEADER_DEPARTMENT2, tempUser.getDepartName2());
+					tempMap.put(HEADER_DEPARTMENT2, tempUser.getDepartNames(2));
 				}
 				if(StringUtils.isNotEmpty(tempUser.getDepartName3())){
-					tempMap.put(HEADER_DEPARTMENT3, tempUser.getDepartName3());
-				}
-				if(StringUtils.isNotEmpty(tempUser.getDepartName())){
-					tempMap.put(HEADER_DEPARTMENT, tempUser.getDepartNames());
+					tempMap.put(HEADER_DEPARTMENT3, tempUser.getDepartNames(3));
 				}
 				String orgFullName=tempUser.getOrgFullName();
 				if(StringUtils.isNotEmpty(tempUser.getInstitutionName())){
