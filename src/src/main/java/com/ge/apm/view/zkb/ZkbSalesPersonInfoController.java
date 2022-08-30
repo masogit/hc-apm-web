@@ -3,9 +3,14 @@ package com.ge.apm.view.zkb;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbSalesPersonInfoRepository;
 import com.ge.apm.dao.ZkbSalesTenantAssociateRepository;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.ZkbSalesPersonInfo;
+import com.ge.apm.domain.ZkbSalesTenantAssociate;
 import com.ge.apm.service.zkb.ZkbSalesPersonInfoService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -121,6 +126,17 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
             sb.append(t.getName()).append(" ");
         });
         return sb.toString();
+    }
+
+    @Override
+    @Transactional
+    public void save() {
+        if(!this.selected.getSparePartsSelection()&&!this.selected.getProbeSelection()){
+            WebUtil.addErrorMessage(WebUtil.getMessage("请至少勾选一种订单类型！"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        super.save();
     }
 
     public List<TenantInfo> getTenantInfoList() {
