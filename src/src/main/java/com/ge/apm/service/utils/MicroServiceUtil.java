@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.codec.binary.Base64;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.core.io.ByteArrayResource;
@@ -19,7 +20,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.*;
@@ -42,6 +46,33 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return bios;
     }
 
+    public String getImgBase64(String fileId) {
+        Base64 encoder = new Base64();
+        String res = "data:image/jpeg;base64,";
+        try {
+            HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
+            String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);
+            ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
+            HttpHeaders responseHeader = response.getHeaders();
+            List<String> dispositions = responseHeader.get("content-disposition");
+            String disposition = dispositions.get(0);
+            String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
+            String suffix = Arrays.asList(fileName.substring(1, fileName.length() - 1).split("\\.")).get(1);
+            byte[] result = response.getBody();
+            InputStream inputStream = new ByteArrayInputStream(result);
+            BufferedImage image = ImageIO.read(inputStream);
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            ImageIO.write(image, suffix, byteOut);
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+            byte[] bytes = new byte[byteIn.available()];
+            byteIn.read(bytes);
+            res += encoder.encodeToString(bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
     public StreamedContent downloadSingleFile(String fileId) {
         HttpHeaders headers = createHttpHeaders(UserContextService.getAccessToken());
         String gatewayURL = getGatewayURL(GatewayURL.AUTH_DOWNLOAD_FILE);
@@ -52,7 +83,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         DefaultStreamedContent fileStream = new DefaultStreamedContent(ins);
         fileStream.setContentType(responseHeader.getContentType().toString());
         List<String> dispositions = responseHeader.get("content-disposition");
-        String disposition = (String) dispositions.get(0);
+        String disposition = dispositions.get(0);
         String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
         fileStream.setName(fileName);
         return fileStream;

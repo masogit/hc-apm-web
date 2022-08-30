@@ -45,9 +45,10 @@
                         </p:column>
                         <p:column headerText="#{msg.TemplateFile}" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
                                   filterMatchMode="EQ">
-                            <p:link href="#{fileDownloadService.getFileUrl(item.storageId)}">
-                                <h:outputText value="#{item.fileName}"/>
-                            </p:link>
+                            <p:commandLink value="#{item.fileName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(item.storageId)}" styleClass="p-mr-2"/>
+<!--                            <p:link href="#{fileDownloadService.getFileUrl(item.storageId)}">-->
+<!--                                <h:outputText value="#{item.fileName}"/>-->
+<!--                            </p:link>-->
                         </p:column>
 
                         <f:facet name="{Toolbar}">

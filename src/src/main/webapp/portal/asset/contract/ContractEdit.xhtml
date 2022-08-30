@@ -145,7 +145,8 @@
 
                                 <div class="ui-g">
                                     <h:outputText value="#{fieldMsg.fieldValue('contractAttachmentType', fileitem.boSubType)}" class="ui-g-2"/>
-                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" class="ui-g-3" >#{fileitem.objectName}</p:link>
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="ui-g-3"/>
+<!--                                    <p:link href="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" class="ui-g-3" >#{fileitem.objectName}</p:link>-->
                                     <h:outputText value="#{fileitem.createdDate}" class="ui-g-3">
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                                     </h:outputText>
