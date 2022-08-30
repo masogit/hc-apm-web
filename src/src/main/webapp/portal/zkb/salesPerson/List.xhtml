@@ -53,7 +53,7 @@
                                              update="datalist" disabled="#{empty zkbSalesPersonInfoController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
                             </p:commandButton>
-                            <p:commandButton id="tenantButton" icon="ui-icon-people" title="租户设置"  actionListener="#{zkbSalesPersonInfoController.prepareAssociateTenant}"
+                            <p:commandButton id="tenantButton" icon="ui-icon-person-add" title="关联租户"  actionListener="#{zkbSalesPersonInfoController.prepareAssociateTenant}"
                                              update=":tenantEditDlg" oncomplete="PF('tenantEditDialog').show()" disabled="#{empty zkbSalesPersonInfoController.selected}" />
                         </f:facet>
                     </p:dataTable>
