@@ -300,4 +300,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     List<OrgInfo> findAllSiteByTenantUid(String tenantUid);
 
     List<OrgInfo> findByTenantUID(String tenantUID);
+
+//    @Query(nativeQuery = true, value = "select o from org_info o where o.site_uid = ?1 and o.name_py_code= ?2")
+    OrgInfo findBySiteUIDAndNamePyCode(String siteUID,String name);
 }
