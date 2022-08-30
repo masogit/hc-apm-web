@@ -150,7 +150,7 @@ and open the template in the editor.
                                                         <div style="display: inline-block;width: 78px">
                                                             <figure style="display: block; padding-right: 3px;" id="#{fileitem.fileUrl}">
                                                                 <a href="" data-size="800x600">
-                                                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.fileUrl)}"  height="78px" width="78px" />
+                                                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.fileUrl)}" stream="false" height="78px" width="78px" />
                                                                 </a>
                                                             </figure>
                                                             <p class="removePicButton" align="center" onclick="showConfirmDialog(this);" style="display:none;width: 78px">

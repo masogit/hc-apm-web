@@ -88,7 +88,8 @@
                     <h:panelGroup>
                         <p:dataList id="measuringUploadList" value="#{measureAssetListController.getAttachList()}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">附件列表</f:facet>
-                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>&nbsp;&nbsp;
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;
+<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>&nbsp;&nbsp;-->
                             <p:commandButton actionListener="#{measureAssetListController.removeAttachmentById(fileitem.id)}" update="measuringUploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>

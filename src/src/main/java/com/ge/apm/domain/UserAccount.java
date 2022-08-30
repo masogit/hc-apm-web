@@ -991,6 +991,10 @@ public class UserAccount implements ChineseName, Serializable {
 		}
 		return departName;
 	}
+	public  String getDepartNames(){
+		OrgInfo org = this.orgInfo;
+		return org.getName();
+	}
 
 	public void setDepartName(String departName) {
 		this.departName = departName;
