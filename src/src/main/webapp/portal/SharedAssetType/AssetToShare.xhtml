@@ -173,7 +173,12 @@
                                 <label class="label">#{msg.SwappedEquipmentNo}</label>
                                 <p:inputText id="swapIndex" value="#{sharedAssetInfoController.selected.sharedAssetSwapIndex}" />
                             </h:panelGroup>
-
+                            <h:panelGroup rendered="#{sharedAssetInfoController.whethertoenableunattended}">
+                                <label class="label">是否可调剂</label>
+                                <p:selectOneRadio id="isAdjust" value="#{sharedAssetInfoController.selected.sharedStatus}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('woConfigIsDefault')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
                             <!--测试代码start-->
                             <!--<h:panelGroup>
                                 <label class="label">测试222</label>
@@ -213,7 +218,12 @@
                                     <f:selectItems value="#{sharedAssetInfoController.allType()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-
+                            <h:panelGroup rendered="#{sharedAssetInfoController.whethertoenableunattended}">
+                                <label class="label">是否可调剂</label>
+                                <p:selectOneRadio id="isAdjustBatch" value="#{sharedAssetInfoController.bathcSharedStatus}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('woConfigIsDefault')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
                         </p:panelGrid>
                         <br/>
                         <p:commandButton validateClient="true" actionListener="#{sharedAssetInfoController.batchSave}" value="批量保存"
