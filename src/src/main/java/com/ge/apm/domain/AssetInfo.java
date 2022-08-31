@@ -626,7 +626,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "running_status")
     private Integer runningStatus;
 
-    //1- 正常可借用， 2-入库待保洁
+    //1- 正常可借用（无人值守可以调剂）， 2-无人值守不可以调剂
     @Column(name = "shared_status")
     private Integer sharedStatus;
 
@@ -2468,7 +2468,7 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public Integer getSharedStatus() {
-        return sharedStatus;
+        return sharedStatus==null?1:sharedStatus;
     }
 
     public void setSharedStatus(Integer sharedStatus) {

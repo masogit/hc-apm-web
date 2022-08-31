@@ -352,5 +352,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
 
         return xStream.toXML(data);
     }
-
+    public boolean isWhethertoenableunattended(){
+       return sharedAssetStockService.isWhethertoenableunattended();
+    }
 }

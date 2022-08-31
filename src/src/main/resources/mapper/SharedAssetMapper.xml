@@ -18,6 +18,7 @@
         <result column="manufacture" property="manufacture"/>
         <result column="asset_is_deleted" property="isDeleted"/>
         <result column="asset_is_valid" property="isValid"/>
+        <result column="shared_status" property="sharedStatus"/>
         <association property="assetDeptOrg" resultMap="orgInfoResult"/>
         <association property="sharedAssetType" resultMap="sharedAssetTypeResult"/>
         <association property="sharedAssetReqDetail" resultMap="sharedAssetReqDetailResult"/>
@@ -75,6 +76,7 @@
                 ai.manufacture,
                 ai.is_deleted as asset_is_deleted,
                 ai.is_valid as asset_is_valid,
+                ai.shared_status as shared_status,
                 oi.name as lease_org_name,
                 oi.name_py_code as org_name_py_code,
                 sat.swap_name as swap_name,
@@ -111,6 +113,7 @@
             ai.manufacture,
             ai.is_deleted as asset_is_deleted,
             ai.is_valid as asset_is_valid,
+            ai.shared_status as shared_status,
             oi.name as lease_org_name,
             oi.name_py_code as org_name_py_code,
             sat.id as sat_id,
