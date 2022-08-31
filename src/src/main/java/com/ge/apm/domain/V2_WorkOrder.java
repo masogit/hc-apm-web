@@ -307,6 +307,9 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="order_type")
     private String orderType;
 
+    @Transient
+    private String partApproveSignature;
+
     public Integer getIsCoreMemberApproval() {
         return isCoreMemberApproval;
     }
@@ -952,5 +955,13 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setOrderType(String orderType) {
         this.orderType = orderType;
+    }
+
+    public String getPartApproveSignature() {
+        return partApproveSignature;
+    }
+
+    public void setPartApproveSignature(String partApproveSignature) {
+        this.partApproveSignature = partApproveSignature;
     }
 }

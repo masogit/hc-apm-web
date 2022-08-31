@@ -95,7 +95,10 @@
                     <br/>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder()}" value="#{msg.ApprovalP}" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.preApproveWorkOrder()}"
+                                         value="#{msg.ApprovalP}" update="woTab:woMgrListForm woTab:woMgrDetailForm woTab:signatureDlg" icon="ui-icon-check"
+                                         oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton style="display: none" id="openSignature" actionListener="#{workOrderMgrController.getSignature()}" value="查看签名" update="woTab:signatureDlg" oncomplete="PF('signatureDlg').show();" />
                         <!--<p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder('false')}" value="拒绝" update=":woMgrListForm :woMgrDetailForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approveDialog');"/>-->
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('approveDialog').hide()"/>
                     </h:panelGroup>
@@ -104,13 +107,37 @@
             </h:form>
             <script>
                 function handleComplete(xhr, status, args) {
-                    if (args.needComents) {
-                        $('#woTab\\:approveDialogForm\\:comment').addClass("ui-state-error");
-                    } else {
-                        handleSubmit(args, 'approveDialog');
+                    if(xhr.status===205){
+                        document.getElementById('woTab:approveDialogForm:openSignature').click();
+                    }else{
+                        if (args.needComents) {
+                            $('#woTab\\:approveDialogForm\\:comment').addClass("ui-state-error");
+                        } else {
+                            handleSubmit(args, 'approveDialog');
+                        }
+                    }
+                }
+                function handleApproveSuccess(xhr, status, args) {
+                    if(xhr.status!==206){
+                        PF('signatureDlg').hide();
+                        PF('approveDialog').hide();
                     }
                 }
             </script>
+        </p:dialog>
+        <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名" modal="true">
+            <h:form id="signatureForm">
+                <h:panelGrid columnClasses="value" columns="1">
+                    <h:panelGroup>
+                        <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sigPanel" base64Value="#{workOrderMgrController.signatureContent}"
+                                     required="true" requiredMessage="签名 #{msg.ValidationRequire}" guideline="false" rendered="#{workOrderMgrController.signatureContentStream==null}" />
+                        <p:graphicImage value="#{workOrderMgrController.signatureContentStream}" stream="false" rendered="#{workOrderMgrController.signatureContentStream!=null}"></p:graphicImage>
+                    </h:panelGroup>
+                </h:panelGrid>
+                <p:commandButton value="确认" actionListener="#{workOrderMgrController.saveSignatureAndSubmitApprove()}" update="woTab:woMgrListForm woTab:woMgrDetailForm" oncomplete="handleApproveSuccess(xhr, status, args);"/>
+                <p:commandButton value="重写" actionListener="#{workOrderMgrController.resetSignature()}" update="woTab:signatureForm" oncomplete="PF('sigPanel').clear()"/>
+                <p:commandButton value="关闭" onclick="PF('signatureDlg').hide();" />
+            </h:form>
         </p:dialog>
     </ui:composition>
 </html>

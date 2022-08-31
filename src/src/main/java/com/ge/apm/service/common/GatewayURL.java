@@ -140,7 +140,9 @@ public enum GatewayURL {
     APPROVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveAdverseEvent"),
 
     RESET_USER_TO_REDIS("/hcapmgateway/api/apm/security/userAccounts/resetUser/{loginName}"),
-    REMOVE_USER_FROM_REDIS("/hcapmgateway/api/apm/security/userAccounts/removeUser/{loginName}");
+    REMOVE_USER_FROM_REDIS("/hcapmgateway/api/apm/security/userAccounts/removeUser/{loginName}"),
+    USER_SIGNATURE("/hcapmmasterdataservice/api/apm/masterData/userSignature"),
+    ;
 
     private final String url;
 

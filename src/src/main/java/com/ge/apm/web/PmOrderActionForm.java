@@ -40,6 +40,8 @@ public class PmOrderActionForm {
     /**县域需求：院区名称 来源于设备所属院区的name字段*/
     private String siteName;
 
+    private String signature;
+
 
 //V2_WorkOrder_Coworker[] coworkes //optional
     public String getPmOrderId() {
@@ -224,5 +226,13 @@ public class PmOrderActionForm {
 
     public void setSiteName(String siteName) {
         this.siteName = siteName;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }

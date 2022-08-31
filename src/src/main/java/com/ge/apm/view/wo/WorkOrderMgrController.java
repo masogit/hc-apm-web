@@ -24,6 +24,7 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.simpleparts.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
+import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -42,6 +43,8 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -51,6 +54,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -60,7 +64,14 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -227,6 +238,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String applyTimeFormatTime = null;
     private String filterApplyTime = null;
     List<V2_WorkOrderManHours> v2WorkOrderManHoursList;
+    // 签名相关
+    private String signatureContent;
+    private StreamedContent signatureContentStream;
+    private String signatureId;
+    private boolean newSignature = true;
 
     @Override
     protected void init() {
@@ -1185,6 +1201,10 @@ public void test1(){
 //      requestAssetUid = null;
         locationName = null;
         v2WorkOrderDetailReturnList = null;
+        signatureId = null;
+        signatureContentStream = null;
+        signatureContent = null;
+        newSignature = true;
     }
 
     public void onSelectWorkOrder() {
@@ -2446,18 +2466,98 @@ public void test1(){
         cancel();
     }
 
-    public void approveWorkOrder() {
-        if (selectedApproverUid !=null) {
-            approveHighLevelWorkOrder();
-            return;
-        }
+    public void getSignature() {
+        this.signatureContent = null;
+        this.signatureContentStream = null;
 
-        List<V2_WorkOrder_Detail> approvedDetailsNew = new ArrayList<>();
+        List<Map<String, String>> signatureList = woService.getUserSignature();
+
+        if (!CollectionUtils.isEmpty(signatureList)) {
+            String lastSignatureId = signatureList.get(signatureList.size() - 1).get("signatureUid");
+            this.signatureContentStream = blobService.getBlobObjectByStorageId(lastSignatureId);
+            this.signatureId = lastSignatureId;
+            this.newSignature = false;
+        }else{
+            this.newSignature = true;
+        }
+    }
+
+    public void resetSignature() {
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+        this.newSignature = true;
+    }
+
+    public void preApproveWorkOrder(){
+        // 审核不通过，必须填写备注
         if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
             WebUtil.addErrorMessage(WebUtil.getMessage(WebUtil.getMessage("ApprovalFallureReasonRequired")));
             RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
             return;
         }
+
+        // 备件审核是否需要签名
+        WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(userContextService.getLoginUser().getSiteUID());
+
+        if(workflowConfig.getPartsNeedSign()){
+            // 如果勾选了‘备件审核需要签名’，校验是否已经签名
+            // 如果没有签名，就在前端弹出签名窗口
+            if(StringUtils.isEmpty(this.signatureId)){
+                ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+                HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+                response.setStatus(205);
+                return;
+            }
+            if(this.newSignature){
+                // 把新签名保存到用户的签名列表
+                woService.addUserSignature(this.signatureId);
+            }
+        }
+
+        approveWorkOrder();
+    }
+
+    public void saveSignatureAndSubmitApprove(){
+        if(this.newSignature){
+            if (StringUtils.isNotEmpty(signatureContent)) {
+                ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+                HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+                try {
+                    String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    byte[] decode = decoder.decodeBuffer(base64);
+
+                    V2_BlobObject blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
+                    if (null != blobObject) {
+                        this.signatureId = blobObject.getObjectStorageId();
+                        woService.addUserSignature(this.signatureId);
+                    }else{
+                        WebUtil.addErrorMessage("签名保存失败！");
+                        response.setStatus(206);
+                        return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error(e.getMessage());
+                    WebUtil.addErrorMessage("签名保存失败！");
+                    response.setStatus(206);
+                    return;
+                }
+            }
+        }
+        approveWorkOrder();
+    }
+
+    public void approveWorkOrder() {
+        // 设置备件审批签名
+        this.selectedWorkOrder.setPartApproveSignature(this.signatureId);
+
+        if (selectedApproverUid !=null) {
+            approveHighLevelWorkOrder();
+            return;
+        }
+        List<V2_WorkOrder_Detail> approvedDetailsNew = new ArrayList<>();
 
         for (int i = 0; i < approvedDetails.size(); i++) {
             V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
@@ -3237,6 +3337,34 @@ public void test1(){
         }
     }
 
+    public String getMaintainSignatureWeb(String signatureId) {
+        StreamedContent streamedContent = blobService.getBlobObjectByStorageId(signatureId);
+        InputStream input = streamedContent.getStream();
+        byte[] b = new byte[1024];
+        StringBuilder sb = new StringBuilder();
+        String result = "";
+        int i = 0;
+        try {
+            while ((i = input.read(b)) > 0) {
+                String str = new String(b, 0, i);
+                sb.append(str);
+            }
+            input.close();
+        } catch (Exception e) {
+            // TODO: handle exception
+            try {
+                input.close();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                LOGGER.error(e.getMessage());
+            }
+            LOGGER.error(e.getMessage());
+            return "";
+        }
+        result = sb.toString();
+        return result;
+    }
+
     public List<V2_WorkOrderManHours> getWorkOrderManHours(String woId){
         return manHoursDao.findByWoIdSort(woId);
     }
@@ -3263,6 +3391,30 @@ public void test1(){
 
     public void setFilterApplyTime(String filterApplyTime) {
         this.filterApplyTime = filterApplyTime;
+    }
+
+    public String getSignatureContent() {
+        return signatureContent;
+    }
+
+    public void setSignatureContent(String signatureContent) {
+        this.signatureContent = signatureContent;
+    }
+
+    public StreamedContent getSignatureContentStream() {
+        return signatureContentStream;
+    }
+
+    public void setSignatureContentStream(StreamedContent signatureContentStream) {
+        this.signatureContentStream = signatureContentStream;
+    }
+
+    public String getSignatureId() {
+        return signatureId;
+    }
+
+    public void setSignatureId(String signatureId) {
+        this.signatureId = signatureId;
     }
 }
 
