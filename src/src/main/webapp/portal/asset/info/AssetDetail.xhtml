@@ -428,6 +428,11 @@
 <!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         </p:dataList>
                     </p:tab>
+                    <p:tab title="#{fieldMsg.fieldValue('attachmentType', 4)}">
+                        <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,4)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                        </p:dataList>
+                    </p:tab>
                     <c:forEach items="#{assetInfoDetailController.getAttachmentCategories()}" var="attachmentConfig">
                         <p:tab title="#{attachmentConfig.label}">
                             <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
