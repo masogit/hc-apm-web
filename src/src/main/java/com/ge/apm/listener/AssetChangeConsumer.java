@@ -11,6 +11,8 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
@@ -61,7 +63,16 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             }
 
             String jsonData = JSONArray.toJSONString(resultList);
-            String assetJson = JSONObject.toJSONString(newAsset);
+
+
+            newAsset.setHospital(null);
+            newAsset.setQrCodeLib(null);
+            newAsset.setAssetTags(null);
+            newAsset.setBrand(null);
+            //gson序列化只与属性(字段)有关，与get开头的方法无关
+            Gson g = new GsonBuilder().create();
+            String assetJson = g.toJson(newAsset);
+//            String assetJson = JSONObject.toJSONString(newAsset);
             AssetHistory assetHistory = new AssetHistory();
             assetHistory.setAssetUid(newAsset.getUid());
             assetHistory.setAssetName(newAsset.getName());

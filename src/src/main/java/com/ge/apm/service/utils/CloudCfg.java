@@ -23,8 +23,8 @@ public class CloudCfg {
         .withValue("credentials.port", ConfigValueFactory.fromAnyRef(5432))
         .withValue("credentials.database", ConfigValueFactory.fromAnyRef("ge_apm"))
         .withValue("credentials.username", ConfigValueFactory.fromAnyRef("postgres"))
-        .withValue("credentials.password", ConfigValueFactory.fromAnyRef("123456"))
-        .withValue("credentials.jdbc_uri", ConfigValueFactory.fromAnyRef("jdbc:postgresql://localhost:5432/postgres"))));
+        .withValue("credentials.password", ConfigValueFactory.fromAnyRef("root"))
+        .withValue("credentials.jdbc_uri", ConfigValueFactory.fromAnyRef("jdbc:postgresql://localhost:5432/ge_apm"))));
     jdbcHost = cfg.getString("credentials.host");
     jdbcPort = cfg.getInt("credentials.port");
     jdbcDatabase = cfg.getString("credentials.database");
