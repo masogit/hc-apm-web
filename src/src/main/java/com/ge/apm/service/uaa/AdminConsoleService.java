@@ -11,6 +11,8 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminConsoleService extends MicroServiceInvoker {
@@ -92,6 +96,10 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	
 	@Autowired
 	BlobObjectRepository blobObjectRepository;
+
+	@Autowired
+	private AssetHistoryRepository assetHistoryRepository;
+
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -574,5 +582,45 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			logger.info("批量创建保养失败记录：{}",pmOrders);
 		} else {
 		}
+	}
+
+	public void batchUpdateAssetHistoryEvent() {
+		int pageNum=0;
+		int pageSize=1000;
+		int querySize=0;
+		//gson序列化只与属性(字段)有关，与get开头的方法无关
+		Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		while (true){
+			try {
+				List<AssetHistory> assetHistorys = assetHistoryRepository.getAssetHistory(pageNum, pageSize);
+				if(CollectionUtils.isEmpty(assetHistorys)){
+					break;
+				}
+				querySize=querySize+assetHistorys.size();
+				Set<String> uids = assetHistorys.stream().map(AssetHistory::getAssetUid).collect(Collectors.toSet());
+
+				List<AssetInfo> assetInfos = assetInfoRepository.fetchListByUid(uids);
+				Map<String, AssetInfo> collect = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo -> AssetInfo));
+				for (AssetHistory  assetHistory:assetHistorys ){
+					AssetInfo assetInfo = collect.get(assetHistory.getAssetUid());
+					if(assetInfo!=null){
+						assetInfo.setHospital(null);
+						assetInfo.setQrCodeLib(null);
+						assetInfo.setAssetTags(null);
+						assetInfo.setBrand(null);
+						String str = g.toJson(assetInfo);
+						assetHistory.setAssetJson(str);
+					}
+				}
+				assetHistoryRepository.save(assetHistorys);
+			}catch (Exception e){
+				logger.error("AdminConsoleService batchUpdateAssetHistoryEvent e:",e);
+
+			}
+
+			pageNum=pageNum+pageSize;
+		}
+
+		logger.info("查询assetHistory size:{}",querySize);
 	}
 }

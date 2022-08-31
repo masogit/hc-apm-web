@@ -3,6 +3,7 @@ package com.ge.apm.service.common;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.listener.UserAccountThreadLocal;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,16 @@ public class I18nMessageService {
     }
 
     public String getMsgLabelByMsgTypeAndMsgKey(String msgType, String msgKey) {
-        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        UserAccount userAccount =null;
+        try{
+            userAccount= UserContextService.getCurrentUserAccount();
+        }catch (Exception e){
+            userAccount = UserAccountThreadLocal.getUserAccount();
+            if(userAccount==null){
+                throw e;
+            }
+        }
+
 
         I18nMessage foundMsg = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(msgType, msgKey, userAccount.getSiteId());
         if (foundMsg == null) {
