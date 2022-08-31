@@ -59,9 +59,7 @@
                                 <p:selectOneMenu onchange="PF('varDataList').filter()">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <c:forEach items="#{fieldMsg.getFieldValueList('attachmentType')}" var="v">
-                                        <c:if test="#{v.msgKey ne '4'}">
-                                            <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}" />
-                                        </c:if>
+                                        <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}" />
                                     </c:forEach>
                                     <!--<f:selectItems value="#{fieldMsg.getFieldValueList('attachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                 </p:selectOneMenu>
