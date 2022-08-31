@@ -5,11 +5,10 @@ import com.ge.apm.callback.MqContext;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.job.AssetHistoryJob;
 import com.ge.apm.mq.MqUtils;
-import com.ge.apm.view.sysutil.UserContextService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.junit.runner.RunWith;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -44,17 +43,21 @@ public class Test {
 
     @org.junit.Test
     public void toAsset(){
-
-        AssetInfo assetInfo = assetInfoRepository.findByUid("d4714eda47fe4b9f9156304d7d9f3ff8");
+//        AssetInfo assetInfo = assetInfoRepository.findByUid("aaabaaaaappaaaabbbb");
+        AssetInfo assetInfo = assetInfoRepository.findByUid("5c9fbe682d0749c29bdde749546b40a7");
 //        assetInfo.setId(null);
-//        assetInfo.setUid("hfhffjjfjfkfkfkfkfkfkfkf");
+//        assetInfo.setUid("aaabaaaaappaaaabbbb");
+//        assetInfo.setQrCode("jjjbbbbpkkj");
+//        assetInfo.setSiteUID("sbbbbkpss");
 //        assetInfoRepository.save(assetInfo);
+//        assetInfo.setId(null);
+
         assetInfo.setDeviceStatus(22);
         assetInfo.setStatus(32);
         assetInfo.setAssetDeptUID("abdeea5a968a462cb464fff33c2c5d26");
         assetInfo.setClinicalDeptUID("5c5b52fd74054998a92bd410d54a3c55");
-        assetInfo.setAssetDeptName("再发士大夫地方");
-        assetInfo.setClinicalDeptName("发射点发射点今天又");
+        assetInfo.setAssetDeptName("df翻云覆雨");
+        assetInfo.setClinicalDeptName("他依然天涯");
 //        AssetInfo oldAsset = dao.findByUid(selected.getUid());
 
         MqContext mqContext = new MqContext();
@@ -69,7 +72,14 @@ public class Test {
         currentUserAccount.setSiteUID("14");
         currentUserAccount.setSiteId(14);
         JSONObject jsonObject =new JSONObject();
-        jsonObject.put("assetInfo",assetInfo);
+        assetInfo.setHospital(null);
+        assetInfo.setQrCodeLib(null);
+        assetInfo.setAssetTags(null);
+        assetInfo.setBrand(null);
+        //gson序列化只与属性(字段)有关，与get开头的方法无关
+        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String str = g.toJson(assetInfo);
+        jsonObject.put("assetInfo",str);
 //        jsonObject.put("oldAssetInfo",oldAsset);
         jsonObject.put("currentUserAccount",currentUserAccount);
         mqContext.setJsonObject(jsonObject);
@@ -77,14 +87,6 @@ public class Test {
 //        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
     }
 
-    @Autowired
-    private AssetHistoryJob assetHistoryJob;
 
-    @org.junit.Test
-    public void assetHistoryJobTest(){
-
-        assetHistoryJob.execute();
-
-    }
 
 }

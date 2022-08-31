@@ -10,21 +10,23 @@ import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetHistoryService;
-import com.ge.apm.view.sysutil.UserContextService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 
 public class AssetChangeConsumer implements ChannelAwareMessageListener {
+    public static final Logger LOGGER = LoggerFactory.getLogger(AssetChangeConsumer.class);
+
     @Autowired
     private AssetInfoRepository dao;
     @Autowired
@@ -32,15 +34,20 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
     @Autowired
     private AssetHistoryRepository assetHistoryRepository;
 
+
     @Override
     public void onMessage(Message message, Channel channel ) throws Exception {
+        MqContext mqContext = JSONObject.parseObject(new String(message.getBody()), MqContext.class);
+
         try {
-            MqContext mqContext = JSONObject.parseObject(new String(message.getBody()), MqContext.class);
-            System.out.println("mq 监听的消息 message :"+mqContext);
+            LOGGER.info("mq 监听的消息 message :{}",mqContext);
 
             JSONObject jsonObject = mqContext.getJsonObject();
-            String assetInfoString = JSONObject.toJSONString(jsonObject.get("assetInfo"));
-            AssetInfo newAsset = JSONObject.parseObject(assetInfoString, new TypeReference<AssetInfo>() {});
+            String assetInfoString = (String) jsonObject.get("assetInfo");
+//            AssetInfo newAsset = JSONObject.parseObject(assetInfoString, new TypeReference<AssetInfo>() {});
+            Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
+            AssetInfo newAsset = g.fromJson(assetInfoString, AssetInfo.class);
 
             AssetInfo oldAsset = null;
             String currentUserAccountString = JSONObject.toJSONString(jsonObject.get("currentUserAccount"));
@@ -49,7 +56,9 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             if(newAsset.getId()!=null){
                 AssetHistory assetHistory=assetHistoryRepository.getAssetHistoryByAssetUidOne(newAsset.getUid());
                 String assetJson = assetHistory.getAssetJson();
-                AssetInfo assetInfo = JSONObject.parseObject(assetJson, AssetInfo.class);
+                AssetInfo assetInfo = g.fromJson(assetJson, AssetInfo.class);
+
+//                AssetInfo assetInfo = JSONObject.parseObject(assetJson, AssetInfo.class);
                 oldAsset=assetInfo;
                 UserAccountThreadLocal.setUserAccount(currentUserAccount);
                 resultList = assetHistoryService.getAssetsHistoryModifiedFields(oldAsset, newAsset);
@@ -70,7 +79,6 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             newAsset.setAssetTags(null);
             newAsset.setBrand(null);
             //gson序列化只与属性(字段)有关，与get开头的方法无关
-            Gson g = new GsonBuilder().create();
             String assetJson = g.toJson(newAsset);
 //            String assetJson = JSONObject.toJSONString(newAsset);
             AssetHistory assetHistory = new AssetHistory();
@@ -86,16 +94,12 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             assetHistory.setInstitutionUID(currentUserAccount.getInstitutionUID());
             assetHistory.setClinicalDeptUid(newAsset.getClinicalDeptUID());
             assetHistory.setAssetJson(assetJson);
-            assetHistoryService.save(assetHistory);
+            assetHistoryRepository.save(assetHistory);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }catch (Exception e){
-            try {
-//                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-
+            LOGGER.info("mq 消息 error message:{}, e :",mqContext,e);
                 channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+
         }
     }
 

@@ -25,7 +25,7 @@ public class MqUtils {
         try{
             rabbitTemplate.convertAndSend(mqContext.getExChange(),mqContext.getRoutingKey(),mqContext);
         }catch (Exception e){
-            log.error("send to mq error exchange:{},routingKey:{},message:{}\",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getContext()");
+            log.error("send to mq error exchange:{},routingKey:{},message:{},e :",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject(),e);
             throw new RuntimeException(e);
         }
 
