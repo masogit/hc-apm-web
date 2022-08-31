@@ -21,6 +21,8 @@ import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -1439,16 +1441,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 //        AssetInfo oldAsset = dao.findByUid(selected.getUid());
 
         MqContext mqContext = new MqContext();
-//        JSONObject jsonObject = (JSONObject) JSONObject.toJSON(selected);
-
         mqContext.setTime(new Date());
         mqContext.setType("asset");
         mqContext.setRoutingKey("asset.update");
         mqContext.setExChange("assetChange");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         JSONObject jsonObject =new JSONObject();
-        jsonObject.put("assetInfo",selected);
-//        jsonObject.put("oldAssetInfo",oldAsset);
+
+
+        selected.setHospital(null);
+        selected.setQrCodeLib(null);
+        selected.setAssetTags(null);
+        selected.setBrand(null);
+        //gson序列化只与属性(字段)有关，与get开头的方法无关
+        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String str = g.toJson(selected);
+        jsonObject.put("assetInfo",str);
+//        jsonObject.put("assetInfo",selected);
         jsonObject.put("currentUserAccount",currentUserAccount);
         mqContext.setJsonObject(jsonObject);
         MqUtils.sendToMq(mqContext);

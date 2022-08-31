@@ -34,7 +34,7 @@
     <rabbit:queue id="assetDeleteQueue" name="assetDeleteQueue" durable="true" auto-delete="false" />
     <rabbit:queue id="assetUpdateQueue" name="assetUpdateQueue" durable="true" auto-delete="false" />
 
-    <rabbit:topic-exchange  name="assetChange" durable="true" auto-delete="false" auto-declare="true" id="assetChange">
+    <rabbit:topic-exchange  name="${rabbit.topic-exchange}" durable="true" auto-delete="false" auto-declare="true" id="${rabbit.topic-exchange}">
         <rabbit:bindings>
             <rabbit:binding queue="assetDeleteQueue" pattern="asset.delete" ></rabbit:binding>
             <rabbit:binding queue="assetUpdateQueue" pattern="asset.update" ></rabbit:binding>
