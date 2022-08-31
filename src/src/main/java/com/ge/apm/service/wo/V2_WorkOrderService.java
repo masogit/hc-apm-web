@@ -344,6 +344,7 @@ public class V2_WorkOrderService {
         approvedDetails.stream().forEach(item -> item.setCreatedDate(null));
         formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
+        formData.setSignature(selectedWorkOrder.getPartApproveSignature());
 
         String approvalType = "approvalReject";
         if (approvedDetails.stream().anyMatch(item -> item.getApproved())) {
@@ -612,6 +613,7 @@ public class V2_WorkOrderService {
         formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
         formData.setAssigneeId(approverUid);
+        formData.setSignature(selectedWorkOrder.getPartApproveSignature());
         String approvalType = "approval";
         String res = srApi.invokeWorkOrderAction(token, formData, approvalType, selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
@@ -621,4 +623,11 @@ public class V2_WorkOrderService {
         }
     }
 
-}
+    public List<Map<String, String>> getUserSignature() {
+        return srApi.getUserSignature();
+    }
+    public String addUserSignature(String signatureId) {
+        return srApi.addUserSignature(signatureId);
+    }
+
+    }

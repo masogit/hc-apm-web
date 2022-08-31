@@ -265,6 +265,9 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Setter
     private String period;
 
+    @Transient
+    private String partApproveSignature;
+
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
         return totalPriceToBigDecimal;
@@ -769,5 +772,13 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setSiteName(String siteName) {
         this.siteName = siteName;
+    }
+
+    public String getPartApproveSignature() {
+        return partApproveSignature;
+    }
+
+    public void setPartApproveSignature(String partApproveSignature) {
+        this.partApproveSignature = partApproveSignature;
     }
 }
