@@ -68,6 +68,9 @@ public class AssetHistory implements Serializable {
     @Column(name = "clinical_dept_uid",columnDefinition = "CHAR(32)")
     private String clinicalDeptUid;   //所属科室
 
+    @Column(name = "asset_json", nullable = true, columnDefinition = "VARCHAR(3072)")
+    private String assetJson;
+
     public static class AssetHistoryInfo {
 
         @Getter
