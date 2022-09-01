@@ -77,6 +77,7 @@ public class AssetOwnerSettingController {
 
     private List<OrgInfo> clinicalDeptList;
     private OrgInfo deptOrg;
+    private List<String> clinicalDeptUids;
 
     //
     private OrgInfo selectedOrg;
@@ -222,7 +223,7 @@ public class AssetOwnerSettingController {
             availableAssets = new DualListModel<>(Collections.emptyList(), targetAssets);
             return;
         }
-        Page page = aoService.getAssetListEx(queryAsset);
+        Page page = aoService.getAssetListEx(queryAsset,clinicalDeptUids);
         sourceAssets = new ArrayList<AssetInfo>(page.getContent());
         targetAssets.forEach((item)->{
             if(sourceAssets.contains(item)){
@@ -386,7 +387,7 @@ public class AssetOwnerSettingController {
     public void handleSelectDept(AjaxBehaviorEvent event){
         this.queryAsset.setClinicalDeptUID(null);
         if(this.deptOrg != null){
-            this.queryAsset.setClinicalDeptUID(this.deptOrg.getUid());
+            clinicalDeptUids = uaaService.getOrgInfoUidsByparentUid(deptOrg.getUid());
             this.getQueryAssetsList();
         }
     }

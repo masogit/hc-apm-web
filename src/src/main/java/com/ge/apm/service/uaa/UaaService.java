@@ -1109,6 +1109,10 @@ public class UaaService {
         return rootNode;
     }
 
+    public List<String> getOrgInfoUidsByparentUid(String uid) {
+        return orgInfoDao.getOrgInfoUidsByparentUid(uid);
+    }
+
     public TreeNode buildOrgTreeByParentIdWithSelectedChildren(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList) {
 
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
