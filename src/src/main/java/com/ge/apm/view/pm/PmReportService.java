@@ -130,7 +130,7 @@ public class PmReportService {
                             } catch (ClassCastException e) {
                                 String value = (String) tableValue.get(item.getKey());
                                 Boolean res = value.equals("true") ? true : false;
-                                content.put(wrap(prefix, item.getKey()), res ? "是" : "否");
+                                content.put(wrap(prefix, item.getKey()), res ? "是" : "否"); 
                             } catch (RuntimeException e) {
                                 content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
                             }
