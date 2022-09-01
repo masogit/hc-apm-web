@@ -176,7 +176,8 @@
                             <h:panelGroup rendered="#{sharedAssetInfoController.whethertoenableunattended}">
                                 <label class="label">是否可调剂</label>
                                 <p:selectOneRadio id="isAdjust" value="#{sharedAssetInfoController.selected.sharedStatus}">
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('woConfigIsDefault')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <f:selectItem  itemLabel="是" itemValue="1"/>
+                                    <f:selectItem  itemLabel="否" itemValue="2"/>
                                 </p:selectOneRadio>
                             </h:panelGroup>
                             <!--测试代码start-->
@@ -221,7 +222,8 @@
                             <h:panelGroup rendered="#{sharedAssetInfoController.whethertoenableunattended}">
                                 <label class="label">是否可调剂</label>
                                 <p:selectOneRadio id="isAdjustBatch" value="#{sharedAssetInfoController.bathcSharedStatus}">
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('woConfigIsDefault')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <f:selectItem  itemLabel="是" itemValue="1"/>
+                                    <f:selectItem  itemLabel="否" itemValue="2"/>
                                 </p:selectOneRadio>
                             </h:panelGroup>
                         </p:panelGrid>
