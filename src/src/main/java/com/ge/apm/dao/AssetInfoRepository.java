@@ -159,8 +159,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Modifying
     @Transactional
-    @Query("update AssetInfo ai set ai.sharedAssetTypeUid = :batchSharedAssetTypeUid,ai.assetDeptUID = :orgId where ai.uid in :assetUids")
-    public void batchUpdateAssetInfoSwapType(@Param("batchSharedAssetTypeUid") String batchSharedAssetTypeUid, @Param("assetUids") List<String> assetUids, @Param("orgId") String orgId);
+    @Query("update AssetInfo ai set ai.sharedAssetTypeUid = :batchSharedAssetTypeUid,ai.assetDeptUID = :orgId,ai.sharedStatus=:sharedStatus where ai.uid in :assetUids")
+    public void batchUpdateAssetInfoSwapType(@Param("batchSharedAssetTypeUid") String batchSharedAssetTypeUid, @Param("assetUids") List<String> assetUids, @Param("orgId") String orgId,@Param("sharedStatus") Integer sharedStatus);
 
     public List<AssetInfo> findByClinicalDeptUIDIn(List<String> clinicalDeptUIDs);
 
@@ -309,4 +309,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     List<Object> findParentAndChildrenAsset1(Set<Integer> rootIds);
     @Query(value = "select count(id) from site_to_site_allocation where asset_uid = ?1 and return_at is null", nativeQuery = true)
     int secondment(String uid);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE asset_info SET shared_status =?2 where uid in ?1",nativeQuery = true)
+    void batchUpdateAssetInfoSharedStatus(List<String> assetUids,Integer sharedStatus);
 }

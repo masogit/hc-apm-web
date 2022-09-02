@@ -46,6 +46,7 @@
                         <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(1)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 1}" value="正常可借用"/>
                         <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(2)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 2}" value="正常已借出"/>
                         <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(3)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 3}" value="故障不可借用" />
+                        <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(4)}"  rendered="#{sharedAssetStockController.isWhethertoenableunattended()}" disabled="#{sharedAssetStockController.queryType == 4}" value="正常不可借用" />
                     </h:panelGrid>
 
                     <p:dataTable id="datalist" value="#{sharedAssetStockController.lazyModel}" var="asset" widgetVar="varDataList"
@@ -139,7 +140,7 @@
                                              rendered="#{asset.canBorrow}"
                                              update="forceLeaseAssetDialog"
                                              actionListener="#{sharedAssetStockController.prepareForceLeaseAsset(asset)}"
-                                             oncomplete="openForceLeaseDialog(xhr, status, args)"/>
+                                             oncomplete="openForceLeaseDialog(xhr, status, args)" disabled="#{sharedAssetStockController.isWhethertoenableunattended()and asset.sharedStatus==2}"/>
                             <p:commandButton value="归还"
                                              rendered="#{asset.canReturn}"
                                              update="forceReturnAssetDialog"

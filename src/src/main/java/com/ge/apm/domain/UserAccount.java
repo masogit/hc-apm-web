@@ -3,6 +3,7 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.Digests;
@@ -18,6 +19,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import webapp.framework.web.WebUtil;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -45,7 +47,6 @@ public class UserAccount implements ChineseName, Serializable {
 	public static final int HASH_INTERATIONS = 1024;
 	public static final int SALT_SIZE = 8;
 	public static final int LI_XIANG = -1;
-
 
 
 	@Id
@@ -991,9 +992,46 @@ public class UserAccount implements ChineseName, Serializable {
 		}
 		return departName;
 	}
-	public  String getDepartNames(){
+	public  String getDepartNames(Integer i){
 		OrgInfo org = this.orgInfo;
-		return org.getName();
+		String shortNamePyCode = org.getShortNamePyCode();
+		String namePyCode = org.getNamePyCode();
+		String[] split = namePyCode.split(shortNamePyCode,2);
+		String name1="";
+		String name2="";
+		String name3="";
+		OrgInfoRepository bean = WebUtil.getBean(OrgInfoRepository.class);
+		name1=org.getShortName();
+		if (split.length>0&&split[0]!=null&&!split[0].equals("")){
+			if (split[1]!=null&&split[1]!=""){
+				split[0]=split[0]+split[1];
+			}
+			OrgInfo orgInfoNames = bean.findBySiteUIDAndNamePyCode(org.getSiteUID(), split[0]);
+			name1=orgInfoNames.getShortName();
+			name2=org.getShortName();
+			String[] split1 = orgInfoNames.getNamePyCode().split(orgInfoNames.getShortNamePyCode(),2);
+			if (split1[1]!=null&&!split1[0].equals("")){
+				split1[0]=split1[0]+split1[1];
+			}
+			if (split1.length>0&&split1[0]!=null&&!split1[0].equals("")){
+				OrgInfo orgInfoName2 = bean.findBySiteUIDAndNamePyCode(org.getSiteUID(), split1[0]);
+				name2=name1;
+				name1=orgInfoName2.getShortName();
+				name3=org.getShortName();
+			}
+		}
+		if (i==1){
+			return name1;
+		}
+		if(i==2){
+			return name2;
+		}
+		if(i==3) {
+			return name3;
+		}
+		else {
+			return org.getName();
+		}
 	}
 
 	public void setDepartName(String departName) {

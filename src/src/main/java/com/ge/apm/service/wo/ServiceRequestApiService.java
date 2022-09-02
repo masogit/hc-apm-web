@@ -267,6 +267,32 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         return response.getBody();
     }
 
+    public List<Map<String, String>> getUserSignature() {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<>(header);
+        String url = getGatewayURL(GatewayURL.USER_SIGNATURE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            List<Map<String, String>> responseBody = (List<Map<String, String>>) response.getBody().get("data");
+            return responseBody;
+        } else {
+            return null;
+        }
+    }
+
+    public String addUserSignature(String signatureId) {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<>(signatureId, header);
+        String url = getGatewayURL(GatewayURL.USER_SIGNATURE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
+
 }
 
 class ServiceRequestForm {
@@ -485,6 +511,7 @@ class WorkOrderActionForm {
     Integer repairType;
     String repairResult;
     Double externalExpense;
+    String signature;
 
     List<V2_BlobObject> attachments;
 
@@ -710,6 +737,14 @@ class WorkOrderActionForm {
 
     public void setSubStatus(Integer subStatus) {
         this.subStatus = subStatus;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }
 

@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -63,7 +64,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     private Boolean isSelectedCurrentPage = false;
 
     private String batchSharedAssetTypeUid;
-
+    private Integer bathcSharedStatus=1;
     List<String> deptids;
 
     private long queryIndex = -1;
@@ -280,11 +281,14 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
 
         if (deptids.size() > 0 && batchSharedAssetTypeUid != null){
-            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,deptids.get(0));
+            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,deptids.get(0),bathcSharedStatus);
         }else{
-            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,null);
+            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,null,1);
+            assetUids.forEach(item->{
+                sharedAssetSwapIndexDao.deleteByAssetUid(item);
+            });
         }
-
+        this.bathcSharedStatus=1;
         this.batchSharedAssetTypeUid = null;
         this.selectedMap.clear();
     }
@@ -321,6 +325,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                 } else {
                     if(StringUtils.isBlank(sharedAssetTypeUid)){
                         sharedAssetSwapIndexDao.deleteByAssetUid(selected.getUid());
+                        selected.setSharedStatus(1);
                         super.save();
                        // WebUtil.addWarnMessage("设备调剂名称解绑成功");
                        // RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -438,5 +443,13 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         removeFilterOnField("hospitalUID");
         bean.onSelectSiteTreeNode(event);
 
+    }
+
+    public Integer getBathcSharedStatus() {
+        return bathcSharedStatus;
+    }
+
+    public void setBathcSharedStatus(Integer bathcSharedStatus) {
+        this.bathcSharedStatus = bathcSharedStatus;
     }
 }
