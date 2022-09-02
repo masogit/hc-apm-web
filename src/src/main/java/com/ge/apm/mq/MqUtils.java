@@ -15,6 +15,7 @@ public class MqUtils {
 
 
 
+    @Autowired
     private  RabbitTemplate rabbitTemplate;
 
     public   void sendToMq(MqContext mqContext){
