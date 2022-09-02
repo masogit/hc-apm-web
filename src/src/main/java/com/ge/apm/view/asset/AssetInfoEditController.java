@@ -116,6 +116,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
 
+
     @Getter
     @Setter
     private Supplier newSupplier;
@@ -167,6 +168,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private UserContextService userContextService;
 
+
+    private MqUtils mqUtils;
+
     //设备状态
     @Getter
     List<I18nMessage> assetStatusList = Collections.emptyList();
@@ -216,6 +220,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         userContextService = WebUtil.getBean(UserContextService.class);
+        mqUtils = WebUtil.getBean(MqUtils.class);
 
         countyArea = userContextService.isCountyArea();
 
@@ -1460,7 +1465,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 //        jsonObject.put("assetInfo",selected);
         jsonObject.put("currentUserAccount",currentUserAccount);
         mqContext.setJsonObject(jsonObject);
-        MqUtils.sendToMq(mqContext);
+        mqUtils.sendToMq(mqContext);
 //        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
     }
 
