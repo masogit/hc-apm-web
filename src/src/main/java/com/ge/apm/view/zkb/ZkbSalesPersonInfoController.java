@@ -1,23 +1,38 @@
 package com.ge.apm.view.zkb;
 
-import com.ge.apm.dao.TenantInfoRepository;
+import
+
+        com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbSalesPersonInfoRepository;
 import com.ge.apm.dao.ZkbSalesTenantAssociateRepository;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbSalesPersonInfo;
-import com.ge.apm.domain.ZkbSalesTenantAssociate;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbSalesPersonInfoService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ManagedBean
 @ViewScoped
@@ -44,6 +59,12 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
 
     private UserAccount currentUser;
 
+    private StreamedContent exportFile;
+
+    private UploadedFile uploadedFile;
+
+    private List<HashMap<String,String>> errorImportList= new ArrayList<>();
+
     @Override
     protected GenericRepositoryUUID<ZkbSalesPersonInfo> getDAO() {
         return dao;
@@ -58,6 +79,11 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         tenantInfoList = zkbSalesPersonInfoService.getSourceTenantInfoList();
         currentUser = UserContextService.getCurrentUserAccount();
+        String encodeStr = WebUtil.getRequestParameter("str");
+        if(StringUtils.isNotEmpty(encodeStr)){
+            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+            this.selected = dao.findById(selectedId);
+        }
     }
 
     @Override
@@ -139,6 +165,45 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
         super.save();
     }
 
+    public void exportAll(){
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, 3));
+        List<TenantInfo> tenantInfos = tenantInfoDao.findBySearchFilter(searchFilters);
+        List<HashMap<String, Object>> dataMap = zkbSalesPersonInfoService.createTenantInfoData(tenantInfos);
+
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/salesPerson/excel/APM_ZKB_SalePerson_Exp_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            zkbSalesPersonInfoService.exportData(doc, dataMap);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbTenantInfoExcel_Export.xlsx");
+        } catch (IOException ex) {
+            Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public String importAction(){
+        return UrlEncryptController.encodeUrlParam("Import?selectedid=".concat(selected.getId()));
+    }
+
+    public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO,"导入完成", event.getFile().getFileName() + " 处理完成！");
+        this.uploadedFile = event.getFile();
+        errorImportList = zkbSalesPersonInfoService.handleExcel(uploadedFile, currentUser,selected);
+        //有错误数据 warning 没有错误数据  info
+        if (CollectionUtils.isNotEmpty(errorImportList)){
+            message = new FacesMessage(FacesMessage.SEVERITY_WARN,"导入完成", event.getFile().getFileName() + " 处理完成，但有错误数据！");
+        }
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+
     public List<TenantInfo> getTenantInfoList() {
         return tenantInfoList;
     }
@@ -161,5 +226,13 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
 
     public void setTenantInfoUids(List<String> tenantInfoUids) {
         this.tenantInfoUids = tenantInfoUids;
+    }
+
+    public List<HashMap<String, String>> getErrorImportList() {
+        return errorImportList;
+    }
+
+    public void setErrorImportList(List<HashMap<String, String>> errorImportList) {
+        this.errorImportList = errorImportList;
     }
 }
