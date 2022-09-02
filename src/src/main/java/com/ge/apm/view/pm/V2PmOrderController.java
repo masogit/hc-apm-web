@@ -34,6 +34,7 @@ import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -61,6 +62,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -70,11 +72,11 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -247,6 +249,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //备注
     @Getter @Setter
     private String remarks;
+    // 签名相关
+    private String signatureContent;
+    private StreamedContent signatureContentStream;
+    private String signatureId;
+    private boolean newSignature = true;
+
+    private WorkflowService workflowService;
 
     public String getActualCompletionTimeFormat() {
         return actualCompletionTimeFormat;
@@ -1593,6 +1602,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmReportService = WebUtil.getBean(PmReportService.class);
         multiLevelApprovalService= WebUtil.getBean(MultiLevelApprovalService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
+        workflowService = WebUtil.getBean(WorkflowService.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -2151,15 +2161,94 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return !selectedMap.entrySet().stream().anyMatch(item -> item.getValue());
     }
 
+    public void getSignature() {
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+
+        List<Map<String, String>> signatureList = woService.getUserSignature();
+
+        if (!org.springframework.util.CollectionUtils.isEmpty(signatureList)) {
+            String lastSignatureId = signatureList.get(signatureList.size() - 1).get("signatureUid");
+            this.signatureContentStream = blobService.getBlobObjectByStorageId(lastSignatureId);
+            this.signatureId = lastSignatureId;
+            this.newSignature = false;
+        }else{
+            this.newSignature = true;
+        }
+    }
+
+    public void resetSignature() {
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+        this.newSignature = true;
+    }
+
+    public void preApprovePMOrder(){
+        // 审核不通过，必须填写备注
+        if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
+                (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ApprovalFallureReasonRequired"));
+            RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
+            return;
+        }
+
+        // 备件审核是否需要签名
+        WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(userContextService.getLoginUser().getSiteUID());
+
+        if(workflowConfig.getPartsNeedSign()){
+            // 如果勾选了‘备件审核需要签名’，校验是否已经签名
+            // 如果没有签名，就在前端弹出签名窗口
+            if(StringUtils.isEmpty(this.signatureId)){
+                ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+                HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+                response.setStatus(205);
+                return;
+            }
+            if(this.newSignature){
+                // 把新签名保存到用户的签名列表
+                woService.addUserSignature(this.signatureId);
+            }
+        }
+
+        approvePMorder();
+    }
+
+    public void saveSignatureAndSubmitApprove(){
+        if(this.newSignature){
+            if (StringUtils.isNotEmpty(signatureContent)) {
+                ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+                HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+                try {
+                    String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    byte[] decode = decoder.decodeBuffer(base64);
+
+                    V2_BlobObject blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
+                    if (null != blobObject) {
+                        this.signatureId = blobObject.getObjectStorageId();
+                        woService.addUserSignature(this.signatureId);
+                    }else{
+                        WebUtil.addErrorMessage("签名保存失败！");
+                        response.setStatus(206);
+                        return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error(e.getMessage());
+                    WebUtil.addErrorMessage("签名保存失败！");
+                    response.setStatus(206);
+                    return;
+                }
+            }
+        }
+        approvePMorder();
+    }
+
     public void approvePMorder() {
         List<V2_WorkOrder_Detail> approvedDetailsNew = new ArrayList<>();
        if (selectedPmOrder != null) {
-            if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
-                    (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("ApprovalFallureReasonRequired"));
-                RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
-                return;
-            }
+           selectedPmOrder.setPartApproveSignature(this.signatureId);
            for (int i = 0; i < approvedDetails.size(); i++) {
                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
                if (selectedMap.get(v2_workOrder_detail.getId())) {
@@ -2204,6 +2293,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
          pmOrderService.approvePMorder(selectedPmOrder, approvedDetails, this.comments);
             this.comments = null;
             approvedDetails = null;
+            resetSignature();
         }
     }
 
@@ -2332,6 +2422,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedPmOrder = null;assetName = null;endTime = null;
         ruleLevel = null;dptName = null;picList = null;
         planTimeForBatch = null;comments = null;
+        resetSignature();
     }
 
     public void prepareActTakeGrap(String woid, String head) {
@@ -3268,5 +3359,29 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
         return null;
+    }
+
+    public String getSignatureContent() {
+        return signatureContent;
+    }
+
+    public void setSignatureContent(String signatureContent) {
+        this.signatureContent = signatureContent;
+    }
+
+    public StreamedContent getSignatureContentStream() {
+        return signatureContentStream;
+    }
+
+    public void setSignatureContentStream(StreamedContent signatureContentStream) {
+        this.signatureContentStream = signatureContentStream;
+    }
+
+    public String getSignatureId() {
+        return signatureId;
+    }
+
+    public void setSignatureId(String signatureId) {
+        this.signatureId = signatureId;
     }
 }

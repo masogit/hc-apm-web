@@ -3,14 +3,7 @@ package com.ge.apm.service.sharedasset;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.model.SelectItem;
@@ -100,6 +93,9 @@ public class SharedAssetStockService {
                 ew.andNew().ne("asset_status", 1).andNew().ne("asset_status", 3);
                 ew.andNew().in("asset_dept_uid", allocationCenterUids);
                 break;
+            case 4:
+                ew.andNew().in("asset_status", Arrays.asList(1,3)).andNew().eq("shared_status",2);
+                ew.andNew().in("asset_dept_uid", allocationCenterUids);
             default:
         }
     }
@@ -440,5 +436,20 @@ public class SharedAssetStockService {
             orgInfList.addAll(orgUidList);
         }
         return orgInfList;
+    }
+    public boolean  isWhethertoenableunattended(){
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        String siteUid="";
+        if(selectSite != null){
+            siteUid=selectSite.getUid();
+        }else{
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            siteUid=user.getSiteUID();
+        }
+        List<WorkflowConfig> bySiteUID = wfCfigDao.findBySiteUID(siteUid);
+        if(CollectionUtils.isEmpty(bySiteUID)) return false;
+        Boolean whethertoenableunattended = bySiteUID.get(0).getWhethertoenableunattended();
+        return whethertoenableunattended==null?false:whethertoenableunattended;
     }
 }

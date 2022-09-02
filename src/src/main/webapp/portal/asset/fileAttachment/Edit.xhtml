@@ -23,9 +23,9 @@
                             <p:ajax update="AssetFileAttachmentEditForm"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <c:forEach items="#{fieldMsg.getFieldValueList('attachmentType')}" var="v">
-                                <c:if test="#{v.msgKey ne '4'}">
+<!--                                <c:if test="#{v.msgKey ne '4'}">-->
                                     <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}"/>
-                                </c:if>
+                              <!--  </c:if>-->
                             </c:forEach>
                         </p:selectOneMenu>
                     </h:panelGroup>
