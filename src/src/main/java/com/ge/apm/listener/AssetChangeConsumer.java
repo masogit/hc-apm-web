@@ -98,8 +98,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }catch (Exception e){
             LOGGER.info("mq 消息 error message:{}, e :",mqContext,e);
-                channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
-
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+//            channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
         }
     }
 
