@@ -1458,6 +1458,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setQrCodeLib(null);
         selected.setAssetTags(null);
         selected.setBrand(null);
+        selected.setTags(null);
         //gson序列化只与属性(字段)有关，与get开头的方法无关
         Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
         String str = g.toJson(selected);
