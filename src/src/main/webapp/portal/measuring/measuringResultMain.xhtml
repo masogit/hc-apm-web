@@ -25,9 +25,16 @@
                     <p:tab title="计量结果导入" id="resultImport">
                         <ui:include src="resultImport.xhtml"/>
                     </p:tab>
+                    <p:tab title="计量附件批量上传" id="fileImport">
+                        <ui:include src="fileImport.xhtml"/>
+                    </p:tab>
                 </p:tabView>
             </div>
         </div>
+        <style type="text/css">
+            .column1{width: 30%}
+            .column2{width: 70%}
+        </style>
         <script>
             function openAssetViewWindow(xhr, status, args) {
                 if(args.url != null){
