@@ -319,4 +319,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value = "select ai.* from asset_info ai left join asset_history ah on ai.uid=ah.asset_uid where ah.asset_uid is null limit 2000", nativeQuery = true)
     List<AssetInfo> queryAssetHistoryNotExistsInsert();
+
+    @Query(value="select o.* from asset_info o where o.site_uid=?1 and o.is_valid=true and o.is_deleted=false",nativeQuery=true)
+    List<AssetInfo> getBySiteUid(String siteUid);
 }
