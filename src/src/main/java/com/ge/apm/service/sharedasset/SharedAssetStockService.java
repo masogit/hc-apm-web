@@ -84,6 +84,7 @@ public class SharedAssetStockService {
         switch (queryType) {
             case 1 :
                 ew.andNew().eq("asset_status", 1).or().eq("asset_status", 3);
+                ew.andNew().eq("shared_status",1).or().isNull("shared_status");
                 ew.andNew().in("asset_dept_uid", allocationCenterUids);
                 break;
             case 2:

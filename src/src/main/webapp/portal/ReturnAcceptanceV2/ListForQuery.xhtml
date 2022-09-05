@@ -137,8 +137,15 @@
                                 <p:column headerText="使用时长">
                                     <h:outputText value="#{item.getFormattedRentalTime()}"/>
                                 </p:column>
-                                <p:column headerText="租赁费用">
-                                    <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item)}">
+<!--                            <c:if test="#{!sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">-->
+<!--                                <p:column headerText="租赁费用">-->
+<!--                                    <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item)}">-->
+<!--                                        <f:convertNumber pattern="0.00"/>-->
+<!--                                    </h:outputText>-->
+<!--                                </p:column>-->
+<!--                            </c:if>-->
+                                <p:column headerText="租赁费用" >
+                                    <h:outputText value="#{item.totalAmount}">
                                         <f:convertNumber pattern="0.00"/>
                                     </h:outputText>
                                 </p:column>
@@ -147,11 +154,50 @@
                                         <f:convertNumber pattern="0.00"/>
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="总计费用">
-                                    <h:outputText value="#{item.compensationAmount + sharedAssetReqDetailForQueryController.getTotalAmount(item)}">
+                            <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
+                                <p:column headerText="免除计费时长">
+                                    <h:outputText value="#{item.gratisDuration*1}">
                                         <f:convertNumber pattern="0.00"/>
                                     </h:outputText>
                                 </p:column>
+                                <p:column headerText="优惠时段">
+                                    <h:outputText value="#{item.getDiscountPeriod()}">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="优惠折扣">
+                                    <h:outputText value="#{item.discount * 100}">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </h:outputText>%
+                                </p:column>
+                            <p:column headerText="优惠时长">
+                                <h:outputText value="#{item.discountTime}">
+                                    <f:convertNumber pattern="0.00"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="优惠费用">
+                                <h:outputText value="#{item.discountFee}">
+                                    <f:convertNumber pattern="0.00"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="免除费用">
+                                <h:outputText value="#{item.gratisFee}">
+                                    <f:convertNumber pattern="0.00"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="总计费用">
+                                <h:outputText value="#{item.compensationAmount + item.totalAmount}">
+                                    <f:convertNumber pattern="0.00"/>
+                                </h:outputText>
+                            </p:column>
+                            </c:if>
+                            <c:if test="#{!sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
+                            <p:column headerText="总计费用">
+                                <h:outputText value="#{item.compensationAmount + sharedAssetReqDetailForQueryController.getTotalAmount(item)}">
+                                    <f:convertNumber pattern="0.00"/>
+                                </h:outputText>
+                            </p:column>
+                            </c:if>
                             <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
                                 <p:column headerText="状态">
                                     <h:outputText value="#{item.state}" />

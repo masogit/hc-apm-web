@@ -49,7 +49,7 @@
                                     <f:selectItem itemLabel="自然时间" itemValue="4"/>
                                     <f:selectItem itemLabel="天" itemValue="3"/>
                                     <f:selectItem itemLabel="次" itemValue="1"/>
-                                    <p:ajax update="startingPeriod startingPrice"
+                                    <p:ajax update=":SwapTypeEditForm "
                                             listener="#{sharedAssetTypeController.onChargingTypeChange}"/>
                                 </p:selectOneRadio>
                             </h:panelGroup>
@@ -89,8 +89,26 @@
                                             disabled="true"/>
                             </h:panelGroup>
 
-                            <h:panelGroup>
+                            <h:panelGroup id="gratisDuration" rendered="#{sharedAssetTypeController.isWhetherToEnableUnattendedAndType()}">
+                                <label class='label'>免除计费时长（小时)</label>
+                                <p:inputNumber value="#{sharedAssetTypeController.selected.gratisDuration}"
+                                             required="true"
+                                             requiredMessage="免除计费时长 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
+                            <h:panelGroup id="discountPeriod" rendered="#{sharedAssetTypeController.isWhetherToEnableUnattendedAndType()}">
+                                <label  class='label'>优惠时段</label>
+                                    <p:calendar  value="#{sharedAssetTypeController.selected.discountStartDate}" required="true" showTodayButton="false" showMillisec="false" showMinute="false" showSecond="false" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="HH" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                                    -
+                                    <p:calendar value="#{sharedAssetTypeController.selected.discountEndDate}" required="true" showTodayButton="false" showMillisec="false" showMinute="false" showSecond="false"  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="HH" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup id="discount" rendered="#{sharedAssetTypeController.isWhetherToEnableUnattendedAndType()}">
+                                <label class='label'>优惠折扣</label>
+                                <p:inputText  value="#{sharedAssetTypeController.selected.discount}"
+                                             required="true"
+                                             requiredMessage="优惠折扣 #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                        <h:panelGroup>
+                        </h:panelGroup>
                             <h:panelGroup>
                                 <label class='label'>设备描述</label>
                                 <p:inputTextarea id="deviceDescription" rows="1" cols="66" queryDelay="750" minQueryLength="4"
