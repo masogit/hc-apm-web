@@ -634,6 +634,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				}
 				assetHistorys.clear();
 				pageNum=pageNum+pageSize;
+				Thread.sleep(10000);
 			}
 			long endTime = System.currentTimeMillis();
 			logger.info("batchInsertAssetHistoryEvent end 添加设备到历史数据运行时间：{} ms",endTime-startTime);
