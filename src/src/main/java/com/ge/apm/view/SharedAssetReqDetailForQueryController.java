@@ -8,6 +8,7 @@ package com.ge.apm.view;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -217,11 +218,16 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if(result != null && !CollectionUtils.isEmpty(result.getContent())){
             for (SharedAssetReqDetail sharedAssetReqDetail : result.getContent()) {
                 String assetInfoId = sharedAssetReqDetail.getAssetInfoId();
+                String sharedAssetTypeId = sharedAssetReqDetail.getSharedAssetTypeId();
                 if(StringUtils.isNotBlank(assetInfoId)){
                     SharedAssetSwapIndex byAssetUid = swapIndexRepository.findByAssetUid(assetInfoId);
                     if(byAssetUid != null){
                         sharedAssetReqDetail.setSwapIndex(byAssetUid.getSwapIndex());
                     }
+                }
+                if(StringUtils.isNotBlank(assetInfoId)){
+                    SharedAssetType byId = sharedAssetTypeRepository.findById(sharedAssetTypeId);
+                    ValuationFactory.valuation(byId,sharedAssetReqDetail);
                 }
             }
         }
