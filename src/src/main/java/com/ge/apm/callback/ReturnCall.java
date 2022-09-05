@@ -10,7 +10,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 @Slf4j
 public class ReturnCall implements RabbitTemplate.ReturnCallback {
 
-    private static final Logger logger = LoggerFactory.getLogger(CBoardController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReturnCall.class);
 
     /**
      *只有消息从Exchange路由到Queue失败才会回调这个方法

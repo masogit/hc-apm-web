@@ -6,6 +6,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.mq.MqUtils;
+import com.ge.apm.service.uaa.AdminConsoleService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.runner.RunWith;
@@ -44,11 +45,11 @@ public class Test {
     @org.junit.Test
     public void toAsset(){
 //        AssetInfo assetInfo = assetInfoRepository.findByUid("aaabaaaaappaaaabbbb");
-        AssetInfo assetInfo = assetInfoRepository.findByUid("5c9fbe682d0749c29bdde749546b40a7");
+        AssetInfo assetInfo = assetInfoRepository.findByUid("840c7b62bbf84fb984622347a8e5c5f6");
 //        assetInfo.setId(null);
-//        assetInfo.setUid("aaabaaaaappaaaabbbb");
-//        assetInfo.setQrCode("jjjbbbbpkkj");
-//        assetInfo.setSiteUID("sbbbbkpss");
+//        assetInfo.setUid("aaabooaapobbb");
+//        assetInfo.setQrCode("jjjbobbbopkkj");
+//        assetInfo.setSiteUID("sbbbbokopss");
 //        assetInfoRepository.save(assetInfo);
 //        assetInfo.setId(null);
 
@@ -83,10 +84,18 @@ public class Test {
 //        jsonObject.put("oldAssetInfo",oldAsset);
         jsonObject.put("currentUserAccount",currentUserAccount);
         mqContext.setJsonObject(jsonObject);
-        MqUtils.sendToMq(mqContext);
+        mqUtils.sendToMq(mqContext);
 //        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
     }
 
+
+    @Autowired
+    private AdminConsoleService adminConsoleService;
+
+    @org.junit.Test
+    public void AssetHostory(){
+        adminConsoleService.batchUpdateAssetHistoryEvent();
+    }
 
 
 }
