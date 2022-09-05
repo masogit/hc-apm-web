@@ -94,8 +94,9 @@
             }
             function handleApproveSuccess(xhr, status, args) {
                 if(xhr.status!==206){
-                    PF('signatureDlg').hide();
-                    PF('pmapproveDialog').hide();
+                    document.getElementById('pmTab:signatureForm:refreshDataTable').click();
+                    handleSubmit(args, 'signatureDlg');
+                    handleSubmit(args, 'pmapproveDialog');
                 }
             }
         </script>
@@ -106,13 +107,14 @@
             <h:panelGrid columnClasses="value" columns="1">
                 <h:panelGroup>
                     <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sigPanel" base64Value="#{v2PmOrderController.signatureContent}"
-                                 required="true" requiredMessage="签名 #{msg.ValidationRequire}" guideline="false" rendered="#{v2PmOrderController.signatureContentStream==null}" />
+                        guideline="false" rendered="#{v2PmOrderController.signatureContentStream==null}" />
                     <p:graphicImage value="#{v2PmOrderController.signatureContentStream}" stream="false" rendered="#{v2PmOrderController.signatureContentStream!=null}"></p:graphicImage>
                 </h:panelGroup>
             </h:panelGrid>
-            <p:commandButton value="确认" actionListener="#{v2PmOrderController.saveSignatureAndSubmitApprove()}" update="pmTab:pmOrderListForm @(.beizhuClass) @(.selectCheckBoxHeader) @(.selectCheckBox)" oncomplete="handleApproveSuccess(xhr, status, args);"/>
-            <p:commandButton value="重写" actionListener="#{v2PmOrderController.resetSignature()}" update="pmTab:signatureForm" oncomplete="PF('sigPanel').clear()"/>
-            <p:commandButton value="关闭" onclick="PF('signatureDlg').hide();" />
+            <p:commandButton value="确认" actionListener="#{v2PmOrderController.saveSignatureAndSubmitApprove()}" update="pmTab:signatureForm" oncomplete="handleApproveSuccess(xhr, status, args);"/>
+            <p:commandButton immediate="true" process="@this" style="display: none" id="refreshDataTable" update="pmTab:pmOrderListForm @(.beizhuClass) @(.selectCheckBoxHeader) @(.selectCheckBox)"/>
+            <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{v2PmOrderController.resetSignature()}" update="pmTab:signatureForm" oncomplete="PF('sigPanel').clear()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('signatureDlg').hide()"/>
         </h:form>
     </p:dialog>
 </ui:composition>

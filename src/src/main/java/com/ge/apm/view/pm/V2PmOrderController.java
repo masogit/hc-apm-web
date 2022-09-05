@@ -2178,6 +2178,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void resetSignature() {
+        this.signatureId = null;
         this.signatureContent = null;
         this.signatureContentStream = null;
         this.newSignature = true;
@@ -2193,31 +2194,30 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 
         // 备件审核是否需要签名
-        WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(userContextService.getLoginUser().getSiteUID());
+        WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(this.selectedPmOrder.getSiteUID());
 
-        if(workflowConfig.getPartsNeedSign()){
-            // 如果勾选了‘备件审核需要签名’，校验是否已经签名
-            // 如果没有签名，就在前端弹出签名窗口
-            if(StringUtils.isEmpty(this.signatureId)){
-                ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
-                HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
-                response.setStatus(205);
-                return;
-            }
-            if(this.newSignature){
-                // 把新签名保存到用户的签名列表
-                woService.addUserSignature(this.signatureId);
-            }
+        if(workflowConfig != null && workflowConfig.getPartsNeedSign() != null && workflowConfig.getPartsNeedSign()){
+            // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
+            ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+            HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+            response.setStatus(205);
+            return;
         }
-
         approvePMorder();
     }
 
     public void saveSignatureAndSubmitApprove(){
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+        if(StringUtils.isEmpty(this.signatureId)){
+            WebUtil.addErrorMessage("签名不可为空！");
+            response.setStatus(206);
+            return;
+        }
+
         if(this.newSignature){
             if (StringUtils.isNotEmpty(signatureContent)) {
-                ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
-                HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
 
                 try {
                     String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);

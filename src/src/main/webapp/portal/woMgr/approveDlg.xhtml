@@ -119,8 +119,8 @@
                 }
                 function handleApproveSuccess(xhr, status, args) {
                     if(xhr.status!==206){
-                        PF('signatureDlg').hide();
-                        PF('approveDialog').hide();
+                        handleSubmit(args, 'signatureDlg');
+                        handleSubmit(args, 'approveDialog');
                     }
                 }
             </script>
@@ -130,13 +130,13 @@
                 <h:panelGrid columnClasses="value" columns="1">
                     <h:panelGroup>
                         <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sigPanel" base64Value="#{workOrderMgrController.signatureContent}"
-                                     required="true" requiredMessage="签名 #{msg.ValidationRequire}" guideline="false" rendered="#{workOrderMgrController.signatureContentStream==null}" />
+                            guideline="false" rendered="#{workOrderMgrController.signatureContentStream==null}" />
                         <p:graphicImage value="#{workOrderMgrController.signatureContentStream}" stream="false" rendered="#{workOrderMgrController.signatureContentStream!=null}"></p:graphicImage>
                     </h:panelGroup>
                 </h:panelGrid>
                 <p:commandButton value="确认" actionListener="#{workOrderMgrController.saveSignatureAndSubmitApprove()}" update="woTab:woMgrListForm woTab:woMgrDetailForm" oncomplete="handleApproveSuccess(xhr, status, args);"/>
-                <p:commandButton value="重写" actionListener="#{workOrderMgrController.resetSignature()}" update="woTab:signatureForm" oncomplete="PF('sigPanel').clear()"/>
-                <p:commandButton value="关闭" onclick="PF('signatureDlg').hide();" />
+                <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{workOrderMgrController.resetSignature()}" update="woTab:signatureForm" oncomplete="PF('sigPanel').clear()"/>
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('signatureDlg').hide()"/>
             </h:form>
         </p:dialog>
     </ui:composition>
