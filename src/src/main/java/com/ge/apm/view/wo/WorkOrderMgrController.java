@@ -2514,7 +2514,7 @@ public void test1(){
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
 
-        if(StringUtils.isEmpty(this.signatureId)){
+        if(StringUtils.isEmpty(this.signatureId) && (this.newSignature && StringUtils.isEmpty(this.signatureContent))){
             WebUtil.addErrorMessage("签名不可为空！");
             response.setStatus(206);
             return;
