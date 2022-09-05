@@ -22,7 +22,7 @@
                     <p:ajax event="rowSelect" listener="#{measureAssetListController.onSelectMeasureAsset}" update="measuringTab:measuringResultForm"/>
                     <p:ajax event="filter" listener="#{measureAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                     <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
-                    <p:column width="36"  id="checkBoxColumn" rendered="#{measureAssetListController.judgeMeasurementRepair()}">
+                    <p:column width="36"  id="checkBoxColumn" exportable="false">
                         <p:selectBooleanCheckbox value="#{measureAssetListController.selectedMap[item.uid]}"  class="selectCheckBox">
                             <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                         </p:selectBooleanCheckbox>
@@ -100,6 +100,14 @@
                     <p:column headerText="检测单位" filterBy="#{item.lastCheckCompany}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.lastCheckCompany}"/>
                     </p:column>
+                    <p:column headerText="计量日期" sortBy="#{item.checkDate}" filterBy="#{item.checkDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputText id="filterCheckDate" widgetVar="varFilterCheckDate" />
+                        </f:facet>
+                        <h:outputText value="#{item.checkDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
                     <p:column headerText="最后计量日期" sortBy="#{item.lastMeteringDate}" filterBy="#{item.lastMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">
                             <p:inputText id="filterLastMeteringDate" widgetVar="varFilterLastMeteringDate" />
@@ -118,11 +126,15 @@
                     </p:column>
 
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.judgeMeasurementRepair()}"/>
+                        <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.measurementRepairVisible}"/>
 
                         <!--<p:commandButton id="uploadButton" icon="ui-icon-file-upload" class="btn btn-sm btn-gray" title="上传附件" disabled="#{empty measureAssetListController.selected}" update="measuringTab:measuringUploadDlg" oncomplete="PF('measuringUploadDialog').show()"/>-->
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="downloadAllId" title="#{msg.DownloadFile}" icon="ui-icon-file-download" ajax="false"
+                                         actionListener="#{measureAssetListController.downloadSelectedFile()}" update=":growl">
+                            <p:fileDownload value="#{measureAssetListController.exportFile}" />
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
@@ -159,6 +171,17 @@
                 </h:form>
             </p:dialog>
             <ui:include src="BatchSrCreate.xhtml"/>
+            <p:overlayPanel widgetVar="panelFilterCheckDate" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:filterCheckDate" dismissable="false">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{msg.From}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_CheckDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    <p:outputLabel value="#{msg.To}"/>
+                    <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_CheckDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                </h:panelGrid>
+                <p:commandButton onclick="setDateFilter('varDataList_measuringAsset','varFilterCheckDate','varStartTimeFrom_CheckDate','varStartTimeTo_CheckDate'); PF('panelFilterCheckDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterCheckDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            </p:overlayPanel>
+
             <p:overlayPanel widgetVar="panelFilterLastMeteringDate" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:filterLastMeteringDate" dismissable="false">
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{msg.From}"/>

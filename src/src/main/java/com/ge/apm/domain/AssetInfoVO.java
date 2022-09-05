@@ -29,10 +29,12 @@ public class AssetInfoVO extends AssetInfo {
         return stringBuffer.toString().hashCode();
     }
 
+    @Override
     public int getLineNum() {
         return lineNum;
     }
 
+    @Override
     public void setLineNum(int lineNum) {
         this.lineNum = lineNum;
     }
