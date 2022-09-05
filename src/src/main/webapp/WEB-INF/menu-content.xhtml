@@ -236,6 +236,7 @@
                 <p:menuitem id="um4200" value="#{msg.AlertSettingsList}" outcome="/portal/fealert/report/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
                 <p:menuitem id="um046" value="导出记录信息" outcome="/portal/export/system/SystemRecord.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
                 <p:menuitem id="um5023" value="#{msg.ConfigItemManage}" outcome="/portal/config/sysAdminConfig/configItemList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
+                <p:menuitem id="um5025" value="#{msg.IotDeviceBind}" outcome="/portal/iot/iotDeviceBind.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
             </p:submenu>
             <p:submenu label="#{msg.ZKBBasicInfo}" icon="settings" rendered="#{userContextService.accessContains('zkbBasicInfo')}">
                 <p:menuitem value="#{msg.ZKBAgentContactPersonMgt}" outcome="/portal/zkb/contactPerson/List.xhtml" rendered="#{userContextService.accessContains('zkbBasicInfo.agentContactPersonMgt')}"/>
