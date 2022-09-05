@@ -584,43 +584,62 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		}
 	}
 
+
 	public void batchUpdateAssetHistoryEvent() {
-		int pageNum=0;
-		int pageSize=1000;
-		int querySize=0;
-		//gson序列化只与属性(字段)有关，与get开头的方法无关
-		Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		while (true){
-			try {
-				List<AssetHistory> assetHistorys = assetHistoryRepository.getAssetHistory(pageNum, pageSize);
-				if(CollectionUtils.isEmpty(assetHistorys)){
+		try {
+			logger.info("batchUpdateAssetHistoryEvent start .......");
+			long startTimeUpdate = System.currentTimeMillis();
+
+			assetHistoryRepository.batchUpdateAssetHistoryEvent();
+			long endTimeUpdate = System.currentTimeMillis();
+
+			logger.info("batchUpdateAssetHistoryEvent end .......耗时:{}ms",endTimeUpdate-startTimeUpdate);
+			logger.info("batchInsertAssetHistoryEvent start .......");
+			int pageNum=0;
+			int pageSize=3000;
+			Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+			long startTime = System.currentTimeMillis();
+			List<AssetHistory> assetHistorys =new ArrayList<>();
+			while (true){
+				List<AssetInfo> assetInfos=assetInfoRepository.queryAssetHistoryNotExistsInsert();
+				if(CollectionUtils.isEmpty(assetInfos)){
 					break;
 				}
-				querySize=querySize+assetHistorys.size();
-				Set<String> uids = assetHistorys.stream().map(AssetHistory::getAssetUid).collect(Collectors.toSet());
+				for(AssetInfo assetInfo:assetInfos){
+					AssetHistory assetHistory = new AssetHistory();
+					assetHistory.setAssetUid(assetInfo.getUid());
+					assetHistory.setAssetName(assetInfo.getName());
+					assetHistory.setFinancingNum(assetInfo.getFinancingNum());
+					assetHistory.setJsonData("[]");
+					assetHistory.setCreatedDate(new Date());
+					assetHistory.setCreatedBy(assetInfo.getCreatedBy()!=null?assetInfo.getCreatedBy():"admin");
+					assetHistory.setSiteUID(assetInfo.getSiteUID());
+					assetHistory.setHospitalUID(assetInfo.getHospitalUID());
+					assetHistory.setTenantUID(assetInfo.getTenantUID());
+					assetHistory.setInstitutionUID(assetInfo.getInstitutionUID());
+					assetHistory.setClinicalDeptUid(assetInfo.getClinicalDeptUID());
 
-				List<AssetInfo> assetInfos = assetInfoRepository.fetchListByUid(uids);
-				Map<String, AssetInfo> collect = assetInfos.stream().collect(Collectors.toMap(AssetInfo::getUid, AssetInfo -> AssetInfo));
-				for (AssetHistory  assetHistory:assetHistorys ){
-					AssetInfo assetInfo = collect.get(assetHistory.getAssetUid());
-					if(assetInfo!=null){
-						assetInfo.setHospital(null);
-						assetInfo.setQrCodeLib(null);
-						assetInfo.setAssetTags(null);
-						assetInfo.setBrand(null);
-						String str = g.toJson(assetInfo);
-						assetHistory.setAssetJson(str);
-					}
+					assetInfo.setHospital(null);
+					assetInfo.setQrCodeLib(null);
+					assetInfo.setAssetTags(null);
+					assetInfo.setBrand(null);
+					assetInfo.setTags(null);
+					String assetJson = g.toJson(assetInfo);
+					assetHistory.setAssetJson(assetJson);
+
+					assetHistorys.add(assetHistory);
 				}
-				assetHistoryRepository.save(assetHistorys);
-			}catch (Exception e){
-				logger.error("AdminConsoleService batchUpdateAssetHistoryEvent e:",e);
-
+				if(!CollectionUtils.isEmpty(assetHistorys)){
+					assetHistoryRepository.save(assetHistorys);
+				}
+				assetHistorys.clear();
+				pageNum=pageNum+pageSize;
 			}
+			long endTime = System.currentTimeMillis();
+			logger.info("batchInsertAssetHistoryEvent end 添加设备到历史数据运行时间：{} ms",endTime-startTime);
 
-			pageNum=pageNum+pageSize;
+		}catch (Exception e){
+			logger.info("batchUpdateAssetHistoryEvent error e:",e);
 		}
-
-		logger.info("查询assetHistory size:{}",querySize);
 	}
 }

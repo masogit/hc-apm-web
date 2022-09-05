@@ -314,4 +314,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Transactional
     @Query(value = "UPDATE asset_info SET shared_status =?2 where uid in ?1",nativeQuery = true)
     void batchUpdateAssetInfoSharedStatus(List<String> assetUids,Integer sharedStatus);
+
+
+
+    @Query(value = "select * from asset_info a where not exists (select * from asset_history b where a.uid=b.asset_uid )order by id DESC  limit 2000", nativeQuery = true)
+    List<AssetInfo> queryAssetHistoryNotExistsInsert();
 }

@@ -13,6 +13,7 @@ import com.ge.apm.service.asset.AssetHistoryService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -55,9 +56,17 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             List<AssetHistory.AssetHistoryInfo> resultList =new ArrayList<>();
             if(newAsset.getId()!=null){
                 AssetHistory assetHistory=assetHistoryRepository.getAssetHistoryByAssetUidOne(newAsset.getUid());
-                String assetJson = assetHistory.getAssetJson();
-                AssetInfo assetInfo = g.fromJson(assetJson, AssetInfo.class);
 
+                if(assetHistory==null){
+                    LOGGER.info("update asset assetHistory is null assetUid:{}",newAsset.getUid());
+                    channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                }
+                String assetJson = assetHistory.getAssetJson();
+                if(StringUtils.isEmpty(assetJson)){
+                    LOGGER.info("update  asset  assetJson is null assetUid:{},historyUid:{}",newAsset.getUid(),assetHistory.getUid());
+                    channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                }
+                AssetInfo assetInfo = g.fromJson(assetJson, AssetInfo.class);
 //                AssetInfo assetInfo = JSONObject.parseObject(assetJson, AssetInfo.class);
                 oldAsset=assetInfo;
                 UserAccountThreadLocal.setUserAccount(currentUserAccount);
@@ -72,12 +81,11 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             }
 
             String jsonData = JSONArray.toJSONString(resultList);
-
-
             newAsset.setHospital(null);
             newAsset.setQrCodeLib(null);
             newAsset.setAssetTags(null);
             newAsset.setBrand(null);
+            newAsset.setTags(null);
             //gson序列化只与属性(字段)有关，与get开头的方法无关
             String assetJson = g.toJson(newAsset);
 //            String assetJson = JSONObject.toJSONString(newAsset);
@@ -102,19 +110,4 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 //            channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
         }
     }
-
-//
-//    public void listener(Object context, Channel channel, Message message){
-//        try {
-//            System.out.println("mq 监听的消息 message :"+context);
-//            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-//        }catch (Exception e){
-//            try {
-//                channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
-//            } catch (IOException ioException) {
-//                ioException.printStackTrace();
-//            }
-//        }
-//
-//    }
 }
