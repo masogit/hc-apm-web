@@ -58,7 +58,7 @@ public class IotDeviceBindController extends GenericCRUDController<RccEtlDevice>
     }
 
     public List<AssetInfo> getAssetList() {
-        if(this.selected == null){
+        if(this.selected == null || this.selected.getOrgInfo() == null){
             return new ArrayList<>();
         }
         return assetInfoRepository.getBySiteUid(this.selected.getOrgInfo().getSiteUID());
@@ -77,7 +77,8 @@ public class IotDeviceBindController extends GenericCRUDController<RccEtlDevice>
             WebUtil.addErrorMessage("请选择设备！");
             return;
         }
-        dao.updateAssetById(this.selected.getId(), this.assetUid);
+        this.selected.setAssetUid(this.assetUid);
+        dao.updateAssetById(this.selected);
         this.selected = null;
     }
 
