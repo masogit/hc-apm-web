@@ -28,6 +28,11 @@
                             <p>1. <a href="excel/APM_ZKB_SalePerson_Imp_Template.xlsx" title="download">下载模板</a> </p>
                             <p>2. 文件中填入要导入的租户id<br/>
                             其中：租户id可以通过列表页面导出文件中获取</p>
+                            <p>3.
+                                <p:commandLink ajax="false" value="下载智康保租户" actionListener="#{zkbSalesPersonInfoController.exportAllTenant}" styleClass="p-mr-2"  disabled="#{empty zkbSalesPersonInfoController.selected}" >
+                                    <p:fileDownload value="#{zkbSalesPersonInfoController.exportFile}"/>
+                                </p:commandLink>
+                            </p>
                         </h:panelGroup>
                     </p:fieldset>
                     <h:panelGroup>

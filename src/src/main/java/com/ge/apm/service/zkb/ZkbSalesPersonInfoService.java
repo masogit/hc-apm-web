@@ -49,6 +49,14 @@ public class ZkbSalesPersonInfoService {
         return tenantInfoDao.findBySearchFilter(searchFilters);
     }
 
+    public List<HashMap<String,Object>> createSalesTenantAssociateData(List<ZkbSalesTenantAssociate> zkbSalesTenantAssociates){
+        List<HashMap<String, Object>> zkbTenantInfoDataList = new ArrayList<>();
+        for(ZkbSalesTenantAssociate t : zkbSalesTenantAssociates){
+            HashMap<String, Object> m = getSalesTenantAssociateMap(t);
+            zkbTenantInfoDataList.add(m);
+        }
+        return zkbTenantInfoDataList;
+    }
 
     public List<HashMap<String,Object>> createTenantInfoData(List<TenantInfo> tenantInfos){
         List<HashMap<String, Object>> zkbTenantInfoDataList = new ArrayList<>();
@@ -59,19 +67,27 @@ public class ZkbSalesPersonInfoService {
         return zkbTenantInfoDataList;
     }
 
+    public HashMap<String, Object> getSalesTenantAssociateMap(ZkbSalesTenantAssociate t){
+        HashMap<String, Object> zkbTenantInfoDataMap = new HashMap<>(50);
+        zkbTenantInfoDataMap.put("租户id", t.getTenantUid());
+        if(StringUtils.isNotEmpty(t.getTenantUid())){
+            TenantInfo tt = tenantInfoDao.findByUid(t.getTenantUid());
+            zkbTenantInfoDataMap.put("租户名称", tt.getName());
+        }
+
+        return zkbTenantInfoDataMap;
+    }
+
     public HashMap<String, Object> getTenantInfoMap(TenantInfo t){
         HashMap<String, Object> zkbTenantInfoDataMap = new HashMap<>(50);
-
-        zkbTenantInfoDataMap.put("租户名称", t.getName());
         zkbTenantInfoDataMap.put("租户id", t.getUid());
-
+        zkbTenantInfoDataMap.put("租户名称", t.getName());
         return zkbTenantInfoDataMap;
     }
 
     public void exportData(ExcelDocument doc, List<HashMap<String, Object>> dataMap) {
         Integer keyRow = 1;
         Integer dataRow = 2;
-
 
         for (HashMap<String, Object> item : dataMap) {
             doc.writeRowData("租户列表", keyRow, dataRow++, item);

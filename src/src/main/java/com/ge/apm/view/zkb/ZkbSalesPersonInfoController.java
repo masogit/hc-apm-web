@@ -165,17 +165,15 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
         super.save();
     }
 
-    public void exportAll(){
-        List<SearchFilter> searchFilters = new ArrayList<>();
-        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, 3));
-        List<TenantInfo> tenantInfos = tenantInfoDao.findBySearchFilter(searchFilters);
-        List<HashMap<String, Object>> dataMap = zkbSalesPersonInfoService.createTenantInfoData(tenantInfos);
+    public void exportSalesTenantAssociate(){
+        List<ZkbSalesTenantAssociate> zkbSalesTenantAssociateList = zkbSalesTenantAssociateRepository.findBySalesPersonId(selected.getId());
+        List<HashMap<String, Object>> dataMap = zkbSalesPersonInfoService.createSalesTenantAssociateData(zkbSalesTenantAssociateList);
 
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/salesPerson/excel/APM_ZKB_SalePerson_Exp_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             zkbSalesPersonInfoService.exportData(doc, dataMap);
-            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbTenantInfoExcel_Export.xlsx");
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbSalesTenantAssociateExcel_Export.xlsx");
         } catch (IOException ex) {
             Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -194,6 +192,22 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
             message = new FacesMessage(FacesMessage.SEVERITY_WARN,"导入完成", event.getFile().getFileName() + " 处理完成，但有错误数据！");
         }
         FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    public void exportAllTenant(){
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, 3));
+        List<TenantInfo> tenantInfos = tenantInfoDao.findBySearchFilter(searchFilters);
+        List<HashMap<String, Object>> dataMap = zkbSalesPersonInfoService.createTenantInfoData(tenantInfos);
+
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/salesPerson/excel/APM_ZKB_SalePerson_Exp_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            zkbSalesPersonInfoService.exportData(doc, dataMap);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbTenantInfoExcel_Export.xlsx");
+        } catch (IOException ex) {
+            Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public StreamedContent getExportFile() {

@@ -18,7 +18,7 @@
                                  sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
-                        <p:ajax event="rowSelect" update="editButton deleteButton tenantButton importButton" />
+                        <p:ajax event="rowSelect" update="editButton deleteButton tenantButton importButton exportButton" />
                         <p:ajax event="filter" listener="#{zkbSalesPersonInfoController.onFilter}" />
                         <p:column headerText="姓名" exportable="true" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"  />
@@ -52,7 +52,7 @@
                                              update="datalist" disabled="#{empty zkbSalesPersonInfoController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
                             </p:commandButton>
-                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbSalesPersonInfoController.exportAll}" icon="ui-icon-arrowstop-1-s">
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbSalesPersonInfoController.exportSalesTenantAssociate}" icon="ui-icon-arrowstop-1-s"  disabled="#{empty zkbSalesPersonInfoController.selected}" >
                                 <p:fileDownload value="#{zkbSalesPersonInfoController.exportFile}"/>
                             </p:commandButton>
                             <p:commandButton id="importButton" ajax="false" title="导入" action="#{zkbSalesPersonInfoController.importAction}" icon="ui-icon-arrowstop-1-n"  disabled="#{empty zkbSalesPersonInfoController.selected}" >
