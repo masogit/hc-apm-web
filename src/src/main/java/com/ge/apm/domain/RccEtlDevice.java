@@ -21,8 +21,9 @@ public class RccEtlDevice implements Serializable {
     @Basic(optional = false)
     private Integer id;
 
-    @Column(name = "site_uid")
-    private String siteUid;
+    @JoinColumn(insertable = false, updatable = false, name = "site_uid", referencedColumnName = "uid")
+    @OneToOne
+    private OrgInfo orgInfo;
 
     @JoinColumn(insertable = false, updatable = false, name = "asset_uid", referencedColumnName = "uid")
     @OneToOne
@@ -33,6 +34,9 @@ public class RccEtlDevice implements Serializable {
 
     @Column(name = "aet")
     private String aet;
+
+    @Column(name = "station_name")
+    private String stationName;
 
     @Column(name = "device_type")
     private String deviceType;

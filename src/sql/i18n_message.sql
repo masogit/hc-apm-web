@@ -4734,3 +4734,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ConfigItemKey','配置键','Configure key',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ConfigItemValue','配置值','Configure value',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ConfigItemUseParent','是否使用上级配置','Whether to use parent configuration',NULL,-1);
+-- 物联绩效设备绑定
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','IotDeviceBind','物联绩效设备绑定','IoT performance device binding',NULL,-1);
