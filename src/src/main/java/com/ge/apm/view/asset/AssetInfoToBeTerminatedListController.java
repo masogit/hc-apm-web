@@ -206,6 +206,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
             String assetUid = i.getKey();
             AssetInfo assetInfo = dao.getByUid(assetUid);
             assetInfo.setTerminationCause(terminationCause);
+            assetInfo.setTerminateDate(new Date());  //mobile端没有已报废的设备，先将鉴定的时间作为待报废资产的报废时间
             return assetInfo;
         }).collect(Collectors.toList());
         dao.save(updatedAssets);
