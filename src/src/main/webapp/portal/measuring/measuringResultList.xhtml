@@ -41,6 +41,8 @@
                     <p:dataTable id="datalist_measuringResult" rendered="#{not empty measureAssetListController.measuringCertificateList}" value="#{measureAssetListController.measuringCertificateList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="5" emptyMessage="#{msg.noRecordFound}">
+
+
                         <p:column headerText="证书编号">
                             <h:outputText value="#{item.certificateNo}"/>
                         </p:column>
@@ -75,13 +77,6 @@
                         <p:column headerText="存档记录">
                             <h:outputText value="#{item.fileNo}"/>
                         </p:column>
-<!--                        <p:column headerText="操作">-->
-<!--                            <p:commandLink value="查看附件" ajax="false" actionListener="#{measureAssetListController.getMeasuringAttachList(item.id)}" styleClass="p-mr-2"/>-->
-<!--                        </p:column>-->
-                        <p:column headerText="上传文件">
-                            <p:fileUpload id="measuringResultUploadFile" value="#{item.id}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{measureAssetListController.uploadMeasuringFile}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                          multiple="true" sizeLimit="100000000" update="measuringTab:measuringResultForm:datalist_measuringFileResult" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
-                        </p:column>
 
                         <f:facet name="{Toolbar}">
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
@@ -90,63 +85,18 @@
                         </f:facet>
                     </p:dataTable>
 
-                    <p:panelGrid columnClasses="column1,column2" columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 100%">
-                        <p:column>
-                            <p:dataList id="assetInfoUploadList" value="#{measureAssetListController.getAttachList()}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                <f:facet name="header">资产附件列表</f:facet>
-                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;
-                                <p:commandButton actionListener="#{measureAssetListController.removeAttachmentById(fileitem.id)}" update="assetInfoUploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                </p:commandButton>
-                            </p:dataList>
-                            <p:fileUpload id="assetInfoUploadFile" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{measureAssetListController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                          multiple="true"  sizeLimit="100000000"  update="assetInfoUploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
-                        </p:column>
-<!--                        <p:column rendered="#{not empty measureAssetListController.resultAttachList}">-->
-<!--                            <p:dataList id="measuringResltUploadList" value="#{measureAssetListController.resultAttachList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-<!--                                <f:facet name="header">结果附件列表</f:facet>-->
-<!--                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;-->
-<!--                                <p:commandButton actionListener="#{measureAssetListController.removeAttachmentById(fileitem.id)}" update="measuringResltUploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">-->
-<!--                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>-->
-<!--                                </p:commandButton>-->
-<!--                            </p:dataList>-->
-<!--                            <p:fileUpload id="measuringResltUploadFile" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{measureAssetListController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"-->
-<!--                                          multiple="true"  sizeLimit="100000000"  update="measuringResltUploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>-->
-<!--                        </p:column>-->
-                        <p:column>
-                            <p:dataTable id="datalist_measuringFileResult" value="#{measureAssetListController.getMeasuringResult()}" var="measuringResultItem" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="5" emptyMessage="#{msg.noRecordFound}">
-                                <p:column headerText="证书编号">
-                                    <h:outputText value="#{measuringResultItem.certificateNo}"/>
-                                </p:column>
-                                <p:column headerText="检定结论">
-                                    <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', measuringResultItem.status)}"/>
-                                </p:column>
-                                <p:column headerText="检定日期">
-                                    <h:outputText value="#{measuringResultItem.checkDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="附件列表" style="width: 400px">
-                                    <p:dataList id="measuringFileList" value="#{measureAssetListController.getMeasuringAttachList(measuringResultItem.id)}" var="measuringFileItem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                        <p:commandLink value="#{measuringFileItem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(measuringFileItem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;
-                                        <p:commandButton actionListener="#{measureAssetListController.removeAttachmentById(measuringFileItem.id)}" update="measuringFileList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                        </p:commandButton>
-                                    </p:dataList>
-                                </p:column>
-<!--                                <p:column headerText="附件列表" style="width: 400px">-->
-<!--                                    <p:dataList id="measuringFileList" value="#{measureAssetListController.getMeasuringAttachList(measuringResultItem.id)}" var="measuringFileItem" type="definition" emptyMessage="#{msg.noRecordFound}">-->
-<!--                                        <p:commandLink value="#{measuringFileItem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(measuringFileItem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;-->
-<!--                                        <p:commandButton actionListener="#{measureAssetListController.removeAttachmentById(measuringFileItem.id)}" update="measuringFileList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">-->
-<!--                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>-->
-<!--                                        </p:commandButton>-->
-<!--                                    </p:dataList>-->
-<!--                                </p:column>-->
-                            </p:dataTable>
-                        </p:column>
-                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p:dataList id="measuringUploadList" value="#{measureAssetListController.getAttachList()}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">附件列表</f:facet>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>&nbsp;&nbsp;
+<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>&nbsp;&nbsp;-->
+                            <p:commandButton actionListener="#{measureAssetListController.removeAttachmentById(fileitem.id)}" update="measuringUploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="measuringUploadFile" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{measureAssetListController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="measuringUploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                    </h:panelGroup>
                 </p:fieldset>
             </h:form>
         </div>

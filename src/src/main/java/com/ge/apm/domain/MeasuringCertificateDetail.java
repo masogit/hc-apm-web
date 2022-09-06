@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by 212605082 on 2017/11/6.
@@ -147,9 +146,6 @@ public class MeasuringCertificateDetail implements Serializable {
 
     @Transient
     private String validDateToDisplay;
-
-    @Transient
-    private List<V2_BlobObject> measuringAttachList;
 
     public String getId() {
         return id;
@@ -405,14 +401,6 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setQrCode(String qrCode) {
         this.qrCode = qrCode;
-    }
-
-    public List<V2_BlobObject> getMeasuringAttachList() {
-        return measuringAttachList;
-    }
-
-    public void setMeasuringAttachList(List<V2_BlobObject> measuringAttachList) {
-        this.measuringAttachList = measuringAttachList;
     }
 
     @Override

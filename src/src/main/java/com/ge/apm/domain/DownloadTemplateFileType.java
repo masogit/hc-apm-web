@@ -14,7 +14,6 @@ public enum DownloadTemplateFileType {
     SMALL_ASSET_PERFORMANCE_CONFIG("APM_SmallAssetPerformanceConfig_Template.xlsx", ""),
     ORG_INFO("APM_Org_Template.xlsx", ""),
     USER_ACCOUNT("UserAccountImport_Template.xlsx", ""),
-    MEASURING_RESULT("APM_MEASURING_Template.xls", ""),
     ;
 
     private final String templateFileZh;
