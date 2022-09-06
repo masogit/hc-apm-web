@@ -15,10 +15,10 @@ public class RccEtlDevice implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
+    @EmbeddedId
+    RccEltDevicePK pk;
+
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     private Integer id;
 
     @JoinColumn(insertable = false, updatable = false, name = "site_uid", referencedColumnName = "uid")
@@ -32,20 +32,13 @@ public class RccEtlDevice implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "aet")
-    private String aet;
-
     @Column(name = "station_name")
     private String stationName;
-
-    @Column(name = "device_type")
-    private String deviceType;
 
     @Column(name = "device_model")
     private String deviceModel;
 
     @Transient
     private String assetUid;
-
 
 }
