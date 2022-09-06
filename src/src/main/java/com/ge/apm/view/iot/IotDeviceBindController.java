@@ -61,7 +61,7 @@ public class IotDeviceBindController extends GenericCRUDController<RccEtlDevice>
         if(this.selected == null){
             return new ArrayList<>();
         }
-        return assetInfoRepository.getBySiteUid(this.selected.getSiteUid());
+        return assetInfoRepository.getBySiteUid(this.selected.getOrgInfo().getSiteUID());
     }
 
     public void setIotAssetUid(){
