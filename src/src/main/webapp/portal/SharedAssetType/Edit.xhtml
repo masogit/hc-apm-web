@@ -110,7 +110,7 @@
                             </h:panelGroup>
                             <h:panelGroup class="selectCheckBoxHeader" id="discount" rendered="#{sharedAssetTypeController.isWhetherToEnableUnattendedAndType()}">
                                 <label class='label'>优惠折扣</label>
-                                <p:inputText  value="#{sharedAssetTypeController.selected.discount}"
+                                <p:inputNumber symbol="%" symbolPosition="s" emptyValue="empty" value="#{sharedAssetTypeController.selected.discount}"
                                               requiredMessage="优惠折扣 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                         </p:panelGrid>

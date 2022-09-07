@@ -11,6 +11,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserAccountExportService {
@@ -58,7 +61,7 @@ public class UserAccountExportService {
 	private int recordCount;
 	boolean isInsulate=false;
 	UserAccount currentUser;
-	
+	private List<OrgInfo> tenantOrgInfoOfType4All=new ArrayList<>(256);
 	@Autowired
 	UserAccountMapper userAccountMapper;
 	
@@ -103,15 +106,16 @@ public class UserAccountExportService {
 			for (int i = 0; i < listUserAccount.size(); ++i) {
 				UserAccount tempUser = listUserAccount.get(i);
 				Map<String, Object> tempMap = new HashMap<String, Object>();
-				if(StringUtils.isNotEmpty(tempUser.getDepartName())) {
-					tempMap.put(HEADER_DEPARTMENT, tempUser.getDepartNames(1));
-				}
-				if(StringUtils.isNotEmpty(tempUser.getDepartName2())){
-					tempMap.put(HEADER_DEPARTMENT2, tempUser.getDepartNames(2));
-				}
-				if(StringUtils.isNotEmpty(tempUser.getDepartName3())){
-					tempMap.put(HEADER_DEPARTMENT3, tempUser.getDepartNames(3));
-				}
+//				if(StringUtils.isNotEmpty(tempUser.getDepartName())) {
+//					tempMap.put(HEADER_DEPARTMENT, tempUser.getDepartNames(1));
+//				}
+//				if(StringUtils.isNotEmpty(tempUser.getDepartName2())){
+//					tempMap.put(HEADER_DEPARTMENT2, tempUser.getDepartNames(2));
+//				}
+//				if(StringUtils.isNotEmpty(tempUser.getDepartName3())){
+//					tempMap.put(HEADER_DEPARTMENT3, tempUser.getDepartNames(3));
+//				}
+				setDepartNames(tempMap,tempUser);
 				String orgFullName=tempUser.getOrgFullName();
 				if(StringUtils.isNotEmpty(tempUser.getInstitutionName())){
 					tempMap.put(HEADER_INSTITUTION, tempUser.getInstitutionName());
@@ -138,7 +142,68 @@ public class UserAccountExportService {
 		}
 		return listMapResult;
 	}
+	private void setDepartNames(Map<String, Object> tempMap,UserAccount tempUser){
+		String siteUID = tempUser.getSiteUID();
+		String orgInfoUID = tempUser.getOrgInfoUID();
+		if(StringUtils.isBlank(siteUID) ) return;
+		if(StringUtils.isBlank(orgInfoUID)) return;
+		if(siteUID.equals(orgInfoUID))return;
+		List<OrgInfo> orgInfos = tenantOrgInfoTypeOf4All();
+		Optional<OrgInfoVO> first = orgInfos.stream().filter(item -> item.getUid().equals(orgInfoUID)).map(item -> {
+			OrgInfoVO vo=new OrgInfoVO();
+			String parentUID = item.getParentUID();
+			vo.setParentUID(parentUID);
+			vo.setName(item.getName());
+			vo.setUid(item.getUid());
+			vo.setParent(recursiveSearch(item, orgInfos));
+			return vo;
+		}).findFirst();
+		if(first.isPresent()){
+			OrgInfoVO orgInfoVO=first.get();
+			List<String> org=new ArrayList<>();
+			do {
+				org.add(orgInfoVO.getName());
 
+			}while ((orgInfoVO=orgInfoVO.getParent()) != null);
+			Collections.reverse(org);
+			for (int i = 0; i < org.size(); i++) {
+				if(i==0){
+					tempMap.put(HEADER_DEPARTMENT,org.get(i));
+				}else if(i == 1){
+					tempMap.put(HEADER_DEPARTMENT2,org.get(i));
+				}else if(i ==2){
+					tempMap.put(HEADER_DEPARTMENT3,org.get(i));
+				}
+			}
+		}
+	}
+	private OrgInfoVO recursiveSearch(OrgInfo orgInfo, List<OrgInfo> orgInfos){
+		Optional<OrgInfoVO> first = orgInfos.stream().filter(item -> {
+			String parentUID = orgInfo.getParentUID();
+			return item.getUid().equals(parentUID);
+		}).filter(item->{
+			return item != null;
+		}).map(item -> {
+			OrgInfoVO vo = new OrgInfoVO();
+			String parentUID = item.getParentUID();
+			vo.setParentUID(parentUID);
+			vo.setName(item.getName());
+			vo.setUid(item.getUid());
+			vo.setParent(recursiveSearch(item, orgInfos));
+			return vo;
+		}).findFirst();
+		return first.isPresent()?first.get():null;
+	}
+	private List<OrgInfo> tenantOrgInfoTypeOf4All(){
+		if(tenantOrgInfoOfType4All.size() == 0){
+			UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+			if(currentUserAccount == null) return tenantOrgInfoOfType4All;
+			String tenantUID = currentUserAccount.getTenantUID();
+			if(StringUtils.isBlank(tenantUID)) return tenantOrgInfoOfType4All;
+			tenantOrgInfoOfType4All = orgInfoRepository.findByTenantUIDAndOrgType(tenantUID, 4);
+		}
+		return tenantOrgInfoOfType4All;
+	}
 	/**
 	 * use space as delimiter to group tags to export
 	 * @param tempUser
