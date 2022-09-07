@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "v2_work_order")
+@TableName("v2_work_order")
 /*@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable(true)*/
 public class V2_WorkOrder implements Serializable, ApprovableTarget {
