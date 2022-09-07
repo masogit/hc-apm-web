@@ -424,6 +424,13 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
 
         return false;
     }
+    public boolean isWhetherToEnableUnattended(){
+        WorkflowConfig workflowConfig = getWorkflowConfig();
+        if(workflowConfig == null){
+            return false;
+        }
+       return Boolean.TRUE.equals(workflowConfig.getWhethertoenableunattended());
+    }
     private WorkflowConfig  getWorkflowConfig(){
         WorkflowConfig workflowConfig=null;
         WorkflowConfigRepository workflowConfigRepository = WebUtil.getBean(WorkflowConfigRepository.class);
