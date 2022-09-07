@@ -267,7 +267,6 @@ public class UaaService {
     
     @Transactional
     public void setUserRoles(UserAccount userAccount, List<String> newRoleNames){
-        UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
@@ -295,7 +294,6 @@ public class UaaService {
                 CustomRole customRole = customRoleRepository.findByTenantUIDAndName(userAccount.getTenantUID(),newRoleName);
                 if(customRole == null){
                     logger.warn("Assign role to user: Role not found, roleName="+newRoleName);
-                    continue;
                 }else{
                     UserRole userRole = new UserRole();
                     userRole.setUserId(userAccount.getId());
