@@ -258,7 +258,12 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
         if(StringUtils.isNotEmpty(siteUid)){
             WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(siteUid);
-            if(workflowConfig != null && workflowConfig.getPartsNeedSign() != null && workflowConfig.getPartsNeedSign()){
+            if(workflowConfig != null && Boolean.TRUE.equals(workflowConfig.getPartsNeedSign())){
+                if(agree == 1){
+                    this.isAgree = true;
+                }else if(agree == 2){
+                    this.isAgree = false;
+                }
                 this.needSignature = true;
                 // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
                 ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
@@ -304,30 +309,27 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             return;
         }
 
-        if(this.newSignature){
-            if (StringUtils.isNotEmpty(signatureContent)) {
+        if(this.newSignature && StringUtils.isNotEmpty(signatureContent)){
+            try {
+                String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
+                BASE64Decoder decoder = new BASE64Decoder();
+                byte[] decode = decoder.decodeBuffer(base64);
 
-                try {
-                    String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
-                    BASE64Decoder decoder = new BASE64Decoder();
-                    byte[] decode = decoder.decodeBuffer(base64);
-
-                    V2_BlobObject blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
-                    if (null != blobObject) {
-                        this.signatureId = blobObject.getObjectStorageId();
-                        woService.addUserSignature(this.signatureId);
-                    }else{
-                        WebUtil.addErrorMessage("签名保存失败！");
-                        response.setStatus(206);
-                        return;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error(e.getMessage());
+                V2_BlobObject blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
+                if (null != blobObject) {
+                    this.signatureId = blobObject.getObjectStorageId();
+                    woService.addUserSignature(this.signatureId);
+                }else{
                     WebUtil.addErrorMessage("签名保存失败！");
                     response.setStatus(206);
                     return;
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e.getMessage());
+                WebUtil.addErrorMessage("签名保存失败！");
+                response.setStatus(206);
+                return;
             }
         }
 
