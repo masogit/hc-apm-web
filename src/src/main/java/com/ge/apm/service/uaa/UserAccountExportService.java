@@ -153,7 +153,7 @@ public class UserAccountExportService {
 			OrgInfoVO vo=new OrgInfoVO();
 			String parentUID = item.getParentUID();
 			vo.setParentUID(parentUID);
-			vo.setName(item.getName());
+			vo.setName(item.getShortName());
 			vo.setUid(item.getUid());
 			vo.setParent(recursiveSearch(item, orgInfos));
 			return vo;
@@ -187,7 +187,7 @@ public class UserAccountExportService {
 			OrgInfoVO vo = new OrgInfoVO();
 			String parentUID = item.getParentUID();
 			vo.setParentUID(parentUID);
-			vo.setName(item.getName());
+			vo.setName(item.getShortName());
 			vo.setUid(item.getUid());
 			vo.setParent(recursiveSearch(item, orgInfos));
 			return vo;

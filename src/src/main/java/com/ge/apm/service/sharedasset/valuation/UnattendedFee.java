@@ -41,10 +41,10 @@ public abstract class UnattendedFee {
             reqDetail.setDiscountTime(discountTimeStr);
             return promotionTimeCount;
         }
-        if(reqDetail.getRentalTimeInMins() <= discountTimeInt){
-            reqDetail.setDiscountTime(discountTimeStr);
-            return promotionTimeCount;
-        }
+//        if(reqDetail.getRentalTimeInMins() <= discountTimeInt){
+//            reqDetail.setDiscountTime(discountTimeStr);
+//            return promotionTimeCount;
+//        }
         endTime=getTime(reqDetail.getChargingEndTime(),true);
         promotionTimeCount = computePromotionTime(beginTime, endTime, sharedAssetTypeBeginTime, sharedAssetTypeEndTime);
         reqDetail.setDiscountTime( getDiscountTimeStr(promotionTimeCount));
@@ -199,6 +199,6 @@ public abstract class UnattendedFee {
             long between1 = ChronoUnit.MINUTES.between(plus1, endTime);
             promotionTimeCount+=between1;
         }
-        return promotionTimeCount;
+        return promotionTimeCount<=0?0:promotionTimeCount;
     }
 }
