@@ -120,10 +120,9 @@ public abstract class UnattendedFee {
     private String getDiscountTimeStr(long promotionTimeCount){
         StringBuilder formattedRentalTime = new StringBuilder();
         long days = 0L, hours = 0L, minutes = 0L;
-        days = promotionTimeCount / (24 * 60);
-        hours = (promotionTimeCount / 60) % 24;
+        hours = (promotionTimeCount / 60);
         minutes = promotionTimeCount % 60;
-        formattedRentalTime.append(days).append("天").append(hours).append("时").append(minutes).append("分");
+        formattedRentalTime.append(hours).append("时").append(minutes).append("分");
         return formattedRentalTime.toString();
     }
       private long getDiscountTimeInt(LocalDateTime sharedAssetTypeBeginTime,LocalDateTime sharedAssetTypeEndTime){
@@ -184,9 +183,10 @@ public abstract class UnattendedFee {
         while (( plus = plus.plus(1, ChronoUnit.HOURS)).compareTo(endPromotionTimeOfLastDay) !=1);
         long between = ChronoUnit.HOURS.between(lastDay, endTime);
 
-        for (int i = 1; i <=between ; i++) {
+        for (int i = 0; i <=between ; i++) {
             LocalDateTime plus1 = lastDay.plus(i, ChronoUnit.HOURS);
-            if(arryList.contains(plus1.getHour())){
+            int hour = plus1.getHour();
+            if(arryList.contains(hour) && hour!= arryList.get(0)){
                 promotionTimeCount+=60;
             }
         }
