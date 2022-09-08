@@ -739,8 +739,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-        this.saveAssetHistory();
         this.save();
+        this.saveAssetHistory();
 
         if(selected != null && selected.getId() != null && selectedPictures != null){
             acService.createAttachments(selected, selectedPictures);
