@@ -160,6 +160,11 @@
                                         <f:convertNumber pattern="0.00"/>
                                     </h:outputText>
                                 </p:column>
+                                <p:column headerText="免除费用">
+                                    <h:outputText value="#{item.gratisFee}">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </h:outputText>
+                                </p:column>
                                 <p:column headerText="优惠时段">
                                     <h:outputText value="#{item.getDiscountPeriod()}">
                                         <f:convertNumber pattern="0.00"/>
@@ -180,11 +185,7 @@
                                     <f:convertNumber pattern="0.00"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="免除费用">
-                                <h:outputText value="#{item.gratisFee}">
-                                    <f:convertNumber pattern="0.00"/>
-                                </h:outputText>
-                            </p:column>
+
                             <p:column headerText="总计费用">
                                 <h:outputText value="#{item.compensationAmount + item.totalAmount}">
                                     <f:convertNumber pattern="0.00"/>
