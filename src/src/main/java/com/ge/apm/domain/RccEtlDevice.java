@@ -21,7 +21,7 @@ public class RccEtlDevice implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @JoinColumn(insertable = false, updatable = false, name = "site_uid", referencedColumnName = "uid")
+    @JoinColumn(insertable = false, updatable = false, name = "bind_site_uid", referencedColumnName = "uid")
     @OneToOne
     private OrgInfo orgInfo;
 
