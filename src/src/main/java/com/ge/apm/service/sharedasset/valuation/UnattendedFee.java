@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,10 +42,7 @@ public abstract class UnattendedFee {
             reqDetail.setDiscountTime(discountTimeStr);
             return promotionTimeCount;
         }
-//        if(reqDetail.getRentalTimeInMins() <= discountTimeInt){
-//            reqDetail.setDiscountTime(discountTimeStr);
-//            return promotionTimeCount;
-//        }
+
         endTime=getTime(reqDetail.getChargingEndTime(),true);
         promotionTimeCount = computePromotionTime(beginTime, endTime, sharedAssetTypeBeginTime, sharedAssetTypeEndTime);
         reqDetail.setDiscountTime( getDiscountTimeStr(promotionTimeCount));
@@ -75,17 +73,13 @@ public abstract class UnattendedFee {
     protected  void setGratisFee(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail,long discountTimeInt){
 
         Double gratisDuration = reqDetail.getGratisDuration();
-        if(gratisDuration == null || gratisDuration==0){
-            reqDetail.setGratisFee(BigDecimal.ZERO);
-            return;
-        }
-        if(reqDetail.getRentalTimeInMins() <= gratisDuration*60){
+        if(gratisDuration == null || gratisDuration<=0){
             reqDetail.setGratisFee(BigDecimal.ZERO);
             return;
         }
         BigDecimal gratisFee=null;
         Double unitPrice = reqDetail.getUnitPrice();
-        if(gratisDuration == null || unitPrice== null){
+        if(unitPrice== null || unitPrice < 0){
             gratisFee=BigDecimal.ZERO;
         }else{
             BigDecimal unitPriceBigDecimal = BigDecimal.valueOf(unitPrice);
@@ -164,10 +158,6 @@ public abstract class UnattendedFee {
         long promotionTime=ChronoUnit.MINUTES.between(sharedAssetTypeBeginTime,sharedAssetTypeEndTime);
         promotionTimeCount+=countDays*promotionTime;
         LocalDateTime lastDay = beginTime.plus(countDays, ChronoUnit.DAYS);
-        LocalTime localTime = lastDay.toLocalTime();
-        long between2 = ChronoUnit.SECONDS.between(localTime, beginLocalTime);
-        lastDay= lastDay.plus(between2, ChronoUnit.SECONDS);
-        System.out.println(lastDay);
         LocalDateTime startPromotionTimeOfLastDay = LocalDateTime.of(lastDay.toLocalDate(), beginLocalTime);
         LocalDateTime endPromotionTimeOfLastDay;
         if(flag){
@@ -182,17 +172,18 @@ public abstract class UnattendedFee {
         }
         while (( plus = plus.plus(1, ChronoUnit.HOURS)).compareTo(endPromotionTimeOfLastDay) !=1);
         long between = ChronoUnit.HOURS.between(lastDay, endTime);
-
+        int i1 = lastDay.get(ChronoField.MINUTE_OF_HOUR);
+        if(i1 != 0){
+            promotionTimeCount-=i1;
+        }
         for (int i = 0; i <=between ; i++) {
             LocalDateTime plus1 = lastDay.plus(i, ChronoUnit.HOURS);
             int hour = plus1.getHour();
-            if(arryList.contains(hour) && hour!= arryList.get(0)){
+            if(arryList.contains(hour) ){
                 promotionTimeCount+=60;
             }
         }
-        if(between2 < 0){
-            promotionTimeCount+=between2/60;
-        }
+        promotionTimeCount-=60;
         int hour = endTime.getHour();
         if(arryList.contains(hour) && hour != arryList.get(arryList.size() -1) ){
             LocalDateTime plus1 = lastDay.plus(between, ChronoUnit.HOURS);
