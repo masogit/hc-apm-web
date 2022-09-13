@@ -10,7 +10,6 @@
         <h:outputScript name="js/assetUsageAll.js"/>
         <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
-        <!--        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>-->
         <style>
             div.ui-autocomplete.ui-autocomplete-multiple.asset-tags ul.ui-autocomplete-multiple-container{
                 max-width: 200px;
@@ -40,9 +39,6 @@
                             </p:panelGrid>
                         </div>
                         <div class="ui-g-4">
-                            <!--                            <p:galleria value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="attach" panelWidth="300" panelHeight="200" showCaption="false" rendered="#{!empty assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}">-->
-                            <!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;" onclick="javascript:showthis(this);"/>-->
-                            <!--                            </p:galleria>-->
                             <div class="container-fluid" style="height: 400px; overflow: auto;">
                                 <div class="row" id="picDiv">
                                     <c:forEach items="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="attach" >
@@ -201,7 +197,6 @@
                     <p:panel  header="#{msg.MetrologyMonitor}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/measuring/measuringResultMain?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/insp/MetrologyOrderCreate?faces-redirect=true&amp;actionName=Create')}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                         </f:facet>
 
                         <p:dataTable var="item" value="#{inspectionServiceController.getInspectionOrderList(assetInfoDetailController.selected.id, 2, 3)}" emptyMessage="#{msg.noRecordFound}">
@@ -276,7 +271,6 @@
                     <p:panel  header="#{msg.ExternalMaintenanceRecord}4566" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;queryTab=pmOrderListRemote&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
                         </f:facet>
                         <p:dataTable var="item" value="#{assetInfoDetailController.getOrderList('5')}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.MaintenanceID}" >
@@ -325,26 +319,6 @@
                 </p:panelGrid>
             </h:form>
 
-            <!--            <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceExpo.series}">
-                             Chart 2: Device Exposure
-                            <div class="ui-g-12">
-                                <div class="block">
-                                    <h3 class="block-title">#{msg.deviceExpohd}</h3>
-                                    <p:chart id="exposure_bar" type="line" model="#{assetUsageSingleController.deviceExpo}"
-                                             responsive="true"/>
-                                </div>
-                            </div>
-                        </p:fieldset>
-                        <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceScan.series}">
-                             Chart 1: Device Scan
-                            <div class="ui-g-12">
-                                <div class="block">
-                                    <h3 class="block-title">#{msg.deviceScanhd}</h3>
-                                    <p:chart id="scan_bar" type="line"
-                                             model="#{assetUsageSingleController.deviceScan}" responsive="true"/>
-                                </div>
-                            </div>
-                        </p:fieldset>-->
             <h:form>
                 <p:panel  header="#{msg.RelatedEquipmentUID}" rendered="#{assetInfoDetailController.showParentsTree()}">
                     <p:treeTable styleClass="ui-datatable"  value="#{assetInfoDetailController.getParentsRelationTree()}" var="assetItem">
@@ -362,7 +336,6 @@
                             <h:outputText value="#{assetItem.departNum}" />
                         </p:column>
                         <p:column >
-                            <!--<p:commandLink value="#{msg.View}" action="#{assetInfoDetailController.getDetailPageLink(assetItem.uid)}" disabled="#{assetItem.uid eq assetInfoDetailController.selected.uid}"/>-->
                             <p:link  outcome="#{assetInfoDetailController.getDetailPageLink(assetItem.uid)}" disabled="#{assetItem.uid eq assetInfoDetailController.selected.uid}" >#{msg.View}</p:link>
                         </p:column>
 
@@ -374,7 +347,6 @@
                     <f:facet name="actions">
                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}"
                                        disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                        <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Create&amp;assetId='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                     </f:facet>
                     <p:dataTable var="item" value="#{assetInfoDetailController.getContractList()}" emptyMessage="#{msg.noRecordFound}">
                         <p:column headerText="#{msg.name}" >
@@ -402,7 +374,6 @@
                             <h:outputText value="#{assetInfoDetailController.getContractInvoice(item)}"/>
                         </p:column>
                         <p:column   >
-                            <!--<p:commandLink action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.id))}" value="查看" />-->
                             <p:link outcome="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.id))}" disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}">#{msg.View}</p:link>
                         </p:column>
                     </p:dataTable>
@@ -413,31 +384,27 @@
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 1)}">
                         <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 2)}">
                         <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,2)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 3)}">
                         <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,3)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 4)}">
                         <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,4)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                         </p:dataList>
                     </p:tab>
                     <c:forEach items="#{assetInfoDetailController.getAttachmentCategories()}" var="attachmentConfig">
                         <p:tab title="#{attachmentConfig.label}">
                             <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                             </p:dataList>
                         </p:tab>
                     </c:forEach>
@@ -447,7 +414,6 @@
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoDetailController.selected.qrCode}">
-<!--                        <img id="codeImg" src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" />-->
                         <p:panelGrid columns="2" layout="grid" styleClass="showcase-text-align-center">
                             <p:graphicImage id="qrcode" value="#{qrCodeShowController.getImg(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" stream="false" />
                             <p:commandButton id="btn" value="打印" icon="ui-icon-print" style="margin-top: 41px;margin-left: 30px">
