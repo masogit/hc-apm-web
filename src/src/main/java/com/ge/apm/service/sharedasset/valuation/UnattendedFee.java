@@ -54,16 +54,13 @@ public abstract class UnattendedFee {
             reqDetail.setDiscountFee(BigDecimal.ZERO);
             return;
         }
-        if(reqDetail.getRentalTimeInMins() < discountTimeInt){
-            reqDetail.setDiscountFee(BigDecimal.ZERO);
-            return;
-        }
+
         Double unitPrice = reqDetail.getUnitPrice();
         Double discount = reqDetail.getDiscount();
 
         if(unitPrice != null && discount != null){
             BigDecimal unitPriceBigDecimal = BigDecimal.valueOf(unitPrice);
-            BigDecimal multiply = unitPriceBigDecimal.multiply(BigDecimal.valueOf(discountTimeInt / 60 * (discount / 100)));
+            BigDecimal multiply = unitPriceBigDecimal.multiply(BigDecimal.valueOf(discountTimeInt / 60 )).multiply(BigDecimal.valueOf(discount / 100));
             discountFee=multiply;
         }
         reqDetail.setDiscountFee(discountFee);
