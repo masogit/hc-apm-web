@@ -60,7 +60,7 @@ public abstract class UnattendedFee {
 
         if(unitPrice != null && discount != null){
             BigDecimal unitPriceBigDecimal = BigDecimal.valueOf(unitPrice);
-            BigDecimal multiply = unitPriceBigDecimal.multiply(BigDecimal.valueOf(discountTimeInt / 60 )).multiply(BigDecimal.valueOf(discount / 100));
+            BigDecimal multiply = unitPriceBigDecimal.multiply(BigDecimal.valueOf(discountTimeInt / 60 )).multiply(BigDecimal.valueOf((discount / 100)));
             discountFee=multiply;
         }
         reqDetail.setDiscountFee(discountFee);
@@ -259,7 +259,7 @@ public abstract class UnattendedFee {
         }else if(state > 0 && differenceDay==0){
             if(lastDayLocalTime.compareTo(discountBeginTime) <= 0 && endTimeLocalTime.compareTo(discountEndTime) >=0){
                 promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,discountEndTime);
-            }else if(lastDayLocalTime.compareTo(discountBeginTime) <= 0 && endTimeLocalTime.compareTo(discountEndTime) <=0){
+            }else if(lastDayLocalTime.compareTo(discountBeginTime) <= 0 &&  endTimeLocalTime.compareTo(discountBeginTime) >=0 && endTimeLocalTime.compareTo(discountEndTime) <=0){
                 promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,endTimeLocalTime);
             }else if(lastDayLocalTime.compareTo(discountBeginTime) >=0 && lastDayLocalTime.compareTo(discountEndTime) < 0 && endTimeLocalTime.compareTo(discountEndTime) <=0){
                 promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,endTimeLocalTime);
