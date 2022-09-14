@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.faces.model.SelectItem;
 
 import com.ge.apm.domain.*;
+import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.TreeNode;
@@ -353,7 +354,9 @@ public class SharedAssetStockService {
                     logger.info("charging_type is missed in request, so set charging_type from share_asset_type: " + asset.getUid() + ":" + asset.getSharedAssetType().getChargingType());
                     reqDetail.setChargingType(asset.getSharedAssetType().getChargingType());
                 }
-                asset.setSharedAssetReqDetail(this.calcRentTimeAndFeeByReqDetail(asset, reqDetail));
+                SharedAssetReqDetail sharedAssetReqDetail = this.calcRentTimeAndFeeByReqDetail(asset, reqDetail);
+                ValuationFactory.valuation(null,sharedAssetReqDetail);
+                asset.setSharedAssetReqDetail(sharedAssetReqDetail);
             }
         }
     }
