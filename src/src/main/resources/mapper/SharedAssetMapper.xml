@@ -53,6 +53,10 @@
         <result column="patient_num" property="patientNum"/>
         <result column="patient_bed_num" property="patientBedNum"/>
         <result column="clinical_dept_name" property="clinicalDeptName"/>
+        <result column="gratis_duration" property="gratisDuration"/>
+        <result column="discount_start_date" property="discountStartDate"/>
+        <result column="discount_end_date" property="discountEndDate"/>
+        <result column="discount" property="discount"/>
     </resultMap>
 
     <select id="getTotalRowCount" resultType="int">
@@ -134,7 +138,11 @@
             sard.return_id,
             sard.patient_num,
             sard.patient_bed_num,
-            sard.clinical_dept_name
+            sard.clinical_dept_name,
+            sard.gratis_duration,
+            sard.discount_start_date,
+            sard.discount_end_date,
+            sard.discount
             from asset_info ai left join shared_asset_type sat on ai.shared_asset_type = sat.id
             left join org_info oi on ai.asset_dept_uid=oi.uid
             left join (select * from shared_asset_req_detail where charging_end_time is null or charging_end_time > now()) sard on ai.uid=sard.asset_info_id
