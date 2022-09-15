@@ -44,16 +44,16 @@
                 </p:autoComplete> -->
 				<p:selectManyMenu id="deptOrgInfoCreate" value="#{assetSelectJNController.listCheckOrgInfo}" var="t" converter="orgInfoConverter" required="false" filter="true"
 					filterMatchMode="contains" showCheckbox="true" style="width:100%" rendered="#{!assetSelectJNController.is4Edit}">
-					<f:selectItems value="#{assetSelectJNController.deptList}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
+					<f:selectItems value="#{assetSelectJNController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 					<p:column style="float: left;text-align:left;">
-						<h:outputText value="#{t.shortName}" />
+						<h:outputText value="#{t.name}" />
 					</p:column>
 				</p:selectManyMenu>
 				<p:selectOneMenu id="deptOrgInfoEdit" value="#{assetSelectJNController.listCheckOrgInfo[0]}" var="t" converter="orgInfoConverter" required="false" filter="false"
 					showCheckbox="false" style="width:100%" rendered="#{assetSelectJNController.is4Edit}" disabled="#{assetSelectJNController.is4Edit}">
-					<f:selectItems value="#{assetSelectJNController.deptList}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
+					<f:selectItems value="#{assetSelectJNController.deptList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 					<p:column style="float: left;text-align:left;">
-						<h:outputText value="#{t.shortName}" />
+						<h:outputText value="#{t.name}" />
 					</p:column>
 				</p:selectOneMenu>
 			</h:panelGroup>
