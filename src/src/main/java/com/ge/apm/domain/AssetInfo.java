@@ -3,6 +3,7 @@
 package com.ge.apm.domain;
 
 import com.alibaba.druid.util.StringUtils;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
@@ -85,6 +86,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private Integer supplierId; //供应商Id =Supplier.id
 
     @Transient
+    @TableField(exist = false)
     private String vendorTel;//供应商电话
 
     @Column(name = "maitanance_id")
@@ -155,6 +157,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private String modalityType;
 
     @Transient
+    @TableField(exist = false)
     private String assetDeptName;//使用科室
 
     @Column(name = "asset_group")
@@ -575,6 +578,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private String oneQrCode;
 
     @Transient
+    @TableField(exist = false)
     private String oneQrCodeStatus;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -635,81 +639,118 @@ public class AssetInfo implements ChineseName,Serializable {
     private String contractType;
 
     @Transient
+    @TableField(exist = false)
     private int lineNum;
 
     @Transient
+    @TableField(exist = false)
     private Set<SharedAssetReqDetail> sharedAssetReqDetailList;
     
     @Transient
+    @TableField(exist = false)
     private SharedAssetReqDetail sharedAssetReqDetail;
 
     @Transient
+    @TableField(exist = false)
     private SharedAssetType sharedAssetType;
 
     @Transient
+    @TableField(exist = false)
     private OrgInfo siteOrg;
 
     @Transient
+    @TableField(exist = false)
     private OrgInfo assetDeptOrg;
 
     @Transient
+    @TableField(exist = false)
     private Boolean canBorrow;
 
     @Transient
+    @TableField(exist = false)
     private Boolean canReturn;
 
     @Transient
+    @TableField(exist = false)
     private Boolean canEdit;
 
     @Transient
+    @TableField(exist = false)
     private Integer verificationConclusion;
 
     @Transient
+    @TableField(exist = false)
     private OrgInfo clinicalDeptOrg;
 
     @Transient
+    @TableField(exist = false)
     private Supplier supplier;
     @Transient
+    @TableField(exist = false)
     private String isPmValue;
     @Transient
+    @TableField(exist = false)
     private String isCheckedValue;
     @Transient
+    @TableField(exist = false)
     private String warrantyValue;
     @Transient
+    @TableField(exist = false)
     @Getter
     @Setter
     private String errorMessage;
     @Transient
+    @TableField(exist = false)
     @Getter
     @Setter
     private String branchIds;
     @Transient
+    @TableField(exist = false)
     private String aet;
     @Transient
+    @TableField(exist = false)
     @Getter
     @Setter
     private Integer rank;
     @Transient
+    @TableField(exist = false)
     private Date studydate;
     @Transient
+    @TableField(exist = false)
     private Date startTime;
     @Transient
+    @TableField(exist = false)
     private Date endTime;
     @Transient
+    @TableField(exist = false)
     private Double studyexposuretime;
     @Transient
+    @TableField(exist = false)
     private String usageRate;
     @Transient
+    @TableField(exist = false)
     private Double energyConsumption;
     @Transient
+    @TableField(exist = false)
     private String dashboardPage;
     @Transient
+    @TableField(exist = false)
     private String assetGroupName;//设备分类名称
     @Transient
+    @TableField(exist = false)
     private List<String> tags = new ArrayList<>();
 
     @Transient
+    @TableField(exist = false)
     private String sharedAssetSwapIndex;
+
+    @Transient
+    @TableField(exist = false)
+    private Date checkDate;
+
+    @Transient
+    @TableField(exist = false)
+    private String boUuid;
 
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
@@ -720,6 +761,7 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     @Transient
+    @TableField(exist = false)
     private String sharedAssetSwapIndexId;
 
     public Integer getAssetDisposalResults() {
@@ -2205,10 +2247,7 @@ public class AssetInfo implements ChineseName,Serializable {
             return false;
         }
         AssetInfo other = (AssetInfo) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
     }
 
     @Override
@@ -2216,6 +2255,7 @@ public class AssetInfo implements ChineseName,Serializable {
         return name;
     }
     
+    @Override
     public String getPinYin() {
 		return getNamePyCode();
 	}
@@ -2295,6 +2335,7 @@ public class AssetInfo implements ChineseName,Serializable {
     }*/
     
     @Transient
+    @TableField(exist = false)
     private String warrantyAlertStatus = null;
 
     public String getWarrantyAlertStatus(){
@@ -2494,4 +2535,12 @@ public class AssetInfo implements ChineseName,Serializable {
     public Integer getEmpowermentStatus() { return empowermentStatus; }
 
     public void setEmpowermentStatus(Integer empowermentStatus) { this.empowermentStatus = empowermentStatus; }
+
+    public Date getCheckDate() { return checkDate; }
+
+    public void setCheckDate(Date checkDate) { this.checkDate = checkDate; }
+
+    public String getBoUuid() { return boUuid; }
+
+    public void setBoUuid(String boUuid) { this.boUuid = boUuid; }
 }
