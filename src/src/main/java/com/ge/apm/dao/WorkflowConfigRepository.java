@@ -52,6 +52,9 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
 
     List<WorkflowConfig> findByTenantUID(String tenantUID);
 
+    @Query(value = "SELECT jsonb_array_elements ( customized_asset_attachment_category :: jsonb ) -> 'label' AS label, jsonb_array_elements ( customized_asset_attachment_category :: jsonb ) -> 'boType' AS boType FROM workflow_config wc WHERE wc.tenant_uid = ?1",nativeQuery = true)
+    List<Object[]> getAttachmentCategoriesByTenantUid(String tenantUid);
+
     @Query(value="select * from workflow_config where generate_method = 1 and prefix is not null and tenant_uid = ?1",nativeQuery = true)
     List<WorkflowConfig> findAllPrefixByTenantUID(String tenantUID);
 

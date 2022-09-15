@@ -15,9 +15,8 @@ import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkflowConfig;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +77,16 @@ public class ConfigService {
                 });
             }
         }
+        return result;
+    }
+
+    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategoriesByTenantUid(String tenantUid) {
+        List<WorkflowConfig.AttachmentCategory> result = new ArrayList<>();
+        List<WorkflowConfig> configList = configDao.findByTenantUID(tenantUid);
+        for(WorkflowConfig config : configList) {
+            result.addAll(getAttachmentCategories(config));
+        }
+        result = result.stream().distinct().collect(Collectors.toList());
         return result;
     }
 

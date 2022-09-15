@@ -22,7 +22,7 @@
                                          required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
                             <p:ajax update="AssetFileAttachmentEditForm"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <c:forEach items="#{fieldMsg.getFieldValueList('attachmentType')}" var="v">
+                            <c:forEach items="#{assetFileAttachmentController.i18nMessages}" var="v">
 <!--                                <c:if test="#{v.msgKey ne '4'}">-->
                                     <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}"/>
                               <!--  </c:if>-->
