@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author 212579464
@@ -1597,6 +1598,19 @@ public class WorkflowConfig implements Serializable {
         String id;
         String boType;
         String label;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            AttachmentCategory that = (AttachmentCategory) o;
+            return Objects.equals(boType, that.boType);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(boType);
+        }
     }
 
 }

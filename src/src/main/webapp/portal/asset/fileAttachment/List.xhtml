@@ -53,24 +53,24 @@
                         <p:column headerText="设备型号" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.functionType}"/>
                         </p:column>
-                        <p:column rendered="#{!userContextService.hasCurrentTenantName('')}" headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{fieldMsg.fieldValue('attachmentType', item.boSubType)}"/>
+                        <p:column rendered="#{!userContextService.hasCurrentTenantName('')}" headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="EQ">
+                            <h:outputText value="#{assetFileAttachmentController.getAttachmentType(item.boSubType)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <c:forEach items="#{fieldMsg.getFieldValueList('attachmentType')}" var="v">
+                                    <c:forEach items="#{assetFileAttachmentController.i18nMessages}" var="v">
                                         <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}" />
                                     </c:forEach>
                                     <!--<f:selectItems value="#{fieldMsg.getFieldValueList('attachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column rendered="#{userContextService.hasCurrentTenantName('')}" headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{fieldMsg.fieldValue('attachmentType', item.boSubType)}"/>
+                        <p:column rendered="#{userContextService.hasCurrentTenantName('')}" headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="EQ">
+                            <h:outputText value="#{assetFileAttachmentController.getAttachmentType(item.boSubType)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <c:forEach items="#{fieldMsg.getFieldValueList('attachmentType')}" var="v">
+                                    <c:forEach items="#{assetFileAttachmentController.i18nMessages}" var="v">
                                         <c:if test="#{v.msgKey ne '1' and v.msgKey ne '4'}">
                                             <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}" />
                                         </c:if>

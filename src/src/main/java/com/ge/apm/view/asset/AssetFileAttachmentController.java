@@ -8,10 +8,14 @@ import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.VlinkParserService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -80,7 +84,9 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     private Set<AssetInfo> repeatAssets;
     private List<AssetInfo> assetInfoList;
     private String boSubTypeBatch;
-
+    private ConfigService configService;
+    @Getter @Setter
+    private List<I18nMessage> i18nMessages = new ArrayList<>();
     //复选的附件数据
     private Map<String, Boolean> selectedMap;
     private List<V2_BlobObject> currentPageBlobObject;
@@ -106,9 +112,11 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         uuaService = WebUtil.getBean(UaaService.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
-        uaaService = WebUtil.getBean(UaaService.class);
         assetTagService = WebUtil.getBean(AssetTagService.class);
         vlinkParserService = WebUtil.getBean(VlinkParserService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        configService = WebUtil.getBean(ConfigService.class);
+        getAllAttachmentCategories();
         this.filterBySite = false;
         orgUidList = uuaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() == 0){
@@ -132,6 +140,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             searchFilters = new ArrayList();
         }
         String boSubType = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("boSubType")).map(item -> (String) item.value).findAny().orElse(""));
+        boSubType = boSubType.length() > 2  ? boSubType.replace("%","") : boSubType;
         String boName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("objectName")).map(item -> (String) item.value).findAny().orElse(""));
         String assetName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.name")).map(item -> (String) item.value).findAny().orElse(""));
         String serialNum = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.serialNum")).map(item -> (String) item.value).findAny().orElse(""));
@@ -206,6 +215,24 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         this.vlink = null;
         this.vlinkTitle = null;
         this.selectedAsset = null;
+    }
+
+    private void getAllAttachmentCategories() {
+        List<WorkflowConfig.AttachmentCategory> attachmentCategoriesList = configService.getAttachmentCategoriesByTenantUid(currentUser.getTenantUID());
+        i18nMessages = FieldValueMessageController.getFieldValueListByMsgType("attachmentType");
+        for(WorkflowConfig.AttachmentCategory attachmentCategory : attachmentCategoriesList) {
+            I18nMessage i18nMessage = new I18nMessage();
+            i18nMessage.setMsgKey(attachmentCategory.getBoType());
+            i18nMessage.setValueZh(attachmentCategory.getLabel());
+            i18nMessages.add(i18nMessage);
+        }
+    }
+
+    public String getAttachmentType(String msyKey) {
+        for(I18nMessage i18nMessage : i18nMessages) {
+            if(i18nMessage.getMsgKey()!=null && msyKey!=null && i18nMessage.getMsgKey().equals(msyKey)) return i18nMessage.getValue();
+        }
+        return "未匹配类型";
     }
 
     @Override
