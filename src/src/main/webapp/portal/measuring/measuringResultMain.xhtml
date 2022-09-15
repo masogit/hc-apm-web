@@ -1,10 +1,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+                template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
         <div class="ui-g">
@@ -15,19 +12,22 @@
             <div class="ui-g-12">
                 <p:tabView id="measuringTab" class="ui-g-12">
                     <p:ajax event="tabChange" listener="#{measureAssetListController.onTabChange}" oncomplete="openAssetViewWindow(xhr, status, args)"/>
-                    <!--<p:ajax event="tabChange"/>-->
                     <p:tab title="计量信息" id="measuringAssetList">
                         <ui:include src="measuringAssetList.xhtml"/>
                     </p:tab>
-                    <!--<p:tab title="计量结果查询" id="showList">
-                        <ui:include src="showList.xhtml"/>
-                    </p:tab>-->
                     <p:tab title="计量结果导入" id="resultImport">
                         <ui:include src="resultImport.xhtml"/>
+                    </p:tab>
+                    <p:tab title="计量附件批量上传" id="fileImport" rendered="#{measureAssetListController.canBatchUpload()}">
+                        <ui:include src="fileImport.xhtml"/>
                     </p:tab>
                 </p:tabView>
             </div>
         </div>
+        <style type="text/css">
+            .column1{width: 30%}
+            .column2{width: 70%}
+        </style>
         <script>
             function openAssetViewWindow(xhr, status, args) {
                 if(args.url != null){
