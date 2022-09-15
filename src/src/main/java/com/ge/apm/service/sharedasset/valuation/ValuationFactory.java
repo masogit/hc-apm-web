@@ -20,7 +20,7 @@ public class ValuationFactory {
     private ValuationFactory(){}
 
     public static void valuation(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail){
-        if(sharedAssetType==null || reqDetail==null){
+        if( reqDetail==null){
             return;
         }
         UnattendedFee unattendedFee =null;
