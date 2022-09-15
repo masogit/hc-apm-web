@@ -8,6 +8,7 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -36,7 +37,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private OrgInfo selectedOrg;
 
-    //    private QrCodeLibRepository qrcodeDao;
     private List<ArrivalListItem> arrivalItemList;
 
     private AssetInstallationService aiService;
@@ -52,7 +52,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private ArrivalListItem easyInstallItem;
 
-    //    private OrgInfoService orgService;
     private CustomConfigService ccService;
 
     private List<I18nMessage> code68List;
@@ -68,6 +67,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
     private SupplierController supplierController;
+    private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
 
     UserAccount currentUser;
 
@@ -75,7 +75,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private BlobFileService blobService;
 
-    //    private String supplierName;
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
     List<Supplier> manueList;
@@ -86,7 +85,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private String selectedContractItemId;
     private String selectedContractId;
     private List<ContractInfo> contractList;
-    private List<ContractInfoItem> contractItemList = new ArrayList();
+    private List<ContractInfoItem> contractItemList = new ArrayList<>();
 
     private SupplierService supplierService;
     private List<UserAccount> supplierUserList;
@@ -119,9 +118,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         contractService = WebUtil.getBean(ContractInfoService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-//        orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-//        qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
@@ -131,13 +128,15 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
-        attachList = new ArrayList();
+        attachList = new ArrayList<>();
         currentUser=UserContextService.getCurrentUserAccount();
         configService = WebUtil.getBean(ConfigService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
+        medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
+        medicalInstrumentsClassificationCompCtrl.registerController(this);
 
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
@@ -166,7 +165,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
                 this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
-//                supplierName = supplier == null ? null : supplier.getName();
             }
             if (selected.getManufactureId() != null) {
                 manufacture = aiService.getSupplierById(Integer.parseInt(selected.getManufactureId()));
@@ -181,14 +179,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }else{
                 attachList = aiService.getPicList(selected.getId());
             }
-//            if (ArrivalList.ProcessType.Easy.toString().equals(selected.getProcessType())) {
-//                initEasyInstallItem();
-//                this.changeFunctionGroup();
-//
-//            }
             if(null == selected.getBoxInstallationDate()) {
                 selected.setBoxInstallationDate(selected.getArrivalDate());
             }
+            medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, easyInstallItem.getMedicalApparatusClassification());
             prepareEdit();
         }
 
@@ -390,13 +384,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void saveEasyItem() {
         easyInstallItem.setNationalStandardCode(nationalStandardCode == null ? "" : nationalStandardCode.split("/")[0]);
         List<ArrivalListItem> saveList = getNewInstallAssetList();
-//        if (easyInstallItem.getWarrantyYear() != null) {
-//            Integer monthLong = Double.valueOf(easyInstallItem.getWarrantyYear() * 12).intValue();
-//            Calendar calender = Calendar.getInstance();
-//            calender.setTime(new Date());
-//            calender.add(Calendar.MONTH, monthLong);
-//            easyInstallItem.setFactoryWarrantyDate(calender.getTime());
-//        }
         saveList.forEach(item -> {
             item.setNationalStandardCode(easyInstallItem.getNationalStandardCode());
             item.setFunctionGroup(easyInstallItem.getFunctionGroup());
@@ -421,6 +408,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setIsPm(easyInstallItem.getIsPm());
             item.setIsChecked(easyInstallItem.getIsChecked());
             item.setWarrantyYear(easyInstallItem.getWarrantyYear());
+            item.setMedicalApparatusClassification(easyInstallItem.getMedicalApparatusClassification());
             if(item.getFixassetAckStatus() == null){
                 item.setFixassetAckStatus(ArrivalListItem.ACK_STATUS_NONE);
             }
@@ -443,7 +431,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
         aiService.reAssignWorkOrder(item);
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
-//        cancel();
     }
 
     public void takeWorkOrderBatch(String itemId) {
@@ -478,7 +465,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             WebUtil.addErrorMessage(errorMessage);
         }
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
-//        cancel();
     }
 
     public void onSelectGbTreeNode(NodeSelectEvent event) {
@@ -1121,5 +1107,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setCopyFrom(String copyFrom) {
         this.copyFrom = copyFrom;
+    }
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
+            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
+            easyInstallItem.setMedicalApparatusClassification(selectedAuthGroup.getClassificationCode());
+        }
     }
 }
