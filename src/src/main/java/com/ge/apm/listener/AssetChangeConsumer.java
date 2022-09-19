@@ -60,11 +60,13 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                 if(assetHistory==null){
                     LOGGER.info("update asset assetHistory is null assetUid:{}",newAsset.getUid());
                     channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                    return;
                 }
                 String assetJson = assetHistory.getAssetJson();
                 if(StringUtils.isEmpty(assetJson)){
                     LOGGER.info("update  asset  assetJson is null assetUid:{},historyUid:{}",newAsset.getUid(),assetHistory.getUid());
                     channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                    return;
                 }
                 AssetInfo assetInfo = g.fromJson(assetJson, AssetInfo.class);
 //                AssetInfo assetInfo = JSONObject.parseObject(assetJson, AssetInfo.class);
