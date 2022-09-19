@@ -258,7 +258,7 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "appointment_status_locked_time")
     private Integer appointmentstatuslockedtime ;
     //是否启用无人值守
-    @Column(name = "whether_to_enable_unattended ")
+    @Column(name = "whether_to_enable_unattended")
     private Boolean whethertoenableunattended;
     //是否启用院间借调
     @Column(name = "enable_site_to_site_allocation")
