@@ -1,6 +1,9 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.UserSchedule;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.Date;
@@ -24,5 +27,8 @@ public interface UserScheduleRepository extends GenericRepositoryUUID<UserSchedu
     public List<UserSchedule> findByTypeAndScheduleDateAndSiteUID(String type, Date scheduleDate, String siteUID);
 
     public void deleteByTypeAndScheduleDateAndSiteUID(String type, Date scheduleDate, String siteUID);
-
+    @Modifying
+    @Transactional
+    @Query(value="delete from user_schedule where user_uid in ?1 and schedule_date between ?2 and ?3 and type=?4 and schedule_date_stage in ?5",nativeQuery = true)
+    void batchDeleteWorkSchedule(List<String> collect, Date startBatchDate, Date endBatchDate, String name,List<String> scheduleDateStage);
 }
