@@ -276,16 +276,7 @@ public class SharedAssetReqDetail implements Serializable{
 //    }
 
     public String getState() {
-        String state="";
-        if(leaseRequest != null && leaseRequest.getState() == 3){
-            state="已预约";
-        }else if(chargingBeginTime !=null && chargingEndTime == null){
-            state="使用中";
-        }else if(returnRequest != null && chargingEndTime != null && isCleaned !=null && isCleaned == false){
-            state="已归还（未清洁保养）";
-        }else if(isCleaned != null && isCleaned){
-            state="已完成";
-        }
+
         return state;
     }
 
