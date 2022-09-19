@@ -739,7 +739,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-        if(org.apache.commons.lang3.StringUtils.isEmpty(selected.getUid())){
+        if(org.apache.commons.lang3.StringUtils.isEmpty(selected.getUid()) && selected.getId()==null){
             String uid = UUID.randomUUID().toString().replace("-", "");
             selected.setUid(uid);
         }
