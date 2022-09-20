@@ -942,15 +942,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                             assetInfoList.add(infoVo);
                             applySwapType.setActualQty(applySwapType.getActualQty() + 1);
                             WebUtil.addSuccessMessage("录入成功！");
-                            return;
                         } else {
                             if (this.isLogPatientInfoEnabled()) {
                                 WebUtil.addWarnMessage("该设备类型 ‘" + applySwapType.getSwapName() + "-" + applySwapType.getPatientNum() + "-" + applySwapType.getPatientBedNum() + "’ 预计借用数量已满！");
                             } else {
                                 WebUtil.addWarnMessage("该设备类型 ‘" + applySwapType.getSwapName() + "’ 预计借用数量已满！");
                             }
-                            return;
                         }
+                        return;
                     }
                 }
                 WebUtil.addWarnMessage("该设备不属于借用申请的设备类型！");
