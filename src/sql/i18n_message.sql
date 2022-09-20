@@ -3177,6 +3177,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DailyCheckSettings', '日常检查设置', 'Daily Check Settings', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DailyCheckReport', '日常检查报表', 'Daily Check Report', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UseRegistrationCheckSettings', '使用登记检查设置', 'Use registration check settings', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UseRegistrationCheckItemSettings', '使用登记检查项设置', 'Use registration check item settings', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'StartupAndShutdownRegistration', '开关机登记', 'Startup/Shutdown Registration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UseRegistration', '使用登记', 'Use registration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BigScreenForEquipmentManagement', '设备管理大屏', 'Big Screen for Equipment Management', NULL, '-1');
