@@ -595,7 +595,7 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     }
 
     public String getQualityChecking() {
-        if(currentStepId!=null && currentStepId.equals("Closed") && qualityChecking == null) qualityChecking = "1"; //已关单的默认是正常
+        if(currentStepName!=null && currentStepName.equals("已关单") && qualityChecking == null) qualityChecking = "1"; //已关单的默认是正常
         return qualityChecking;
     }
 
