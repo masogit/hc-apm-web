@@ -31,7 +31,7 @@ public class SharedAssetReqDetailService {
 
         setSort(page,wrapper);
         logger.info("sql:"+wrapper.getSqlSegment());
-        List<SharedAssetReqDetail> sharedAssets=sharedAssetReqDetailMapper.loadSharedAssets(new Pagination(page.getPageNumber(), page.getPageSize()), wrapper);
+        List<SharedAssetReqDetail> sharedAssets=sharedAssetReqDetailMapper.loadSharedAssets(new Pagination(page.getPageNumber()+1, page.getPageSize()), wrapper);
         sharedAssets.forEach(item->{
             ValuationFactory.valuation(null,item);
         });
