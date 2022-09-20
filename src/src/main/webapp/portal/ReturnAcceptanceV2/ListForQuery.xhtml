@@ -54,7 +54,7 @@
                         <p:dataTable id="datalist" value="#{sharedAssetReqDetailForQueryController.lazyModel}" var="item" widgetVar="varDataList"
                             selectionMode="single" selection="#{sharedAssetReqDetailForQueryController.selected}"
                             lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                            rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.chargingBeginTime}"
+                            rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.charging_begin_time}"
                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                             rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -68,7 +68,7 @@
                             <p:ajax event="rowSelect" listener="#{sharedAssetReqDetailV2Controller.onChanged}"  update=""/>-->
                             <p:ajax event="filter" listener="#{sharedAssetReqDetailForQueryController.onFilter}" update=""/>
                             <!--sharedId-->
-                            <p:column headerText="借用科室" sortBy="#{item.borrowId}" filterBy="#{item.clinical_dept_name}" filterMatchMode="LIKE">
+                            <p:column headerText="借用科室" sortBy="#{item.clinical_dept_name}" filterBy="#{item.clinical_dept_name}" filterMatchMode="LIKE">
         <!--                        <f:facet name="filter">
                                     <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
                                         <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -212,7 +212,7 @@
                                     </f:facet>
                                     <h:outputText value="#{item.state}" />
                                 </p:column>
-                                <p:column headerText="调剂编码" filterBy="#{item.swap_index}" filterMatchMode="EQ">
+                                <p:column headerText="调剂编码" filterBy="#{item.swap_index}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.swapIndex}" />
                                 </p:column>
 <!--                                <p:column headerText="预约人">-->
