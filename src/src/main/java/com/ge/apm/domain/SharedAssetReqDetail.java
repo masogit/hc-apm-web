@@ -209,6 +209,8 @@ public class SharedAssetReqDetail implements Serializable{
     private Date discountEndDate;  //折扣开始日期
     @Column(name = "discount")
     private Double discount;  // 优惠折扣
+    @Column(name = "qr_code")
+    private String qrCode;  // 二维码
 
     @Transient
     private String swapIndex;
@@ -1019,6 +1021,14 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setDiscountStartDate(Date discountStartDate) {
         this.discountStartDate = discountStartDate;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
     }
 
     public Date getDiscountEndDate() {
