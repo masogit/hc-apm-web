@@ -4,17 +4,17 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.mapper.SharedAssetReqDetailMapper;
-import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SharedAssetReqDetail;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import webapp.framework.dao.SearchFilter;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,22 +27,38 @@ public class SharedAssetReqDetailService {
     private SharedAssetReqDetailMapper sharedAssetReqDetailMapper;
 
 
-    public List<SharedAssetReqDetail> loadSharedAssets(PageRequest page,  Wrapper wrapper){
+    public List<SharedAssetReqDetail> loadSharedAssets(PageRequest page,  Wrapper<SharedAssetReqDetail> wrapper){
 
-        System.out.println(wrapper.getSqlSegment());
+        setSort(page,wrapper);
+        logger.info("sql:"+wrapper.getSqlSegment());
         List<SharedAssetReqDetail> sharedAssets=sharedAssetReqDetailMapper.loadSharedAssets(new Pagination(page.getPageNumber(), page.getPageSize()), wrapper);
         sharedAssets.forEach(item->{
             ValuationFactory.valuation(null,item);
         });
         return sharedAssets;
     }
-    public int getTotalRowCount(@Param("ew") Wrapper<AssetInfo> wrapper){
 
-        return 0;
+    private void setSort(PageRequest page, Wrapper<SharedAssetReqDetail> wrapper) {
+        page.getSort();
+        Iterator<Sort.Order> iterator = page.getSort().iterator();
+        while (iterator.hasNext()){
+            Sort.Order next = iterator.next();
+            String property = next.getProperty();
+            if(Sort.Direction.ASC.equals(next.getDirection())){
+                wrapper.orderBy(true,property,true);
+            }else{
+                wrapper.orderBy(true,property,false);
+            }
+        }
+
     }
 
-    public Wrapper buildDefaultFilters(List<SearchFilter> searchFilters) {
-        Wrapper ew = new EntityWrapper();
+    public int getTotalRowCount(@Param("ew") Wrapper<SharedAssetReqDetail> wrapper){
+        return  sharedAssetReqDetailMapper.getTotalRowCount(wrapper);
+    }
+
+    public Wrapper<SharedAssetReqDetail> buildDefaultFilters(List<SearchFilter> searchFilters) {
+        Wrapper<SharedAssetReqDetail> ew = new EntityWrapper<SharedAssetReqDetail>();
         Map<String, SearchFilter> collect = searchFilters.stream().collect(Collectors.toMap((item) -> item.fieldName, (item) -> item));
         SearchFilter clinicalDeptUid = collect.get("clinicalDeptUid");
         if("1*2+".equals(clinicalDeptUid.conditionPath)){
@@ -93,6 +109,8 @@ public class SharedAssetReqDetailService {
                         break;
                     case IsNotNull:
                         ew.isNotNull(filter.fieldName);
+                        break;
+                    default:
                         break;
             }
         }

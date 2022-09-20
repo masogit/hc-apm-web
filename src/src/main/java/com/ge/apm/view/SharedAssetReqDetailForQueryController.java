@@ -214,10 +214,9 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
             this.updateSearchFilter(new SearchFilter("charging_end_time", SearchFilter.Operator.IsNull,null));
         }
 
-//        searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
         Wrapper wrapper = sharedAssetReqDetailService.buildDefaultFilters(searchFilters);
-        List<SharedAssetReqDetail> sharedAssets = sharedAssetReqDetailService.loadSharedAssets(pageRequest, wrapper);
         int totalRowCount = sharedAssetReqDetailService.getTotalRowCount(wrapper);
+        List<SharedAssetReqDetail> sharedAssets = sharedAssetReqDetailService.loadSharedAssets(pageRequest, wrapper);
         Page<SharedAssetReqDetail> result=null;
         if (sharedAssets== null) {
             result=new PageImpl(new ArrayList(),pageRequest,totalRowCount);
