@@ -1,3 +1,2 @@
-alter table map_user_config alter column zoom type float4;
-
-alter table map_user_config alter column area_adcodes type varchar(2000);
+-- YHAAO-16622 云阜需求-手机端，设备调剂-各个页面的设备信息显示调整
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, validation, value_type) select '3f6953a582a5488c91b41ce53ad34588', 2, '1', '调剂名称信息自定义配置', 'assetAllocate', '调剂设备名称配置', 'f', 'f', '[{"key":"设备编号","value":"1"},{"key":"二维码","value":"2"}]', 7 where not exists (select * from config_item where key = 'assetAllocate');

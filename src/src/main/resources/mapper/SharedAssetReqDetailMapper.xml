@@ -31,10 +31,13 @@
         <result column="clinical_dept_name" property="clinicalDeptName"/>
         <result column="starting_price" property="startingPrice"/>
         <result column="starting_duration" property="startingDuration"/>
-        <result column="gratis_duration" property="startingDuration"/>
+        <result column="gratis_duration" property="gratisDuration"/>
         <result column="discount_start_date" property="discountStartDate"/>
         <result column="discount_end_date" property="discountEndDate"/>
         <result column="discount" property="discount"/>
+        <result column="compensation_amount" property="compensationAmount"/>
+        <result column="patient_num" property="patientNum"/>
+        <result column="patient_bed_num" property="patientBedNum"/>
         <result column="swap_index" property="swapIndex"/>
     </resultMap>
 
@@ -54,7 +57,6 @@
                 sard.charging_begin_time,
                 sard.charging_end_time,
                 sard.count_qty,
-                sard.patient_num,
                 sard.tenant_uid,
                 sard.institution_uid,
                 sard.hospital_uid,
@@ -68,6 +70,9 @@
                 sard.discount_end_date,
                 sard.discount,
                 sard.is_cleaned,
+                sard.compensation_amount,
+                sard.patient_num,
+                sard.patient_bed_num,
                 sasi.swap_index,
                 (case
                 when  sard.charging_end_time is not null and sard.is_cleaned=true then '已完成'
@@ -100,7 +105,6 @@
             sard.charging_begin_time,
             sard.charging_end_time,
             sard.count_qty,
-            sard.patient_num,
             sard.tenant_uid,
             sard.institution_uid,
             sard.hospital_uid,
@@ -114,6 +118,9 @@
             sard.discount_end_date,
             sard.discount,
             sard.is_cleaned,
+            sard.compensation_amount,
+            sard.patient_num,
+            sard.patient_bed_num,
             sasi.swap_index,
             (case
             when  sard.charging_end_time is not null and sard.is_cleaned=true then '已完成'
