@@ -21,20 +21,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.CollectionUtils;
-import webapp.framework.dao.NativeSqlUtil;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-
-import javax.annotation.Resource;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -60,11 +54,6 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<SharedAssetRequest>{
-    private Double total;
-    private UaaService uuaService;
-    private SharedAssetService sharedAssetService;
-    private SharedAssetRequestService sharedAssetRequestService;
-    private Integer queryIndex=-1;
     UserOrgInfoRepository userOrgDao = null;
     OrgInfoRepository orgInfoDao = null;
     SharedAssetRequestRepository dao = null;
@@ -76,15 +65,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     SharedAssetConfigRepository sharedAssetConfigDao = null;
     UserRoleRepository userRoleRepository = null;
     SysRoleRepository sysRoleDao;
-    JdbcTemplate jdbcTemplate=null;
-    String p=null;
+    JdbcTemplate jdbcTemplate = null;
+
+    String p = null;
+    private Double total;
+    private UaaService uuaService;
+    private SharedAssetService sharedAssetService;
+    private SharedAssetRequestService sharedAssetRequestService;
+    private Integer queryIndex=-1;
     private String operation;
-    
     private Date applyTimeTo = null;
     private Date applyTimeFrom = null;
     private String applyTimeFormatTime = null;
     private String filterApplyTime = null;
-    
     private UserAccount selectedAssignee;
 
     @Getter
@@ -863,7 +856,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
                 }
-                if (infoVo.getStatus() == 1 || infoVo.getStatus() == 3) {
+                if (infoVo.getStatus() != 1 && infoVo.getStatus() != 3) {
                     WebUtil.addWarnMessage("该设备故障，不可借用！");
                     return;
                 }
