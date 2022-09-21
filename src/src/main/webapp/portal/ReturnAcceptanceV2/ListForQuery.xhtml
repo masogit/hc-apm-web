@@ -202,12 +202,14 @@
                             <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
                                 <p:column headerText="状态" filterBy="#{item.state}" filterMatchMode="EQ">
                                     <f:facet name="filter">
-                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                            <f:selectItem itemLabel="已预约" itemValue="已预约" />
-                                            <f:selectItem itemLabel="使用中" itemValue="使用中" />
-                                            <f:selectItem itemLabel="已归还（未清洁保养）" itemValue="已归还（未清洁保养）" />
-                                            <f:selectItem itemLabel="已完成" itemValue="已完成" />
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" id="selectOneMenu1">
+                                                <f:selectItem id="select1" itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                                <f:selectItem itemLabel="已预约" itemValue="已预约" />
+                                                <f:selectItem itemLabel="使用中" itemValue="使用中" />
+                                                <c:if test="#{sharedAssetReqDetailForQueryController.queryIndex != 1}">
+                                                    <f:selectItem itemLabel="已归还（未清洁保养）" itemValue="已归还（未清洁保养）" />
+                                                    <f:selectItem itemLabel="已完成" itemValue="已完成" />
+                                                </c:if>
                                         </p:selectOneMenu>
                                     </f:facet>
                                     <h:outputText value="#{item.state}" />

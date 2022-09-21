@@ -199,22 +199,18 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if (queryIndex == 0){
             this.removeFilterOnField("charging_begin_time");
         }
-//        if (filterBeginTime != null){
-//            searchFilters.add(new SearchFilter("charging_begin_time", SearchFilter.Operator.GTE,filterBeginTime));
-//        }
-//        if (filterEndTime != null){
-//            searchFilters.add(new SearchFilter("charging_end_time", SearchFilter.Operator.LTE,filterEndTime));
-//        }
 
-        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("asset_number", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-        }
+
         if (queryIndex == 1){
             this.updateSearchFilter(new SearchFilter("charging_end_time", SearchFilter.Operator.IsNull,null));
         }
 
         Wrapper wrapper = sharedAssetReqDetailService.buildDefaultFilters(searchFilters);
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+//            this.updateSearchFilter(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+//            this.updateSearchFilter(new SearchFilter("asset_number", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            wrapper.andNew().like("asset_name",oneSearchStr).or().like("asset_number",oneSearchStr);
+        }
         int totalRowCount = sharedAssetReqDetailService.getTotalRowCount(wrapper);
         List<SharedAssetReqDetail> sharedAssets = sharedAssetReqDetailService.loadSharedAssets(pageRequest, wrapper);
         Page<SharedAssetReqDetail> result=null;
