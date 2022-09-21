@@ -9,6 +9,8 @@ import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -380,6 +382,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @JoinColumn(insertable = false, updatable = false, name = "hospital_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
+    @NotFound(action= NotFoundAction.IGNORE)
     private OrgInfo hospital;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
