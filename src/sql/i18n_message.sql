@@ -4738,3 +4738,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- 物联绩效设备绑定
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','IotDeviceBind','物联绩效设备绑定','IoT performance device binding',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Device','设备','Device',NULL,-1);
+-- 导出记录状态
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'REFUSE', '拒绝', 'refuse', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'AUDIT', '审核', 'audit', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'FAIL', '失败', 'fail', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'FINISHED', '完成', 'finished', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'RUN', '执行', 'run', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'NEW', '新建', 'new', -1);
+
