@@ -14,7 +14,7 @@
         <result column="clinical_dept_name" property="clinicalDeptName"/>
         <result column="measure_grade" property="measureGrade"/>
         <result column="measuring_item_category" property="measuringItemCategory"/>
-        <result column="metering_no" property="meteringNO"/>
+        <result column="certificate_no" property="meteringNO"/>
         <result column="status" property="verificationConclusion"/>
         <result column="measuring_type" property="measuringType"/>
         <result column="last_check_company" property="lastCheckCompany"/>
@@ -36,7 +36,7 @@
         ai.clinical_dept_name,
         ai.measure_grade,
         ai.measuring_item_category,
-        ai.metering_no,
+        mcd.certificate_no,
         mcd.status,
         ai.measuring_type,
         ai.last_check_company,
