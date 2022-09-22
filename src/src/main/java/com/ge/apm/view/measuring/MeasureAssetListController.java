@@ -126,6 +126,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             String prefix = "check_date".equals(property) ? "mcd." : "ai.";
             wrapper.orderBy(prefix + property, "ASC".equals(direction.name()));
         }
+        wrapper.orderBy("mcd.check_date", false);
         currentPageAssets = assetInfoMapper.selectMeasureResult(pagination, wrapper);
         return new PageImpl<>(currentPageAssets, pageRequest, pagination.getTotal());
     }
@@ -361,8 +362,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     }
 
     public boolean canBatchUpload() {
-        ConfigItem configItem = configItemMapper.findByKey("batch_upload", currentUser.getSiteUID());
-        return ObjectUtil.isNotEmpty(configItem) && Boolean.TRUE.toString().equals(configItem.getDefaultValue());
+        ConfigItemValue configItemValue = configItemMapper.findByKey("batch_upload", currentUser.getSiteUID());
+        return ObjectUtil.isNotEmpty(configItemValue) && Boolean.TRUE.toString().equals(configItemValue.getValue());
     }
 
 }
