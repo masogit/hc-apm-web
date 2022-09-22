@@ -7,6 +7,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -68,6 +69,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private TreeNode gbTree;
     private SupplierController supplierController;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+    private ServiceRequestApiService serviceRequestApiService;
 
     UserAccount currentUser;
 
@@ -133,6 +135,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         configService = WebUtil.getBean(ConfigService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
@@ -264,6 +267,15 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         } else {
             WebUtil.addErrorMessage("到货清单提交失败");
         };
+
+        // YHAAO-16616 到货清单提交后，展开的信息要根据上次记录带入
+        LinkedHashMap<String, Object> configMap = serviceRequestApiService.getConfigByKeyAndSite("arrivalListAutoFill", selected.getSiteUID());
+        LinkedHashMap<String, Object> customerConfig = (LinkedHashMap<String, Object>) configMap.get("customerConfig");
+
+        if(null != customerConfig && "true".equals(customerConfig.get("actualValue"))){
+            autoFillInfo();
+        }
+
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
         selected = dao.findById(selected.getId());
@@ -1114,6 +1126,39 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
             SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
             easyInstallItem.setMedicalApparatusClassification(selectedAuthGroup.getClassificationCode());
+        }
+    }
+
+    private void autoFillInfo(){
+
+        ArrivalListItem lastItem = itemDao.getLastItemByNameAndModel(this.selected.getAssetName(),
+                StringUtils.isNotEmpty(this.selected.getFunctionType()) ? this.selected.getFunctionType() : "", this.selected.getTenantUID(), this.selected.getId());
+
+        if(lastItem != null){
+            List<ArrivalListItem> list = itemDao.findByArrivalListId(selected.getId());
+            for (ArrivalListItem item : list) {
+                item.setNationalStandardCode(lastItem.getNationalStandardCode());
+                item.setMedicalApparatusClassification(lastItem.getMedicalApparatusClassification());
+                item.setRegistrationNo(lastItem.getRegistrationNo());
+                item.setMaitananceId(lastItem.getMaitananceId());
+                item.setMaitanance(lastItem.getMaitanance());
+                item.setWarrantyYear(lastItem.getWarrantyYear());
+                item.setWarrantyDate(lastItem.getWarrantyDate());
+                item.setAssetUsage(lastItem.getAssetUsage());
+                item.setCapitalSource(lastItem.getCapitalSource());
+                item.setMeasureGrade(lastItem.getMeasureGrade());
+                item.setRiskGrade(lastItem.getRiskGrade());
+                item.setEmergencyEquipment(lastItem.getEmergencyEquipment());
+                item.setImportEquipment(lastItem.getImportEquipment());
+                item.setMeasuringItemCategory(lastItem.getMeasuringItemCategory());
+                item.setAccountingCategory(lastItem.getAccountingCategory());
+                item.setSalvageValue(lastItem.getSalvageValue());
+                item.setLifecycleInYear(lastItem.getLifecycleInYear());
+                item.setDepreciationMethod(lastItem.getDepreciationMethod());
+                item.setIsPm(lastItem.getIsPm());
+                item.setIsChecked(lastItem.getIsChecked());
+                itemDao.save(item);
+            }
         }
     }
 }

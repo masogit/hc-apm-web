@@ -33,4 +33,7 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
 
     @Query(value = "select asset_uid from arrival_list_item where arrival_list_id=?1",nativeQuery=true)
     List<String> getAssetUid(String arrivalListId);
+
+    @Query(value = "select * from arrival_list_item t1 inner join arrival_list t2 on t1.arrival_list_id = t2.id where t2.asset_name = ?1 and case when ?2 = '' then true else t2.function_type = ?2 end and t2.tenant_uid = ?3 and t1.arrival_list_id != ?4 order by t1.created_date desc limit 1",nativeQuery=true)
+    ArrivalListItem getLastItemByNameAndModel(String assetName, String functionType, String tenantUid, String arrivalListId);
 }
