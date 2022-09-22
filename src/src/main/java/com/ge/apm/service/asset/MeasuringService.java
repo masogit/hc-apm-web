@@ -364,6 +364,7 @@ public class MeasuringService {
     public List<MeasuringCertificateDetail> handleZip(UploadedFile file, UserAccount user) throws IOException {
         Wrapper<MeasuringCertificateDetail> wrapper = new EntityWrapper<>();
         wrapper.setSqlSelect("id, certificate_no certificateNo");
+        wrapper.eq("tenant_uid", user.getTenantUID());
         List<MeasuringCertificateDetail> measuringCertificateDetails = certificateDetailMapper.selectList(wrapper);
         Map<String, List<MeasuringCertificateDetail>> certificateDetailMap = measuringCertificateDetails.stream().filter(detail -> ObjectUtil.isNotEmpty(detail.getCertificateNo())).collect(Collectors.groupingBy(MeasuringCertificateDetail::getCertificateNo));
 

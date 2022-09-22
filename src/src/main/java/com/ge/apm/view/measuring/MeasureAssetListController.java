@@ -117,7 +117,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
-        Pagination pagination = new Pagination(pageRequest.getPageNumber(), pageRequest.getPageSize());
+        Pagination pagination = new Pagination(pageRequest.getPageNumber() + 1, pageRequest.getPageSize());
         Wrapper<AssetInfo> wrapper = convert();
         Sort sort = pageRequest.getSort();
         for (Sort.Order order : sort) {
@@ -199,6 +199,11 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             List<SearchFilter> checkDateFilters = searchFilters.stream().filter(sf -> "checkDate".equals(sf.fieldName)).collect(Collectors.toList());
             searchFilters.removeIf(e -> "checkDate".equals(e.fieldName));
             WrapperSearchFilterUtils.convert(checkDateFilters, wrapper, "mcd");
+        }
+        if(this.hasFilterOnField("meteringNO")){
+            String meteringNO = searchFilters.stream().filter(sf -> "meteringNO".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("meteringNO", SearchFilter.Operator.EQ, 0)).value.toString();
+            searchFilters.removeIf(e -> "meteringNO".equals(e.fieldName));
+            wrapper.like("mcd.certificate_no", meteringNO);
         }
 
         WrapperSearchFilterUtils.convert(searchFilters, wrapper, "ai");
