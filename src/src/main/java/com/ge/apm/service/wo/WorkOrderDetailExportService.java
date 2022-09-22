@@ -118,7 +118,7 @@ public class WorkOrderDetailExportService {
             workOrderDetailMap.put(WebUtil.getMessage("Vendor"), workOrderDetailPojo.getSupplierName());
             workOrderDetailMap.put(WebUtil.getMessage("PartName_xlsx2"), workOrderDetailPojo.getPartsName());
             workOrderDetailMap.put(WebUtil.getMessage("Quantity"), workOrderDetailPojo.getPartsQuantity());
-            workOrderDetailMap.put(WebUtil.getMessage("ClosedPrice_xlsx"), workOrderDetailPojo.getClosedPrice() * workOrderDetailPojo.getPartsQuantity());
+            workOrderDetailMap.put(WebUtil.getMessage("ClosedPrice_xlsx"), workOrderDetailPojo.getClosedPrice()); 
             workOrderDetailMap.put(WebUtil.getMessage("InvoiceNumber_xlsx"), workOrderDetailPojo.getInvoiceNum());
             workOrderDetailMap.put(WebUtil.getMessage("InvoiceTime_xlsx"), formatDate(workOrderDetailPojo.getInvoiceTime()));
             workOrderDetailMap.put(WebUtil.getMessage("approveUserId"), workOrderDetailPojo.getApproverName());
