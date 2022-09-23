@@ -349,7 +349,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     public void downloadSelectedFile() {
         List<String> boUuids = currentPageAssets.stream().map(AssetInfo::getBoUuid).collect(Collectors.toList());
         List<V2_BlobObject> blobObjects = blobDao.fetchListByBoTypeAndBoUuIds(V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring, boUuids);
-        try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zipOut = new ZipOutputStream(bout)) {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        try (ZipOutputStream zipOut = new ZipOutputStream(bout)) {
             for (V2_BlobObject blobObject : blobObjects) {
                 StreamedContent file = fileDownloadService.getFile(blobObject.getObjectStorageId());
                 InputStream stream = file.getStream();
@@ -360,10 +361,11 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 }
                 zipOut.closeEntry();
             }
-            exportFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "CertificateFiles.zip");
         } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
         }
+        exportFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "CertificateFiles.zip");
     }
 
     public boolean canBatchUpload() {
