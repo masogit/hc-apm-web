@@ -4745,4 +4745,9 @@ INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES
 INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'FINISHED', '完成', 'finished', -1);
 INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'RUN', '执行', 'run', -1);
 INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'NEW', '新建', 'new', -1);
-
+-- YHAAO-16709 system_client 管理页面
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SystemClientInfo','子系统账户','Subsystem account',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ClientName','账户名称','Client name',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ClientType','账户类型','Client type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BindOrgInfo','关联组织','Associated organizations',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('clientType','IOT','IOT','IOT',NULL,-1);
