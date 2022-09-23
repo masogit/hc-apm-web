@@ -76,12 +76,9 @@
                             <h:outputText rendered="#{item.valueType != '3' and item.valueType != '7'}"
                                           value="#{item.showValue}"/>
                         </p:column>
-                        <p:column headerText="#{msg.ConfigItemUseParent}">
+                        <!--<p:column headerText="#{msg.ConfigItemUseParent}">
                             <h:outputText value="#{item.userParentConfig == 'true' ? '是' : '否'}"/>
-                            <!--<p:selectBooleanButton onLabel="禁用" offLabel="启用" value="#{item.userParentConfig}" style="width:5rem">
-                                <p:ajax event="change" listener="#{configItemController.onSelectSiteTreeNode}" update="datalist" />
-                            </p:selectBooleanButton>-->
-                        </p:column>
+                        </p:column>-->
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":configItemEditDlg" oncomplete="PF('configItemEditDialog').show()" disabled="#{empty superAdminConfigItemController.selected}" />
                         </f:facet>
