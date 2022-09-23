@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.SharedAssetReqDetailMapper">
+
+    <resultMap id="sharedAssetReqDetailResult" type="com.ge.apm.domain.SharedAssetReqDetail">
+        <id column="id" property="id"/>
+        <result column="shared_id" property="sharedId"/>
+        <result column="borrow_id" property="borrowId"/>
+        <result column="return_id" property="returnId"/>
+        <result column="asset_info_id" property="assetInfoId"/>
+        <result column="shared_asset_type" property="sharedAssetTypeId"/>
+        <result column="asset_number" property="assetNumber"/>
+        <result column="asset_name" property="assetName"/>
+        <result column="unit" property="unit"/>
+        <result column="unit_price" property="unitPrice"/>
+        <result column="charging_type" property="chargingType"/>
+        <result column="state" property="state"/>
+        <result column="charging_begin_time" property="chargingBeginTime"/>
+        <result column="charging_end_time" property="chargingEndTime"/>
+        <result column="count_qty" property="countQty"/>
+        <result column="patient_num" property="patientNum"/>
+        <result column="cost" property="cost"/>
+        <result column="accepter" property="accepter"/>
+        <result column="financing_num" property="financingNum"/>
+        <result column="remark" property="remark"/>
+        <result column="tenant_uid" property="tenantUID"/>
+        <result column="institution_uid" property="institutionUID"/>
+        <result column="hospital_uid" property="institutionUID"/>
+        <result column="site_uid" property="siteUID"/>
+        <result column="clinical_dept_uid" property="clinicalDeptUid"/>
+        <result column="clinical_dept_name" property="clinicalDeptName"/>
+        <result column="starting_price" property="startingPrice"/>
+        <result column="starting_duration" property="startingDuration"/>
+        <result column="gratis_duration" property="gratisDuration"/>
+        <result column="discount_start_date" property="discountStartDate"/>
+        <result column="discount_end_date" property="discountEndDate"/>
+        <result column="discount" property="discount"/>
+        <result column="compensation_amount" property="compensationAmount"/>
+        <result column="patient_num" property="patientNum"/>
+        <result column="patient_bed_num" property="patientBedNum"/>
+        <result column="swap_index" property="swapIndex"/>
+    </resultMap>
+
+    <select id="getTotalRowCount" resultType="int">
+            select count(distinct id) from (
+                select
+                sard.id,
+                sard.borrow_id,
+                sard.return_id,
+                sard.asset_info_id,
+                sard.shared_asset_type,
+                sard.asset_number,
+                sard.asset_name,
+                sard.unit,
+                sard.unit_price,
+                sard.charging_type,
+                sard.charging_begin_time,
+                sard.charging_end_time,
+                sard.count_qty,
+                sard.tenant_uid,
+                sard.institution_uid,
+                sard.hospital_uid,
+                sard.site_uid,
+                sard.clinical_dept_uid,
+                sard.clinical_dept_name,
+                sard.starting_price,
+                sard.starting_duration,
+                sard.gratis_duration,
+                sard.discount_start_date,
+                sard.discount_end_date,
+                sard.discount,
+                sard.is_cleaned,
+                sard.compensation_amount,
+                sard.patient_num,
+                sard.patient_bed_num,
+                sasi.swap_index,
+                (case
+                when  sard.charging_end_time is not null and sard.is_cleaned=true then '已完成'
+                when  sard.charging_end_time is not null and sard.is_cleaned != true then '已归还（未清洁保养）'
+                when	 bsar.state = 6 and  sard.charging_end_time is null then '使用中'
+                when  bsar.state = 3 then '已预约'
+                else ''
+                end) state
+                from  shared_asset_req_detail sard
+                left join shared_asset_request bsar on bsar.id=sard.borrow_id
+                left join shared_asset_request rsar on rsar.id=sard.return_id
+                left join shared_asset_swap_index sasi on sard.asset_info_id = sasi.asset_uid
+            ) t1
+        <where>${ew.sqlSegment}</where>
+    </select>
+
+    <select id="loadSharedAssets" resultMap="sharedAssetReqDetailResult">
+        select * from (
+            select
+            sard.id,
+            sard.borrow_id,
+            sard.return_id,
+            sard.asset_info_id,
+            sard.shared_asset_type,
+            sard.asset_number,
+            sard.asset_name,
+            sard.unit,
+            sard.unit_price,
+            sard.charging_type,
+            sard.charging_begin_time,
+            sard.charging_end_time,
+            sard.count_qty,
+            sard.tenant_uid,
+            sard.institution_uid,
+            sard.hospital_uid,
+            sard.site_uid,
+            sard.clinical_dept_uid,
+            sard.clinical_dept_name,
+            sard.starting_price,
+            sard.starting_duration,
+            sard.gratis_duration,
+            sard.discount_start_date,
+            sard.discount_end_date,
+            sard.discount,
+            sard.is_cleaned,
+            sard.compensation_amount,
+            sard.patient_num,
+            sard.patient_bed_num,
+            sasi.swap_index,
+            (case
+            when  sard.charging_end_time is not null and sard.is_cleaned=true then '已完成'
+            when  sard.charging_end_time is not null and sard.is_cleaned != true then '已归还（未清洁保养）'
+            when	 bsar.state = 6 and  sard.charging_end_time is null then '使用中'
+            when  bsar.state = 3 then '已预约'
+            else ''
+            end) state
+            from  shared_asset_req_detail sard
+            left join shared_asset_request bsar on bsar.id=sard.borrow_id
+            left join shared_asset_request rsar on rsar.id=sard.return_id
+            left join shared_asset_swap_index sasi on sard.asset_info_id = sasi.asset_uid
+        ) t1
+        <where>${ew.sqlSegment}</where>
+    </select>
+
+</mapper>

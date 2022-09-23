@@ -172,9 +172,9 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@LastModifiedDate
 	@Column(name = "last_modified_date")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@JsonIgnore
-	private Date lastModifiedDate = new Date();
+	private Date lastModifiedDate;
 
 	//-1:理想用户户,99：测试用户,
 	@Column(name = "type")

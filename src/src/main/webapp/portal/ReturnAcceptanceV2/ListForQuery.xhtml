@@ -54,7 +54,7 @@
                         <p:dataTable id="datalist" value="#{sharedAssetReqDetailForQueryController.lazyModel}" var="item" widgetVar="varDataList"
                             selectionMode="single" selection="#{sharedAssetReqDetailForQueryController.selected}"
                             lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                            rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.chargingBeginTime}"
+                            rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.charging_begin_time}"
                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                             rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -68,7 +68,7 @@
                             <p:ajax event="rowSelect" listener="#{sharedAssetReqDetailV2Controller.onChanged}"  update=""/>-->
                             <p:ajax event="filter" listener="#{sharedAssetReqDetailForQueryController.onFilter}" update=""/>
                             <!--sharedId-->
-                            <p:column headerText="借用科室" sortBy="#{item.borrowId}" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+                            <p:column headerText="借用科室" sortBy="#{item.clinical_dept_name}" filterBy="#{item.clinical_dept_name}" filterMatchMode="LIKE">
         <!--                        <f:facet name="filter">
                                     <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
                                         <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -88,13 +88,13 @@
         <!--&lt;!&ndash;                        <h:outputText value="#{sharedAssetReqDetailForQueryController.getclinicalDeptName(item.returnId)}"/>&ndash;&gt;-->
                                     <!--<h:outputText value="#{item.clinicalDeptForReturnName}"/>-->
                             <!--</p:column>-->
-                            <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                            <p:column headerText="设备名称" sortBy="#{item.asset_name}" filterBy="#{item.asset_name}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetName}"/>
                                 </p:column>
-                                <p:column headerText="设备编号" sortBy="#{item.assetNumber}" filterBy="#{item.assetNumber}" filterMatchMode="LIKE">
+                                <p:column headerText="设备编号" sortBy="#{item.asset_number}" filterBy="#{item.asset_number}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetNumber}"/>
                                 </p:column>
-                                <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" filterBy="#{item.chargingBeginTime}" filterMatchMode="LIKE">
+                                <p:column headerText="计费开始时间" sortBy="#{item.charging_begin_time}" filterBy="#{item.charging_begin_time}" filterMatchMode="GTE">
                                     <f:facet name="filter">
                                         <p:calendar id="cal1" effect="fold" value="#{sharedAssetReqDetailForQueryController.filterBeginTime}"
                                                     onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
@@ -103,7 +103,7 @@
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="计费结束时间" sortBy="#{item.chargingEndTime}" filterBy="#{item.chargingEndTime}" filterMatchMode="LIKE">
+                                <p:column headerText="计费结束时间" sortBy="#{item.charging_end_time}" filterBy="#{item.charging_end_time}" filterMatchMode="LTE">
                                     <f:facet name="filter">
                                         <p:calendar id="cal2" effect="fold" value="#{sharedAssetReqDetailForQueryController.filterEndTime}"
                                                     onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
@@ -112,19 +112,19 @@
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"/>
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="病人号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}" sortBy="#{item.patientNum}" filterBy="#{item.patientNum}" filterMatchMode="LIKE">
+                                <p:column headerText="病人号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}" sortBy="#{item.patient_num}" filterBy="#{item.patient_num}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.patientNum}"/>
                                 </p:column>
-                                <p:column headerText="床号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}" sortBy="#{item.patientBedNum}" filterBy="#{item.patientBedNum}" filterMatchMode="LIKE">
+                                <p:column headerText="床号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}" sortBy="#{item.patient_bed_num}" filterBy="#{item.patient_bed_num}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.patientBedNum}"/>
                                 </p:column>
-                                <p:column headerText="单价" sortBy="#{item.unitPrice}">
+                                <p:column headerText="单价" sortBy="#{item.unit_price}">
                                     <f:facet name="filter">
                                         <p:inputText id="filterUnitPrice" widgetVar="varFilterUnitPrice" value="#{sharedAssetReqDetailForQueryController.filterUnitPrice}"/>
                                     </f:facet>
                                     <h:outputText value="#{item.unitPrice}"/>
                                 </p:column>
-                                <p:column headerText="计价方式" sortBy="#{item.chargingType}" filterBy="#{item.chargingType}" filterMatchMode="EQ">
+                                <p:column headerText="计价方式" sortBy="#{item.charging_type}" filterBy="#{item.charging_type}" filterMatchMode="EQ">
                                     <f:facet name="filter">
                                         <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -160,13 +160,18 @@
                                         <f:convertNumber pattern="0.00"/>
                                     </h:outputText>
                                 </p:column>
+                                <p:column headerText="免除费用">
+                                    <h:outputText value="#{item.gratisFee}">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </h:outputText>
+                                </p:column>
                                 <p:column headerText="优惠时段">
                                     <h:outputText value="#{item.getDiscountPeriod()}">
                                         <f:convertNumber pattern="0.00"/>
                                     </h:outputText>
                                 </p:column>
                                 <p:column headerText="优惠折扣">
-                                    <h:outputText value="#{item.discount * 100}">
+                                    <h:outputText value="#{item.discount}">
                                         <f:convertNumber pattern="0.00"/>
                                     </h:outputText>%
                                 </p:column>
@@ -180,11 +185,7 @@
                                     <f:convertNumber pattern="0.00"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="免除费用">
-                                <h:outputText value="#{item.gratisFee}">
-                                    <f:convertNumber pattern="0.00"/>
-                                </h:outputText>
-                            </p:column>
+
                             <p:column headerText="总计费用">
                                 <h:outputText value="#{item.compensationAmount + item.totalAmount}">
                                     <f:convertNumber pattern="0.00"/>
@@ -199,10 +200,21 @@
                             </p:column>
                             </c:if>
                             <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
-                                <p:column headerText="状态">
+                                <p:column headerText="状态" filterBy="#{item.state}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" id="selectOneMenu1">
+                                                <f:selectItem id="select1" itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                                <f:selectItem itemLabel="已预约" itemValue="已预约" />
+                                                <f:selectItem itemLabel="使用中" itemValue="使用中" />
+                                                <c:if test="#{sharedAssetReqDetailForQueryController.queryIndex != 1}">
+                                                    <f:selectItem itemLabel="已归还（未清洁保养）" itemValue="已归还（未清洁保养）" />
+                                                    <f:selectItem itemLabel="已完成" itemValue="已完成" />
+                                                </c:if>
+                                        </p:selectOneMenu>
+                                    </f:facet>
                                     <h:outputText value="#{item.state}" />
                                 </p:column>
-                                <p:column headerText="调剂编码">
+                                <p:column headerText="调剂编码" filterBy="#{item.swap_index}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.swapIndex}" />
                                 </p:column>
 <!--                                <p:column headerText="预约人">-->

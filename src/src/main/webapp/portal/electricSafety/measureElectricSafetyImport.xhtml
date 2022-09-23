@@ -23,7 +23,7 @@
 						<h:panelGroup>
 							<p>#{msg.Description}</p>
 							<p>
-								1. <a href="APM_Electric_Safety_Template.ps" title="download">#{msg.downloadTemplateFile}</a>
+								<p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('MEASURE_ELECTRIC_SAFETY')}" styleClass="p-mr-2"/>
 							</p>
 							<p>2. #{msg.ImportElectricSafetyData}</p>
 							<p>3. #{msg.UpFileImport}</p>

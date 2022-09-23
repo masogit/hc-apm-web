@@ -5,9 +5,11 @@
  */
 package com.ge.apm.view;
 
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.sharedasset.SharedAssetReqDetailService;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -15,7 +17,9 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.datatable.DataTable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
@@ -53,7 +57,8 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     SharedAssetTypeRepository sharedAssetTypeRepository = null;
     SharedAssetSwapIndexRepository swapIndexRepository=null;
     private UaaService uuaService;
-
+    @Autowired
+    SharedAssetReqDetailService sharedAssetReqDetailService;
     private Date filterBeginTime;
     private Date filterEndTime;
     private String oneSearchStr;
@@ -105,6 +110,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         sharedAssetTypeRepository = WebUtil.getBean(SharedAssetTypeRepository.class);
+        sharedAssetReqDetailService = WebUtil.getBean(SharedAssetReqDetailService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         swapIndexRepository=WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -187,49 +193,31 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         List<WorkflowConfig> wfCfigList = wfCfigDao.findByDeptForSharedAsset(orgUid);
         if (wfCfigList != null && wfCfigList.size() > 0) {
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.NE,orgUid));
+            this.updateSearchFilter(new SearchFilter("clinical_dept_uid", SearchFilter.Operator.NE,orgUid));
         }
 
         if (queryIndex == 0){
-            this.removeFilterOnField("chargingEndTime");
-        }
-        if (filterBeginTime != null){
-            searchFilters.add(new SearchFilter("chargingBeginTime", SearchFilter.Operator.GTE,filterBeginTime));
-        }
-        if (filterEndTime != null){
-            searchFilters.add(new SearchFilter("chargingEndTime", SearchFilter.Operator.LTE,filterEndTime));
+            this.removeFilterOnField("charging_begin_time");
         }
 
-        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("assetNumber", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-        }
+
         if (queryIndex == 1){
-            this.updateSearchFilter(new SearchFilter("chargingEndTime", SearchFilter.Operator.IsNull,null));
+            this.updateSearchFilter(new SearchFilter("charging_end_time", SearchFilter.Operator.IsNull,null));
         }
 
-//        searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
-        Page<SharedAssetReqDetail> result=null;
-        if (this.searchFilters == null) {
-            result=dao.findAll(pageRequest);
-        } else {
-            result= dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Wrapper wrapper = sharedAssetReqDetailService.buildDefaultFilters(searchFilters);
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+//            this.updateSearchFilter(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+//            this.updateSearchFilter(new SearchFilter("asset_number", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            wrapper.andNew().like("asset_name",oneSearchStr).or().like("asset_number",oneSearchStr);
         }
-        if(result != null && !CollectionUtils.isEmpty(result.getContent())){
-            for (SharedAssetReqDetail sharedAssetReqDetail : result.getContent()) {
-                String assetInfoId = sharedAssetReqDetail.getAssetInfoId();
-                String sharedAssetTypeId = sharedAssetReqDetail.getSharedAssetTypeId();
-                if(StringUtils.isNotBlank(assetInfoId)){
-                    SharedAssetSwapIndex byAssetUid = swapIndexRepository.findByAssetUid(assetInfoId);
-                    if(byAssetUid != null){
-                        sharedAssetReqDetail.setSwapIndex(byAssetUid.getSwapIndex());
-                    }
-                }
-                if(StringUtils.isNotBlank(assetInfoId)){
-                    SharedAssetType byId = sharedAssetTypeRepository.findById(sharedAssetTypeId);
-                    ValuationFactory.valuation(byId,sharedAssetReqDetail);
-                }
-            }
+        int totalRowCount = sharedAssetReqDetailService.getTotalRowCount(wrapper);
+        List<SharedAssetReqDetail> sharedAssets = sharedAssetReqDetailService.loadSharedAssets(pageRequest, wrapper);
+        Page<SharedAssetReqDetail> result=null;
+        if (sharedAssets== null) {
+            result=new PageImpl(new ArrayList(),pageRequest,totalRowCount);
+        } else {
+            result= new PageImpl(sharedAssets,pageRequest,totalRowCount);
         }
         return result;
     }

@@ -293,6 +293,20 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
     }
 
+    public LinkedHashMap<String, Object> getConfigByKeyAndSite(String key, String siteUid) {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<>(header);
+        String url = getGatewayURL(GatewayURL.GET_CONFIG_BY_KEY_AND_SITE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url + "?key=" + key + "&siteUid=" + siteUid,
+                HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap.get("data");
+        } else {
+            return new LinkedHashMap<>();
+        }
+    }
+
 }
 
 class ServiceRequestForm {

@@ -9,7 +9,9 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.ExportService;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.collect.Lists;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,17 +32,23 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author 503310146
+ */
 @ManagedBean
 @ViewScoped
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ExportRecordController extends JpaCRUDController<ExportRecord> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExportRecordController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExportRecordController.class);
 
-    private static final long serialVersionUID = -1L;
+    private static final long serialVersionUID = -6722475457093568033L;
 
-    private ExportService exportService;
+    private String tenantLogin = "tenant";
+
     private ExportRepository dao;
+    private ExportService exportService;
     private FileDownloadService fileDownloadService;
     private UserAccountRepository userAccountRepository;
 
@@ -113,7 +121,7 @@ public class ExportRecordController extends JpaCRUDController<ExportRecord> {
 
     public void saveAuditBatch(List<ExportRecord> itemBatch) {
         boolean writeFlag = ExportRecord.AuditStatus.PASS.name().equals(item.getAuditStatus());
-        itemBatch.forEach(item -> item.setStatus(writeFlag ? ExportRecord.Status.RUN.name() : ExportRecord.Status.REFUSE.name()));
+        itemBatch.forEach(itemRecord -> itemRecord.setStatus(writeFlag ? ExportRecord.Status.RUN.name() : ExportRecord.Status.REFUSE.name()));
         dao.save(itemBatch);
         if (writeFlag) {
             String token = UserContextService.getAccessToken();
@@ -135,7 +143,7 @@ public class ExportRecordController extends JpaCRUDController<ExportRecord> {
             downloadFlag = true;
         } catch (Exception e) {
             downloadFlag = false;
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             WebUtil.addErrorMessage("Fail to download data.");
         }
     }
@@ -146,28 +154,28 @@ public class ExportRecordController extends JpaCRUDController<ExportRecord> {
     }
 
     public void onSelectAllOfPage() {
-        boolean isSelectedAll = false;
-        for (ExportRecord item : currentPageRecord) {
-            if ("tenant".equals(loginType)) {
-                if (!(ExportRecord.Status.RUN.name().equals(item.getStatus()) || ExportRecord.Status.AUDIT.name().equals(item.getStatus()))) {
-                    isSelectedAll = !(!selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        for (ExportRecord currentRecord : currentPageRecord) {
+            if (tenantLogin.equals(loginType)) {
+                if(!Lists.newArrayList(ExportRecord.Status.RUN.name(), ExportRecord.Status.AUDIT.name()).contains(currentRecord.getStatus())) {
+                    putSelectedMap(currentRecord.getId());
+                } else {
+                    selectedMap.put(currentRecord.getId(), false);
                 }
             } else {
-                if (ExportRecord.Status.AUDIT.name().equals(item.getStatus())) {
-                    isSelectedAll = !(!selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+                if (ExportRecord.Status.AUDIT.name().equals(currentRecord.getStatus())) {
+                    putSelectedMap(currentRecord.getId());
+                } else {
+                    selectedMap.put(currentRecord.getId(), false);
                 }
             }
         }
-        for (ExportRecord item : currentPageRecord) {
-            if ("tenant".equals(loginType)) {
-                if (!(ExportRecord.Status.RUN.name().equals(item.getStatus()) || ExportRecord.Status.AUDIT.name().equals(item.getStatus()))) {
-                    selectedMap.put(item.getId(), !isSelectedAll);
-                }
-            } else {
-                if (ExportRecord.Status.AUDIT.name().equals(item.getStatus())) {
-                    selectedMap.put(item.getId(), !isSelectedAll);
-                }
-            }
+    }
+
+    private void putSelectedMap(Long id) {
+        if (!selectedMap.containsKey(id)) {
+            selectedMap.put(id, true);
+        } else {
+            selectedMap.put(id, Boolean.FALSE.equals(selectedMap.get(id)));
         }
     }
 
@@ -196,10 +204,6 @@ public class ExportRecordController extends JpaCRUDController<ExportRecord> {
 
     public String downloadRedirect() {
         return downloadFlag ? "false" : "TenantRecord?faces-redirect=true";
-    }
-
-    public String redirect() {
-        return "SystemRecord?faces-redirect=true";
     }
 
     private boolean checkDelete(Collection<Long> ids) {
@@ -233,9 +237,9 @@ public class ExportRecordController extends JpaCRUDController<ExportRecord> {
             return Collections.singletonList(-1L);
         }
         List<Long> ids = new ArrayList<>();
-        for (Long id : selectedMap.keySet()) {
-            if (selectedMap.get(id)) {
-                ids.add(id);
+        for (Map.Entry<Long, Boolean> entry : selectedMap.entrySet()) {
+            if (Boolean.TRUE.equals(entry.getValue())) {
+                ids.add(entry.getKey());
             }
         }
         return ids;
@@ -266,10 +270,10 @@ public class ExportRecordController extends JpaCRUDController<ExportRecord> {
         if (ObjectUtil.isEmpty(loginType)) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) facesContext.getExternalContext().getRequest();
-            loginType = request.getRequestURI().contains("tenant") ? "tenant" : "system";
+            loginType = request.getRequestURI().contains(tenantLogin) ? tenantLogin : "system";
         }
 
-        if ("tenant".equals(loginType)) {
+        if (tenantLogin.equals(loginType)) {
             if (!this.hasFilterOnField("tenantUid")) {
                 searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, tenantUid));
             }

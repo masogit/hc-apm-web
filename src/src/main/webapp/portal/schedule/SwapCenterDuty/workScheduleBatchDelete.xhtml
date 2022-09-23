@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dialog id="workScheduleBatchDeleteDlg" widgetVar="workScheduleBatchDeleteDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.BatchWorkSchedule}">
+            <h:form id="workScheduleBatchDeleteForm">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">#{msg.StartTime}*</label>
+                        <p:calendar id="StartTime" timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{workScheduleController.deleteStartBatchDate}" required="true" requiredMessage="#{msg.StartTime} #{msg.ValidationRequire}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.EndTime}*</label>
+                        <p:calendar  timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{workScheduleController.deleteEndBatchDate}" required="true" requiredMessage="#{msg.EndTime} #{msg.ValidationRequire}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.Personnel}*</label>
+                        <p:selectManyMenu value="#{workScheduleController.deleteSelectedUserList}" var="t" converter="userAccountConverter" required="true" filter="true" filterMatchMode="contains" showCheckbox="true" requiredMessage="#{msg.PersonnelCannotBeEmpty}">
+                            <f:selectItems value="#{sharedAssetConfigController.userList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                            <p:column>
+                                <h:outputText value="#{t.name}" />
+                            </p:column>
+                        </p:selectManyMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.BatchWorkScheduleType}*</label>
+                        <p:selectManyCheckbox style="width: 200px" value="#{workScheduleController.shiftType}" required="true" requiredMessage="#{msg.BatchWorkScheduleTypecannotbeEmpty}">
+                            <!--                                <f:selectItem itemLabel="#{msg.WeekDay}" itemValue="WeekDay" />-->
+                            <!--                                <f:selectItem itemLabel="#{msg.WeekEnd}" itemValue="WeekEnd" />-->
+                            <!--                                <f:selectItem itemLabel="#{msg.WeekEnd}" itemValue="WeekEnd" />-->
+                            <f:selectItem itemLabel="#{msg.MorningShift}" itemValue="AM" />
+                            <f:selectItem itemLabel="#{msg.NightShift}" itemValue="PM" />
+                            <f:selectItem itemLabel="#{msg.AllDay}" itemValue="ALL"  />
+                        </p:selectManyCheckbox>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <br/>
+                <br/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{workScheduleController.batchDeleteWorkSchedule}" update=":growl" icon="ui-icon-check" oncomplete="batchAfter(xhr, status, args)"/>
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('workScheduleBatchDeleteDlg').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

@@ -51,7 +51,7 @@
                 <label class="label">所属科室</label>
                 <p:selectOneMenu id="idCSClinicalOrgInfo" value="#{maintainExportController.selectedOrgDepart}" disabled="false" converter="orgInfoColumnFilterConverter"
                                  style="width:100%;" filter="true" filterMatchMode="contains">
-                    <f:selectItems value="#{maintainExportController.listOrgDept}" var="item" itemLabel="#{item.shortName}" itemValue="#{item}" />
+                    <f:selectItems value="#{maintainExportController.listOrgDept}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
                 </p:selectOneMenu>
             </h:panelGroup>
         </p:panelGrid>

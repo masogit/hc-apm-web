@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ge.apm.domain.MeasuringCertificateDetail;
 
 /**
- * Created by 212605082 on 2017/11/7.
+ * @author 503310146
  */
 public interface MeasuringCertificateDetailMapper extends BaseMapper<MeasuringCertificateDetail> {
 

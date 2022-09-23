@@ -4,7 +4,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+      xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
         <div class="ui-g-12 card">
@@ -60,7 +60,7 @@
                     <p:column headerText="#{msg.clinicalDeptName}">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                            <p:inputText id="clinicalDept"  value="#{measureAssetListController.fileterOrg.name}"  readonly="true"/>
+                            <p:inputText id="clinicalDept"  value="#{measureAssetListController.filterOrg.name}"  readonly="true"/>
                         </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
@@ -126,9 +126,7 @@
                     </p:column>
 
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修" rendered="#{measureAssetListController.measurementRepairVisible}"/>
-
-                        <!--<p:commandButton id="uploadButton" icon="ui-icon-file-upload" class="btn btn-sm btn-gray" title="上传附件" disabled="#{empty measureAssetListController.selected}" update="measuringTab:measuringUploadDlg" oncomplete="PF('measuringUploadDialog').show()"/>-->
+                        <p:commandButton id="batchToRelRule" oncomplete="PF('BatchRepairDialog').show()" update="measuringTab:BatchRepairDlg" actionListener="#{measureAssetListController.setSelectedAssetsUuids()}" icon="fa fa-wrench" class="btn btn-sm btn-gray batch-terminated"  title="批量报修"/>
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist_measuringAsset" fileName="MeasuringAsset_export"/>
                         </p:commandButton>

@@ -115,13 +115,17 @@
                             <p:commandButton icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetArrivedItemsController.selected.qrCode}" class="popupIconButton"/>
                         </h:panelGroup>
 
-                        <h:panelGroup >
-                            <label class="label">#{msg.medicalInstrumentClassification}</label>
-                            <p:inputText  value="#{fieldMsg.fieldValue('assetFunctionType', assetArrivedItemsController.selected.functionGroup)}" readonly="true"/>
-                        </h:panelGroup>
-                        <h:panelGroup >
-                            <label class="label">#{msg.medicalInstrumentSubclassification}</label>
-                            <p:inputText  value="#{fieldMsg.fieldValue(assetArrivedItemsController.selected.functionGroup, assetArrivedItemsController.selected.assetCode68)}" readonly="true"/>
+<!--                        <h:panelGroup >-->
+<!--                            <label class="label">#{msg.medicalInstrumentClassification}</label>-->
+<!--                            <p:inputText  value="#{fieldMsg.fieldValue('assetFunctionType', assetArrivedItemsController.selected.functionGroup)}" readonly="true"/>-->
+<!--                        </h:panelGroup>-->
+<!--                        <h:panelGroup >-->
+<!--                            <label class="label">#{msg.medicalInstrumentSubclassification}</label>-->
+<!--                            <p:inputText  value="#{fieldMsg.fieldValue(assetArrivedItemsController.selected.functionGroup, assetArrivedItemsController.selected.assetCode68)}" readonly="true"/>-->
+<!--                        </h:panelGroup>-->
+                        <h:panelGroup>
+                            <label class="label">#{msg.medicalApparatusClassification}</label>
+                            <p:inputText  value="#{medicalInstrumentsClassificationCompCtrl.selectedAuthGroupName}" readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.locationCode}</label>
@@ -151,13 +155,6 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </p:inputText>
                         </h:panelGroup>
-                        <!--                        <h:panelGroup>
-                                                    <label class="label">#{msg.arriveDate}</label>
-                                                    <p:inputText  value="#{assetArrivedItemsController.selected.arriveDate}" readonly="true">
-                                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                                                    </p:inputText>
-                                                </h:panelGroup>-->
-
                         <h:panelGroup>
                             <label class="label">#{msg.installDate}</label>
                             <p:inputText  value="#{assetArrivedItemsController.selected.installDate}" readonly="true">

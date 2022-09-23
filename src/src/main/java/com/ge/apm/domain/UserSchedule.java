@@ -18,7 +18,7 @@ public class UserSchedule implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum Type {
-        V, W
+        V, W, A
     }
     public enum ScheduleDateStage {
         ALL, AM, PM
@@ -42,7 +42,7 @@ public class UserSchedule implements Serializable {
     @Column(name = "schedule_date")
     private Date scheduleDate;
 
-    //计划类型[V：休假，W：排班]
+    //计划类型[V：休假，W：维修流程排班,A:调剂排班]
     @Column(name = "type")
     private String type;
 

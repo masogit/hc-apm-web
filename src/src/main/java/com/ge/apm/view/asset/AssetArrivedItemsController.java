@@ -2,7 +2,6 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.ArrivalListItemRepository;
 
-import java.io.IOException;
 import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -11,9 +10,8 @@ import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import org.apache.commons.lang3.StringUtils;
-import org.primefaces.component.tree.Tree;
-import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,8 +22,6 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -64,6 +60,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private String mergeContractNum;
 
+    private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+
     @Override
     protected void init() {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
@@ -75,6 +73,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         addDateTimeFields("arrivalList.arrivalDate");
         arrivalListDao = WebUtil.getBean(ArrivalListRepository.class);
         getSavedArrivalContractNum();
+        medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
+        medicalInstrumentsClassificationCompCtrl.registerController(this);
     }
 
     @Override
@@ -124,6 +124,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     public void onRowSelect(SelectEvent event) {
         this.selected = (ArrivalListItem) event.getObject();
+        medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, selected.getMedicalApparatusClassification());
         picList = aiService.getPicList(selected.getId());
     }
 
@@ -207,7 +208,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
         List<I18nMessage> statusList = FieldValueMessageController.getFieldValueList("arrivalListItemStatus", siteId);
-        if (!userContextService.needInstorageCheck()) {
+        if (Boolean.FALSE.equals(userContextService.needInstorageCheck())) {
             return statusList.stream().filter(item -> !ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getMsgKey())).collect(Collectors.toList());
         }
         return statusList;
@@ -315,32 +316,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     }
 
     public void getSavedArrivalContractNum(){
-//        List<SearchFilter> searchFilters = this.searchFilters;
-//        if (this.searchFilters == null) {
-//            searchFilters = new ArrayList();
-//            this.searchFilters = searchFilters;
-//        }
-//        List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
-//        searchFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-//        searchFilters.add(new SearchFilter("arrivalList.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-//        searchFilters.add(new SearchFilter("arrivalList.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-//        searchFilters.add(new SearchFilter("arrivalList.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-//        searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-//        searchFilters.add(new SearchFilter("arrivalList.processType", SearchFilter.Operator.EQ, "Normal"));
-//        searchFilters.add(new SearchFilter("arrivalList.contractNum", SearchFilter.Operator.IsNotNull, null));
-//        searchFilters.add(new SearchFilter("arrivalList.supplierStatus", SearchFilter.Operator.EQ, ArrivalList.SupplierStatus.Saved.toString()));
-//
-//        List<ArrivalListItem> ArrivalListItem = dao.findBySearchFilter(searchFilters);
-//        if(ArrivalListItem == null || ArrivalListItem.isEmpty()){
-//            return ;
-//        }
-//        List<String> contractNumList = new ArrayList<>();
-//        for(ArrivalListItem list : ArrivalListItem){
-//            contractNumList.add(list.getArrivalList().getContractNum());
-//        }
-//        mergeContractNum = contractNumList.stream().distinct().collect(Collectors.toList()).toString();
-        List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
-        if(orgUidList != null && !orgUidList.isEmpty()){
+        List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
+        if(!orgUidList.isEmpty()){
             List<String> arrivalListContractNum = dao.getArrivalListNotInstalledContractNum(orgUidList,UserContextService.getCurrentUserAccount().getUid(),ArrivalList.SupplierStatus.Saved.name());
             mergeContractNum = arrivalListContractNum.toString().replace("[","").replace("]","");
         }
@@ -374,11 +351,16 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     }
 
     public void beforeUpdateInfo(){
-        if(selected != null){
-            if(StringUtils.isBlank(selected.getBrand())){
-                selected.setBrand(selected.getArrivalList().getBrand());
-            }
+        if(selected != null && StringUtils.isBlank(selected.getBrand())){
+            selected.setBrand(selected.getArrivalList().getBrand());
         }
+    }
 
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
+            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
+            selected.setMedicalApparatusClassification(selectedAuthGroup.getClassificationCode());
+        }
     }
 }

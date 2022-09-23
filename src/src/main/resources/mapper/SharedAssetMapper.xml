@@ -19,6 +19,7 @@
         <result column="asset_is_deleted" property="isDeleted"/>
         <result column="asset_is_valid" property="isValid"/>
         <result column="shared_status" property="sharedStatus"/>
+        <result column="shared_asset_swap_index" property="sharedAssetSwapIndex"/>
         <association property="assetDeptOrg" resultMap="orgInfoResult"/>
         <association property="sharedAssetType" resultMap="sharedAssetTypeResult"/>
         <association property="sharedAssetReqDetail" resultMap="sharedAssetReqDetailResult"/>
@@ -53,6 +54,10 @@
         <result column="patient_num" property="patientNum"/>
         <result column="patient_bed_num" property="patientBedNum"/>
         <result column="clinical_dept_name" property="clinicalDeptName"/>
+        <result column="gratis_duration" property="gratisDuration"/>
+        <result column="discount_start_date" property="discountStartDate"/>
+        <result column="discount_end_date" property="discountEndDate"/>
+        <result column="discount" property="discount"/>
     </resultMap>
 
     <select id="getTotalRowCount" resultType="int">
@@ -84,10 +89,12 @@
                 sard.charging_type as req_charging_type,
                 sard.unit_price as req_unit_price,
                 sard.charging_begin_time,
-                sard.charging_end_time
+                sard.charging_end_time,
+                sasi.swap_index  as shared_asset_swap_index
                 from asset_info ai left join shared_asset_type sat on ai.shared_asset_type = sat.id
                 left join org_info oi on ai.asset_dept_uid=oi.uid
                 left join (select * from shared_asset_req_detail where charging_end_time is null or charging_end_time > now()) sard on ai.uid=sard.asset_info_id
+                left join  shared_asset_swap_index sasi on sasi.asset_uid=ai.uid
             ) assets
         <where>${ew.sqlSegment}</where>
     </select>
@@ -134,10 +141,16 @@
             sard.return_id,
             sard.patient_num,
             sard.patient_bed_num,
-            sard.clinical_dept_name
+            sard.clinical_dept_name,
+            sard.gratis_duration,
+            sard.discount_start_date,
+            sard.discount_end_date,
+            sard.discount,
+            sasi.swap_index  as shared_asset_swap_index
             from asset_info ai left join shared_asset_type sat on ai.shared_asset_type = sat.id
             left join org_info oi on ai.asset_dept_uid=oi.uid
             left join (select * from shared_asset_req_detail where charging_end_time is null or charging_end_time > now()) sard on ai.uid=sard.asset_info_id
+            left join  shared_asset_swap_index sasi on sasi.asset_uid=ai.uid
         ) assets
         <where>${ew.sqlSegment}</where>
     </select>

@@ -57,9 +57,6 @@
                         <p:ajax event="rowSelect" update="loginAsButton createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton deactivateButton"/>
                         <p:ajax event="filter" listener="#{userAccountController.onFilter}" update="loginAsButton createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton"/>
 
-                        <!-- <p:column headerText="#{msg.orgId}" sortBy="#{item.orgInfoId}">
-                            <h:outputText value="#{userAccountController.getOrgFullNameByUid(item.orgInfoUID)}"/>
-                        </p:column> -->
                         <p:column headerText="#{msg.orgId}" sortBy="#{item.orgInfoId}">
 							<h:outputText value="#{item.orgFullName}" />
 						</p:column>

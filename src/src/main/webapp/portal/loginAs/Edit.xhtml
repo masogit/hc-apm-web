@@ -66,18 +66,9 @@
                         <h:panelGroup>
                             <label class="label">#{msg.Region}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.region}" >
-                                <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('region')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
- <!--                       <h:panelGroup rendered="#{userContextService.isSupportMultiLanguage()}">
-                            <label class="label">#{msg.defaultLang}</label>
-                            <p:selectOneMenu value="#{userAccountController.selected.defaultLanguage}">
-                                <f:selectItem itemLabel="zh" itemValue="zh"/>
-                                <f:selectItem itemLabel="en" itemValue="en"/>
-                                &lt;!&ndash;<f:selectItem itemLabel="tw" itemValue="tw"/>&ndash;&gt;
-                            </p:selectOneMenu>
-                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.userPosition}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.position}" >
@@ -111,7 +102,6 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-<!--                    <p:commandButton validateClient="true" actionListener="#{userAccountController.save}" value="#{msg.Save}" update="@(.datalist) :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'UserAccountEditDialog');"/>-->
                     <p:commandButton validateClient="true" actionListener="#{userAccountController.save}" value="#{msg.Save}" update="@(.datalist) :growl,:UserAccountEditDlg" icon="ui-icon-check" />
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('UserAccountEditDialog').hide()"/>

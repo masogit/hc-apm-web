@@ -30,7 +30,7 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil.PersistAction;
 
-public abstract class GenericCRUDUUIDController<E> implements Serializable {
+public abstract class GenericCRUDUUIDController<E> implements Serializable, ServerEventInterface {
     private V2_WorkOrderStepRepository workOrderStepDao;
     private V2_WorkOrderService workOrderService;
     private static final long serialVersionUID = 1L;
@@ -606,5 +606,9 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
 
     public void setGamePlanLazyModel(LazyDataModel gamePlanLazyModel) {
         this.gamePlanLazyModel = gamePlanLazyModel;
+    }
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
     }
 }

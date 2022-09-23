@@ -209,6 +209,8 @@ public class SharedAssetReqDetail implements Serializable{
     private Date discountEndDate;  //折扣开始日期
     @Column(name = "discount")
     private Double discount;  // 优惠折扣
+    @Column(name = "qr_code")
+    private String qrCode;  // 二维码
 
     @Transient
     private String swapIndex;
@@ -276,16 +278,7 @@ public class SharedAssetReqDetail implements Serializable{
 //    }
 
     public String getState() {
-        String state="";
-        if(leaseRequest != null && leaseRequest.getState() == 3){
-            state="已预约";
-        }else if(chargingBeginTime !=null && chargingEndTime == null){
-            state="使用中";
-        }else if(returnRequest != null && chargingEndTime != null && isCleaned !=null && isCleaned == false){
-            state="已归还（未清洁保养）";
-        }else if(isCleaned != null && isCleaned){
-            state="已完成";
-        }
+
         return state;
     }
 
@@ -1028,6 +1021,14 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setDiscountStartDate(Date discountStartDate) {
         this.discountStartDate = discountStartDate;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
     }
 
     public Date getDiscountEndDate() {

@@ -3177,6 +3177,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DailyCheckSettings', '日常检查设置', 'Daily Check Settings', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DailyCheckReport', '日常检查报表', 'Daily Check Report', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UseRegistrationCheckSettings', '使用登记检查设置', 'Use registration check settings', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UseRegistrationCheckItemSettings', '使用登记检查项设置', 'Use registration check item settings', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'StartupAndShutdownRegistration', '开关机登记', 'Startup/Shutdown Registration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UseRegistration', '使用登记', 'Use registration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BigScreenForEquipmentManagement', '设备管理大屏', 'Big Screen for Equipment Management', NULL, '-1');
@@ -4736,3 +4737,17 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ConfigItemUseParent','是否使用上级配置','Whether to use parent configuration',NULL,-1);
 -- 物联绩效设备绑定
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','IotDeviceBind','物联绩效设备绑定','IoT performance device binding',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Device','设备','Device',NULL,-1);
+-- 导出记录状态
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'REFUSE', '拒绝', 'refuse', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'AUDIT', '审核', 'audit', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'FAIL', '失败', 'fail', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'FINISHED', '完成', 'finished', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'RUN', '执行', 'run', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, value_en, site_id) VALUES ('exportRecordStatus', 'NEW', '新建', 'new', -1);
+-- YHAAO-16709 system_client 管理页面
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SystemClientInfo','子系统账户','Subsystem account',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ClientName','账户名称','Client name',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ClientType','账户类型','Client type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','BindOrgInfo','关联组织','Associated organizations',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('clientType','IOT','IOT','IOT',NULL,-1);
