@@ -1,9 +1,8 @@
 package com.ge.apm.service;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.ExportRepository;
 import com.ge.apm.dao.mapper.ExportMapper;
@@ -29,6 +28,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * @author 503310146
+ */
 @Service
 public class ExportService {
 
@@ -44,7 +46,7 @@ public class ExportService {
     private BlobObjectRepository blobDao;
 
     @Value("#{systemEnvironment['BATCH_FILE_FOLDER'] ?: urlProperties.BatchFileFolder}")
-    private String BATCH_FILE_FOLDER;
+    private String bathFileUpload;
 
     List<String> tableNameList = Arrays.asList("acc_org_info", "adverse_events", "arrival_list", "asset_contract", "asset_history", "asset_info", "asset_lifecycle", "asset_opt_record", "asset_purchase_list", "asset_seria_num_config", "asset_tag", "asset_termination_report_template", "attribute",
             "biomed_group", "brand", "click_rate", "contract_info", "custom_config", "custom_role", "dept_transaction_category", "dept_transaction_log", "electric_safety_data",
@@ -70,44 +72,43 @@ public class ExportService {
                 // wechat_report : ERROR: column "tenant_uid" does not exist :
                 Map<String, String> writeMap = new HashMap<>(200);
                 for (String tableName : tableNameList) {
-                    writeMap.put(tableName, JSONObject.toJSONString(exportMapper.findByTenantUid(tableName, tenantUid)));
+                    writeMap.put(tableName, JSON.toJSONString(exportMapper.findByTenantUid(tableName, tenantUid)));
                 }
                 // tenant_info 租户信息
-                writeMap.put("tenant_info", JSONObject.toJSONString(exportMapper.findByField("tenant_info", "uid", tenantUid)));
+                writeMap.put("tenant_info", JSON.toJSONString(exportMapper.findByField("tenant_info", "uid", tenantUid)));
 
                 // type -> 2
                 List<String> assetTableNameList = Stream.of("asset_lifecycle_event", "asset_service_member", "asset_tags", "external_work_order", "pm_order_pre_create", "site_to_site_allocation", "event_collection", "nurse_site_maintain_item").collect(Collectors.toList());
                 for (String assetTableName : assetTableNameList) {
-                    writeMap.put(assetTableName, JSONObject.toJSONString(exportMapper.findByAssetInfoTenantUid(assetTableName, tenantUid)));
+                    writeMap.put(assetTableName, JSON.toJSONString(exportMapper.findByAssetInfoTenantUid(assetTableName, tenantUid)));
                 }
 
                 // type -> 3
                 for (RelationTenantUid relationTenantUid : RelationTenantUid.values()) {
-                    writeMap.put(relationTenantUid.getTableA(), JSONObject.toJSONString(exportMapper.findByRelationTableTenantUid(relationTenantUid.getTableA(), relationTenantUid.getTableB(), relationTenantUid.getFieldA(), relationTenantUid.getFieldB(), tenantUid)));
+                    writeMap.put(relationTenantUid.getTableA(), JSON.toJSONString(exportMapper.findByRelationTableTenantUid(relationTenantUid.getTableA(), relationTenantUid.getTableB(), relationTenantUid.getFieldA(), relationTenantUid.getFieldB(), tenantUid)));
                 }
 
                 // type -> 4
-                writeMap.put("unstructured_data", JSONObject.toJSONString(exportMapper.findByParentRelationTableTenantUid("unstructured_data", "unstructured_data_collection", "collection_id", "id",
+                writeMap.put("unstructured_data", JSON.toJSONString(exportMapper.findByParentRelationTableTenantUid("unstructured_data", "unstructured_data_collection", "collection_id", "id",
                         "bo_uuid", "v2_pm_order", "id", tenantUid)));
 
                 // type -> 5
-                writeMap.put("gb_code", JSONObject.toJSONString(exportMapper.findAll("gb_code")));
-                writeMap.put("role_msg_rel", JSONObject.toJSONString(exportMapper.findAll("role_msg_rel")));
-                writeMap.put("sys_auth_group", JSONObject.toJSONString(exportMapper.findAll("sys_auth_group")));
-                writeMap.put("sys_authority", JSONObject.toJSONString(exportMapper.findAll("sys_authority")));
-                writeMap.put("sys_role", JSONObject.toJSONString(exportMapper.findAll("sys_role")));
+                writeMap.put("gb_code", JSON.toJSONString(exportMapper.findAll("gb_code")));
+                writeMap.put("role_msg_rel", JSON.toJSONString(exportMapper.findAll("role_msg_rel")));
+                writeMap.put("sys_auth_group", JSON.toJSONString(exportMapper.findAll("sys_auth_group")));
+                writeMap.put("sys_authority", JSON.toJSONString(exportMapper.findAll("sys_authority")));
+                writeMap.put("sys_role", JSON.toJSONString(exportMapper.findAll("sys_role")));
 
                 Map<String, List<String>> tableBlobObjectMap = MapUtil.newHashMap();
-                for (String tableName : writeMap.keySet()) {
-                    JSONArray objects = JSONArray.parseArray(writeMap.get(tableName));
-                    BoTypeRelation boTypeRelation = BoTypeRelation.getBoTypeRelation(tableName);
+                for (Map.Entry<String, String> entry : writeMap.entrySet()) {
+                    JSONArray objects = JSON.parseArray(entry.getValue());
+                    BoTypeRelation boTypeRelation = BoTypeRelation.getBoTypeRelation(entry.getKey());
                     if (!CollectionUtils.isEmpty(objects) && boTypeRelation != null) {
-                        List<String> uuids = objects.stream().map(object -> JSONObject.parseObject(object.toString()).getString(boTypeRelation.getTableField())).collect(Collectors.toList());
+                        List<String> uuids = objects.stream().map(object -> JSON.parseObject(object.toString()).getString(boTypeRelation.getTableField())).collect(Collectors.toList());
                         List<String> objectStorageIds = exportMapper.fetchObjectIds(boTypeRelation.name(), boTypeRelation.getBoField(), uuids);
-                        tableBlobObjectMap.put(tableName, objectStorageIds);
+                        tableBlobObjectMap.put(entry.getKey(), objectStorageIds);
                     }
                 }
-                System.out.println(tableBlobObjectMap);
                 writeData(exportRecord, writeMap, tableBlobObjectMap, token, uid);
             } catch (Exception e) {
                 exportRecord.setUpdateDate(new Date());
@@ -123,18 +124,18 @@ public class ExportService {
         // 随机生成文件名
         String fileName = UUID.randomUUID().toString().replace("-", "");
         // 写入文件路径
-        String suffix = BATCH_FILE_FOLDER.substring(BATCH_FILE_FOLDER.length() - 1);
-        String src = BATCH_FILE_FOLDER + fileName + suffix;
+        String suffix = File.separator;
+        String bathTmpPath = new File(bathFileUpload).getPath() + suffix;
+        String src = bathTmpPath + fileName + suffix;
         String dataSrc = src + "data" + suffix;
         String fileSrc = src + "file" + suffix;
         // 存放压缩包路径
         fileName = fileName + ".zip";
-        String dest = BATCH_FILE_FOLDER + fileName;
+        String dest = bathTmpPath + fileName;
         // 写文件
         List<String> tableNames = new ArrayList<>(writeMap.keySet());
-        FileOutputStream fileOutputStream = null;
         for (String tableName : tableNames) {
-            FileUtils.writeFile(dataSrc, tableName + ".txt", writeMap.get(tableName), tableNames.size() - 1 == tableNames.indexOf(tableName));
+            FileUtils.writeFile(dataSrc, tableName + ".txt", writeMap.get(tableName));
             List<String> objectStorageIds = tableBlobObjectMap.get(tableName);
             if (!CollectionUtils.isEmpty(objectStorageIds)) {
                 String writeFilePath = fileSrc + ZipUtil.underlineToCamel(tableName, false) + suffix;
@@ -142,10 +143,9 @@ public class ExportService {
                 writeFile.mkdirs();
 
                 for (String objectStorageId : objectStorageIds) {
-                    try {
                         StreamedContent file = microService.downloadSingleFile(objectStorageId);
                         String name = file.getName();
-                        fileOutputStream = new FileOutputStream(writeFilePath + name.substring(1, name.length() - 1));
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(writeFilePath + name.substring(1, name.length() - 1))) {
                         StreamUtils.copy(file.getStream(), fileOutputStream);
                         fileOutputStream.flush();
                     } catch (Exception e) {
@@ -155,16 +155,13 @@ public class ExportService {
                 }
             }
         }
-        if (fileOutputStream != null) {
-            fileOutputStream.close();
-        }
         // 生成随机密码
         String randomPassword = ZipUtil.getRandomPassword(8);
         // 压缩
         ZipUtil.zip(src, dest, randomPassword);
 
         if (token == null || token.isEmpty()) {
-            WebUtil.addErrorMessage("do not have premission");
+            WebUtil.addErrorMessage("do not have permission");
         }
         Map<String, Object> fileObject = microService.uploadSingleFile(token, new File(dest));
 

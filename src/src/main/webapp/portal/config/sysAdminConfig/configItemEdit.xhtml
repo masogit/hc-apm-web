@@ -66,7 +66,6 @@
                     <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 7}">
                         <label class="label">#{msg.ConfigItemValue}</label>
                         <p:selectOneMenu value="#{superAdminConfigItemController.selected.showValue}" required="true" style="width: 95%;">
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{superAdminConfigItemController.selected.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>

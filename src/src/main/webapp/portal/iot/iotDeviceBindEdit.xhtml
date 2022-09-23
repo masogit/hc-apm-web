@@ -16,7 +16,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.selectAssetChoose}*</label>
-                        <p:selectOneMenu value="#{iotDeviceBindController.assetUid}" filter="true" filterMatchMode="contains" required="true" requiredMessage="#{msg.Equipment} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
+                        <p:selectOneMenu value="#{iotDeviceBindController.assetUid}" filter="true" filterMatchMode="contains" required="true" requiredMessage="#{msg.Device} #{msg.ValidationRequire}" autoWidth="false" style="width: 95%;">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{iotDeviceBindController.assetList}" var="item" itemLabel="#{item.name} - #{item.departNum}" itemValue="#{item.uid}"/>
                         </p:selectOneMenu>

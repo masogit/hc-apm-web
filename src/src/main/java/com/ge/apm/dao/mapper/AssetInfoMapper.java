@@ -85,5 +85,7 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 	@SelectProvider(type = AssetInfoProvider.class,method="countAssetWithQRcode")
 	Integer countAssetWithQRcode(@Param("uidList")List<String> uidList,@Param("tenantUid")String tenantUid);
 
-	List<AssetInfo> selectMeasureResultPage(Pagination pagination, @Param("ew") Wrapper<AssetInfo> wrapper);
+	List<AssetInfo> selectMeasureResult(Pagination pagination, @Param("ew") Wrapper<AssetInfo> wrapper);
+
+	List<AssetInfo> selectMeasureResult(@Param("ew") Wrapper<AssetInfo> wrapper);
 }

@@ -1,15 +1,13 @@
 package com.ge.apm.view.uaa;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;
-import com.ge.apm.dao.mapper.UserAccountMapper;
-import com.ge.apm.dao.mapper.UserTagsMapper;
+import com.ge.apm.dao.mapper.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.api.UserApiService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
-import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.security.UserDetailsServiceImpl;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.uaa.UserAccountExportService;
@@ -59,6 +57,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,7 +75,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
     public static final String SYSTEM_ACTIVE_ROLE = "系统激活专用";
     public static final String SYSTEM_ACTIVE = "ActivationPerson";
-    //public static final int ACTIVATION_ROLE = 10;
 
     private static final Integer LX_USER_TYPE = -1; // lixinag usertype
     private boolean isShowButton = true;
@@ -99,7 +97,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private OrgInfo selectedUserOrg;
 
-    private  String oldIsDisable;
+    private  Boolean oldIsDisable;
 
     private UserCommonService userCommonService;
 
@@ -125,8 +123,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     
     private StreamedContent exportFile;
 
-    private OrgInfoTreeService orgInfoTreeService;
-
     private SysRoleRepository sysRoleRepository;
 
     private CustomRoleRepository customRoleRepository;
@@ -140,13 +136,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private String retrieval;//查询树的关键字
 
-    private List<String> treeDeleteUrgOidList = new ArrayList<String>();//存储要删除的orgUids
+    private List<String> treeDeleteUrgOidList = new ArrayList<>();//存储要删除的orgUids
 
-    private List<OrgInfo> orgInfoTableData46 = new ArrayList<OrgInfo>();//存放页面表格的数据；
+    private List<OrgInfo> orgInfoTableData46 = new ArrayList<>();//存放页面表格的数据；
 
-    private List<String> unselectInstitutions = new ArrayList<String>();
+    private List<String> unselectInstitutions = new ArrayList<>();
 
-    private List<String> unselectUidss = new ArrayList<String>();
+    private List<String> unselectUidss = new ArrayList<>();
 
     private boolean userAccountEditFlag = true;
 
@@ -219,10 +215,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.retrieval = retrieval;
     }
 
-    private boolean isSelect46Account;
-
-
-
     private Boolean confirmDestroy=false;
 
 
@@ -238,7 +230,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userCommonService = WebUtil.getBean(UserCommonService.class);
         userAccountService = WebUtil.getBean(UserAccountService.class);
         userApi = WebUtil.getBean(UserApiService.class);
-        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         userTagsDao = WebUtil.getBean(UserTagsRepository.class);
         userTagsMapper = WebUtil.getBean(UserTagsMapper.class);
         multiLevelApprovalConfigRepository = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
@@ -272,16 +263,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public boolean isLocale(){
-        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
-            return true;
-        } else {
-            return false;
-        }
+        return "zh".equalsIgnoreCase(LocaleHolder.getLocale().toString());
     }
 
     private void updateRoleList() {
         roles = Lists.newArrayList(sysRoleRepository.findAll());
-        roles.sort(Comparator.comparingInt(i -> i.getId()));
+        roles.sort(Comparator.comparingInt(SysRole::getId));
         if (selectedTenant != null) {
             if (selectedTenant.getInsulate() == null || !selectedTenant.getInsulate()) {
                 roles.removeIf(i -> "LocalITAdmin".equals(i.getName()));
@@ -411,7 +398,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     @Override
     protected Page<UserAccount> loadData(PageRequest pageRequest) {
-        //this.selected = null;
     	generateListSearchFilter();
         Boolean isDisable =false;
         for (SearchFilter searchFilter :searchFilters) {
@@ -425,11 +411,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if(!isDisable){
             searchFilters.add(new SearchFilter("isDisable", SearchFilter.Operator.IsNull,null,"1*3+"));
         }
+        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ,false,"1*4+"));
+        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.IsNull,null,"1*4+"));
         Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
         for(UserAccount user: pageUserAccount){
             List<OrgInfo> orgListByUid = this.deptList.stream().filter(item -> item.getId().equals(user.getOrgInfoId())).collect(Collectors.toList());
-            if(orgListByUid.size()>0)
+            if(!orgListByUid.isEmpty()) {
                 user.setOrgInfo(orgListByUid.get(0));
+            }
         }
         return pageUserAccount;
     }
@@ -735,38 +724,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void deleteSelectedUser() {
-        if (this.selected.getSiteUID() != null) {
-            //判断操作权限
-            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
-                return;
-            }
+        if (this.selected.getSiteUID() != null && !userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())) {
+            return;
         }
 
-        //判断多级审核是否在用此用户
-        List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.find();
-        if (multiLevelApprovalConfigs!=null && !multiLevelApprovalConfigs.isEmpty()){
-            for (MultiLevelApprovalConfig multiLevelApprovalConfig: multiLevelApprovalConfigs){
-                String approvalItem = multiLevelApprovalConfig.getApprovalItem();
-                if (null != approvalItem) {
-                    List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>(){
-                    });
-                    for (int i = 0; i < approvalNodes.size(); i++) {
-                        ApprovalNode node = approvalNodes.get(i);
-                            List<String> userUids = node.getUserUids();
-                           if (userUids!=null && userUids.contains(selected.getUid())){
-                               WebUtil.addErrorMessage("该用户为多级审核人，不能删除！");
-                                return;
-                           }
-                    }
-                }
-            }
-        }
-        if(getApproveByUserAccount()){
-            WebUtil.addErrorMessage("该用户为审核人员，不能删除！");
+        if (isMultiLevelAuditor() || isAuditor()) {
             return;
         }
         if (canDelete()) {
-            //super.delete();
+            selected.setIsDeleted(true);
+            selected.setLastModifiedBy(loginUser.getLoginName());
+            selected.setLastModifiedDate(new Timestamp(System.currentTimeMillis()));
+            dao.save(selected);
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
+            /* 物理删除
             log.info("start delete user, uid: {}",this.selected.getUid());
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
 
@@ -779,75 +750,75 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 }
             }
             userAccountService.deleteUserAccount(this.selected);
-            userApi.removeUser(selected.getLoginName());
+            userApi.removeUser(selected.getLoginName());*/
 
         }
     }
-    public boolean getApproveByUserAccount(){
-        AuditGroupConfigurationRepository auditGroupConfigurationRepository=WebUtil.getBean(AuditGroupConfigurationRepository.class);
-        List<AuditGroupConfiguration> auditGroupConfigurations = auditGroupConfigurationRepository.find();
-        if(auditGroupConfigurations!=null && !auditGroupConfigurations.isEmpty()){
-            for (AuditGroupConfiguration auditGroupConfiguration:auditGroupConfigurations){
-                String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
-                List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
-                if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
-                    for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
-                        AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
-                        List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                        if (userUids!=null && userUids.contains(selected.getUid())){
-                            return true;
-                        }
-                    }
 
-                }
-            }
+    private boolean isMultiLevelAuditor(){
+        MultiLevelApprovalConfigMapper multiLevelApprovalConfigMapper = WebUtil.getBean(MultiLevelApprovalConfigMapper.class);
+        boolean isMultiLevelAuditor = multiLevelApprovalConfigMapper.countApprovalItemIncludeUserUid(selected.getUid()) > 0;
+        if (isMultiLevelAuditor) {
+            WebUtil.addErrorMessage("该用户为多级审核人，不能操作！");
         }
-        return false;
+        return isMultiLevelAuditor;
     }
-    private Boolean canDelete() {
-        List<SearchFilter> checkFilters = new ArrayList<>();
-        checkFilters.add(new SearchFilter("dispatchUserId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
-        checkFilters.add(new SearchFilter("dispatchUserId2", SearchFilter.Operator.EQ, selected.getId(), "1+"));
-        WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
-        List<WorkflowConfig> cfgList = wfDao.findBySearchFilter(checkFilters);
-        if (cfgList != null && !cfgList.isEmpty()) {
+
+    private boolean isAuditor(){
+        AuditGroupConfigurationMapper auditGroupConfigurationMapper = WebUtil.getBean(AuditGroupConfigurationMapper.class);
+        boolean isAuditor = auditGroupConfigurationMapper.countGroupMemberItemIncludeUserUid(selected.getUid()) > 0;
+        if (isAuditor) {
+            WebUtil.addErrorMessage("该用户为审核人员，不能操作！");
+        }
+        return isAuditor;
+    }
+
+    private boolean canDelete() {
+        Integer id = selected.getId();
+
+        WorkflowConfigMapper wfDao = WebUtil.getBean(WorkflowConfigMapper.class);
+        Wrapper wrapper = new EntityWrapper<WorkflowConfig>();
+        wrapper.eq("dispatch_user_id", id);
+        wrapper.or().eq("dispatch_user_id2", id);
+        if (wfDao.selectCount(wrapper) > 0) {
             WebUtil.addErrorMessage(WebUtil.getMessage("TheUserIsAssignerAndCannotBeDeleted"));
             return false;
         }
-        checkFilters.clear();
-        checkFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
-        checkFilters.add(new SearchFilter("assetOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
-        checkFilters.add(new SearchFilter("assetOwnerId2", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
-        checkFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
-        checkFilters.add(new SearchFilter("clinicalOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
-        AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
-        List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
-        if (assetList != null && !assetList.isEmpty()) {
+
+        AssetInfoMapper assetDao = WebUtil.getBean(AssetInfoMapper.class);
+        wrapper = new EntityWrapper<AssetInfo>();
+        wrapper.eq("is_deleted", false);
+        wrapper.andNew();
+        wrapper.eq("asset_owner_id", id);
+        wrapper.or().eq("asset_owner_id2", id);
+        wrapper.or().eq("asset_owner_id3", id);
+        wrapper.or().eq("clinical_owner_id", id);
+        if (assetDao.selectCount(wrapper) > 0) {
             WebUtil.addErrorMessage(WebUtil.getMessage("TheUserIsEquipmentOwnerAndCannotBeDeleted"));
             return false;
         }
-        checkFilters.clear();
-        checkFilters.add(new SearchFilter("userId", SearchFilter.Operator.EQ, selected.getId()));
-        BiomedGroupUserRepository groupDao = WebUtil.getBean(BiomedGroupUserRepository.class);
-        List<BiomedGroupUser> groupList = groupDao.findBySearchFilter(checkFilters);
-        if (groupList != null && !groupList.isEmpty()) {
+
+        BiomedGroupUserMapper groupDao = WebUtil.getBean(BiomedGroupUserMapper.class);
+        wrapper = new EntityWrapper<BiomedGroupUser>();
+        wrapper.eq("user_id", id);
+        if (groupDao.selectCount(wrapper) > 0) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ListedInTheGroupOfMintenanceEngineersCannotBeDeleted"));
             return false;
         }
 
-        checkFilters.clear();
-        checkFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, selected.getId()));
-        checkFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-        V2_WorkOrderRepository woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
-        List<V2_WorkOrder> woList = woDao.findBySearchFilter(checkFilters);
-        if (woList != null && !woList.isEmpty()) {
+        V2_WorkOrderMapper woDao = WebUtil.getBean(V2_WorkOrderMapper.class);
+        wrapper = new EntityWrapper<V2_WorkOrder>();
+        wrapper.eq("current_person_id", id);
+        wrapper.eq("status", 1);
+        if (woDao.selectCount(wrapper) > 0) {
             WebUtil.addErrorMessage(WebUtil.getMessage("TheUserHasAnOnGoingWorkOrderAndCannotBeDeleted"));
             return false;
         }
 
         return true;
     }
-    private Boolean isDisable() {
+
+    private boolean isDisable() {
         List<SearchFilter> checkFilters = new ArrayList<>();
         checkFilters.add(new SearchFilter("dispatchUserId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
         checkFilters.add(new SearchFilter("dispatchUserId2", SearchFilter.Operator.EQ, selected.getId(), "1+"));
@@ -938,44 +909,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     @Transactional
     public void save() {
-        if (selectedUserOrg != null) {
-            //判断操作权限
-            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedUserOrg.getSiteUID())){
-                return;
-            }
+        if (selectedUserOrg != null && !userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedUserOrg.getSiteUID())) {
+            return;
         }
-        Boolean isDisable = selected.getIsDisable()==null ? false : selected.getIsDisable();
-        String newIsDisable="f";
-        if(isDisable){
-            newIsDisable="t";
-        }
-        if(oldIsDisable!=null && !oldIsDisable.equals(newIsDisable)){
-            //判断多级审核是否在用此用户
-            List<MultiLevelApprovalConfig> multiLevelApprovalConfigs = multiLevelApprovalConfigRepository.find();
-            if (multiLevelApprovalConfigs!=null && !multiLevelApprovalConfigs.isEmpty()){
-                for (MultiLevelApprovalConfig multiLevelApprovalConfig: multiLevelApprovalConfigs){
-                    String approvalItem = multiLevelApprovalConfig.getApprovalItem();
-                    if (null != approvalItem) {
-                        List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>(){
-                        });
-                        for (int i = 0; i < approvalNodes.size(); i++) {
-                            ApprovalNode node = approvalNodes.get(i);
-                            List<String> userUids = node.getUserUids();
-                            if (userUids!=null && userUids.contains(selected.getUid())){
-                                WebUtil.addErrorMessage("该用户为多级审核人，不能停用！");
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-            if(getApproveByUserAccount()){
-                WebUtil.addErrorMessage("该用户为审核人员，不能停用！");
-                return;
-            }
-            if (!isDisable()) {
-                return;
-            }
+
+        Boolean newIsDisable = Boolean.TRUE.equals(selected.getIsDisable());
+        if(!newIsDisable.equals(oldIsDisable) && (isMultiLevelAuditor() || isAuditor() || !isDisable())){
+            return;
         }
         if (!StringUtils.isEmpty(selected.getPlainPassword())) {
             String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
@@ -1008,7 +948,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 selected.setTelephone(originalTelephone);
                 WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
                 userAccountEditFlag = false;
-                //isRepeatedAfter();
                 return;
             }
             isRepeatedAfter();
@@ -1022,7 +961,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private void isRepeatedAfter() {
         userAccountEditFlag = true;
         super.save();
-        if (selected.getIsLocked()) {
+        if (Boolean.TRUE.equals(selected.getIsLocked())) {
             userApi.removeUser(selected.getLoginName());
         } else {
             userApi.resetUser(selected.getLoginName());
@@ -1057,14 +996,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         });
 
         //remove useless tags
-        removeTags.stream().distinct().forEach(item -> {
-            userTagsMapper.removeTag(this.selected.getUid(), item);
-        });
+        removeTags.stream().distinct().forEach(item -> userTagsMapper.removeTag(this.selected.getUid(), item));
     }
 
     @Transactional
     public void updateUserRole(Integer creatorUserType){
-        List<String> role = new ArrayList<String>();
+        List<String> role = new ArrayList<>();
         if(creatorUserType != null && creatorUserType.equals(LX_USER_TYPE)){
             role.add(SYSTEM_ACTIVE_ROLE);
         }else{
@@ -1075,7 +1012,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         //绑定新建用户和该用户所在层级的以下层级
         if(46!=selected.getSiteId()){
-            userOrgInfoList=new ArrayList<UserOrgInfo>();
+            userOrgInfoList=new ArrayList<>();
             accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
             List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
             setSelectedOrgTree(accessOrgTree, orgList);
@@ -1145,11 +1082,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void prepareEdit() {
         super.prepareEdit();
         selectedUserOrg = orgInfoDao.getByUid(selected.getOrgInfoUID());
-        Boolean isDisable = selected.getIsDisable()==null ? false : selected.getIsDisable();
-        oldIsDisable="f";
-        if (isDisable){
-            oldIsDisable="t";
-        }
+        oldIsDisable = selected.getIsDisable() != null && selected.getIsDisable();
         filterTreeNodeByUid();
         if(selected.getId() != null){
             List<String> existingTags = userTagsMapper.getTagsByUser(selected.getUid());
@@ -1524,9 +1457,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void logout(){
-        /*String context = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-        String logoutUrl = FacesContext().getExternalContext().getRequestContextPath()+ "/logout.xhtml?uid="+loginUser.getId();
-        return logoutUrl;*/
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth != null){
             ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
@@ -1633,7 +1563,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 	}
 
 	public String getCurrentUserRoleNames(Integer userId){
-        //Integer userId = selected.getId();
         List<SysRole> sysRoles = getSystemRolesByUserId(userId);
         StringBuilder sb = new StringBuilder();
         if(CollectionUtils.isNotEmpty(sysRoles)){

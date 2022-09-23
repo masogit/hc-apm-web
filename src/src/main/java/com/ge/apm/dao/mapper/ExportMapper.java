@@ -1,11 +1,16 @@
 package com.ge.apm.dao.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.ge.apm.domain.ExportRecord;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 import java.util.Map;
 
-public interface ExportMapper {
+/**
+ * @author 503310146
+ */
+public interface ExportMapper extends BaseMapper<ExportRecord> {
 
     /**
      * 查询所有数据

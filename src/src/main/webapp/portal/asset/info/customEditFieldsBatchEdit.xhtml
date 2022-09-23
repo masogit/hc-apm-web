@@ -452,6 +452,13 @@
                          readonly="true" />
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'systemNum1')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum1}<span style="color:red">#{assetInfoBulkEditController.customConfig.assetFields['systemNum1'].required? '*':''}</span></label>
+            <p:inputText id="systemNum1" value="#{assetInfoBulkEditController.selected.systemNum1}" required="#{assetInfoBulkEditController.customConfig.assetFields['systemNum1'].required}"
+                         requiredMessage="#{msg.systemNum1} #{msg.ValidationRequire}" readonly="#{!assetInfoBulkEditController.needEdit('systemNum1')}" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'qrCode')}" >
         <h:panelGroup>
             <label class="label">#{msg.QRCode}</label>

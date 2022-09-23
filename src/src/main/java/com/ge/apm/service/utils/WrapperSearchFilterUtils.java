@@ -12,6 +12,10 @@ import java.util.Collection;
  */
 public class WrapperSearchFilterUtils {
 
+    private WrapperSearchFilterUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static <T> Wrapper<T> convert(Collection<SearchFilter> searchFilters, Wrapper<T> wrapper, String paramAlias) {
         if (ObjectUtil.isEmpty(searchFilters)) {
             return new EntityWrapper<>();
@@ -21,26 +25,27 @@ public class WrapperSearchFilterUtils {
             if (ObjectUtil.isNotEmpty(paramAlias)) {
                 fieldName = paramAlias + "." + fieldName;
             }
+            Object filterValue = filter.value;
             switch(filter.operator){
                 case EQ:
-                    wrapper.eq(fieldName, filter.value);
+                    wrapper.eq(fieldName, filterValue);
                     break;
                 case LIKE:
-                    if(filter.value!=null){
-                        wrapper.like("lower("+fieldName+")", filter.value.toString().toLowerCase());
+                    if(filterValue!=null){
+                        wrapper.like("lower("+fieldName+")", filterValue.toString().toLowerCase());
                     }
                     break;
                 case LT :
-                    wrapper.lt(fieldName, filter.value);
+                    wrapper.lt(fieldName, filterValue);
                     break;
                 case LTE:
-                    wrapper.le(fieldName, filter.value);
+                    wrapper.le(fieldName, filterValue);
                     break;
                 case GT:
-                    wrapper.gt(fieldName, filter.value);
+                    wrapper.gt(fieldName, filterValue);
                     break;
                 case GTE:
-                    wrapper.ge(fieldName, filter.value);
+                    wrapper.ge(fieldName, filterValue);
                     break;
                 default:
                     break;

@@ -7,14 +7,18 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public abstract class UnattendedFee {
     // 优惠时长
     protected long  setDiscountTime(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail){
-        long rentalTimeInDays = 0L;
+        long promotionTimeCount = 0L;
         String discountTimeStr="0";
         String chargingType = reqDetail.getChargingType();
         if(StringUtils.isBlank(chargingType) || ChargingType.PAY_PER.getIndex().equals(chargingType) || ChargingType.PAY_DAY.getIndex().equals(chargingType)){
@@ -27,38 +31,21 @@ public abstract class UnattendedFee {
         LocalDateTime endTime;
         if((sharedAssetTypeBeginTime=getTime(reqDetail.getDiscountStartDate(),false))==null){
             reqDetail.setDiscountTime(discountTimeStr);
-            return rentalTimeInDays;
+            return promotionTimeCount;
         }
         if((sharedAssetTypeEndTime=getTime(reqDetail.getDiscountEndDate(),false))==null){
             reqDetail.setDiscountTime(discountTimeStr);
-            return rentalTimeInDays;
+            return promotionTimeCount;
         }
-        long discountTimeInt = getDiscountTimeInt(sharedAssetTypeBeginTime, sharedAssetTypeEndTime);
         if((beginTime=getTime(reqDetail.getChargingBeginTime(),false)) == null){
             reqDetail.setDiscountTime(discountTimeStr);
-            return rentalTimeInDays;
+            return promotionTimeCount;
         }
-        if(reqDetail.getRentalTimeInMins() <= discountTimeInt){
-            reqDetail.setDiscountTime(discountTimeStr);
-            return rentalTimeInDays;
-        }
+
         endTime=getTime(reqDetail.getChargingEndTime(),true);
-        rentalTimeInDays = ChronoUnit.DAYS.between(beginTime, endTime);
-
-
-        if(rentalTimeInDays == 0 && isBefore(beginTime,sharedAssetTypeBeginTime) && isAfter(endTime,sharedAssetTypeEndTime)){
-             discountTimeStr = getDiscountTimeStr(1, discountTimeInt, sharedAssetType);
-        }else if(rentalTimeInDays > 0){
-            if(isAfter(beginTime,sharedAssetTypeBeginTime)){
-                rentalTimeInDays-=1;
-            }
-            if(rentalTimeInDays !=0 && isAfter(endTime,sharedAssetTypeEndTime)){
-                rentalTimeInDays+=1;
-            }
-            discountTimeStr = getDiscountTimeStr(rentalTimeInDays, discountTimeInt, sharedAssetType);
-        }
-        reqDetail.setDiscountTime(discountTimeStr);
-        return discountTimeInt*rentalTimeInDays;
+        promotionTimeCount = computePromotionTime(beginTime, endTime, sharedAssetTypeBeginTime, sharedAssetTypeEndTime);
+        reqDetail.setDiscountTime( getDiscountTimeStr(promotionTimeCount));
+        return promotionTimeCount;
     }
     // 优惠费用
     protected void  setDiscountFee(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail,long discountTimeInt){
@@ -67,16 +54,13 @@ public abstract class UnattendedFee {
             reqDetail.setDiscountFee(BigDecimal.ZERO);
             return;
         }
-        if(reqDetail.getRentalTimeInMins() < discountTimeInt){
-            reqDetail.setDiscountFee(BigDecimal.ZERO);
-            return;
-        }
+
         Double unitPrice = reqDetail.getUnitPrice();
         Double discount = reqDetail.getDiscount();
 
         if(unitPrice != null && discount != null){
             BigDecimal unitPriceBigDecimal = BigDecimal.valueOf(unitPrice);
-            BigDecimal multiply = unitPriceBigDecimal.multiply(BigDecimal.valueOf(discountTimeInt / 60 * discount));
+            BigDecimal multiply = unitPriceBigDecimal.multiply(BigDecimal.valueOf(discountTimeInt / 60 )).multiply(BigDecimal.valueOf((discount / 100)));
             discountFee=multiply;
         }
         reqDetail.setDiscountFee(discountFee);
@@ -85,17 +69,13 @@ public abstract class UnattendedFee {
     protected  void setGratisFee(SharedAssetType sharedAssetType, SharedAssetReqDetail reqDetail,long discountTimeInt){
 
         Double gratisDuration = reqDetail.getGratisDuration();
-        if(gratisDuration == null || gratisDuration==0){
-            reqDetail.setGratisFee(BigDecimal.ZERO);
-            return;
-        }
-        if(reqDetail.getRentalTimeInMins() <= gratisDuration*60){
+        if(gratisDuration == null || gratisDuration<=0){
             reqDetail.setGratisFee(BigDecimal.ZERO);
             return;
         }
         BigDecimal gratisFee=null;
         Double unitPrice = reqDetail.getUnitPrice();
-        if(gratisDuration == null || unitPrice== null){
+        if(unitPrice== null || unitPrice < 0){
             gratisFee=BigDecimal.ZERO;
         }else{
             BigDecimal unitPriceBigDecimal = BigDecimal.valueOf(unitPrice);
@@ -114,27 +94,12 @@ public abstract class UnattendedFee {
            return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
     }
-    private boolean isBefore(LocalDateTime beginTime,LocalDateTime sharedAssetTypeBeginTime){
-        if(beginTime.getHour() <= sharedAssetTypeBeginTime.getHour() && beginTime.getMinute() <= sharedAssetTypeBeginTime.getMinute() && beginTime.getSecond() <= sharedAssetTypeBeginTime.getSecond()){
-            return true;
-        }
-      return false;
-    }
-
-    private boolean isAfter(LocalDateTime endTime,LocalDateTime sharedAssetTypeEndTime){
-        if(endTime.getHour() >= sharedAssetTypeEndTime.getHour() && endTime.getMinute() >= sharedAssetTypeEndTime.getMinute() && endTime.getSecond() >= sharedAssetTypeEndTime.getSecond()){
-            return true;
-        }
-        return false;
-    }
-    private String getDiscountTimeStr(long rentalTimeInDays,long discountTimeInt,SharedAssetType sharedAssetType){
-        discountTimeInt=rentalTimeInDays * discountTimeInt;
+    private String getDiscountTimeStr(long promotionTimeCount){
         StringBuilder formattedRentalTime = new StringBuilder();
         long days = 0L, hours = 0L, minutes = 0L;
-        days = discountTimeInt / (24 * 60);
-        hours = (discountTimeInt / 60) % 24;
-        minutes = discountTimeInt % 60;
-        formattedRentalTime.append(days).append("天").append(hours).append("时").append(minutes).append("分");
+        hours = (promotionTimeCount / 60);
+        minutes = promotionTimeCount % 60;
+        formattedRentalTime.append(hours).append("时").append(minutes).append("分");
         return formattedRentalTime.toString();
     }
       private long getDiscountTimeInt(LocalDateTime sharedAssetTypeBeginTime,LocalDateTime sharedAssetTypeEndTime){
@@ -158,5 +123,154 @@ public abstract class UnattendedFee {
         setDiscountFee(sharedAssetType,reqDetail, discountTimeInt);
         setGratisFee(sharedAssetType,reqDetail,discountTimeInt);
         setTotalAmount(sharedAssetType, reqDetail);
+    }
+
+    public  long  computePromotionTime(LocalDateTime beginTime,LocalDateTime endTime,
+                                              LocalDateTime sharedAssetTypeBeginTime,LocalDateTime sharedAssetTypeEndTime){
+        LocalTime discountBeginTime = sharedAssetTypeBeginTime.toLocalTime();
+        LocalTime discountEndTime = sharedAssetTypeEndTime.toLocalTime();
+        int discountBeginTimeState = discountEndTime.getHour()-discountBeginTime.getHour();
+        if(discountBeginTimeState < 1){
+            sharedAssetTypeEndTime=sharedAssetTypeEndTime.plus(1,ChronoUnit.DAYS);
+        }
+        long OneDayMinute=60 * 24;
+        long promotionTimeCount=0L;
+        long countMinute=ChronoUnit.MINUTES.between(beginTime,endTime);
+        long countDays = countMinute / OneDayMinute;
+        long promotionTime=ChronoUnit.MINUTES.between(sharedAssetTypeBeginTime,sharedAssetTypeEndTime);
+        promotionTimeCount+=countDays*promotionTime;  // 整数天数
+        LocalDateTime lastDay = beginTime.plus(countDays, ChronoUnit.DAYS);
+
+        if(discountBeginTimeState < 0){
+            //优惠时间包含次日
+            promotionTimeCount+= discountTimeIncludesNextDay(lastDay,endTime,discountBeginTime,discountEndTime);
+            System.out.println(promotionTime);
+        }else if (discountBeginTimeState > 0){
+            //优惠时间不包含次日
+            promotionTimeCount+= discountTimeDoesNotIncludeTheNextDay(lastDay,endTime,discountBeginTime,discountEndTime);
+        }else{
+            // 全天候优惠时间
+            long between=ChronoUnit.MINUTES.between(lastDay,endTime);
+            promotionTimeCount+=between;
+        }
+        return promotionTimeCount<=0?0:promotionTimeCount;
+    }
+    //优惠时间包含次日
+    public   long  discountTimeIncludesNextDay( LocalDateTime lastDay,LocalDateTime endTime,
+                                                      LocalTime discountBeginTime,LocalTime discountEndTime){
+
+        int lastDayHour = lastDay.getHour();
+        int endTimeHour = endTime.getHour();
+        int lastDayDayOfYear = lastDay.getDayOfYear();
+        int endDayOfYear = endTime.getDayOfYear();
+        int state =endTimeHour - lastDayHour;
+        int differenceDay=endDayOfYear-lastDayDayOfYear;
+        long promotionTimeCount=0L;
+        LocalTime DayStartTime = LocalTime.of(00, 00, 00);
+        LocalTime DayEndTime = LocalTime.of(23, 59, 59);
+        LocalTime lastDayLocalTime = lastDay.toLocalTime();
+        LocalTime endTimeLocalTime = endTime.toLocalTime();
+
+
+        if(state < 0 && differenceDay ==1){
+            // 最后一天的开始时间在昨日，结束时间在今日
+            if(lastDayLocalTime.compareTo(discountBeginTime) == 1 ){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,DayEndTime)+1;
+            }else {
+                promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,DayEndTime)+1;
+            }
+            if(endTimeLocalTime.compareTo(discountEndTime) == 1){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(DayStartTime,discountEndTime);
+            }else {
+                promotionTimeCount+=ChronoUnit.MINUTES.between(DayStartTime,endTimeLocalTime);
+            }
+            if(endTimeLocalTime.compareTo(discountBeginTime) > 0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,endTimeLocalTime);
+            }
+
+        }else if(state == 0 && differenceDay ==1){
+            LocalDateTime begin = LocalDateTime.of(lastDay.toLocalDate(), discountBeginTime);
+            LocalDateTime end = LocalDateTime.of(endTime.toLocalDate(), discountEndTime);
+            long countTime = ChronoUnit.MINUTES.between(begin, end);
+            if((lastDayLocalTime.compareTo(discountBeginTime) > 0 && lastDayLocalTime.compareTo(DayEndTime) < 0) ||
+                    (lastDayLocalTime.compareTo(DayStartTime) > 0 && lastDayLocalTime.compareTo(discountEndTime) < 0)
+            ){
+                long between1 = ChronoUnit.MINUTES.between(endTimeLocalTime,lastDayLocalTime);
+                promotionTimeCount+=countTime-between1;
+            }else{
+                promotionTimeCount+=countTime;
+            }
+
+        }
+        else if(state > 0 && differenceDay == 0){
+            // 最后一天的开始时间在今日，结束时间在今日
+            if(lastDayLocalTime.compareTo(discountBeginTime) <= 0 && endTimeLocalTime.compareTo(discountBeginTime) > 0 && endTimeLocalTime.compareTo(DayEndTime) <=0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,endTimeLocalTime);
+            }else if(lastDayLocalTime.compareTo(discountBeginTime) > 0 && endTimeLocalTime.compareTo(discountBeginTime) > 0 && endTimeLocalTime.compareTo(DayEndTime) <=0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,endTimeLocalTime);
+            }
+
+            if(lastDayLocalTime.compareTo(DayStartTime) >= 0 && lastDayLocalTime.compareTo(discountEndTime) < 0 && endTimeLocalTime.compareTo(discountEndTime) <=0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,endTimeLocalTime);
+            }else if(lastDayLocalTime.compareTo(DayStartTime) >= 0 && lastDayLocalTime.compareTo(discountEndTime) < 0 && endTimeLocalTime.compareTo(discountEndTime) >= 0 ){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,discountEndTime);
+            }
+
+        }else if(state == 0 && differenceDay == 0){
+            // 最后一天的开始时间和结束时间在同一个小时
+            if(lastDayLocalTime.compareTo(discountBeginTime) ==-1  && endTimeLocalTime.compareTo(discountBeginTime) ==1 && endTimeLocalTime.compareTo(DayEndTime) <= 0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,endTimeLocalTime);
+            }else if(lastDayLocalTime.compareTo(discountBeginTime) == 0 && endTimeLocalTime.compareTo(discountBeginTime) ==1 &&  endTimeLocalTime.compareTo(DayEndTime) <= 0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,endTimeLocalTime);
+            }else if(lastDayLocalTime.compareTo(discountBeginTime) == 1 &&  endTimeLocalTime.compareTo(discountBeginTime) ==1 &&  endTimeLocalTime.compareTo(DayEndTime) <= 0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,endTimeLocalTime);
+            }
+
+            if(lastDayLocalTime.compareTo(DayStartTime) >=0 && endTimeLocalTime.compareTo(discountEndTime) <= 0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,endTimeLocalTime);
+            }
+        }
+        return promotionTimeCount;
+    }
+    //优惠时间不包含次日
+    public   long  discountTimeDoesNotIncludeTheNextDay( LocalDateTime lastDay,LocalDateTime endTime,
+                                                               LocalTime discountBeginTime,LocalTime discountEndTime){
+
+        int lastDayHour = lastDay.getHour();
+        int endTimeHour = endTime.getHour();
+        int lastDayDayOfYear = lastDay.getDayOfYear();
+        int endDayOfYear = endTime.getDayOfYear();
+        int state =endTimeHour - lastDayHour;
+        int differenceDay=endDayOfYear-lastDayDayOfYear;
+        long promotionTimeCount=0L;
+        LocalTime lastDayLocalTime = lastDay.toLocalTime();
+        LocalTime endTimeLocalTime = endTime.toLocalTime();
+        if(state <= 0 && differenceDay==1 ){
+            if(lastDayLocalTime.compareTo(discountBeginTime) >= 0 && lastDayLocalTime.compareTo(discountEndTime) < 0 ){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,discountEndTime);
+            }
+
+            if(endTimeLocalTime.compareTo(discountBeginTime) > 0  && endTimeLocalTime.compareTo(discountEndTime) <= 0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,endTimeLocalTime);
+            }else if(endTimeLocalTime.compareTo(discountBeginTime) > 0  && endTimeLocalTime.compareTo(discountEndTime) > 0) {
+                promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,discountEndTime);
+            }
+
+        }else if(state > 0 && differenceDay==0){
+            if(lastDayLocalTime.compareTo(discountBeginTime) <= 0 && endTimeLocalTime.compareTo(discountEndTime) >=0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,discountEndTime);
+            }else if(lastDayLocalTime.compareTo(discountBeginTime) <= 0 &&  endTimeLocalTime.compareTo(discountBeginTime) >=0 && endTimeLocalTime.compareTo(discountEndTime) <=0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(discountBeginTime,endTimeLocalTime);
+            }else if(lastDayLocalTime.compareTo(discountBeginTime) >=0 && lastDayLocalTime.compareTo(discountEndTime) < 0 && endTimeLocalTime.compareTo(discountEndTime) <=0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,endTimeLocalTime);
+            }else if(lastDayLocalTime.compareTo(discountBeginTime) >=0 && lastDayLocalTime.compareTo(discountEndTime) < 0 && endTimeLocalTime.compareTo(discountEndTime) >0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,discountEndTime);
+            }
+        }else if(state == 0 && differenceDay==0){
+            if(lastDayLocalTime.compareTo(discountBeginTime) >= 0 && endTimeLocalTime.compareTo(discountBeginTime) > 0 && endTimeLocalTime.compareTo(discountEndTime) <= 0){
+                promotionTimeCount+=ChronoUnit.MINUTES.between(lastDayLocalTime,endTimeLocalTime);
+            }
+        }
+        return promotionTimeCount;
     }
 }
