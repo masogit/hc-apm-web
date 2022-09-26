@@ -427,6 +427,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         });
         itemDao.save(saveList);
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
+        initEasyInstallItem();
         WebUtil.addSuccessMessage("已保存");
     }
 
