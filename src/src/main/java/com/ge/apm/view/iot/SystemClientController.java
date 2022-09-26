@@ -145,6 +145,7 @@ public class SystemClientController extends GenericCRUDUUIDController<SystemClie
         if(null != this.selected && null != this.selected.getOrgInfo()){
             this.selectSite = this.selected.getOrgInfo();
             this.selectTenant = tenantInfoRepository.findByuid(this.selectSite.getTenantUID());
+            this.tenantOrgTreePage = null;
             getTenantOrgTree();
         }
     }
