@@ -34,7 +34,7 @@ public class ConfigItem implements Serializable {
 
     /**
      * 类别 配置归属于哪个业务模块
-     * 1-设备档案 2-设备调剂 3-到货安装 4-维修流程 5-预防维护 6-预算管理 7-计量管理 8-临床助手 9-知识文档 10-绩效分析 11-质控评审
+     * 1-设备档案 2-设备调剂 3-到货安装 4-维修流程 5-预防维护 6-预算管理 7-计量管理 8-临床助手 9-知识文档 10-绩效分析 11-质控评审 12-盘点工单
      */
     @Column(name = "category")
     private Integer category;
@@ -46,7 +46,7 @@ public class ConfigItem implements Serializable {
     private String key;
 
     /**
-     * 值类型 1-text 2-number 3-boolean 4-date 5-time 6-datetime 7-enum
+     * 值类型 1-text 2-number 3-boolean 4-date 5-time 6-datetime 7-enum 8-multi-enum
      * 类型为text时，如果需要做格式校验，需要在 validation 字段中定义正则表达式
      * 类型为enum时，需要在 validation 字段中定义key-value array
      */
