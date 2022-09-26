@@ -44,7 +44,7 @@
                         <div style="border: 1px solid #bdbdbd">
                             <br/>
                             <p:selectManyCheckbox required="true"  id="grid3" value="#{workScheduleController.selectedOptions2}"  valueChangeListener="#{workScheduleController.valueChangeListener}"
-                                                  layout="pageDirection" columns="1" styleClass="grid-checkbox grid3"   requiredMessage="#{msg.PersonnelCannotBeEmpty}">
+                                                  layout="pageDirection" columns="1" styleClass="grid-checkbox grid3"   requiredMessage="#{msg.BatchWorkScheduleTypecannotbeEmpty}">
                                 <p:ajax listener="#{workScheduleController.selectedOptions2Changed}" update="grid3" />
                                 <f:selectItem itemLabel="全选" itemValue="0"/>
                                 <f:selectItem itemLabel="星期一" itemValue="1"/>
