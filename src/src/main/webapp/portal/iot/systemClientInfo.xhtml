@@ -43,7 +43,7 @@
                                 actionListener="#{systemClientController.setDefaultVal}"
                                 update=":systemClientInfoEditDlg" oncomplete="PF('systemClientInfoEditDialog').show()"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
-                                title="#{msg.Edit}" disabled="#{empty systemClientController.selected}"
+                                title="#{msg.Delete}" disabled="#{empty systemClientController.selected}"
                                 actionListener="#{systemClientController.delete}" update="@(.datalist)">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
