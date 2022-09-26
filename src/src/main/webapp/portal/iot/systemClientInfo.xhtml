@@ -23,7 +23,7 @@
                                  rowsPerPageTemplate="10,20,30,90">
 
                         <p:ajax event="filter" listener="#{systemClientController.onFilter}" />
-                        <p:ajax event="rowSelect" update="editButton deleteButton resetPassButton"/>
+                        <p:ajax event="rowSelect" update="editButton deleteButton"/>
 
                         <p:column headerText="#{msg.ClientName}" filterBy="#{item.clientName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.clientName}"/>
@@ -46,11 +46,6 @@
                                 title="#{msg.Delete}" disabled="#{empty systemClientController.selected}"
                                 actionListener="#{systemClientController.delete}" update="@(.datalist)">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                            </p:commandButton>
-                            <p:commandButton id="resetPassButton" icon="ui-icon-repeat" class="btn btn-sm btn-gray"
-                                title="#{msg.resetPassword}" disabled="#{empty systemClientController.selected}"
-                                actionListener="#{systemClientController.resetPassword}" update="@(.datalist)">
-                                <p:confirm header="#{msg.ResetConformation}" message="#{msg.ResetConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
