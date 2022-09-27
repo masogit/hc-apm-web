@@ -1,9 +1,6 @@
 package com.ge.apm.dao;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -134,5 +131,10 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	public List<NurseSiteMaintainItem> findByParentIdAndAssetUid(String assetUid,Set<String> parentIds);
 	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
 
+	@Query(value="select * from nurse_site_maintain_item where asset_uid=?1 order by schedule_date desc limit 5 ",nativeQuery = true)
+	List<NurseSiteMaintainItem> getMaintainDataList(String assetUid);
+
+	@Query(value="select * from nurse_site_maintain_item where asset_uid=?1 and schedule_date >=?2 and schedule_date<=?3 ",nativeQuery = true)
+	List<NurseSiteMaintainItem> getMaintainItemDataList(String assetUid,Date startDate,Date endDate);
 
 }
