@@ -508,7 +508,7 @@
                 </h:form>
             </p:dialog>
             </div>
-            <p:dialog id="nurseSiteMaintainDialog" widgetVar="nurseSiteMaintainDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="设备开关机记录-下载">
+            <p:dialog id="nurseSiteMaintainDialog" widgetVar="nurseSiteMaintainDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="日常检查记录-下载">
                 <p:ajax event="open" listener="#{assetDetailExportController.initOpenDialog}" update="nurseSiteMaintainForm" onsuccess="window.location.hash='#header'"></p:ajax>
                 <p:ajax event="close" listener="#{assetDetailExportController.closeOpenDialog}" update="nurseSiteMaintainForm"  onsuccess="window.location.hash='returnButton'"></p:ajax>
                 <h:form id="nurseSiteMaintainForm">

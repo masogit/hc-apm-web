@@ -2266,16 +2266,30 @@ public class NurseSiteMaintainService {
 	}
 	private List<NurseSiteMaintainExport> getNurseSiteMaintainExport(String assetUid, Date startDate, Date endDate){
 		List<NurseSiteMaintainItem> maintainItemDataList = nurseSiteMaintainItemRepository.getMaintainItemDataList(assetUid, startDate, endDate);
+		if(CollectionUtils.isEmpty(maintainItemDataList)) return null;
+		Set<String> collect1 = maintainItemDataList.stream().map(item -> item.getParentId()).collect(Collectors.toSet());
+		List<NurseSiteMaintain> nurseSiteMaintainList=nurseSiteMaintainRepository.findByIds(collect1);
+		if(CollectionUtils.isEmpty(nurseSiteMaintainList)) return null;
+		Map<String, String>  signatureIds = nurseSiteMaintainList.stream().collect(Collectors.toMap(NurseSiteMaintain::getId, NurseSiteMaintain::getSignatureId));
+		Map<String, String> signatureIdMap=signatureIds;
 		List<NurseSiteMaintainExport> collect = maintainItemDataList.stream().map(item -> {
 			NurseSiteMaintainExport nurseSiteMaintainExport = new NurseSiteMaintainExport();
 			nurseSiteMaintainExport.setScheduleDate(item.getScheduleDate());
 			nurseSiteMaintainExport.setCheckDate(item.getCheckDate());
 			nurseSiteMaintainExport.setPrincipal(getUserName(item.getCreateByUid()));
 			nurseSiteMaintainExport.setChecker(getUserName(item.getUpdateByUid()));
-			nurseSiteMaintainExport.setSignatureId(item.getSignatureId());
+			String signatureId="";
+			if(signatureIdMap.containsKey(item.getParentId())){
+				 signatureId=signatureIdMap.get(item.getParentId());
+			}
+			nurseSiteMaintainExport.setSignatureId(signatureId);
 			nurseSiteMaintainExport.setComment(item.getComment());
 			nurseSiteMaintainExport.setCheckData(getNurseSiteMaintainData(item.getId()));
 			return nurseSiteMaintainExport;
+		}).sorted((m1,m2)->{
+			Date scheduleDate = m1.getScheduleDate()== null?new Date():m1.getScheduleDate();
+			Date scheduleDate1 =m2.getScheduleDate()== null?new Date():m2.getScheduleDate();
+			return scheduleDate.compareTo(scheduleDate1);
 		}).collect(Collectors.toList());
 		return collect;
 	}

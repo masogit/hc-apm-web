@@ -38,34 +38,7 @@ public class AssetOptRecordExport {
 
     public String getCostTime(){
 
-        if(startDate == null){
-            return "";
-        }
-        LocalDateTime localDateTimeStart = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        LocalDateTime localDateTimeEnd =null;
-        if(endDate == null){
-            localDateTimeEnd=LocalDateTime.now();
-        }else{
-            localDateTimeEnd = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-        long year= ChronoUnit.YEARS.between(localDateTimeStart,localDateTimeEnd);
-        long day=ChronoUnit.DAYS.between(localDateTimeStart,localDateTimeEnd)%356;
-        long hour=ChronoUnit.HOURS.between(localDateTimeStart,localDateTimeEnd);
-        long minute=ChronoUnit.MINUTES.between(localDateTimeStart,localDateTimeEnd);
-        StringBuilder sb=new StringBuilder();
-        if(year>0){
-            sb.append(year+"年");
-        }
-        if(day>0){
-            sb.append(day+"天");
-        }
-        if(hour>0){
-            sb.append(hour+"时");
-        }
-        if(minute>0){
-            sb.append(minute+"分");
-        }
-        return sb.toString();
+      return costTime;
     }
 
     public Date getStartDate() {
