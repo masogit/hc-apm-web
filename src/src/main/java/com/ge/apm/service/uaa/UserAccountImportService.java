@@ -3,7 +3,6 @@ package com.ge.apm.service.uaa;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,51 +55,49 @@ public class UserAccountImportService {
 	private static final String HEADER_TELEPHONE="电话";
 	private static final String HEADER_ISACTIVE="激活?*";
 	private static final String HEADER_ISLOCKED="锁定?*";
+	private static final String HEADER_ISDISABLE="停用?*";
 	private static final String HEADER_ROLENAME="角色*";
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
 	private static final String HEADER_POSITION="职务";
 	private static final String HEADER_TAGS="标签";
 	private static final String HEADER_PASSWORD= getEncryptedPass();
 	private static final String HEADER_UUID="UUID";
-	private static final String SHEET_USER="datalist";
 	private static final String ROLE_GUEST="仅报修权限账号";
 	private static Map<String,Integer> sysRoleMap;
-	private Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
-	private Map<String,OrgInfo> mapUidOrgInfo=new HashMap<String,OrgInfo>();
-	private Map<String,TenantInfo> mapUidTenantInfo=new HashMap<String,TenantInfo>();
+	private Map<String,OrgInfo> mapOrgInfo=new HashMap<>();
+	private Map<String,OrgInfo> mapUidOrgInfo=new HashMap<>();
+	private Map<String,TenantInfo> mapUidTenantInfo=new HashMap<>();
 	private OrgInfo orgInfoTemp;
 	private int successCount;
 	private int failedCount;
-	private int existsCount;
-	private int recordCount;
 	boolean isInsulate=false;
 	boolean isCreate=true;
 	UserAccount currentUser;
-	
+
 	@Autowired
 	UserAccountMapper userAccountMapper;
-	
+
 	@Autowired
 	UserAccountRepository userAccountRepository;
 
 	@Autowired
 	AssetInfoMapper assetInfoMapper;
-	
+
 	@Autowired
 	TenantInfoRepository tenantInfoRepository;
-	
+
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
 
 	@Autowired
 	UserOrgInfoRepository userOrgDao;
-	
+
 	@Autowired
 	UserOrgInfoRepository userOrgInfoRepository;
-	
+
 	@Autowired
 	SysRoleRepository sysRoleRepository;
-	
+
 	@Autowired
 	UserRoleRepository userRoleRepository;
 
@@ -120,11 +117,7 @@ public class UserAccountImportService {
 		return userAccountMapper.getUserByLoginName(loginName) != null ? true : false;
 	}
 	private boolean checkData(UserAccount newUser){
-		boolean pass=true;
-		if(StringUtils.isNotEmpty(newUser.getStatus())){
-			pass=false;
-		}
-		return pass;
+		return !StringUtils.isNotEmpty(newUser.getStatus());
 	}
 	private boolean handleNewUser(UserAccount newUser,String institution,String hospital,String site,String department,String department2,String department3,TenantInfo tenantInfo) throws NoSuchAlgorithmException {
 		//get all user
@@ -155,7 +148,7 @@ public class UserAccountImportService {
 
 		return null;
 	}
-	
+
 	private UserAccount checkNewUser(UserAccount newUser,TenantInfo tenantInfo) throws NoSuchAlgorithmException {
 		String loginName=newUser.getLoginName();
 		String telephone=newUser.getTelephone();
@@ -164,7 +157,6 @@ public class UserAccountImportService {
 			//create
 			isCreate=true;
 			if(isExistsByLoginName(loginName)){
-				existsCount++;
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME_EXISTS,"用户名已存在");
 				return newUser;
 			}
@@ -316,7 +308,7 @@ public class UserAccountImportService {
 		}
 		return temp;
 	}
-	
+
 	private OrgInfo getOrgInfoByDepartmentKeyParent(String name,String uid){
 		OrgInfo temp=null;
 		String key=name+uid;
@@ -349,23 +341,6 @@ public class UserAccountImportService {
 			return;
 		}
 		newUser.setSiteId(tenantInfo.getId());
-//		if(isInsulate){
-//			newUser.setInstitutionUID(currentUser.getInstitutionUID());
-//			newUser.setHospitalUID(currentUser.getHospitalUID());
-//			orgInfoTemp=getOrgInfoByMappingUid(currentUser.getHospitalUID());
-////			newUser.setSiteUID(currentUser.getSiteUID());
-////			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getSiteUID());
-//			newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
-//			newUser.setOrgType(orgInfoTemp.getOrgType());
-//			if(getSiteID(newUser, site)){
-//				if(getDepartmentID(newUser, department,isInsulate)){
-//					if(getDepartmentIDParent(newUser, department+"-"+department2,isInsulate)){
-//						if(getDepartmentIDParent(newUser,department+"-"+department2+"-"+department3,isInsulate)){
-//						}
-//					}
-//				}
-//			}
-//		}
 		if (getInstitutionID(newUser, institution, isInsulate)) {
 			if (getHospitalID(newUser, hospital, isInsulate)) {
 				if (getSiteID(newUser, site, isInsulate)) {
@@ -388,9 +363,9 @@ public class UserAccountImportService {
 		}
 		newUser.setOrgInfoUID(orgInfoTemp.getUid());
 		newUser.setOrgInfoId(orgInfoTemp.getId());
-		
+
 	}
-	
+
 	private boolean hasControllerOrgInfo(OrgInfo tempOrgInfo,String userOrgInfoUid){
 		while(tempOrgInfo!=null){
 			if(tempOrgInfo.getUid().equals(userOrgInfoUid)){
@@ -400,7 +375,7 @@ public class UserAccountImportService {
 		}
 		return false;
 	}
-	
+
 	private boolean getInstitutionID(UserAccount newUser,String institution,boolean isInsulate){
 		OrgInfo temp=getOrgInfoByInstitutionKey(institution, orgInfoTemp.getUid());
 		if(temp==null){
@@ -483,7 +458,7 @@ public class UserAccountImportService {
 		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
 	}
-	
+
 	private boolean getDepartmentIDParent(UserAccount newUser,String department,boolean isInsulate){
 		OrgInfo temp=getOrgInfoByDepartmentKeyParent(department, orgInfoTemp.getUid());
 		if(temp==null){
@@ -499,16 +474,16 @@ public class UserAccountImportService {
 		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
 	}
-	
+
 	private boolean supplementUserRole(UserAccount user){
 		String roleName=user.getImportRoleNames();
-		List<UserRole> listRole=new ArrayList<UserRole>();
+		List<UserRole> listRole=new ArrayList<>();
 		if(StringUtils.isEmpty(roleName)){
 			user.setStatusDisplay(UploadFileErrorTypeEnum.ROLE,"角色不能为空;");
 			return false;
 		}
 		else{
-			String roleNames[]=roleName.split("[,， ]");
+			String[] roleNames =roleName.split("[,， ]");
 			for(int i=0;i<roleNames.length;++i){
 				String tempRoleName=roleNames[i];
 				if(StringUtils.isEmpty(tempRoleName)){
@@ -533,49 +508,47 @@ public class UserAccountImportService {
 		user.setListImportUserRole(listRole);
 		return true;
 	}
-	
+
 	private boolean supplementUserRoleWithUserId(UserAccount user){
 		List<UserRole> listUserRole=user.getListImportUserRole();
-		if(listUserRole!=null && listUserRole.size()>0){
-			for(int i=0;i<listUserRole.size();++i){
-				listUserRole.get(i).setUserId(user.getId());
+		if(listUserRole!=null && !listUserRole.isEmpty()){
+			for (UserRole userRole : listUserRole) {
+				userRole.setUserId(user.getId());
 			}
 		}
 		return true;
 	}
-	
+
 	private void supplementOriginUserOrgInfo(UserAccount user){
 		List<UserOrgInfo> listUserOrgInfo=user.getListUserOrgInfo();
-		if(listUserOrgInfo==null||listUserOrgInfo.size()==0){
+		if(listUserOrgInfo==null||listUserOrgInfo.isEmpty()){
 			listUserOrgInfo=userOrgInfoRepository.findByUserUid(user.getUid());
 			user.setListUserOrgInfo(listUserOrgInfo);
 		}
 	}
-	
+
 	private void supplementOriginUserRole(UserAccount user){
 		List<UserRole> listUserRole=user.getUserRoleList();
-		if(listUserRole==null||listUserRole.size()==0){
+		if(listUserRole==null||listUserRole.isEmpty()){
 			listUserRole=userRoleRepository.findByUserId(user.getId());
 			user.setUserRoleList(listUserRole);
 		}
 	}
-	
+
 	private Map<String,Integer>getRoleNameMap(){
 		if(sysRoleMap!=null){
 			return sysRoleMap;
 		}
 		Iterable<SysRole> listSysRole=sysRoleRepository.findAll();
 		if(listSysRole!=null){
-			sysRoleMap=new HashMap<String,Integer>();
-			Iterator<SysRole> itSysRole=listSysRole.iterator();
-			while(itSysRole.hasNext()){
-				SysRole tempSysRole=itSysRole.next();
+			sysRoleMap=new HashMap<>();
+			for (SysRole tempSysRole : listSysRole) {
 				sysRoleMap.put(tempSysRole.getRoleDesc(), tempSysRole.getId());
 			}
 		}
 		return sysRoleMap;
 	}
-	
+
 	private boolean addUserAccessScope(UserAccount user,OrgInfo tempOrgInfo,boolean showError){
 		if(tempOrgInfo==null){
 			if(showError){
@@ -586,7 +559,7 @@ public class UserAccountImportService {
 		else{
 			List<UserOrgInfo> listUserOrgInfo=user.getListImportUserOrgInfo();
 			if(listUserOrgInfo==null){
-				listUserOrgInfo=new ArrayList<UserOrgInfo>();
+				listUserOrgInfo=new ArrayList<>();
 				user.setListImportUserOrgInfo(listUserOrgInfo);
 			}
 			Integer orgType=tempOrgInfo.getOrgType();
@@ -601,13 +574,12 @@ public class UserAccountImportService {
 		}
 		return true;
 	}
-	
+
 	private void addClinicalUserOrg(List<UserOrgInfo> listUserOrgInfo,OrgInfo tempOrgInfo,String userUid){
 		List<OrgInfo> listOrgInfo=orgInfoRepository.fetchOrgByParentUid(tempOrgInfo.getUid());
 		if(listOrgInfo!=null){
-			for(int i=0;i<listOrgInfo.size();++i){
-				OrgInfo tempOrg=listOrgInfo.get(i);
-				UserOrgInfo tempUserOrgInfo=new UserOrgInfo();
+			for (OrgInfo tempOrg : listOrgInfo) {
+				UserOrgInfo tempUserOrgInfo = new UserOrgInfo();
 				tempUserOrgInfo.setOrgType(tempOrg.getOrgType());
 				tempUserOrgInfo.setOrgUid(tempOrg.getUid());
 				tempUserOrgInfo.setUserUid(userUid);
@@ -615,7 +587,7 @@ public class UserAccountImportService {
 			}
 		}
 	}
-	
+
 	private boolean supplementAccessScope(UserAccount user){
 		if(StringUtils.isEmpty(user.getDepartName()) && StringUtils.isEmpty(user.getDepartName2()) && StringUtils.isEmpty(user.getDepartName3())){
 			OrgInfo tempOrgInfo=null;
@@ -710,29 +682,26 @@ public class UserAccountImportService {
 		}
 		return true;
 	}
-	
+
 	private void initParam(){
 		mapOrgInfo.clear();
 		mapUidOrgInfo.clear();
 		mapUidTenantInfo.clear();
 	}
-	
-	public List<UserAccount> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
-//		 SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+
+	public List<UserAccount> handleExcel(UploadedFile file, UserAccount user) throws IOException {
 		initParam();
 		getRoleNameMap();
 		currentUser=user;
 		TenantInfo tenantInfo=tenantInfoRepository.findByuid(user.getTenantUID());
 		if(tenantInfo!=null && tenantInfo.getInsulate()!=null){
 			isInsulate=tenantInfo.getInsulate();
-			if(isInsulate){
-				if(!UserContextService.isOnlyLocalITAdmin()){
-					isInsulate=false;
-				}
+			if(isInsulate && !UserContextService.isOnlyLocalITAdmin()){
+				isInsulate=false;
 			}
 		}
-		List<UserAccount> importFailedDataList = new ArrayList<UserAccount>();
-		
+		List<UserAccount> importFailedDataList = new ArrayList<>();
+
 		Workbook workbook = null;
 		if(file.getFileName().toLowerCase().endsWith(".xls")){
 			workbook=new HSSFWorkbook(file.getInputstream());
@@ -740,31 +709,14 @@ public class UserAccountImportService {
 		else if(file.getFileName().toLowerCase().endsWith(".xlsx")){
 			workbook=new XSSFWorkbook(file.getInputstream());
 		}
-		
+
 		Sheet sheet = workbook.getSheetAt(0);
 		if (sheet == null) {
-			return null;
+			return Collections.emptyList();
 		}
-//		List<String> headers = new ArrayList<>();
-//		headers.add(HEADER_INSTITUTION);
-//		headers.add(HEADER_HOSPITAL);
-//		headers.add(HEADER_SITE);
-//		headers.add(HEADER_DEPARTMENT);
-//		headers.add(HEADER_DEPARTMENT2);
-//		headers.add(HEADER_DEPARTMENT3);
-//		headers.add(HEADER_LOGINNAME);
-//		headers.add(HEADER_NAME);
-//		headers.add(HEADER_EMAIL);
-//		headers.add(HEADER_TELEPHONE);
-//		headers.add(HEADER_ISACTIVE);
-//		headers.add(HEADER_ISLOCKED);
-//		headers.add(HEADER_ROLENAME);
-//		headers.add(HEADER_ACCESSSCOPE);
-//		headers.add(HEADER_PASSWORD);
-//		headers.add(HEADER_UUID);
 		Map<String, Integer> header = ExcelParser.findFirstRowHeader(sheet);
 		if (header.isEmpty()) {
-			return null;
+			return Collections.emptyList();
 		}
 		String institution;
 		String hospital;
@@ -778,6 +730,7 @@ public class UserAccountImportService {
 		String telephone;
 		boolean isActive;
 		boolean isLocked;
+		boolean isDisable;
 		String roleName;
 		String accessScope;
 		String position;
@@ -795,9 +748,10 @@ public class UserAccountImportService {
 		int nameIndex=header.get(HEADER_NAME);
 		int emailIndex=header.get(HEADER_EMAIL);
 		int telephoneIndex=header.get(HEADER_TELEPHONE);
-		int isactiveIndex=header.get(HEADER_ISACTIVE);
-		int islockedIndex=header.get(HEADER_ISLOCKED);
-		int rolenameIndex=header.get(HEADER_ROLENAME);
+		int isaCtiveIndex=header.get(HEADER_ISACTIVE);
+		int isLockedIndex=header.get(HEADER_ISLOCKED);
+		int isDisableIndex=header.get(HEADER_ISDISABLE);
+		int roleNameIndex=header.get(HEADER_ROLENAME);
 		int accessScopeIndex=header.get(HEADER_ACCESSSCOPE);
 		int positionIndex=header.get(HEADER_POSITION);
 		int tagsIndex=header.get(HEADER_TAGS);
@@ -811,8 +765,7 @@ public class UserAccountImportService {
 			if (row == null) {
 				continue;
 			}
-			boolean pass=true;
-			UserAccount newUser = new UserAccount();			
+			UserAccount newUser = new UserAccount();
 			try {
 				newUser.setExcelIdex(j + 1);
 				newUser.setTenantUID(user.getTenantUID());
@@ -824,12 +777,11 @@ public class UserAccountImportService {
 				department3=ExcelParser.getCellStringValue(row, departmentIndex3);
 				loginName=ExcelParser.getCellStringValue(row, loginnameIndex);
 				if(loginName!=null && loginName.length()>0){
-					boolean canParseDouble=false;
+					boolean canParseDouble;
 					try {
 						Double.parseDouble(loginName);
 						canParseDouble=true;
 					} catch (Exception e) {
-						// TODO: handle exception
 						canParseDouble=false;
 					}
 					if(canParseDouble){
@@ -841,21 +793,13 @@ public class UserAccountImportService {
 				name=ExcelParser.getCellStringValue(row, nameIndex);
 				email=ExcelParser.getCellStringValue(row, emailIndex);
 				telephone=ExcelParser.getCellStringValue(row, telephoneIndex);
-				String strActive=ExcelParser.getCellStringValue(row, isactiveIndex);
-				if(StringUtils.isNotEmpty(strActive)&& strActive.equals("是")){
-					isActive=true;
-				}
-				else{
-					isActive=false;
-				}
-				String strLocked=ExcelParser.getCellStringValue(row, islockedIndex);
-				if(StringUtils.isNotEmpty(strLocked)&& strLocked.equals("否")){
-					isLocked=false;
-				}
-				else{
-					isLocked=true;
-				}
-				roleName=ExcelParser.getCellStringValue(row, rolenameIndex);
+				String strActive=ExcelParser.getCellStringValue(row, isaCtiveIndex);
+				isActive= StringUtils.isNotEmpty(strActive) && "是".equals(strActive);
+				String strLocked=ExcelParser.getCellStringValue(row, isLockedIndex);
+				isLocked= !StringUtils.isNotEmpty(strLocked) || !"否".equals(strLocked);
+				String strDisable=ExcelParser.getCellStringValue(row, isDisableIndex);
+				isDisable = !StringUtils.isNotEmpty(strDisable) || !"否".equals(strDisable);
+				roleName=ExcelParser.getCellStringValue(row, roleNameIndex);
 				accessScope=ExcelParser.getCellStringValue(row, accessScopeIndex);
 
 				position=ExcelParser.getCellStringValue(row, positionIndex);
@@ -865,12 +809,7 @@ public class UserAccountImportService {
 				password = ObjectUtil.isNotEmpty(passwordIndex) ? ExcelParser.getCellStringValue(row, passwordIndex) : "";
 
 				UUID = ObjectUtil.isNotEmpty(uuidIndex) ? ExcelParser.getCellStringValue(row, uuidIndex) : "";
-				
-				if(!pass){
-					importFailedDataList.add(newUser);
-					failedCount++;
-					continue;
-				}
+
 				newUser.setLoginName(loginName);
 				newUser.setName(name);
 				newUser.setEmail(email);
@@ -891,7 +830,7 @@ public class UserAccountImportService {
 					newUser.setActiveTime(new Date());
 				}
 				newUser.setIsLocked(isLocked);
-//				newUser.setUserRoleList(userRoleList);
+				newUser.setIsDisable(isDisable);
 				newUser.setUid(UUID);
 				newUser.setInstitutionName(institution);
 				newUser.setHospitalName(hospital);
@@ -909,22 +848,14 @@ public class UserAccountImportService {
 					String checkResult = PasswordUtil.checkPwd(password.trim());
 					if(!StringUtils.isEmpty(checkResult)) {
 						newUser.setStatusDisplay(UploadFileErrorTypeEnum.PASSWORD,checkResult);
-						pass=false;
 					} else {
 						newUser.setPlainPassword(password.trim());
 						newUser.entryptPassword();
 					}
-
 				}
-				
-//				if(StringUtils.isEmpty(institution)){
-//					newUser.setStatusDisplay(UploadFileErrorTypeEnum.INSTITUTION,"所属集团不能为空;");
-//					pass=false;
-//				}
-				
+
 				if(StringUtils.isEmpty(loginName)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"登录名不能为空;");
-					pass=false;
 				} else {
 					if (loginNameList.contains(loginName)) {
 						newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"Excel 表中登录名重复;");
@@ -934,37 +865,26 @@ public class UserAccountImportService {
 				}
 				if(StringUtils.isEmpty(name)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.NAME,"姓名不能为空;");
-					pass=false;
 				}
 				if(StringUtils.isEmpty(strActive)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.IS_ACTIVED,"激活值不能为空;");
-					pass=false;
 				}
 				if(StringUtils.isEmpty(strLocked)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.IS_LOCKED,"锁定值不能为空;");
-					pass=false;
 				}
-				if(StringUtils.isNotEmpty(department3)){
-					if(StringUtils.isEmpty(department2)){
-						newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
-						pass=false;
-					}
+				if(StringUtils.isNotEmpty(department3) && StringUtils.isEmpty(department2)){
+				    newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
 				}
-				if(StringUtils.isNotEmpty(department2)){
-					if(StringUtils.isEmpty(department)){
-						newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
-						pass=false;
-					}
+				if(StringUtils.isNotEmpty(department2) && StringUtils.isEmpty(department)){
+				    newUser.setStatusDisplay(UploadFileErrorTypeEnum.DEPARTMENT_ERROR,"科室错误;");
 				}
 				if (StringUtils.isNotEmpty(email) && !emailValidator.isValid(email)) {
 					newUser.setEmail(null);
-//                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"邮件地址无效");
                 }
 				if(StringUtils.isEmpty(roleName)){
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.ROLE,"角色不能为空;");
-					pass=false;
 				}
-				
+
 				if(!handleNewUser(newUser, institution, hospital, site, department, department2, department3, tenantInfo)){
 					importFailedDataList.add(newUser);
 					failedCount++;
@@ -989,34 +909,26 @@ public class UserAccountImportService {
 		}
 
 		// use space or comma as delimiter
-		List<String> tags = Arrays.stream(tagsJoined.split("[, ]"))
+		return Arrays.stream(tagsJoined.split("[, ]"))
 				.filter(item -> !StringUtils.isEmpty(item))
-				.map(item -> item.trim())
+				.map(String::trim)
 				.collect(Collectors.toList());
-		return tags;
 	}
 
 	private void addWarnMessage(){
-		FacesMessage message=null;
-		message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败！");
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败！");
         FacesContext.getCurrentInstance().addMessage(null, message);
         successCount=0;
         failedCount=0;
-        existsCount=0;
 	}
-	
+
 	@Transactional
 	public void createUser(UserAccount user) {
 		if(user.getId()!=null){
 			updateUser(user);
 			return;
 		}
-
-        TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
-		//TODO nickName
 		try {
-
-
 			user.setCreatedBy(currentUser.getLoginName());
 			user.setCreatedDate(new Date());
 			user.setLastModifiedBy(user.getCreatedBy());
@@ -1055,21 +967,19 @@ public class UserAccountImportService {
 		});
 
 		//remove useless tags
-		removeTags.stream().distinct().forEach(item -> {
-			userTagsMapper.removeTag(user.getUid(), item);
-		});
+		removeTags.stream().distinct().forEach(item -> userTagsMapper.removeTag(user.getUid(), item));
 
 	}
 
 	private void deleteUserRole(UserAccount user){
 		List<UserRole> listUserRole=user.getUserRoleList();
-		if(listUserRole!=null && listUserRole.size()>0 && user.getListImportUserRole()!=null && user.getListImportUserRole().size()>0){
-			for(int i=0;i<listUserRole.size();++i){
-				userAccountMapper.deleteUserRole(listUserRole.get(i));
+		if(listUserRole!=null && !listUserRole.isEmpty() && user.getListImportUserRole()!=null && !user.getListImportUserRole().isEmpty()){
+			for (UserRole userRole : listUserRole) {
+				userAccountMapper.deleteUserRole(userRole);
 			}
 		}
 	}
-	
+
 	private void saveUserRole(UserAccount user,boolean create){
 		if(!create){
 			//delete before save
@@ -1078,33 +988,32 @@ public class UserAccountImportService {
 		}
 		supplementUserRoleWithUserId(user);
 		List<UserRole> listUserRole=user.getListImportUserRole();
-		if(listUserRole!=null && listUserRole.size()>0){
-			for(int i=0;i<listUserRole.size();++i){
-				userAccountMapper.saveUserRole(listUserRole.get(i));
+		if(listUserRole!=null && !listUserRole.isEmpty()){
+			for (UserRole userRole : listUserRole) {
+				userAccountMapper.saveUserRole(userRole);
 			}
 		}
 	}
-	
+
 	private void deleteUserOrgInfo(UserAccount user){
 		List<UserOrgInfo> listUserOrgInfo=user.getListUserOrgInfo();
-		if(listUserOrgInfo!=null && listUserOrgInfo.size()>0 && user.getListImportUserOrgInfo()!=null && user.getListImportUserOrgInfo().size()>0){
+		if(listUserOrgInfo!=null && !listUserOrgInfo.isEmpty() && user.getListImportUserOrgInfo()!=null && !user.getListImportUserOrgInfo().isEmpty()){
 			userOrgInfoRepository.delete(listUserOrgInfo);
 		}
 	}
-	
+
 	private void saveUserOrgInfo(UserAccount user,boolean create){
 		if(!create){
 			supplementOriginUserOrgInfo(user);
 			deleteUserOrgInfo(user);
 		}
 		List<UserOrgInfo> listUserOrgInfo=user.getListImportUserOrgInfo();
-		if(listUserOrgInfo!=null && listUserOrgInfo.size()>0){
+		if(listUserOrgInfo!=null && !listUserOrgInfo.isEmpty()){
 			userOrgInfoRepository.save(listUserOrgInfo);
 		}
 	}
-	
+
 	private void updateUser(UserAccount user) {
-		//TODO nickName
 		try {
 			//save
 			user.setLastModifiedBy(currentUser.getLoginName());
@@ -1117,141 +1026,9 @@ public class UserAccountImportService {
 			saveOrUpdateTags(user);
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error("update user error : {}", e.getMessage());
 		}
 	}
-	//not remove
-	private void supplementAccessScope(List<UserAccount> listUserAccount,List<UserOrgInfo> listUserOrgInfo){
-		Set<String> setAccessOrgUid=new HashSet<String>();
-		Map<String,List<OrgInfo>> mapUserAccessScope=new HashMap<String,List<OrgInfo>>();
-		Map<String,List<UserOrgInfo>> mapUserOrgInfo=new HashMap<String,List<UserOrgInfo>>();
-		Map<String,Set<String>> mapUserAccessScopeUid=new HashMap<String,Set<String>>();
-		List<OrgInfo> listOrgInfo=null;
-		if(listUserOrgInfo!=null){
-			for(int i=0;i<listUserOrgInfo.size();++i){
-				UserOrgInfo tempUserOrg=listUserOrgInfo.get(i);
-				String tempUserUid=tempUserOrg.getUserUid();
-				if(mapUserOrgInfo.containsKey(tempUserUid)){
-					mapUserOrgInfo.get(tempUserUid).add(tempUserOrg);
-				}
-				else{
-					List<UserOrgInfo> tempListUserOrg=new ArrayList<UserOrgInfo>();
-					tempListUserOrg.add(tempUserOrg);
-					mapUserOrgInfo.put(tempUserUid, tempListUserOrg);
-				}
-			}
-		}
-		if(mapUserOrgInfo.size()>0){
-			mapUserAccessScopeUid=supplementAccessOrgUid(mapUserOrgInfo);
-			if(mapUserAccessScopeUid.size()>0){
-				for(Set<String> tempSet: mapUserAccessScopeUid.values()){
-					setAccessOrgUid.addAll(tempSet);
-				}
-			}
-		}
-		if(setAccessOrgUid.size()>0){
-			listOrgInfo=orgInfoRepository.findByUids(setAccessOrgUid);
-		}
-		if(listOrgInfo!=null){
-			Iterator<String> tempIt=mapUserAccessScopeUid.keySet().iterator();
-			while(tempIt.hasNext()){
-				String key=tempIt.next();
-				Set<String> setValue=mapUserAccessScopeUid.get(key);
-				if(setValue!=null){
-					Iterator<String> tempInnerIt=setValue.iterator();
-					List<OrgInfo> listTempOrgInfo=new ArrayList<OrgInfo>();
-					while(tempInnerIt.hasNext()){
-						String tempAccessUid=tempInnerIt.next();
-						if(StringUtils.isNotEmpty(tempAccessUid)){
-							for(int i=0;i<listOrgInfo.size();++i){
-								OrgInfo tempOrgInfo=listOrgInfo.get(i);
-								String tempOrgUid=tempOrgInfo.getUid();
-								if(tempAccessUid.equals(tempOrgUid)){
-									listTempOrgInfo.add(tempOrgInfo);
-								}
-							}
-						}
-					}
-					mapUserAccessScope.put(key, listTempOrgInfo);
-				}
-			}
-		}
-		if(mapUserAccessScope.size()>0){
-			for(int i=0;i<listUserAccount.size();++i){
-				UserAccount tempUser=listUserAccount.get(i);
-				String tempUserUid=tempUser.getUid();
-				Iterator<String> tempIt=mapUserAccessScope.keySet().iterator();
-				while(tempIt.hasNext()){
-					String tempKey=tempIt.next();
-					if(tempUserUid.equals(tempKey)){
-						tempUser.setListOrgInfo(mapUserAccessScope.get(tempKey));
-					}
-				}
-			}
-		}
-	}
-	
-	//don't remove
-	private Map<String,Set<String>> supplementAccessOrgUid(Map<String,List<UserOrgInfo>> mapUserOrgInfo){
-		Map<String,Set<String>> mapResult=new HashMap<String,Set<String>>();
-		if(mapUserOrgInfo.size()>0){
-			Iterator<String> it=mapUserOrgInfo.keySet().iterator();
-			while(it.hasNext()){
-				String key=it.next();
-				List<UserOrgInfo> value=mapUserOrgInfo.get(key);
-				if(value!=null){
-					//remove
-//					if(value.size()==1){
-//						UserOrgInfo tempUserOrg=value.get(0);
-//						if(tempUserOrg.getOrgType()!=4){
-//							Set<String> deepOrgUid=orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(tempUserOrg.getOrgUid());
-//							if(deepOrgUid!=null){
-//								mapResult.put(key, deepOrgUid);
-//							}
-//							//all access
-////							else{
-////								deepOrgUid=new HashSet<String>();
-////								mapResult.put(key, deepOrgUid);
-////							}
-////							deepOrgUid.add(tempUserOrg.getOrgUid());
-//						}
-//						else{
-//							mapResult.put(key, convertUserOrgToUid(value));
-//						}
-//					}
-//					else{
-//						mapResult.put(key, convertUserOrgToUid(value));
-//					}
-					mapResult.put(key, convertUserOrgToUid(value));
-				}
-			}
-		}
-		return mapResult;
-	}
-	
-	private Set<String> convertUserOrgToUid(List<UserOrgInfo> listUserOrg){
-		Set<String> result=new HashSet<String>();
-		if(listUserOrg!=null){
-			for(int i=0;i<listUserOrg.size();++i){
-				result.add(listUserOrg.get(i).getOrgUid());
-			}
-		}
-		return result;
-	}
-	
-	private String getOrgInfoName(List<OrgInfo> listOrgInfo){
-		String result="";
-		if(listOrgInfo!=null){
-			for(int i=0;i<listOrgInfo.size();++i){
-				String name=listOrgInfo.get(i).getName();
-				if(StringUtils.isNotEmpty(name)){
-					result+=name+",";
-				}
-			}
-		}
-		if(result.length()>0){
-			result=result.substring(0, result.length()-1);
-		}
-		return result;
-	}
+
 }
