@@ -326,19 +326,21 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1+"));
                         }
                     }else if("all".equals(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString()));
-                        /*if(searchFilters.size() > 0) {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1*2+"));
+                        if(searchFilters.size() > 0) {
+                            /*searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1*2+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1*2+"));*/
                             searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
                             searchFilters.add(new SearchFilter("commercialAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1*2+"));
                         }else {
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1+"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1+"));
+                            /*searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(),"1+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.CommercialPending.toString(),"1+"));*/
                             searchFilters.add(new SearchFilter("commercialAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
                             searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1+"));
 
-                        }*/
+
+                        }
                     }
                 }
             }
