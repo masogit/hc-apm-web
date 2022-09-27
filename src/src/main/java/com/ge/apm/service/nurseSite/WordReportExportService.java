@@ -55,7 +55,7 @@ public class WordReportExportService {
             }else {
                  name = maintain.getName()+"-"+sequence;
             }
-            name += year;
+            name = name  + " " + year;
             if(listMap.containsKey(name)){
                 listMap.get(name).add(maintain);
                 listMap.put(name,listMap.get(name));
@@ -176,7 +176,7 @@ public class WordReportExportService {
         List<byte[]> reports= null;
         Map<String,List<NurseSiteMaintainHistory>>listMap = new LinkedHashMap<>();
         for (NurseSiteMaintainHistory maintain : listMaintain) {
-            String name = maintain.getName() + DateFormatUtils.format(maintain.getScheduleDate(), "yyyy");
+            String name = maintain.getName() + " " + DateFormatUtils.format(maintain.getScheduleDate(), "yyyy");
             if(listMap.containsKey(name)){
                 listMap.get(name).add(maintain);
                 listMap.put(name,listMap.get(name));
