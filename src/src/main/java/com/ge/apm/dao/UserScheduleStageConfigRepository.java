@@ -13,5 +13,6 @@ public interface UserScheduleStageConfigRepository extends GenericRepositoryUUID
     public List<UserScheduleStageConfig> findByScheduleDateStageAndSiteUID(String scheduleDateStage, String siteUID);
 
     public List<UserScheduleStageConfig> findBySiteUID(String siteUID);
+    public List<UserScheduleStageConfig> findBySiteUIDAndType(String siteUID,String typeName);
 
 }
