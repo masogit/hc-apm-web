@@ -67,7 +67,7 @@
 
                         <p:column headerText="借用科室" sortBy="#{asset.lease_org_name}" filterBy="#{asset.asset_dept_uid}" filterMatchMode="EQ">
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200" filter="true" filterMatchMode="contains">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{sharedAssetStockController.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
                                 </p:selectOneMenu>
