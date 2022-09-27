@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="configItemEditDlg" widgetVar="configItemEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ConfigItemManage}" height="420" width="650">
+        <p:dialog id="configItemEditDlg" widgetVar="configItemEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ConfigItemManage}" max-height="600" width="520">
             <h:form id="configItemEditForm">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
@@ -18,10 +18,10 @@
                         <label class="label">#{msg.ConfigItemDesc}*</label>
                         <p:inputText id="configItemDesc" value="#{superAdminConfigItemController.selected.description}" disabled="true" style="width: 95%;"/>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <label class="label">#{msg.ConfigItemUseParent}*</label>
                         <p:selectBooleanCheckbox id="isEnabled" value="#{superAdminConfigItemController.selected.userParentConfig}" disabled="true" label="启用" style="color: rgb(170, 170, 170)" />
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                     <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 1}">
                         <label class="label">#{msg.ConfigItemValue}</label>
                         <p:inputTextarea id="valueStr" value="#{superAdminConfigItemController.selected.showValue}"
@@ -68,6 +68,12 @@
                         <p:selectOneMenu value="#{superAdminConfigItemController.selected.showValue}" required="true" style="width: 95%;">
                             <f:selectItems value="#{superAdminConfigItemController.selected.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 8}">
+                        <label class="label">#{msg.ConfigItemValue}</label>
+                        <p:selectManyMenu value="#{superAdminConfigItemController.multiSelected}" required="true" showCheckbox="true" collectionType="java.util.ArrayList" style="width: 95%;">
+                            <f:selectItems value="#{superAdminConfigItemController.selected.enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}"/>
+                        </p:selectManyMenu>
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>

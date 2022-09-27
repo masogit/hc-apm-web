@@ -356,11 +356,4 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         }
     }
 
-    @Override
-    public void onServerEvent(String eventName, Object eventObject) {
-        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
-            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
-            selected.setMedicalApparatusClassification(selectedAuthGroup.getClassificationCode());
-        }
-    }
 }
