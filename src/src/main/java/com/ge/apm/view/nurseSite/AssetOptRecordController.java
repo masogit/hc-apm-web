@@ -198,4 +198,8 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 		this.customRoleAuth = customRoleAuth;
 	}
 
+	public List<AssetOptRecord> getAssetOptRecordList(String assetUid){
+		return service.getAssetOptRecordList(assetUid);
+	}
+
 }
