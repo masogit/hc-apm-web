@@ -193,6 +193,27 @@ public class AssetOptRecordService {
 					collect = bySearchFilter.stream().map(item -> {
 					AssetOptRecordExport export = new AssetOptRecordExport();
 					BeanUtils.copyProperties(item, export);
+						String createByUid = export.getCreateByUid();
+						if(StringUtils.isNotEmpty(createByUid)){
+						UserAccount byUid = userAccountRepository.getByUid(createByUid);
+						if(byUid != null){
+							export.setCreateByUid(byUid.getName());
+						}
+					}
+					String modifyByUid = export.getModifyByUid();
+					if(StringUtils.isNotEmpty(modifyByUid) && item.getEndDate() != null){
+						UserAccount byUid = userAccountRepository.getByUid(modifyByUid);
+						if(byUid != null){
+							export.setCreateByUid(byUid.getName());
+						}
+					}else{
+						export.setCreateByUid("");
+					}
+					if(item.getStartDate() != null && item.getEndDate()!= null){
+						export.setCostTime(generateCostTime(item.getStartDate(),item.getEndDate()));
+					}else{
+						export.setCostTime("");
+					}
 					return export;
 				}).collect(Collectors.toList());
 			}
