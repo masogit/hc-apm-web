@@ -62,6 +62,19 @@ public class UserScheduleService {
     public final static String BATCH_SUCCESS_LIST="SuccessList";   //批量创建成功LIST
     public final static String BATCH_FAILED_LIST="FailedList";   //批量创建失败LIST
 
+    private final static List<UserScheduleStageConfig> DEFAULT_USER_SCHEDULE_STAGE_CONFIG=new ArrayList<>();
+    static {
+        DEFAULT_USER_SCHEDULE_STAGE_CONFIG.add(initConfig("08:00:00","08:00:00",SCHEDULE_STAGE_ALL));
+        DEFAULT_USER_SCHEDULE_STAGE_CONFIG.add(initConfig("12:00:00","13:30:00",SCHEDULE_STAGE_AM));
+        DEFAULT_USER_SCHEDULE_STAGE_CONFIG.add(initConfig("17:00:00","08:00:00",SCHEDULE_STAGE_PM));
+    }
+    private static UserScheduleStageConfig initConfig(String startTime,String endTime,String scheduleDateStage){
+        UserScheduleStageConfig userScheduleStageConfig = new UserScheduleStageConfig();
+        userScheduleStageConfig.setStartTime(startTime);
+        userScheduleStageConfig.setEndTime(endTime);
+        userScheduleStageConfig.setScheduleDateStage(scheduleDateStage);
+        return userScheduleStageConfig;
+    }
     public void saveWork(List<UserAccount> userAccountList, Date startDate, Date endDate, UserSchedule userSchedule, boolean isBatch){
 
         Instant startDateInstant = startDate.toInstant();
@@ -515,7 +528,40 @@ public class UserScheduleService {
 
     public void batchDeleteWorkSchedule(List<UserAccount> selectedUserList, Date startBatchDate, Date endBatchDate, UserAccount currentUser, UserSchedule.Type type,List<String> scheduleDateStage) {
         List<String> collect = selectedUserList.stream().map(UserAccount::getUid).collect(Collectors.toList());
-        userScheduleDao.batchDeleteWorkSchedule(collect,startBatchDate,endBatchDate,type.name(),scheduleDateStage);
+        Date date = deleteOneDay(collect, startBatchDate, currentUser, type);
+        if(date.compareTo(endBatchDate) != 1){
+            userScheduleDao.batchDeleteWorkSchedule(collect,startBatchDate,endBatchDate,type.name(),scheduleDateStage);
+        }
+    }
+    private Date deleteOneDay(List<String> userUidCollect,Date startBatchDate, UserAccount currentUser,UserSchedule.Type type){
+        LocalDate localDate = startBatchDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        if(LocalDate.now().compareTo(localDate) == 0){
+            LocalDate nowDate = LocalDate.now();
+            LocalDateTime nowDateTime=LocalDateTime.now();
+            List<UserScheduleStageConfig> bySiteUID = userScheduleStageConfigDao.findBySiteUIDAndType(currentUser.getSiteUID(),type.name());
+            if(CollectionUtils.isEmpty(bySiteUID)) bySiteUID=DEFAULT_USER_SCHEDULE_STAGE_CONFIG;
+            List<String> scheduleDateStage = bySiteUID.stream()
+                    .filter(item -> {
+                        if(StringUtils.isBlank(item.getStartTime()) ) return true;
+                        if(StringUtils.isBlank(item.getEndTime()) ) return true;
+                        LocalTime startTime=LocalTime.parse(item.getStartTime());
+                        LocalTime endTime=LocalTime.parse(item.getEndTime());
+                        int startHour = startTime.getHour();
+                        int endHour = endTime.getHour();
+                        LocalDateTime startDateTime = LocalDateTime.of(nowDate, startTime);
+                        LocalDateTime endDateTime = LocalDateTime.of(nowDate, endTime);
+                        if(startHour >= endHour){
+                            endDateTime=endDateTime.plus(1,ChronoUnit.DAYS);
+                        }
+                        return nowDateTime.isBefore(startDateTime) && nowDateTime.isBefore(endDateTime);
+                    })
+                    .map(item -> item.getScheduleDateStage())
+                    .collect(Collectors.toList());
+            userScheduleDao.batchDeleteWorkSchedule(userUidCollect,startBatchDate,startBatchDate,type.name(),scheduleDateStage);
+            LocalDate plus = localDate.plus(1, ChronoUnit.DAYS);
+            return new Date(plus.getYear(),plus.getMonthValue(),plus.getDayOfMonth());
+        }
+        return startBatchDate;
     }
 
     public boolean isValidateWorkScheduleAndUser(Date scheduleDate, String scheduleDateStage, UserAccount currentUser, String userUID,UserSchedule.Type type) {

@@ -1165,6 +1165,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 item.setIsChecked(lastItem.getIsChecked());
                 itemDao.save(item);
             }
+            medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, lastItem.getMedicalApparatusClassification());
         }
     }
 }
