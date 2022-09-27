@@ -102,10 +102,10 @@
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                             </p:commandButton>
-                            <p:commandButton id="exportPdfButton" title="导出选中记录到PDF" icon="ui-icon-document" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportSelectedToPdf()}" update="datalist" disabled="#{empty assetArrivedListController.selected}" rendered="#{not assetArrivedListEditController.activeSupplier()}">
+                            <p:commandButton id="exportPdfButton" title="导出选中记录到PDF" icon="ui-icon-document" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportSelectedToPdf()}" update="datalist" disabled="#{empty assetArrivedListController.selected}" rendered="#{not assetArrivedListController.activeSupplier()}">
                                 <p:fileDownload value="#{assetArrivedListController.exportPdf}" />
                             </p:commandButton>
-                            <p:commandButton id="exportDocButton" title="导出选中记录到DOC" icon="ui-icon-document" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportArrivalSupplierReportToDoc()}" update="datalist" disabled="#{empty assetArrivedListController.selected}" rendered="#{assetArrivedListEditController.activeSupplier()}">
+                            <p:commandButton id="exportDocButton" title="导出选中记录到DOC" icon="ui-icon-document" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportArrivalSupplierReportToDoc()}" update="datalist" disabled="#{empty assetArrivedListController.selected}" rendered="#{assetArrivedListController.activeSupplier()}">
                                 <p:fileDownload value="#{assetArrivedListController.exportDoc}" />
                             </p:commandButton>
                             

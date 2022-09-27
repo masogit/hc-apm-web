@@ -166,7 +166,7 @@ public class AssetOperationRecordProvider {
 		} else if (tempColumn.equals("assetInfofunctionType")) {
 			sb.append("b.function_type like '%" + value + "%' and ");
 		} else if (tempColumn.equals("serialNum")) {
-			sb.append("(b.serial_num like '%" + value + "%' and ");
+			sb.append("b.serial_num like '%" + value + "%' and ");
 		}else if (tempColumn.equals("assetInfoclinicalDeptName")) {
 			sb.append("(b.clinical_dept_name like '%" + value + "%' or ");
 			sb.append("b.clinical_dept_name_py_code like '%" + value + "%') and ");

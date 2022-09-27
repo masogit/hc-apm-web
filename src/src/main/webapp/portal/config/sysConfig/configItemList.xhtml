@@ -12,6 +12,9 @@
                 color: #fff !important;
                 border: none !important;
             }
+            body.layout-compact .ui-chkbox{
+                width: 18px !important;
+            }
         </style>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
@@ -72,18 +75,17 @@
                             <h:outputText rendered="#{item.valueType == '3'}"
                                           value="#{item.showValue == 'true' ? '是' : '否'}"/>
                             <h:outputText rendered="#{item.valueType == '7'}"
-                                          value="#{systemConfigItemController.transferEnum(item.showValue,item.enumList)}"/>
-                            <h:outputText rendered="#{item.valueType != '3' and item.valueType != '7'}"
+                                          value="#{systemConfigItemController.transferEnum(item.valueType, item.showValue,item.enumList)}"/>
+                            <h:outputText rendered="#{item.valueType == '8'}"
+                                          value="#{systemConfigItemController.transferEnum(item.valueType, item.showValue,item.enumList)}"/>
+                            <h:outputText rendered="#{item.valueType != '3' and item.valueType != '7' and item.valueType != '8'}"
                                           value="#{item.showValue}"/>
                         </p:column>
-                        <p:column headerText="#{msg.ConfigItemUseParent}">
+                        <!--<p:column headerText="#{msg.ConfigItemUseParent}">
                             <h:outputText value="#{item.userParentConfig == 'true' ? '是' : '否'}"/>
-                            <!--<p:selectBooleanButton onLabel="禁用" offLabel="启用" value="#{item.userParentConfig}" style="width:5rem">
-                                <p:ajax event="change" listener="#{configItemController.onSelectSiteTreeNode}" update="datalist" />
-                            </p:selectBooleanButton>-->
-                        </p:column>
+                        </p:column>-->
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":configItemEditDlg" oncomplete="PF('configItemEditDialog').show()" disabled="#{empty systemConfigItemController.selected}" />
+                            <p:commandButton id="editButton" actionListener="#{systemConfigItemController.prepareEdit}" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":configItemEditDlg" oncomplete="PF('configItemEditDialog').show()" disabled="#{empty systemConfigItemController.selected}" />
                         </f:facet>
                     </p:dataTable>
                 </h:form>

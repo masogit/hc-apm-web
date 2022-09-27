@@ -9,6 +9,7 @@ import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -107,26 +108,14 @@ public class SystemClientController extends GenericCRUDUUIDController<SystemClie
             this.selected.setClientSecret(BCrypt.hashpw(this.selected.getPlainPassword(), BCrypt.gensalt()));
         }else{
             if (null == selected.getUid()) {
-                if(StringUtils.isEmpty(this.selectTenant.getInitialPassword())) {
-                    selected.setClientSecret(BCrypt.hashpw(PasswordUtil.DEFAULT_PWD, BCrypt.gensalt()));
-                } else {
-                    selected.setClientSecret(BCrypt.hashpw(this.selectTenant.getInitialPassword(), BCrypt.gensalt()));
-                }
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                WebUtil.addErrorMessage("创建账户时，请输入密码！");
+                return;
             }
         }
         this.selected.setOrgInfo(this.selectSite);
         dao.save(this.selected);
         WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
-    }
-
-    public void resetPassword(){
-        if(StringUtils.isEmpty(this.selectTenant.getInitialPassword())) {
-            selected.setClientSecret(BCrypt.hashpw(PasswordUtil.DEFAULT_PWD, BCrypt.gensalt()));
-        } else {
-            selected.setClientSecret(BCrypt.hashpw(this.selectTenant.getInitialPassword(), BCrypt.gensalt()));
-        }
-        dao.save(this.selected);
-        WebUtil.addSuccessMessage(WebUtil.getMessage("ResetSuccess"));
     }
 
     @Override
@@ -145,6 +134,7 @@ public class SystemClientController extends GenericCRUDUUIDController<SystemClie
         if(null != this.selected && null != this.selected.getOrgInfo()){
             this.selectSite = this.selected.getOrgInfo();
             this.selectTenant = tenantInfoRepository.findByuid(this.selectSite.getTenantUID());
+            this.tenantOrgTreePage = null;
             getTenantOrgTree();
         }
     }
