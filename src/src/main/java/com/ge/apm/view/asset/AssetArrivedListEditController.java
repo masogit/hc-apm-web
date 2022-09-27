@@ -1132,8 +1132,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private void autoFillInfo(){
 
+        if(org.apache.commons.lang.StringUtils.isEmpty(this.selected.getAssetName())
+                || org.apache.commons.lang.StringUtils.isEmpty(this.selected.getFunctionType())){
+            return;
+        }
+
         ArrivalListItem lastItem = itemDao.getLastItemByNameAndModel(this.selected.getAssetName(),
-                StringUtils.isNotEmpty(this.selected.getFunctionType()) ? this.selected.getFunctionType() : "", this.selected.getTenantUID(), this.selected.getId());
+                this.selected.getFunctionType(), this.selected.getTenantUID(), this.selected.getId());
 
         if(lastItem != null){
             List<ArrivalListItem> list = itemDao.findByArrivalListId(selected.getId());
