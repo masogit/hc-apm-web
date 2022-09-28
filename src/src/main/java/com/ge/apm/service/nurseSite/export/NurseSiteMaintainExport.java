@@ -28,6 +28,7 @@ public class NurseSiteMaintainExport implements Serializable {
     private String status;
     private List<NurseSiteMaintainData> checkData;
 
+    private String configId;
     public Date getScheduleDate() {
         return scheduleDate;
     }
@@ -90,6 +91,14 @@ public class NurseSiteMaintainExport implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
     }
 
     @Override

@@ -1,10 +1,8 @@
 package com.ge.apm.service.nurseSite.export;
 
+import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
-import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
-import org.apache.poi.hssf.usermodel.HSSFPatriarch;
-import org.apache.poi.hssf.usermodel.HSSFPicture;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -13,6 +11,8 @@ import org.apache.poi.xssf.usermodel.XSSFDrawing;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -25,18 +25,24 @@ import java.io.InputStream;
 import java.util.*;
 
 public class NurseSiteMaintainExportUtil {
+    private static final Logger log = LoggerFactory.getLogger(NurseSiteMaintainExportUtil.class);
+
     private static final String [] title={"计划检查日期","实际检查日期","负责人","检查人"};
     private static final int offsetRow=4;
-    public  InputStream export(List<Map<String,String>> basicInfo, List<NurseSiteMaintainExport> data, NurseSiteMaintainService siteMaintainService) {
+
+    public  InputStream export(List<Map<String,String>> basicInfo, Map<String, List<NurseSiteMaintainExport>>  data, NurseSiteMaintainService siteMaintainService) {
         Workbook workbook=null;
         ByteArrayOutputStream byteArrayOutputStream=null;
         try {
             workbook= new XSSFWorkbook();
-            Sheet sheet = workbook.createSheet();
-            createAssetBasicInfo(workbook,sheet,basicInfo);
-            List<String> header = new ArrayList<>();
-            createTitle(workbook,sheet);
-            createData(workbook,sheet,data,2,header,siteMaintainService);
+            if(CollectionUtils.isEmpty(data)){
+                setSheetData(workbook,basicInfo,null,siteMaintainService,null);
+            }else{
+                for (Map.Entry<String, List<NurseSiteMaintainExport>> stringListEntry : data.entrySet()) {
+                    NurseSiteMaintainConfig maintainConfigById = siteMaintainService.getMaintainConfigById(stringListEntry.getKey());
+                    setSheetData(workbook,basicInfo,stringListEntry.getValue(),siteMaintainService,maintainConfigById.getName());
+                }
+            }
             byteArrayOutputStream = new ByteArrayOutputStream();
             workbook.write(byteArrayOutputStream);
             return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
@@ -56,7 +62,18 @@ public class NurseSiteMaintainExportUtil {
         }
         return null;
     }
-
+    private void setSheetData(Workbook workbook,List<Map<String,String>> basicInfo,List<NurseSiteMaintainExport> data,NurseSiteMaintainService siteMaintainService,String sheetName){
+        Sheet sheet =null;
+        if(StringUtils.isEmpty(sheetName)){
+             sheet = workbook.createSheet();
+        }else{
+            sheet = workbook.createSheet(sheetName);
+        }
+        createAssetBasicInfo(workbook,sheet,basicInfo);
+        List<String> header = new ArrayList<>();
+        createTitle(workbook,sheet);
+        createData(workbook,sheet,data,2,header,siteMaintainService);
+    }
     private  void createAssetBasicInfo(Workbook workbook, Sheet sheet,List<Map<String,String>> titleMap){
         Row row = sheet.createRow(0);
         int current=0;

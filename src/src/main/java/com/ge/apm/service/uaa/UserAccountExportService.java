@@ -51,7 +51,6 @@ public class UserAccountExportService {
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
 
-	private List<OrgInfo> tenantOrgInfoOfType4All=new ArrayList<>(256);
 	@Autowired
 	UserAccountMapper userAccountMapper;
 	
@@ -90,10 +89,11 @@ public class UserAccountExportService {
 
 	public List<Map<String, Object>> parseUserAccountToMap(List<UserAccount> listUserAccount) {
 		List<Map<String, Object>> listMapResult = new ArrayList<>();
+		List<OrgInfo> orgInfos = tenantOrgInfoTypeOf4All();
 		if (listUserAccount != null && !listUserAccount.isEmpty()) {
 			for (UserAccount tempUser : listUserAccount) {
 				Map<String, Object> tempMap = new HashMap<>();
-				setDepartNames(tempMap, tempUser);
+				setDepartNames(tempMap, tempUser,orgInfos);
 				if (StringUtils.isNotEmpty(tempUser.getInstitutionName())) {
 					tempMap.put(HEADER_INSTITUTION, tempUser.getInstitutionName());
 				}
@@ -120,13 +120,12 @@ public class UserAccountExportService {
 		}
 		return listMapResult;
 	}
-	private void setDepartNames(Map<String, Object> tempMap,UserAccount tempUser){
+	private void setDepartNames(Map<String, Object> tempMap,UserAccount tempUser,List<OrgInfo> orgInfos){
 		String siteUID = tempUser.getSiteUID();
 		String orgInfoUID = tempUser.getOrgInfoUID();
 		if(StringUtils.isBlank(siteUID) ) return;
 		if(StringUtils.isBlank(orgInfoUID)) return;
 		if(siteUID.equals(orgInfoUID))return;
-		List<OrgInfo> orgInfos = tenantOrgInfoTypeOf4All();
 		Optional<OrgInfoVO> first = orgInfos.stream().filter(item -> item.getUid().equals(orgInfoUID)).map(item -> {
 			OrgInfoVO vo=new OrgInfoVO();
 			String parentUID = item.getParentUID();
@@ -173,14 +172,9 @@ public class UserAccountExportService {
 		return first.isPresent()?first.get():null;
 	}
 	private List<OrgInfo> tenantOrgInfoTypeOf4All(){
-		if(tenantOrgInfoOfType4All.size() == 0){
 			UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-			if(currentUserAccount == null) return tenantOrgInfoOfType4All;
 			String tenantUID = currentUserAccount.getTenantUID();
-			if(StringUtils.isBlank(tenantUID)) return tenantOrgInfoOfType4All;
-			tenantOrgInfoOfType4All = orgInfoRepository.findByTenantUIDAndOrgType(tenantUID, 4);
-		}
-		return tenantOrgInfoOfType4All;
+			return orgInfoRepository.findByTenantUIDAndOrgType(tenantUID, 4);
 	}
 	/**
 	 * use space as delimiter to group tags to export

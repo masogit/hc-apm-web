@@ -181,7 +181,34 @@ public class AssetOptRecordService {
 	}
 	public List<AssetOptRecord> getAssetOptRecordList(String assetUid){
 		if(StringUtils.isEmpty(assetUid)) return null;
-		return assetOptRecordRepository.getAssetOptRecordListLimit5(assetUid);
+		List<AssetOptRecord> assetOptRecordListLimit5 = assetOptRecordRepository.getAssetOptRecordListLimit5(assetUid);
+		assetOptRecordListLimit5.forEach(item->{
+			if(item.getEndDate() != null){
+				item.setCostTime(generateCostTime(item.getStartDate(),item.getEndDate()));
+			}
+			UserAccount createBy=null ;
+			if((createBy=item.getCreateBy()) != null){
+				item.setCreateByName(createBy.getName());
+			}else{
+				String createByUid = item.getCreateByUid();
+				if(StringUtils.isNotEmpty(createByUid)){
+					createBy= userAccountRepository.getByUid(createByUid);
+					item.setCreateByName(createBy.getName());
+				}
+			}
+			UserAccount modifyBy=null ;
+			if((modifyBy=item.getModifyBy()) != null){
+				item.setModifyByName(modifyBy.getName());
+			}else{
+				String modifyByUid = item.getModifyByUid();
+				if(StringUtils.isNotEmpty(modifyByUid)){
+					modifyBy= userAccountRepository.getByUid(modifyByUid);
+					item.setModifyByName(modifyBy.getName());
+				}
+			}
+
+		});
+		return assetOptRecordListLimit5;
 	}
 	public static String[] basicInfo={"院区","科室","设备名称","设备编号","序列号","型号"};
 	public StreamedContent exportAllWoByAssetInfoId(AssetInfo assetInfo, Date startDate, Date endDate){
@@ -204,10 +231,10 @@ public class AssetOptRecordService {
 					if(StringUtils.isNotEmpty(modifyByUid) && item.getEndDate() != null){
 						UserAccount byUid = userAccountRepository.getByUid(modifyByUid);
 						if(byUid != null){
-							export.setCreateByUid(byUid.getName());
+							export.setModifyByUid(byUid.getName());
 						}
 					}else{
-						export.setCreateByUid("");
+						export.setModifyByUid("");
 					}
 					if(item.getStartDate() != null && item.getEndDate()!= null){
 						export.setCostTime(generateCostTime(item.getStartDate(),item.getEndDate()));
