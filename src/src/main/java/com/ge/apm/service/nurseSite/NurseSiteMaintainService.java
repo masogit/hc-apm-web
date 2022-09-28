@@ -2247,7 +2247,7 @@ public class NurseSiteMaintainService {
 	public StreamedContent exportNurseSiteMaintainByAssetInfoId(AssetInfo assetInfo, Date startDate, Date endDate) {
 		InputStream inputStream =null;
 		try {
-			List<NurseSiteMaintainExport> nurseSiteMaintainExport = getNurseSiteMaintainExport(assetInfo.getUid(), startDate, endDate);
+			Map<String, List<NurseSiteMaintainExport>> nurseSiteMaintainExport = getNurseSiteMaintainExport(assetInfo.getUid(), startDate, endDate);
 			List<Map<String, String>> maps = setAssetBasicInfo(assetInfo);
 			inputStream = new NurseSiteMaintainExportUtil().export(maps, nurseSiteMaintainExport,this);
 			return new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "NurseSiteMaintainData.xlsx");
@@ -2264,33 +2264,36 @@ public class NurseSiteMaintainService {
 		}
 		return null;
 	}
-	private List<NurseSiteMaintainExport> getNurseSiteMaintainExport(String assetUid, Date startDate, Date endDate){
+
+	private Map<String,List<NurseSiteMaintainExport>> getNurseSiteMaintainExport(String assetUid, Date startDate, Date endDate){
 		List<NurseSiteMaintainItem> maintainItemDataList = nurseSiteMaintainItemRepository.getMaintainItemDataList(assetUid, startDate, endDate);
 		if(CollectionUtils.isEmpty(maintainItemDataList)) return null;
 		Set<String> collect1 = maintainItemDataList.stream().map(item -> item.getParentId()).collect(Collectors.toSet());
 		List<NurseSiteMaintain> nurseSiteMaintainList=nurseSiteMaintainRepository.findByIds(collect1);
 		if(CollectionUtils.isEmpty(nurseSiteMaintainList)) return null;
-		Map<String, String>  signatureIds = nurseSiteMaintainList.stream().collect(Collectors.toMap(NurseSiteMaintain::getId, NurseSiteMaintain::getSignatureId));
+		Map<String, String>  signatureIds = nurseSiteMaintainList.stream().filter(item->StringUtils.isNotBlank(item.getSignatureId())).collect(Collectors.toMap(NurseSiteMaintain::getId, NurseSiteMaintain::getSignatureId));
 		Map<String, String> signatureIdMap=signatureIds;
-		List<NurseSiteMaintainExport> collect = maintainItemDataList.stream().map(item -> {
+		Map<String, List<NurseSiteMaintainExport>> collect = maintainItemDataList.stream().map(item -> {
 			NurseSiteMaintainExport nurseSiteMaintainExport = new NurseSiteMaintainExport();
 			nurseSiteMaintainExport.setScheduleDate(item.getScheduleDate());
 			nurseSiteMaintainExport.setCheckDate(item.getCheckDate());
 			nurseSiteMaintainExport.setPrincipal(getUserName(item.getCreateByUid()));
 			nurseSiteMaintainExport.setChecker(getUserName(item.getUpdateByUid()));
-			String signatureId="";
-			if(signatureIdMap.containsKey(item.getParentId())){
-				 signatureId=signatureIdMap.get(item.getParentId());
+			String signatureId = item.getSignatureId();
+			if (StringUtils.isBlank(signatureId) && signatureIdMap != null && signatureIdMap.size() > 0) {
+				String s = signatureIdMap.get(item.getParentId());
+				signatureId = StringUtils.isBlank(s)?"":s;
 			}
+			nurseSiteMaintainExport.setConfigId(item.getConfigId());
 			nurseSiteMaintainExport.setSignatureId(signatureId);
 			nurseSiteMaintainExport.setComment(item.getComment());
 			nurseSiteMaintainExport.setCheckData(getNurseSiteMaintainData(item.getId()));
 			return nurseSiteMaintainExport;
-		}).sorted((m1,m2)->{
-			Date scheduleDate = m1.getScheduleDate()== null?new Date():m1.getScheduleDate();
-			Date scheduleDate1 =m2.getScheduleDate()== null?new Date():m2.getScheduleDate();
+		}).sorted((m1, m2) -> {
+			Date scheduleDate = m1.getScheduleDate() == null ? new Date() : m1.getScheduleDate();
+			Date scheduleDate1 = m2.getScheduleDate() == null ? new Date() : m2.getScheduleDate();
 			return scheduleDate.compareTo(scheduleDate1);
-		}).collect(Collectors.toList());
+		}).collect(Collectors.groupingBy(NurseSiteMaintainExport::getConfigId));
 		return collect;
 	}
 	private List<NurseSiteMaintainData> getNurseSiteMaintainData(String uid){

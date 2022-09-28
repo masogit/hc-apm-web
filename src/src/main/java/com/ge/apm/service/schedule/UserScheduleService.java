@@ -530,7 +530,7 @@ public class UserScheduleService {
         List<String> collect = selectedUserList.stream().map(UserAccount::getUid).collect(Collectors.toList());
         Date date = deleteOneDay(collect, startBatchDate, currentUser, type);
         if(date.compareTo(endBatchDate) != 1){
-            userScheduleDao.batchDeleteWorkSchedule(collect,startBatchDate,endBatchDate,type.name(),scheduleDateStage);
+            userScheduleDao.batchDeleteWorkSchedule(collect,date,endBatchDate,type.name(),scheduleDateStage);
         }
     }
     private Date deleteOneDay(List<String> userUidCollect,Date startBatchDate, UserAccount currentUser,UserSchedule.Type type){
@@ -559,7 +559,8 @@ public class UserScheduleService {
                     .collect(Collectors.toList());
             userScheduleDao.batchDeleteWorkSchedule(userUidCollect,startBatchDate,startBatchDate,type.name(),scheduleDateStage);
             LocalDate plus = localDate.plus(1, ChronoUnit.DAYS);
-            return new Date(plus.getYear(),plus.getMonthValue(),plus.getDayOfMonth());
+            return  Date.from(plus.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+
         }
         return startBatchDate;
     }
