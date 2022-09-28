@@ -735,6 +735,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selected.setIsDeleted(true);
             selected.setLastModifiedBy(loginUser.getLoginName());
             selected.setLastModifiedDate(new Timestamp(System.currentTimeMillis()));
+            selected.setWeChatId(null);
             dao.save(selected);
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
             /* 物理删除
