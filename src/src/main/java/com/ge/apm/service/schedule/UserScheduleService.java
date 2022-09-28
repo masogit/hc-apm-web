@@ -345,6 +345,7 @@ public class UserScheduleService {
                 if(!usscList.isEmpty()){
                     ussc = usscList.get(0);
                 }
+                ussc.setType(type.name());
                 ussc.setStartTime(sdf.format(startTime_all).split(" ")[1]);
                 ussc.setEndTime(sdf.format(endTime_all).split(" ")[1]);
             }else if(i == 1){
@@ -355,6 +356,7 @@ public class UserScheduleService {
                 if(!usscList.isEmpty()){
                     ussc = usscList.get(0);
                 }
+                ussc.setType(type.name());
                 ussc.setStartTime(sdf.format(startTime_am).split(" ")[1]);
                 ussc.setEndTime(sdf.format(endTime_am).split(" ")[1]);
             }else if(i == 2){
@@ -365,6 +367,7 @@ public class UserScheduleService {
                 if(!usscList.isEmpty()){
                     ussc = usscList.get(0);
                 }
+                ussc.setType(type.name());
                 ussc.setStartTime(sdf.format(startTime_pm).split(" ")[1]);
                 ussc.setEndTime(sdf.format(endTime_pm).split(" ")[1]);
             }
@@ -538,7 +541,12 @@ public class UserScheduleService {
         if(LocalDate.now().compareTo(localDate) == 0){
             LocalDate nowDate = LocalDate.now();
             LocalDateTime nowDateTime=LocalDateTime.now();
-            List<UserScheduleStageConfig> bySiteUID = userScheduleStageConfigDao.findBySiteUIDAndType(currentUser.getSiteUID(),type.name());
+            List<UserScheduleStageConfig> bySiteUID ;
+            if(UserSchedule.Type.W.equals(type)){
+                bySiteUID=userScheduleStageConfigDao.findBySiteUIDAndTypeW(currentUser.getSiteUID(),type.name());
+            }else{
+                bySiteUID=userScheduleStageConfigDao.findBySiteUIDAndTypeA(currentUser.getSiteUID(),type.name());
+            }
             if(CollectionUtils.isEmpty(bySiteUID)) bySiteUID=DEFAULT_USER_SCHEDULE_STAGE_CONFIG;
             List<String> scheduleDateStage = bySiteUID.stream()
                     .filter(item -> {
@@ -557,7 +565,9 @@ public class UserScheduleService {
                     })
                     .map(item -> item.getScheduleDateStage())
                     .collect(Collectors.toList());
-            userScheduleDao.batchDeleteWorkSchedule(userUidCollect,startBatchDate,startBatchDate,type.name(),scheduleDateStage);
+            if(!CollectionUtils.isEmpty(scheduleDateStage)){
+                userScheduleDao.batchDeleteWorkSchedule(userUidCollect,startBatchDate,startBatchDate,type.name(),scheduleDateStage);
+            }
             LocalDate plus = localDate.plus(1, ChronoUnit.DAYS);
             return  Date.from(plus.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 
