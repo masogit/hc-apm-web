@@ -158,12 +158,6 @@ public class NurseSiteMaintainExportUtil {
                         Integer index = headerMap.get(checkItem);
                          Cell cell = row.createCell(index);
                     String strValue = checkDatum.getStrValue();
-                    if(!StringUtils.isEmpty(checkDatum.getVariableText())){
-                        strValue+="（"+checkDatum.getVariableText()+"）";
-                    }else if(checkDatum.getDateValue() != null){
-                        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
-                        strValue+="（"+format.format(checkDatum.getDateValue())+"）";
-                    }
                     cell.setCellValue(strValue);
                 }
             }
