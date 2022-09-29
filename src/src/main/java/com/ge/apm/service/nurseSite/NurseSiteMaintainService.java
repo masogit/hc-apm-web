@@ -3,6 +3,8 @@ package com.ge.apm.service.nurseSite;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -1417,7 +1419,17 @@ public class NurseSiteMaintainService {
 		StreamedContent streamedContent = blobFileService.getBlobObjectByStorageId(signatureId);
 		return streamedContent;
 	}
-
+	public StreamedContent getMaintainSignature(String signatureId){
+		String typePrefix="text";
+		List<V2_BlobObject> blobObjectsByStorageId = blobFileService.getBlobObjectsByStorageId(signatureId);
+		if(CollectionUtils.isEmpty(blobObjectsByStorageId)) return null;
+		V2_BlobObject v2BlobObject;
+		if((v2BlobObject=blobObjectsByStorageId.get(0)) != null && v2BlobObject.getObjectType().contains(typePrefix)){
+				return getMaintainSignatureWebToStream(signatureId);
+		}else{
+			    return getMaintainSignatureWeiXin(signatureId);
+		}
+	}
 	public StreamedContent getMaintainSignatureWebToStream(String signatureId) {
 		String str = getMaintainSignatureWeb(signatureId);
 		DefaultStreamedContent streamedContent = new DefaultStreamedContent();
@@ -2189,7 +2201,8 @@ public class NurseSiteMaintainService {
 
 	public List<NurseSiteMaintainExport> getMaintainDataList(String assetUid) {
 		if(StringUtils.isBlank(assetUid)) return null;
-		List<NurseSiteMaintainItem> maintainDataList = nurseSiteMaintainItemRepository.getMaintainDataList(assetUid);
+		Date date=Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+		List<NurseSiteMaintainItem> maintainDataList = nurseSiteMaintainItemRepository.getMaintainDataList(assetUid,date);
 		if(CollectionUtils.isNotEmpty(maintainDataList)){
 			return maintainDataList.stream().map(item->{
 				NurseSiteMaintainExport nurseSiteMaintainExport = new NurseSiteMaintainExport();
@@ -2264,7 +2277,38 @@ public class NurseSiteMaintainService {
 		}
 		return null;
 	}
+	private Map<String,List<NurseSiteMaintainExport>> getDataTest(){
+		List<NurseSiteMaintainExport> maintainItemDataList=new ArrayList<>();
+		for (int i=0;i<10;i++){
+			NurseSiteMaintainExport item=new NurseSiteMaintainExport();
+			item.setCheckDate(new Date());
+			item.setScheduleDate(new Date());
+			item.setPrincipal("3277e91babd04081b185bd0c2d15e415");
+			item.setChecker("3277e91babd04081b185bd0c2d15e415");
+			item.setComment("123");
+			item.setSignatureId("632ecc7910eec84f18700b3e");
+			item.setCheckData(getNurseSiteMaintainData(i));
+			if(i%2==0){
+				item.setConfigId("2c91898b6c68d696016c694819650039");
+			}else{
+				item.setConfigId("2c91898b6c68d696016c6948197e003f");
+			}
 
+			maintainItemDataList.add(item);
+		}
+		Map<String,List<NurseSiteMaintainExport>> result=maintainItemDataList.stream().collect(Collectors.groupingBy(NurseSiteMaintainExport::getConfigId));
+		return result;
+	}
+	private List<NurseSiteMaintainData> getNurseSiteMaintainData(int y){
+		List<NurseSiteMaintainData> list=new ArrayList<>();
+		for (int i = 0; i < y; i++) {
+			NurseSiteMaintainData data=new NurseSiteMaintainData();
+			data.setCheckItem("检查项"+i);
+			data.setCheckValue(i<3);
+			list.add(data);
+		}
+		return list;
+	}
 	private Map<String,List<NurseSiteMaintainExport>> getNurseSiteMaintainExport(String assetUid, Date startDate, Date endDate){
 		List<NurseSiteMaintainItem> maintainItemDataList = nurseSiteMaintainItemRepository.getMaintainItemDataList(assetUid, startDate, endDate);
 		if(CollectionUtils.isEmpty(maintainItemDataList)) return null;
