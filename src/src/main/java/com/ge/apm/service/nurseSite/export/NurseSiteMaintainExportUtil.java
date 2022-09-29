@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class NurseSiteMaintainExportUtil {
@@ -156,7 +157,14 @@ public class NurseSiteMaintainExportUtil {
                 if(headerMap.containsKey(checkItem)){
                         Integer index = headerMap.get(checkItem);
                          Cell cell = row.createCell(index);
-                         cell.setCellValue(checkDatum.getStrValue());
+                    String strValue = checkDatum.getStrValue();
+                    if(!StringUtils.isEmpty(checkDatum.getVariableText())){
+                        strValue+="（"+checkDatum.getVariableText()+"）";
+                    }else if(checkDatum.getDateValue() != null){
+                        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+                        strValue+="（"+format.format(checkDatum.getDateValue())+"）";
+                    }
+                    cell.setCellValue(strValue);
                 }
             }
         }
@@ -168,7 +176,7 @@ public class NurseSiteMaintainExportUtil {
         if(!StringUtils.isEmpty(aor.getSignatureId())){
             StreamedContent signatureIn =null;
             try {
-                 signatureIn = siteMaintainService.getMaintainSignatureWebToStream(aor.getSignatureId());
+                 signatureIn = siteMaintainService.getMaintainSignature(aor.getSignatureId());
                  if(signatureIn != null){
                      BufferedImage bufferImg = ImageIO.read(signatureIn.getStream());
                      ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
