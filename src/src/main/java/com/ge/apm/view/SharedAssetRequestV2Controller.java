@@ -1319,6 +1319,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                selected.setState(state);
                selected.setModifyDate(new Date());
                sharedAssetRequestService.save(selected);
+               //调用微服务
+               try {
+                   sharedAssetService.pushWxMsg(selected.getId());
+               } catch (Exception e) {
+                   logger.warn("SharedAssetRequestService[]pushWxMsg[]error", e);
+               }
                String url = "List.xhtml?faces-redirect=true";
                requestContext.addCallbackParam("url", url);
                return;
