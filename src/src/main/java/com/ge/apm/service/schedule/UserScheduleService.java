@@ -259,29 +259,15 @@ public class UserScheduleService {
             int dayOfWeek = scheduleDate.get(ChronoField.DAY_OF_WEEK);
             if(selectedOptions2.contains(dayOfWeek)){
                 // 删除已经有的排班
-                userScheduleDao.deleteByTypeAndScheduleDateAndSiteUID(type.name(), Date.from(scheduleDateInstant), userAccount.getSiteUID());
+                if(!UserSchedule.Type.A.equals(type)){
+                    userScheduleDao.deleteByTypeAndScheduleDateAndSiteUID(type.name(), Date.from(scheduleDateInstant), userAccount.getSiteUID());
+                }
                 for (UserAccount ua : userAccountList) {
-                    for (int j=0;j<batchType.length;j++)
-                    if(SCHEDULE_STAGE_AM.equals(batchType[j])) {
-                        if(this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.AM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()){
-                            successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE,type));
-                        }else {
-                            failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE,type));
-                        }
-                    }else if(SCHEDULE_STAGE_PM.equals(batchType[j])){
-                        if(this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.PM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()){
-                            successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE,type));
-                        }else {
-                            failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE,type));
-                        }
-                    }else if(SCHEDULE_STAGE_ALL.equals(batchType[j])) {
-                        if(this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.ALL.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()){
-                            successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE,type));
-                        }else {
-                            failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE,type));
-                        }
+                    String[] types=batchType;
+                    if(UserSchedule.Type.A.equals(type)){
+                        types=changeType(types,scheduleDateInstant,ua);
                     }
-
+                    createUserWorkSchedule(scheduleDateInstant,types,successList,failedList,userAccount,ua,type);
                 }
             }
         }
@@ -291,6 +277,38 @@ public class UserScheduleService {
         resultMap.put(BATCH_SUCCESS_LIST, successList);
         resultMap.put(BATCH_FAILED_LIST, failedList);
         return resultMap;
+    }
+    private String[] changeType(String[] types,Instant scheduleDateInstant,UserAccount ua){
+        List<UserSchedule> byTypeAndUserUIDAndScheduleDate = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(UserSchedule.Type.A.name(), ua.getUid(), Date.from(scheduleDateInstant));
+        if(CollectionUtils.isNotEmpty(byTypeAndUserUIDAndScheduleDate)){
+            List<String> collect = byTypeAndUserUIDAndScheduleDate.stream().filter(item -> !StringUtils.isEmpty(item.getScheduleDateStage())).map(UserSchedule::getScheduleDateStage).collect(Collectors.toList());
+            List<String> typeList = Arrays.asList(types).stream().filter(item -> !collect.contains(item)).collect(Collectors.toList());
+            return typeList.toArray(new String[typeList.size()]);
+        }
+        return types;
+    }
+    private void createUserWorkSchedule(Instant scheduleDateInstant,String[] batchType,List<UserSchedule> successList,List<UserSchedule> failedList,UserAccount userAccount,UserAccount ua,UserSchedule.Type type){
+        for (int j=0;j<batchType.length;j++) {
+            if (SCHEDULE_STAGE_AM.equals(batchType[j])) {
+                if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.AM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
+                    successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                } else {
+                    failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                }
+            } else if (SCHEDULE_STAGE_PM.equals(batchType[j])) {
+                if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.PM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
+                    successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                } else {
+                    failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                }
+            } else if (SCHEDULE_STAGE_ALL.equals(batchType[j])) {
+                if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.ALL.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
+                    successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                } else {
+                    failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                }
+            }
+        }
     }
     private UserSchedule createWorkSchedule(UserAccount loginUserAccount, UserAccount scheduleUserAccount, String scheduleDateStage, Date scheduleDate, boolean isSave,UserSchedule.Type type) {
         UserSchedule userSchedule = new UserSchedule();
