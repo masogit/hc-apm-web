@@ -2324,7 +2324,7 @@ public class NurseSiteMaintainService {
 			nurseSiteMaintainExport.setPrincipal(getUserName(item.getCreateByUid()));
 			nurseSiteMaintainExport.setChecker(getUserName(item.getUpdateByUid()));
 			String signatureId = item.getSignatureId();
-			if (StringUtils.isBlank(signatureId) && signatureIdMap != null && signatureIdMap.size() > 0) {
+			if ((StringUtils.isBlank(signatureId)|| "".equals(signatureId)) && signatureIdMap != null && signatureIdMap.size() > 0) {
 				String s = signatureIdMap.get(item.getParentId());
 				signatureId = StringUtils.isBlank(s)?"":s;
 			}
