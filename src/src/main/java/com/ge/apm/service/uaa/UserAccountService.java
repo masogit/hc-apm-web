@@ -344,6 +344,7 @@ public class UserAccountService {
 		wrapper.eq("telephone", telephone);
 		wrapper.ne(ObjectUtil.isNotEmpty(userAccount.getId()), "id", userAccount.getId());
 		wrapper.eq(telephone.length() < 11, "tenant_uid", UserContextService.getCurrentUserAccount().getTenantUID());
+		wrapper.andNew().eq("is_deleted",false).or().isNull("is_deleted");
 		return userAccountMapper.selectCount(wrapper) > 0;
 	}
 
@@ -365,4 +366,13 @@ public class UserAccountService {
 		}
 		return null;
     }
+
+	public boolean checkUser(UserAccount userAccount) {
+		// 判断手机号码是否重复
+		if (whetherTheCallIsRepeated(userAccount.getTelephone(), userAccount)) {
+			WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
+			return false;
+		}
+		return true;
+	}
 }

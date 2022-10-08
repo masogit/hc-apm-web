@@ -733,6 +733,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         if (canDelete()) {
             selected.setIsDeleted(true);
+            selected.setLoginName(selected.getLoginName() + "-" + ZipUtil.makeRandomPassword(5));
             selected.setLastModifiedBy(loginUser.getLoginName());
             selected.setLastModifiedDate(new Timestamp(System.currentTimeMillis()));
             selected.setWeChatId(null);
@@ -944,10 +945,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                     }
                 }
             }
-            boolean isRepeated = userAccountService.whetherTheCallIsRepeated(selected.getTelephone(),selected);//判断手机号码是否重复 true:重复 false:不重复
-            if(isRepeated){//重复
+            boolean flag = userAccountService.checkUser(selected);
+            if(!flag){
                 selected.setTelephone(originalTelephone);
-                WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
                 userAccountEditFlag = false;
                 return;
             }
