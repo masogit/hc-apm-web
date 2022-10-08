@@ -221,6 +221,7 @@ public class UserAccountImportService {
 			EntityWrapper<UserAccount> wrapper = new EntityWrapper<>();
 			wrapper.eq("telephone", telephone);
 			wrapper.eq(telephone.length() < 11, "tenant_uid", newUser.getTenantUID());
+			wrapper.andNew().eq("is_deleted",false).or().isNull("is_deleted");
 			return userAccountMapper.selectCount(wrapper) > 0;
 		}
 		return false;
