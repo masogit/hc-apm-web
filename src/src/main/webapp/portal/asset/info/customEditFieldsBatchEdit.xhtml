@@ -459,6 +459,34 @@
                          requiredMessage="#{msg.systemNum1} #{msg.ValidationRequire}" readonly="#{!assetInfoBulkEditController.needEdit('systemNum1')}" />
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'systemNum2')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum2}<span style="color:red">#{assetInfoBulkEditController.customConfig.assetFields['systemNum2'].required? '*':''}</span></label>
+            <p:inputText id="systemNum2" value="#{assetInfoBulkEditController.selected.systemNum2}" required="#{assetInfoBulkEditController.customConfig.assetFields['systemNum2'].required}"
+                         requiredMessage="#{msg.systemNum2} #{msg.ValidationRequire}" readonly="#{!assetInfoBulkEditController.needEdit('systemNum2')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'systemNum3')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum3}<span style="color:red">#{assetInfoBulkEditController.customConfig.assetFields['systemNum3'].required? '*':''}</span></label>
+            <p:inputText id="systemNum3" value="#{assetInfoBulkEditController.selected.systemNum3}" required="#{assetInfoBulkEditController.customConfig.assetFields['systemNum3'].required}"
+                         requiredMessage="#{msg.systemNum3} #{msg.ValidationRequire}" readonly="#{!assetInfoBulkEditController.needEdit('systemNum3')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'systemNum4')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum4}<span style="color:red">#{assetInfoBulkEditController.customConfig.assetFields['systemNum4'].required? '*':''}</span></label>
+            <p:inputText id="systemNum4" value="#{assetInfoBulkEditController.selected.systemNum4}" required="#{assetInfoBulkEditController.customConfig.assetFields['systemNum4'].required}"
+                         requiredMessage="#{msg.systemNum4} #{msg.ValidationRequire}" readonly="#{!assetInfoBulkEditController.needEdit('systemNum4')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'systemNum5')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemNum5}<span style="color:red">#{assetInfoBulkEditController.customConfig.assetFields['systemNum5'].required? '*':''}</span></label>
+            <p:inputText id="systemNum5" value="#{assetInfoBulkEditController.selected.systemNum5}" required="#{assetInfoBulkEditController.customConfig.assetFields['systemNum5'].required}"
+                         requiredMessage="#{msg.systemNum5} #{msg.ValidationRequire}" readonly="#{!assetInfoBulkEditController.needEdit('systemNum5')}" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'qrCode')}" >
         <h:panelGroup>
             <label class="label">#{msg.QRCode}</label>
