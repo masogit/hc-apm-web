@@ -162,6 +162,11 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("repairForm")), "setRepairForm", repairFormList, map, StringUtils.isEmpty(asset.getUid()) ? 1 : null); //新增资产默认内修
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("functionType")), "setFunctionType", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("serialNum")), "setSerialNum", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum1")), "setSystemNum1", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum2")), "setSystemNum2", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum3")), "setSystemNum3", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum4")), "setSystemNum4", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum5")), "setSystemNum5", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemId")), "setSystemId", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("BarCode")), "setBarcode", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("NationalCode")), "setNationalStandardCode", true);
