@@ -1422,9 +1422,8 @@ public class NurseSiteMaintainService {
 	public StreamedContent getMaintainSignature(String signatureId){
 		String typePrefix="text";
 		List<V2_BlobObject> blobObjectsByStorageId = blobFileService.getBlobObjectsByStorageId(signatureId);
-		if(CollectionUtils.isEmpty(blobObjectsByStorageId)) return null;
 		V2_BlobObject v2BlobObject;
-		if((v2BlobObject=blobObjectsByStorageId.get(0)) != null && v2BlobObject.getObjectType().contains(typePrefix)){
+		if(CollectionUtils.isNotEmpty(blobObjectsByStorageId) && (v2BlobObject=blobObjectsByStorageId.get(0)) != null && v2BlobObject.getObjectType().contains(typePrefix)){
 				return getMaintainSignatureWebToStream(signatureId);
 		}else{
 			    return getMaintainSignatureWeiXin(signatureId);
