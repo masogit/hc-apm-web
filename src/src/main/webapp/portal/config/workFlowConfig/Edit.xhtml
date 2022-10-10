@@ -307,6 +307,30 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">原因描述是否必填</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.patProblems}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                        <label class = "label">解决方案是否必填</label>
+                        <p:selectBooleanCheckbox value="#{workflowConfigController.selected.patActions}">
+                            <p:ajax process="@this" />
+                        </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">交付前检测是否必填</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.patTests}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class = "label">附件上传是否必填</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.workOrderImagesUpload}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                         <h:panelGroup rendered="true">
                             <label class = "label">是否开启计量报修?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.measurementRepair}"/>

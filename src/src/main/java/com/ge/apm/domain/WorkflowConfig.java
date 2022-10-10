@@ -383,6 +383,34 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "other_expenses")
     private Boolean otherExpenses ; // 其他费用
 
+    @Column(name = "pat_problems")
+    private Boolean patProblems;    //原因描述
+
+    @Column(name = "pat_actions")
+    private Boolean patActions;     //解决方案
+
+    @Column(name = "pat_tests")
+    private Boolean patTests;       //交付前检测
+
+    @Column(name = "work_order_images_upload")
+    private Boolean workOrderImagesUpload; //维修附件是否上传，当前只对图片限制
+
+    public Boolean getPatProblems() { return patProblems; }
+
+    public void setPatProblems(Boolean patProblems) { this.patProblems = patProblems; }
+
+    public Boolean getPatActions() { return patActions; }
+
+    public void setPatActions(Boolean patActions) { this.patActions = patActions; }
+
+    public Boolean getPatTests() { return patTests; }
+
+    public void setPatTests(Boolean patTests) { this.patTests = patTests; }
+
+    public Boolean getWorkOrderImagesUpload() { return workOrderImagesUpload; }
+
+    public void setWorkOrderImagesUpload(Boolean workOrderImagesUpload) { this.workOrderImagesUpload = workOrderImagesUpload; }
+
     public Boolean getExternalExpenses() {
         return externalExpenses == null ? false : externalExpenses;
     }
