@@ -1679,8 +1679,26 @@ public void test1(){
             valid = false;
         };
 
-       /* WorkflowConfig woc = woConDao.getBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
-        hourRequired=  woc.getHourRequired();*/
+        WorkflowConfig woc = workflowService.getWorkflowByOrg(UserContextService.getCurrentUserAccount().getSiteUID());
+        /*hourRequired=  woc.getHourRequired();*/
+        if(null!=woc) {
+            if(woc.getPatProblems()!=null && woc.getPatProblems() && selectedWorkOrder.getPatProblems()==null) {
+                WebUtil.addErrorMessage("原因描述不能为空！");
+                valid = false;
+            }
+            if(woc.getPatActions()!=null && woc.getPatActions() && selectedWorkOrder.getPatActions()==null) {
+                WebUtil.addErrorMessage("解决方案不能为空！");
+                valid = false;
+            }
+            if(woc.getPatTests()!=null && woc.getPatTests() && selectedWorkOrder.getPatTests()==null) {
+                WebUtil.addErrorMessage("原因描述不能为空！");
+                valid = false;
+            }
+            if(woc.getWorkOrderImagesUpload()!=null && woc.getWorkOrderImagesUpload() && CollectionUtils.isEmpty(picList)) {
+                WebUtil.addErrorMessage("请上传维修图片！");
+                valid = false;
+            }
+        }
         if (hourRequired) { //如果工作流配置了工时必填，那么就要jian
             if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("TheCompletedManhoursTips"));
