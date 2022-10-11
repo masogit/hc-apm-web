@@ -743,8 +743,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             String uid = UUID.randomUUID().toString().replace("-", "");
             selected.setUid(uid);
         }
-        this.save();
         this.saveAssetHistory();
+        this.save();
 
         if(selected != null && selected.getId() != null && selectedPictures != null){
             acService.createAttachments(selected, selectedPictures);
