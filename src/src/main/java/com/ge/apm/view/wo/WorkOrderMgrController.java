@@ -1693,7 +1693,7 @@ public void test1(){
                 valid = false;
             }
             if(woc.getPatTests()!=null && woc.getPatTests() && selectedWorkOrder.getPatTests()==null) {
-                WebUtil.addErrorMessage("交付前检测！");
+                WebUtil.addErrorMessage("交付前检测不能为空！");
                 RequestContext.getCurrentInstance().addCallbackParam("pat_tests", true);
                 valid = false;
             }
