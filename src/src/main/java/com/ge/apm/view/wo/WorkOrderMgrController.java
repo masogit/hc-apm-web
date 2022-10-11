@@ -1684,18 +1684,22 @@ public void test1(){
         if(null!=woc) {
             if(woc.getPatProblems()!=null && woc.getPatProblems() && selectedWorkOrder.getPatProblems()==null) {
                 WebUtil.addErrorMessage("原因描述不能为空！");
+                RequestContext.getCurrentInstance().addCallbackParam("pat_problems", true);
                 valid = false;
             }
             if(woc.getPatActions()!=null && woc.getPatActions() && selectedWorkOrder.getPatActions()==null) {
                 WebUtil.addErrorMessage("解决方案不能为空！");
+                RequestContext.getCurrentInstance().addCallbackParam("pat_actions", true);
                 valid = false;
             }
             if(woc.getPatTests()!=null && woc.getPatTests() && selectedWorkOrder.getPatTests()==null) {
-                WebUtil.addErrorMessage("原因描述不能为空！");
+                WebUtil.addErrorMessage("交付前检测！");
+                RequestContext.getCurrentInstance().addCallbackParam("pat_tests", true);
                 valid = false;
             }
             if(woc.getWorkOrderImagesUpload()!=null && woc.getWorkOrderImagesUpload() && CollectionUtils.isEmpty(picList)) {
                 WebUtil.addErrorMessage("请上传维修图片！");
+                RequestContext.getCurrentInstance().addCallbackParam("imges", true);
                 valid = false;
             }
         }
