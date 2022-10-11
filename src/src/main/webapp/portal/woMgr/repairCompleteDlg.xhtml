@@ -333,6 +333,18 @@
                     $('#woTab\\:repairCompleteDialogForm\\:manHours_input').addClass("ui-state-error");
                     valid = false;
                 }
+                if (args.pat_problems) {
+                    valid = false;
+                }
+                if (args.pat_actions) {
+                    valid = false;
+                }
+                if (args.pat_tests) {
+                    valid = false;
+                }
+                if (args.imges) {
+                    valid = false;
+                }
                 if(args.approvalMust){
                     valid1 =false;
                 }
