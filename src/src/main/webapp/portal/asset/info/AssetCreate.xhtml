@@ -97,7 +97,7 @@
                                         <li><a class="jp-stop" href="#">Stop</a></li>
                                     </ul>
                                 </div>
-                                <c:forEach items="#{assetInfoDetailController.getAttachList('9f44536bcff34c2c8cfd3cee6638c692', 1)}" var="item" varStatus="status">
+                                <c:forEach items="#{assetInfoEditController.audioList}" var="item" varStatus="status">
                                     <h:inputHidden class="mp3Link" value="#{fileDownloadService.getFileUrl(item.objectStorageId)}" id="audio#{status.index}"/>
                                 </c:forEach>
                             </p:panelGrid>
