@@ -1355,12 +1355,22 @@ public class NurseSiteMaintainService {
 		}
 		supplementMaintain(tempNurseSiteMaintain, 0, 0, true);
 		updateMaintainItem(tempNurseSiteMaintain,date,user);
+		updateTimeAndUser(tempNurseSiteMaintain,date,user);
 		saveMaintainItem(tempNurseSiteMaintain);
 		updateMaintain(tempNurseSiteMaintain,date,user);
 		save(tempNurseSiteMaintain);
 		return true;
 	}
-
+	private void updateTimeAndUser(NurseSiteMaintain obj, Date date, UserAccount user){
+		if(obj == null)return;
+		List<NurseSiteMaintainItem> listItem = obj.getListNurseSiteMaintainItem();
+		if(CollectionUtils.isEmpty(listItem)) return;
+		if(user == null)return;
+		listItem.forEach(item->{
+			item.setUpdateDate(date);
+			item.setUpdateByUid(user.getUid());
+		});
+	}
 	@Transactional
 	public boolean saveMaintain(NurseSiteMaintain tempNurseSiteMaintain) {
 		save(tempNurseSiteMaintain);
