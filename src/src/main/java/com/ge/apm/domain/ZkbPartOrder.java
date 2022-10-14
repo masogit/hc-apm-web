@@ -29,7 +29,7 @@ public class ZkbPartOrder implements Serializable {
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,
+        Requested,TechnicalAccept,TechnicalReject,ProductAccept,ProductReject,
         ManageAccept,ManageReject,UnOrdered,UnOrderedReject,
         Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject,CommercialAccept,CommercialReject,FourHundredCancel
     }
@@ -45,6 +45,10 @@ public class ZkbPartOrder implements Serializable {
 
     public enum ProbeQuotaTypeEnum{
         Any,Special,Normal,High
+    }
+
+    public enum CcsbQuotaTypeEnum{
+        Repair, Maintain
     }
 
     @Id
@@ -596,6 +600,16 @@ public class ZkbPartOrder implements Serializable {
     @Transient
     private String regionalManagerPhone;//区域经理电话
 
+    @Column(name = "ccsb_apply_type")
+    private String ccsbApplyType;// apply maintain
+
+    public String getCcsbApplyType() {
+        return ccsbApplyType;
+    }
+
+    public void setCcsbApplyType(String ccsbApplyType) {
+        this.ccsbApplyType = ccsbApplyType;
+    }
 
     public String getRegionalManagerName() {
         return regionalManagerName;

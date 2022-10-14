@@ -29,7 +29,7 @@ public class ZkbContract implements ChineseName, Serializable {
     }
 
     public enum ContractType {
-        PCB,Biomed,CCS,DI
+        PCB,Biomed,CCS,DI,CCSB
     }
 
     public enum ModifyTypeEnum{
@@ -220,6 +220,31 @@ public class ZkbContract implements ChineseName, Serializable {
     @Column(name = "spare_artificail_use")
     private Integer spareArtificailUse = 0;
 
+
+    /**
+     *备件高值名额
+     */
+    @Column(name = "part_high_quota")
+    private Integer partHighQuota = 0;
+    @Column(name = "part_high_quota_use")
+    private Integer partHighQuotaUse = 0;
+    @Column(name = "part_high_quota_apply")
+    private Integer partHighQuotaApply = 0;
+    @Column(name = "part_high_quota_total")
+    private Integer partHighQuotaTotal = 0;
+
+    /**
+     * CCSB保养名额
+     */
+    @Column(name = "ccsb_maintenance_quota")
+    private Integer ccsbMaintenanceQuota = 0;
+    @Column(name = "ccsb_maintenance_quota_use")
+    private Integer ccsbMaintenanceQuotaUse = 0;
+    @Column(name = "ccsb_maintenance_quota_apply")
+    private Integer ccsbMaintenanceQuotaApply = 0;
+    @Column(name = "ccsb_maintenance_quota_total")
+    private Integer ccsbMaintenanceQuotaTotal = 0;
+
     /**
      * 负责人
      */
@@ -340,6 +365,70 @@ public class ZkbContract implements ChineseName, Serializable {
      */
     @Column(name = "asset_quota_type")
     private String assetQuotaType;
+
+    public Integer getCcsbMaintenanceQuota() {
+        return ccsbMaintenanceQuota;
+    }
+
+    public void setCcsbMaintenanceQuota(Integer ccsbMaintenanceQuota) {
+        this.ccsbMaintenanceQuota = ccsbMaintenanceQuota;
+    }
+
+    public Integer getCcsbMaintenanceQuotaUse() {
+        return ccsbMaintenanceQuotaUse;
+    }
+
+    public void setCcsbMaintenanceQuotaUse(Integer ccsbMaintenanceQuotaUse) {
+        this.ccsbMaintenanceQuotaUse = ccsbMaintenanceQuotaUse;
+    }
+
+    public Integer getCcsbMaintenanceQuotaApply() {
+        return ccsbMaintenanceQuotaApply;
+    }
+
+    public void setCcsbMaintenanceQuotaApply(Integer ccsbMaintenanceQuotaApply) {
+        this.ccsbMaintenanceQuotaApply = ccsbMaintenanceQuotaApply;
+    }
+
+    public Integer getCcsbMaintenanceQuotaTotal() {
+        return ccsbMaintenanceQuotaTotal;
+    }
+
+    public void setCcsbMaintenanceQuotaTotal(Integer ccsbMaintenanceQuotaTotal) {
+        this.ccsbMaintenanceQuotaTotal = ccsbMaintenanceQuotaTotal;
+    }
+
+    public Integer getPartHighQuota() {
+        return partHighQuota;
+    }
+
+    public void setPartHighQuota(Integer partHighQuota) {
+        this.partHighQuota = partHighQuota;
+    }
+
+    public Integer getPartHighQuotaUse() {
+        return partHighQuotaUse;
+    }
+
+    public void setPartHighQuotaUse(Integer partHighQuotaUse) {
+        this.partHighQuotaUse = partHighQuotaUse;
+    }
+
+    public Integer getPartHighQuotaApply() {
+        return partHighQuotaApply;
+    }
+
+    public void setPartHighQuotaApply(Integer partHighQuotaApply) {
+        this.partHighQuotaApply = partHighQuotaApply;
+    }
+
+    public Integer getPartHighQuotaTotal() {
+        return partHighQuotaTotal;
+    }
+
+    public void setPartHighQuotaTotal(Integer partHighQuotaTotal) {
+        this.partHighQuotaTotal = partHighQuotaTotal;
+    }
 
     public String getAssetQuotaType() {
         return assetQuotaType;
