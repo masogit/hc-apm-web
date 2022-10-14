@@ -38,7 +38,7 @@
                 <p:menuitem id="um0011" value="多级审批" outcome="/portal/approval/MultiLevelApproval.xhtml" rendered="true"/>
             </p:submenu>
 
-            <p:submenu id="um010" label="备件管理" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRole('SparePartsAdmin')}">
+            <p:submenu id="um010" label="备件管理" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('parts')}">
                 <p:menuitem value="备件申购" outcome="/portal/parts/PartsPurchase.xhtml"/>
                 <p:menuitem value="备件申领" outcome="/portal/parts/PartsRequest.xhtml"/>
                 <p:menuitem value="备件出库" outcome="/portal/parts/PartsOutStock.xhtml"/>
