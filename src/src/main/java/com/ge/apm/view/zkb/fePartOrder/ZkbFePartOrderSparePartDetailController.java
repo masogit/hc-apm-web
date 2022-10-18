@@ -277,6 +277,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                     confirmMessage += "备件+人工+保养剩余名额为"+spareArtificail+"。";
                     thisDeductionMessage = "本次扣除"+curApplyCount+"个备件+人工+保养名额。";
                 }else if("CCS".equals(zkbContract.getContractType())
+                        ||"CCSB".equals(zkbContract.getContractType())
                         ||"Biomed".equals(zkbContract.getContractType())) {
                     Integer spareQuota = zkbContract.getSpareQuota()!= null?zkbContract.getSpareQuota():new Integer(0);
                     if(adjustApplyCount<beforeAdjustQty){
@@ -476,8 +477,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         {
             reaminApplyCount=zkbContract.getSpareArtificail();
         }else if("CCS".equals(zkbContract.getContractType())
-            ||"Biomed".equals(zkbContract.getContractType()))
-        {
+                ||"CCSB".equals(zkbContract.getContractType())
+            ||"Biomed".equals(zkbContract.getContractType())){
             reaminApplyCount=zkbContract.getSpareQuota();
         }
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
