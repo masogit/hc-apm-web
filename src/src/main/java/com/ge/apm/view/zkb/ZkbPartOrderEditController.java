@@ -281,8 +281,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }else if(contractList.size() == 1){
             selectedContract = contractList.get(0);
-            ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(selectedContract.getId(),assetInfo.getUid());
+            //判断合同是否是CCSB
+            if(ZkbContract.ContractType.CCSB.toString().equals(selectedContract.getContractType())){
+                if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "CCSB类型合同只能进行人工申请！", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                    contractList = new ArrayList<>();
+                    return;
+                }
+            }
 
+            //599方案判断
+            ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(selectedContract.getId(),assetInfo.getUid());
             if(ZkbContract.YOrNEnum.N.toString().equals(selectedContract.getFiveNineNineFlag())){
                 if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                     if(zkbContractAsset != null && StringUtils.isNotEmpty(zkbContractAsset.getAssetType())){
@@ -480,6 +490,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void editCurrentScoreFlag(){
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            if(ZkbContract.ContractType.CCSB.toString().equals(selectedContract.getContractType())){
+                currentScoreFlag = true;
+                return;
+            }
+        }
         //积分不够不能申请
         currentScore = zkbIntegralService.queryScoreFlag(selectionTenantInfo);
         currentScoreText = "当前积分："+ currentScore;
@@ -737,6 +753,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            if(ZkbContract.ContractType.CCSB.toString().equals(selectedContract.getContractType())){
+                maintainFlag = CopyByInvok.F;
+            }
             this.selected.setArtificialType(artificialType);
             this.selected.setMaintainFlag(maintainFlag);
             if(CopyByInvok.T.equals(maintainFlag)){
@@ -948,7 +967,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
 
         } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-            if(CopyByInvok.T.equals(maintainFlag)){
+            if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+
+            }else if(CopyByInvok.T.equals(maintainFlag)){
                 if(CopyByInvok.T.equals(selected.getScoreFlag())){
                 }else{
                     ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
@@ -960,7 +981,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }else{
-
                 if(!CopyByInvok.NORMAL_TWO.equals(artificialType)){
                     ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
                     if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){

@@ -31,7 +31,7 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
 
-                    <h:panelGroup id="maintainFlagGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
+                    <h:panelGroup id="maintainFlagGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and !(zkbPartOrderEditController.selectedContract.contractType eq 'CCSB')}">
                         <label class="label">保养申请*</label>
                         <p:selectOneMenu id="maintainFlag" value="#{zkbPartOrderEditController.maintainFlag}" required="true" requiredMessage="保养申请 #{msg.ValidationRequire}">
                             <p:ajax event="change" update="zkbPartOrderEditForm zkbHeadEditForm" listener="#{zkbPartOrderEditController.orderTypeChange}"  />
@@ -73,7 +73,7 @@
                                  lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
                                  paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
 
-                        <p:ajax event="rowSelect"  listener="#{zkbPartOrderEditController.workFlowSelected}" update="zkbwkEditForm zkbPartOrderEditForm zkbContractDatalist "/>
+                        <p:ajax event="rowSelect"  listener="#{zkbPartOrderEditController.workFlowSelected}" update="zkbHeadEditForm zkbwkEditForm zkbPartOrderEditForm zkbContractDatalist "/>
 
                         <p:column headerText="设备名称">
                             <h:outputText value="#{item.name}"/>
@@ -228,6 +228,16 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.selectedContract.contractType eq 'CCSB'}">
+                            <label class="label">CCSB扣除名额类型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.ccsbApplyType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="qty remainQty" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCCsbQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType != null and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'Old'}">
                             <label class="label">是否高值探头*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.highCatFlag}" required="true" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
