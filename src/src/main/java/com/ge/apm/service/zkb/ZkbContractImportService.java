@@ -1,5 +1,7 @@
 package com.ge.apm.service.zkb;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -837,15 +839,32 @@ public class ZkbContractImportService {
                 zkbContractAssetRepository.save(zkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetEdit","",zkbContractAssetVO.getQrCode(),"导入设备编辑",currentUser,null);
 
+                AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
+                boolean modifyFlag= false;
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
                     Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
-                    AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
                     if(assetInfo != null && repairForm != null){
                         if(!repairForm.equals(assetInfo.getRepairForm())){
                             assetInfo.setRepairForm(repairForm);
-                            assetInfoRepository.save(assetInfo);
+                            modifyFlag = true;
                         }
                     }
+                }
+                if(assetInfo.getWarrantyDate() != null){
+                    ZkbContract zkbContract = zkbContractRepository.findById(zkbContractAsset.getContractId());
+                    if(assetInfo.getWarrantyDate() != null){
+                        long betweenDay = DateUtil.between(assetInfo.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
+                        if(betweenDay != 0){
+                            assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                            modifyFlag = true;
+                        }
+                    }else {
+                        assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                        modifyFlag = true;
+                    }
+                }
+                if(modifyFlag){
+                    assetInfoRepository.save(assetInfo);
                 }
             }else{
                 ZkbContractAsset newZkbContractAsset = new ZkbContractAsset();
@@ -869,15 +888,33 @@ public class ZkbContractImportService {
                 newZkbContractAsset.setKa(zkbContractAssetVO.getKa());
                 zkbContractAssetRepository.save(newZkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser,null);
+
+                AssetInfo assetInfo = assetInfoRepository.findByUid(newZkbContractAsset.getAssetId());
+                boolean modifyFlag= false;
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
                     Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
-                    AssetInfo assetInfo = assetInfoRepository.findByUid(newZkbContractAsset.getAssetId());
                     if(assetInfo != null && repairForm != null){
                         if(!repairForm.equals(assetInfo.getRepairForm())){
                             assetInfo.setRepairForm(repairForm);
-                            assetInfoRepository.save(assetInfo);
+                            modifyFlag = true;
                         }
                     }
+                }
+                if(assetInfo.getWarrantyDate() != null){
+                    ZkbContract zkbContract = zkbContractRepository.findById(zkbContractAsset.getContractId());
+                    if(assetInfo.getWarrantyDate() != null){
+                        long betweenDay = DateUtil.between(assetInfo.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
+                        if(betweenDay != 0){
+                            assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                            modifyFlag = true;
+                        }
+                    }else {
+                        assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                        modifyFlag = true;
+                    }
+                }
+                if(modifyFlag){
+                    assetInfoRepository.save(assetInfo);
                 }
             }
         }else if("Y".equals(zkbContractAssetVO.getFlag())){
