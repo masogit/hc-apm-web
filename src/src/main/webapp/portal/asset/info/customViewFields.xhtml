@@ -393,6 +393,14 @@
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'networkingStatus')}">
+        <h:panelGroup >
+            <label class="label">#{msg.networkingStatus}</label>
+            <p:selectOneRadio id="networkingStatus"  label="#{msg.networkingStatus}" value="#{assetInfoDetailController.selected.networkingStatus}" disabled="true">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('networkingStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'comments')}">
         <h:panelGroup >
             <label class="label">#{msg.comments}</label>
@@ -611,6 +619,15 @@
         <h:panelGroup>
             <label class="label">#{msg.isAssetPMed}</label>
             <p:selectOneRadio value="#{assetInfoDetailController.selected.isPm}" disabled="true">
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'isUseRegistration')}">
+        <h:panelGroup>
+            <label class="label">#{msg.isUseRegistration}</label>
+            <p:selectOneRadio value="#{assetInfoDetailController.selected.isUseRegistration}" disabled="true">
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
             </p:selectOneRadio>
