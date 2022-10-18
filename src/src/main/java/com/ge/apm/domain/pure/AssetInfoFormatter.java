@@ -194,6 +194,18 @@ public class AssetInfoFormatter {
         return null;
     }
 
+    public Integer getNetworkingStatus() {
+        return assetInfo.getNetworkingStatus();
+    }
+
+    public String getNetworkingStatusAsString() {
+        I18nMessage msg = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority("networkingStatus",String.valueOf(assetInfo.getNetworkingStatus()), siteId);
+        if (msg != null) {
+            return msg.getValueZh();
+        }
+        return null;
+    }
+
     public String getComments() {
         return assetInfo.getComments();
     }
@@ -565,9 +577,7 @@ public class AssetInfoFormatter {
         return assetInfo.getSystemId();
     }
 
-    public String getSystemNum1() {
-        return assetInfo.getSystemNum1();
-    }
+    public String getSystemNum1() { return assetInfo.getSystemNum1(); }
 
     public String getSystemNum2() {
         return assetInfo.getSystemNum2();
@@ -908,10 +918,12 @@ public class AssetInfoFormatter {
         map.put(getMessage("accountingCategory"), this.getAccountingCategoryAsString());
         map.put(getMessage("isAssetPMed"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? getMessage("true") : getMessage("false"));
         map.put(getMessage("isFixed"), assetInfo.getIsFixed() == null || assetInfo.getIsFixed() ? getMessage("true") : getMessage("false"));
+        map.put(getMessage("isUseRegistration"), assetInfo.getIsUseRegistration() == null || assetInfo.getIsUseRegistration() ? getMessage("true") : getMessage("false"));
         map.put(getMessage("isAssetChecked"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? getMessage("true") : getMessage("false"));
 
         map.put(getMessage("assetValueCategory"), this.getAssetValueCategoryName());
         map.put(getMessage("deviceStatus"), this.getDeviceStatusAsString());
+        map.put(getMessage("networkingStatus"), this.getNetworkingStatusAsString());
         map.put(getMessage("capitalSource2"), this.getCapitalSource2AsString());
         map.put(getMessage("isWarrantyNotice"), this.getWarrantyAsString());
         map.put(getMessage("assetTags"), this.joinTags(assetMap));
