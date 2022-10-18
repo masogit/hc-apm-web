@@ -744,6 +744,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     break;
             }
         } else if ("CCS".equals(zkbContract.getContractType())
+                ||"CCSB".equals(zkbContract.getContractType())
                 || "Biomed".equals(zkbContract.getContractType())) {
             orderType = ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString();
             switch (type) {
@@ -807,6 +808,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     break;
             }
         } else if ("CCS".equals(zkbContract.getContractType())
+                ||"CCSB".equals(zkbContract.getContractType())
                 || "Biomed".equals(zkbContract.getContractType())) {
             orderType = ZkbContractQuotaLog.OrderTypeEnum.Spare.toString();
             switch (type) {

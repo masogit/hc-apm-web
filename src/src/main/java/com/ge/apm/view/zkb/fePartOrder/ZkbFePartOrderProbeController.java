@@ -439,6 +439,13 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             this.contractError = true;
             return;
         }
+        ZkbContract zkbContract =  this.contractList.stream().findFirst().get();
+        if (ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())&&ZkbFePartOrder.OrderType.Probe.toString().equals(this.selected.getOrderType())) {
+            WebUtil.addErrorMessage("合同类型为CCSB的设备只允许进行备件申请！","");
+            this.contractError = true;
+            return;
+        }
+
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             this.selected.setFatherPartOrderNo(null);
