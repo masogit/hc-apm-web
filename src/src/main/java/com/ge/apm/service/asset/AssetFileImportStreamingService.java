@@ -214,6 +214,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("assetValueCategory")), "setAssetValueCategory", assetValueCategoryList, map, null);
 
+                assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("isUseRegistration")), "setIsUseRegistration", true);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("networkingStatus")), "setNetworkingStatus", networkingStatusList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("deviceStatus")), "setDeviceStatus", deviceStatusList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("capitalSource2")), "setCapitalSource2", capitalSource2List, map, null);
                 assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("isWarrantyNotice")), "setWarranty", true);

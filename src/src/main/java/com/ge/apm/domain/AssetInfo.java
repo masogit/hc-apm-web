@@ -339,6 +339,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "device_status")
     private Integer deviceStatus;//资产状态
 
+    @Column(name = "networking_status")
+    private Integer networkingStatus;  //联网状态 0 未联网  1 内网  3 外网
+
     //null   1 empowerment  //这个字段不需要编辑和展示，所以只存null 和1
     @Column(name = "empowerment_status")
     private Integer empowermentStatus;
@@ -475,6 +478,9 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "is_pm")
     private Boolean isPm = Boolean.TRUE;//是否保养
+
+    @Column(name = "is_use_registration")  //是否使用登记
+    private Boolean isUseRegistration = Boolean.TRUE;
 
     @Column(name = "is_fixed")
     private Boolean isFixed = Boolean.TRUE;//是否固定资产
@@ -2546,4 +2552,19 @@ public class AssetInfo implements ChineseName,Serializable {
     public String getBoUuid() { return boUuid; }
 
     public void setBoUuid(String boUuid) { this.boUuid = boUuid; }
+
+    public Integer getNetworkingStatus() {
+        if(networkingStatus == null) return 0;
+        return networkingStatus;
+    }
+
+    public void setNetworkingStatus(Integer networkingStatus) { this.networkingStatus = networkingStatus; }
+
+    public Boolean getIsUseRegistration() {
+        if(isUseRegistration==null) return true;
+        return isUseRegistration;
+    }
+
+    public void setIsUseRegistration(Boolean isUseRegistration) { this.isUseRegistration = isUseRegistration; }
+
 }

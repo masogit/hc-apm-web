@@ -69,6 +69,7 @@ public class AssetFileImportBaseService {
     public List<I18nMessage> assetValueCategoryList = FieldValueMessageController.getFieldValueList("assetValueCategory", siteId);
     public List<I18nMessage> capitalSource2List = FieldValueMessageController.getFieldValueList("capitalSource2", siteId);
     public List<I18nMessage> deviceStatusList = FieldValueMessageController.getFieldValueList("deviceStatus", siteId);
+    public List<I18nMessage> networkingStatusList = FieldValueMessageController.getFieldValueList("networkingStatus", siteId);
     public List<I18nMessage> proprietaryClassList = FieldValueMessageController.getFieldValueList("proprietaryClass", siteId);
     public List<I18nMessage> assetQualityList = FieldValueMessageController.getFieldValueList("assetQuality", siteId);
 
