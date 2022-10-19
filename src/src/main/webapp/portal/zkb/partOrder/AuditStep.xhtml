@@ -164,7 +164,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.maintainFlag != 't'}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.maintainFlag != 't' and zkbPartOrderEditController.selectedContract.contractType != 'CCSB'}">
                             <c:if test="#{zkbPartOrderAuditController.selected.artificialType eq '1'}">
                                 <label class="label" >是否需要SSA Key*</label>
                             </c:if>
@@ -210,6 +210,13 @@
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.probeQuotaType}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and zkbPartOrderAuditController.zkbContract.contractType eq 'CCSB'}">
+                            <label class="label">CCSB扣除名额类型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.ccsbApplyType}"  disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCCsbQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and (empty zkbPartOrderAuditController.selected.probeQuotaType)}">
@@ -529,7 +536,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <c:choose>
-                                <c:when test="#{zkbPartOrderAuditController.orderType eq 'Artificial'}">
+                                <c:when test="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.zkbContract.contractType eq 'CCSB'}">
                                     <label class="label">区域经理审批备注（是否上过培训课）</label>
                                 </c:when>
                                 <c:otherwise>
