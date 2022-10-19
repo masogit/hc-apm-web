@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetHistoryService;
+import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
@@ -38,7 +40,7 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
     private AssetHistoryRepository assetHistoryRepository;
     private AssetInfoEditController assetInfoEditController;
     private UaaService uuaService;
-
+    private CustomConfigService customConfigService;
     @Getter
     @Setter
     private String oneSearchStr;
@@ -53,6 +55,7 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         assetHistoryRepository = WebUtil.getBean(AssetHistoryRepository.class);
         uuaService = WebUtil.getBean(UaaService.class);
+        customConfigService = WebUtil.getBean(CustomConfigService.class);
 
     }
 
@@ -68,6 +71,9 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        CustomConfigObject  customConfig = customConfigService.getCurrentCustomConfig(userAccount.getSiteUID());
+        List<String> assetsImportantFields = customConfig.getAssetsImportantFields();
+        searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.CONTAINS, assetsImportantFields));
         if(!StringUtils.isEmpty(oneSearchStr)) {
             searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.LIKE, oneSearchStr));
         }
