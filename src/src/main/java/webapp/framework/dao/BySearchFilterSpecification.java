@@ -90,6 +90,19 @@ public class BySearchFilterSpecification {
                             case IsEmpty:
                                 predicates.add(new Tuple2(filter.conditionPath, builder.isEmpty(expression)));
                                 break;
+                            case CONTAINS:
+                                List<String> list2 = (List<String>) filter.value;
+                                List<Predicate> PredicateList=new ArrayList<>();
+                                for (String s: list2) {
+                                    if (s!= null) {
+                                        Predicate like = builder.like(builder.lower(expression), "%" + s.toString().toLowerCase() + "%");
+                                        PredicateList.add(like);
+                                    }
+                                }
+                                Predicate[] Predicates = new Predicate[PredicateList.size()];
+                                PredicateList.toArray(Predicates);
+                                predicates.add(new Tuple2(filter.conditionPath, builder.or(Predicates)));
+                                break;
                         }
                     }
 
