@@ -3,12 +3,19 @@ package com.ge.apm.view;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepository;
@@ -18,6 +25,9 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,9 +42,9 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     private UaaService uaaService;
     private OrgInfoRepository orgInfoRepository;
     private String oneSearchStr;
-
+    private BrandRepository brandRepository;
     private String filterSatId;
-
+    private StreamedContent exportXls;
     //是否启用无人值守 true：启动
     private boolean whethertoenableunattended;
 
@@ -99,7 +109,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                 whethertoenableunattended = true;
             }
         }
-
+        brandRepository=WebUtil.getBean(BrandRepository.class);
         sharedAssetSwapIndexDao = WebUtil.getBean(SharedAssetSwapIndexRepository.class);
         this.selectedMap = new HashMap();
 
@@ -152,6 +162,13 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                 sharedAssetSwapIndexList.stream().forEach(sharedAssetSwapIndex -> assetUids.add(sharedAssetSwapIndex.getAssetUid()));
                 searchFilters.add(new SearchFilter("uid",SearchFilter.Operator.IN,assetUids));
                 this.removeFilterOnField("swapIndex");
+            }else if(fieldName.equals("brandId")){
+                List<String> byBrandId = dao.findByBrandId(Integer.valueOf(this.searchFilters.get(i).value.toString()));
+                if(CollectionUtils.isEmpty(byBrandId)){
+                   byBrandId=Arrays.asList("-1");
+                }
+                searchFilters.add(new SearchFilter("uid",SearchFilter.Operator.IN,byBrandId));
+                this.removeFilterOnField("brandId");
             }
         }
 
@@ -169,6 +186,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                     index = sharedAssetSwapIndexDao.findByAssetUid(assetInfo.getUid());
                     assetInfo.setSharedAssetSwapIndex(index == null ?  null : index.getSwapIndex());
                     assetInfo.setSharedAssetSwapIndexId(index == null ?  null : index.getId());
+                    assetInfo.setRemark(index == null ?"":index.getRemark());
                 }
             }
 
@@ -178,6 +196,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                     if(sharedAssetSwapIndex.getAssetUid().equals(assetInfo.getUid())) {
                         assetInfo.setSharedAssetSwapIndex(sharedAssetSwapIndex.getSwapIndex());
                         assetInfo.setSharedAssetSwapIndexId(sharedAssetSwapIndex.getId());
+                        assetInfo.setRemark(sharedAssetSwapIndex.getRemark());
                     }
                 }
             }
@@ -316,6 +335,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                         sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
                         sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
                         sharedAssetSwapIndex.setSwapIndex(ind);
+                        sharedAssetSwapIndex.setRemark(this.selected.getRemark());
                         sharedAssetSwapIndexDao.save(sharedAssetSwapIndex);
                         swapIndex = null;
                     } else {
@@ -348,6 +368,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                             sharedAssetSwapIndex.setSharedAssetType(this.selected.getSharedAssetTypeUid());
                             sharedAssetSwapIndex.setAssetUid(this.selected.getUid());
                             sharedAssetSwapIndex.setSwapIndex(ind);
+                            sharedAssetSwapIndex.setRemark(this.selected.getRemark());
                             sharedAssetSwapIndexDao.save(sharedAssetSwapIndex);
                             swapIndex = null;
                         } else {
@@ -397,6 +418,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             SharedAssetSwapIndex sharedAssetSwapIndex = sharedAssetSwapIndexDao.findByAssetUid(uid);
             selected.setSharedAssetSwapIndex(sharedAssetSwapIndex == null ? "" : sharedAssetSwapIndex.getSwapIndex());
             selected.setSharedAssetSwapIndexId(sharedAssetSwapIndex == null ? "" : sharedAssetSwapIndex.getId());
+            selected.setRemark(sharedAssetSwapIndex == null ? "" : sharedAssetSwapIndex.getRemark());
         }
     }
 
@@ -452,4 +474,79 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setBathcSharedStatus(Integer bathcSharedStatus) {
         this.bathcSharedStatus = bathcSharedStatus;
     }
+
+
+    public StreamedContent getExportXls() {
+        List<String> collect1 = selectedMap.entrySet().stream().filter(item -> Boolean.TRUE.equals(item.getValue())).map(item -> item.getKey()).collect(Collectors.toList());
+        List<AssetInfo> assetInfos=new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(collect1)){
+            assetInfos = dao.findByUidIn(collect1);
+        }else{
+            assetInfos = dao.findBySearchFilter(this.searchFilters);
+        }
+        List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueListByMsgType("assetGroup");
+        Map<String, String> i18nMessageMap = assetGroup.stream().collect(Collectors.toMap(I18nMessage::getMsgKey, I18nMessage::getValue));
+        Set<String> collect = assetInfos.stream().map(item -> item.getUid()).collect(Collectors.toSet());
+        if(CollectionUtils.isNotEmpty(collect)){
+            List<SharedAssetSwapIndex> byAssetUidList = sharedAssetSwapIndexDao.findByAssetUidList(collect);
+            Map<String, SharedAssetSwapIndex> sharedAssetSwapIndexMap = byAssetUidList.stream().collect(Collectors.toMap(SharedAssetSwapIndex::getAssetUid, item -> item));
+            List<SharedAssetType> sharedAssetTypes = allType();
+            Map<String, String> sharedAssetTypesMap = sharedAssetTypes.stream().collect(Collectors.toMap(SharedAssetType::getId, SharedAssetType::getSwapName));
+            assetInfos.forEach(item->{
+                SharedAssetSwapIndex sharedAssetSwapIndex = sharedAssetSwapIndexMap.get(item.getUid());
+                String swapName = sharedAssetTypesMap.get(item.getSharedAssetTypeUid());
+                item.setSharedAssetTypeUid(swapName);
+                if(sharedAssetSwapIndex != null){
+                    item.setSharedAssetSwapIndex(sharedAssetSwapIndex.getSwapIndex());
+                    item.setRemark(sharedAssetSwapIndex.getRemark());
+                }
+            });
+        }
+        String [] header={"设备名称","调剂编号","设备编号(院方)","二维码","设备分类","设备型号","品牌","采购价格","设备调剂名称","注意事项"};
+        HSSFWorkbook workbook=new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet();
+        HSSFRow row = sheet.createRow(0);
+        int length = header.length;
+        for (int i = 0; i < length; i++) {
+            HSSFCell cell = row.createCell(i);
+            cell.setCellValue(header[i]);
+        }
+        for (int i = 0; i < assetInfos.size(); i++) {
+            HSSFRow row1 = sheet.createRow(i + 1);
+            AssetInfo assetInfo = assetInfos.get(i);
+            setCellValue(row1,0,assetInfo.getName());
+            setCellValue(row1,1,assetInfo.getSharedAssetSwapIndex());
+            setCellValue(row1,2,assetInfo.getDepartNum());
+            setCellValue(row1,3,assetInfo.getQrCode());
+            setCellValue(row1,4,i18nMessageMap.get(assetInfo.getAssetGroup()+""));
+            setCellValue(row1,5,assetInfo.getFunctionType());
+            Brand brand = assetInfo.getBrand();
+            setCellValue(row1,6,brand==null?"":brand.getName());
+            Double purchasePrice = assetInfo.getPurchasePrice();
+            setCellValue(row1,7,purchasePrice == null?"":purchasePrice+"");
+            setCellValue(row1,8,assetInfo.getSharedAssetTypeUid());
+            setCellValue(row1,9,assetInfo.getRemark());
+
+        }
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            workbook.write(byteArrayOutputStream);
+            exportXls = new DefaultStreamedContent((new ByteArrayInputStream(byteArrayOutputStream.toByteArray())), "application/vnd.ms-excel", "AssetOptRecordData.xls");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return exportXls;
+    }
+    private void setCellValue(HSSFRow row,int index,String value){
+        HSSFCell cell = row.createCell(index);
+        cell.setCellValue(value);
+    }
+    public void setExportXls(StreamedContent exportXls) {
+        this.exportXls = exportXls;
+    }
+
+    public List<Brand> getBrandAll(){
+        return brandRepository.findByBrandList();
+    }
+
 }

@@ -36,7 +36,9 @@ public class SharedAssetSwapIndex implements Serializable{
     //调剂编号 同一调剂设备类型shared_asset_type下应唯一
     @Column(name = "swap_index")
     private String swapIndex;
-
+    //
+    @Column(name="remark",columnDefinition = "text")
+    private String remark;
 
     public String getId() {
         return id;
@@ -73,4 +75,12 @@ public class SharedAssetSwapIndex implements Serializable{
 //        if (getId() == null)
 //            setId(UUID.randomUUID().toString().replace("-", ""));
 //    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 }
