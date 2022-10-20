@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -44,6 +45,18 @@ public abstract class MyCRUDController<E> implements Serializable, ServerEventIn
     protected boolean warnOnEmptySearchFilters = false;
     public String crudActionName;
 
+    public boolean hasFilterOnField(String fieldName){
+        for(SearchFilter filter: searchFilters){
+            if(fieldName.equals(filter.fieldName)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void removeFilterOnField(String fieldName) {
+        searchFilters.stream().filter(item -> fieldName.equals(item.fieldName)).collect(Collectors.toList()).forEach(searchFilters::remove);
+    }
 
     public boolean isWarnOnEmptySearchFilters() {
         return warnOnEmptySearchFilters;
