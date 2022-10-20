@@ -823,6 +823,10 @@ public class ZkbContractService {
             ZkbContractAsset zkbContractAsset = new ZkbContractAsset();
             zkbContractAsset.setContractId(zkbContract.getId());
             zkbContractAsset.setAssetId(a.getUid());
+            zkbContractAsset.setCreatedDate(new Date());
+            zkbContractAsset.setCreatedBy(currentUser.getName());
+            zkbContractAsset.setLastModifiedDate(new Date());
+            zkbContractAsset.setLastModifiedBy(currentUser.getName());
             zkbContractAssetRepository.save(zkbContractAsset);
 
             zkbContract.setLastModifiedDate(new Date());
@@ -846,6 +850,8 @@ public class ZkbContractService {
 
     @Transactional(rollbackFor = Exception.class)
     public void updateAsset(ZkbContract zkbContract,ZkbContractAsset zkbContractAsset,String reason,UserAccount currentUser){
+        zkbContractAsset.setLastModifiedBy(currentUser.getName());
+        zkbContractAsset.setLastModifiedDate(new Date());
         zkbContractAssetRepository.save(zkbContractAsset);
         zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetEdit","",zkbContractAsset.getAssetInfo().getQrCode(),reason,currentUser,null);
 

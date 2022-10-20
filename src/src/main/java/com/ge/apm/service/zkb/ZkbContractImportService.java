@@ -836,6 +836,8 @@ public class ZkbContractImportService {
                     zkbContractAsset.setTrainReasonFlag("empty");
                 }
                 zkbContractAsset.setSupportMaintainFlag(zkbContractAssetVO.getSupportMaintainFlag());
+                zkbContractAsset.setLastModifiedBy(currentUser.getName());
+                zkbContractAsset.setLastModifiedDate(new Date());
                 zkbContractAssetRepository.save(zkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetEdit","",zkbContractAssetVO.getQrCode(),"导入设备编辑",currentUser,null);
 
@@ -885,6 +887,10 @@ public class ZkbContractImportService {
                 newZkbContractAsset.setModality(zkbContractAssetVO.getModality());
                 newZkbContractAsset.setResponsiblEngineer(zkbContractAssetVO.getResponsiblEngineer());
                 newZkbContractAsset.setKa(zkbContractAssetVO.getKa());
+                newZkbContractAsset.setCreatedBy(currentUser.getName());
+                newZkbContractAsset.setCreatedDate(new Date());
+                newZkbContractAsset.setLastModifiedBy(currentUser.getName());
+                newZkbContractAsset.setLastModifiedDate(new Date());
                 zkbContractAssetRepository.save(newZkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser,null);
 
