@@ -118,14 +118,8 @@
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.functionType}"/>
                         </p:column>
-                        <p:column headerText="品牌" sortBy="#{item.brandId}" filterBy="#{item.brandId}" filterMatchMode="EQ" rendered="#{sharedAssetInfoController.whethertoenableunattended}">
-                            <h:outputText value="#{item.brand.name}"/>
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{sharedAssetInfoController.getBrandAll()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
+                        <p:column headerText="品牌" sortBy="#{item.makerShortName}" filterBy="#{item.makerShortName}" filterMatchMode="LIKE" rendered="#{sharedAssetInfoController.whethertoenableunattended}">
+                            <h:outputText value="#{item.makerShortName}"/>
                         </p:column>
                         <p:column headerText="#{msg.purchasePrice}" sortBy="#{item.purchasePrice}" filterBy="#{item.purchasePrice}" filterMatchMode="GTE">
                             <h:outputText value="#{item.purchasePrice}"/>

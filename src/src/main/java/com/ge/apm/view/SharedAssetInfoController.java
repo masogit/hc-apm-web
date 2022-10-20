@@ -162,13 +162,6 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
                 sharedAssetSwapIndexList.stream().forEach(sharedAssetSwapIndex -> assetUids.add(sharedAssetSwapIndex.getAssetUid()));
                 searchFilters.add(new SearchFilter("uid",SearchFilter.Operator.IN,assetUids));
                 this.removeFilterOnField("swapIndex");
-            }else if(fieldName.equals("brandId")){
-                List<String> byBrandId = dao.findByBrandId(Integer.valueOf(this.searchFilters.get(i).value.toString()));
-                if(CollectionUtils.isEmpty(byBrandId)){
-                   byBrandId=Arrays.asList("-1");
-                }
-                searchFilters.add(new SearchFilter("uid",SearchFilter.Operator.IN,byBrandId));
-                this.removeFilterOnField("brandId");
             }
         }
 
@@ -520,8 +513,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
             setCellValue(row1,3,assetInfo.getQrCode());
             setCellValue(row1,4,i18nMessageMap.get(assetInfo.getAssetGroup()+""));
             setCellValue(row1,5,assetInfo.getFunctionType());
-            Brand brand = assetInfo.getBrand();
-            setCellValue(row1,6,brand==null?"":brand.getName());
+            setCellValue(row1,6,assetInfo.getMakerShortName());
             Double purchasePrice = assetInfo.getPurchasePrice();
             setCellValue(row1,7,purchasePrice == null?"":purchasePrice+"");
             setCellValue(row1,8,assetInfo.getSharedAssetTypeUid());
@@ -543,10 +535,6 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     }
     public void setExportXls(StreamedContent exportXls) {
         this.exportXls = exportXls;
-    }
-
-    public List<Brand> getBrandAll(){
-        return brandRepository.findByBrandList();
     }
 
 }
