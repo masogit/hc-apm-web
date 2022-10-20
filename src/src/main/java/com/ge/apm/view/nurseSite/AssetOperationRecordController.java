@@ -65,6 +65,9 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
         }
         boolean assetFlag = !this.hasFilterOnField("assetInfoUid");
+        if (returnFlag == assetFlag) {
+            pageRequest = new Pagination(1, pageRequest.getSize());
+        }
         returnFlag = !assetFlag;
         this.lazyModel.setRowCount(dao.getAllCount(searchFilters, assetFlag));
         return dao.getAll(searchFilters, "createDate", isAscending, pageRequest.getLimit(), pageRequest.getOffset(), assetFlag);
