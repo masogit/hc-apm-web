@@ -370,8 +370,8 @@ public class AssetInfo implements ChineseName,Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brand_id")
     private Brand brand;//品牌
-
-
+    @Transient
+    private String remark;
    /* @ManyToOne(fetch = FetchType.EAGER)
     @NotFound(action= NotFoundAction.IGNORE)
     @JoinColumn(insertable = false, nullable = false,updatable = false,name = "uid",referencedColumnName = "id")
@@ -2567,4 +2567,11 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setIsUseRegistration(Boolean isUseRegistration) { this.isUseRegistration = isUseRegistration; }
 
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 }

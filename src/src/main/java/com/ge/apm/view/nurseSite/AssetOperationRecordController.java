@@ -2,189 +2,164 @@ package com.ge.apm.view.nurseSite;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
-import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.mapper.AssetOperationRecordMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetOperationRecordService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.primefaces.event.SelectEvent;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.MyCRUDController;
-import webapp.framework.web.mvc.ServerEventInterface;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+/**
+ * @author Liu
+ */
 @ManagedBean
 @ViewScoped
-public class AssetOperationRecordController extends MyCRUDController<AssetOperationRecord> implements Serializable, ServerEventInterface {
-	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainConfigController.class);
-	private I18nMessageRepository i18nDao;
-	private UserAccount currentUser;
-	private AssetOperationRecordService service;
-	private AssetOperationRecordMapper dao;
-	private List<AssetOperationRecord> listAssetOperationRecord;
-	private Set<String> setOrgUid;
-	private List<String> listOrgUid;
-	private String assetGroupFilter;
-	private SearchController searchController;
-	private OrgInfo selectOrgInfo;
-	private List<String> setUserUids;
-	private UserAuth customRoleAuth;
-	@Override
-	protected void init() {
-		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-		currentUser = UserContextService.getCurrentUserAccount();
-		service = WebUtil.getBean(AssetOperationRecordService.class);
-		searchController = WebUtil.getBean(SearchController.class);
-		searchController.setCallingController(this);
-		searchController.setUpdateViewIDs(":optRecordListForm:datalist");
-		searchController.setBlnOrgTreeUpdate(true);
-		searchController.setType(5);
-		searchController.updateData();
-		dao = WebUtil.getBean(AssetOperationRecordMapper.class);
-		setUserUids = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
-		if (setOrgUid != null) {
-			listOrgUid = new ArrayList<String>();
-			listOrgUid.addAll(setOrgUid);
-		}
-		this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
-		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
-		// test
-	}
+public class AssetOperationRecordController extends MyCRUDController<AssetOperationRecord> {
 
-	@Override
-	protected List<AssetOperationRecord> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
-		sortField="createDate";
-		if (this.searchFilters == null) {
-			this.searchFilters = new HashSet<SearchFilter>();
-		}
-		// need list or set
-		searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUids, "1*"));
-		if (selectOrgInfo.getOrgType() == 0) {
-			searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-		} else if (selectOrgInfo.getOrgType() == 1) {
-			searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-		} else if (selectOrgInfo.getOrgType() == 2) {
-			searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-		} else if (selectOrgInfo.getOrgType() == 3) {
-			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-		}
-		this.lazyModel.setRowCount(dao.getAllCount(searchFilters));
-		listAssetOperationRecord = dao.getAll(searchFilters, sortField, isAscending, pageRequest.getLimit(), pageRequest.getOffset());
-//		service.supplementCostTime(listAssetOperationRecord);
-		return listAssetOperationRecord;
-	}
+    private UserAccount currentUser;
+    private AssetOperationRecordMapper dao;
+    private String assetGroupFilter;
+    private OrgInfo selectOrgInfo;
+    private List<String> setUserUuids;
+    private UserAuth customRoleAuth;
+    private boolean returnFlag = false;
 
-	@Override
-	public void onServerEvent(String eventName, Object eventObject) {
-		try {
-			OrgInfo orgInfo = (OrgInfo) eventObject;
-			if (orgInfo != null) {
-				selectOrgInfo = orgInfo;
-				searchFilters.clear();
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-	}
+    @Override
+    protected void init() {
+        currentUser = UserContextService.getCurrentUserAccount();
+        dao = WebUtil.getBean(AssetOperationRecordMapper.class);
+        SearchController searchController = WebUtil.getBean(SearchController.class);
+        searchController.setCallingController(this);
+        searchController.setUpdateViewIDs(":optRecordListForm:datalist");
+        searchController.setBlnOrgTreeUpdate(true);
+        searchController.setType(5);
+        searchController.updateData();
+        AssetOperationRecordService service = WebUtil.getBean(AssetOperationRecordService.class);
+        setUserUuids = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
+        this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
+        customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
+    }
 
-	@Override
-	public void onBeforeNewObject(AssetOperationRecord object) {
-		super.onBeforeNewObject(object);
-		object.setTenantUID(currentUser.getTenantUID());
-		object.setInstitutionUID(currentUser.getInstitutionUID());
-		object.setHospitalUID(currentUser.getHospitalUID());
-		object.setSiteUID(currentUser.getSiteUID());
-	}
+    @Override
+    protected List<AssetOperationRecord> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
+        if (this.searchFilters == null) {
+            this.searchFilters = new HashSet<>();
+        }
+        // need list or set
+        searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUuids, "1*"));
+        if (selectOrgInfo.getOrgType() == 0) {
+            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+        } else if (selectOrgInfo.getOrgType() == 1) {
+            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+        } else if (selectOrgInfo.getOrgType() == 2) {
+            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+        } else if (selectOrgInfo.getOrgType() == 3) {
+            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+        }
+        boolean assetFlag = !this.hasFilterOnField("assetInfoUid");
+        returnFlag = !assetFlag;
+        this.lazyModel.setRowCount(dao.getAllCount(searchFilters, assetFlag));
+        return dao.getAll(searchFilters, "createDate", isAscending, pageRequest.getLimit(), pageRequest.getOffset(), assetFlag);
+    }
 
-	@Override
-	public void save() {
-		this.selected = null;
-		WebUtil.addSuccessMessage("保存成功");
-	}
+    public void onRowSelect(SelectEvent event) {
+        AssetOperationRecord operationRecord = (AssetOperationRecord) event.getObject();
+        if (this.searchFilters == null) {
+            this.searchFilters = new HashSet<>();
+        }
+        // need list or set
+        searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, operationRecord.getAssetInfoUid(), "1*"));
+    }
 
-	public void update() {
-		this.selected = null;
-		WebUtil.addSuccessMessage("保存成功");
-	}
+    public void returnPreviousLevel() {
+        this.removeFilterOnField("assetInfoUid");
+    }
 
-	@Override
-	public void delete() {
-		// TODO Auto-generated method stub
-		// boolean
-		// result=nurseSiteMaintainService.deleteMaintainConfig(this.selected);
-		// if(result){
-		// WebUtil.addSuccessMessage("删除成功！");
-		// }
-		// else{
-		// WebUtil.addSuccessMessage("不允许删除！");
-		// }
-		this.selected = null;
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        try {
+            OrgInfo orgInfo = (OrgInfo) eventObject;
+            if (orgInfo != null) {
+                selectOrgInfo = orgInfo;
+                searchFilters.clear();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	}
+    @Override
+    public void onBeforeNewObject(AssetOperationRecord object) {
+        super.onBeforeNewObject(object);
+        object.setTenantUID(currentUser.getTenantUID());
+        object.setInstitutionUID(currentUser.getInstitutionUID());
+        object.setHospitalUID(currentUser.getHospitalUID());
+        object.setSiteUID(currentUser.getSiteUID());
+    }
 
-	@Override
-	protected String getActionMessage(String actionName) {
-		// TODO Auto-generated method stub
-		return "开关机记录" + " " + WebUtil.getMessage(actionName);
-	}
+    @Override
+    public void save() {
+        this.selected = null;
+        WebUtil.addSuccessMessage("保存成功");
+    }
 
-	@Override
-	public void prepareCreate() throws InstantiationException, IllegalAccessException {
-		// TODO Auto-generated method stub
-		super.prepareCreate();
-	}
+    @Override
+    public void update() {
+        save();
+    }
 
-	@Override
-	public void prepareEdit() {
-		// TODO Auto-generated method stub
-		super.prepareEdit();
-	}
+    @Override
+    public void delete() {
+        this.selected = null;
+    }
 
-	@Override
-	protected BaseMapper<AssetOperationRecord> getDAO() {
-		// TODO Auto-generated method stub
-		return dao;
-	}
+    @Override
+    protected String getActionMessage(String actionName) {
+        return "开关机记录" + " " + WebUtil.getMessage(actionName);
+    }
 
-	public String getAssetGroupFilter() {
-		return assetGroupFilter;
-	}
+    @Override
+    protected BaseMapper<AssetOperationRecord> getDAO() {
+        return dao;
+    }
 
-	public void setAssetGroupFilter(String assetGroupFilter) {
-		this.assetGroupFilter = assetGroupFilter;
-	}
+    public String getAssetGroupFilter() {
+        return assetGroupFilter;
+    }
 
-	private void addMessage(String str) {
-		FacesMessage message = new FacesMessage(str, null);
-		FacesContext.getCurrentInstance().addMessage(null, message);
-	}
+    public void setAssetGroupFilter(String assetGroupFilter) {
+        this.assetGroupFilter = assetGroupFilter;
+    }
 
-	public OrgInfo getSelectOrgInfo() {
-		return selectOrgInfo;
-	}
+    public OrgInfo getSelectOrgInfo() {
+        return selectOrgInfo;
+    }
 
-	public void setSelectOrgInfo(OrgInfo selectOrgInfo) {
-		this.selectOrgInfo = selectOrgInfo;
-	}
+    public void setSelectOrgInfo(OrgInfo selectOrgInfo) {
+        this.selectOrgInfo = selectOrgInfo;
+    }
 
-	public UserAuth getCustomRoleAuth() {
-		return customRoleAuth;
-	}
+    public UserAuth getCustomRoleAuth() {
+        return customRoleAuth;
+    }
 
-	public void setCustomRoleAuth(UserAuth customRoleAuth) {
-		this.customRoleAuth = customRoleAuth;
-	}
+    public void setCustomRoleAuth(UserAuth customRoleAuth) {
+        this.customRoleAuth = customRoleAuth;
+    }
 
+    public boolean getReturnFlag() {
+        return returnFlag;
+    }
+
+    public void setReturnFlag(boolean returnFlag) {
+        this.returnFlag = returnFlag;
+    }
 }
