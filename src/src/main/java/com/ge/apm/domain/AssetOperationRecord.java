@@ -2,6 +2,7 @@ package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -17,7 +18,7 @@ import java.util.List;
 @Data
 @Entity
 @Cacheable(false)
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONE)
+@Cache(usage = CacheConcurrencyStrategy.NONE)
 @Table(name = "asset_operation_record")
 public class AssetOperationRecord implements Serializable {
 
@@ -107,5 +108,26 @@ public class AssetOperationRecord implements Serializable {
 
 	@Column(name = "site_uid", columnDefinition = "CHAR(32)")
 	private String siteUID;
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (id != null ? id.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof AssetOperationRecord)) {
+			return false;
+		}
+		AssetOperationRecord other = (AssetOperationRecord) object;
+		return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
+	}
+
+	@Override
+	public String toString() {
+		return "AssetOperationRecord [ id=" + id + " ]";
+	}
 
 }

@@ -4,7 +4,7 @@
 	<ui:define name="content">
 		<div class="ui-g">
 			<div class="ui-g-12 card cardTitle">
-				<p:outputLabel class="pageTitle" value="设备开关机记录" />
+				<p:outputLabel class="pageTitle" value="设备使用记录" />
 			</div>
 			<div class="ui-g-12 card ">
 				<h:form id="optRecordListForm" rendered="#{(not empty assetOperationRecordController)}">
@@ -15,8 +15,8 @@
 								 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 								 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{assetOperationRecordController.customRoleAuth.authSearch}">
 
-						<!-- <p:ajax event="rowSelect" update="createButton editButton deleteButton" /> -->
 						<p:ajax event="filter" listener="#{assetOperationRecordController.onFilter}" />
+						<p:ajax event="rowSelect" listener="#{assetOperationRecordController.onRowSelect}" update=":optRecordListForm"/>
 
 						<p:column headerText="设备名称" filterBy="#{item.assetInfoName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.assetInfoName}" />
@@ -59,19 +59,10 @@
 							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel" rendered="#{assetOperationRecordController.customRoleAuth.authExport}">
 								<p:dataExporter type="xlsx" target="datalist" fileName="assetOperationRecord"/>
 							</p:commandButton>
-							<!-- <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
-                                actionListener="#{assetOptRecordController.prepareCreate}" update=":optRecordCreateDlg"
-                                oncomplete="PF('optRecordCreateDialog').show()" onclick="NurseSiteMaintain.on()"/>
-                            <p:commandButton id="editButton" actionListener="#{assetOptRecordController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
-                                update=":optRecordEditDlg" oncomplete="PF('optRecordEditDialog').show()"
-                                disabled="#{empty assetOptRecordController.selected.id}" onclick="NurseSiteMaintain.on()"/>
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
-                                actionListener="#{assetOptRecordController.delete}" update=":optRecordListForm:datalist"
-                                disabled="#{empty assetOptRecordController.selected.id}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
-                            </p:commandButton> -->
 						</f:facet>
 					</p:dataTable>
+					<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{assetOperationRecordController.returnPreviousLevel()}" immediate="true" update="returnButton datalist"
+									 style="float:left; display: #{assetOperationRecordController.getReturnFlag() ? 'inline' : 'none'}"/>
 				</h:form>
 			</div>
 		</div>
