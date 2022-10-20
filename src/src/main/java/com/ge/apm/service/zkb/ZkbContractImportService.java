@@ -850,19 +850,18 @@ public class ZkbContractImportService {
                         }
                     }
                 }
+                ZkbContract zkbContract = zkbContractRepository.findById(zkbContractAsset.getContractId());
                 if(assetInfo.getWarrantyDate() != null){
-                    ZkbContract zkbContract = zkbContractRepository.findById(zkbContractAsset.getContractId());
-                    if(assetInfo.getWarrantyDate() != null){
-                        long betweenDay = DateUtil.between(assetInfo.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
-                        if(betweenDay != 0){
-                            assetInfo.setWarrantyDate(zkbContract.getEndDate());
-                            modifyFlag = true;
-                        }
-                    }else {
+                    long betweenDay = DateUtil.between(assetInfo.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
+                    if(betweenDay != 0){
                         assetInfo.setWarrantyDate(zkbContract.getEndDate());
                         modifyFlag = true;
                     }
+                }else {
+                    assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                    modifyFlag = true;
                 }
+
                 if(modifyFlag){
                     assetInfoRepository.save(assetInfo);
                 }
@@ -900,19 +899,18 @@ public class ZkbContractImportService {
                         }
                     }
                 }
+                ZkbContract zkbContract = zkbContractRepository.findById(newZkbContractAsset.getContractId());
                 if(assetInfo.getWarrantyDate() != null){
-                    ZkbContract zkbContract = zkbContractRepository.findById(zkbContractAsset.getContractId());
-                    if(assetInfo.getWarrantyDate() != null){
-                        long betweenDay = DateUtil.between(assetInfo.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
-                        if(betweenDay != 0){
-                            assetInfo.setWarrantyDate(zkbContract.getEndDate());
-                            modifyFlag = true;
-                        }
-                    }else {
+                    long betweenDay = DateUtil.between(assetInfo.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
+                    if(betweenDay != 0){
                         assetInfo.setWarrantyDate(zkbContract.getEndDate());
                         modifyFlag = true;
                     }
+                }else {
+                    assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                    modifyFlag = true;
                 }
+
                 if(modifyFlag){
                     assetInfoRepository.save(assetInfo);
                 }
