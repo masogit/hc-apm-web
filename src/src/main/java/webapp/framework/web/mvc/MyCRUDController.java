@@ -162,7 +162,7 @@ public abstract class MyCRUDController<E> implements Serializable, ServerEventIn
         }
     }
     
-    private boolean isDangerValue(Object filterValue){
+    public boolean isDangerValue(Object filterValue){
     	String str=filterValue.toString();
     	if(str.contains("'")|| str.contains(";")||str.length()>255){
     		logger.info("error input:"+str);

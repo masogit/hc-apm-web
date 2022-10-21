@@ -5,10 +5,17 @@ import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import com.ge.apm.dao.mapper.AssetOperationRecordMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetOperationRecordService;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SearchController;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.joda.time.DateTime;
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.data.FilterEvent;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.MyCRUDController;
 
@@ -16,6 +23,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Liu
@@ -31,6 +39,9 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
     private List<String> setUserUuids;
     private UserAuth customRoleAuth;
     private boolean returnFlag = false;
+    private boolean operationFlag = false;
+    private Pagination assetPageRequest;
+    private String assetInfoUid;
 
     @Override
     protected void init() {
@@ -46,6 +57,15 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
         setUserUuids = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
         this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
         customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
+        String encodeStr = WebUtil.getRequestParameter("str");
+        assetInfoUid = (String) UrlEncryptController.getValueFromMap(encodeStr, "assetInfoUid");
+        if (assetInfoUid != null) {
+            operationFlag = true;
+            if (this.searchFilters == null) {
+                this.searchFilters = new HashSet<>();
+            }
+            searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, assetInfoUid, "1*"));
+        }
     }
 
     @Override
@@ -65,10 +85,17 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
         }
         boolean assetFlag = !this.hasFilterOnField("assetInfoUid");
-        if (returnFlag == assetFlag) {
-            pageRequest = new Pagination(1, pageRequest.getSize());
-        }
-        returnFlag = !assetFlag;
+//        if (returnFlag == assetFlag) {
+//            pageRequest = new Pagination(1, pageRequest.getSize());
+//            if (assetFlag) {
+//                pageRequest = assetPageRequest;
+//            }
+//        } else {
+//            if (assetFlag) {
+//                assetPageRequest = pageRequest;
+//            }
+//        }
+//        returnFlag = !assetFlag;
         this.lazyModel.setRowCount(dao.getAllCount(searchFilters, assetFlag));
         return dao.getAll(searchFilters, "createDate", isAscending, pageRequest.getLimit(), pageRequest.getOffset(), assetFlag);
     }
@@ -82,8 +109,61 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
         searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, operationRecord.getAssetInfoUid(), "1*"));
     }
 
+    public void onSelectAsset(SelectEvent event) {
+        AssetOperationRecord operationRecord = (AssetOperationRecord) event.getObject();
+        String url = "actionName=View&assetInfoUid=" + operationRecord.getAssetInfoUid();
+        url = "assetOperationRecordList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
     public void returnPreviousLevel() {
         this.removeFilterOnField("assetInfoUid");
+    }
+
+    @Override
+    public void onFilter(FilterEvent event) {
+        if (searchFilters == null) {
+            searchFilters = new HashSet<>();
+        }
+        searchFilters.clear();
+
+        if (operationFlag) {
+            searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, assetInfoUid, "1*"));
+        }
+        getFilterMatchModes((DataTable) event.getComponent());
+        for (Map.Entry<String, Object> filter : event.getFilters().entrySet()) {
+            String fieldName = filter.getKey();
+            Object filterValue = filter.getValue();
+            if (filterValue == null) {
+                continue;
+            }
+            if (isDangerValue(filterValue)) {
+                filterValue = "";
+            }
+            if (isDateTimeField(fieldName)) {
+                // support lte & gte for datetime field
+                String[] values = filterValue.toString().split("~");
+                if (values.length > 0) {
+                    filterValue = TimeUtil.fromString(values[0]);
+
+                    if (filterValue != null) {
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime) filterValue).toDate()));
+                    }
+                }
+
+                if (values.length > 1) {
+                    filterValue = TimeUtil.fromString(values[1]);
+                    if (filterValue != null) {
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime) filterValue).toDate()));
+                    }
+                }
+                continue;
+            }
+
+            String matchMode = filterMatchModes.get(fieldName);
+            addFilter(fieldName, matchMode, filterValue);
+        }
     }
 
     @Override
@@ -164,5 +244,13 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
 
     public void setReturnFlag(boolean returnFlag) {
         this.returnFlag = returnFlag;
+    }
+
+    public boolean getOperationFlag() {
+        return operationFlag;
+    }
+
+    public void setOperationFlag(boolean operationFlag) {
+        this.operationFlag = operationFlag;
     }
 }
