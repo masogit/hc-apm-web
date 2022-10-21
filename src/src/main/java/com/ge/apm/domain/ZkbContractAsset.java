@@ -136,6 +136,9 @@ public class ZkbContractAsset {
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    @Transient
+    private String systemId;
+
     public Date getMaintainStartDate() {
         return maintainStartDate;
     }
@@ -262,6 +265,14 @@ public class ZkbContractAsset {
 
     public void setResponsiblEngineer(String responsiblEngineer) {
         this.responsiblEngineer = responsiblEngineer;
+    }
+
+    public String getSystemId() {
+        return systemId;
+    }
+
+    public void setSystemId(String systemId) {
+        this.systemId = systemId;
     }
 
     @Override

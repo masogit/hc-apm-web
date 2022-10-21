@@ -128,6 +128,25 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			" and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd') ) T", nativeQuery = true)
 	Integer fetchCount(String dateFormat, String date, String tenantUID);
 
+	/**
+	 * 获取个数
+	 * @param dateFormat 日期格式
+	 * @param date 开单月份
+	 * @param tenantUID 租户 tenantUID
+	 * @return
+	 */
+	@Query(value = "SELECT coalesce(count(id),0) from ( " +
+			" SELECT " +
+			" DISTINCT v2.id " +
+			" FROM " +
+			" v2_pm_order v2 " +
+			" INNER JOIN asset_info a on v2.asset_id = a.id "+
+			" INNER JOIN zkb_contract_asset zca ON zca.asset_id = a.uid "+
+			" INNER JOIN zkb_contract zkbc ON zkbc.ID = zca.contract_id "+
+			" where zkbc.contract_type <> 'CCSB' and to_char(v2.created_date, ?1)=?2 " +
+			" and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd') ) T", nativeQuery = true)
+	Integer fetchCountOfCCSB(String dateFormat, String date, String tenantUID);
+
 	@Query(value = "select count(asset_id) from v2_pm_order where asset_id= ?1 and  rule_level = ?2 and pm_type = ?3 ",nativeQuery = true)
 	Long findCountByAssetId(Integer id, Integer level, Integer pmType);
 

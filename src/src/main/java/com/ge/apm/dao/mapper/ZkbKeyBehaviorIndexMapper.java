@@ -52,5 +52,14 @@ public interface ZkbKeyBehaviorIndexMapper {
      */
     @SelectProvider(type = ZkbKeyBehaviorIndexProvider.class,method = "findByDateAndTenantUID")
     List<ZkbKeyBehaviorIndex>  findByDateAndTenantUID(@Param("kpiDate") String kpiDate,@Param("dateFormat") String dateFormat,@Param("tenantUID") String tenantUID);
+    /**
+     * 批量获取KPI
+     * @param kpiDate  KPI时间
+     * @param dateFormat 日期格式
+     * @param tenantUID 租户UID
+     * @return
+     */
+    @SelectProvider(type = ZkbKeyBehaviorIndexProvider.class,method = "findByDateAndTenantUIDOfCCSB")
+    List<ZkbKeyBehaviorIndex>  findByDateAndTenantUIDOfCCSB(@Param("kpiDate") String kpiDate,@Param("dateFormat") String dateFormat,@Param("tenantUID") String tenantUID);
 
 }
