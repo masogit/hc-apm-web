@@ -65,6 +65,18 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
             "AND (zkbp.status!='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
     Integer fetchUnReturnCount(Date orderedDate,String orderType,String tenantUID);
 
+    /**
+     * CCSB类型合同不计算在内获取探头未归还
+     * @param orderedDate 时间
+     * @param orderType 订单类型
+     * @param tenantUID 租户tenantUID
+     * @return
+     */
+    @Query(value = "SELECT coalesce(count(zkbp.id),0) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where zkbc.contract_type <> 'CCSB' and zkbp.order_type = ?2 and zkbp.ordered_date< ?1 " +
+            "AND (zkbp.status!='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
+    Integer fetchUnReturnCountOfCCSB(Date orderedDate,String orderType,String tenantUID);
+
+
 
     /**
      * 获取备件申请数量
@@ -77,6 +89,18 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
             "zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') " +
             " and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' and zkbp.status != 'DirectorReject'", nativeQuery = true)
     Integer fetchApplyPartsQty(Date orderedDate,String orderType,String tenantUID);
+
+    /**
+     * ccsb类型的合同数据在生成积分的时候需要剔除 获取备件申请数量
+     * @param orderedDate 下单时间
+     * @param orderType 订单类型
+     * @param tenantUID 租户tenant uid
+     * @return
+     */
+    @Query(value = "SELECT coalesce(sum(qty),0) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where zkbc.contract_type <> 'CCSB' and zkbp.order_type = ?2 and zkbp.ordered_date< ?1 and " +
+            "zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') " +
+            " and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' and zkbp.status != 'DirectorReject'", nativeQuery = true)
+    Integer fetchApplyPartsQtyOfCCSB(Date orderedDate,String orderType,String tenantUID);
 
     @Query(value = "SELECT * from zkb_part_order where order_type = ?3 and ordered_date< ?1  and contract_id in ?2 and (status = 'PartReturned' or status = 'Returned' or status = 'Closed')", nativeQuery = true)
     List<ZkbPartOrder> findReturnId(Date orderedDate,List<String> contractIdList,String orderType);

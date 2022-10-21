@@ -502,8 +502,9 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             return;
         }
         super.save();
-        if(ZkbKeyBehaviorIndexService.yes.equals(this.selected.getEffect()))
-        {
+        if(ZkbKeyBehaviorIndexService.yes.equals(this.selected.getEffect())){
+            boolean recalculate = this.getZkbContractList().stream().filter(m->m.getContractType().equals("CCSB")).findAny().isPresent();
+            this.selected.setRecalculate(recalculate);
             this.zkbKeyBehaviorIndexService.changeScore(this.selected,kpi_modify,this.currentUser);
         }
         this.selected = null;

@@ -668,7 +668,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'lifecycle'}">
-                                <p:column headerText="#{msg.lifecycle}">
+                                <p:column headerText="#{msg.lifecycle}" sortBy="#{item.lifecycle}" filterBy="#{item.lifecycle}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
                                 </p:column>
                             </c:if>
