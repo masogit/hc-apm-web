@@ -140,6 +140,13 @@ public class ZkbKeyBehaviorIndex {
     @Transient
     private Integer totalFullScore;
 
+
+    /**
+     * ccsb类型合同重新计算kpi标识
+     */
+    @Transient
+    private boolean recalculate;
+
     /**
      * 排名
      */
@@ -441,4 +448,13 @@ public class ZkbKeyBehaviorIndex {
     public void setEffect(String effect) {
         this.effect = effect;
     }
+
+    public boolean isRecalculate() {
+        return recalculate;
+    }
+
+    public void setRecalculate(boolean recalculate) {
+        this.recalculate = recalculate;
+    }
+
 }

@@ -798,6 +798,13 @@ public class ZkbKeyBehaviorIndexService {
         this.zkbKeyBehaviorIndexRepository.save(zkbKeyBehaviorIndex);
     }
 
+    public ZkbKeyBehaviorIndex generateSingleKpiDataOfCCSB(final ZkbKeyBehaviorIndex zkbKeyBehaviorIndexFinal){
+          ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = this.prepareGenerateSingleKpiData(zkbKeyBehaviorIndexFinal.getTenantUID(),zkbKeyBehaviorIndexFinal.getKbiDate());
+        this.calculateScoreOfCCSB(zkbKeyBehaviorIndex,zkbKeyBehaviorIndexFinal.getTenantUID(),
+                this.getLastDay(zkbKeyBehaviorIndexFinal.getKbiDate()),this.getMonthOfFirstDay(zkbKeyBehaviorIndexFinal.getKbiDate()));
+        return zkbKeyBehaviorIndex;
+    }
+
     /**
      * 检查数据是否合法
      * 1.数据类型字段必填
@@ -852,6 +859,19 @@ public class ZkbKeyBehaviorIndexService {
         Integer totalIbNumber = this.calculatePasteQuickResponseRateScore(zkbKeyBehaviorIndex,tenantUID,kpiDate,firstDay,remark);
         this.calculateApmBillingRateScore(zkbKeyBehaviorIndex,tenantUID,totalIbNumber,kpiDate,firstDay,remark);
         zkbKeyBehaviorIndex.setRemark(remark.toString());
+    }
+
+    /**
+     * ccsb重新计算分数用于生成积分
+     * @param zkbKeyBehaviorIndex kbi实体
+     * @param tenantUID 租户
+     * @param kpiDate 对应KPI时间
+     * @param firstDay 第一时间
+     */
+    public void calculateScoreOfCCSB(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,Date firstDay){
+        this.calculatePartReturnScoreOfCCSB(zkbKeyBehaviorIndex,tenantUID,kpiDate,firstDay);
+        Integer totalIbNumber = this.calculatePasteQuickResponseRateScoreOfCCSB(zkbKeyBehaviorIndex,tenantUID,kpiDate,firstDay);
+        this.calculateApmBillingRateScoreOfCCSB(zkbKeyBehaviorIndex,tenantUID,totalIbNumber,kpiDate,firstDay);
     }
 
 
@@ -939,6 +959,31 @@ public class ZkbKeyBehaviorIndexService {
         return;
     }
 
+
+    /**
+     * ccsb类型合同重新计算得分用于生成积分
+     * @param zkbKeyBehaviorIndex KPI
+     * @param tenantUID 租户tenantUID
+     * @param kpiDate kpi时间
+     */
+    private void calculatePartReturnScoreOfCCSB(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,Date firstDate){
+        Calendar cd = Calendar.getInstance();
+        cd.setTime(kpiDate);
+        cd.add(Calendar.DATE,-18);
+        Date nowBefore = cd.getTime();
+        Integer unReturnCount  = this.zkbPartOrderRepository.fetchUnReturnCountOfCCSB(nowBefore,ZkbPartOrder.OrderType.Probe.toString(),tenantUID);
+        Integer applyPartsCount = this.zkbPartOrderRepository.fetchApplyPartsQtyOfCCSB(nowBefore,ZkbPartOrder.OrderType.Parts.toString(),tenantUID);
+        Integer returnQty = this.zkbPartOrderReturnRepository.fetchQtyOfCCSB(nowBefore,ZkbPartOrder.OrderType.Parts.toString(),tenantUID);
+        Integer unReturnApplyPartsCount = applyPartsCount-returnQty;
+        BigDecimal result = new BigDecimal(14).divide(new BigDecimal(5),2,BigDecimal.ROUND_HALF_DOWN).multiply(new BigDecimal(unReturnApplyPartsCount+unReturnCount)).setScale(0,BigDecimal.ROUND_HALF_DOWN);
+        BigDecimal partReturnFullScore = new BigDecimal(zkbKeyBehaviorIndex.getPartReturnFullScore());
+        if(result.compareTo(partReturnFullScore)>0){
+            zkbKeyBehaviorIndex.setPartReturnScore(0);
+        }else{
+            zkbKeyBehaviorIndex.setPartReturnScore(partReturnFullScore.subtract(result).intValue());
+        }
+     }
+
     /**
      * 计算二维码粘贴率得分
      * @param zkbKeyBehaviorIndex 当前用户得分
@@ -949,11 +994,13 @@ public class ZkbKeyBehaviorIndexService {
     private Integer calculatePasteQuickResponseRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,Date firstDate,StringBuffer remark)
     {
         remark=remark.append("calculatePasteQuickResponseRateScore--");
-        Integer totalIbNumber = this.zkbContractRepository.fetchIbNumber(tenantUID,firstDate,kpiDate);
-        if(totalIbNumber==null)
+        //Integer totalIbNumber = this.zkbContractRepository.fetchIbNumber(tenantUID,firstDate,kpiDate);
+        Integer totalIbNumber = this.zkbContractRepository.fetchIbNumberNew(tenantUID,firstDate,kpiDate);
+
+       /* if(totalIbNumber==null)
         {
             totalIbNumber=new Integer(0);
-        }
+        }*/
         remark=remark.append("totalIbNumber:").append(totalIbNumber).append(";");
         if(totalIbNumber==0)
         {
@@ -1001,6 +1048,46 @@ public class ZkbKeyBehaviorIndexService {
         return totalIbNumber;
     }
 
+
+
+    /**
+     * 计算二维码粘贴率得分
+     * @param zkbKeyBehaviorIndex 当前用户得分
+     * @param tenantUID 租户 tenantUID
+     * @param kpiDate 某月KPI
+     */
+
+    private Integer calculatePasteQuickResponseRateScoreOfCCSB(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,Date firstDate) {
+         //Integer totalIbNumber = this.zkbContractRepository.fetchIbNumberOfCCSB(tenantUID,firstDate,kpiDate);
+        Integer totalIbNumber = this.zkbContractRepository.fetchIbNumberOfNewCCSB(tenantUID,firstDate,kpiDate);
+
+        if(totalIbNumber==0){
+            zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
+            return totalIbNumber;
+        }
+        List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findZkbContractAssetByTenantUIDOfCCSB(tenantUID,firstDate,kpiDate);
+        if(CollectionUtils.isEmpty(zkbContractAssetList)){
+            zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
+            return totalIbNumber;
+        }
+        List<String> assetId = new ArrayList<>();
+        for(ZkbContractAsset item:zkbContractAssetList){
+            assetId.add(item.getAssetId());
+        }
+        Integer qrCodePasteCount = this.zkbAssetQrCodeInfoRepository.qrCodePasteCountOfCCSB(assetId,tenantUID);//已经贴码设备
+        Integer qrCodePasteScrappedCount = this.zkbAssetQrCodeInfoRepository.qrCodePasteScrappedCountOfCCSB(assetId,tenantUID);//贴码状态的拆机设备
+        Integer scrappedCount = this.zkbAssetQrCodeInfoRepository.scrappedCountOfCCSB(assetId,tenantUID);//拆机设备
+        Integer fullScore = zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore();
+        Integer pasteQuickResponseRateScore = new BigDecimal(qrCodePasteCount-qrCodePasteScrappedCount).
+                divide(new BigDecimal(totalIbNumber-scrappedCount),2,BigDecimal.ROUND_HALF_DOWN).
+                multiply(new BigDecimal(fullScore)).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
+         if(pasteQuickResponseRateScore>fullScore){
+            zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(fullScore);
+        }else{
+            zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(pasteQuickResponseRateScore);
+        }
+        return totalIbNumber;
+    }
     /**
      * 计算APM开单率得分
      * @param zkbKeyBehaviorIndex
@@ -1055,6 +1142,38 @@ public class ZkbKeyBehaviorIndexService {
         zkbKeyBehaviorIndex.setApmBillingRateScore(apmBillingRateScore);
     }
 
+    /**
+     * 计算APM开单率得分
+     * @param zkbKeyBehaviorIndex
+     * @param tenantUID 合同列表
+     * @param totalIbNumber ib 总量
+     */
+    private void calculateApmBillingRateScoreOfCCSB(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Integer totalIbNumber,Date kpiDate,Date firstDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexService.monthDateFormat_two);
+        String dateStry = formatter.format(kpiDate);
+        if(totalIbNumber==null||totalIbNumber==0)
+        {
+            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
+            return;
+        }
+        Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCountOfCCSB(ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry,tenantUID);
+        Integer countPmOrder = this.v2PmOrderRepository.fetchCountOfCCSB(monthDateFormat_two,dateStry,tenantUID);
+        Integer highMachineCount = this.zkbContractRepository.fetchHighMachineCountOfCCSB(tenantUID,firstDate,kpiDate);
+        Integer divide =totalIbNumber-highMachineCount;
+        if(divide<=0) {
+            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
+            return;
+        }
+        Integer apmBillingRateScore = new BigDecimal(countWorkOrder+countPmOrder).
+                divide(new BigDecimal(divide),2,BigDecimal.ROUND_HALF_DOWN).
+                multiply(new BigDecimal(100)).
+                setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
+        if(apmBillingRateScore>zkbKeyBehaviorIndex.getApmBillingRateFullScore())        {
+            zkbKeyBehaviorIndex.setApmBillingRateScore(zkbKeyBehaviorIndex.getApmBillingRateFullScore());
+            return;
+        }
+        zkbKeyBehaviorIndex.setApmBillingRateScore(apmBillingRateScore);
+    }
     /**
      * 整理错误信息
      * @param importKeyBehaviorIndexMapList
@@ -1145,7 +1264,7 @@ public class ZkbKeyBehaviorIndexService {
                 date=getPreviousMonth();
             }
         String dateStr = this.getDateFormat(date,monthDateFormat_two);
-        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexMapper.findByDateAndTenantUID(dateStr,monthDateFormat_two,tenantUID);
+        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexMapper.findByDateAndTenantUIDOfCCSB(dateStr,monthDateFormat_two,tenantUID);
         this.zkbKeyBehaviorIndexMapper.batchUpdate(dateStr,monthDateFormat_two,tenantUID);
         if(CollectionUtils.isEmpty(zkbKeyBehaviorIndexList))
         {
@@ -1182,8 +1301,11 @@ public class ZkbKeyBehaviorIndexService {
      * @param recordType kpi单挑记录
      * @param currentUser 当前用户
      */
-    public void changeScore(ZkbKeyBehaviorIndex item,String recordType,UserAccount currentUser)
-    {
+    public void changeScore(ZkbKeyBehaviorIndex item,String recordType,UserAccount currentUser) {
+        Integer totalScore = item.getTotalScore();
+        if(item.isRecalculate()){
+            totalScore = generateSingleKpiDataOfCCSB(item).getTotalScore();
+        }
         zkbIntegralService.kpiScoreHandler(item.getTenantUID(),item.getTotalScore(),recordType,currentUser,this.getDateFormat(item.getKbiDate(),monthDateFormat_two));
     }
 
