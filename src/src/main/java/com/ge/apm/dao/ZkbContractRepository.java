@@ -51,6 +51,27 @@ public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract
     Integer fetchIbNumber(String tenantUID,Date firstDate,Date kpiDate);
 
     /**
+     * 统计数量
+     * @param tenantUID 租户tenantUID
+     * @param kpiDate 生成KPI时间
+     * @return
+     */
+    @Query(value = "SELECT coalesce(count(distinct ai.system_id),0) from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id INNER JOIN asset_info ai on zca.asset_id = ai.uid where zkbc.tenant_uid = ?1 and NOT ((zkbc.end_date < ?2) OR (zkbc.start_date > ?3))", nativeQuery = true)
+    Integer fetchIbNumberNew(String tenantUID, Date firstDate, Date kpiDate);
+
+
+
+
+    /**
+     * 统计数量
+     * @param tenantUID 租户tenantUID
+     * @param firstDate 第一天
+     * @param kpiDate 生成KPI时间
+     * @return
+     */
+    @Query(value = "SELECT coalesce(count(distinct ai.system_id),0)  from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id INNER JOIN asset_info ai on zca.asset_id = ai.uid where zkbc.contract_type <> 'CCSB' and zkbc.tenant_uid = ?1 and NOT ((end_date < ?2) OR (start_date > ?3)) ", nativeQuery = true)
+    Integer fetchIbNumberOfNewCCSB(String tenantUID,Date firstDate,Date kpiDate);
+    /**
      * 统计高端机数量
      * @param tenantUID 租户tenantUID
      * @param kpiDate 生成KPI时间
@@ -59,6 +80,14 @@ public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract
     @Query(value = "SELECT count(ac.id)  from zkb_contract ac  INNER JOIN zkb_contract_asset zca on zca.contract_id = ac.ID and zca.asset_type='highMachine' where tenant_uid = ?1 and  NOT ((end_date < ?2) OR (start_date > ?3))", nativeQuery = true)
     Integer fetchHighMachineCount(String tenantUID,Date firstDate,Date kpiDate);
 
+    /**
+     * 统计高端机数量
+     * @param tenantUID 租户tenantUID
+     * @param kpiDate 生成KPI时间
+     * @return
+     */
+    @Query(value = "SELECT coalesce(count(ac.id),0)  from zkb_contract ac  INNER JOIN zkb_contract_asset zca on zca.contract_id = ac.ID and zca.asset_type='highMachine' where ac.contract_type <> 'CCSB' and tenant_uid = ?1 and  NOT ((end_date < ?2) OR (start_date > ?3))", nativeQuery = true)
+    Integer fetchHighMachineCountOfCCSB(String tenantUID,Date firstDate,Date kpiDate);
     /**
      * 根据ID批量获取
      * @param contractIdSet 主键集合
