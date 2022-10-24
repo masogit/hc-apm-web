@@ -9,6 +9,7 @@ import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.BooleanUtils;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.joda.time.DateTime;
@@ -640,6 +641,47 @@ public class AssetInfo implements ChineseName,Serializable {
     //县域ib合同类别
     @Column(name = "contract_type")
     private String contractType;
+
+    //临床功能得分
+    @Column(name = "clinical_function_score")
+    private Integer clinicalFunctionScore;
+
+    //有形风险得分
+    @Column(name = "tangible_risk_score")
+    private Integer tangibleRiskScore;
+
+    //问题避免率得分
+    @Column(name = "problem_avoidance_rate_score")
+    private Integer problemAvoidanceRateScore;
+
+    //事故历史得分
+    @Column(name = "accident_history_score")
+    private Integer accidentHistoryScore;
+
+    //制造商/管理部门特殊要求得分
+    @Column(name = "special_requirement_score")
+    private Integer specialRequirementScore;
+    //是否风险评估
+    @Column(name = "is_risk_assessment")
+    private Boolean isRiskAssessment;
+    @Getter@Setter
+    @Column(name = "check_cycle")
+    private String checkCycle; //检查周期
+    @Getter@Setter
+    @Column(name = "detection_cycle")
+    private String detectionCycle; //检测周期
+    @Getter@Setter
+    @Column(name = "maintenance_period")
+    private String maintenancePeriod; //保养周期
+    @Getter@Setter
+    @Column(name = "sum_risk_score")
+    private String sumRiskScore; //风险总分
+    @Getter@Setter
+    @Column(name = "assessment_date")
+    private Date assessmentDate; //评估日期
+    @Getter@Setter
+    @Column(name = "assessment_by")
+    private String assessmentBy; //评估人员
 
     @Transient
     @TableField(exist = false)
@@ -1299,6 +1341,10 @@ public class AssetInfo implements ChineseName,Serializable {
             this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
         }
 
+    }
+
+    public String getDepartNumAndName() {
+        return name + (StringUtils.isEmpty(departNum)?"":departNum);
     }
 
     public String getAccountingDeptUID() {
@@ -2234,6 +2280,54 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
+    }
+
+    public Integer getClinicalFunctionScore() {
+        return clinicalFunctionScore;
+    }
+
+    public void setClinicalFunctionScore(Integer clinicalFunctionScore) {
+        this.clinicalFunctionScore = clinicalFunctionScore;
+    }
+
+    public Integer getTangibleRiskScore() {
+        return tangibleRiskScore;
+    }
+
+    public void setTangibleRiskScore(Integer tangibleRiskScore) {
+        this.tangibleRiskScore = tangibleRiskScore;
+    }
+
+    public Integer getProblemAvoidanceRateScore() {
+        return problemAvoidanceRateScore;
+    }
+
+    public void setProblemAvoidanceRateScore(Integer problemAvoidanceRateScore) {
+        this.problemAvoidanceRateScore = problemAvoidanceRateScore;
+    }
+
+    public Integer getAccidentHistoryScore() {
+        return accidentHistoryScore;
+    }
+
+    public void setAccidentHistoryScore(Integer accidentHistoryScore) {
+        this.accidentHistoryScore = accidentHistoryScore;
+    }
+
+    public Integer getSpecialRequirementScore() {
+        return specialRequirementScore;
+    }
+
+    public void setSpecialRequirementScore(Integer specialRequirementScore) {
+        this.specialRequirementScore = specialRequirementScore;
+    }
+
+    public Boolean getRiskAssessment() {
+        return BooleanUtils.isTrue(isRiskAssessment);
+    }
+
+    public void setRiskAssessment(Boolean riskAssessment) {
+        isRiskAssessment = riskAssessment;
     }
 
     @Override
