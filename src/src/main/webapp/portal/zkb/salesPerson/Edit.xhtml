@@ -28,7 +28,15 @@
                              <p:selectBooleanCheckbox  style="margin-bottom: 5px" id="isSparePartsSelection" itemLabel="备件" value="#{zkbSalesPersonInfoController.selected.sparePartsSelection}" />
                              <p:selectBooleanCheckbox   id="isProbeSelection" itemLabel="探头"  value="#{zkbSalesPersonInfoController.selected.probeSelection}" />
                          </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">关联租户</label>
+                            <p:selectManyMenu  styleClass="manymenu-advanced"  id="tenant" value="#{zkbSalesPersonInfoController.tenantInfosByUids}"   var="t" converter="tenantInfoConverter" style="width:99%"  filter="true" filterMatchMode="contains" showCheckbox="true"   >
+                                <f:selectItems value="#{zkbSalesPersonInfoController.tenantInfoList}" var="tenantInfo" label="#{tenantInfo.name}" itemValue="#{tenantInfo}"     />
+                                <p:column>
+                                    <h:outputText value="#{t.name}" />
+                                </p:column>
+                            </p:selectManyMenu>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <br/>
                    <p:commandButton validateClient="true" actionListener="#{zkbSalesPersonInfoController.save}" value="#{msg.Save}" update=":salesPersonInfoListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'salesPersonInfoEditDialog');"/>

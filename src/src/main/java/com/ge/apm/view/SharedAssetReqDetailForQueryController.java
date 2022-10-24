@@ -150,6 +150,8 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
                     .filter(item -> item.getOrgType() == 4)
                     .map(item -> item.getUid())
                     .collect(Collectors.toList());
+
+            orgUidList.add(getVirtuallyOrgInfoUid(user));
         }
 
         this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -159,7 +161,11 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         this.updateSearchFilter(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
     }
-
+    private String getVirtuallyOrgInfoUid(UserAccount user){
+        char[] chars = user.getSiteUID().toCharArray();
+        chars[0]='$';
+        return String.valueOf(chars);
+    }
     @Override
     public void getFilterMatchModes(DataTable table) {
         super.getFilterMatchModes(table);

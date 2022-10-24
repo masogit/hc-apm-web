@@ -94,6 +94,17 @@
                                 <p:column headerText="设备编号" sortBy="#{item.asset_number}" filterBy="#{item.asset_number}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetNumber}"/>
                                 </p:column>
+                            <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
+                                <p:column headerText="调剂名称" sortBy="#{item.swap_name}" filterBy="#{item.swap_name}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.swapName}"/>
+                                </p:column>
+                                <p:column headerText="型号" sortBy="#{item.function_type}" filterBy="#{item.function_type}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.functionType}"/>
+                                </p:column>
+                                <p:column headerText="品牌" sortBy="#{item.brand_name}" filterBy="#{item.brand_name}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.brandName}"/>
+                                </p:column>
+                            </c:if>
                                 <p:column headerText="计费开始时间" sortBy="#{item.charging_begin_time}" filterBy="#{item.charging_begin_time}" filterMatchMode="GTE">
                                     <f:facet name="filter">
                                         <p:calendar id="cal1" effect="fold" value="#{sharedAssetReqDetailForQueryController.filterBeginTime}"

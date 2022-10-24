@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
+import java.util.Set;
 
 public interface SharedAssetSwapIndexRepository extends GenericRepositoryUUID<SharedAssetSwapIndex> {
     @Query(value = "select * from shared_asset_swap_index where asset_uid = ?1 limit 1",nativeQuery = true)
@@ -29,4 +30,7 @@ public interface SharedAssetSwapIndexRepository extends GenericRepositoryUUID<Sh
     @Transactional
     @Query(value = "delete from shared_asset_swap_index where asset_uid = ?1",nativeQuery = true)
     void deleteByAssetUid(String uid);
+
+    @Query(value = "select * from shared_asset_swap_index where asset_uid in ?1 ",nativeQuery = true)
+    List<SharedAssetSwapIndex> findByAssetUidList(Set<String> uids);
 }

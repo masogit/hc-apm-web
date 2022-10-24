@@ -1,5 +1,7 @@
 package com.ge.apm.service.zkb;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.ZkbContract;
@@ -566,7 +568,29 @@ public class ZkbContractService {
                 zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             }
         }
+        syncAsset(zkbContract);
         return zkbContract;
+    }
+
+    /*
+     * 将合同结束日期同步到设备的维保截止日期
+     * 先比较两者是否一致，如果一致，则不同步
+     */
+    public void syncAsset(ZkbContract zkbContract){
+        List<ZkbContractAsset> zkbContractAssets = zkbContractAssetRepository.findByContractId(zkbContract.getId());
+        for(ZkbContractAsset zkbContractAsset : zkbContractAssets){
+            AssetInfo a = zkbContractAsset.getAssetInfo();
+            if(a.getWarrantyDate() != null){
+                long betweenDay = DateUtil.between(a.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
+                if(betweenDay != 0){
+                    a.setWarrantyDate(zkbContract.getEndDate());
+                    assetInfoRepository.save(a);
+                }
+            }else {
+                a.setWarrantyDate(zkbContract.getEndDate());
+                assetInfoRepository.save(a);
+            }
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -799,11 +823,26 @@ public class ZkbContractService {
             ZkbContractAsset zkbContractAsset = new ZkbContractAsset();
             zkbContractAsset.setContractId(zkbContract.getId());
             zkbContractAsset.setAssetId(a.getUid());
+            zkbContractAsset.setCreatedDate(new Date());
+            zkbContractAsset.setCreatedBy(currentUser.getName());
+            zkbContractAsset.setLastModifiedDate(new Date());
+            zkbContractAsset.setLastModifiedBy(currentUser.getName());
             zkbContractAssetRepository.save(zkbContractAsset);
 
             zkbContract.setLastModifiedDate(new Date());
             zkbContract.setLastModifiedBy(currentUser.getLoginName());
             contractRepository.save(zkbContract);
+
+            if(a.getWarrantyDate() != null){
+                long betweenDay = DateUtil.between(a.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
+                if(betweenDay != 0){
+                    a.setWarrantyDate(zkbContract.getEndDate());
+                    assetInfoRepository.save(a);
+                }
+            }else{
+                a.setWarrantyDate(zkbContract.getEndDate());
+                assetInfoRepository.save(a);
+            }
 
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetAdd","",a.getQrCode(),"",currentUser,null);
         }
@@ -811,11 +850,21 @@ public class ZkbContractService {
 
     @Transactional(rollbackFor = Exception.class)
     public void updateAsset(ZkbContract zkbContract,ZkbContractAsset zkbContractAsset,String reason,UserAccount currentUser){
+        zkbContractAsset.setLastModifiedBy(currentUser.getName());
+        zkbContractAsset.setLastModifiedDate(new Date());
         zkbContractAssetRepository.save(zkbContractAsset);
         zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetEdit","",zkbContractAsset.getAssetInfo().getQrCode(),reason,currentUser,null);
 
         AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
         assetInfo.setRepairForm(zkbContractAsset.getAssetInfo().getRepairForm());
+        if(assetInfo.getWarrantyDate() != null){
+            long betweenDay = DateUtil.between(assetInfo.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
+            if(betweenDay != 0){
+                assetInfo.setWarrantyDate(zkbContract.getEndDate());
+            }
+        }else{
+            assetInfo.setWarrantyDate(zkbContract.getEndDate());
+        }
         assetInfoRepository.save(assetInfo);
     }
 

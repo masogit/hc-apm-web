@@ -164,7 +164,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.maintainFlag != 't'}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.maintainFlag != 't' and zkbPartOrderEditController.selectedContract.contractType != 'CCSB'}">
                             <c:if test="#{zkbPartOrderAuditController.selected.artificialType eq '1'}">
                                 <label class="label" >是否需要SSA Key*</label>
                             </c:if>
@@ -210,6 +210,13 @@
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.probeQuotaType}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and zkbPartOrderAuditController.zkbContract.contractType eq 'CCSB'}">
+                            <label class="label">CCSB扣除名额类型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.ccsbApplyType}"  disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCCsbQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and (empty zkbPartOrderAuditController.selected.probeQuotaType)}">
@@ -344,8 +351,9 @@
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderAuditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">故障图片上传</f:facet>
-                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                                <!--<p:commandLink immediate="false" process="@this" value="#{fileitem.objectName}" ajax="false" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
+                                <p:link target="_blank" href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+
                             </p:dataList>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -353,7 +361,8 @@
                         <h:panelGroup>
                             <p:dataList  value="#{zkbPartOrderAuditController.v2_probe_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">院方合同证明</f:facet>
-                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <!--<p:commandLink immediate="false" process="@this" value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
+                                <p:link target="_blank" href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
 <!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                             </p:dataList>
                         </h:panelGroup>
@@ -492,6 +501,23 @@
                         </h:panelGroup>-->
                     </p:panelGrid>
                 </p:fieldset>
+                <p:fieldset id="productFieldset" legend="产品经理审批" rendered="#{zkbPartOrderAuditController.showProduct}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ProductPending')}">
+                            <label class="label">产品经理审批人</label>
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.productAuditer}" disabled="true" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ProductPending')}">
+                            <label class="label">产品经理审批时间*</label>
+                            <p:calendar timeZone="GMT+8"   pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.productAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">产品经理审批备注</label>
+                            <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.productRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ProductPending')}">
+                            </p:inputTextarea>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
                 <p:fieldset id="managementFieldset" legend="区域经理审批" rendered="#{zkbPartOrderAuditController.showManage}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
@@ -512,7 +538,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <c:choose>
-                                <c:when test="#{zkbPartOrderAuditController.orderType eq 'Artificial'}">
+                                <c:when test="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.zkbContract.contractType eq 'CCSB'}">
                                     <label class="label">区域经理审批备注（是否上过培训课）</label>
                                 </c:when>
                                 <c:otherwise>

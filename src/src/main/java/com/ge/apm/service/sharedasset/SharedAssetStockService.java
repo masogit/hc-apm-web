@@ -142,10 +142,18 @@ public class SharedAssetStockService {
         if (rootNode != null) {
             traverse(rootNode, dropdownList, allocationCenterUids);
         }
+        if(isWhethertoenableunattended()){
+            getVirtuallyOrgInfo(siteUID,dropdownList);
+        }
 
         return dropdownList;
     }
-
+    private void getVirtuallyOrgInfo(String siteUID,List<SelectItem> dropdownList){
+         if(StringUtils.isEmpty(siteUID)) return ;
+        char[] chars = siteUID.toCharArray();
+        chars[0]='$';
+        dropdownList.add(new SelectItem(String.valueOf(chars), "调剂无人值守", "", false));
+    }
     public SharedAssetRequest findRequestById(String requestId) {
         if(logger.isDebugEnabled()) {
             logger.debug("Request id: {}", requestId);
@@ -342,6 +350,16 @@ public class SharedAssetStockService {
         for(AssetInfo asset : assets) {
             if(allocationCenterUids.contains(asset.getAssetDeptUID())) {
                 asset.getAssetDeptOrg().setName("");
+            }else{
+                char[] chars = asset.getSiteUID().toCharArray();
+                chars[0]='$';
+                String s = String.valueOf(chars);
+                if(s.equals(asset.getAssetDeptUID())){
+                    OrgInfo orgInfo = new OrgInfo();
+                    orgInfo.setName("调剂无人值守");
+                    orgInfo.setUid(s);
+                    asset.setAssetDeptOrg(orgInfo);
+                }
             }
         }
     }
