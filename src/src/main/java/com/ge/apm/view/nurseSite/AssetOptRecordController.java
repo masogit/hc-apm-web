@@ -1,75 +1,53 @@
 package com.ge.apm.view.nurseSite;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
-import com.ge.apm.dao.AssetOptRecordRepository;
-import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.mapper.AssetOptRecordMapper;
 import com.ge.apm.domain.AssetOptRecord;
 import com.ge.apm.domain.CustomRoleAuthConstant;
 import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.PccExamineReport;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserAuth;
 import com.ge.apm.service.nurseSite.AssetOptRecordService;
 import com.ge.apm.view.SearchController;
 import com.ge.apm.view.sysutil.UserContextService;
 
-import webapp.framework.dao.GenericRepositoryUUID;
+import org.primefaces.event.SelectEvent;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.MyCRUDController;
-import webapp.framework.web.mvc.ServerEventInterface;
 
+/**
+ * @author Zhou
+ */
 @ManagedBean
 @ViewScoped
-public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> implements Serializable, ServerEventInterface {
-	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainConfigController.class);
-	private I18nMessageRepository i18nDao;
+public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 	private UserAccount currentUser;
 	private AssetOptRecordService service;
 	private AssetOptRecordMapper dao;
-	private List<AssetOptRecord> listAssetOptRecord;
-	private Set<String> setOrgUid;
-	private List<String> listOrgUid;
 	private String assetGroupFilter;
-	private SearchController searchController;
 	private OrgInfo selectOrgInfo;
-	private List<String> setUserUids;
+	private List<String> setUserUuids;
 	private UserAuth customRoleAuth;
 	@Override
 	protected void init() {
-		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		service = WebUtil.getBean(AssetOptRecordService.class);
-		searchController = WebUtil.getBean(SearchController.class);
+		SearchController searchController = WebUtil.getBean(SearchController.class);
 		searchController.setCallingController(this);
 		searchController.setUpdateViewIDs(":optRecordListForm:datalist");
 		searchController.setBlnOrgTreeUpdate(true);
 		searchController.setType(5);
 		searchController.updateData();
 		dao = WebUtil.getBean(AssetOptRecordMapper.class);
-		setUserUids = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
-		if (setOrgUid != null) {
-			listOrgUid = new ArrayList<String>();
-			listOrgUid.addAll(setOrgUid);
-		}
+		setUserUuids = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
 		this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
 		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
 		// test
@@ -78,10 +56,10 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 	@Override
 	protected List<AssetOptRecord> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
 		if (this.searchFilters == null) {
-			this.searchFilters = new HashSet<SearchFilter>();
+			this.searchFilters = new HashSet<>();
 		}
 		// need list or set
-		searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUids, "1*"));
+		searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUuids, "1*"));
 		if (selectOrgInfo.getOrgType() == 0) {
 			searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
 		} else if (selectOrgInfo.getOrgType() == 1) {
@@ -92,7 +70,7 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
 		}
 		this.lazyModel.setRowCount(dao.getAllCount(searchFilters));
-		listAssetOptRecord = dao.getAll(searchFilters, sortField, isAscending, pageRequest.getLimit(), pageRequest.getOffset());
+		List<AssetOptRecord> listAssetOptRecord = dao.getAll(searchFilters, sortField, isAscending, pageRequest.getLimit(), pageRequest.getOffset());
 		service.supplementCostTime(listAssetOptRecord);
 		return listAssetOptRecord;
 	}
@@ -106,7 +84,7 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 				searchFilters.clear();
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 	}
 
@@ -125,47 +103,23 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 		WebUtil.addSuccessMessage("保存成功");
 	}
 
-	public void update() {
-		this.selected = null;
-		WebUtil.addSuccessMessage("保存成功");
+	@Override
+    public void update() {
+		save();
 	}
 
 	@Override
 	public void delete() {
-		// TODO Auto-generated method stub
-		// boolean
-		// result=nurseSiteMaintainService.deleteMaintainConfig(this.selected);
-		// if(result){
-		// WebUtil.addSuccessMessage("删除成功！");
-		// }
-		// else{
-		// WebUtil.addSuccessMessage("不允许删除！");
-		// }
 		this.selected = null;
-
 	}
 
 	@Override
 	protected String getActionMessage(String actionName) {
-		// TODO Auto-generated method stub
 		return "开关机记录" + " " + WebUtil.getMessage(actionName);
 	}
 
 	@Override
-	public void prepareCreate() throws InstantiationException, IllegalAccessException {
-		// TODO Auto-generated method stub
-		super.prepareCreate();
-	}
-
-	@Override
-	public void prepareEdit() {
-		// TODO Auto-generated method stub
-		super.prepareEdit();
-	}
-
-	@Override
 	protected BaseMapper<AssetOptRecord> getDAO() {
-		// TODO Auto-generated method stub
 		return dao;
 	}
 
@@ -175,11 +129,6 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> i
 
 	public void setAssetGroupFilter(String assetGroupFilter) {
 		this.assetGroupFilter = assetGroupFilter;
-	}
-
-	private void addMessage(String str) {
-		FacesMessage message = new FacesMessage(str, null);
-		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
 
 	public OrgInfo getSelectOrgInfo() {

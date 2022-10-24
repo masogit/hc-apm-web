@@ -2,189 +2,255 @@ package com.ge.apm.view.nurseSite;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
-import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.mapper.AssetOperationRecordMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.nurseSite.AssetOperationRecordService;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SearchController;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.joda.time.DateTime;
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.event.data.FilterEvent;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.MyCRUDController;
-import webapp.framework.web.mvc.ServerEventInterface;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
+/**
+ * @author Liu
+ */
 @ManagedBean
 @ViewScoped
-public class AssetOperationRecordController extends MyCRUDController<AssetOperationRecord> implements Serializable, ServerEventInterface {
-	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainConfigController.class);
-	private I18nMessageRepository i18nDao;
-	private UserAccount currentUser;
-	private AssetOperationRecordService service;
-	private AssetOperationRecordMapper dao;
-	private List<AssetOperationRecord> listAssetOperationRecord;
-	private Set<String> setOrgUid;
-	private List<String> listOrgUid;
-	private String assetGroupFilter;
-	private SearchController searchController;
-	private OrgInfo selectOrgInfo;
-	private List<String> setUserUids;
-	private UserAuth customRoleAuth;
-	@Override
-	protected void init() {
-		i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-		currentUser = UserContextService.getCurrentUserAccount();
-		service = WebUtil.getBean(AssetOperationRecordService.class);
-		searchController = WebUtil.getBean(SearchController.class);
-		searchController.setCallingController(this);
-		searchController.setUpdateViewIDs(":optRecordListForm:datalist");
-		searchController.setBlnOrgTreeUpdate(true);
-		searchController.setType(5);
-		searchController.updateData();
-		dao = WebUtil.getBean(AssetOperationRecordMapper.class);
-		setUserUids = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
-		if (setOrgUid != null) {
-			listOrgUid = new ArrayList<String>();
-			listOrgUid.addAll(setOrgUid);
-		}
-		this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
-		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
-		// test
-	}
+public class AssetOperationRecordController extends MyCRUDController<AssetOperationRecord> {
 
-	@Override
-	protected List<AssetOperationRecord> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
-		sortField="createDate";
-		if (this.searchFilters == null) {
-			this.searchFilters = new HashSet<SearchFilter>();
-		}
-		// need list or set
-		searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUids, "1*"));
-		if (selectOrgInfo.getOrgType() == 0) {
-			searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-		} else if (selectOrgInfo.getOrgType() == 1) {
-			searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-		} else if (selectOrgInfo.getOrgType() == 2) {
-			searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-		} else if (selectOrgInfo.getOrgType() == 3) {
-			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
-		}
-		this.lazyModel.setRowCount(dao.getAllCount(searchFilters));
-		listAssetOperationRecord = dao.getAll(searchFilters, sortField, isAscending, pageRequest.getLimit(), pageRequest.getOffset());
-//		service.supplementCostTime(listAssetOperationRecord);
-		return listAssetOperationRecord;
-	}
+    private UserAccount currentUser;
+    private AssetOperationRecordMapper dao;
+    private String assetGroupFilter;
+    private OrgInfo selectOrgInfo;
+    private List<String> setUserUuids;
+    private UserAuth customRoleAuth;
+    private boolean returnFlag = false;
+    private boolean operationFlag = false;
+    private Pagination assetPageRequest;
+    private String assetInfoUid;
 
-	@Override
-	public void onServerEvent(String eventName, Object eventObject) {
-		try {
-			OrgInfo orgInfo = (OrgInfo) eventObject;
-			if (orgInfo != null) {
-				selectOrgInfo = orgInfo;
-				searchFilters.clear();
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-	}
+    @Override
+    protected void init() {
+        currentUser = UserContextService.getCurrentUserAccount();
+        dao = WebUtil.getBean(AssetOperationRecordMapper.class);
+        SearchController searchController = WebUtil.getBean(SearchController.class);
+        searchController.setCallingController(this);
+        searchController.setUpdateViewIDs(":optRecordListForm:datalist");
+        searchController.setBlnOrgTreeUpdate(true);
+        searchController.setType(5);
+        searchController.updateData();
+        AssetOperationRecordService service = WebUtil.getBean(AssetOperationRecordService.class);
+        setUserUuids = service.findAccessClinicalUidListByUserUid(currentUser.getUid());
+        this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
+        customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
+        String encodeStr = WebUtil.getRequestParameter("str");
+        assetInfoUid = (String) UrlEncryptController.getValueFromMap(encodeStr, "assetInfoUid");
+        if (assetInfoUid != null) {
+            operationFlag = true;
+            if (this.searchFilters == null) {
+                this.searchFilters = new HashSet<>();
+            }
+            searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, assetInfoUid, "1*"));
+        }
+    }
 
-	@Override
-	public void onBeforeNewObject(AssetOperationRecord object) {
-		super.onBeforeNewObject(object);
-		object.setTenantUID(currentUser.getTenantUID());
-		object.setInstitutionUID(currentUser.getInstitutionUID());
-		object.setHospitalUID(currentUser.getHospitalUID());
-		object.setSiteUID(currentUser.getSiteUID());
-	}
+    @Override
+    protected List<AssetOperationRecord> loadData(Pagination pageRequest, String sortField, boolean isAscending) {
+        if (this.searchFilters == null) {
+            this.searchFilters = new HashSet<>();
+        }
+        // need list or set
+        searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, setUserUuids, "1*"));
+        if (selectOrgInfo.getOrgType() == 0) {
+            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+        } else if (selectOrgInfo.getOrgType() == 1) {
+            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+        } else if (selectOrgInfo.getOrgType() == 2) {
+            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+        } else if (selectOrgInfo.getOrgType() == 3) {
+            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*2+"));
+        }
+        boolean assetFlag = !this.hasFilterOnField("assetInfoUid");
+//        if (returnFlag == assetFlag) {
+//            pageRequest = new Pagination(1, pageRequest.getSize());
+//            if (assetFlag) {
+//                pageRequest = assetPageRequest;
+//            }
+//        } else {
+//            if (assetFlag) {
+//                assetPageRequest = pageRequest;
+//            }
+//        }
+//        returnFlag = !assetFlag;
+        this.lazyModel.setRowCount(dao.getAllCount(searchFilters, assetFlag));
+        return dao.getAll(searchFilters, "createDate", isAscending, pageRequest.getLimit(), pageRequest.getOffset(), assetFlag);
+    }
 
-	@Override
-	public void save() {
-		this.selected = null;
-		WebUtil.addSuccessMessage("保存成功");
-	}
+    public void onRowSelect(SelectEvent event) {
+        AssetOperationRecord operationRecord = (AssetOperationRecord) event.getObject();
+        if (this.searchFilters == null) {
+            this.searchFilters = new HashSet<>();
+        }
+        // need list or set
+        searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, operationRecord.getAssetInfoUid(), "1*"));
+    }
 
-	public void update() {
-		this.selected = null;
-		WebUtil.addSuccessMessage("保存成功");
-	}
+    public void onSelectAsset(SelectEvent event) {
+        AssetOperationRecord operationRecord = (AssetOperationRecord) event.getObject();
+        String url = "actionName=View&assetInfoUid=" + operationRecord.getAssetInfoUid();
+        url = "assetOperationRecordList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
 
-	@Override
-	public void delete() {
-		// TODO Auto-generated method stub
-		// boolean
-		// result=nurseSiteMaintainService.deleteMaintainConfig(this.selected);
-		// if(result){
-		// WebUtil.addSuccessMessage("删除成功！");
-		// }
-		// else{
-		// WebUtil.addSuccessMessage("不允许删除！");
-		// }
-		this.selected = null;
+    public void returnPreviousLevel() {
+        this.removeFilterOnField("assetInfoUid");
+    }
 
-	}
+    @Override
+    public void onFilter(FilterEvent event) {
+        if (searchFilters == null) {
+            searchFilters = new HashSet<>();
+        }
+        searchFilters.clear();
 
-	@Override
-	protected String getActionMessage(String actionName) {
-		// TODO Auto-generated method stub
-		return "开关机记录" + " " + WebUtil.getMessage(actionName);
-	}
+        if (operationFlag) {
+            searchFilters.add(new SearchFilter("assetInfoUid", SearchFilter.Operator.EQ, assetInfoUid, "1*"));
+        }
+        getFilterMatchModes((DataTable) event.getComponent());
+        for (Map.Entry<String, Object> filter : event.getFilters().entrySet()) {
+            String fieldName = filter.getKey();
+            Object filterValue = filter.getValue();
+            if (filterValue == null) {
+                continue;
+            }
+            if (isDangerValue(filterValue)) {
+                filterValue = "";
+            }
+            if (isDateTimeField(fieldName)) {
+                // support lte & gte for datetime field
+                String[] values = filterValue.toString().split("~");
+                if (values.length > 0) {
+                    filterValue = TimeUtil.fromString(values[0]);
 
-	@Override
-	public void prepareCreate() throws InstantiationException, IllegalAccessException {
-		// TODO Auto-generated method stub
-		super.prepareCreate();
-	}
+                    if (filterValue != null) {
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime) filterValue).toDate()));
+                    }
+                }
 
-	@Override
-	public void prepareEdit() {
-		// TODO Auto-generated method stub
-		super.prepareEdit();
-	}
+                if (values.length > 1) {
+                    filterValue = TimeUtil.fromString(values[1]);
+                    if (filterValue != null) {
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime) filterValue).toDate()));
+                    }
+                }
+                continue;
+            }
 
-	@Override
-	protected BaseMapper<AssetOperationRecord> getDAO() {
-		// TODO Auto-generated method stub
-		return dao;
-	}
+            String matchMode = filterMatchModes.get(fieldName);
+            addFilter(fieldName, matchMode, filterValue);
+        }
+    }
 
-	public String getAssetGroupFilter() {
-		return assetGroupFilter;
-	}
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        try {
+            OrgInfo orgInfo = (OrgInfo) eventObject;
+            if (orgInfo != null) {
+                selectOrgInfo = orgInfo;
+                searchFilters.clear();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	public void setAssetGroupFilter(String assetGroupFilter) {
-		this.assetGroupFilter = assetGroupFilter;
-	}
+    @Override
+    public void onBeforeNewObject(AssetOperationRecord object) {
+        super.onBeforeNewObject(object);
+        object.setTenantUID(currentUser.getTenantUID());
+        object.setInstitutionUID(currentUser.getInstitutionUID());
+        object.setHospitalUID(currentUser.getHospitalUID());
+        object.setSiteUID(currentUser.getSiteUID());
+    }
 
-	private void addMessage(String str) {
-		FacesMessage message = new FacesMessage(str, null);
-		FacesContext.getCurrentInstance().addMessage(null, message);
-	}
+    @Override
+    public void save() {
+        this.selected = null;
+        WebUtil.addSuccessMessage("保存成功");
+    }
 
-	public OrgInfo getSelectOrgInfo() {
-		return selectOrgInfo;
-	}
+    @Override
+    public void update() {
+        save();
+    }
 
-	public void setSelectOrgInfo(OrgInfo selectOrgInfo) {
-		this.selectOrgInfo = selectOrgInfo;
-	}
+    @Override
+    public void delete() {
+        this.selected = null;
+    }
 
-	public UserAuth getCustomRoleAuth() {
-		return customRoleAuth;
-	}
+    @Override
+    protected String getActionMessage(String actionName) {
+        return "开关机记录" + " " + WebUtil.getMessage(actionName);
+    }
 
-	public void setCustomRoleAuth(UserAuth customRoleAuth) {
-		this.customRoleAuth = customRoleAuth;
-	}
+    @Override
+    protected BaseMapper<AssetOperationRecord> getDAO() {
+        return dao;
+    }
 
+    public String getAssetGroupFilter() {
+        return assetGroupFilter;
+    }
+
+    public void setAssetGroupFilter(String assetGroupFilter) {
+        this.assetGroupFilter = assetGroupFilter;
+    }
+
+    public OrgInfo getSelectOrgInfo() {
+        return selectOrgInfo;
+    }
+
+    public void setSelectOrgInfo(OrgInfo selectOrgInfo) {
+        this.selectOrgInfo = selectOrgInfo;
+    }
+
+    public UserAuth getCustomRoleAuth() {
+        return customRoleAuth;
+    }
+
+    public void setCustomRoleAuth(UserAuth customRoleAuth) {
+        this.customRoleAuth = customRoleAuth;
+    }
+
+    public boolean getReturnFlag() {
+        return returnFlag;
+    }
+
+    public void setReturnFlag(boolean returnFlag) {
+        this.returnFlag = returnFlag;
+    }
+
+    public boolean getOperationFlag() {
+        return operationFlag;
+    }
+
+    public void setOperationFlag(boolean operationFlag) {
+        this.operationFlag = operationFlag;
+    }
 }

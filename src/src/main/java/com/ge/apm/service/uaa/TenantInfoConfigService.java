@@ -165,6 +165,9 @@ public class TenantInfoConfigService {
 			if(key.equals("deviceDataPreview")){
 				tempItem.setValue(true);
 			}
+			if(key.equals("parts")){
+				tempItem.setValue(false);
+			}
 			if (edition.equals(VERSION_COMMON)) {
 				//默认不勾选”质控评审“菜单
 				if (key.equals("audit")) {

@@ -600,6 +600,25 @@
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'networkingStatus')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.networkingStatus}<span style="color:red">#{assetInfoBulkEditController.customConfig.assetFields['networkingStatus'].required? '*':''}</span></label>
+            <p:selectOneRadio id="networkingStatus" value="#{assetInfoBulkEditController.selected.networkingStatus}" required="#{assetInfoBulkEditController.customConfig.assetFields['networkingStatus'].required}" requiredMessage="#{msg.networkingStatus} #{msg.ValidationRequire}" disabled="#{!assetInfoBulkEditController.needEdit('networkingStatus')}" >
+                <f:selectItems value="#{fieldMsg.getFieldValueList('networkingStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'isUseRegistration')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.isUseRegistration}<span style="color:red">#{assetInfoBulkEditController.customConfig.assetFields['isUseRegistration'].required? '*':''}</span></label>
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isUseRegistration}" required="#{assetInfoBulkEditController.customConfig.assetFields['isUseRegistration'].required}"
+                              requiredMessage="#{msg.isUseRegistration} #{msg.ValidationRequire}" disabled="#{!assetInfoBulkEditController.needEdit('isUseRegistration')}" >
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'isPm')}" >
         <h:panelGroup >
             <label class="label">#{msg.isAssetPMed}</label>

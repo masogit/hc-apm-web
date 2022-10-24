@@ -178,6 +178,20 @@ public class ZkbPartOrder implements Serializable {
     private String manageAuditerUid;
 
     /**
+     * 产品经理审批备注
+     */
+    @Column(name = "product_remark")
+    private String productRemark;
+
+    @Column(name = "product_audit_date")
+    private Date productAuditDate;
+
+    @Column(name = "product_auditer")
+    private String productAuditer;
+    @Column(name = "product_auditer_uid")
+    private String productAuditerUid;
+
+    /**
      * 销售总监审批备注
      */
     @Column(name = "director_remark")
@@ -602,6 +616,38 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "ccsb_apply_type")
     private String ccsbApplyType;// apply maintain
+
+    public String getProductRemark() {
+        return productRemark;
+    }
+
+    public void setProductRemark(String productRemark) {
+        this.productRemark = productRemark;
+    }
+
+    public Date getProductAuditDate() {
+        return productAuditDate;
+    }
+
+    public void setProductAuditDate(Date productAuditDate) {
+        this.productAuditDate = productAuditDate;
+    }
+
+    public String getProductAuditer() {
+        return productAuditer;
+    }
+
+    public void setProductAuditer(String productAuditer) {
+        this.productAuditer = productAuditer;
+    }
+
+    public String getProductAuditerUid() {
+        return productAuditerUid;
+    }
+
+    public void setProductAuditerUid(String productAuditerUid) {
+        this.productAuditerUid = productAuditerUid;
+    }
 
     public String getCcsbApplyType() {
         return ccsbApplyType;

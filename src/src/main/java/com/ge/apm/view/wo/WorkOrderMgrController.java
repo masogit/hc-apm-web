@@ -691,7 +691,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Boolean isRating;
 
     public List<String> autoCompleteSupplier(String query) {
-        supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
         List<Supplier> suList = autoCompleteService.autoCompleteVendor(query, supplierList);
         List<String> sList = new ArrayList<String>();
         suList.forEach(item -> sList.add(item.getName()));

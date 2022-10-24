@@ -1,5 +1,6 @@
 package com.ge.apm.view.zkb;
 
+import cn.hutool.core.util.StrUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.zkb.CopyByInvok;
@@ -40,6 +41,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<V2_BlobObject> v2_blobObjectList;
     private List<V2_BlobObject> v2_probe_blobObjectList;
     private boolean showTech=false;
+    private boolean showProduct = false;
     private boolean showManage=false;
     private boolean showDirector = false;
     private boolean showCommercial = false;
@@ -433,14 +435,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showOrder = false;
                     showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
-                    //if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
                     if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                         showCommercial = true;
                     }
                     showOrder = true;
                     showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
-                    //if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
                     if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                         showCommercial = true;
                     }
@@ -449,9 +449,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
             }else{
                 if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && canEditFlag){
-                    showManage = true;
+                    if(ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(selected.getCurrentStep())){
+                        showProduct = true;
+                    }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+                        showManage = true;
+                    }
                     showBtn = "0";
+                }else if(ZkbPartOrder.PartOrderStatus.ProductAccept.toString().equals(selected.getStatus())){
+                    showProduct = true;
+                    showBtn = "0";
+                }else if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(selected.getStatus())){
+                    showProduct = true;
                 }else if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(selected.getStatus())){
+                    if(StrUtil.isNotEmpty(selected.getProductAuditerUid())){
+                        showProduct = true;
+                    }
                     showManage = true;
                     if(canEditFlag){
                         if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
@@ -463,9 +475,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         }
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus())){
+                    if(StrUtil.isNotEmpty(selected.getProductAuditerUid())){
+                        showProduct = true;
+                    }
                     showManage = true;
                     showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.CommercialAccept.toString().equals(selected.getStatus())){
+                    if(StrUtil.isNotEmpty(selected.getProductAuditerUid())){
+                        showProduct = true;
+                    }
                     showManage = true;
                     showCommercial = true;
                     if(canEditFlag){
@@ -473,28 +491,37 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showBtn = "1";
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.CommercialReject.toString().equals(selected.getStatus())){
+                    if(StrUtil.isNotEmpty(selected.getProductAuditerUid())){
+                        showProduct = true;
+                    }
                     showManage = true;
                     showCommercial = true;
                     showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
+                    if(StrUtil.isNotEmpty(selected.getProductAuditerUid())){
+                        showProduct = true;
+                    }
                     showManage = true;
-                    //if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
                     if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                         showCommercial = true;
                     }
                     showOrder = true;
                     showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.FourHundredCancel.toString().equals(selected.getStatus())){
+                    if(StrUtil.isNotEmpty(selected.getProductAuditerUid())){
+                        showProduct = true;
+                    }
                     showManage = true;
-                    //if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
                     if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                         showCommercial = true;
                     }
                     showOrder = true;
                     showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+                    if(StrUtil.isNotEmpty(selected.getProductAuditerUid())){
+                        showProduct = true;
+                    }
                     showManage = true;
-                    //if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
                     if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                         showCommercial = true;
                     }
@@ -629,7 +656,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
-                //if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                     showCommercial = true;
                 }
@@ -649,7 +675,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
-                //if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                     showCommercial = true;
                 }
@@ -666,7 +691,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
-                //if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                     showCommercial = true;
                 }
@@ -689,7 +713,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
-                //if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(selected.getRequestDate(),zkbContract.getEndDate()))){
                 if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
                     showCommercial = true;
                 }
@@ -1901,6 +1924,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setModifySsaKey(String modifySsaKey) {
         this.modifySsaKey = modifySsaKey;
+    }
+
+    public boolean isShowProduct() {
+        return showProduct;
+    }
+
+    public void setShowProduct(boolean showProduct) {
+        this.showProduct = showProduct;
     }
 
     @Override

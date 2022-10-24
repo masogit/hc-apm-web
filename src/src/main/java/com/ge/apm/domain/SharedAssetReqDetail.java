@@ -220,6 +220,14 @@ public class SharedAssetReqDetail implements Serializable{
     private BigDecimal discountFee; // 优惠费用
     @Transient
     private BigDecimal gratisFee;  // 免除费用
+    @Transient
+    private String swapName; // 调剂设备名称
+
+    @Transient
+    private String functionType;//设备型号
+    @Transient
+    private String brandName;//品牌名称
+
 
     public String getId() {
         return id;
@@ -1069,5 +1077,29 @@ public class SharedAssetReqDetail implements Serializable{
             buffer.append(format.format(discountEndDate)).append("时");
         }
         return buffer.toString();
+    }
+
+    public String getSwapName() {
+        return swapName;
+    }
+
+    public void setSwapName(String swapName) {
+        this.swapName = swapName;
+    }
+
+    public String getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(String functionType) {
+        this.functionType = functionType;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
     }
 }
