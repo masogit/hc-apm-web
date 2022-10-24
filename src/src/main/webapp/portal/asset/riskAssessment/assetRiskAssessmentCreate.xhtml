@@ -1,0 +1,282 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
+        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
+        <style type="text/css">
+            .grid-radio td {
+                padding: .5rem;
+            }
+            .legend {
+                display: inline-block;
+                width: 1.5rem;
+                height: 1.5rem;
+                border-radius: .25rem;
+                vertical-align: sub;
+            }
+            .radiolabelPF {
+                margin-left: 7px;
+                margin-right: 40px;
+            }
+        </style>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="医疗设备风险评估"/>
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="AssetRiskCreateForm">
+                    <p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true"/>
+                    <p:panel header="医疗设备风险评估">
+                        <p:fieldset legend="相关设备查询条件(所属院区为必选条件，其他查询条件最少要填写或选择一个)">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
+                                    <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
+                                    <p:inputText id="selectedUserOrgName" value="#{empty assetRiskAssessmentController.selectSite? msg.AllHospitals:assetRiskAssessmentController.selectSite.name}" readonly="true" class="SiteUIDChange"/>
+                                    <p:commandButton id="btnOrg" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                                    <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                        <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                        <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":AssetRiskCreateForm:treeNodeNameFilter @this" update="AssetRiskCreateForm:orgTree" actionListener="#{orgTreeController.filterNodeByName()}" value="#{msg.Search}"/>
+                                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                            <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                                <p:ajax process="@this" event="select" listener="#{assetRiskAssessmentController.onSelectSiteTreeNode}" update="@(.SiteUIDChange) :AssetRiskCreateForm:pickList #{assetRiskAssessmentController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                                <p:ajax process="@this" event="expand"/>
+                                                <p:ajax process="@this" event="collapse"/>
+                                                <p:treeNode type="org">
+                                                    <h:outputText value="#{node.name}"/>
+                                                </p:treeNode>
+                                                <p:treeNode type="hidden" rendered="false"/>
+                                            </p:tree>
+                                        </p:scrollPanel>
+                                    </p:overlayPanel>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.clinicalDeptName}</label>
+                                    <p:autoComplete dropdown="true" value="#{assetRiskAssessmentController.filterClinicalDeptOrg}"
+                                                    scrollHeight="300"  forceSelection="true"  completeMethod="#{assetRiskAssessmentController.autoCompleteDeptName}"
+                                                    var="t" itemLabel="#{t}" itemValue="#{t}" class="siteFilterChange">
+                                        <p:ajax event="itemSelect" listener="#{assetRiskAssessmentController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetRiskCreateForm:pickList  " />
+                                        <p:ajax process="@this" listener="#{assetRiskAssessmentController.onClinicalDeptNameFilterChange}" update=":AssetRiskCreateForm:pickList  " />
+                                    </p:autoComplete>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetGroup}}</label>
+                                    <p:selectOneMenu id="assetGroup" value="#{assetRiskAssessmentController.assetGroup}">
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" class="selectAssetGroup"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        <p:ajax listener="#{assetRiskAssessmentController.assetGroupChangeListener}" update="@(.assetGroupChange) :AssetRiskCreateForm:pickList" />
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.functionType}</label>
+                                    <p:inputText id="functionType" value="#{assetRiskAssessmentController.functionType}">
+                                        <p:ajax event="keyup" update=":AssetRiskCreateForm:pickList"></p:ajax>
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.preventiveMaintenanceAnalysis_deviceName}</label>
+                                    <p:inputText id="assetName" value="#{assetRiskAssessmentController.assetName}">
+                                        <p:ajax event="keyup" update=":AssetRiskCreateForm:pickList"></p:ajax>
+                                    </p:inputText>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </p:fieldset>
+                        <h:panelGrid>
+                            <p:commandButton value="选择设备" update=":growl" style="float:left" />
+                        </h:panelGrid>
+                        <p:fieldset legend="相关设备">
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <h:panelGroup>
+                                    <p:pickList id="pickList" value="#{assetRiskAssessmentController.assets}"
+                                                var="asset" itemLabel="#{asset}" itemValue="#{asset}"
+                                                showSourceFilter="true" showTargetFilter="true" responsive="true"
+                                                filterMatchMode="contains" converter="assetInfoConverter" class="pickList">
+                                        <f:facet name="sourceCaption">待选设备</f:facet>
+                                        <f:facet name="targetCaption">已选设备</f:facet>
+                                        <p:ajax event="transfer" listener="#{assetRiskAssessmentController.onTransfer}" />
+                                        <p:column style="width:30%;">
+                                            <h:outputText value="#{asset.name}" />
+                                        </p:column>
+                                        <p:column style="width:20%;">
+                                            <h:outputText value="#{asset.functionType}" />
+                                        </p:column>
+                                        <p:column style="width:30%;">
+                                            <h:outputText value="#{asset.departNum}" />
+                                        </p:column>
+                                    </p:pickList>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </p:fieldset>
+                        <h:panelGrid>
+                            <p:commandButton value="评分" update=":growl" style="float:left" />
+                        </h:panelGrid>
+                        <p:fieldset legend="临床功能">
+                            <p:column width="140">
+                                <p:selectOneRadio value="#{assetRiskAssessmentController.batchRiskAssessment.clinicalFunctionScore}" id="clinicalFunctionScore" layout="custom">
+                                    <p:ajax event="change" listener="#{assetRiskAssessmentController.batchSumScore(assetRiskAssessmentController.batchRiskAssessment)}" update=":AssetRiskCreateForm:batchSumScore" />
+                                    <f:selectItem itemValue="1" />
+                                    <f:selectItem itemValue="2" />
+                                    <f:selectItem itemValue="3" />
+                                    <f:selectItem itemValue="4" />
+                                    <f:selectItem itemValue="5" />
+                                </p:selectOneRadio>
+                                <h:panelGroup>
+                                    <p:radioButton for="clinicalFunctionScore" itemIndex="0"/>
+                                    <h:outputLabel value="不接触患者，1分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="clinicalFunctionScore" itemIndex="1"/>
+                                    <h:outputLabel value="设备可能直接接触患者但不起关键作用，2分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="clinicalFunctionScore" itemIndex="2"/>
+                                    <h:outputLabel value="设备用于患者疾病诊断或直接监护，3分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="clinicalFunctionScore" itemIndex="3"/>
+                                    <h:outputLabel value="设备用于直接为患者提供治疗，4分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="clinicalFunctionScore" itemIndex="4"/>
+                                    <h:outputLabel value="设备用于生命支持，5分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                            </p:column>
+                        </p:fieldset>
+                        <p:fieldset legend="有形风险">
+                            <p:column width="140">
+                                <p:selectOneRadio value="#{assetRiskAssessmentController.batchRiskAssessment.tangibleRiskScore}" id="tangibleRiskScore" layout="custom">
+                                    <p:ajax event="change" listener="#{assetRiskAssessmentController.batchSumScore(assetRiskAssessmentController.batchRiskAssessment)}" update=":AssetRiskCreateForm:batchSumScore" />
+                                    <f:selectItem itemValue="1" />
+                                    <f:selectItem itemValue="2" />
+                                    <f:selectItem itemValue="3" />
+                                    <f:selectItem itemValue="4" />
+                                </p:selectOneRadio>
+                                <h:panelGroup>
+                                    <p:radioButton for="tangibleRiskScore" itemIndex="0"/>
+                                    <h:outputLabel value="设备故障不会造成风险，1分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="tangibleRiskScore" itemIndex="1"/>
+                                    <h:outputLabel value="设备故障会导致低风险，2分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="tangibleRiskScore" itemIndex="2"/>
+                                    <h:outputLabel value="设备故障会导致治疗失误、诊断或对患者的状态监护失败，3分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="tangibleRiskScore" itemIndex="3"/>
+                                    <h:outputLabel value="设备故障会导致患者或使用者的严重损伤乃至死亡，4分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                            </p:column>
+                        </p:fieldset>
+                        <p:fieldset legend="问题避免概率">
+                            <p:column width="140">
+                                <p:selectOneRadio value="#{assetRiskAssessmentController.batchRiskAssessment.problemAvoidanceRateScore}" id="problemAvoidanceRateScore" layout="custom" >
+                                    <p:ajax event="change" listener="#{assetRiskAssessmentController.batchSumScore(assetRiskAssessmentController.batchRiskAssessment)}" update=":AssetRiskCreateForm:batchSumScore" />
+                                    <f:selectItem itemValue="1" />
+                                    <f:selectItem itemValue="2" />
+                                    <f:selectItem itemValue="3" />
+                                    <f:selectItem itemValue="4" />
+                                    <f:selectItem itemValue="5" />
+                                </p:selectOneRadio>
+                                <h:panelGroup>
+                                    <p:radioButton for="problemAvoidanceRateScore" itemIndex="0"/>
+                                    <h:outputLabel value="维护或者检查不会影响设备的可靠性，1分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="problemAvoidanceRateScore" itemIndex="1"/>
+                                    <h:outputLabel value="常见设备故障类型是不可预计的或者不是非常容易预计的，2分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="problemAvoidanceRateScore" itemIndex="2"/>
+                                    <h:outputLabel value="常见设备的故障类型不易预计，但设备历史记录表是技术指标测试中经常检测到的问题，3分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="problemAvoidanceRateScore" itemIndex="3"/>
+                                    <h:outputLabel value="常见设备的故障类型可以预计并且可通过预防性维护避免，4分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="problemAvoidanceRateScore" itemIndex="4"/>
+                                    <h:outputLabel value="具体的规则或制造商的要求决定了预防性维护或测试，5分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                            </p:column>
+                        </p:fieldset>
+                        <p:fieldset legend="事故历史">
+                            <p:column width="140">
+                                <p:selectOneRadio value="#{assetRiskAssessmentController.batchRiskAssessment.accidentHistoryScore}" id="accidentHistoryScore" layout="custom">
+                                    <p:ajax event="change" listener="#{assetRiskAssessmentController.batchSumScore(assetRiskAssessmentController.batchRiskAssessment)}" update=":AssetRiskCreateForm:batchSumScore" />
+                                    <f:selectItem itemValue="1" />
+                                    <f:selectItem itemValue="2" />
+                                </p:selectOneRadio>
+                                <h:panelGroup>
+                                    <p:radioButton for="accidentHistoryScore" itemIndex="0"/>
+                                    <h:outputLabel value="没有显著的事故历史，1分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="accidentHistoryScore" itemIndex="1"/>
+                                    <h:outputLabel value="存在显著的事故历史，2分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                            </p:column>
+                        </p:fieldset>
+                        <p:fieldset legend="制造商/管理部门的特殊要求">
+                            <p:column width="140">
+                                <p:selectOneRadio value="#{assetRiskAssessmentController.batchRiskAssessment.specialRequirementScore}" id="specialRequirementScore" layout="custom">
+                                    <p:ajax event="change" listener="#{assetRiskAssessmentController.batchSumScore(assetRiskAssessmentController.batchRiskAssessment)}" update=":AssetRiskCreateForm:batchSumScore" />
+                                    <f:selectItem itemValue="1" />
+                                    <f:selectItem itemValue="2" />
+                                </p:selectOneRadio>
+                                <h:panelGroup>
+                                    <p:radioButton for="specialRequirementScore" itemIndex="0"/>
+                                    <h:outputLabel value="没有要求，1分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:radioButton for="specialRequirementScore" itemIndex="1"/>
+                                    <h:outputLabel value="有独立与数值评级制度的测试要求，2分" styleClass="radiolabelPF"/>
+                                </h:panelGroup>
+                            </p:column>
+                        </p:fieldset>
+                    </p:panel>
+                    <p:panelGrid columns="4" id="batchSumScore" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">总分<span style="color:red"></span></label>
+                            <p:inputText id="sumRiskScore" value="#{assetRiskAssessmentController.batchRiskAssessment.sumRiskScore}" readonly="true"/>
+                            <p:commandButton style="zoom:0.8" value="计算" class="btn btn-sm btn-gray" actionListener="#{assetRiskAssessmentController.batchSumScore(assetRiskAssessmentController.batchRiskAssessment)}" update=":AssetRiskCreateForm"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">保养周期<span style="color:red"></span></label>
+                            <p:inputText id="maintenancePeriod" value="#{assetRiskAssessmentController.batchRiskAssessment.maintenancePeriod}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">检测周期<span style="color:red"></span></label>
+                            <p:inputText id="detectionCycle" value="#{assetRiskAssessmentController.batchRiskAssessment.detectionCycle}" readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label"><span style="color:black">注：</span></label>
+                            <label class="label"><span style="color:black">总分≥13分：</span></label>
+                            <label class="label"><span style="color:black">临床设备管理员每天检查设备状态并且记录，每季度保养1次，每半年检测1次</span></label>
+                            <label class="label"><span style="color:black">总分9-12分：</span></label>
+                            <label class="label"><span style="color:black">临床设备管理员每周检查设备状态并且记录，每半年保养1次，每年检测1次</span></label>
+                            <label class="label"><span style="color:black">总分＜9分：</span></label>
+                            <label class="label"><span style="color:black">临床设备管理员每与人检查设备状态并且记录，每年保养1次，每2年检测1次</span></label>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup id="buttonGroup">
+                            <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetRiskAssessmentController.saveBatchRiskAssetInfo()}" validateClient="true" update=":growl" style="float:left" />
+                            <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"  onclick="window.location.reload();" immediate="true" style="float:left"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
