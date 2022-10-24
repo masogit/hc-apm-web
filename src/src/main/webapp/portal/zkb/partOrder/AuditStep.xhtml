@@ -351,8 +351,9 @@
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderAuditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">故障图片上传</f:facet>
-                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
+                                <!--<p:commandLink immediate="false" process="@this" value="#{fileitem.objectName}" ajax="false" action="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
+                                <p:link target="_blank" href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+
                             </p:dataList>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -360,7 +361,8 @@
                         <h:panelGroup>
                             <p:dataList  value="#{zkbPartOrderAuditController.v2_probe_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">院方合同证明</f:facet>
-                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                <!--<p:commandLink immediate="false" process="@this" value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>-->
+                                <p:link target="_blank" href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
 <!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                             </p:dataList>
                         </h:panelGroup>
