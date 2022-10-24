@@ -1,11 +1,12 @@
 package com.ge.apm.view.zkb;
 
-import
-
-        com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbSalesPersonInfoRepository;
 import com.ge.apm.dao.ZkbSalesTenantAssociateRepository;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.ZkbSalesPersonInfo;
+import com.ge.apm.domain.ZkbSalesTenantAssociate;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbSalesPersonInfoService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -33,6 +34,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -65,6 +67,9 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
 
     private List<HashMap<String,String>> errorImportList= new ArrayList<>();
 
+    private List<TenantInfo> tenantInfosByUids ;
+
+
     @Override
     protected GenericRepositoryUUID<ZkbSalesPersonInfo> getDAO() {
         return dao;
@@ -78,6 +83,7 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
         zkbSalesPersonInfoService = WebUtil.getBean(ZkbSalesPersonInfoService.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         tenantInfoList = zkbSalesPersonInfoService.getSourceTenantInfoList();
+        tenantInfosByUids = new ArrayList<>();
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         if(StringUtils.isNotEmpty(encodeStr)){
@@ -89,6 +95,7 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
+        this.tenantInfoUids = new ArrayList<String>();
         this.selected.setSparePartsSelection(true);
         this.selected.setProbeSelection(true);
         this.selected.setCreatedBy(currentUser.getLoginName());
@@ -100,6 +107,14 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
     @Override
     public void prepareEdit(){
         super.prepareEdit();
+        tenantInfoUids = new ArrayList<String>();
+        if (selected == null) {
+            return;
+        }
+        List<ZkbSalesTenantAssociate> zkbSalesTenantAssociateList = this.selected.getZkbSalesTenantAssociateList();// zkbSalesTenantAssociateRepository.getBySalesPersonId(selected.getId());
+        zkbSalesTenantAssociateList.stream().forEach(a ->{
+            tenantInfoUids.add(a.getTenantUid());
+        });
         this.selected.setModifiedBy(currentUser.getLoginName());
         this.selected.setModifiedTime(new Date());
     }
@@ -120,9 +135,9 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
         }
         zkbSalesTenantAssociateRepository.deleteBySalesPersonId(this.selected.getId());
         List<ZkbSalesTenantAssociate> zkbSalesTenantAssociatesList = new ArrayList<ZkbSalesTenantAssociate>();
-        tenantInfoUids.stream().forEach(uid -> {
+        tenantInfosByUids.stream().forEach(tenantInfo -> {
             ZkbSalesTenantAssociate zkbSalesTenantAssociates = new ZkbSalesTenantAssociate();
-            zkbSalesTenantAssociates.setTenantUid(uid);
+            zkbSalesTenantAssociates.setTenantUid(tenantInfo.getUid());
             zkbSalesTenantAssociates.setZkbSalesPersonInfo(this.selected);
             zkbSalesTenantAssociates.setCreatedTime(new Date());
             zkbSalesTenantAssociates.setSalesPersonId(this.selected.getId());
@@ -162,7 +177,8 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-        super.save();
+       ZkbSalesPersonInfo zkbSalesPersonInfo = dao.save(this.selected);;
+       this.saveSalesTenantAssociate();
     }
 
     public void exportSalesTenantAssociate(){
@@ -248,5 +264,18 @@ public class ZkbSalesPersonInfoController extends GenericCRUDUUIDController<ZkbS
 
     public void setErrorImportList(List<HashMap<String, String>> errorImportList) {
         this.errorImportList = errorImportList;
+    }
+
+    public List<TenantInfo> getTenantInfosByUids() {
+        tenantInfosByUids = new ArrayList<TenantInfo>();
+        if(CollectionUtils.isNotEmpty(this.tenantInfoUids)){
+            Set<String> tenantInfoUidOfSet = tenantInfoUids.stream().map(t ->t).collect(Collectors.toSet());
+            tenantInfosByUids = this.tenantInfoDao.findByUidIn(tenantInfoUidOfSet);
+        }
+        return tenantInfosByUids;
+    }
+
+    public void setTenantInfosByUids(List<TenantInfo> tenantInfosByUids) {
+        this.tenantInfosByUids = tenantInfosByUids;
     }
 }
