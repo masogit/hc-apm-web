@@ -230,6 +230,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters = new ArrayList<SearchFilter>();
         }
         setUserSearchFilters();
+        Integer newLifecyle = null;
+        for(SearchFilter searchFilter : searchFilters) {
+            if(searchFilter.fieldName.equals("lifecycle")) newLifecyle = Integer.valueOf(searchFilter.value.toString()) * 12;
+        }
+        if(newLifecyle!=null) {
+            this.updateSearchFilter(new SearchFilter("lifecycle", SearchFilter.Operator.EQ,newLifecyle));
+        }
         selected = null;
             Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
             if (tenantOptionConfigOptional.isPresent() && tenantOptionConfigOptional.get().getOrderByCreateTimeByDefault()) {
