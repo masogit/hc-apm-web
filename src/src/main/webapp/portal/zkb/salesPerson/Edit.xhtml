@@ -30,10 +30,10 @@
                          </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">关联租户</label>
-                            <p:selectManyMenu  styleClass="manymenu-advanced"  id="tenant" value="#{zkbSalesPersonInfoController.tenantInfosByUids}"   var="t" converter="tenantInfoConverter"  filter="true" filterMatchMode="contains" showCheckbox="true"   >
-                                <f:selectItems value="#{zkbSalesPersonInfoController.tenantInfoList}" var="tenantInfo" label="#{tenantInfo.name}" itemValue="#{tenantInfo}"  style="overflow: hidden;  "  />
+                            <p:selectManyMenu  styleClass="manymenu-advanced"  id="tenant" value="#{zkbSalesPersonInfoController.tenantInfosByUids}"   var="t" converter="tenantInfoConverter" style="width:99%"  filter="true" filterMatchMode="contains" showCheckbox="true"   >
+                                <f:selectItems value="#{zkbSalesPersonInfoController.tenantInfoList}" var="tenantInfo" label="#{tenantInfo.name}" itemValue="#{tenantInfo}"     />
                                 <p:column>
-                                    <h:outputText value="#{t.name}" />.
+                                    <h:outputText value="#{t.name}" />
                                 </p:column>
                             </p:selectManyMenu>
                         </h:panelGroup>
