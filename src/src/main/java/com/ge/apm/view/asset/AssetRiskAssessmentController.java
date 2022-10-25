@@ -148,11 +148,11 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
             loadAssetInfo(selectedId);
         } else if ("Create".equals(actionName)) {
             batchRiskAssessment = BatchRiskAssessment.builder()
-                    .accidentHistoryScore(1)
-                    .clinicalFunctionScore(1)
-                    .problemAvoidanceRateScore(1)
-                    .specialRequirementScore(1)
-                    .tangibleRiskScore(1)
+                    .accidentHistoryScore(0)
+                    .clinicalFunctionScore(0)
+                    .problemAvoidanceRateScore(0)
+                    .specialRequirementScore(0)
+                    .tangibleRiskScore(0)
                     .build();
             batchSumScore(batchRiskAssessment);
         }
@@ -226,6 +226,10 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     }
 
     public DualListModel<AssetInfo> getAssets() {
+        if (selectSite == null) {
+            assets.setSource(new ArrayList<>());
+            return assets;
+        }
         searchFilters = new ArrayList<>();
         setUserSearchFilters();
         searchFilters.add(new SearchFilter("isRiskAssessment", SearchFilter.Operator.IsNull, null));
@@ -392,7 +396,11 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     }
 
     public void batchSumScore(BatchRiskAssessment assessment) {
-        Integer sumScore = assessment.getAccidentHistoryScore() + assessment.getClinicalFunctionScore() + assessment.getTangibleRiskScore() + assessment.getSpecialRequirementScore() + assessment.getProblemAvoidanceRateScore();
+        Integer sumScore = (assessment.getAccidentHistoryScore()==null?0:assessment.getAccidentHistoryScore())
+                + (assessment.getClinicalFunctionScore()==null?0:assessment.getClinicalFunctionScore())
+                + (assessment.getTangibleRiskScore()==null?0:assessment.getTangibleRiskScore())
+                + (assessment.getSpecialRequirementScore()==null?0:assessment.getSpecialRequirementScore())
+                + (assessment.getProblemAvoidanceRateScore()==null?0:assessment.getProblemAvoidanceRateScore());
         assessment.setSumRiskScore(sumScore + "分");
         if (sumScore >= 13) {
             assessment.setDetectionCycle("每半年检测一次"); //检测周期
@@ -402,10 +410,14 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
             assessment.setDetectionCycle("每年检测一次"); //检测周期
             assessment.setMaintenancePeriod("每半年保养一次"); //保养周期
             assessment.setCheckCycle("每周");
-        } else if (sumScore < 9) {
+        } else if (sumScore < 9 && sumScore > 0) {
             assessment.setDetectionCycle("每两年检测一次"); //检测周期
             assessment.setMaintenancePeriod("每年保养一次"); //保养周期
             assessment.setCheckCycle("每月");
+        } else if (sumScore == 0) {
+            assessment.setDetectionCycle(null); //检测周期
+            assessment.setMaintenancePeriod(null); //保养周期
+            assessment.setCheckCycle(null);
         }
     }
 
@@ -425,6 +437,14 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     }
 
     public void saveBatchRiskAssetInfo() {
+        if (CollectionUtils.isEmpty(assets.getTarget())) {
+            MessageUtil.outPutReturnFacesMessage("ChooseAssets", FacesMessage.SEVERITY_INFO);
+            return;
+        }
+        if ("0分".equals(batchRiskAssessment.getSumRiskScore())) {
+            MessageUtil.outPutReturnFacesMessage("NotAssessmentScore", FacesMessage.SEVERITY_INFO);
+            return;
+        }
         assets.getTarget().forEach(assetInfo -> {
             assetInfo.setRiskAssessment(Boolean.TRUE);
             assetInfo.setTangibleRiskScore(batchRiskAssessment.getTangibleRiskScore());
