@@ -289,14 +289,10 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
         LOGGER.info("Initialize new node, auditEventList：{}", JSONObject.toJSONString(auditEventList));
         if(CollectionUtils.isEmpty(auditEventList)) return ;
         Map<String, List<AuditEntry>> auditEntryMap = auditEventList.stream().collect(Collectors.groupingBy(item -> item.getCaseUid()));
-        int systemSize = systemEntryList.size();
         for (Map.Entry<String, List<AuditEntry>> stringListEntry : auditEntryMap.entrySet()) {
             String key = stringListEntry.getKey();
             List<AuditEntry> entryValue = stringListEntry.getValue();
-            int size = entryValue.size();
-            if(systemSize > size){
-                saveAuditEntry(key,entryValue,systemEntryList);
-            }
+            saveAuditEntry(key,entryValue,systemEntryList);
         }
 
     }
