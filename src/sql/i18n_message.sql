@@ -3747,6 +3747,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- 设备风险评估操作 start
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AssetRiskAssessment','设备风险评估','Asset risk assessment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ItemsTransferred','元素移动完成','Items Transferred',NULL,-1);
 -- 设备风险评估操作 end
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('extensionStatus','DeliveryPending','待到货','DeliveryPending',NULL,-1);
