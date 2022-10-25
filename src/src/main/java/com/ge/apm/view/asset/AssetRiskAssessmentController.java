@@ -16,6 +16,7 @@ import com.ge.apm.service.nurseSite.WordReportExportService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.view.asset.components.BatchRiskAssessment;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -70,7 +71,7 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
     private WordReportExportService exportService;
 
     /*属性类*/
-    static PageRequest pageRequest = new PageRequest(0, 10000);
+    static PageRequest pageRequest = new PageRequest(0, 1000);
     @Getter@Setter
     private List<AssetInfo> assetInfoList;
     @Getter@Setter
@@ -413,23 +414,14 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         for (Object item : event.getItems()) {
             builder.append(((AssetInfo) item).getName()).append("<br />");
         }
-
-        FacesMessage msg = new FacesMessage();
-        msg.setSeverity(FacesMessage.SEVERITY_INFO);
-        msg.setSummary("Items Transferred");
-        msg.setDetail(builder.toString());
-
-        FacesContext.getCurrentInstance().addMessage(null, msg);
+        MessageUtil.outPutReturnFacesMessage("ItemsTransferred", FacesMessage.SEVERITY_INFO, builder.toString());
     }
 
     public void saveAssetInfo() {
         selected.setAssessmentBy(userContextService.getLoginUser().getLoginName());
         selected.setAssessmentDate(new Date());
         assetInfoRepository.save(selected);
-        FacesMessage msg = new FacesMessage();
-        msg.setSeverity(FacesMessage.SEVERITY_INFO);
-        msg.setSummary("Save success");
-        FacesContext.getCurrentInstance().addMessage(null, msg);
+        MessageUtil.outPutReturnFacesMessage("SaveSuccess", FacesMessage.SEVERITY_INFO);
     }
 
     public void saveBatchRiskAssetInfo() {
@@ -448,10 +440,7 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
             assetInfo.setAssessmentDate(new Date());
         });
         assetInfoRepository.save(assets.getTarget());
-        FacesMessage msg = new FacesMessage();
-        msg.setSeverity(FacesMessage.SEVERITY_INFO);
-        msg.setSummary("Save success");
-        FacesContext.getCurrentInstance().addMessage(null, msg);
+        MessageUtil.outPutReturnFacesMessage("SaveSuccess", FacesMessage.SEVERITY_INFO);
     }
 
     public boolean isChecked() {
