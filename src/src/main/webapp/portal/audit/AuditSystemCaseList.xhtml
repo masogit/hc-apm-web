@@ -67,6 +67,11 @@
                             <br/> <br/>
                             <p:commandButton  value="创建副本" actionListener="#{auditSystemCaseListController.onCreateCopy(item)}"
                                               rendered="#{item.type eq 1}" oncomplete="PF('createCopyDlg').show()" />
+
+                            <p:commandButton  value="初始化" actionListener="#{auditSystemCaseListController.initializeNewNode(item)}"
+                                              rendered="#{item.type eq 2 and item.status eq 2}" >
+                                <p:confirm header="初始化确认" message="您确定要初始化选中的数据嘛!!" icon="ui-icon-alert"/>
+                            </p:commandButton>
                         </p:column>
 
                         <f:facet name="{Toolbar}">
