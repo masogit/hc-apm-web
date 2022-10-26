@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.TemporallyPurchase}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <p:fieldset legend="高级查询">
+                        <p:panelGrid id="searchPanel" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetGroup}}</label>
+                                <p:selectOneMenu id="assetGroup" value="#{PurchaseInfoController.assetGroup}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" class="selectAssetGroup"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <p:ajax listener="#{PurchaseInfoController.assetGroupChangeListener}"  />
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.preventiveMaintenanceAnalysis_deviceName}</label>
+                                <p:inputText id="assetName" value="#{assetRiskAssessmentController.assetName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.AssetBrand}</label>
+                                <p:inputText id="assetBrand" value="#{assetRiskAssessmentController.functionType}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.functionType}</label>
+                                <p:inputText id="functionType" value="#{assetRiskAssessmentController.functionType}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:commandButton value="#{msg.Search}" action="" update="" />
+                                <p:commandButton value="#{msg.Reset}" action="" update="" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                </h:form>
+                <h:form id="PucrhaseForm" style="margin-top: 20px;">
+                    <p:dataTable  id="dataList" value="#{PurchaseInfoController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                  rows="20" emptyMessage="#{msg.noRecordFound}"
+                                  rowsPerPageTemplate="20,50,100,500">
+                        <p:column  headerText="#{msg.productName}" >
+                            <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.PartsSpecification}" >
+                            <h:outputText value="#{item.specification}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.quantity}" >
+                            <h:outputText value="#{item.quantity}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.BudgetAmount}" >
+                            <h:outputText value="#{item.budgetAmount}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.productName}" >
+                            <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.productName}" >
+                            <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.productName}" >
+                            <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.productName}" >
+                            <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.productName}" >
+                            <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.productName}" >
+                            <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

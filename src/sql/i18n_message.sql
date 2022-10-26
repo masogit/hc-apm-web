@@ -4671,6 +4671,10 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetAsset', '预算设备', 'Budget Asset', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetAssetInfo', '预算设备详情', 'Budget Asset Details', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetApprovalInfo', '预算审核详情', 'Budget Approval Details', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'TemporallyPurchase', '临时申购管理', 'Temporally Purchase', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'YeahPurchase', '年度申购管理', 'Year Purchase', NULL, -1);
+
+
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ApplicationDept', '申请科室', 'Application Department', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ApplicationDate', '申请日期', 'Application Date', NULL, -1);
@@ -4693,6 +4697,8 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ApplicationQuantity', '申请数量', 'Application Quantity', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ApplicationPrice', '申请单价', 'Application Price', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ApplicationAmount', '申请金额', 'Application Amount', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetAmount', '预算金额', 'Budget Amount', NULL, -1);
+
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'AddNewAsset', '添加新设备', 'Add New Asset', NULL, -1);
 
