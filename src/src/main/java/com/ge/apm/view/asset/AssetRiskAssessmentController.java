@@ -156,6 +156,7 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
                     .build();
             batchSumScore(batchRiskAssessment);
         }
+        assets.setSource(new ArrayList<>());
         /*初始化方法*/
         loadClinicalDeptList();
         loadCustomConfig();
@@ -225,14 +226,13 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         return res;
     }
 
-    public DualListModel<AssetInfo> getAssets() {
-        if (selectSite == null) {
-            assets.setSource(new ArrayList<>());
+    public DualListModel<AssetInfo> assetList() {
+        if (StringUtils.isEmpty(assetName) && StringUtils.isEmpty(functionType) && assetGroup == null && CollectionUtils.isEmpty(clinicalDeptOrgUidSet)) {
+            MessageUtil.outPutReturnFacesMessage("RiskAssessmentSearchRequire", FacesMessage.SEVERITY_INFO);
             return assets;
         }
         searchFilters = new ArrayList<>();
         setUserSearchFilters();
-        searchFilters.add(new SearchFilter("isRiskAssessment", SearchFilter.Operator.IsNull, null));
         Page<AssetInfo> page = assetInfoRepository.findBySearchFilter(this.searchFilters, pageRequest);
         List<AssetInfo> source = new ArrayList<>(page.getContent());
         source.removeAll(assets.getTarget());
@@ -370,14 +370,29 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
         }
     }
 
-    public void deleteAsset(AssetInfo asset) {
-        int originStatus = asset.getStatus();
-        aiMgrService.deleteAsset(asset);
-        assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
+    public void deleteAsset(AssetInfo assetInfo) {
+        assetInfo.setRiskAssessment(Boolean.FALSE);
+        assetInfo.setTangibleRiskScore(null);
+        assetInfo.setProblemAvoidanceRateScore(null);
+        assetInfo.setAccidentHistoryScore(null);
+        assetInfo.setClinicalFunctionScore(null);
+        assetInfo.setSpecialRequirementScore(null);
+        assetInfo.setCheckCycle(null);
+        assetInfo.setSumRiskScore(null);
+        assetInfo.setDetectionCycle(null);
+        assetInfo.setMaintenancePeriod(null);
+        assetInfo.setAssessmentBy(null);
+        assetInfo.setAssessmentDate(null);
+        assetInfoRepository.save(assetInfo);
+
     }
 
     public void sumScore(AssetInfo assetInfo) {
-        Integer sumScore = assetInfo.getAccidentHistoryScore() + assetInfo.getClinicalFunctionScore() + assetInfo.getTangibleRiskScore() + assetInfo.getSpecialRequirementScore() + assetInfo.getProblemAvoidanceRateScore();
+        Integer sumScore = (assetInfo.getAccidentHistoryScore()==null?0:assetInfo.getAccidentHistoryScore())
+                + (assetInfo.getClinicalFunctionScore()==null?0:assetInfo.getClinicalFunctionScore())
+                + (assetInfo.getTangibleRiskScore()==null?0:assetInfo.getTangibleRiskScore())
+                + (assetInfo.getSpecialRequirementScore()==null?0:assetInfo.getSpecialRequirementScore())
+                + (assetInfo.getProblemAvoidanceRateScore()==null?0:assetInfo.getProblemAvoidanceRateScore());
         assetInfo.setSumRiskScore(sumScore + "分");
         if (sumScore >= 13) {
             assetInfo.setDetectionCycle("每半年检测一次"); //检测周期
