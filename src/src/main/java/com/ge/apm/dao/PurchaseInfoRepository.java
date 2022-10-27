@@ -4,5 +4,5 @@ import com.ge.apm.domain.PurchaseInfo;
 import webapp.framework.dao.GenericRepository;
 
 public interface PurchaseInfoRepository extends GenericRepository<PurchaseInfo> {
-
+    public PurchaseInfo findByUid(String uid);
 }

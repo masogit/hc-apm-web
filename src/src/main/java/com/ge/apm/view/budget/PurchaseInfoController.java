@@ -14,20 +14,22 @@ import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
@@ -49,7 +51,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @ViewScoped
-@ManagedBean(name = "PurchaseInfoController")
+@ManagedBean
 public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
     private static Logger logger = LoggerFactory.getLogger(PurchaseInfoController.class);
 
@@ -76,6 +78,8 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
     private TreeNode orgTree;
     @Getter@Setter
     private TreeNode orgTreeEdit;
+    @Getter@Setter
+    private StreamedContent zipFile;
     @Getter@Setter
     private OrgInfo selectedDept;
     @Getter@Setter
@@ -105,6 +109,36 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(treeNode);
         orgTreeEdit = initOrgTree(treeNodeEdit);
+
+        String encodeStr = WebUtil.getRequestParameter("str");
+        String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
+        if (!StringUtils.isEmpty(actionName) && "Edit".equals(actionName)) {
+            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+            setSelected(dao.findByUid(selectedId));
+        }
+    }
+
+    public void setUserSearchFilters() {
+        if (null != assetGroup) {
+            this.updateSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,  assetGroup, "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetGroup".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        if (!StringUtils.isEmpty(functionType)) {
+            this.updateSearchFilter(new SearchFilter("functionType", SearchFilter.Operator.LIKE,  functionType, "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "functionType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        if (!StringUtils.isEmpty(assetName)) {
+            this.updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE,  assetName, "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        if (!StringUtils.isEmpty(assetBrand)) {
+            this.updateSearchFilter(new SearchFilter("assetBrand", SearchFilter.Operator.LIKE,  assetBrand, "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetBrand".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
     }
 
     @Override
@@ -112,6 +146,7 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
+        setUserSearchFilters();
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -123,13 +158,29 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
         }
     }
 
-    @Override
-    public void save() {
+    public String getEditPage(String uid) {
+        String operation = "Edit.xhtml?actionName=Edit&selectedid=" + uid;
+        return UrlEncryptController.encodeUrlParam(operation);
+    }
 
+    public Object valueOfToString(Object obj) {
+        if (null != obj) {
+            return "" + obj;
+        }
+        return null;
     }
 
     @Override
-    public void delete() {
+    public void save() {
+        dao.save(selected);
+    }
+
+    @Override
+    public void delete(PurchaseInfo purchaseInfo) {
+
+    }
+
+    public void exportExcel() {
 
     }
 

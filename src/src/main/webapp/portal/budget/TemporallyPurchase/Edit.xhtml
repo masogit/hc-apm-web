@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
+        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="临时申购管理"/>
+            </div>
+
+            <div class="ui-g-12 card ">
+                <h:form id="PurchaseInfoEditForm">
+                    <p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true"/>
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetGroup}}<span style="color:red"></span></label>
+                            <p:selectOneMenu id="assetGroup" value="#{purchaseInfoController.selected.assetGroup}" required="true">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" class="selectAssetGroup"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <p:ajax listener="#{purchaseInfoController.assetGroupChangeListener}"  />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.preventiveMaintenanceAnalysis_deviceName}<span style="color:red"></span></label>
+                            <p:inputText id="assetName" value="#{purchaseInfoController.selected.assetName}" required="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.AssetBrand}<span style="color:red"></span></label>
+                            <p:inputText id="assetBrand" value="#{purchaseInfoController.selected.functionType}" required="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.functionType}<span style="color:red"></span></label>
+                            <p:inputText id="functionType" value="#{purchaseInfoController.selected.functionType}" required="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.productName}<span style="color:red"></span></label>
+                            <p:inputText id="productName" value="#{purchaseInfoController.selected.productName}" required="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.PartsSpecification}<span style="color:red"></span></label>
+                            <p:inputText id="specification" value="#{purchaseInfoController.selected.specification}" required="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.quantity}<span style="color:red"></span></label>
+                            <p:inputText id="quantity" value="#{purchaseInfoController.selected.quantity}" required="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.BudgetAmount}<span style="color:red"></span></label>
+                            <p:inputText id="budgetAmount" value="#{purchaseInfoController.selected.budgetAmount}" required="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.Declaration}</label>
+                            <p:inputText id="declaration" value="#{purchaseInfoController.selected.declaration}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.FundingSource}</label>
+                            <p:inputText id="fundingSource" value="#{purchaseInfoController.selected.fundingSource}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.RecommendBrand}</label>
+                            <p:inputText id="recommendBrand" value="#{purchaseInfoController.selected.recommendBrand}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.Description}</label>
+                            <p:inputText id="description" value="#{purchaseInfoController.selected.description}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.LaboratoryEvidence}</label>
+
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup id="buttonGroup">
+                            <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{purchaseInfoController.save()}" validateClient="true" update=":PurchaseInfoEditForm" style="float:left" />
+                            <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"  onclick="window.location.reload();" immediate="true" style="float:left"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
