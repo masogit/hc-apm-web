@@ -38,7 +38,7 @@
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
                                     <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
-                                    <p:inputText id="selectedUserOrgName" value="#{empty assetRiskAssessmentController.selectSite? msg.AllHospitals:assetRiskAssessmentController.selectSite.name}" readonly="true" class="SiteUIDChange"/>
+                                    <p:inputText id="selectedUserOrgName" value="#{assetRiskAssessmentController.selectSite}" required="true" readonly="true" class="SiteUIDChange"/>
                                     <p:commandButton id="btnOrg" type="button" icon="fa fa-angle-down" iconPos="right"/>
                                     <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                         <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
@@ -77,19 +77,17 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.functionType}</label>
                                     <p:inputText id="functionType" value="#{assetRiskAssessmentController.functionType}">
-<!--                                        <p:ajax event="keyup" update=":AssetRiskCreateForm:pickList"></p:ajax>-->
                                     </p:inputText>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.preventiveMaintenanceAnalysis_deviceName}</label>
                                     <p:inputText id="assetName" value="#{assetRiskAssessmentController.assetName}">
-<!--                                        <p:ajax event="keyup" update=":AssetRiskCreateForm:pickList"></p:ajax>-->
                                     </p:inputText>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:fieldset>
                         <h:panelGrid>
-                            <p:commandButton value="选择设备" update=":AssetRiskCreateForm:pickList" style="float:left" />
+                            <p:commandButton value="选择设备" action="#{assetRiskAssessmentController.assetList()}" update=":AssetRiskCreateForm:pickList" validateClient="true"  style="float:left" />
                         </h:panelGrid>
                         <p:fieldset legend="相关设备">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -101,14 +99,17 @@
                                         <f:facet name="sourceCaption">待选设备</f:facet>
                                         <f:facet name="targetCaption">已选设备</f:facet>
                                         <p:ajax event="transfer" listener="#{assetRiskAssessmentController.onTransfer}" />
-                                        <p:column style="width:30%;">
+                                        <p:column style="width:25%;">
                                             <h:outputText value="#{asset.name}" />
                                         </p:column>
                                         <p:column style="width:20%;">
                                             <h:outputText value="#{asset.functionType}" />
                                         </p:column>
-                                        <p:column style="width:30%;">
+                                        <p:column style="width:25%;">
                                             <h:outputText value="#{asset.departNum}" />
+                                        </p:column>
+                                        <p:column style="width:10%;">
+                                            <h:outputText value="#{assetRiskAssessmentController.getIsRiskAssessment(asset)?msg.HaveRiskAssessment:msg.NotHaveRiskAssessment}" />
                                         </p:column>
                                     </p:pickList>
                                 </h:panelGroup>
