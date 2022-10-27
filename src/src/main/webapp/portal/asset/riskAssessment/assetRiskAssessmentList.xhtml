@@ -63,7 +63,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax  event="rowSelect" listener="#{assetRiskAssessmentController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>
+<!--                        <p:ajax  event="rowSelect" listener="#{assetRiskAssessmentController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>-->
                         <p:ajax event="filter" listener="#{assetRiskAssessmentController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                         <p:column width="36"  id="checkBoxColumn">

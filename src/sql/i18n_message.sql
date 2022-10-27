@@ -3749,6 +3749,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AssetRiskAssessment','设备风险评估','Asset risk assessment',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ItemsTransferred','元素移动完成','Items Transferred',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','NotAssessmentScore','评分未完成','Not Assessment Score',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RiskAssessmentSearchRequire','所属院区为必选条件，其他查询条件最少要填写或选择一个','RiskAssessment Search Require',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','HaveRiskAssessment','已有','Have Risk Assessment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','NotHaveRiskAssessment','未有','Not Have Risk Assessment',NULL,-1);
+
 -- 设备风险评估操作 end
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('extensionStatus','DeliveryPending','待到货','DeliveryPending',NULL,-1);
