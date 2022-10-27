@@ -200,14 +200,14 @@ public class AssetRiskAssessmentController extends JpaCRUDController<AssetInfo> 
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetGroup".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (!StringUtils.isEmpty(functionType)) {
-            this.updateSearchFilter(new SearchFilter("functionType", SearchFilter.Operator.LIKE,  functionType, "1*"));
+            this.updateSearchFilter(new SearchFilter("functionType", SearchFilter.Operator.LIKE,  functionType, "1*3+"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "functionType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "functionType".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
         }
         if (!StringUtils.isEmpty(assetName)) {
-            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE,  assetName, "1*"));
+            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE,  assetName, "1*3+"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "name".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "name".equals(item.fieldName) && item.conditionPath.equals("1*3+")).collect(Collectors.toList()));
         }
     }
 
