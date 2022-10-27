@@ -138,7 +138,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         this.selectedAssets = assetSelectService.loadSelectedAssetByConfig(config.getId()).stream().collect(Collectors.toSet());
         this.selectedAssets.stream().forEach(t -> selectedAssetUids.put(t.getUid(), Boolean.TRUE));
         OrgInfo selectedDept = assetSelectService.getOrgInfoByUid(config.getClinicalDeptUID());
-        this.selectedOrg = assetSelectService.getOrgInfoByUid(selectedDept.getParentUID());
+        this.selectedOrg = assetSelectService.getOrgInfoByUid(selectedDept.getSiteUID());
 		if (this.listCheckOrgInfo == null) {
 			this.listCheckOrgInfo = new ArrayList<OrgInfo>();
 		}
