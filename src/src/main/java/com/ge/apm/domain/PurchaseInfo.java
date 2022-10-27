@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
@@ -33,6 +34,11 @@ public class PurchaseInfo implements Serializable {
     @Column(columnDefinition = "CHAR(32)")
     private String uid;
 
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "site_id")
+    private Integer siteId;
+
     // 申请状态 1: 待审核, 2: 审核中, 3: 审核通过, 4: 审核未通过
     @Column(name = "application_status")
     private Integer applicationStatus;
@@ -47,7 +53,7 @@ public class PurchaseInfo implements Serializable {
     private String unit;//单位
 
     @Column(name = "budget_amount")
-    private String budget_amount;//预算金额
+    private String budgetAmount;//预算金额
 
     @Column(name = "declaration")
     private String declaration;//申报说明
@@ -57,6 +63,9 @@ public class PurchaseInfo implements Serializable {
 
     @Column(name = "brand")
     private String brand;//品牌
+
+    @Column(name = "recommend_brand")
+    private String recommendBrand;//推荐品牌
 
     @Column(name = "description")
     private String description;//说明
