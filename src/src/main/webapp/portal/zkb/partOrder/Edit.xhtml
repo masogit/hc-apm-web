@@ -21,7 +21,6 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
                     <h:panelGroup id="artificialTypeGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
                         <label class="label">机型*</label>
                         <p:selectOneMenu id="artificialType" value="#{zkbPartOrderEditController.artificialType}" required="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}">
