@@ -114,8 +114,8 @@
         <p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
             </p:submenu>
 
-            <p:submenu label="#{msg.BudgetMgr}" icon="attach_money" >
-<!--                       rendered="#{userContextService.versionContains('budgetMgr') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff')}">-->
+            <p:submenu label="#{msg.BudgetMgr}" icon="attach_money"
+                       rendered="#{userContextService.versionContains('budgetMgr') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff')}">
 <!--                <p:menuitem value="#{msg.BudgetAsset}" outcome="/portal/budget/asset/List.xhtml"/>-->
                 <p:menuitem value="#{msg.BudgetApplication}" outcome="/portal/budget/application/List.xhtml"/>
                 <p:menuitem value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml"/>
