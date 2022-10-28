@@ -1408,7 +1408,23 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         } else if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             //region  人工
             if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
-
+                if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(zkbPartOrder.getCcsbApplyType())){
+                    Integer remindQty = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
+                    if(remindQty >= 1){
+                        return "当前合同剩余人工名额为"+zkbContract.getGeArtificialSupportTimes()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个人工名额！";
+                    }else{
+                        return "该申请不扣任何名额！";
+                    }
+                }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(zkbPartOrder.getCcsbApplyType())){
+                    Integer remindQty = zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota();
+                    if(remindQty >= 1){
+                        return "当前合同剩余保养名额为"+zkbContract.getCcsbMaintenanceQuota()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个保养名额！";
+                    }else{
+                        return "该申请不扣任何名额！";
+                    }
+                }else{
+                    return "该申请名额扣除有误";
+                }
             }else if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
                 if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
                     //扣除积分

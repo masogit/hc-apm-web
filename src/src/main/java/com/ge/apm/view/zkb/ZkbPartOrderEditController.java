@@ -281,6 +281,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }else if(contractList.size() == 1){
             selectedContract = contractList.get(0);
+            ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(selectedContract.getId(),assetInfo.getUid());
+
             //判断合同是否是CCSB
             if(ZkbContract.ContractType.CCSB.toString().equals(selectedContract.getContractType())){
                 if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
@@ -288,11 +290,19 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     FacesContext.getCurrentInstance().addMessage(null, message);
                     contractList = new ArrayList<>();
                     return;
+                }else{
+                    if(!CopyByInvok.NORMAL_THREE.equals(artificialType)){
+                        WebUtil.addErrorMessage("CCSB类型合同只能进行超声低端机申请");
+                        return;
+                    }
+                    if(!ZkbContractAsset.AssetTypeEnum.lowMachine.toString().equals(zkbContractAsset.getAssetType())){
+                        WebUtil.addErrorMessage("CCSB类型合同中设备不为超声低端机");
+                        return;
+                    }
                 }
             }
 
             //599方案判断
-            ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(selectedContract.getId(),assetInfo.getUid());
             if(ZkbContract.YOrNEnum.N.toString().equals(selectedContract.getFiveNineNineFlag())){
                 if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                     if(zkbContractAsset != null && StringUtils.isNotEmpty(zkbContractAsset.getAssetType())){
@@ -667,7 +677,25 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-                if(CopyByInvok.T.equals(maintainFlag)){
+                if(ZkbContract.ContractType.CCSB.toString().equals(selectedContract.getContractType())){
+                    if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(selected.getCcsbApplyType())){
+                        Integer remindQty = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
+                        if(remindQty >= 1){
+                            this.selected.setRemainQty(remindQty - 1);
+                        }else{
+                            this.selected.setRemainQty(0);
+                        }
+                    }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(selected.getCcsbApplyType())){
+                        Integer remindQty = selectedContract.getCcsbMaintenanceQuota() == null ? 0 : selectedContract.getCcsbMaintenanceQuota();
+                        if(remindQty >= 1){
+                            this.selected.setRemainQty(remindQty - 1);
+                        }else{
+                            this.selected.setRemainQty(0);
+                        }
+                    }else{
+                        this.selected.setRemainQty(0);
+                    }
+                }else if(CopyByInvok.T.equals(maintainFlag)){
                     if(CopyByInvok.T.equals(selected.getScoreFlag())){
                         this.selected.setRemainQty(0);
                     }else {
