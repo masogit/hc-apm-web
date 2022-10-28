@@ -17,7 +17,7 @@
                     <p:fieldset legend="高级查询">
                         <p:panelGrid id="searchPanel" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">#{msg.assetGroup}}</label>
+                                <label class="label">#{msg.assetGroup}</label>
                                 <p:selectOneMenu id="assetGroup" value="#{purchaseInfoController.assetGroup}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" class="selectAssetGroup"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -30,7 +30,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.AssetBrand}</label>
-                                <p:inputText id="assetBrand" value="#{purchaseInfoController.functionType}"/>
+                                <p:inputText id="assetBrand" value="#{purchaseInfoController.assetBrand}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.functionType}</label>
@@ -46,8 +46,8 @@
                                   rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                   paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                   currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                  rowsPerPageTemplate="20,50,100,500">
+                                  rows="5" emptyMessage="#{msg.noRecordFound}"
+                                  rowsPerPageTemplate="5,20,100,200">
                         <p:column headerText="操作">
                             <p:link target="_new" title="#{msg.Edit}" outcome="#{purchaseInfoController.getEditPage(item.uid)}" >
                                 <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
@@ -80,9 +80,6 @@
                         </p:column>
                         <p:column  headerText="#{msg.Description}" >
                             <h:outputText value="#{item.description}"/>
-                        </p:column>
-                        <p:column  headerText="#{msg.LaboratoryEvidence}" >
-
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Create.xhtml?actionName=Create')}"  />
