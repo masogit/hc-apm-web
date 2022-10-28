@@ -1,12 +1,5 @@
 package com.ge.apm.view.pm;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.SupplierService;
@@ -15,7 +8,10 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.OrgInfoComparator;
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
@@ -33,11 +29,15 @@ import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAsset> {
@@ -66,6 +66,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private UserCommonService userCommonService;
     private PmOrderRule pmOrderRule;
     public static List<String> assetInfoUids = null;
+    private List<ZkbFileDirectory> subZkbFileDirectoryList=null;
     @Getter @Setter
     private PmOrderRule pmOrderRuleTwoLevel;
     @Getter @Setter
@@ -75,6 +76,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private SupplierService supplierService;
     private ConfigService configService;
     private TenantInfo selectedTenant;
+    private ZkbFileDirectoryService zkbFileDirectoryService;
     private OrgInfo selectedUserOrg;
     private OrgInfo selectedOrg;
     private TreeNode orgTree;
@@ -92,6 +94,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         brandRepository = WebUtil.getBean(BrandRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
@@ -116,6 +119,23 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
+    }
+    /**
+     * 根据主目录值获取子目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> getSubZkbFileDirectoryList() {
+        if(StringUtils.isBlank(this.queryAsset.getMainDirectory())){
+            return null;
+        }
+        List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
+                ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
+                this.queryAsset.getMainDirectory());
+        if(CollectionUtils.isEmpty(mainZkbFileDirectory)){
+            return null;
+        }
+        subZkbFileDirectoryList=this.zkbFileDirectoryService.findByZkbFileDirectory(mainZkbFileDirectory.get(0));
+        return subZkbFileDirectoryList;
     }
 
     public void initOrgTree() {
@@ -246,6 +266,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
 		}
+        if (StringUtils.isNotEmpty(queryAsset.getMainDirectory())) {
+            assetFilters.add(new SearchFilter("mainDirectory", SearchFilter.Operator.EQ, queryAsset.getMainDirectory()));
+        }
+        if (StringUtils.isNotEmpty(queryAsset.getSecondDirectory())) {
+            assetFilters.add(new SearchFilter("secondDirectory", SearchFilter.Operator.EQ, queryAsset.getSecondDirectory()));
+        }
 /*        if (null != queryAsset.getManufactureId()) {
             assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
         }*/
@@ -301,7 +327,13 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         }
         return new ArrayList<>();
     }
-
+    /**
+     * 获取所有主目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> findMainDirectory() {
+        return zkbFileDirectoryService.findMainDirectory(null);
+    }
 
     public List<String> getAssetUids(String tenantUid,String pmOrderRuleLevel){
         List<String> uids = null;
