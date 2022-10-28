@@ -20,6 +20,10 @@
                     <p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true"/>
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
+                            <label class="label">#{msg.clinicalDeptName}<span style="color:red"></span></label>
+                            <p:inputText id="deptName" value="#{yearPurchaseInfoController.selected.deptName}" required="true" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">#{msg.PurchaseYear}<span style="color:red"></span></label>
                             <p:inputText id="purchaseYear" value="#{yearPurchaseInfoController.selected.purchaseYear}" required="true"/>
                         </h:panelGroup>
