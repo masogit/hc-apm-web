@@ -199,6 +199,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("CapitalSourceTwo"), capitalSource2List, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("assetClass"),assetClassList , true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("deviceStatus"), deviceStatusList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("networkingStatus"), networkingStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("ProprietaryClass"), proprietaryClassList, true);
 
         dynamicListSheet.setSelected(false);
@@ -212,6 +213,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         int rowNum = 1;
         createDropdownWithStaticList(rowNum++, WebUtil.getMessage("FunctionGrade"), true, "1", "2", "3");
         createDropdownWithStaticList(rowNum++, WebUtil.getMessage("IsPM"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
+        createDropdownWithStaticList(rowNum++, WebUtil.getMessage("isUseRegistration"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
         createDropdownWithStaticList(rowNum++, WebUtil.getMessage("isFixed"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
         createDropdownWithStaticList(rowNum++, WebUtil.getMessage("IsChecked"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
         createDropdownWithStaticList(rowNum++, WebUtil.getMessage("WarrantyExpirationReminder"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));

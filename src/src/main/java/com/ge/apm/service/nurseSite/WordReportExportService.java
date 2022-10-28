@@ -461,6 +461,22 @@ public class WordReportExportService {
         }
     }
 
+    public byte[] docxZip(Map<String, byte[]> maps) throws IOException {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream(); ZipOutputStream zos = new ZipOutputStream(out)) {
+            maps.forEach((key, val) -> {
+                try {
+                    zos.putNextEntry(new ZipEntry(key));
+                    IOUtils.write(val, zos);
+                } catch (IOException e) {
+                    return;
+                }
+            });
+            zos.closeEntry();
+            zos.close();
+            return out.toByteArray();
+        }
+    }
+
     public byte[] export(byte[] templateBytes, Map<String, Object> datas) {
         XWPFTemplate template = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
