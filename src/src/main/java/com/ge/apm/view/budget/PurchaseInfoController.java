@@ -1,17 +1,16 @@
 package com.ge.apm.view.budget;
 
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.PurchaseInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.BudgetApplicationAsset;
 import com.ge.apm.domain.budget.BudgetAssetInfo;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.SysRoleConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.MessageUtil;
 import com.ge.apm.view.budget.form.BudgetAssetSearchForm;
 import com.ge.apm.view.budget.form.BudgetSearchForm;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -19,6 +18,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -37,6 +37,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.JpaCRUDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -66,8 +67,13 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
     private BudgetPersistService persistService;
     private CustomConfigService ccService;
     private UaaService uaaService;
+    private BlobFileService blobService;
+    private BlobObjectRepository blobDao;
 
     /*属性类*/
+    private boolean resultStatus;
+    @Getter@Setter
+    private List<V2_BlobObject> attachements;
     @Getter@Setter
     private PurchaseInfo selected;
     @Getter@Setter
@@ -100,11 +106,13 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
         userContextService = WebUtil.getBean(UserContextService.class);
         persistService = WebUtil.getBean(BudgetPersistService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
-        org = orgDao.findById(account.getOrgInfoId());
         ccService = WebUtil.getBean(CustomConfigService.class);
-        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-
+        blobService = WebUtil.getBean(BlobFileService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        blobDao = WebUtil.getBean(BlobObjectRepository.class);
+
+        org = orgDao.findById(account.getOrgInfoId());
+        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 0);
         TreeNode treeNodeEdit = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(treeNode);
@@ -115,6 +123,8 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
         if (!StringUtils.isEmpty(actionName) && "Edit".equals(actionName)) {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(dao.findByUid(selectedId));
+        }else if (!StringUtils.isEmpty(actionName) && "Create".equals(actionName)) {
+            prepareCreate();
         }
     }
 
@@ -139,6 +149,14 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetBrand".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
+    }
+
+    public void reset() {
+        searchFilters.clear();
+        assetGroup = null;
+        functionType = null;
+        assetName = null;
+        assetBrand = null;
     }
 
     @Override
@@ -172,12 +190,65 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
 
     @Override
     public void save() {
-        dao.save(selected);
+        String str;
+        try {
+            dao.save(selected);
+            str = "SaveSuccess";
+        } catch (Exception e) {
+            str = "PersistenceErrorOccured";
+        }
+        MessageUtil.outPutReturnFacesMessage(str, FacesMessage.SEVERITY_INFO);
     }
 
     @Override
     public void delete(PurchaseInfo purchaseInfo) {
+        dao.delete(purchaseInfo);
+    }
 
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getComponent().getId();
+            type = type.substring(type.indexOf("type") + 4);
+            attachements.add(blobObject);
+            blobObject.setBoId(selected.getId());
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(selected.getUid());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+
+    public List<V2_BlobObject> getAttachList(String uid, String type) {
+        if (attachements == null || attachements.isEmpty()) {
+            List<SearchFilter> sfs = new ArrayList();
+            sfs.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, uid));
+            attachements = blobDao.findBySearchFilter(sfs);
+        }
+        return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+    }
+
+    @Override
+    public void onAfterNewObject(PurchaseInfo object, boolean isOK) {
+        resultStatus = isOK;
+        if (isOK) {
+            attachements.forEach(item -> {
+                if (item.getBoId() == null) {
+                    item.setBoId(object.getId());
+                    item.setBoUuid(object.getUid());
+                    blobDao.save(item);
+                }
+            });
+        }
+    }
+
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 
     public void exportExcel() {
@@ -211,12 +282,13 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
     }
 
     @Override
-    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+    public void prepareCreate() {
         crudActionName = "Create";
         selectedDept = null;
         Date date = new Date();
         selected = new PurchaseInfo();
         selected.setUid(UUID.randomUUID().toString().replace("-", ""));
+        selected.setSiteId(account.getSiteId());
         selected.setApplicant(account);
         selected.setApplicantId(account.getId());
         selected.setApplicationDate(new Date());
