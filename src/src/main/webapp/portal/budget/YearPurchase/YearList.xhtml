@@ -14,47 +14,44 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
-                    <p:fieldset legend="高级查询">
-                        <p:panelGrid id="searchPanel" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <label class="label">#{msg.assetGroup}}</label>
-                                <p:selectOneMenu id="assetGroup" value="#{PurchaseInfoController.assetGroup}">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" class="selectAssetGroup"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                    <p:ajax listener="#{PurchaseInfoController.assetGroupChangeListener}"  />
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.preventiveMaintenanceAnalysis_deviceName}</label>
-                                <p:inputText id="assetName" value="#{assetRiskAssessmentController.assetName}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.AssetBrand}</label>
-                                <p:inputText id="assetBrand" value="#{assetRiskAssessmentController.functionType}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.functionType}</label>
-                                <p:inputText id="functionType" value="#{assetRiskAssessmentController.functionType}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <p:commandButton value="#{msg.Search}" action="" update="" />
-                                <p:commandButton value="#{msg.Reset}" action="" update="" />
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                </h:form>
-                <h:form id="PucrhaseForm" style="margin-top: 20px;">
-                    <p:dataTable  id="dataList" value="#{PurchaseInfoController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:column  headerText="#{msg.productName}" >
-                            <h:outputText value="#{item.productName}"/>
+                    <p:dataTable style="margin-top: 20px;"  id="datalist" value="#{yearPurchaseInfoController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}" selection="#{yearPurchaseInfoController.selected}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="filter" listener="#{yearPurchaseInfoController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                        <p:column width="36"  id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{yearPurchaseInfoController.selectedMap[item.uid]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{yearPurchaseInfoController.onSelectAllOfPage}" update="@(.selectCheckBox) :searchForm:datalist" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
                         </p:column>
-                        <p:column  headerText="#{msg.PartsSpecification}" >
-                            <h:outputText value="#{item.specification}"/>
+                        <p:column headerText="操作">
+                            <p:link target="_new" title="#{msg.Edit}" outcome="#{yearPurchaseInfoController.getEditPage(item.uid)}" >
+                                <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                            </p:link>
+                            <p:commandLink id="deleteButton" title="#{msg.Delete}"  actionListener="#{yearPurchaseInfoController.delete(item)}" update="datalist">
+                                <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandLink>
+                        </p:column>
+                        <p:column  headerText="#{msg.PurchaseYear}" >
+                            <h:outputText value="#{item.purchaseYear}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.clinicalDeptName}" >
+                            <h:outputText value="#{item.applicationDept.name}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" >
+                            <h:outputText value="#{item.assetName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.FunctionType}" >
+                            <h:outputText value="#{item.functionType}"/>
                         </p:column>
                         <p:column  headerText="#{msg.quantity}" >
                             <h:outputText value="#{item.quantity}"/>
@@ -62,26 +59,72 @@
                         <p:column  headerText="#{msg.BudgetAmount}" >
                             <h:outputText value="#{item.budgetAmount}"/>
                         </p:column>
-                        <p:column  headerText="#{msg.Declaration}" >
-                            <h:outputText value="#{item.declaration}"/>
+                        <p:column headerText="#{msg.ApplicationStatus}">
+                            <h:outputText value="#{fieldMsg.fieldValue('budgetApplicationStatus', item.applicationStatus)}"/>
                         </p:column>
-                        <p:column  headerText="#{msg.FundingSource}" >
-                            <h:outputText value="#{item.fundingSource}"/>
-                        </p:column>
-                        <p:column  headerText="#{msg.RecommendBrand}" >
-                            <h:outputText value="#{item.recommendBrand}"/>
-                        </p:column>
-                        <p:column  headerText="#{msg.Description}" >
-                            <h:outputText value="#{item.description}"/>
-                        </p:column>
-                        <p:column  headerText="#{msg.LaboratoryEvidence}" >
-                           
-                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('YearCreate.xhtml?actionName=Create')}"  />
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{yearPurchaseInfoController.exportExcel}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                <p:fileDownload value="#{yearPurchaseInfoController.zipFile}" />
+                            </p:commandButton>
+                        </f:facet>
                     </p:dataTable>
+                    <p:remoteCommand name="rc" update=":searchForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
                 </h:form>
-
             </div>
         </div>
+        <script>
 
+            function afterLoadRender(){
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            }
+
+            $(function () {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            });
+
+            //<![CDATA[
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+                var isActive = "#{userContextService.isActive()}";
+                if (isActive == '1') {
+                    PF('ActiveDlg').show();
+                }
+            }
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
     </ui:define>
 </ui:composition>

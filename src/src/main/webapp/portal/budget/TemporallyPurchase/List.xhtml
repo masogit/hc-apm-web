@@ -37,8 +37,8 @@
                                 <p:inputText id="functionType" value="#{purchaseInfoController.functionType}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:commandButton value="#{msg.Search}" />
-                                <p:commandButton value="#{msg.Reset}"  />
+                                <p:commandButton value="#{msg.Search}" update=":searchForm:datalist"/>
+                                <p:commandButton value="#{msg.Reset}" action="#{purchaseInfoController.reset}" update=":searchForm" />
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
@@ -48,7 +48,7 @@
                                   currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                   rows="20" emptyMessage="#{msg.noRecordFound}"
                                   rowsPerPageTemplate="20,50,100,500">
-                        <p:column headerText="操 作" exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
+                        <p:column headerText="操作">
                             <p:link target="_new" title="#{msg.Edit}" outcome="#{purchaseInfoController.getEditPage(item.uid)}" >
                                 <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                             </p:link>
@@ -85,11 +85,11 @@
 
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('assetRiskAssessmentCreate.xhtml?actionName=Create')}"  />
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{purchaseInfoController.exportExcel}" update=":growl"
-                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
-                                <p:fileDownload value="#{purchaseInfoController.zipFile}" />
-                            </p:commandButton>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Create.xhtml?actionName=Create')}"  />
+<!--                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{purchaseInfoController.exportExcel}" update=":growl"-->
+<!--                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >-->
+<!--                                <p:fileDownload value="#{purchaseInfoController.zipFile}" />-->
+<!--                            </p:commandButton>-->
                         </f:facet>
                     </p:dataTable>
                     <p:remoteCommand name="rc" update=":searchForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>

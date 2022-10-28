@@ -33,7 +33,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.AssetBrand}<span style="color:red"></span></label>
-                            <p:inputText id="assetBrand" value="#{purchaseInfoController.selected.functionType}" required="true"/>
+                            <p:inputText id="assetBrand" value="#{purchaseInfoController.selected.brand}" required="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.functionType}<span style="color:red"></span></label>
@@ -49,11 +49,15 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.quantity}<span style="color:red"></span></label>
-                            <p:inputText id="quantity" value="#{purchaseInfoController.selected.quantity}" required="true"/>
+                            <p:inputText id="quantity" value="#{purchaseInfoController.selected.quantity}" requiredMessage="#{msg.ComponentTypeNumber}" required="true">
+                                <f:validateDoubleRange minimum="1" maximum="999999999" />
+                            </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.BudgetAmount}<span style="color:red"></span></label>
-                            <p:inputText id="budgetAmount" value="#{purchaseInfoController.selected.budgetAmount}" required="true"/>
+                            <label class="label">#{msg.BudgetAmount}<span style="color:red" ></span></label>
+                            <p:inputText id="budgetAmount" value="#{purchaseInfoController.selected.budgetAmount}" requiredMessage="#{msg.ComponentTypeNumber}" required="true" size="19">
+                                <f:validateDoubleRange minimum="0.01" maximum="9999999999999999.99" />
+                            </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.Declaration}</label>
@@ -71,9 +75,16 @@
                             <label class="label">#{msg.Description}</label>
                             <p:inputText id="description" value="#{purchaseInfoController.selected.description}"/>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.LaboratoryEvidence}</label>
-
+                        <h:panelGroup >
+                            <p:dataList id="LaboratoryEvidenceList" value="#{purchaseInfoController.getAttachList(purchaseInfoController.selected.uid,2)}" var="fileitem" type="definition" >
+                                <f:facet name="header">#{msg.LaboratoryEvidence}</f:facet>
+                                #{fileitem.objectName}
+                                <p:commandButton actionListener="#{purchaseInfoController.removeAttachmentById(fileitem.id)}" update="LaboratoryEvidenceList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload id="type2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{purchaseInfoController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                          multiple="true"  sizeLimit="500000000"  update="LaboratoryEvidenceList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >

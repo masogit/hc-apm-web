@@ -16,9 +16,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 
-/**
- * @author 503331510
- */
 @Data
 @Entity
 @Table(name = "purchase_info")
