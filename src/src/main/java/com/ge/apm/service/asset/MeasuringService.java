@@ -533,7 +533,7 @@ public class MeasuringService {
                 if (ObjectUtil.isEmpty(row.getCell(header.get("VERIFICATION_DATE_CELL")))) {
                     errorInfo.append("[检定日期不能为空]");
                 }
-                if (ObjectUtil.isAllEmpty(row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue(), row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue(), row.getCell(header.get("QR_CODE_CELL")).getStringCellValue())) {
+                if (ObjectUtil.isAllEmpty(row.getCell(header.get("ASSET_SN_CELL")), row.getCell(header.get("ASSET_NO_CELL")), row.getCell(header.get("QR_CODE_CELL")))) {
                     errorInfo.append("[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]");
                 }
                 if (errorInfo.length() > 0) {
