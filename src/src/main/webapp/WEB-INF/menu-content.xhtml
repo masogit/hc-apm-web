@@ -115,11 +115,14 @@
             </p:submenu>
 
             <p:submenu label="#{msg.BudgetMgr}" icon="attach_money"
-                       rendered="#{userContextService.versionContains('budgetMgr') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff')}">
+                       rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}">
 <!--                <p:menuitem value="#{msg.BudgetAsset}" outcome="/portal/budget/asset/List.xhtml"/>-->
-                <p:menuitem value="#{msg.BudgetApplication}" outcome="/portal/budget/application/List.xhtml"/>
-                <p:menuitem value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml"/>
-                <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/YearPurchase/YearList.xhtml"/>
+                <p:menuitem value="#{msg.BudgetApplication}" outcome="/portal/budget/application/List.xhtml"
+                            rendered="#{userContextService.versionContains('budgetMgr') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff')}"/>
+                <p:menuitem value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml"
+                            rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
+                <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/YearPurchase/YearList.xhtml"
+                            rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
             </p:submenu>
 
             <p:submenu id="um25" label="#{msg.MyTrain}" icon="fa fa-check-square-o" rendered="#{userContextService.isAccessMyTrain()}">

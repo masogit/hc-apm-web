@@ -145,9 +145,9 @@ public class PurchaseInfoController extends JpaCRUDController<PurchaseInfo> {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (!StringUtils.isEmpty(assetBrand)) {
-            this.updateSearchFilter(new SearchFilter("assetBrand", SearchFilter.Operator.LIKE,  assetBrand, "1*"));
+            this.updateSearchFilter(new SearchFilter("brand", SearchFilter.Operator.LIKE,  assetBrand, "1*"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetBrand".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "brand".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
     }
 
