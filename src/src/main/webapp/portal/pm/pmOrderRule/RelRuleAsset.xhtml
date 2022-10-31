@@ -146,6 +146,30 @@
                            </p:inputNumber>
                        </h:panelGroup>
 
+                       <c:if test="#{userContextService.zkbAccount}" >
+                           <h:panelGroup>
+                               <label class="label">Modality</label>
+                               <p:selectOneMenu id="fileMainDirectory" value="#{relRuleAssetController.queryAsset.mainDirectory}"   >
+                                   <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList fileSecondDirectory"/>
+                                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                   <c:forEach items="#{relRuleAssetController.findMainDirectory()}" var="v">
+                                       <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                   </c:forEach>
+                               </p:selectOneMenu>
+                           </h:panelGroup>
+                           <h:panelGroup>
+                               <label class="label">Product</label>
+                               <p:selectOneMenu id="fileSecondDirectory" value="#{relRuleAssetController.queryAsset.secondDirectory}"  >
+                                   <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                   <c:forEach items="#{relRuleAssetController.subZkbFileDirectoryList}" var="v">
+                                       <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                   </c:forEach>
+                               </p:selectOneMenu>
+                           </h:panelGroup>
+                       </c:if>
+
+
                        <h:panelGroup id="queryLevel" rendered="#{relRuleAssetController.queryAsset.ruleStatus != null}">
                            <label class="label">#{msg.RuleGrade}</label>
                            <p:selectOneMenu value="#{relRuleAssetController.queryAsset.queryLevel}">

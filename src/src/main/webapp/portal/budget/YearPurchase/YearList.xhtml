@@ -10,7 +10,7 @@
         </style>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="#{msg.TemporallyPurchase}"/>
+                <p:outputLabel class="pageTitle" value="#{msg.YearPurchase}"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
@@ -18,8 +18,8 @@
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}" selection="#{yearPurchaseInfoController.selected}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                 rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,50,100,500">
+                                 rows="5" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="5,20,100,200">
                         <p:ajax event="filter" listener="#{yearPurchaseInfoController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                         <p:column width="36"  id="checkBoxColumn">

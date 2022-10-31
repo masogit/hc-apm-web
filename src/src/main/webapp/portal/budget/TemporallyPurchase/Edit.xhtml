@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="临时申购管理"/>
+                <p:outputLabel class="pageTitle" value="临时申购修改"/>
             </div>
 
             <div class="ui-g-12 card ">
@@ -20,7 +20,7 @@
                     <p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true"/>
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
-                            <label class="label">#{msg.assetGroup}}<span style="color:red"></span></label>
+                            <label class="label">#{msg.assetGroup}<span style="color:red"></span></label>
                             <p:selectOneMenu id="assetGroup" value="#{purchaseInfoController.selected.assetGroup}" required="true">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" class="selectAssetGroup"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -50,13 +50,13 @@
                         <h:panelGroup>
                             <label class="label">#{msg.quantity}<span style="color:red"></span></label>
                             <p:inputText id="quantity" value="#{purchaseInfoController.selected.quantity}" requiredMessage="#{msg.ComponentTypeNumber}" required="true">
-                                <f:validateDoubleRange minimum="1" maximum="999999999" />
+                                <f:validateDoubleRange minimum="0.01" />
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.BudgetAmount}<span style="color:red" ></span></label>
-                            <p:inputText id="budgetAmount" value="#{purchaseInfoController.selected.budgetAmount}" requiredMessage="#{msg.ComponentTypeNumber}" required="true" size="19">
-                                <f:validateDoubleRange minimum="0.01" maximum="9999999999999999.99" />
+                            <p:inputText id="budgetAmount" value="#{purchaseInfoController.selected.budgetAmount}" requiredMessage="#{msg.ComponentTypeNumber}" required="true">
+                                <f:validateDoubleRange minimum="0.01" />
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -90,7 +90,7 @@
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup id="buttonGroup">
                             <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{purchaseInfoController.save()}" validateClient="true" update=":PurchaseInfoEditForm" style="float:left" />
-                            <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"  onclick="window.location.reload();" immediate="true" style="float:left"/>
+                            <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel"  action="List?faces-redirect=true" immediate="true" style="float:left"/>
                         </h:panelGroup>
                     </p:panelGrid>
                 </h:form>
