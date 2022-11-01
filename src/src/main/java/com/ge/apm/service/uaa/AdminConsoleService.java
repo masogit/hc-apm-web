@@ -599,13 +599,16 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			int pageSize=3000;
 			Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			long startTime = System.currentTimeMillis();
-			List<AssetHistory> assetHistorys =new ArrayList<>();
+			List<AssetHistory> assetHistorys =new ArrayList<>(2000);
 			while (true){
 				List<AssetInfo> assetInfos=assetInfoRepository.queryAssetHistoryNotExistsInsert();
 				if(CollectionUtils.isEmpty(assetInfos)){
 					break;
 				}
 				for(AssetInfo assetInfo:assetInfos){
+					if(assetInfo.getHospital()!=null){
+						assetInfo.setAssetDeptName(assetInfo.getHospital().getName());
+					}
 					AssetHistory assetHistory = new AssetHistory();
 					assetHistory.setAssetUid(assetInfo.getUid());
 					assetHistory.setAssetName(assetInfo.getName());
