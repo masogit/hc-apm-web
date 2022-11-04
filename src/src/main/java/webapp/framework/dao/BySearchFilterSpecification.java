@@ -95,7 +95,7 @@ public class BySearchFilterSpecification {
                                 List<Predicate> PredicateList=new ArrayList<>();
                                 for (String s: list2) {
                                     if (s!= null) {
-                                        Predicate like = builder.like(builder.lower(expression), "%" + s.toString().toLowerCase() + "%");
+                                        Predicate like = builder.like(expression, "%" + s + "%");
                                         PredicateList.add(like);
                                     }
                                 }

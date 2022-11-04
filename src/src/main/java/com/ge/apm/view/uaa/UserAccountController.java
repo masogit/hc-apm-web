@@ -1,5 +1,6 @@
 package com.ge.apm.view.uaa;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;
@@ -731,6 +732,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (isMultiLevelAuditor() || isAuditor()) {
             return;
         }
+        if(userAssociationVerification(selected)){
+            return;
+        }
         if (canDelete()) {
             selected.setIsDeleted(true);
             selected.setLoginName(selected.getLoginName() + "-" + ZipUtil.makeRandomPassword(5));
@@ -755,6 +759,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             userApi.removeUser(selected.getLoginName());*/
 
         }
+    }
+    private boolean userAssociationVerification(UserAccount selected){
+        List<String> errorMsg = userAccountService.userAssociationVerification(selected);
+        if(CollectionUtils.isNotEmpty(errorMsg)){
+            for (String s : errorMsg) {
+                WebUtil.addErrorMessage(s);
+            }
+            log.info("删除用户失败，msg:{}",JSONObject.toJSONString(errorMsg));
+            return true;
+        }
+        return false;
     }
 
     private boolean isMultiLevelAuditor(){
@@ -923,6 +938,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
             if(!StringUtils.isEmpty(checkResult)) {
                 WebUtil.addErrorMessage(checkResult);
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+        }
+
+        if(crudActionName.equals("Edit") && Boolean.TRUE.equals(selected.getIsDisable())){
+            if(userAssociationVerification(selected)){
                 RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("validationFailed", true);
                 return;

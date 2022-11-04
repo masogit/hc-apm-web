@@ -6,6 +6,7 @@
 package com.ge.apm.domain.pure;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.view.asset.AssetInfoListController;
 import org.slf4j.Logger;
@@ -46,7 +47,8 @@ public class CustomConfigObject {
     List<String> assetsWebMaintainDetailFields;
 
     List<String> assetsImportantFields;
-    
+    List<String> assetAllocateFields;
+
     JSONObject mobilePage;
 
 
@@ -280,4 +282,15 @@ public class CustomConfigObject {
         this.assetsImportantFields = assetsImportantFields;
     }
 
+    public List<String> getAssetAllocateFields() {
+
+        if (assetAllocateFields == null) {
+            assetAllocateFields = AllocateCustomConfigConstant.ASSET_ALLOCATE.getAssetAllocateFields();
+        }
+        return assetAllocateFields;
+    }
+
+    public void setAssetAllocateFields(List<String> assetAllocateFields) {
+        this.assetAllocateFields = assetAllocateFields;
+    }
 }
