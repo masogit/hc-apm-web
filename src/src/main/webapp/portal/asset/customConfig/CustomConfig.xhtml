@@ -371,7 +371,24 @@
                                 </p:fieldset>
                             </p:panelGrid>
                         </p:tab>
-
+                        <p:tab title="无人值守调剂计费情况列表自定义页面">
+                            <p:dataTable id="assetAllocatePageTable"  var='item' value="#{customConfigController.customConfigObject.assetAllocateFields}" draggableRows="true">
+                                <p:ajax event="rowReorder" update="assetAllocatePageTable"/>
+                                <p:column headerText="#{msg.DisplayedField}">
+                                    <h:outputText value="#{customConfigController.allAllocateFields[item]}" />
+                                </p:column>
+                                <!--                            <p:column headerText="列宽%">
+                                                                <h:outputText value="#{customConfigController.customConfigObject.assetFields[item].widthInListPage}" />
+                                                            </p:column>-->
+                                <p:column headerText="#{msg.Operation}">
+                                    <f:facet name="header" >
+                                        <p:commandLink value="#{msg.Add}" actionListener="#{customConfigController.prepareAddAssetField('assetAllocateFieldsList')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    </f:facet>
+                                    <!--<p:commandLink value="修改" actionListener="#{customConfigController.prepareEditAssetField(item)}" update=":ListPageFieldsEditForm" oncomplete="PF('ListPageFieldsEditDialog').show()"/>-->
+                                    <p:commandLink value="#{msg.Delete}" actionListener="#{customConfigController.removeAllocateListPageField(item)}" update="assetAllocatePageTable "/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:tab>
                     </p:tabView>
 
                     <h:panelGroup >
@@ -456,9 +473,17 @@
                             <h:outputText value="#{msg.NoAddableField}" rendered="#{empty customConfigController.addFieldsList}" />
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <c:forEach items="#{customConfigController.addFieldsList}" var="item" >
-                                    <h:panelGroup >
-                                        <p:selectBooleanCheckbox label="#{customConfigController.allFields[item]}" value="#{customConfigController.selectedAddFields[item]}"   />
-                                    </h:panelGroup>
+                                    <c:if test="#{customConfigController.addFieldsType ne 'assetAllocateFieldsList'}">
+                                        <h:panelGroup >
+                                            <p:selectBooleanCheckbox label="#{customConfigController.allFields[item]}" value="#{customConfigController.selectedAddFields[item]}"   />
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{customConfigController.addFieldsType eq 'assetAllocateFieldsList'}">
+                                        <h:panelGroup >
+                                            <p:selectBooleanCheckbox label="#{customConfigController.allAllocateFields[item]}" value="#{customConfigController.selectedAddFields[item]}"   />
+                                        </h:panelGroup>
+                                    </c:if>
+
                                 </c:forEach>
                             </p:panelGrid>
                             <br/>

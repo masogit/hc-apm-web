@@ -8,7 +8,9 @@ package com.ge.apm.view;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.sharedasset.SharedAssetReqDetailService;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import com.ge.apm.service.uaa.UaaService;
@@ -57,13 +59,15 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     SharedAssetTypeRepository sharedAssetTypeRepository = null;
     SharedAssetSwapIndexRepository swapIndexRepository=null;
     private UaaService uuaService;
+    private CustomConfigService ccService;
     @Autowired
     SharedAssetReqDetailService sharedAssetReqDetailService;
     private Date filterBeginTime;
     private Date filterEndTime;
     private String oneSearchStr;
     private Object clinicalDeptName;
-
+    private List<String> assetAllocateFields;
+    private Boolean whethertoenableunattended;
     public String getOneSearchStr() {
         return oneSearchStr;
     }
@@ -113,6 +117,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         sharedAssetReqDetailService = WebUtil.getBean(SharedAssetReqDetailService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         swapIndexRepository=WebUtil.getBean(SharedAssetSwapIndexRepository.class);
+        ccService=WebUtil.getBean(CustomConfigService.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
         String actionName = (String)UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -376,12 +381,27 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         return "";
     }
     public boolean  openWhethertoenableunattended(){
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        String siteUID = currentUserAccount.getSiteUID();
-        List<WorkflowConfig> bySiteUID = wfCfigDao.findBySiteUID(siteUID);
-        if(CollectionUtils.isEmpty(bySiteUID)){
-            return false;
+        if(whethertoenableunattended == null){
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            String siteUID = currentUserAccount.getSiteUID();
+            List<WorkflowConfig> bySiteUID = wfCfigDao.findBySiteUID(siteUID);
+            if(CollectionUtils.isEmpty(bySiteUID)){
+                return false;
+            }
+            whethertoenableunattended= bySiteUID.stream().allMatch(item -> item.getWhethertoenableunattended() != null && item.getWhethertoenableunattended());
         }
-       return bySiteUID.stream().allMatch(item -> item.getWhethertoenableunattended() != null && item.getWhethertoenableunattended());
+
+       return whethertoenableunattended;
+    }
+
+    public boolean  whetherIsShow(String key){
+        if(!openWhethertoenableunattended()) return Boolean.TRUE;
+        if(CollectionUtils.isEmpty(assetAllocateFields)){
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            String siteUID = currentUserAccount.getSiteUID();
+            CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(siteUID);
+            assetAllocateFields = currentCustomConfig.getAssetAllocateFields();
+        }
+        return assetAllocateFields.contains(key);
     }
 }
