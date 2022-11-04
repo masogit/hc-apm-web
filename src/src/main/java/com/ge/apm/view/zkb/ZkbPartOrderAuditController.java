@@ -11,6 +11,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.RowEditEvent;
+import org.springframework.retry.backoff.Sleeper;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -946,7 +947,69 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
+    public String normalCheck(){
+        StringBuilder errorLog = new StringBuilder();
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())){
+                if(StrUtil.isEmpty(selected.getSrNo())){
+                    errorLog.append("SR#不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getActivityNo())){
+                    errorLog.append("Act#不能为空，\r\n");
+                }
+            }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+                if(StrUtil.isEmpty(selected.getOrderNo())){
+                    errorLog.append("Order#不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getPrice())){
+                    errorLog.append("价格不能为空，\r\n");
+                }
+                if(selected.getZkbPartOrderCat() != null && !ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType()) && StrUtil.isEmpty(selected.getNewCatFlag())){
+                    errorLog.append("是否全新探头不能为空，\r\n");
+                }
+            }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
+                if(StrUtil.isEmpty(selected.getReturnType())){
+                    errorLog.append("归还类型不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getPartSerialNumber())){
+                    errorLog.append("Part Serial Number不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getPartQualityIssue())){
+                    errorLog.append("故障描述不能为空，\r\n");
+                }
+                if(selected.getReturnQty() != null){
+                    errorLog.append("归还数量不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getWaybillNo())){
+                    errorLog.append("运单号不能为空，\r\n");
+                }
+                if(selected.getReturnDate() != null){
+                    errorLog.append("归还日期不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getNewCatSn())){
+                    errorLog.append("新探头SN编号不能为空，\r\n");
+                }
+            }
+        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
+            if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+                if(StrUtil.isEmpty(selected.getSrNo())){
+                    errorLog.append("SR#不能为空，\r\n");
+                }
+                if(StrUtil.isEmpty(selected.getActivityNo())){
+                    errorLog.append("Act#不能为空，\r\n");
+                }
+            }
+        }
+        return errorLog.toString();
+    }
+
     public String normalNext(){
+        String checkResult = normalCheck();
+        if(StrUtil.isNotEmpty(checkResult)){
+            WebUtil.addErrorMessage(checkResult,"");
+            return "";
+        }
+
         ZkbContract c = zkbContractRepository.findById(selected.getContractId());
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
@@ -1526,6 +1589,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String closeOrderModify(){
         return "AuditStep?faces-redirect=true&str="+str;
+    }
+
+    public String probeCloseReject() throws InterruptedException {
+        zkbPartOrderService.probeCloseReject(selected, currentUser);
+        WebUtil.addErrorMessage("操作成功！","操作成功w2");
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     //region get、set
