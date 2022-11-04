@@ -31,7 +31,9 @@ public class ZkbPartOrder implements Serializable {
     public enum PartOrderStatus {
         Requested,TechnicalAccept,TechnicalReject,ProductAccept,ProductReject,
         ManageAccept,ManageReject,UnOrdered,UnOrderedReject,
-        Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject,CommercialAccept,CommercialReject,FourHundredCancel
+        Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,
+        DirectorReject,CommercialAccept,CommercialReject,FourHundredCancel,
+        CloseReject
     }
 
     /**
