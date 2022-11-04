@@ -1,12 +1,14 @@
 package com.ge.apm.service.uaa;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.schedule.UserScheduleService;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
@@ -17,10 +19,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserAccountService {
@@ -66,7 +70,18 @@ public class UserAccountService {
 
 	@Autowired
 	UserAccountHistoryService userAccountHistoryService;
-
+	@Autowired
+	UserScheduleService userScheduleService;
+	@Autowired
+	MeasuringTypeConfigRepository measuringTypeConfigRepository;
+	@Autowired
+	MessageSubscriberRepository messageSubscriberRepository;
+	@Autowired
+	AssetTagMsgSubscriberRepository assetTagMsgSubscriberRepository;
+	@Autowired
+	OwnerConfigRepository ownerConfigRepository;
+	@Autowired
+	WorkflowConfigRepository workflowConfigRepository;
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
 	public List<UserAccount> getUserAccount() {
@@ -374,5 +389,120 @@ public class UserAccountService {
 			return false;
 		}
 		return true;
+	}
+
+	public List<String> userAssociationVerification(UserAccount selected) {
+		List<String> result=new ArrayList<>();
+		isSparePartsAdmin(selected,result);
+		isUserSchedule(selected,result);
+		isMeasurement(selected,result);
+		existSubscribeMessages(selected,result);
+		isPersonLiable(selected,result);
+		existWorkflowConfigPersonLiable(selected,result);
+		logger.info("该用户为设备类型负责人,result:{}", JSONObject.toJSONString(result));
+		return result;
+	}
+	private void  existWorkflowConfigPersonLiable(UserAccount selected,List<String> result){
+		// TODO
+		String siteUID = selected.getSiteUID();
+		String hospitalUID = selected.getHospitalUID();
+		String institutionUID = selected.getInstitutionUID();
+		String tenantUID = selected.getTenantUID();
+		List<String> uidList = Arrays.asList(siteUID, hospitalUID, institutionUID, tenantUID);
+		List<WorkflowConfig> workflowConfig = workflowConfigRepository.findWorkflowConfig(uidList);
+		if(CollectionUtils.isNotEmpty(workflowConfig)){
+			Set<String> set=new HashSet<>();
+			for (WorkflowConfig config : workflowConfig) {
+				checkoutWorkflowConfig(config,selected,set);
+			}
+			if(!set.isEmpty()){
+				result.addAll(set);
+			}
+		}
+	}
+	private void checkoutWorkflowConfig(WorkflowConfig item,UserAccount selected,Set<String> result){
+		logger.info("该用户为设备类型负责人,config:{},user:{}", JSONObject.toJSONString(item),selected);
+		Integer userID = selected.getId();
+		String userUID = selected.getUid();
+		Integer dispatchUserId = item.getDispatchUserId();
+		Integer dispatchUserId2 = item.getDispatchUserId2();
+		Integer measureDispatchUserId = item.getMeasureDispatchUserId();
+		Integer measureDispatchUserId2 = item.getMeasureDispatchUserId2();
+		Integer pmDispatchUserId = item.getPmDispatchUserId();
+		Integer pmDispatchUserId2 = item.getPmDispatchUserId2();
+		String assetApprover = item.getAssetApprover();
+		if(userID.equals(dispatchUserId)) result.add("该用户为维修派工人，不能操作！");
+		if(userID.equals(dispatchUserId2)) result.add("该用户为维修派工人2，不能操作！");
+		if(userID.equals(measureDispatchUserId))  result.add("该用户为计量派工人，不能操作！");
+		if(userID.equals(measureDispatchUserId2)) result.add("该用户为计量派工人2，不能操作！");
+		if(userID.equals(pmDispatchUserId))  result.add("该用户为保养派工人，不能操作！");
+		if(userID.equals(pmDispatchUserId2)) result.add("该用户为保养派工人2，不能操作！");
+		if(userUID.equals(assetApprover)) result.add("该用户为资产审核人，不能操作！");
+		logger.info("流程配置项中负责人校验,config:{},user:{},result:{}", JSONObject.toJSONString(item), JSONObject.toJSONString(selected),JSONObject.toJSONString(result));
+
+	}
+	private  void  isPersonLiable(UserAccount selected,List<String> result){
+		String uid = selected.getUid();
+		List<SearchFilter> searchFilters=new ArrayList<>();
+		searchFilters.add(new SearchFilter("woOwnerUID", SearchFilter.Operator.EQ,uid,"1+"));
+		searchFilters.add(new SearchFilter("woOwnerUID2", SearchFilter.Operator.EQ,uid,"1+"));
+		searchFilters.add(new SearchFilter("woOwnerUID3", SearchFilter.Operator.EQ,uid,"1+"));
+		searchFilters.add(new SearchFilter("pmOwnerUID", SearchFilter.Operator.EQ,uid,"1+"));
+		List<OwnerConfig> bySearchFilter = ownerConfigRepository.findBySearchFilter(searchFilters);
+		if(CollectionUtils.isNotEmpty(bySearchFilter)){
+			Map<String, List<OwnerConfig>> collect = bySearchFilter.stream().collect(Collectors.groupingBy(OwnerConfig::getOwnerConfigType));
+			if(collect !=null ){
+				if(collect.containsKey(OwnerConfig.OwnerConfigType.AssetGroup.name())){
+					// 设置为设备类型维修责任人1\2\3\类型保养责任人
+					result.add("该用户为设备类型负责人，不能操作！");
+				}
+				if(collect.containsKey(OwnerConfig.OwnerConfigType.Department.name())){
+					//设置为科室维修责任人1\2\3\科室保养责任人
+					result.add("该用户为科室责任人，不能操作！");
+				}
+			}
+			logger.info("该用户为设备类型负责人,{}", JSONObject.toJSONString(bySearchFilter));
+		}
+
+	}
+	public void  existSubscribeMessages(UserAccount selected,List<String> result){
+		// 订阅消息
+		Integer id = selected.getId();
+		List<SearchFilter> searchFilters=new ArrayList<>();
+		searchFilters.add(new SearchFilter("subscribeUserId", SearchFilter.Operator.EQ,id));
+		List<MessageSubscriber> bySearchFilter = messageSubscriberRepository.findBySearchFilter(searchFilters);
+		if(CollectionUtils.isNotEmpty(bySearchFilter)){
+			result.add("该用户有设备消息订阅，不能操作！");
+			logger.info("该用户有设备消息订阅,{}", JSONObject.toJSONString(bySearchFilter));
+		}
+		List<AssetTagMsgSubscriber> assetTagMsgSubscriber = assetTagMsgSubscriberRepository.getAssetTagMsgSubscriber(id);
+		if(CollectionUtils.isNotEmpty(assetTagMsgSubscriber)){
+			result.add("该用户有标签消息订阅，不能操作！");
+			logger.info("该用户有标签消息订阅,{}", JSONObject.toJSONString(assetTagMsgSubscriber));
+		}
+	}
+	private void isMeasurement(UserAccount selected,List<String> result){
+		// 计量类型责任人
+		List<SearchFilter> searchFilters=new ArrayList<>();
+		searchFilters.add(new SearchFilter("measureOwnerUid", SearchFilter.Operator.EQ,selected.getUid()));
+		List<MeasuringTypeConfig> bySearchFilter = measuringTypeConfigRepository.findBySearchFilter(searchFilters);
+		if(CollectionUtils.isNotEmpty(bySearchFilter)){
+			result.add("该用户为计量类型责任人，不能操作！");
+			logger.info("该用户为计量类型责任人,{}", JSONObject.toJSONString(bySearchFilter));
+		}
+	}
+	private void isUserSchedule(UserAccount selected,List<String> result){
+		//设置了排班记录的人员
+		userScheduleService.existUserWorkList(selected,result, UserSchedule.Type.W);
+		userScheduleService.existUserWorkList(selected,result, UserSchedule.Type.A);
+
+	}
+	private void  isSparePartsAdmin(UserAccount selected,List<String> result){
+		//设置为备件仓库管理员
+		List<UserRole> userRoleList = selected.getUserRoleList();
+		if(CollectionUtils.isNotEmpty(userRoleList)){
+			boolean anyMatch = userRoleList.stream().map(UserRole::getRole).anyMatch(item -> "SparePartsAdmin".equals(item.getName()));
+			if(anyMatch) result.add("该用户为备件仓库管理员，不能操作！");
+		}
 	}
 }

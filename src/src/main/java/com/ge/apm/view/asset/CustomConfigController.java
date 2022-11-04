@@ -15,6 +15,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
@@ -61,7 +62,6 @@ public class CustomConfigController {
     private List<String> addFieldsList;
     private String addFieldsType;
     private Map<String, String> configInfo = new HashMap();
-
     private PinYinComparator pinYinComparator;
 
     private Map<String,Boolean> importantFieldsCheckedStatus = new HashMap();
@@ -213,6 +213,9 @@ public class CustomConfigController {
             case "RemoveWebWorkOrderFieldsList":
                 addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;
+            case "assetAllocateFieldsList":
+                addFieldsList=getAllAllocateFields().keySet().stream().filter(item->!customConfigObject.getAssetAllocateFields().contains(item)).collect(Collectors.toList());
+                break;
 
 
         }
@@ -276,7 +279,8 @@ public class CustomConfigController {
 
             case "RemoveWebWorkOrderFieldsList":
                 return "customConfigForm:tabView:WebWorkOrderFieldsList";
-
+            case "assetAllocateFieldsList":
+                return "customConfigForm:tabView:assetAllocatePageTable";
             default:
                 return "";
         }
@@ -424,6 +428,10 @@ public class CustomConfigController {
                         && !customConfigObject.getAssetsImportantFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 customConfigObject.setAssetsImportantFields(addImportantFields);
                 break;
+            case "assetAllocateFieldsList":
+                customConfigObject.getAssetAllocateFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetAllocateFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
 
         }
         cancelAddFields();
@@ -525,7 +533,11 @@ public class CustomConfigController {
             customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
         }
     }
-
+    public void removeAllocateListPageField(String key) {
+        if (customConfigObject.getAssetAllocateFields().contains(key)) {
+            customConfigObject.setAssetAllocateFields(customConfigObject.getAssetAllocateFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
+        }
+    }
     public void prepareEditAssetField(String fieldKey) {
         currentEditField = customConfigObject.getAssetFields().get(fieldKey);
     }
@@ -701,4 +713,10 @@ public class CustomConfigController {
         if(workflowConfig!=null && tenantOptionConfig!=null && workflowConfig.getActiveSupplier()!=null && tenantOptionConfig.getActiveSupplier()!=null && workflowConfig.getActiveSupplier() && tenantOptionConfig.getActiveSupplier()) return true;
         return false;
     }
+
+    public LinkedHashMap<String, String> getAllAllocateFields() {
+        return AllocateCustomConfigConstant.ASSET_ALLOCATE.getAllAllocateFields();
+    }
+
+
 }

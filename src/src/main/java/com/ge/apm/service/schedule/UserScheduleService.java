@@ -1,5 +1,6 @@
 package com.ge.apm.service.schedule;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.UserScheduleRepository;
 import com.ge.apm.dao.UserScheduleStageConfigRepository;
@@ -602,4 +603,50 @@ public class UserScheduleService {
                 return true;
             }
     }
+
+    public void existUserWorkList(UserAccount selected,List<String> result,UserSchedule.Type type) {
+        String uid = selected.getUid();
+        String tName = type.name();
+        String siteUID = selected.getSiteUID();
+        LocalDate nowDate = LocalDate.now();
+        LocalDateTime nowDateTime=LocalDateTime.now();
+        Date date = Date.from(nowDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        List<UserSchedule> userScheduleW = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(tName, uid,date);
+        if(CollectionUtils.isNotEmpty(userScheduleW)){
+            List<UserScheduleStageConfig> userScheduleStageConfigW = userScheduleStageConfigDao.findBySiteUIDAndTypeA(siteUID, tName);
+            if(CollectionUtils.isEmpty(userScheduleStageConfigW)) userScheduleStageConfigW=DEFAULT_USER_SCHEDULE_STAGE_CONFIG;
+            List<String> collect = userScheduleStageConfigW.stream().filter(item -> {
+                if (StringUtils.isBlank(item.getStartTime())) return false;
+                if (StringUtils.isBlank(item.getEndTime())) return false;
+                LocalTime startTime = LocalTime.parse(item.getStartTime());
+                LocalTime endTime = LocalTime.parse(item.getEndTime());
+                int startHour = startTime.getHour();
+                int endHour = endTime.getHour();
+                LocalDateTime startDateTime = LocalDateTime.of(nowDate, startTime);
+                LocalDateTime endDateTime = LocalDateTime.of(nowDate, endTime);
+                if (startHour >= endHour) {
+                    endDateTime = endDateTime.plus(1, ChronoUnit.DAYS);
+                }
+                return nowDateTime.isBefore(startDateTime) && nowDateTime.isBefore(endDateTime) || (nowDateTime.isAfter(startDateTime) && nowDateTime.isBefore(endDateTime));
+            }).map(UserScheduleStageConfig::getScheduleDateStage).collect(Collectors.toList());
+            for (UserSchedule userSchedule : userScheduleW) {
+                String scheduleDateStage = userSchedule.getScheduleDateStage();
+                if(collect.contains(scheduleDateStage)){
+                    result.add("该用户有当日排班"+scheduleDateStage+"，不能操作！");
+                    logger.info("该用户正在进行当日排班"+scheduleDateStage+"，不能操作！：{}", JSONObject.toJSONString(userSchedule));
+                    break;
+                 }
+            }
+        }
+        List<SearchFilter> filterFilter=new ArrayList<>();
+        filterFilter.add(new SearchFilter("userUID", SearchFilter.Operator.EQ,uid));
+        filterFilter.add(new SearchFilter("type", SearchFilter.Operator.EQ,tName));
+        filterFilter.add(new SearchFilter("scheduleDate", SearchFilter.Operator.GT,date));
+        List<UserSchedule> bySearchFilter = userScheduleDao.findBySearchFilter(filterFilter);
+        if(CollectionUtils.isNotEmpty(bySearchFilter)){
+            result.add("该用户有未执行的排班，不能操作！");
+            logger.info("该用户正在进行当日排班，不能操作！：{}", JSONObject.toJSONString(bySearchFilter));
+        }
+    }
+
 }
