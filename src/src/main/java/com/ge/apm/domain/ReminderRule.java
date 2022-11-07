@@ -37,6 +37,9 @@ public class ReminderRule implements Serializable {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "state")
+    private Integer state;
+
     @Column(name = "description")
     private String description;
 
@@ -46,7 +49,7 @@ public class ReminderRule implements Serializable {
     @Column(name = "reminder_type")
     private String reminderType;
 
-    @Column(name = "parameters")
+    @Column(name = "parameters", columnDefinition = "text")
     private String parameters;
 
 }
