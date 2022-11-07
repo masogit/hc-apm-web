@@ -188,7 +188,14 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('reportType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>-->
-
+                        <h:panelGroup>
+                            <label class="label">#{msg.templateType}*</label>
+                            <p:selectOneMenu id="type" value="#{tableCreateController.selectedTableDefinition.templateType}"
+                                             required="true" requiredMessage="#{msg.templateType}#{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('templateType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup>
                         <!--<p:commandButton icon="ui-icon-remove-red-eye" immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>-->
