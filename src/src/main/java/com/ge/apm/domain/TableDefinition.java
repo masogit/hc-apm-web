@@ -34,6 +34,9 @@ public class TableDefinition implements Serializable {
     public enum TableDefinitionStatus {
         Draft, Released, Expired
     }
+    public enum TableTemplateType {
+        Maintain, AssetAchievements
+    }
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -92,6 +95,9 @@ public class TableDefinition implements Serializable {
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "template_type")
+    private String templateType;
 
     @Column(name = "type")
     private Integer type;//类型 1-保养相关 2-计量相关
@@ -252,7 +258,15 @@ public class TableDefinition implements Serializable {
 		this.instrumentKeyValues = instrumentKeyValues;
 	}
 
-	@Override
+    public String getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
+    }
+
+    @Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);
