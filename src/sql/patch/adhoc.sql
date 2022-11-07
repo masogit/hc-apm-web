@@ -10,4 +10,4 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 --备件管理员添加菜单校验
 UPDATE sys_role SET authorities = ( CASE WHEN authorities IS NULL THEN 'parts' ELSE authorities || ',parts' END ), menus = ( CASE WHEN menus IS NULL THEN 'parts' ELSE menus || ',parts' END ), authorities_ch = ( CASE WHEN authorities_ch IS NULL THEN '备件管理' ELSE authorities_ch || ',备件管理' END ) WHERE role_desc = '备件管理员';
 -- YHAAO-17216 模板定义添加类型字段
-UPDATE table_definition SET template_type = 'Maintain';
+UPDATE table_definition SET template_type = 'Maintain' where template_type is null;
