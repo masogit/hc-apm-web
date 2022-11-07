@@ -60,52 +60,42 @@
                             rows="20" emptyMessage="#{msg.noRecordFound}"
                             rowsPerPageTemplate="20,50,100,500">
 
-        <!--                    <p:ajax event="rowSelect" update=""
-                                    listener="#{sharedAssetReqDetailForQueryController.onSelectE}"
-                                    oncomplete="openSwapTypeViewWindow(xhr, status, args)" />-->
-
-        <!--                    <p:ajax event="rowSelect" listener="#{sharedAssetReqTypeController.onChanged}"  update=""/>
-                            <p:ajax event="rowSelect" listener="#{sharedAssetReqDetailV2Controller.onChanged}"  update=""/>-->
                             <p:ajax event="filter" listener="#{sharedAssetReqDetailForQueryController.onFilter}" update=""/>
-                            <!--sharedId-->
-                            <p:column headerText="借用科室" sortBy="#{item.clinical_dept_name}" filterBy="#{item.clinical_dept_name}" filterMatchMode="LIKE" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('reclinicalDept')}">
-        <!--                        <f:facet name="filter">
-                                    <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
-                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                        <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
-                                    </p:selectOneMenu>
-                                </f:facet>-->
-        <!--                        <h:outputText value="#{sharedAssetReqDetailForQueryController.getclinicalDeptName(item.borrowId)}"/>-->
-                                     <h:outputText value="#{item.clinicalDeptName}"/>
-                            </p:column>
-                             <!--<p:column headerText="归还科室" sortBy="#{item.returnId}" filterBy="#{item.clinicalDeptForReturnUid}" filterMatchMode="LIKE">-->
-                                <!--<f:facet name="filter">-->
-                                    <!--<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">-->
-                                        <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
-                                        <!--<f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevelForReturn()}" />-->
-                                    <!--</p:selectOneMenu>-->
-                                <!--</f:facet>-->
-        <!--&lt;!&ndash;                        <h:outputText value="#{sharedAssetReqDetailForQueryController.getclinicalDeptName(item.returnId)}"/>&ndash;&gt;-->
-                                    <!--<h:outputText value="#{item.clinicalDeptForReturnName}"/>-->
-                            <!--</p:column>-->
-                            <p:column headerText="设备名称" sortBy="#{item.asset_name}" filterBy="#{item.asset_name}" filterMatchMode="LIKE" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('arrivalListAssetName')}">
-                                    <h:outputText value="#{item.assetName}"/>
-                                </p:column>
-                                <p:column headerText="设备编号" sortBy="#{item.asset_number}" filterBy="#{item.asset_number}" filterMatchMode="LIKE" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('departNum')}">
-                                    <h:outputText value="#{item.assetNumber}"/>
-                                </p:column>
+                           <c:forEach items="#{sharedAssetReqDetailForQueryController.assetAllocateFields}" var="columnItem" >
+                               <c:if test="#{columnItem eq 'reclinicalDept'}">
+                                    <p:column headerText="借用科室" sortBy="#{item.clinical_dept_name}" filterBy="#{item.clinical_dept_name}" filterMatchMode="LIKE" >
+                                             <h:outputText value="#{item.clinicalDeptName}"/>
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'arrivalListAssetName'}">
+                                    <p:column headerText="设备名称" sortBy="#{item.asset_name}" filterBy="#{item.asset_name}" filterMatchMode="LIKE" >
+                                     <h:outputText value="#{item.assetName}"/>
+                                     </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'departNum'}">
+                                   <p:column headerText="设备编号" sortBy="#{item.asset_number}" filterBy="#{item.asset_number}" filterMatchMode="LIKE">
+                                        <h:outputText value="#{item.assetNumber}"/>
+                                    </p:column>
+                               </c:if>
                             <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
-                                <p:column headerText="调剂名称" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('swapName')}" sortBy="#{item.swap_name}" filterBy="#{item.swap_name}" filterMatchMode="LIKE">
-                                    <h:outputText value="#{item.swapName}"/>
-                                </p:column>
-                                <p:column headerText="型号" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('functionType')}" sortBy="#{item.function_type}" filterBy="#{item.function_type}" filterMatchMode="LIKE">
-                                    <h:outputText value="#{item.functionType}"/>
-                                </p:column>
-                                <p:column headerText="品牌" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('brand')}" sortBy="#{item.brand_name}" filterBy="#{item.brand_name}" filterMatchMode="LIKE">
-                                    <h:outputText value="#{item.brandName}"/>
-                                </p:column>
+                               <c:if test="#{columnItem eq 'swapName'}">
+                                    <p:column headerText="调剂名称"  sortBy="#{item.swap_name}" filterBy="#{item.swap_name}" filterMatchMode="LIKE">
+                                        <h:outputText value="#{item.swapName}"/>
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'functionType'}">
+                                    <p:column headerText="型号" sortBy="#{item.function_type}" filterBy="#{item.function_type}" filterMatchMode="LIKE">
+                                        <h:outputText value="#{item.functionType}"/>
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'brand'}">
+                                    <p:column headerText="品牌"  sortBy="#{item.brand_name}" filterBy="#{item.brand_name}" filterMatchMode="LIKE">
+                                        <h:outputText value="#{item.brandName}"/>
+                                    </p:column>
+                               </c:if>
                             </c:if>
-                                <p:column headerText="计费开始时间" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('chargingBeginTime')}" sortBy="#{item.charging_begin_time}" filterBy="#{item.charging_begin_time}" filterMatchMode="GTE">
+                            <c:if test="#{columnItem eq 'chargingBeginTime'}">
+                                <p:column headerText="计费开始时间"  sortBy="#{item.charging_begin_time}" filterBy="#{item.charging_begin_time}" filterMatchMode="GTE">
                                     <f:facet name="filter">
                                         <p:calendar id="cal1" effect="fold" value="#{sharedAssetReqDetailForQueryController.filterBeginTime}"
                                                     onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
@@ -114,7 +104,9 @@
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="计费结束时间" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('chargingEndTime')}" sortBy="#{item.charging_end_time}" filterBy="#{item.charging_end_time}" filterMatchMode="LTE">
+                            </c:if>
+                            <c:if test="#{columnItem eq 'chargingEndTime'}">
+                               <p:column headerText="计费结束时间"  sortBy="#{item.charging_end_time}" filterBy="#{item.charging_end_time}" filterMatchMode="LTE">
                                     <f:facet name="filter">
                                         <p:calendar id="cal2" effect="fold" value="#{sharedAssetReqDetailForQueryController.filterEndTime}"
                                                     onchange="PF('varDataList').filter()" pattern="yyyy/MM/dd HH:mm" showButtonPanel="true" navigator="true"/>
@@ -126,16 +118,22 @@
                                 <p:column headerText="病人号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}" sortBy="#{item.patient_num}" filterBy="#{item.patient_num}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.patientNum}"/>
                                 </p:column>
+
                                 <p:column headerText="床号" rendered="#{sharedAssetStockController.isLogPatientInfoEnabled()}" sortBy="#{item.patient_bed_num}" filterBy="#{item.patient_bed_num}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.patientBedNum}"/>
                                 </p:column>
-                                <p:column headerText="单价" sortBy="#{item.unit_price}" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('unitPrice')}">
-                                    <f:facet name="filter">
-                                        <p:inputText id="filterUnitPrice" widgetVar="varFilterUnitPrice" value="#{sharedAssetReqDetailForQueryController.filterUnitPrice}"/>
-                                    </f:facet>
-                                    <h:outputText value="#{item.unitPrice}"/>
-                                </p:column>
-                                <p:column headerText="计价方式" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('chargingType')}" sortBy="#{item.charging_type}" filterBy="#{item.charging_type}" filterMatchMode="EQ">
+                            </c:if>
+
+                               <c:if test="#{columnItem eq 'unitPrice'}">
+                                   <p:column headerText="单价" sortBy="#{item.unit_price}" >
+                                        <f:facet name="filter">
+                                            <p:inputText id="filterUnitPrice" widgetVar="varFilterUnitPrice" value="#{sharedAssetReqDetailForQueryController.filterUnitPrice}"/>
+                                        </f:facet>
+                                        <h:outputText value="#{item.unitPrice}"/>
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'chargingType'}">
+                                <p:column headerText="计价方式"  sortBy="#{item.charging_type}" filterBy="#{item.charging_type}" filterMatchMode="EQ">
                                     <f:facet name="filter">
                                         <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -145,100 +143,118 @@
                                     </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)=='' ? '维修借用' : fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                                 </p:column>
-                                <p:column headerText="使用时长" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('rentalTime')}">
-                                    <h:outputText value="#{item.getFormattedRentalTime()}"/>
-                                </p:column>
-<!--                            <c:if test="#{!sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">-->
-<!--                                <p:column headerText="租赁费用">-->
-<!--                                    <h:outputText value="#{sharedAssetReqDetailForQueryController.getTotalAmount(item)}">-->
-<!--                                        <f:convertNumber pattern="0.00"/>-->
-<!--                                    </h:outputText>-->
-<!--                                </p:column>-->
-<!--                            </c:if>-->
-                                <p:column headerText="租赁费用" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('totalAmount')}">
-                                    <h:outputText value="#{item.totalAmount}">
-                                        <f:convertNumber pattern="0.00"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="赔偿费用" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('compensationAmount')}">
-                                    <h:outputText value="#{item.compensationAmount}">
-                                        <f:convertNumber pattern="0.00"/>
-                                    </h:outputText>
-                                </p:column>
-                            <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
-                                <p:column headerText="免除计费时长" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('gratisDuration')}">
-                                    <h:outputText value="#{item.gratisDuration*1}">
-                                        <f:convertNumber pattern="0.00"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="免除费用" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('gratisFee')}">
-                                    <h:outputText value="#{item.gratisFee}">
-                                        <f:convertNumber pattern="0.00"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="优惠时段" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('getDiscountPeriod')}">
-                                    <h:outputText value="#{item.getDiscountPeriod()}">
-                                        <f:convertNumber pattern="0.00"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="优惠折扣" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('discount')}">
-                                    <h:outputText value="#{item.discount}">
-                                        <f:convertNumber pattern="0.00"/>
-                                    </h:outputText>%
-                                </p:column>
-                            <p:column headerText="优惠时长" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('discountTime')}">
-                                <h:outputText value="#{item.discountTime}">
-                                    <f:convertNumber pattern="0.00"/>
-                                </h:outputText>
-                            </p:column>
-                            <p:column headerText="优惠费用" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('discountFee')}">
-                                <h:outputText value="#{item.discountFee}">
-                                    <f:convertNumber pattern="0.00"/>
-                                </h:outputText>
-                            </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'rentalTime'}">
+                                   <p:column headerText="使用时长" >
+                                        <h:outputText value="#{item.getFormattedRentalTime()}"/>
+                                    </p:column>
+                               </c:if>
 
-                            <p:column headerText="总计费用" rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('cost')}">
-                                <h:outputText value="#{item.compensationAmount + item.totalAmount}">
-                                    <f:convertNumber pattern="0.00"/>
-                                </h:outputText>
-                            </p:column>
+                               <c:if test="#{columnItem eq 'totalAmount'}">
+                                    <p:column headerText="租赁费用" >
+                                        <h:outputText value="#{item.totalAmount}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </h:outputText>
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'compensationAmount'}">
+                                    <p:column headerText="赔偿费用">
+                                        <h:outputText value="#{item.compensationAmount}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </h:outputText>
+                                    </p:column>
+                               </c:if>
+                            <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
+                               <c:if test="#{columnItem eq 'gratisDuration'}">
+                                    <p:column headerText="免除计费时长" >
+                                        <h:outputText value="#{item.gratisDuration*1}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </h:outputText>
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'gratisFee'}">
+                                    <p:column headerText="免除费用">
+                                        <h:outputText value="#{item.gratisFee}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </h:outputText>
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'discountPeriod'}">
+                                    <p:column headerText="优惠时段" >
+                                        <h:outputText value="#{item.getDiscountPeriod()}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </h:outputText>
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'discount'}">
+                                    <p:column headerText="优惠折扣">
+                                        <h:outputText value="#{item.discount}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </h:outputText>%
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'discountTime'}">
+                                   <p:column headerText="优惠时长" >
+                                    <h:outputText value="#{item.discountTime}">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'discountFee'}">
+                                <p:column headerText="优惠费用" >
+                                    <h:outputText value="#{item.discountFee}">
+                                        <f:convertNumber pattern="0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'cost'}">
+                                    <p:column headerText="总计费用" >
+                                        <h:outputText value="#{item.compensationAmount + item.totalAmount}">
+                                            <f:convertNumber pattern="0.00"/>
+                                        </h:outputText>
+                                    </p:column>
+                               </c:if>
                             </c:if>
                             <c:if test="#{!sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
-                            <p:column headerText="总计费用"  rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('cost')}">
-                                <h:outputText value="#{item.compensationAmount + sharedAssetReqDetailForQueryController.getTotalAmount(item)}">
-                                    <f:convertNumber pattern="0.00"/>
-                                </h:outputText>
-                            </p:column>
+                               <c:if test="#{columnItem eq 'cost'}">
+                                    <p:column headerText="总计费用"  >
+                                       <h:outputText value="#{item.compensationAmount + sharedAssetReqDetailForQueryController.getTotalAmount(item)}">
+                                           <f:convertNumber pattern="0.00"/>
+                                       </h:outputText>
+                                   </p:column>
+                               </c:if>
                             </c:if>
                             <c:if test="#{sharedAssetReqDetailForQueryController.openWhethertoenableunattended()}">
-                                <p:column headerText="状态" filterBy="#{item.state}" filterMatchMode="EQ"  rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('status')}">
-                                    <f:facet name="filter">
-                                        <p:selectOneMenu onchange="PF('varDataList').filter()" id="selectOneMenu1">
-                                                <f:selectItem id="select1" itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                                <f:selectItem itemLabel="已预约" itemValue="已预约" />
-                                                <f:selectItem itemLabel="使用中" itemValue="使用中" />
-                                                <c:if test="#{sharedAssetReqDetailForQueryController.queryIndex != 1}">
-                                                    <f:selectItem itemLabel="已归还（未清洁保养）" itemValue="已归还（未清洁保养）" />
-                                                    <f:selectItem itemLabel="已完成" itemValue="已完成" />
-                                                </c:if>
-                                        </p:selectOneMenu>
-                                    </f:facet>
-                                    <h:outputText value="#{item.state}" />
-                                </p:column>
-                                <p:column headerText="调剂编码" filterBy="#{item.swap_index}" filterMatchMode="LIKE"  rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('swapIndex')}">
-                                    <h:outputText value="#{item.swapIndex}" />
-                                </p:column>
+                               <c:if test="#{columnItem eq 'status'}">
+                                    <p:column headerText="状态" filterBy="#{item.state}" filterMatchMode="EQ"  >
+                                        <f:facet name="filter">
+                                            <p:selectOneMenu onchange="PF('varDataList').filter()" id="selectOneMenu1">
+                                                    <f:selectItem id="select1" itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                                    <f:selectItem itemLabel="已预约" itemValue="已预约" />
+                                                    <f:selectItem itemLabel="使用中" itemValue="使用中" />
+                                                    <c:if test="#{sharedAssetReqDetailForQueryController.queryIndex != 1}">
+                                                        <f:selectItem itemLabel="已归还（未清洁保养）" itemValue="已归还（未清洁保养）" />
+                                                        <f:selectItem itemLabel="已完成" itemValue="已完成" />
+                                                    </c:if>
+                                            </p:selectOneMenu>
+                                        </f:facet>
+                                        <h:outputText value="#{item.state}" />
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'swapIndex'}">
+                                    <p:column headerText="调剂编码" filterBy="#{item.swap_index}" filterMatchMode="LIKE"  >
+                                        <h:outputText value="#{item.swapIndex}" />
+                                    </p:column>
+                               </c:if>
+                               <c:if test="#{columnItem eq 'precautions'}">
+                                    <p:column headerText="注意事项"   >
+                                        <h:outputText value="#{item.remark}" title="#{item.remark}" style="white-space: nowrap;text-overline: ellipsis"/>
+                                    </p:column>
+                               </c:if>
 
-                                <p:column headerText="注意事项"   rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('precautions')}">
-                                    <h:outputText value="#{item.remark}" title="#{item.remark}" style="white-space: nowrap;text-overline: ellipsis"/>
-                                </p:column>
-<!--                                <p:column headerText="预约人">-->
-<!--                                    <h:outputText value="#{item.leaseRequest.applicantName}" />-->
-<!--                                </p:column>-->
-                            </c:if>
-                                <!--<p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">-->
-                                    <!--<h:outputText value="#{item.remark}"/>-->
-                                <!--</p:column>-->
+                             </c:if>
+                           </c:forEach>
+
                             <f:facet name="{Toolbar}">
                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                     <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>

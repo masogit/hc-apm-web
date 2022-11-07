@@ -11,6 +11,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.sharedasset.SharedAssetReqDetailService;
 import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import com.ge.apm.service.uaa.UaaService;
@@ -128,7 +129,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-
+        initAssetAllocateFields();
     }
 
 
@@ -394,14 +395,24 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
        return whethertoenableunattended;
     }
 
-    public boolean  whetherIsShow(String key){
-        if(!openWhethertoenableunattended()) return Boolean.TRUE;
-        if(CollectionUtils.isEmpty(assetAllocateFields)){
+    public void  initAssetAllocateFields(){
+        if(!openWhethertoenableunattended())  {
+            assetAllocateFields= AllocateCustomConfigConstant.ASSET_ALLOCATE.getAssetAllocateFields();
+            return ;
+        }else {
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             String siteUID = currentUserAccount.getSiteUID();
             CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(siteUID);
             assetAllocateFields = currentCustomConfig.getAssetAllocateFields();
         }
-        return assetAllocateFields.contains(key);
+
+    }
+
+    public List<String> getAssetAllocateFields() {
+        return assetAllocateFields;
+    }
+
+    public void setAssetAllocateFields(List<String> assetAllocateFields) {
+        this.assetAllocateFields = assetAllocateFields;
     }
 }
