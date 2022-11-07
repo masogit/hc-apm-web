@@ -228,6 +228,10 @@
                                 <p:column headerText="调剂编码" filterBy="#{item.swap_index}" filterMatchMode="LIKE"  rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('swapIndex')}">
                                     <h:outputText value="#{item.swapIndex}" />
                                 </p:column>
+
+                                <p:column headerText="注意事项"   rendered="#{sharedAssetReqDetailForQueryController.whetherIsShow('precautions')}">
+                                    <h:outputText value="#{item.remark}" title="#{item.remark}" style="white-space: nowrap;text-overline: ellipsis"/>
+                                </p:column>
 <!--                                <p:column headerText="预约人">-->
 <!--                                    <h:outputText value="#{item.leaseRequest.applicantName}" />-->
 <!--                                </p:column>-->

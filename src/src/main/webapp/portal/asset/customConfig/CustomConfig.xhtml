@@ -371,7 +371,7 @@
                                 </p:fieldset>
                             </p:panelGrid>
                         </p:tab>
-                        <p:tab title="无人值守调剂计费情况列表自定义页面">
+                        <p:tab title="无人值守调剂计费情况列表自定义页面" rendered="#{customConfigController.enabledWhethertoenableunattended()}">
                             <p:dataTable id="assetAllocatePageTable"  var='item' value="#{customConfigController.customConfigObject.assetAllocateFields}" draggableRows="true">
                                 <p:ajax event="rowReorder" update="assetAllocatePageTable"/>
                                 <p:column headerText="#{msg.DisplayedField}">
