@@ -74,4 +74,8 @@ public interface I18nMessageRepository extends GenericRepository<I18nMessage> {
     @Query(value="select a.* from (select t.* from I18n_Message t, tenant_info ti where t.msg_Type=?1 and t.msg_Key=?2 and ti.id = t.site_id and ti.uid = ?3 " +
             "union select t.* from I18n_Message t where t.msg_Type=?1 and t.msg_Key=?2 and site_id = '-1') a order by site_id desc limit 1", nativeQuery=true)
     I18nMessage findByMsgTypeAndMsgKey(String msgType,String msgKey, String tenantUid);
+
+    @Query(value = "select max(to_number(msg_key, '99999')) from i18n_message where msg_type = ?1 and site_id = ?2",nativeQuery = true)
+    Integer getMaxMsgKeyByTypeAndSiteId(String msgType, Integer siteId);
+
 }

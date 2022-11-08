@@ -50,10 +50,10 @@ public class ReminderEvent implements Serializable {
     @Column(name = "finish_time")
     private Date finishTime;
 
-    @Column(name = "parameters")
+    @Column(name = "parameters", columnDefinition = "text")
     private String parameters;
 
-    @Column(name = "res_data")
+    @Column(name = "res_data", columnDefinition = "text")
     private String resData;
 
     @Column(name = "type")

@@ -377,7 +377,7 @@
             </h:form>
 
             <h:form>
-                <p:panel  header="#{msg.RelatedEquipmentUID}" rendered="#{assetInfoDetailController.showParentsTree()}">
+                <p:panel  header="相关设备" rendered="#{assetInfoDetailController.showParentsTree()}">
                     <p:treeTable styleClass="ui-datatable"  value="#{assetInfoDetailController.getParentsRelationTree()}" var="assetItem">
                         <f:facet name="header" />
                         <p:column headerText="#{msg.name}">
@@ -388,6 +388,9 @@
                         </p:column>
                         <p:column headerText="#{msg.financingNum}">
                             <h:outputText value="#{assetItem.financingNum}" />
+                        </p:column>
+                        <p:column headerText="#{msg.functionType}">
+                            <h:outputText value="#{assetItem.functionType}" />
                         </p:column>
                         <p:column headerText="#{msg.departNum}">
                             <h:outputText value="#{assetItem.departNum}" />
