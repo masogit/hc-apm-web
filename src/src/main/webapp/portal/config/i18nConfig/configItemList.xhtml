@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .ui-selectmanycheckbox td{
+                width: 80px !important;
+            }
+            .ui-state-highlight{
+                background-color: #5180ce !important;
+                color: #ffffff;
+            }
+            .ui-datatable-tablewrapper{
+                max-height: 400px !important;
+                overflow-y: auto;
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.i18nConfig}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="configItemForm">
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                        <h:panelGroup>
+                            <p:commandButton id="btnOrg" value="#{i18nConfigController.selectTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelSite" for="btnOrg" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
+                                <p:selectOneListbox value="#{i18nConfigController.selectTenantId}" scrollHeight="500" style="border: none;" filter="true" filterMatchMode="contains">
+                                    <p:ajax process="@this" event="click" listener="#{i18nConfigController.changeSelectTenant}" update="configItemForm" oncomplete="PF('varPanelSite').hide();"/>
+                                    <f:selectItems value="#{tenantInfoController.itemList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                </p:selectOneListbox>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                    <p:dataTable id="datalist" class="datalist" value="#{i18nConfigController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{i18nConfigController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="rowSelect" update="editButton" />
+                        <p:ajax event="filter" listener="#{i18nConfigController.onFilter}" />
+
+                        <p:column headerText="#{msg.ConfigItemName}" filterBy="#{item.valueZh}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.valueZh}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ConfigItemValue}">
+                            <h:outputText value="#{item.customConfig}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" actionListener="#{i18nConfigController.prepareEdit}" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":configEditDlg" oncomplete="PF('configEditDialog').show()" disabled="#{empty i18nConfigController.selected}" />
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+        <ui:include src="configItemEdit.xhtml"/>
+        <ui:include src="addCustomI18n.xhtml"/>
+    </ui:define>
+</ui:composition>

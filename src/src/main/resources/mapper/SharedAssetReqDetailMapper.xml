@@ -42,6 +42,7 @@
         <result column="function_type" property="functionType"/>
         <result column="brand_name" property="brandName"/>
         <result column="swap_name" property="swapName"/>
+        <result column="remark" property="remark"/>
     </resultMap>
 
     <select id="getTotalRowCount" resultType="int">
@@ -77,6 +78,7 @@
                 sard.patient_num,
                 sard.patient_bed_num,
                 sasi.swap_index,
+                sasi.remark,
                 (case
                 when  sard.charging_end_time is not null and sard.is_cleaned=true then '已完成'
                 when  sard.charging_end_time is not null and sard.is_cleaned != true then '已归还（未清洁保养）'
@@ -130,6 +132,7 @@
             sard.patient_num,
             sard.patient_bed_num,
             sasi.swap_index,
+            sasi.remark,
             (case
             when  sard.charging_end_time is not null and sard.is_cleaned=true then '已完成'
             when  sard.charging_end_time is not null and sard.is_cleaned != true then '已归还（未清洁保养）'
