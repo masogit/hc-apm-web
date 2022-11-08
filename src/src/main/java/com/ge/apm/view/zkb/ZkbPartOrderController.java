@@ -88,7 +88,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
+                    ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
+                    ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
                 ){
                     showStatusBtn =false;
                 }
@@ -136,6 +137,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters,"");
         List<ZkbPartOrder> zkbPartOrders = zkbPartOrderService.getZkbPartOrderRepository().find();
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
+        for(ZkbPartOrder p : zkbContractPage.getContent()){
+            p.setAssetInfo(null);
+        }
         //searchFilters.clear();
         return zkbContractPage;
     }
@@ -229,6 +233,18 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }else {
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.DirectorPending.toString(), "1+"));
                             searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                        }
+                    }
+                }else if(ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    if(StringUtils.isEmpty(queryStatus)){
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ProductPending.toString()));
+                    }else if("all".equals(queryStatus)){
+                        if(searchFilters.size() > 0) {
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ProductPending.toString(),"1*2+"));
+                            searchFilters.add(new SearchFilter("productAuditer", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
+                        }else {
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ProductPending.toString(), "1+"));
+                            searchFilters.add(new SearchFilter("productAuditer", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
                         }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
