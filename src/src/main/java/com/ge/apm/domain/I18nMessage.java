@@ -51,6 +51,8 @@ public class I18nMessage implements Serializable, Comparable {
     private Integer orderBy;
     @Transient
     private boolean editable;
+    @Transient
+    private String customConfig;
 
     public I18nMessage() {
     }
@@ -235,5 +237,13 @@ public class I18nMessage implements Serializable, Comparable {
 
     public void setOrderBy(Integer orderBy) {
         this.orderBy = orderBy;
+    }
+
+    public String getCustomConfig() {
+        return customConfig;
+    }
+
+    public void setCustomConfig(String customConfig) {
+        this.customConfig = customConfig;
     }
 }
