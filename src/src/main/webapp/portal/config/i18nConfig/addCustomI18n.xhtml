@@ -7,12 +7,18 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="addCustomI18nDlg" widgetVar="addCustomI18nDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.addI18nConfig}" max-height="480" width="360">
+        <p:dialog id="addCustomI18nDlg" widgetVar="addCustomI18nDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.addI18nConfig}" max-height="480" width="400">
             <h:form id="addCustomI18nCForm">
+
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup rendered="#{null ne i18nConfigController.tips.get(i18nConfigController.selected.msgKey)}">
+                        <div class="col-12 md:col-4">
+                            <p:staticMessage severity="info" summary="" detail="#{i18nConfigController.tips.get(i18nConfigController.selected.msgKey)}" style="width: 95% !important;"/>
+                        </div>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ConfigItemKey}*</label>
-                        <p:inputText id="configItemKey" autocomplete="off" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" style="width: 95%;"/>
+                        <p:inputText id="configItemKey" autocomplete="off" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ConfigItemName}-#{msg.Chinese}*</label>
