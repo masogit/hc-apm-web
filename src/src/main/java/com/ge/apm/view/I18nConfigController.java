@@ -42,6 +42,7 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
 
     private List<I18nMessage> i18nList;
     private List<I18nMessage> removeList;
+    private Map<String, String> tips;
 
     @Override
     protected void init() {
@@ -51,6 +52,8 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
         i18nConfigService = WebUtil.getBean(I18nConfigService.class);
         selectTenant = tenantInfoRepository.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
         selectTenantId = selectTenant.getId();
+        tips = new HashMap<>();
+        tips.put("transaction","该配置的配置键目前只支持输入数字！");
     }
 
     @Override
@@ -226,5 +229,21 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
 
     public void setEditI18n(I18nMessage editI18n) {
         this.editI18n = editI18n;
+    }
+
+    public boolean isEditFlag() {
+        return editFlag;
+    }
+
+    public void setEditFlag(boolean editFlag) {
+        this.editFlag = editFlag;
+    }
+
+    public Map<String, String> getTips() {
+        return tips;
+    }
+
+    public void setTips(Map<String, String> tips) {
+        this.tips = tips;
     }
 }
