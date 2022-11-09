@@ -35,4 +35,6 @@ public interface DeptTransactionLogRepository extends GenericRepository<DeptTran
             + "group by td.assetUid,td.seriaNum order by inputDate desc")
     Page<TubeData> findByConditionWithUidsAndSeriaNum(String tenantUid, List<String> queryUids, String queryCondition,Pageable pageable);*/
 
+    @Query(value="select count(1) from dept_transaction_log where category = ?1 and tenant_uid = ?2", nativeQuery = true)
+    int countByCategoryAndTenant(Integer category, String tenantUid);
 }
