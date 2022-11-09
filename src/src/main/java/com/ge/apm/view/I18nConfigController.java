@@ -112,11 +112,17 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
     }
 
     public void deleteI18n() {
-        i18nList.remove(selectedI18n);
-        // 如果不是首次配置，需要删除对应租户下的该项配置
-        if(!initFlag){
-            removeList.add(selectedI18n);
+        if(i18nConfigService.beforeDeleteCheck(this.selected.getMsgKey(),selectedI18n.getMsgKey(), this.selectTenantId)){
+            // 删除前校验，是否有数据引用
+            i18nList.remove(selectedI18n);
+            // 如果不是首次配置，需要删除对应租户下的该项配置
+            if(!initFlag){
+                removeList.add(selectedI18n);
+            }
+        }else{
+            WebUtil.addErrorMessage("该配置存在引用，无法删除!");
         }
+
     }
 
     public void prepareEdit() {
