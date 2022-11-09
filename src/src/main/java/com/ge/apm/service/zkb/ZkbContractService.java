@@ -553,7 +553,12 @@ public class ZkbContractService {
             }else{
                 quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),currentUser);
             }
-
+            if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+                quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),currentUser);
+            }
+            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+                quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.toString(),currentUser);
+            }
             zkbContract = contractRepository.save(zkbContract);
         }else {
             zkbContract = contractRepository.save(zkbContract);
@@ -567,6 +572,13 @@ public class ZkbContractService {
             }else{
                 zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             }
+            if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+                zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
+            }
+            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+                zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
+            }
+
         }
         syncAsset(zkbContract);
         return zkbContract;
