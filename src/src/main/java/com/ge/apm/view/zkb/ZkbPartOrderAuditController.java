@@ -458,6 +458,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showBtn = "0";
                 }else if(ZkbPartOrder.PartOrderStatus.ProductAccept.toString().equals(selected.getStatus())){
                     showProduct = true;
+                    showManage = true;
                     showBtn = "0";
                 }else if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(selected.getStatus())){
                     showProduct = true;

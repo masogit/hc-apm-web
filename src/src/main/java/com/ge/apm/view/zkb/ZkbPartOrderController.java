@@ -135,11 +135,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     @Override
     protected Page<ZkbPartOrder> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters,"");
-        List<ZkbPartOrder> zkbPartOrders = zkbPartOrderService.getZkbPartOrderRepository().find();
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
-        for(ZkbPartOrder p : zkbContractPage.getContent()){
-            p.setAssetInfo(null);
-        }
         //searchFilters.clear();
         return zkbContractPage;
     }
@@ -241,10 +237,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     }else if("all".equals(queryStatus)){
                         if(searchFilters.size() > 0) {
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ProductPending.toString(),"1*2+"));
-                            searchFilters.add(new SearchFilter("productAuditer", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
+                            searchFilters.add(new SearchFilter("productAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
                         }else {
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ProductPending.toString(), "1+"));
-                            searchFilters.add(new SearchFilter("productAuditer", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                            searchFilters.add(new SearchFilter("productAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
                         }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
