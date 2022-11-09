@@ -536,7 +536,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <c:choose>
-                                <c:when test="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.zkbContract.contractType eq 'CCSB'}">
+                                <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and !(zkbPartOrderAuditController.zkbContract.contractType eq 'CCSB')}">
                                     <label class="label">区域经理审批备注（是否上过培训课）</label>
                                 </c:when>
                                 <c:otherwise>
