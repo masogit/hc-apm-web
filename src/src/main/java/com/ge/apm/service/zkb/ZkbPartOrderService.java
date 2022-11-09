@@ -877,54 +877,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrderStepRepository.save(s);
         }
         ZkbPartOrderStep newZkbPartOrderStep = new ZkbPartOrderStep();
-        if(nextFlag){
-            if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(oldStep)) {
-                newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
-                newZkbPartOrderStep.setStepName("待经理审批");
-            }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(oldStep)){
-                if(CopyByInvok.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
-                    newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
-                    newZkbPartOrderStep.setStepName("待总监审批");
-                }else if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
-                    newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
-                    newZkbPartOrderStep.setStepName("待Commercial审批");
-                }else{
-                    if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
-                        newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
-                        newZkbPartOrderStep.setStepName("待开单");
-                    }else{
-                        newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
-                        newZkbPartOrderStep.setStepName("待下单");
-                    }
-                }
-            }else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(oldStep)){
-                if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
-                    newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
-                    newZkbPartOrderStep.setStepName("待Commercial审批");
-                }else{
-                    if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
-                        newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
-                        newZkbPartOrderStep.setStepName("待开单");
-                    }else{
-                        newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
-                        newZkbPartOrderStep.setStepName("待下单");
-                    }
-                }
-
-            }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(oldStep)){
-                if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
-                    newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
-                    newZkbPartOrderStep.setStepName("待开单");
-                }else{
-                    newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
-                    newZkbPartOrderStep.setStepName("待下单");
-                }
-            }
-        }else{
-            newZkbPartOrderStep.setStepKey("Complete");
-            newZkbPartOrderStep.setStepName("完成");
-        }
-
+        newZkbPartOrderStep.setStepKey(zkbPartOrder.getCurrentStep());
+        newZkbPartOrderStep.setStepName(WebUtil.getFieldValueMessage("zkbPoSteps",newZkbPartOrderStep.getStepKey()));
         newZkbPartOrderStep.setStartTime(new Date());
         newZkbPartOrderStep.setOwnerId(userAccount.getUid());
         newZkbPartOrderStep.setOwnerName(userAccount.getName());
@@ -1040,13 +994,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrder = zkbPartOrderRepository.save(zkbPartOrder);
 
-        List<ZkbPartOrderStep> zkbPartOrderStepList = zkbPartOrderStepRepository.findByPartOrderId(zkbPartOrder.getId());
+       /* List<ZkbPartOrderStep> zkbPartOrderStepList = zkbPartOrderStepRepository.findByPartOrderId(zkbPartOrder.getId());
         for(ZkbPartOrderStep s : zkbPartOrderStepList){
             if(s.getStepKey().equals(oldStep)){
                 s.setEndTime(new Date());
                 zkbPartOrderStepRepository.save(s);
             }
-        }
+        }*/
         ZkbPartOrderStep newZkbPartOrderStep = new ZkbPartOrderStep();
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())){
             newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.Complete.toString());
@@ -1568,7 +1522,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString();
         }
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())) {
-            //region 备件名额处理
+             //region 备件名额处理
             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
             if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag()) && "highMachine".equals(zkbContractAsset.getAssetType())){
                 Integer a = zkbContractAsset.getApplyNum() == null ? 0: zkbContractAsset.getApplyNum();
@@ -1717,8 +1671,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         }
                     }else{
                         if(remindQty >= 1){
-                            zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
-                            zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
+                            zkbContract.setCcsbMaintenanceQuota((zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota()) - qty);
+                            zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) + qty);
                             zkbContractRepository.save(zkbContract);
                             zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                         }
@@ -1873,7 +1827,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     }
                 }
             }
-
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             ZkbContractCat zkbContractCat = new ZkbContractCat();
             if(StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())){
