@@ -116,6 +116,16 @@ public class ZkbContractService {
             zkbContractDataMap.put("探头特殊申请名额", isEmptyInteger(zkbContract.getProbeQuotaSpecialApply()));
             zkbContractDataMap.put("探头特殊已使用名额", isEmptyInteger(zkbContract.getProbeQuotaSpecialUse()));
 
+            zkbContractDataMap.put("保养总额", isEmptyInteger(zkbContract.getCcsbMaintenanceQuotaTotal()));
+            zkbContractDataMap.put("保养剩余名额", isEmptyInteger(zkbContract.getCcsbMaintenanceQuota()));
+            zkbContractDataMap.put("保养申请名额", isEmptyInteger(zkbContract.getCcsbMaintenanceQuotaApply()));
+            zkbContractDataMap.put("保养已使用名额", isEmptyInteger(zkbContract.getCcsbMaintenanceQuotaUse()));
+
+            zkbContractDataMap.put("备件高值总额", isEmptyInteger(zkbContract.getPartHighQuotaTotal()));
+            zkbContractDataMap.put("备件高值剩余名额", isEmptyInteger(zkbContract.getPartHighQuota()));
+            zkbContractDataMap.put("备件高值申请中名额", isEmptyInteger(zkbContract.getPartHighQuotaApply()));
+            zkbContractDataMap.put("备件高值已使用名额", isEmptyInteger(zkbContract.getPartHighQuotaUse()));
+
             /*zkbContractDataMap.put("探头高值总额", isEmptyInteger(zkbContract.getProbeQuotaHighTotal()));
             zkbContractDataMap.put("探头高值剩余名额", isEmptyInteger(zkbContract.getProbeQuotaHigh()));
             zkbContractDataMap.put("探头高值申请名额", isEmptyInteger(zkbContract.getProbeQuotaHighApply()));

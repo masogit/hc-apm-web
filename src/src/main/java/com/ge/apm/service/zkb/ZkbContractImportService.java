@@ -127,6 +127,15 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("探头特殊剩余名额", "setProbeQuotaSpecial");
             contractRow.setFieldNumValue("探头特殊已使用名额", "setProbeQuotaSpecialUse");
 
+            contractRow.setFieldNumValue("保养总额", "setCcsbMaintenanceQuotaTotal");
+            contractRow.setFieldNumValue("保养剩余名额", "setCcsbMaintenanceQuota");
+            contractRow.setFieldNumValue("保养已使用名额", "setCcsbMaintenanceQuotaUse");
+
+            contractRow.setFieldNumValue("备件高值总额", "setPartHighQuotaTotal");
+            contractRow.setFieldNumValue("备件高值剩余名额", "setPartHighQuota");
+            contractRow.setFieldNumValue("备件高值已使用名额", "setPartHighQuotaUse");
+
+
             /*contractRow.setFieldNumValue("探头高值总额", "setProbeQuotaHighTotal");
             contractRow.setFieldNumValue("探头高值剩余名额", "setProbeQuotaHigh");
             contractRow.setFieldNumValue("探头高值已使用名额", "setProbeQuotaHighUse");*/
@@ -298,6 +307,8 @@ public class ZkbContractImportService {
             newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
             newZkbContract.setGeArtificialSupportTimesApply(newZkbContract.getGeArtificialSupportTimesTotal() - newZkbContract.getGeArtificialSupportTimesUse() - newZkbContract.getGeArtificialSupportTimes());
             newZkbContract.setSpareArtificailApply(newZkbContract.getSpareArtificailTotal() - newZkbContract.getSpareArtificailUse() - newZkbContract.getSpareArtificail());
+            newZkbContract.setPartHighQuotaApply(newZkbContract.getPartHighQuotaTotal() - newZkbContract.getPartHighQuota() - newZkbContract.getPartHighQuotaUse());
+            newZkbContract.setCcsbMaintenanceQuotaApply(newZkbContract.getCcsbMaintenanceQuotaTotal() - newZkbContract.getCcsbMaintenanceQuota() - newZkbContract.getCcsbMaintenanceQuotaUse());
             zkbContractRepository.save(newZkbContract);
         }
 
