@@ -1,13 +1,5 @@
--- YHAAO-16622 云阜需求-手机端，设备调剂-各个页面的设备信息显示调整
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, validation, value_type) select '3f6953a582a5488c91b41ce53ad34588', 2, '1', '调剂名称信息自定义配置', 'assetAllocate', '调剂设备名称配置', 'f', 'f', '[{"key":"设备编号","value":"1"},{"key":"二维码","value":"2"}]', 7 where not exists (select * from config_item where key = 'assetAllocate');
--- YHAAO-16616 到货清单提交后，展开的信息要根据上次记录带入
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select '8f4f32053d8443f284f2a468ce09b101', 3, 'false', '到货清单同类设备是否自动填充', 'arrivalListAutoFill', '到货清单同类设备是否自动填充', 'f', 't', 3 where not exists (select * from config_item where key = 'arrivalListAutoFill');
--- YHAAO-15835 计量信息-批量上传计量报告附件
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select '79fb9c1ed56943bc8df24ee29fef6471', 7, 'false', '批量上传计量报告附件', 'batch_upload', '批量上传计量报告附件', 'f', 'f', 3 where not exists (select * from config_item where key = 'batch_upload');
--- YHAAO-16835 云阜需求-扫码盘点界面，新增显示字段信息
-alter table config_item alter column validation type varchar(1000);
-INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, validation, value_type) select '6bb2d9e4ee734f2587348408de7ce068', 12, '[{"key":"设备型号","value":"functionType"},{"key":"设备序列号","value":"serialNum"},{"key":"出厂日期","value":"manufactDate"},{"key":"注册证号","value":"registrationNo"},{"key":"安装位置","value":"locationName"}]', '扫码盘点页面显示字段', 'scanInventoryField', '扫码盘点页面显示字段', 'f', 't', '[{"key":"设备型号","value":"functionType"},{"key":"设备序列号","value":"serialNum"},{"key":"出厂日期","value":"manufactDate"},{"key":"注册证号","value":"registrationNo"},{"key":"安装位置","value":"locationName"},{"key":"二维码","value":"qrCode"},{"key":"制造商","value":"manufactureId"},{"key":"品牌/制造商简称","value":"makerShortName"}]', 8 where not exists (select * from config_item where key = 'scanInventoryField');
---备件管理员添加菜单校验
-UPDATE sys_role SET authorities = ( CASE WHEN authorities IS NULL THEN 'parts' ELSE authorities || ',parts' END ), menus = ( CASE WHEN menus IS NULL THEN 'parts' ELSE menus || ',parts' END ), authorities_ch = ( CASE WHEN authorities_ch IS NULL THEN '备件管理' ELSE authorities_ch || ',备件管理' END ) WHERE role_desc = '备件管理员';
 -- YHAAO-17216 模板定义添加类型字段
 UPDATE table_definition SET template_type = 'Maintain' where template_type is null;
+-- YHAAO-15761 供应商小程序-增加配置项， 编辑照片说明
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select 'e2eccc5875994efab9742554d930f627', 3, '出厂编号、设备整体外观、医院编号标签', '供应商小程序到货清单照片说明配置', 'arrivalListPhotoCaption', '到货清单照片说明', 'f', 'f', 1 where not exists (select * from config_item where key = 'arrivalListPhotoCaption');
+
