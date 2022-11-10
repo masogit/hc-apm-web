@@ -17,7 +17,7 @@
                     </h:panelGroup>
                     <h:panelGroup rendered="#{i18nConfigController.selected.msgKey eq 'transaction'}">
                         <label class="label">#{msg.ConfigItemKey}*</label>
-                        <p:inputNumber id="configItemKeyNum" autocomplete="off" decimalPlaces="0" thousandSeparator="" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
+                        <p:inputNumber id="configItemKeyNum" autocomplete="off" decimalPlaces="0" thousandSeparator="" placeholder="请输入数字" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ConfigItemName}-#{msg.Chinese}*</label>
