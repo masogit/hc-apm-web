@@ -7,6 +7,7 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
@@ -17,6 +18,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
@@ -33,6 +36,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,6 +71,9 @@ public class AssetFileImportController {
     private Boolean hasExportData = false;
     
     private Boolean canbeImported = false;
+    private Boolean unCheckedNurseSite = false;
+    private Boolean toDeleteCheckedNurseSite = false;
+    private List<AssetInfo> unCheckNurseSiteMaintainList = new ArrayList<>();
     private Boolean autoGenerateQrcode = true;
     private Boolean isGeneratePmOrder;
 
@@ -166,7 +173,9 @@ public class AssetFileImportController {
             importOrgMap = streamingService.getOrgInfoMapFromTemplate(orgDoc);
 
             logger.info("start to check data");
-            canbeImported = streamingService.checkData(importOrgMap, importAssetMap);
+            Map checkresult = streamingService.checkData(importOrgMap, importAssetMap,unCheckNurseSiteMaintainList);
+            canbeImported = (Boolean) checkresult.get("canBeImport");
+            unCheckedNurseSite = (Boolean) checkresult.get("unCheckedNurseSite");
 
             filterErrorRecords();
 
@@ -180,6 +189,19 @@ public class AssetFileImportController {
         }
     }
 
+    public void toBedelete() {
+        toDeleteCheckedNurseSite = true;
+    }
+
+    public void checkIfRequireBeforeImportData() {
+        if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintainList) && !toDeleteCheckedNurseSite) {
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
+            requestContext.addCallbackParam("toDeleteCheckedNurseSite", toDeleteCheckedNurseSite);
+        } else {
+            importData();
+        }
+    }
 
     public void importData() {
         try {
@@ -195,6 +217,10 @@ public class AssetFileImportController {
             //AssetFileImportCache assetFileImportCache = new AssetFileImportCache(importAssetMap, selectedOrg, assetFileImportCacheService);
 
             streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
+            if(toDeleteCheckedNurseSite) {
+                streamingService.deleteNursiteMaintain(unCheckNurseSiteMaintainList);
+                toDeleteCheckedNurseSite = false;
+            }
             //importUseCacheService.importAssetData(crossSite, selectedOrg, importAssetMap, autoGenerateQrcode, orgNamesUriCache, assetFileImportCache);
             isImported = true;
 
@@ -428,6 +454,10 @@ public class AssetFileImportController {
     public Boolean getCanbeImported() {
         return canbeImported;
     }
+
+    public Boolean getUnCheckedNurseSite() { return unCheckedNurseSite; }
+
+    public Boolean getToDeleteCheckedNurseSite() { return toDeleteCheckedNurseSite; }
 
     public Boolean getAutoGenerateQrcode() {
         return autoGenerateQrcode;

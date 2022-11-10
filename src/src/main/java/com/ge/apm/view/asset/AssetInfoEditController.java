@@ -28,6 +28,7 @@ import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -73,6 +74,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private MvsUtil mvsUtil;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+    private AssetInfoBulkEditCheckService assetInfoBulkEditCheckService;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -175,6 +177,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Getter
     List<I18nMessage> assetStatusList = Collections.emptyList();
 
+    @Getter
+    private Boolean unCheckedNursesiteMaintainSite = false;
+    @Getter
+    private Boolean toDeleteNurseMaintainSite = false;
+    private List<AssetInfo> unCheckNurseSiteMaintain = Collections.emptyList();
+
+    public void toDelete () {
+       toDeleteNurseMaintainSite = true;
+    }
+
     // TreeNodeName Filter
     private String treeNodeNameFilter;
     public String getTreeNodeNameFilter() {
@@ -221,6 +233,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         userContextService = WebUtil.getBean(UserContextService.class);
         mqUtils = WebUtil.getBean(MqUtils.class);
+        assetInfoBulkEditCheckService = WebUtil.getBean(AssetInfoBulkEditCheckService.class);
 
         countyArea = userContextService.isCountyArea();
 
@@ -662,6 +675,29 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void todelete() {
+        toDeleteNurseMaintainSite = true;
+    }
+
+    public String checkIfRequireBeforeApplyChange() {
+        if(!unCheckedNursesiteMaintainSite && selected.getUid()!=null) {
+            AssetInfo old = dao.findByUid(selected.getUid());
+            if(old.getClinicalDeptId()!=selected.getClinicalDeptId()) {
+                List<AssetInfo> assets = new ArrayList<>();
+                assets.add(old);
+                unCheckNurseSiteMaintain = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets);
+                if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain)) {
+                    unCheckedNursesiteMaintainSite = true;
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("unCheckedNursesiteMaintainSite", unCheckedNursesiteMaintainSite);
+                    requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
+                    return "";
+                }
+            }
+        }
+        return applyChange();
+    }
+
     @Transactional
     public String applyChange() {
 
@@ -746,6 +782,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         this.saveAssetHistory();
         this.save();
+        if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain) && toDeleteNurseMaintainSite) {
+            assetInfoBulkEditCheckService.deleteNursiteMaintain(unCheckNurseSiteMaintain.get(0));
+        }
 
         if(selected != null && selected.getId() != null && selectedPictures != null){
             acService.createAttachments(selected, selectedPictures);

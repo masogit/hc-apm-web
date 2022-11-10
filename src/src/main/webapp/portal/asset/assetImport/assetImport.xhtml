@@ -217,8 +217,8 @@
 
                         <h:panelGroup>
 
-                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check"
-                                             onstart="PF('statusDialogForImport').show()" oncomplete="PF('statusDialogForImport').hide()" disabled="#{assetFileImportController.isEmpty() or !assetFileImportController.canbeImported or assetFileImportController.isImported}" />
+                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.checkIfRequireBeforeImportData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check"
+                                             onstart="PF('statusDialogForImport').show()" oncomplete="handleComplete(xhr, status, args)" disabled="#{assetFileImportController.isEmpty() or !assetFileImportController.canbeImported or assetFileImportController.isImported}" />
                             <!--<p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">-->
                             <!--<p:fileDownload value="#{assetFileImportController.exportFile}" />-->
                             <!--</p:commandButton>-->
@@ -236,10 +236,37 @@
             </div>
 
         </div>
+        <script>
+            //<![CDATA[
+
+            function showDialog(xhr, status, args) {
+
+            }
+
+            function handleComplete(xhr, status, args) {
+                var unCheckedNurseSite = args.unCheckedNurseSite;
+                var toDeleteCheckedNurseSite = args.toDeleteCheckedNurseSite
+                if(unCheckedNurseSite==true && toDeleteCheckedNurseSite == false) {
+                    PF('toDeleteCheckedNurseSite').show()
+                } else {
+                    PF('statusDialogForImport').hide()
+                }
+                PF('statusDialogForImport').hide()
+            }
+
+            //]]>
+        </script>
 
 
         <p:dialog widgetVar="statusDialogForImport" modal="true" class="ajaxStatusDialog" draggable="false" closable="false" resizable="false" showHeader="false">
             <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"></i>
+        </p:dialog>
+        <p:dialog widgetVar="toDeleteCheckedNurseSite" modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">
+            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.toBedelete()}" value="是" update=":importDataForm :growl" icon="ui-icon-check"
+                              oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
+            <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update=":growl"/>
+            </p:fieldset>
         </p:dialog>
     </ui:define>
 

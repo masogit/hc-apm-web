@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
@@ -109,6 +110,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private List<String> selectedColumns = new ArrayList<>();
     @Getter @Setter
     private boolean assetGroupSecondarySupport = false;
+    @Getter @Setter
+    private Boolean unCheckedNurseSite = false;
+    @Getter @Setter
+    private Boolean toDeleteNurseMaintainSite = false;
+    private List<AssetInfo> unCheckedNursiteMaintainList = new ArrayList<>();
     @Getter @Setter
     private List<I18nMessage> assetGroupSecondaryList;
     @Getter @Setter
@@ -263,6 +269,24 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
         return true;
     }
+    public void todelete() {
+        toDeleteNurseMaintainSite = true;
+    }
+
+    public String verifyIfRequiredBeforeApplyChange() throws Exception {
+        if(selected.getClinicalDeptUID() !=null && !unCheckedNurseSite) {
+            //日常检查设备进行中
+            unCheckedNursiteMaintainList  = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assetInfoList);
+            if (CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList)) {
+                unCheckedNurseSite = true;
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
+                requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
+                return "";
+            }
+        }
+        return applyChange();
+    }
 
     public String applyChange() throws Exception {
         assetInfos = new HashSet<>();
@@ -357,16 +381,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                         assetInfos.addAll(assets);
                         assetInfoList.removeAll(assets);
                     }
-                }
-
-                //临床助手检查进行中
-                List<AssetInfo> assetList = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assetInfoList);
-                if (assetList != null && !assetList.isEmpty()) {
-                    for ( AssetInfo a:assetList) {
-                        a.setErrorMessage("当前有未完成的日常检查工单无法迁移，不能修改所属科室!");
-                    }
-                    assetInfos.addAll(assetList);
-                    assetInfoList.removeAll(assetList);
                 }
             }
             if(CollectionUtils.isNotEmpty(assetInfoList)){
@@ -483,6 +497,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         AssetInfoListController.resultAssetMap.clear();
         if(assetInfos != null && !assetInfos.isEmpty()){
             return "";
+        }
+        if(CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList) && toDeleteNurseMaintainSite) {
+            for(AssetInfo assetInfo : unCheckedNursiteMaintainList) {
+                assetInfoBulkEditCheckService.deleteNursiteMaintain(assetInfo);
+            }
         }
         return "AssetList.xhtml?faces-redirect=true";
     }
