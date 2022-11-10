@@ -277,6 +277,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
             changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
             uploadFlag = getAttachList(selected.getUid(), "1").size() ==0;
+            selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
         }
         if(selected ==null){
             try {

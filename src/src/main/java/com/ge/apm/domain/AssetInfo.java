@@ -803,6 +803,12 @@ public class AssetInfo implements ChineseName,Serializable {
     @TableField(exist = false)
     private String boUuid;
 
+    @Transient
+    @TableField(exist = false)
+    @Getter
+    @Setter
+    private String assetUsedLifecycle;
+
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
     }

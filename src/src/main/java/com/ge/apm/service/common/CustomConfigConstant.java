@@ -193,6 +193,7 @@ public class CustomConfigConstant {
         allFields.put("systemNum3", WebUtil.getMessage("systemNum3"));
         allFields.put("systemNum4", WebUtil.getMessage("systemNum4"));
         allFields.put("systemNum5", WebUtil.getMessage("systemNum5"));
+        allFields.put("assetUsedLifecycle", WebUtil.getMessage("assetUsedLifecycle"));
         return allFields;
     }
 
@@ -205,7 +206,7 @@ public class CustomConfigConstant {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
                 "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
-                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality");
+                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle");
     }
 
     public static List<String> getAssetsDetailpageDetailFields() {
@@ -215,7 +216,7 @@ public class CustomConfigConstant {
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
-                "lastQaDate", "lastMeteringDate", "warranty","createdBy");
+                "lastQaDate", "lastMeteringDate", "warranty","createdBy","assetUsedLifecycle");
     }
 
     public static List<String> getAssetsEditpageBasicFields() {
