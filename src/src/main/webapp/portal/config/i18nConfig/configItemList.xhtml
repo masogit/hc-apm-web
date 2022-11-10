@@ -59,7 +59,7 @@
                             <h:outputText value="#{item.customConfig}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" actionListener="#{i18nConfigController.prepareEdit}" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":configEditDlg" oncomplete="PF('configEditDialog').show()" disabled="#{empty i18nConfigController.selected}" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" actionListener="#{i18nConfigController.prepareEdit}" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":configEditDlg" oncomplete="PF('configEditDialog').show()" disabled="#{empty i18nConfigController.selected}" />
                         </f:facet>
                     </p:dataTable>
                 </h:form>
