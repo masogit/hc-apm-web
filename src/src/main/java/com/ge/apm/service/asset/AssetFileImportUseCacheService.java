@@ -35,12 +35,6 @@ public class AssetFileImportUseCacheService extends AssetFileImportBaseService {
     @Autowired
     protected AssetFileImportSupportingService supportingService;
 
-
-    @Override
-    public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
-        return  false;
-    }
-
     @Transactional
     public void importAssetData(boolean crossSite, OrgInfo selectedOrg, List<Map<String, Object>> importAssetMap,
                                 Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, AssetFileImportCache assetFileImportCache) {

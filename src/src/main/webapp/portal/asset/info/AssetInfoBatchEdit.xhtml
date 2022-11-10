@@ -163,7 +163,7 @@
                               </p:fieldset>
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup id="buttonGroup">
-                            <p:commandButton value="批量修改" icon="ui-icon-check" action="#{assetInfoBulkEditController.applyChange()}"  update="AssetInfoEditForm importDataForm" auto="true"  style="float:left"  rendered="#{assetInfoBulkEditController.getFlag()}" />
+                            <p:commandButton value="批量修改" icon="ui-icon-check" action="#{assetInfoBulkEditController.verifyIfRequiredBeforeApplyChange()}" oncomplete="handleComplete(xhr, status, args);" update="AssetInfoEditForm importDataForm" auto="true"  style="float:left"  rendered="#{assetInfoBulkEditController.getFlag()}" />
                             <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoBulkEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
                              </h:panelGroup>
                             </p:panelGrid>
@@ -323,7 +323,21 @@
                 });
 
             });
+            function handleComplete(xhr, status, args) {
+                var unCheckedNurseSite = args.unCheckedNurseSite;
+                var toDeleteNurseMaintainSite = args.toDeleteNurseMaintainSite
+                if(unCheckedNurseSite==true && toDeleteNurseMaintainSite == false) {
+                    PF('toDeleteCheckedNurseSite').show()
+                }
+            }
             //]]>
         </script>
+        <p:dialog widgetVar="toDeleteCheckedNurseSite" modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">
+                <p:commandButton validateClient="true" action="#{assetInfoBulkEditController.todelete()}" value="是" icon="ui-icon-check"
+                                 oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
+                <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update=":growl"/>
+            </p:fieldset>
+        </p:dialog>
     </ui:define>
 </ui:composition>

@@ -2,6 +2,7 @@ package com.ge.apm.dao;
 
 import java.util.*;
 
+import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +60,15 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	public List<NurseSiteMaintainItem> findError8ByLimit(int limit,int offset,Date date);
 
 	public List<NurseSiteMaintainItem> findByAssetUid(String assetUid);
+
+	@Query(value = "SELECT DISTINCT item.* FROM nurse_site_maintain_item item LEFT JOIN nurse_site_maintain_data itemdata ON item.id = itemdata.parent_id WHERE item.asset_uid = ?1 AND item.schedule_date > ?2 AND itemdata.check_value IS NULL ",nativeQuery = true)
+	public List<NurseSiteMaintainItem> findNoCheckedByAssetUidAAndScheduleDate(String assetUid,Date now);
+
+	@Query(value = "SELECT parent_id FROM nurse_site_maintain_config_item WHERE asset_uid = ?1",nativeQuery = true)
+	public List<String> findConfigItemByAssetUid(String assetUid);
+
+	@Query(value = "SELECT count(*) FROM nurse_site_maintain_config_item WHERE parent_id = ?1",nativeQuery = true)
+	public int findConfigItemCountByParentId(String parentId);
 	
 	@Transactional
 	@Modifying
@@ -79,6 +89,26 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Modifying
 	@Query(value = "delete from nurse_site_maintain_item a where a.id not in (select b.parent_id from nurse_site_maintain_data b )", nativeQuery = true)
 	void deleteInvalid();
+
+	@Transactional
+	@Modifying
+	@Query(value = "DELETE FROM nurse_site_maintain_data WHERE parent_id = ?1", nativeQuery = true)
+	void deleteDataByParentId(String parentId);
+
+	@Transactional
+	@Modifying
+	@Query(value = "DELETE FROM nurse_site_maintain WHERE id = ?1", nativeQuery = true)
+	void deleteMaintainById(String parentId);
+
+	@Transactional
+	@Modifying
+	@Query(value = "DELETE FROM nurse_site_maintain_config_item WHERE asset_uid = ?1", nativeQuery = true)
+	void deleteMaintainConfigItemByAssetUid(String assetUid);
+
+	@Transactional
+	@Modifying
+	@Query(value = "DELETE FROM nurse_site_maintain_config WHERE id = ?1", nativeQuery = true)
+	void deleteMaintainConfigById(String id);
 
 	@Transactional
 	@Modifying
