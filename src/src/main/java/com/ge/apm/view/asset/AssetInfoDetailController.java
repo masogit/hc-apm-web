@@ -12,10 +12,7 @@ import com.ge.apm.dao.mapper.AeMapper;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.AssetHistoryService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.ContractInfoService;
-import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.TreeNodeUtil;
@@ -114,6 +111,7 @@ public class AssetInfoDetailController {
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         if(selectedId!=null) selected = assetDao.findByUid(selectedId);
+        selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 

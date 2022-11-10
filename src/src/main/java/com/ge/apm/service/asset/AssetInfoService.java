@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
@@ -27,6 +28,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import javax.faces.model.SelectItemGroup;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -279,5 +284,16 @@ public class AssetInfoService {
             sortSysAuthGroupNaturally(node);
         }
 
+    }
+
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+
+    public static String getAssetUsedLifecycle(Date installDate, Integer lifecycle) {
+        if (ObjectUtil.isEmpty(installDate) || ObjectUtil.isEmpty(lifecycle)) {
+            return null;
+        }
+        Temporal temporal1 = LocalDate.parse(SDF.format(installDate));
+        Temporal temporal2 = LocalDate.parse(SDF.format(System.currentTimeMillis()));
+        return String.format("%.0f", Math.floor(Double.parseDouble(String.valueOf(ChronoUnit.MONTHS.between(temporal1, temporal2))) / 12));
     }
 }

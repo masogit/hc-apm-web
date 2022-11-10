@@ -1,5 +1,7 @@
 package com.ge.apm.view.asset;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
@@ -55,7 +57,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetCreateService acService;
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
-    private QrCodeService qrCodeService;
     private UaaService uaaService;
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
@@ -161,7 +162,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         userContextService = WebUtil.getBean(UserContextService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        qrCodeService = WebUtil.getBean(QrCodeService.class);
         acService = WebUtil.getBean(AssetCreateService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
@@ -232,7 +232,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setUserSearchFilters();
         Integer newLifecyle = null;
         for(SearchFilter searchFilter : searchFilters) {
-            if(searchFilter.fieldName.equals("lifecycle")) newLifecyle = Integer.valueOf(searchFilter.value.toString()) * 12;
+            if("lifecycle".equals(searchFilter.fieldName)) {
+                newLifecyle = Integer.parseInt(searchFilter.value.toString()) * 12;
+            }
         }
         if(newLifecyle!=null) {
             this.updateSearchFilter(new SearchFilter("lifecycle", SearchFilter.Operator.EQ,newLifecyle));
@@ -268,8 +270,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
         Page<AssetInfo> res;
         if(createdByBoolean) {
-            List<SearchFilter> searchFiltersList = new ArrayList(searchFilters);
-            searchFiltersList.removeIf(e -> e.fieldName.equals("createdBy"));
+            searchFilters.removeIf(e -> e.fieldName.equals("createdBy"));
             List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
             List<String> loginNamList = new ArrayList<>();
             if(!userAccountList.isEmpty()){
@@ -277,19 +278,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                     loginNamList.add(userAccount.getLoginName());
                 }
             }
-            searchFiltersList.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
-            res = dao.findBySearchFilter(searchFiltersList, pageRequest);
-        }else {
-            res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
         }
+        if (this.hasFilterOnField("assetUsedLifecycle")) {
+            int assetUsedLifecycle = Integer.parseInt(searchFilters.stream().filter(sf -> "assetUsedLifecycle".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("assetUsedLifecycle", SearchFilter.Operator.EQ, 0)).value.toString());
+            DateTime parse = DateUtil.parse(String.valueOf(org.joda.time.LocalDate.now().plusYears(-assetUsedLifecycle)));
+            searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.IsNotNull, null));
+            searchFilters.add(new SearchFilter("lifecycle", SearchFilter.Operator.IsNotNull, null));
+            searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.LTE, new Date(parse.getTime())));
+            this.removeFilterOnField("assetUsedLifecycle");
+        }
+        res = dao.findBySearchFilter(this.searchFilters, pageRequest);
 
         currentPageAssets = res.getContent();
 
         //设置OneQrCodeStatus
-        currentPageAssets.stream().forEach(item -> {
+        currentPageAssets.forEach(item -> {
             if(item.getQrCodeLib()!=null){
                 item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
             }
+            item.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(item.getInstallDate(), item.getLifecycle()));
         });
 
         addMisingClinicalDeptOrg(currentPageAssets);

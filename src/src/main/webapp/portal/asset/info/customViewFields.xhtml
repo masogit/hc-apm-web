@@ -572,7 +572,7 @@
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'warrantyMonth')}">
         <h:panelGroup>
             <label class="label">#{msg.warrantyMonth}</label>
-            <p:inputText id="lifecycle" value="#{assetInfoDetailController.selected.warrantyMonth}" readonly="true">
+            <p:inputText id="warrantyMonth" value="#{assetInfoDetailController.selected.warrantyMonth}" readonly="true">
             </p:inputText>
         </h:panelGroup>
     </c:if>
@@ -674,6 +674,12 @@
         <h:panelGroup >
             <label class="label">#{msg.assetQuality}</label>
             <p:inputText id="assetQuality" value="#{fieldMsg.fieldValue('assetQuality', assetInfoDetailController.selected.assetQuality)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetUsedLifecycle')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetUsedLifecycle}</label>
+            <p:inputText id="assetUsedLifecycle" value="#{assetInfoDetailController.selected.assetUsedLifecycle}" readonly="true"/>
         </h:panelGroup>
     </c:if>
 </ui:composition>

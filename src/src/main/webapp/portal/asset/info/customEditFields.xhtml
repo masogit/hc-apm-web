@@ -968,4 +968,10 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetUsedLifecycle')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetUsedLifecycle}</label>
+            <p:inputText id="assetUsedLifecycle" value="#{assetInfoEditController.selected.assetUsedLifecycle}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>
