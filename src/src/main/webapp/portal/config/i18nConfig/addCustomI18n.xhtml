@@ -7,12 +7,17 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="addCustomI18nDlg" widgetVar="addCustomI18nDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.addI18nConfig}" max-height="480" width="360">
+        <p:dialog id="addCustomI18nDlg" widgetVar="addCustomI18nDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.addI18nConfig}" max-height="480" width="400">
             <h:form id="addCustomI18nCForm">
+
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{i18nConfigController.selected.msgKey ne 'transaction'}">
                         <label class="label">#{msg.ConfigItemKey}*</label>
-                        <p:inputText id="configItemKey" autocomplete="off" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" style="width: 95%;"/>
+                        <p:inputText id="configItemKeyStr" autocomplete="off" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{i18nConfigController.selected.msgKey eq 'transaction'}">
+                        <label class="label">#{msg.ConfigItemKey}*</label>
+                        <p:inputNumber id="configItemKeyNum" autocomplete="off" decimalPlaces="0" thousandSeparator="" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ConfigItemName}-#{msg.Chinese}*</label>

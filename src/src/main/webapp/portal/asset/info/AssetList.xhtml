@@ -770,6 +770,11 @@
                                     </f:facet>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'assetUsedLifecycle'}">
+                                <p:column headerText="#{msg.assetUsedLifecycle}" filterBy="#{item.assetUsedLifecycle}" filterMatchMode="LTE">
+                                    <h:outputText value="#{item.assetUsedLifecycle}"/>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
