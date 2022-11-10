@@ -276,7 +276,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Artificial.toString())){
                 if(canEditFlag){
                     if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
-                        if(CopyByInvok.T.equals(selected.getMaintainFlag())){
+                        if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+                            if(StrUtil.isNotEmpty(selected.getProductAuditerUid())){
+                                whetherDeductEdit = true;
+                                selected.setWhetherDeduct(CopyByInvok.F);
+                            }else{
+                                if(selected.getAssetInfo().getRepairForm() != null && selected.getAssetInfo().getRepairForm() == 2){
+                                    whetherDeductEdit = true;
+                                    selected.setWhetherDeduct(CopyByInvok.F);
+                                }
+                            }
+                        }else if(CopyByInvok.T.equals(selected.getMaintainFlag())){
                             whetherDeductEdit = true;
                             ZkbContractAsset zkbContractAsset = zkbPartOrderService.getZkbContractAssetRepository().findFirstByContractIdAndAssetId(selected.getContractId(),selected.getAssetId());
                             if(CopyByInvok.F.equals(zkbContractAsset.getSupportMaintainFlag())){

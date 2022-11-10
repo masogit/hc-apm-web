@@ -716,7 +716,7 @@
                                     <label class="label">GE工程师电话*</label>
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.geEngineerPhone}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_geEngineerPhone} #{msg.ValidationRequire}" />
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.artificialType eq '2') or zkbPartOrderAuditController.selected.maintainFlag eq 't'}">
+                                <h:panelGroup rendered="#{(!(zkbPartOrderAuditController.selected.artificialType eq '2') or zkbPartOrderAuditController.selected.maintainFlag eq 't')}">
                                     <label class="label">是否扣除名额*</label>
                                     <p:selectOneMenu id="whetherDeduct" value="#{zkbPartOrderAuditController.selected.whetherDeduct}" disabled="#{zkbPartOrderAuditController.whetherDeductEdit or !(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_whetherDeduct} #{msg.ValidationRequire}" >
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
