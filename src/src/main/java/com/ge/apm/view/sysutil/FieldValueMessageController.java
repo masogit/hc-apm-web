@@ -58,6 +58,18 @@ public class FieldValueMessageController implements Serializable {
         return getFieldValueList(fieldName, instId);
     }
 
+    public static List<I18nMessage> getMeasureGradeList(){
+        List<I18nMessage> msgList = getFieldValueListByMsgType("measureGrade");
+        I18nMessage tempI18m = null;
+        for (I18nMessage i18m : msgList) {
+            if("4".equals(i18m.getMsgKey())){
+                tempI18m = i18m;
+            }
+        }
+        msgList.remove(tempI18m);
+        return msgList;
+    }
+
     public List<I18nMessage> getFieldValueList(String fieldName) {
         Integer instId = -1;
         try {
