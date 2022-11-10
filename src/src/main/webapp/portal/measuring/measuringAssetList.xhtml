@@ -69,7 +69,7 @@
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{measureAssetListController.measureGradeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <f:selectItems value="#{fieldMsg.getMeasureGradeList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>

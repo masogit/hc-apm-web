@@ -6,14 +6,17 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="计量结果"/>
+                <p:outputLabel class="pageTitle" value="计量信息"/>
             </div>
 
             <div class="ui-g-12">
                 <p:tabView id="measuringTab" class="ui-g-12">
                     <p:ajax event="tabChange" listener="#{measureAssetListController.onTabChange}" oncomplete="openAssetViewWindow(xhr, status, args)"/>
-                    <p:tab title="计量信息" id="measuringAssetList">
+                    <p:tab title="计量结果" id="measuringAssetList">
                         <ui:include src="measuringAssetList.xhtml"/>
+                    </p:tab>
+                    <p:tab title="未检计量设备" id="unmeasuredAssetList">
+                        <ui:include src="unmeasuredAssetList.xhtml"/>
                     </p:tab>
                     <p:tab title="计量结果导入" id="resultImport">
                         <ui:include src="resultImport.xhtml"/>

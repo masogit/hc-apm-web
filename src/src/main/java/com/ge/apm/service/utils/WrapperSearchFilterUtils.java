@@ -20,22 +20,22 @@ public class WrapperSearchFilterUtils {
         if (ObjectUtil.isEmpty(searchFilters)) {
             return new EntityWrapper<>();
         }
-        for(SearchFilter filter: searchFilters){
+        for (SearchFilter filter : searchFilters) {
             String fieldName = ZipUtil.camelToUnderline(filter.fieldName);
             if (ObjectUtil.isNotEmpty(paramAlias)) {
                 fieldName = paramAlias + "." + fieldName;
             }
             Object filterValue = filter.value;
-            switch(filter.operator){
+            switch (filter.operator) {
                 case EQ:
                     wrapper.eq(fieldName, filterValue);
                     break;
                 case LIKE:
-                    if(filterValue!=null){
-                        wrapper.like("lower("+fieldName+")", filterValue.toString().toLowerCase());
+                    if (filterValue != null) {
+                        wrapper.like("lower(" + fieldName + ")", filterValue.toString().toLowerCase());
                     }
                     break;
-                case LT :
+                case LT:
                     wrapper.lt(fieldName, filterValue);
                     break;
                 case LTE:
@@ -46,6 +46,18 @@ public class WrapperSearchFilterUtils {
                     break;
                 case GTE:
                     wrapper.ge(fieldName, filterValue);
+                    break;
+                case IsNull:
+                    wrapper.isNull(fieldName);
+                    break;
+                case IsNotNull:
+                    wrapper.isNotNull(fieldName);
+                    break;
+                case IN:
+                    wrapper.in(fieldName, (Collection) filterValue);
+                    break;
+                case NotIN:
+                    wrapper.notIn(fieldName, (Collection) filterValue);
                     break;
                 default:
                     break;
