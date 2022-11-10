@@ -233,6 +233,21 @@ public class ZkbContractImportService {
             zkbContract.setGeArtificialSupportTimes(contractInfoVO.getGeArtificialSupportTimes());
             zkbContract.setGeArtificialSupportTimesUse(contractInfoVO.getGeArtificialSupportTimesUse());
 
+            zkbContract.setCcsbMaintenanceQuotaTotal(contractInfoVO.getGeArtificialSupportTimesTotal());
+            zkbContract.setCcsbMaintenanceQuota(contractInfoVO.getGeArtificialSupportTimes());
+            zkbContract.setCcsbMaintenanceQuotaUse(contractInfoVO.getGeArtificialSupportTimesUse());
+
+            zkbContract.setPartHighQuotaTotal(contractInfoVO.getGeArtificialSupportTimesTotal());
+            zkbContract.setPartHighQuota(contractInfoVO.getGeArtificialSupportTimes());
+            zkbContract.setPartHighQuotaUse(contractInfoVO.getGeArtificialSupportTimesUse());
+
+            zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaTotal() - zkbContract.getSpareQuotaUse() - zkbContract.getSpareQuota());
+            zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaTotal() - zkbContract.getProbeQuotaUse() - zkbContract.getProbeQuota());
+            zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesTotal() - zkbContract.getGeArtificialSupportTimesUse() - zkbContract.getGeArtificialSupportTimes());
+            zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailTotal() - zkbContract.getSpareArtificailUse() - zkbContract.getSpareArtificail());
+            zkbContract.setPartHighQuotaApply(zkbContract.getPartHighQuotaTotal() - zkbContract.getPartHighQuota() - zkbContract.getPartHighQuotaUse());
+            zkbContract.setCcsbMaintenanceQuotaApply(zkbContract.getCcsbMaintenanceQuotaTotal() - zkbContract.getCcsbMaintenanceQuota() - zkbContract.getCcsbMaintenanceQuotaUse());
+
             if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
                 if("是".equals(contractInfoVO.getFiveNineNineFlag())){
                     zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());

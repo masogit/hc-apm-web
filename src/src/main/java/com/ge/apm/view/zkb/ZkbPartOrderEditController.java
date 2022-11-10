@@ -625,7 +625,19 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 return;
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
-                if(!"2".equals(selected.getArtificialType())) {
+                if(ZkbContract.ContractType.CCSB.toString().equals(selectedContract.getContractType())){
+                    Integer remindQty = 0;
+                    if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(selected.getCcsbApplyType())){
+                        remindQty = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
+                    }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(selected.getCcsbApplyType())){
+                        remindQty = selectedContract.getCcsbMaintenanceQuota() == null ? 0 : selectedContract.getCcsbMaintenanceQuota();
+                    }
+                    if(remindQty >= 1){
+                        this.selected.setRemainQty(remindQty - 1);
+                    }else{
+                        this.selected.setRemainQty(0);
+                    }
+                }else if(!CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())) {
                     if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
                         Integer contractCount = selectedContract.getSpareQuota() == null ? 0 : selectedContract.getSpareQuota();
                         this.selected.setRemainQty(contractCount - this.selected.getQty());
@@ -1249,6 +1261,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         calcRemainQty();
     }
 
+    public void ccsbApplyTypeSelect(){
+        calcRemainQty();
+    }
     public void initZknPartCat(Date contractDate){
         zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat(contractDate);
     }

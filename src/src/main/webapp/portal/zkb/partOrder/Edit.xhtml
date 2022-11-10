@@ -231,7 +231,7 @@
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.selectedContract.contractType eq 'CCSB'}">
                             <label class="label">CCSB扣除名额类型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.ccsbApplyType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
-                                <p:ajax event="change" update="qty remainQty" />
+                                <p:ajax event="change" update="remainQty" listener="#{zkbPartOrderEditController.ccsbApplyTypeSelect}"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCCsbQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
