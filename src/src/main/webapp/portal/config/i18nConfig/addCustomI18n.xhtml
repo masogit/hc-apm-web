@@ -11,14 +11,13 @@
             <h:form id="addCustomI18nCForm">
 
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup rendered="#{null ne i18nConfigController.tips.get(i18nConfigController.selected.msgKey)}">
-                        <div class="col-12 md:col-4">
-                            <p:staticMessage severity="info" summary="" detail="#{i18nConfigController.tips.get(i18nConfigController.selected.msgKey)}" style="width: 95% !important;"/>
-                        </div>
-                    </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{i18nConfigController.selected.msgKey ne 'transaction'}">
                         <label class="label">#{msg.ConfigItemKey}*</label>
-                        <p:inputText id="configItemKey" autocomplete="off" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
+                        <p:inputText id="configItemKeyStr" autocomplete="off" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{i18nConfigController.selected.msgKey eq 'transaction'}">
+                        <label class="label">#{msg.ConfigItemKey}*</label>
+                        <p:inputNumber id="configItemKeyNum" autocomplete="off" decimalPlaces="0" thousandSeparator="" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ConfigItemName}-#{msg.Chinese}*</label>
