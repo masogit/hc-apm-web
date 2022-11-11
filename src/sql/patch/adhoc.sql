@@ -6,3 +6,6 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 -- 刷新设备联网情况，是否使用登记 字段的历史数据
 UPDATE asset_info SET networking_status = 0 WHERE networking_status IS NULL;
 UPDATE asset_info SET is_use_registration = TRUE WHERE is_use_registration IS NULL;
+
+-- YHAAO-15915 医工角色新增设备绩效记录页面菜单权限
+UPDATE sys_role set menus = menus || ',asset.achievements' WHERE "name" = 'AssetStaff' ;

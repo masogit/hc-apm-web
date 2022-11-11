@@ -688,6 +688,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Getter@Setter
     @Column(name = "assessment_by")
     private String assessmentBy; //评估人员
+    @Getter@Setter
+    @Column(name = "asset_achievements")
+    private String assetAchievements; //设备绩效
 
     @Transient
     @TableField(exist = false)
