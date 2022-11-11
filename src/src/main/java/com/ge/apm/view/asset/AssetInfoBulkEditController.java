@@ -1,10 +1,12 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.callback.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.KeyLabel;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
@@ -18,6 +20,8 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -28,6 +32,8 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepository;
@@ -78,6 +84,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private AssetHistoryService assetHistoryService;
     private SupplierController supplierController;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+    private MqUtils mqUtils;
 
     private QrCodeLib createRequest;
     //******* filter start
@@ -226,6 +233,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         initGbTree();
         qrCode = WebUtil.getRequestParameter("qrCode");
         updateAssetStatusList();
+        mqUtils = WebUtil.getBean(MqUtils.class);
 
 
     }
@@ -580,11 +588,37 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 int oldId = oldAssetInfo.getId();
                 int newId =assetInfoList.get(i).getId();
                 if( oldId == newId ){
-                    assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, assetInfoList.get(i));
+//                    assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, assetInfoList.get(i));
+                    this.sendAssetMq(assetInfoList.get(i));
                 }
             }
         }
 
+    }
+
+
+    private void sendAssetMq(AssetInfo newAsset) {
+        AssetInfo assetInfo = new AssetInfo();
+        BeanUtils.copyProperties(newAsset,assetInfo);
+        MqContext mqContext = new MqContext();
+        mqContext.setTime(new Date());
+        mqContext.setType("asset");
+        mqContext.setRoutingKey("asset.update");
+        mqContext.setExChange("assetChange");
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        JSONObject jsonObject =new JSONObject();
+        assetInfo.setHospital(null);
+        assetInfo.setQrCodeLib(null);
+        assetInfo.setAssetTags(null);
+        assetInfo.setBrand(null);
+        assetInfo.setTags(null);
+        //gson序列化只与属性(字段)有关，与get开头的方法无关
+        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String str = g.toJson(assetInfo);
+        jsonObject.put("assetInfo",str);
+        jsonObject.put("currentUserAccount",currentUserAccount);
+        mqContext.setJsonObject(jsonObject);
+        mqUtils.sendToMq(mqContext);
     }
     private boolean updateQrCode() {
         QrCodeLib qrCodeLib = qrCodeService.findByQrCode(qrCode, selected.getSiteUID());
