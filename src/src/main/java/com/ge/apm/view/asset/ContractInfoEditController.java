@@ -477,10 +477,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void savePurchaseItem() {
-        /*if (!allItemList.contains(selectedContractItem)) {
-            allItemList.add(selectedContractItem);
-        }*/
+        selectedContractItem.setContractId(selected.getId());
         contractItemDao.save(selectedContractItem);
+        allItemList = contractService.getContractItems(selected.getId());
     }
 
     public void cancelPurchaseItem() {
