@@ -88,10 +88,10 @@
                            <p:commandButton  rendered="#{not empty assetAchievementsController.selected.achievementsReport}" immediate="true" value="#{msg.preview}" onclick="preparePreview(1,'assetAchievementsEditForm');" oncomplete="PF('assetAchievementsPreviewDlg').show();" update=":assetAchievementsPreviewForm"/>
                        </h:panelGroup>
                    </p:panelGrid>
-                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="1" >
                         <h:panelGroup>
                             <label class="label">#{msg.RelatedEquipment}</label>
-                            <p:dataTable id="assetList" class="assetList" value="#{assetAchievementsController.assetInfoList}" var="item" widgetVar="assetList" lazy="false" paginator="false"
+                            <p:dataTable id="assetList" value="#{assetAchievementsController.assetInfoList}" var="item" widgetVar="assetList" lazy="false" paginator="false"
                                          selectionMode="single" selection="#{assetAchievementsController.selectedAssetInfo}"
                                          rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                 <p:column headerText="#{msg.name}">

@@ -133,6 +133,10 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         initOrgTree();
     }
 
+    public void selectEvent(){
+
+    }
+
     public void setUserSearchFilters() {
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
         if (!ObjectUtils.isEmpty(selectSite)) {
@@ -190,6 +194,15 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     }
 
     public void delete(AssetAchievements assetAchievements) {
+        assetSearchFilters = new ArrayList<>();
+        selected = assetAchievements;
+        setAssetSearchFilters();
+        List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(assetSearchFilters);
+        assetInfos.forEach(assetInfo -> {
+            assetInfo.setAssetAchievements(null);
+            assetInfoRepository.save(assetInfos);
+        });
+        selected = null;
         assetAchievementsRepository.delete(assetAchievements);
     }
 
@@ -345,9 +358,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         selected = assetAchievements;
         super.prepareEdit();
         selectSite = orgInfoRepository.findByUid(selected.getSiteUID());
-        if (assetSearchFilters == null) {
-            assetSearchFilters = new ArrayList<>();
-        }
+        assetSearchFilters = new ArrayList<>();
         setAssetSearchFilters();
         assetInfoList = assetInfoRepository.findBySearchFilter(assetSearchFilters);
         selectedAssetInfo = assetInfoList.get(0);
