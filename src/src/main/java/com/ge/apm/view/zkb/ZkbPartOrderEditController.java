@@ -292,11 +292,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     return;
                 }else{
                     if(!CopyByInvok.NORMAL_THREE.equals(artificialType)){
-                        WebUtil.addErrorMessage("CCSB类型合同只能进行超声低端机申请");
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "CCSB类型合同只能进行超声低端机申请！", "");
+                        FacesContext.getCurrentInstance().addMessage(null, message);
                         return;
                     }
                     if(!ZkbContractAsset.AssetTypeEnum.lowMachine.toString().equals(zkbContractAsset.getAssetType())){
-                        WebUtil.addErrorMessage("CCSB类型合同中设备不为超声低端机");
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "CCSB类型合同中设备不为超声低端机！", "");
+                        FacesContext.getCurrentInstance().addMessage(null, message);
                         return;
                     }
                 }
@@ -321,11 +323,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(CopyByInvok.T.equals(selectedContract.getFirstYearFlag()) && (zkbContractAsset.getApplyNum() == null || zkbContractAsset.getApplyNum() == 0)){
                         Boolean r = zkbContractAssetService.checkHalfAsset(selectedContract.getId(),assetInfo.getUid());
                         if(r == null){
-                            WebUtil.addErrorMessage("合同中没有高端机设备！","");
+                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同中没有高端机设备！", "");
+                            FacesContext.getCurrentInstance().addMessage(null, message);
                             contractList = new ArrayList<>();
                             return;
                         }else if(!r){
-                            WebUtil.addErrorMessage("当前备件申请的设备已经超过50%的IB入保数额，此IB无法申请备件！","");
+                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "当前备件申请的设备已经超过50%的IB入保数额，此IB无法申请备件！", "");
+                            FacesContext.getCurrentInstance().addMessage(null, message);
                             contractList = new ArrayList<>();
                         }
                     }
