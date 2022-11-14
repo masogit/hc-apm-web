@@ -145,11 +145,6 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
         this.selectedMap.clear();
     }
 
-    public void onSelectAllOfPage() {
-        boolean isSelectedAll = currentPageAssets.stream().noneMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
-        currentPageAssets.forEach(item -> selectedMap.put(item.getUid(), !isSelectedAll));
-    }
-
     public void onClinicalDeptFilter(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
         OrgInfo deptOrg = (OrgInfo) selectedNode.getData();
