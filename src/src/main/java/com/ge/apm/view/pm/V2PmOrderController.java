@@ -2830,7 +2830,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public List<String> autoCompleteSupplier(String query) {
-        supplierList = aimService.getSuplierListBySiteUid(selectedPmOrder.getTenantUID());
+        supplierList = aimService.getSuplierListBySiteUid(userContextService.getLoginUser().getTenantUID());
         List<Supplier> suList = autoCompleteService.autoCompleteVendor(query, supplierList);
         List<String> sList = new ArrayList<String>();
         suList.forEach(item -> sList.add(item.getName()));
