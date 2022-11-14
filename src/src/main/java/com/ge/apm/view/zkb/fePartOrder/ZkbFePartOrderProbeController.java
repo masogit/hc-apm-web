@@ -8,9 +8,9 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.zkb.ZkbContractAssetService;
+import com.ge.apm.service.zkb.ZkbContractCatQuotaHistoryService;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
-import com.ge.apm.service.zkb.ZkbContractCatQuotaHistoryService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -737,8 +737,22 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * 400团队同意
      * @return
      */
-    public String fullApmInfo()
-    {
+    public String fullApmInfo() {
+        //无法下载   把校验移到  后台
+        if(StringUtils.isBlank(this.selected.getOrderNo())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("Order# 输入不可为空！"));
+            return "";
+        }
+        if(StringUtils.isBlank(this.selected.getPrice())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("价格 输入不可为空！"));
+            return "";
+        }
+        if(StringUtils.isBlank(this.selected.getSecondNewCatFlag())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("是否全新探头 输入不可为空！"));
+            return "";
+        }
+
+
         Date date = new Date();
         this.selected.setFullApmInfoUser(this.userName);
         this.selected.setFullApmInfoDate(new Date());
@@ -829,8 +843,35 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * admin归还
      * @return
      */
-    public String geAdminReturn()
-    {
+    public String geAdminReturn(){
+
+        //无法下载   把校验移到  后台
+        if(StringUtils.isBlank(this.selected.getReturnType())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("归还类型 输入不可为空！"));
+            return "";
+        }
+        if(StringUtils.isBlank(this.selected.getWaybillNo())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("运单号 输入不可为空！"));
+            return "";
+        }
+        if(this.selected.getReturnDate()==null){
+            WebUtil.addErrorMessage(WebUtil.getMessage("归还日期 输入不可为空！"));
+            return "";
+        }
+        if(StringUtils.isBlank(this.selected.getNewCatSn())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("新探头SN编号 输入不可为空！"));
+            return "";
+        }
+        if("DOA".equals(this.selected.getReturnType())){
+            if(StringUtils.isBlank(this.selected.getPartSerialNumber())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("Part Serial Number 输入不可为空！"));
+                return "";
+            }
+            if(StringUtils.isBlank(this.selected.getPartQualityIssue())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("故障描述 输入不可为空！"));
+                return "";
+            }
+        }
         return this.zkbFePartOrderService.geAdminReturn(this.selected,showZkbPoProbeQuotaType,this.userUid,this.userName,this.tenantUID,this.queryStatus,this.currentUser,this.i18Map);
     }
 
