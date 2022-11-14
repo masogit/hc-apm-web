@@ -18,18 +18,7 @@
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
 
-                    <p:ajax event="filter" listener="#{unmeasuredAssetListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
-                    <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
-                    <p:column width="36"  id="checkBoxColumn" exportable="false">
-                        <p:selectBooleanCheckbox value="#{unmeasuredAssetListController.selectedMap[item.uid]}"  class="selectCheckBox">
-                            <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
-                        </p:selectBooleanCheckbox>
-                        <f:facet name="header"  >
-                            <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                <p:ajax listener="#{unmeasuredAssetListController.onSelectAllOfPage()}" update="@(.selectCheckBox) measuringTab:unmeasuredAssetListForm:datalist_unmeasuredAsset " oncomplete="updateSelectAllCheckBox();"/>
-                            </p:selectBooleanCheckbox>
-                        </f:facet>
-                    </p:column>
+                    <p:ajax event="filter" listener="#{unmeasuredAssetListController.onFilter}"/>
                     <p:column headerText="设备名称" filterBy="#{item.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.name}"/>
                     </p:column>
