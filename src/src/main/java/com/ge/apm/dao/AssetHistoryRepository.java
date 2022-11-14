@@ -51,7 +51,9 @@ public interface AssetHistoryRepository extends GenericRepositoryUUID<AssetHisto
             "  select " +
             "   uid, " +
             "   asset_dept_id as \"assetDeptId\", " +
-            "   asset_dept_uid as \"assetDeptUId\", " +
+            "   asset_dept_uid as \"assetDeptUID\", " +
+            "   clinical_dept_id as \"clinicalDeptId\", " +
+            "   clinical_dept_uid as \"clinicalDeptUID\", " +
             "   clinical_dept_name as \"clinicalDeptName\", " +
             "   location_name as \"locationName\", " +
             "   clinical_owner_name as \"clinicalOwnerName\", " +
