@@ -194,16 +194,14 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 2 }">
-                                <label class="label">机型*</label>
-                                <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}" disabled="true">
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItem itemLabel="超声高端机" itemValue="2"/>
-                                    <f:selectItem itemLabel="超声低端机" itemValue="3"/>
-                                    <f:selectItem itemLabel="超声Depot产品" itemValue="depot"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 2 }">
+                            <label class="label">机型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}" disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="超声高端机" itemValue="2"/>
+                                <f:selectItem itemLabel="超声低端机" itemValue="3"/>
+                                <f:selectItem itemLabel="超声Depot产品" itemValue="depot"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and !(empty zkbPartOrderAuditController.selected.probeQuotaType)}">
                             <label class="label">扣除名额类型*</label>
