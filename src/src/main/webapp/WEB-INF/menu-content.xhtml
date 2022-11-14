@@ -32,6 +32,7 @@
                 <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContains('asset.scrapTempMgt')}"/>
                 <p:menuitem id="um090" value="#{msg.HistoryOperations}" outcome="/portal/asset/info/HistoryOperations.xhtml" rendered="#{!userContextService.isDeparmentUser()}"/>
                 <p:menuitem id="um092" value="#{msg.AssetRiskAssessment}" outcome="/portal/asset/riskAssessment/assetRiskAssessmentList.xhtml" rendered="true"/>
+                <p:menuitem id="um093" value="#{msg.AssetAchievementsRecord}" outcome="/portal/asset/assetAchievements/assetAchievementsList.xhtml" rendered="#{userContextService.accessContains('asset.achievements')}"/>
             </p:submenu>
 
             <!--多级审批  -->

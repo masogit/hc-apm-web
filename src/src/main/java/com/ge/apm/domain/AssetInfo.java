@@ -341,7 +341,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private Integer deviceStatus;//资产状态
 
     @Column(name = "networking_status")
-    private Integer networkingStatus;  //联网状态 0 未联网  1 内网  3 外网
+    private Integer networkingStatus = 0;  //联网状态 0 未联网  1 内网  3 外网
 
     //null   1 empowerment  //这个字段不需要编辑和展示，所以只存null 和1
     @Column(name = "empowerment_status")
@@ -688,6 +688,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Getter@Setter
     @Column(name = "assessment_by")
     private String assessmentBy; //评估人员
+    @Getter@Setter
+    @Column(name = "asset_achievements")
+    private String assetAchievements; //设备绩效
 
     @Transient
     @TableField(exist = false)

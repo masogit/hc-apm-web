@@ -318,10 +318,9 @@
                                     <ui:include src="ImportantFieldsView.xhtml"/>
                                 </p:dataTable>
                             </p:panel>
-
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <h:panelGroup id="buttonGroup">
-                                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
+                                    <p:commandButton id = "saveButton" value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.checkIfRequireBeforeApplyChange()}" oncomplete="handleComplete(xhr, status, args);" validateClient="true" update="saveButton :growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
                                     <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval()}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3)}"/>
                                     <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
                                     <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.hasScrappedAuthority()}" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
@@ -377,6 +376,15 @@
         </script>
         <script>
             //<![CDATA[
+
+            function handleComplete(xhr, status, args) {
+                var unCheckedNursesiteMaintainSite = args.unCheckedNursesiteMaintainSite;
+                var toDeleteNurseMaintainSite = args.toDeleteNurseMaintainSite
+                if(unCheckedNursesiteMaintainSite==true && toDeleteNurseMaintainSite == false) {
+                    PF('toDeleteCheckedNurseSite').show()
+                }
+            }
+
             function showthis(pic) {
                 var s = $('#shwoPicDialogImg')[0]
                 s.src = pic.src;
@@ -495,5 +503,12 @@
             //]]>
         </script>
 
+        <p:dialog  widgetVar="toDeleteCheckedNurseSite"  modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">
+                <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.toDelete()}" value="是" icon="ui-icon-check"
+                                 oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
+                <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update=":growl"/>
+            </p:fieldset>
+        </p:dialog>
     </ui:define>
 </ui:composition>

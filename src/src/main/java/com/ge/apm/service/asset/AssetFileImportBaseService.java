@@ -5,9 +5,14 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.callback.MqContext;
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.callback.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -15,9 +20,15 @@ import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -124,6 +135,10 @@ public class AssetFileImportBaseService {
     @Autowired
     MvsUtil mvsUtil;
 
+    @Autowired
+    private MqUtils mqUtils;
+
+
     protected OrgInfo selectedOrgToImport;
 
     protected String assetCodeConfig;
@@ -177,6 +192,12 @@ public class AssetFileImportBaseService {
                 supportingService.importSupplierIfNeeded(selectedOrgToImport, newAssetInfo.getVendor());
             }
         });
+    }
+
+    public void deleteNursiteMaintain(List<AssetInfo> uncheckedNursiteMaintainAssetList) {
+        for (AssetInfo assetInfo : uncheckedNursiteMaintainAssetList) {
+            assetInfoBulkEditCheckService.deleteNursiteMaintain(assetInfo);
+        }
     }
 
     @Transactional
@@ -478,7 +499,14 @@ public class AssetFileImportBaseService {
         supportingService.removeParentAssetIfNotExists(newAsset);
 
         //if import status failure, already returned, will not reach here.
+        if(org.apache.commons.lang3.StringUtils.isEmpty(newAsset.getUid()) && newAsset.getId()==null){
+            String uid = UUID.randomUUID().toString().replace("-", "");
+            newAsset.setUid(uid);
+        }
+        this.saveAssetHistory( newAsset);
+
         assetDao.save(newAsset);
+
         assetDepreciationService.saveAssetDerpeciation(newAsset);
 
         supportingService.saveOrUpdateAssetTags(newAsset, rowMap);
@@ -494,9 +522,32 @@ public class AssetFileImportBaseService {
         }
 
     }
+    private void saveAssetHistory(AssetInfo newAsset) {
+        AssetInfo assetInfo = new AssetInfo();
+        BeanUtils.copyProperties(newAsset,assetInfo);
+        MqContext mqContext = new MqContext();
+        mqContext.setTime(new Date());
+        mqContext.setType("asset");
+        mqContext.setRoutingKey("asset.update");
+        mqContext.setExChange("assetChange");
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        JSONObject jsonObject =new JSONObject();
 
-    public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
 
+        assetInfo.setHospital(null);
+        assetInfo.setQrCodeLib(null);
+        assetInfo.setAssetTags(null);
+        assetInfo.setBrand(null);
+        assetInfo.setTags(null);
+        //gson序列化只与属性(字段)有关，与get开头的方法无关
+        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String str = g.toJson(assetInfo);
+        jsonObject.put("assetInfo",str);
+        jsonObject.put("currentUserAccount",currentUserAccount);
+        mqContext.setJsonObject(jsonObject);
+        mqUtils.sendToMq(mqContext);
+    }
+    public Map checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,List<AssetInfo> unCheckNurseSiteMaintainList) {
         LocalDateTime startTime = LocalDateTime.now();
 
         if (!crossSite) {
@@ -511,7 +562,9 @@ public class AssetFileImportBaseService {
             });
         }
 
-        HashSet<Boolean> result = new HashSet<>();
+        Map<String,Boolean> result = new HashMap<>();
+        result.put("canBeImport",Boolean.TRUE);
+        result.put("unCheckedNurseSite",Boolean.FALSE);
 
         int row = 0;
         for (Map<String, Object> item: importAssetMap) {
@@ -523,7 +576,7 @@ public class AssetFileImportBaseService {
                 //检查是否输入非法UUID
                 if (!tenantUID.equals(newAsset.getTenantUID())) {
                     item.put("status", ImportStatus.CheckFail);
-                    result.add(Boolean.FALSE);
+                    result.put("canBeImport",Boolean.FALSE);
                     AssetRow.addErrMessage(item, String.format("第%d行错误: 非法UUID！", row));
                     continue;
                 }
@@ -531,13 +584,13 @@ public class AssetFileImportBaseService {
 
             if (null == newAsset.getAssetGroup()) {
                 item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
+                result.put("canBeImport",Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
             }
 
             if (StringUtils.isEmpty(newAsset.getDepartNum()) && StringUtils.isEmpty(newAsset.getUid())) {
                 item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
+                result.put("canBeImport",Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
                 continue;
             }
@@ -546,28 +599,28 @@ public class AssetFileImportBaseService {
             if(zkbAccountBoolean){
                 if(StringUtils.isEmpty(newAsset.getMainDirectory())){
                     item.put("status", ImportStatus.CheckFail);
-                    result.add(Boolean.FALSE);
+                    result.put("canBeImport",Boolean.FALSE);
                     AssetRow.addErrMessage(item, "错误: 主目录名字不能为空");
                     continue;
                 }else {
                     List<ZkbFileDirectory> mainDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,newAsset.getMainDirectory());
                     if (mainDirectoryList.isEmpty()) {
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 主目录名字没有找到! "+newAsset.getMainDirectory());
                         continue;
                     }
                 }
                 if(StringUtils.isEmpty(newAsset.getSecondDirectory())){
                     item.put("status", ImportStatus.CheckFail);
-                    result.add(Boolean.FALSE);
+                    result.put("canBeImport",Boolean.FALSE);
                     AssetRow.addErrMessage(item, "错误: 子目录名字不能为空");
                     continue;
                 }else {
                     List<ZkbFileDirectory> secondDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.SUB_DIRECTORY_LEVEL_VALUE,newAsset.getSecondDirectory());
                     if (secondDirectoryList.isEmpty()) {
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 子目录名字找不到! "+newAsset.getSecondDirectory());
                         continue;
                     }
@@ -594,7 +647,7 @@ public class AssetFileImportBaseService {
                     clinicalDept = orgDao.findFirstBySiteUIDAndNameAndOrgType(newAsset.getSiteUID(), clinicalDeptName, 4);
                     if (clinicalDept == null) {
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 所属科室没有找到! " + clinicalDeptName);
                     }
 
@@ -604,13 +657,13 @@ public class AssetFileImportBaseService {
                         clinicalDept = orgDao.findFirstByParentUIDAndShortName(newAsset.getSiteUID(), clinicalDeptName);
                         if (clinicalDept == null) {
                             item.put("status", ImportStatus.CheckFail);
-                            result.add(Boolean.FALSE);
+                            result.put("canBeImport",Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误: 所属科室没有找到! " + clinicalDeptName);
                         }
                     } else {
                         if (!supportingService.isClinicalDeptExists(clinicalDeptName, importOrgMap)) {
                             item.put("status", ImportStatus.CheckFail);
-                            result.add(Boolean.FALSE);
+                            result.put("canBeImport",Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误: 所属科室没有找到! " + clinicalDeptName + ",请添加到科室列表页");
                         }
                     }
@@ -627,7 +680,7 @@ public class AssetFileImportBaseService {
                     assetDept = orgDao.findFirstBySiteUIDAndNameAndOrgType(newAsset.getSiteUID(), assetDeptName, 4);
                     if (assetDept == null) {
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 使用科室没有找到! " + assetDeptName);
                     }
                 } else {
@@ -636,13 +689,13 @@ public class AssetFileImportBaseService {
                         assetDept = orgDao.findFirstByParentUIDAndShortName(newAsset.getSiteUID(), assetDeptName);
                         if (assetDept == null) {
                             item.put("status", ImportStatus.CheckFail);
-                            result.add(Boolean.FALSE);
+                            result.put("canBeImport",Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误: 使用科室没有找到! " + assetDeptName);
                         }
                     } else {
                         if (!supportingService.isClinicalDeptExists(assetDeptName, importOrgMap)) {
                             item.put("status", ImportStatus.CheckFail);
-                            result.add(Boolean.FALSE);
+                            result.put("canBeImport",Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误: 使用科室没有找到! " + assetDeptName + ",请添加到科室列表页");
                         }
                     }
@@ -657,19 +710,19 @@ public class AssetFileImportBaseService {
                 if((!StringUtils.isEmpty(assetDeptName) && !assetDeptName.equals(assetDeptNameOld) )|| (!StringUtils.isEmpty(clinicalDeptName) && !clinicalDeptName.equals(asset.getClinicalDeptName()))){
                     if(asset.getSharedAssetTypeUid() != null){
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备已绑定调剂名称,不能修改科室");
                     }
 
                     if(!assetInfoBulkEditCheckService.verifyForMaintain(assets)){
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备有未完成的保养工单,不能修改科室");
                     }
 
                     if(!assetInfoBulkEditCheckService.verifyForInventory(assets)){
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备有未盘点的工单,不能修改科室");
                     }
                     for(AssetInfo as:assets){
@@ -685,19 +738,14 @@ public class AssetFileImportBaseService {
                                 continue;
                             }else{
                                 item.put("status", ImportStatus.CheckFail);
-                                result.add(Boolean.FALSE);
+                                result.put("canBeImport",Boolean.FALSE);
                                 AssetRow.addErrMessage(item, "错误: 设备有未完成的维修工单,不能修改科室");
                             }
                         }
                     }
 
                     //临床助手检查进行中
-                    Optional<String> optionalResult = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchImport(assets);
-                    if (optionalResult.isPresent()) {
-                        item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
-                        AssetRow.addErrMessage(item, "错误: 设备有未完成的日常检查工单,不能修改科室");
-                    }
+                    unCheckNurseSiteMaintainList.addAll(assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets));
                 }
                 if(assetDao.secondment(asset.getUid())>0){
                     boolean flag=false;
@@ -710,7 +758,7 @@ public class AssetFileImportBaseService {
                     }
                     if(flag){
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备正在科室借调中,不能修改使用科室");
                     }
                     String clinicalDeptNameOld = asset.getClinicalDeptName();
@@ -724,7 +772,7 @@ public class AssetFileImportBaseService {
                     }
                     if(flag){
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 设备正在科室借调中,不能修改所属科室");
                     }
                 }
@@ -734,14 +782,14 @@ public class AssetFileImportBaseService {
             boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(newAsset.getSiteUID(), newAsset);
             if (isDuplicate) {
                 item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
+                result.put("canBeImport",Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 设备编号重复");
             }
 
             if (!StringUtils.isEmpty(newAsset.getDepartNum())) {
                 if (newAsset.getDepartNum().length() > 64) {
                     item.put("status", ImportStatus.CheckFail);
-                    result.add(Boolean.FALSE);
+                    result.put("canBeImport",Boolean.FALSE);
                     AssetRow.addErrMessage(item, "错误: 设备编号不能超过64位");
                     continue;
                 }
@@ -752,7 +800,7 @@ public class AssetFileImportBaseService {
 
                     if (!newAsset.getDepartNum().equals(newAsset.getFinancingNum()) && !StringUtils.isEmpty(newAsset.getFinancingNum())) {
                         item.put("status", ImportStatus.CheckFail);
-                        result.add(Boolean.FALSE);
+                        result.put("canBeImport",Boolean.FALSE);
                         AssetRow.addErrMessage(item, "错误: 资产编码与设备编码不相同不允许导入");
                     } else {
                         newAsset.setFinancingNum(newAsset.getDepartNum());
@@ -770,7 +818,7 @@ public class AssetFileImportBaseService {
             if (!StringUtils.isEmpty(newAsset.getFinancingNum()) && newAsset.getFinancingNum().length() > 64) {
 
                 item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
+                result.put("canBeImport",Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 资产编码不能超过64位");
                 continue;
             }
@@ -783,7 +831,7 @@ public class AssetFileImportBaseService {
                         QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(), newAsset.getSiteUID());
                         if (qrCodeLib != null && qrCodeLib.getStatus() != 1) {
                             item.put("status", ImportStatus.CheckFail);
-                            result.add(Boolean.FALSE);
+                            result.put("canBeImport",Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
                             continue;
                         }
@@ -792,7 +840,7 @@ public class AssetFileImportBaseService {
                         boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), newAsset.getSiteUID(), 1);
                         if (!isAvailable) {
                             item.put("status", ImportStatus.CheckFail);
-                            result.add(Boolean.FALSE);
+                            result.put("canBeImport",Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + newAsset.getQrCode());
                             continue;
                         }
@@ -806,7 +854,7 @@ public class AssetFileImportBaseService {
                 SysAuthGroup selectedAuthGroup = authGroupDao.findByClassificationCode(newAsset.getMedicalApparatusClassification());
                 if (selectedAuthGroup == null) {
                     item.put("status", ImportStatus.CheckFail);
-                    result.add(Boolean.FALSE);
+                    result.put("canBeImport",Boolean.FALSE);
                     AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("medicalApparatusClassification") + "编码不存在");
                     continue;
                 }
@@ -814,20 +862,22 @@ public class AssetFileImportBaseService {
             // 县域租户添加设备性质字段，且必填
             if (newAsset.getAssetQuality() == null && userContextService.isCountyArea()) {
                 item.put("status", ImportStatus.CheckFail);
-                result.add(Boolean.FALSE);
+                result.put("canBeImport",Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 设备性质是必须的");
                 continue;
             }
 
         }
 
-
+        if (CollectionUtils.isNotEmpty(unCheckNurseSiteMaintainList)) {
+            result.put("unCheckedNurseSite",Boolean.TRUE);
+        }
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for checkData: {} seconds", duration.getSeconds());
 
-        return result.isEmpty();
+        return result;
     }
 
 }

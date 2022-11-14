@@ -1,0 +1,158 @@
+package com.ge.apm.view.measuring;
+
+import cn.hutool.core.map.MapUtil;
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.JpaCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * @author 212605082
+ * @date 2018/6/4
+ */
+@ManagedBean
+@ViewScoped
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> {
+
+    private Map<String, Boolean> selectedMap;
+    private OrgInfo filterOrg;
+    private UserAccount currentUser;
+    private List<AssetInfo> currentPageAssets;
+
+    private AssetInfoRepository dao;
+    private UaaService uaaService;
+    private TreeNode selectedNode;
+    private UserAuth customRoleAuth;
+    private OrgInfoTreeService orgInfoTreeService;
+    private AssetInfoMapper assetInfoMapper;
+
+    @Override
+    protected void init() {
+        dao = WebUtil.getBean(AssetInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        customRoleAuth = UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.MEASURE_INFO);
+        assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
+        this.selectedMap = MapUtil.newHashMap();
+        this.searchFilters = new ArrayList<>();
+    }
+
+    @Override
+    protected AssetInfoRepository getDAO() {
+        return dao;
+    }
+
+    @Override
+    protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+
+        if (!this.hasFilterOnField("siteUID")) {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
+
+        if (!this.hasFilterOnField("status")) {
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4, "1*"));
+        }
+
+        if (!this.hasFilterOnField("isValid")) {
+            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE, "1*"));
+        }
+
+        if (!this.hasFilterOnField("isDeleted")) {
+            searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE, "1*"));
+        }
+
+        if (!this.hasFilterOnField("measureGrade")) {
+            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
+            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
+        } else {
+            boolean hasNullMeasureGrade = false;
+            Integer measureGradeValue = null;
+            for (SearchFilter sf : this.searchFilters) {
+                //判断是否有计量等级的过滤条件
+                if (sf.fieldName.equals("measureGrade")) {
+                    if (sf.value == null) {
+                        hasNullMeasureGrade = true;
+                    } else {
+                        measureGradeValue = Integer.valueOf(sf.value.toString());
+                    }
+                }
+            }
+
+            //判断计量等级过滤条件是否为空
+            if (hasNullMeasureGrade) {
+                this.removeFilterOnField("measureGrade");
+                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
+                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
+            } else {
+                this.updateSearchFilter(new SearchFilter("measureGrade", SearchFilter.Operator.EQ, measureGradeValue, "1*"));
+            }
+        }
+
+        if (null != filterOrg) {
+            if (selectedNode.isLeaf()) {
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, filterOrg.getUid(), "1*"));
+            } else {
+                List<OrgInfo> allClinicals = orgInfoTreeService.collectChildClinicalDeptByParent(selectedNode);
+                List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalUids, "1*"));
+            }
+
+        } else {
+            if (this.hasFilterOnField("clinicalDeptUID")) {
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
+            }
+        }
+        this.updateSearchFilter(new SearchFilter("lastMeteringDate", SearchFilter.Operator.IsNull, null, "1*"));
+        return dao.findBySearchFilter(searchFilters, pageRequest);
+    }
+
+    @Override
+    public void onFilter(FilterEvent event) {
+        super.onFilter(event);
+        this.selectedMap.clear();
+    }
+
+    public void onClinicalDeptFilter(NodeSelectEvent event) {
+        selectedNode = event.getTreeNode();
+        OrgInfo deptOrg = (OrgInfo) selectedNode.getData();
+        if (deptOrg.getOrgType() == 4) {
+            filterOrg = deptOrg;
+        } else {
+            filterOrg = null;
+        }
+    }
+
+}

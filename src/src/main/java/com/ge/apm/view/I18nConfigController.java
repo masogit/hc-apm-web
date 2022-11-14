@@ -133,6 +133,9 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
             i18nList = dao.getByTypeAndSiteId(this.selected.getMsgKey(), -1);
         }
         removeList = new ArrayList<>();
+        // 重置
+        selectedI18n = null;
+        editI18n = null;
         super.prepareEdit();
     }
 
@@ -177,9 +180,6 @@ public class I18nConfigController extends GenericCRUDController<I18nMessage> {
         // TODO 逻辑优化
         i18nConfigService.deleteAndInsertI18n(i18nList, removeList);
         DbMessageSource.reLoadMessages();
-        // 重置
-        selectedI18n = null;
-        editI18n = null;
     }
 
     public void changeSelectTenant(){

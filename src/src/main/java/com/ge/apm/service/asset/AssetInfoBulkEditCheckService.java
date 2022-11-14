@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import webapp.framework.web.WebUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -211,6 +210,24 @@ public class AssetInfoBulkEditCheckService {
         }
         return flag;
     }
+
+    public void deleteNursiteMaintain(AssetInfo assetInfo) {
+        //删除检查项工单相关数据
+        List<NurseSiteMaintainItem> noCheckedByAssetUidAAndScheduleDate = nurseSiteMaintainItemRepository.findNoCheckedByAssetUidAAndScheduleDate(assetInfo.getUid(), new Date());
+        for(NurseSiteMaintainItem item : noCheckedByAssetUidAAndScheduleDate) {
+            nurseSiteMaintainItemRepository.deleteDataByParentId(item.getParentId());
+            nurseSiteMaintainItemRepository.delete(item.getId());
+            Set<String> idsByParentId = nurseSiteMaintainItemRepository.findIdsByParentId(item.getParentId());
+            if(CollectionUtils.isEmpty(idsByParentId)) nurseSiteMaintainItemRepository.deleteMaintainById(item.getParentId());
+        }
+        //删除检查项配置相关数据
+        List<String> parentIds = nurseSiteMaintainItemRepository.findConfigItemByAssetUid(assetInfo.getUid());
+        nurseSiteMaintainItemRepository.deleteMaintainConfigItemByAssetUid(assetInfo.getUid());
+        for(String parentId : parentIds) {
+            int configItemCountByParentId = nurseSiteMaintainItemRepository.findConfigItemCountByParentId(parentId);
+            if(configItemCountByParentId < 1) nurseSiteMaintainItemRepository.deleteMaintainConfigById(parentId);
+        }
+    }
     /**
      * 批量导入资产时
      * @param assets
@@ -239,7 +256,7 @@ public class AssetInfoBulkEditCheckService {
         return Optional.empty();
     }
 
-    public List<AssetInfo>verifyForNurseSiteByBatchEdit(List<AssetInfo> assets) {
+    public List<AssetInfo> verifyForNurseSiteByBatchEdit(List<AssetInfo> assets) {
         List<AssetInfo> list = new ArrayList<>();
         for(AssetInfo as: assets){
             //临床助手检查进行中
@@ -256,11 +273,9 @@ public class AssetInfoBulkEditCheckService {
                         list.add(as);
                     }
                 }
-                return list;
             }
         }
-
-        return null;
+        return list;
     }
 
 }

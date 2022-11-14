@@ -61,8 +61,7 @@ public class DateUtil {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		cal.add(Calendar.MONTH, month);
-		Date  time = cal.getTime();
-		return time;
+		return cal.getTime();
 	}
 
 	/**
