@@ -681,10 +681,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public String checkIfRequireBeforeApplyChange() {
         if(!unCheckedNursesiteMaintainSite && selected.getUid()!=null) {
-            AssetInfo old = dao.findByUid(selected.getUid());
-            if(old.getClinicalDeptId()!=selected.getClinicalDeptId()) {
+            if(selectedObjectMap.get("clinicalDeptOld")!=null && selectedObjectMap.get("clinicalDeptOld")!=selected.getClinicalDeptId()) {
                 List<AssetInfo> assets = new ArrayList<>();
-                assets.add(old);
+                assets.add(dao.findByUid(selected.getUid()));
                 unCheckNurseSiteMaintain = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets);
                 if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain)) {
                     unCheckedNursesiteMaintainSite = true;
@@ -1209,6 +1208,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         switch (idx) {
             case "clinicalDept":
                 clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
+                if(selectedObjectMap.get("clinicalDeptOld")==null) {
+                    selectedObjectMap.put("clinicalDeptOld",selected.getClinicalDeptUID());
+                }
                 selected.setClinicalDeptId(clinicalDept == null ? null : clinicalDept.getId());
                 selected.setClinicalDeptName(clinicalDept == null ? null : clinicalDept.getName());
                 selected.setClinicalDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
