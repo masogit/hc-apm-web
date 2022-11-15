@@ -117,7 +117,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value="select distinct u from UserAccount u, UserOrgInfo o, UserRole ur where u.uid=o.userUid and u.id=ur.userId and ur.roleId=3 and o.orgUid in ?1")
     public List<UserAccount> findByAssetAccess(List<String> uid);
 
-    @Query("select u from UserAccount u where u.orgInfoUID=?1  and (u.isDisable =false or u.isDisable is null ) and  u.id not in (select r.userId from UserRole r where r.roleId=9)")
+    @Query("select u from UserAccount u where u.orgInfoUID=?1  and (u.isDisable =false or u.isDisable is null ) and not exists (select r.userId from UserRole r where r.roleId=9 and r.userId = u.id)")
     List<UserAccount> findUsersByOrgIdExceptTemporaryAccount(String orgInfoUID);
 
     //subscirber with tag=-999 under  this assetInfo.site_UID
