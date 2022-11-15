@@ -528,6 +528,8 @@ class WorkOrderActionForm {
     String signature;
 
     List<V2_BlobObject> attachments;
+    Integer entryType;
+    List<V2_WorkOrderManHoursDetail> workHoursList;
 
     public String getRepairResult() {
         return repairResult;
@@ -759,6 +761,22 @@ class WorkOrderActionForm {
 
     public void setSignature(String signature) {
         this.signature = signature;
+    }
+
+    public Integer getEntryType() {
+        return entryType;
+    }
+
+    public void setEntryType(Integer entryType) {
+        this.entryType = entryType;
+    }
+
+    public List<V2_WorkOrderManHoursDetail> getWorkHoursList() {
+        return workHoursList;
+    }
+
+    public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
+        this.workHoursList = workHoursList;
     }
 }
 

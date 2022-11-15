@@ -74,6 +74,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -243,6 +244,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private StreamedContent signatureContentStream;
     private String signatureId;
     private boolean newSignature = true;
+
+    private V2_WorkOrderManHoursDetail selectedWorkOrderManHoursDetail;
+    private List<V2_WorkOrderManHoursDetail> workHoursList;
 
     @Override
     protected void init() {
@@ -1205,6 +1209,7 @@ public void test1(){
         signatureContentStream = null;
         signatureContent = null;
         newSignature = true;
+        workHoursList = null;
     }
 
     public void onSelectWorkOrder() {
@@ -1460,6 +1465,10 @@ public void test1(){
 
        }
 
+        if (selectedWorkOrder.getEntryType() == null) {
+            selectedWorkOrder.setEntryType(0);
+        }
+
        String result = selectedWorkOrder.getRepairResult();
        if(result!=null) {
            if (result.equalsIgnoreCase("2")||result.equalsIgnoreCase("4")) {
@@ -1491,6 +1500,11 @@ public void test1(){
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_DOCS);
+        workHoursList = getWorkOrderManHoursDetail(selectedWorkOrder.getId());
+    }
+
+    public List<V2_WorkOrderManHoursDetail> getWorkOrderManHoursDetail(String woId) {
+        return woService.getWorkOrderManHoursDetail(woId);
     }
 
     //故障类型是否必填
@@ -1567,6 +1581,17 @@ public void test1(){
                 selectedWorkOrder.setManHours(null);
             }*/
 
+        if (selectedWorkOrder.getEntryType() == 1) {
+            workHoursList = workHoursList.stream()
+                    .filter(item -> !"000".equals(item.getId()))
+                    .collect(Collectors.toList());
+            if (workHoursList == null || workHoursList.size() == 0) {
+                WebUtil.addSuccessMessage("增加工时段记录不能为空");
+                return;
+            }
+            workHoursList.forEach(item -> item.setCreatedDate(null));
+            selectedWorkOrder.setWorkHoursList(workHoursList);
+        }
 
         V2_WorkOrder_Detail tmp = new V2_WorkOrder_Detail();
         List<V2_WorkOrder_Detail> tmpList = new ArrayList<>();
@@ -1722,6 +1747,18 @@ public void test1(){
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
+
+        if (selectedWorkOrder.getEntryType() == 1) {
+            workHoursList = workHoursList.stream()
+                    .filter(item -> !"000".equals(item.getId()))
+                    .collect(Collectors.toList());
+            if (workHoursList == null || workHoursList.size() == 0) {
+                WebUtil.addSuccessMessage("增加工时段记录不能为空");
+                return;
+            }
+            workHoursList.forEach(item -> item.setCreatedDate(null));
+            selectedWorkOrder.setWorkHoursList(workHoursList);
+        }
         //将pdf的文件一起合并到图片的list中传给后台
         picList.addAll(attachList);
         //更新维修子状态
@@ -2391,6 +2428,7 @@ public void test1(){
     public void cancelWorkdetail() {
         itemDetail = null;
         coWorkerDetail = null;
+        selectedWorkOrderManHoursDetail = null;
     }
     public List<AssetFaultType> getAssetFaultType() {
         AssetInfo assetinfo = assetDao.findById(this.selectedWorkOrder.getAssetId());
@@ -2688,6 +2726,76 @@ public void test1(){
         }
             return uaList;
 
+    }
+
+    public void prepareEditWorkOrderManHoursDetail(String itemId) {
+        if ("new".equals(itemId)) {
+            selectedWorkOrderManHoursDetail = new V2_WorkOrderManHoursDetail();
+            selectedWorkOrderManHoursDetail.setId(UUID.randomUUID().toString().replace("-", ""));
+        } else {
+            selectedWorkOrderManHoursDetail = workHoursList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+        }
+    }
+
+    public V2_WorkOrderManHoursDetail getSelectedWorkOrderManHoursDetail() {
+        return selectedWorkOrderManHoursDetail;
+    }
+
+    public void setSelectedWorkOrderManHoursDetail(V2_WorkOrderManHoursDetail selectedWorkOrderManHoursDetail) {
+        this.selectedWorkOrderManHoursDetail = selectedWorkOrderManHoursDetail;
+    }
+
+    public void deleteWorkOrderManHoursDetail(String itemId) {
+        workHoursList.removeAll(workHoursList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
+        Double hours = 0d;
+        for (V2_WorkOrderManHoursDetail info : workHoursList) {
+            if (info != null && info.getHours() != null) {
+                hours = hours + info.getHours();
+            }
+        }
+        selectedWorkOrder.setManHours(hours);
+    }
+
+    public void addManHoursDetail(Date firstDate, Date secondDate) {
+        String strHours = "0";
+        long milliSeconds = secondDate.getTime() - firstDate.getTime();
+        if (milliSeconds > 0) {
+            DecimalFormat df = new DecimalFormat("0.0");
+            strHours = df.format((float) milliSeconds / (1000 * 60 * 60));
+            BigDecimal b = new BigDecimal(strHours);
+            float f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+            f1 = Float.parseFloat(df.format(f1));
+            strHours = df.format(f1);
+        } else {
+            WebUtil.addErrorMessage("结束时间不能小于开始时间");
+            return;
+        }
+        selectedWorkOrderManHoursDetail.setHours(Double.valueOf(strHours));
+        selectedWorkOrderManHoursDetail.setStartTime(firstDate);
+        selectedWorkOrderManHoursDetail.setEndTime(secondDate);
+        if (workHoursList.contains(selectedWorkOrderManHoursDetail)) {
+            workHoursList.remove(selectedWorkOrderManHoursDetail);
+        }
+        workHoursList.add(selectedWorkOrderManHoursDetail);
+        Double hours = 0d;
+        for (V2_WorkOrderManHoursDetail info : workHoursList) {
+            if (info != null && info.getHours() != null) {
+                hours = hours + info.getHours();
+            }
+        }
+        selectedWorkOrder.setManHours(hours);
+        cancelWorkdetail();
+    }
+
+    public void updateEntryType(Integer entryType) {
+        if (selectedWorkOrder == null) {
+            selectedWorkOrder = new V2_WorkOrder();
+        }
+        selectedWorkOrder.setEntryType(entryType);
+        if (entryType == 1) {
+            selectedWorkOrder.setManHours(null);
+            workHoursList = null;
+        }
     }
 
     public void setNothing(){}
@@ -3438,5 +3546,35 @@ public void test1(){
     public void setSignatureId(String signatureId) {
         this.signatureId = signatureId;
     }
+
+    public List<V2_WorkOrderManHoursDetail> getWorkHoursList() {
+        if (workHoursList == null) {
+            workHoursList = new ArrayList<>();
+        }
+        V2_WorkOrderManHoursDetail v2_WorkOrderManHoursDetail2 = new V2_WorkOrderManHoursDetail();
+        v2_WorkOrderManHoursDetail2.setId("000");
+        boolean flag = false;
+        for (V2_WorkOrderManHoursDetail info : workHoursList) {
+            String id = info.getId();
+            if ("000".equals(id)) {
+                flag = true;
+                break;
+            }
+        }
+        if (flag) {
+            workHoursList = workHoursList.stream()
+                    .filter(item -> !"000".equals(item.getId()))
+                    .collect(Collectors.toList());
+            workHoursList.add(v2_WorkOrderManHoursDetail2);
+        } else {
+            workHoursList.add(v2_WorkOrderManHoursDetail2);
+        }
+        return workHoursList;
+    }
+
+    public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
+        this.workHoursList = workHoursList;
+    }
+
 }
 
