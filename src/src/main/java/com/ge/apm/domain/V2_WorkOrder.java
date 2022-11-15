@@ -309,6 +309,18 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="order_type")
     private String orderType;
 
+    /**
+     * 填写工时选择方式 0 输入填写 , 1 多个工时段填写
+     */
+    @Column(name="entry_type")
+    private Integer entryType;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<V2_WorkOrderManHoursDetail> workHoursList;
+
     @Transient
     private String partApproveSignature;
 
@@ -965,5 +977,21 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setPartApproveSignature(String partApproveSignature) {
         this.partApproveSignature = partApproveSignature;
+    }
+
+    public Integer getEntryType() {
+        return entryType;
+    }
+
+    public void setEntryType(Integer entryType) {
+        this.entryType = entryType;
+    }
+
+    public List<V2_WorkOrderManHoursDetail> getWorkHoursList() {
+        return workHoursList;
+    }
+
+    public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
+        this.workHoursList = workHoursList;
     }
 }
