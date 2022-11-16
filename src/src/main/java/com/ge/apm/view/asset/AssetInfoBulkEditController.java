@@ -1342,7 +1342,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public void onTransfer(TransferEvent event) {
-
+        unCheckedNurseSite = false;
+        toDeleteNurseMaintainSite = false;
     }
 
     public void onTabChange(TabChangeEvent event) {
@@ -1455,6 +1456,18 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         return false;
     }
 
+    public void checkedIfNessesaryBeforeCommitBulkEditSite() {
+        unCheckedNursiteMaintainList  = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets.getTarget());
+        if(!unCheckedNurseSite && !toDeleteNurseMaintainSite && CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList)) {
+                unCheckedNurseSite = true;
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("unCheckedNurseSite", unCheckedNurseSite);
+                requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
+        } else {
+            commitBulkEditSite();
+        }
+    }
+
     public void commitBulkEditSite() {
 
         if (!checkIsValidInput()) {
@@ -1498,16 +1511,19 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             }
         }
 
-        //临床助手检查进行中
-        Optional<String> optionalResult = assetInfoBulkEditCheckService.verifyForNurseSite(selectedAssets);
-        if (optionalResult.isPresent()) {
-            WebUtil.addErrorMessage(optionalResult.get());
-            return;
-        }
         if(!assetInfoBulkEditCheckService.verifySiteToSite(selectedAssets)){
             WebUtil.addErrorMessage("有设备科室借调中，不能更换院区!");
             return;
         }
+        //临床助手检查进行中
+        if(CollectionUtils.isNotEmpty(unCheckedNursiteMaintainList) && toDeleteNurseMaintainSite) {
+            for(AssetInfo assetInfo : unCheckedNursiteMaintainList) {
+                assetInfoBulkEditCheckService.deleteNursiteMaintain(assetInfo);
+            }
+            toDeleteNurseMaintainSite = false;
+            unCheckedNurseSite = false;
+        }
+
         try {
             assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
 
