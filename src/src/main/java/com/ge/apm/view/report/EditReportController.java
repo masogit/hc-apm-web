@@ -5,6 +5,8 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -44,6 +46,8 @@ public class EditReportController {
     private UnstructuredDataCollection report;
     private TableDefinition tableDefinition;
     private boolean hasElectricSafetyData=false;
+    @Getter@Setter
+    private boolean isMaintainanceReport = true;
     @PostConstruct
     protected void init() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
@@ -60,6 +64,11 @@ public class EditReportController {
         }
         if(StringUtils.isNotEmpty(tableDefinition.getInstrumentKeyValues())){
         	hasElectricSafetyData=true;
+        }
+        if (TableDefinition.TableTemplateType.AssetAchievements.name().equals(tableDefinition.getTemplateType())) {
+            isMaintainanceReport = false;
+        } else {
+            isMaintainanceReport = true;
         }
         table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
         tableValue = new HashMap<String, Object>();

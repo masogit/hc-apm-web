@@ -19,6 +19,8 @@ import com.ge.apm.service.utils.ReportTemplateDocument;
 import com.ge.apm.service.utils.StringComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -91,6 +93,11 @@ public class TableCreateController extends TieWebSheetBean {
     // cache for exported file.
     private StreamedContent exportedFile;
 
+    @Getter@Setter
+    private boolean isMaintainanceReport = true;
+
+
+
     @Override
     public void initialLoad() {
         tableValue = new HashMap<String, Object>();
@@ -124,7 +131,6 @@ public class TableCreateController extends TieWebSheetBean {
                     WebUtil.addErrorMessage(WebUtil.getMessage("FailedToLoadExcelTemplate"));
                 }
             }
-
             if (StringUtils.isNotEmpty(selectedTableDefinition.getInstrumentKeyValues())) {
                 List<String> targetList = new ArrayList<String>();
                 listInstrumentMppingLabels.setTarget(targetList);
@@ -138,6 +144,11 @@ public class TableCreateController extends TieWebSheetBean {
                         }
                     }
                 }
+            }
+            if (TableDefinition.TableTemplateType.AssetAchievements.name().equals(selectedTableDefinition.getTemplateType())) {
+                isMaintainanceReport = false;
+            } else {
+                isMaintainanceReport = true;
             }
         }
 
@@ -607,6 +618,14 @@ public class TableCreateController extends TieWebSheetBean {
     }
 
     public void testSubmit() {
+    }
+
+    public void chengeIsMaintainanceReport() {
+        if (TableDefinition.TableTemplateType.AssetAchievements.name().equals(selectedTableDefinition.getTemplateType())) {
+            isMaintainanceReport = false;
+        } else {
+            isMaintainanceReport = true;
+        }
     }
 
     public void onSiteChange() {
