@@ -124,7 +124,7 @@
                     <p:fileUpload id="type2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{workOrderMgrController.handleFileUploadPDF}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->
-                        <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" id="entryTypeFlag">
+                        <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" id="entryTypeFlag">
                             <h:panelGroup>
                                 <label class="label">工时填写方式*</label>
                                 <p:selectOneRadio id="entryType" required="true" disabled="false" value="#{workOrderMgrController.selectedWorkOrder.entryType}"  requiredMessage="工时填写方式不能为空">
