@@ -51,8 +51,13 @@ public class EditReportController {
 
         String reportId = WebUtil.getRequestParameter("reportId");
         String action = WebUtil.getRequestParameter("action");
+        String requestSource = WebUtil.getRequestParameter("requestSource");
         report = tableService.getReportById(reportId);
-        tableDefinition = tableService.getTemplateById(report.getSchemaId());
+        if (StringUtils.isNotEmpty(requestSource) && "assetAchievements".equals(requestSource)) {
+            tableDefinition = tableService.getTemplateByBaseId(report.getSchemaId());
+        } else {
+            tableDefinition = tableService.getTemplateById(report.getSchemaId());
+        }
         if(StringUtils.isNotEmpty(tableDefinition.getInstrumentKeyValues())){
         	hasElectricSafetyData=true;
         }

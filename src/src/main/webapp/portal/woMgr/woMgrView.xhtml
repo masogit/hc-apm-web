@@ -292,6 +292,29 @@
                             </p:dataTable>
                             <br/>
 
+                            <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderManHoursDetail(woItem.id)}">
+                                <label class="label">工作时间段</label>
+                                <p:dataTable id="x4" class="cl4" value="#{workOrderMgrController.getWorkOrderManHoursDetail(woItem.id)}" var="detailItem">
+
+                                    <p:column headerText="#{msg.StartTime}">
+                                        <h:outputText value="#{detailItem.startTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.EndTime}">
+                                        <h:outputText value="#{detailItem.endTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.hourslb}">
+                                        <h:outputText value="#{detailItem.hours}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.Remark}">
+                                        <h:outputText value="#{detailItem.remark}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+
                             <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderDetail(woItem.id)}">
                                 <label class="label">#{msg.UsedPart}</label>
                                 <p:dataTable id="x3" class="cl3" value="#{workOrderMgrController.getWorkOrderDetail(woItem.id)}" var="detailItem">

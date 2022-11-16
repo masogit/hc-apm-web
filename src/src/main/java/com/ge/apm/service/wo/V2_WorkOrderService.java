@@ -71,6 +71,8 @@ public class V2_WorkOrderService {
     private UserCommonService ucService;
     @Autowired
     private ServiceRequestMsgRepository msgDao;
+    @Autowired
+    private WorkOrderManHoursDetailRepository workOrderManHoursDetailRepository;
 
     public V2_WorkOrder getWorkOrderById(String woId) {
         return woDao.findById(woId);
@@ -395,6 +397,11 @@ public class V2_WorkOrderService {
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
         formData.setPatTests(selectedWorkOrder.getPatTests());
+        formData.setEntryType(selectedWorkOrder.getEntryType());
+
+        if(selectedWorkOrder.getEntryType() == 1){
+            formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
+        }
         if (null != confirmedUpTime) {
             formData.setConfirmedUpTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(confirmedUpTime));
         }
@@ -450,6 +457,10 @@ public class V2_WorkOrderService {
         formData.setExternalExpense(selectedWorkOrder.getExternalExpense());
         formData.setAttachments(attachments);
         formData.setAssigneeId(assignId);
+        formData.setEntryType(selectedWorkOrder.getEntryType());
+        if(selectedWorkOrder.getEntryType() == 1){
+            formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
+        }
         String res = srApi.invokeWorkOrderAction(token, formData, "repair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "完成"));
@@ -621,6 +632,10 @@ public class V2_WorkOrderService {
         } else {
             WebUtil.addSuccessMessage("已提交");
         }
+    }
+
+    public List<V2_WorkOrderManHoursDetail> getWorkOrderManHoursDetail(String woId) {
+        return workOrderManHoursDetailRepository.findByWoId(woId);
     }
 
     public List<Map<String, String>> getUserSignature() {
