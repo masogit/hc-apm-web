@@ -422,7 +422,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     public String getEditUrl(String achievementsUid) {
         UnstructuredDataCollection udc = unstructuredDataCollectionRepository.findCKByUIdAssetAchievements(achievementsUid);
         if (null != udc) {
-            return "/portal/reporter/EditReport.xhtml?faces-redirect=true&amp;reportId=" + udc.getId();
+            return "/portal/reporter/EditReport.xhtml?faces-redirect=true&amp;reportId=" + udc.getId() + "&amp;requestSource=assetAchievements";
         }
         return "";
     }
