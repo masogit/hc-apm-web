@@ -109,7 +109,7 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
-                        <p:tab title="#{msg.ViewExcel}">
+                        <p:tab title="#{msg.ViewExcel}" rendered="#{tableCreateController.isMaintainanceReport()}" >
                             <div class="ui-g-12 card cardTitle">
                                 <p:inputText id="pageTitle3" class="pageTitle" value="#{tableCreateController.table.title}" >
                                     <p:ajax update=":CreateTemplateForm:tabView:pageTitle2 :CreateTemplateForm:tabView:pageTitle1"  listener="#{tableCreateController.onTitleChange}"/>
@@ -130,7 +130,7 @@
                                 </p:panel>
                             </p:fieldset>
                         </p:tab>
-                        <p:tab title="#{msg.InstrumentDataImportConfiguration}">
+                        <p:tab title="#{msg.InstrumentDataImportConfiguration}" rendered="#{tableCreateController.isMaintainanceReport()}">
                             <div class="ui-g-12 card">
                             </div>
                             <h:panelGrid columns="6" id="instrumentDataImportConfig">
@@ -201,6 +201,7 @@
                                         <f:selectItem itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </c:if>
                                 </c:forEach>
+                                <p:ajax event="itemSelect" listener="#{tableCreateController.chengeIsMaintainanceReport}" update="tabView"/>
                             </p:selectOneMenu>
 
                         </h:panelGroup>
