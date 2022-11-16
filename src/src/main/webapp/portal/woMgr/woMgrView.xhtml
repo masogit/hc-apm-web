@@ -210,6 +210,10 @@
                                     <p:outputLabel value="#{woItem.patTests}" style="word-wrap: break-word;"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
+                                    <label class="label">#{msg.entryType}</label>
+                                    <p:outputLabel value="#{fieldMsg.fieldValue('hoursEntryType', woItem.entryType == null ? 0 : woItem.entryType)}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
                                     <label class="label">#{msg.manHours}</label>
                                     <p:outputLabel value="#{woItem.manHours}"/>
                                 </h:panelGroup>

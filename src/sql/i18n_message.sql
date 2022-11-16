@@ -4812,3 +4812,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customI18n','transaction','事务名称','Transaction name',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('transaction','13','参数讨论','Parameter discussion',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('transaction','14','院内招标磋商','Bidding consultation in the hospital',NULL,-1);
+-- YHAAO-17203 维修管理-web端分时段录入工时
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','entryType','工时填写方式','Hours EntryType',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('hoursEntryType','0','填写总工时','Hours EntryType',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('hoursEntryType','1','填写工时段','Hours EntryType',NULL,-1);
