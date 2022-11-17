@@ -239,17 +239,11 @@
         <script>
             //<![CDATA[
 
-            function showDialog(xhr, status, args) {
-
-            }
-
             function handleComplete(xhr, status, args) {
                 var unCheckedNurseSite = args.unCheckedNurseSite;
                 var toDeleteCheckedNurseSite = args.toDeleteCheckedNurseSite
                 if(unCheckedNurseSite==true && toDeleteCheckedNurseSite == false) {
                     PF('toDeleteCheckedNurseSite').show()
-                } else {
-                    PF('statusDialogForImport').hide()
                 }
                 PF('statusDialogForImport').hide()
             }
