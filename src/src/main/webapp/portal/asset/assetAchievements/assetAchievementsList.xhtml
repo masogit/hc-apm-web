@@ -40,7 +40,7 @@
 <!--                            <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="reportButton" title="#{msg.AssetAchievementsTemplate}" action="#{assetAchievementsController.getEditUrl(item.achievementsReport)}"    disabled="#{empty item.achievementsReport}">-->
 <!--                                <p:graphicImage name="icons/find.png" style="width: 30px; height: 30px;"/>-->
 <!--                            </p:commandLink>-->
-                            <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="editButton" title="#{msg.Edit}" actionListener="#{assetAchievementsController.prepareEdit(item)}" oncomplete="PF('assetAchievementsEditDialog').show()" update="assetAchievementsEditForm">
+                            <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="editButton" title="#{msg.Edit}" actionListener="#{assetAchievementsController.prepareEdit(item)}" oncomplete="PF('assetAchievementsEditDialog').show()" update=":assetAchievementsEditForm,:assetAchievementsEditForm:assetList">
                                 <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                             </p:commandLink>
                             <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetAchievementsController.delete(item)}" update="datalist">
