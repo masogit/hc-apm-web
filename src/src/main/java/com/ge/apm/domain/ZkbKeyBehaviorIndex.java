@@ -4,6 +4,7 @@ import com.ge.apm.service.zkb.ZkbKeyBehaviorIndexService;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -117,6 +118,13 @@ public class ZkbKeyBehaviorIndex {
     private String remark;
 
     /**
+     * ccsb备注
+     */
+    @Column(name = "remark_Ccsb")
+    @Size(min = 0, max = 256)
+    private String remarkCcsb;
+
+    /**
      * 租户名称
      */
     @Transient
@@ -220,27 +228,27 @@ public class ZkbKeyBehaviorIndex {
         Integer totalScore = new Integer(0);
         if(this.getPartReturnScore()!=null)
         {
-            totalScore=totalScore+this.getPartReturnScore();
+            totalScore=totalScore+this.getPartReturnScore();//备件归还得分
         }
         if(this.getPasteQuickResponseRateScore()!=null)
         {
-            totalScore=totalScore+this.getPasteQuickResponseRateScore();
+            totalScore=totalScore+this.getPasteQuickResponseRateScore();//二维码粘贴率得分
         }
         if(this.getApmBillingRateScore()!=null)
         {
-            totalScore=totalScore+this.getApmBillingRateScore();
+            totalScore=totalScore+this.getApmBillingRateScore();//APM开单率得分
         }
         if(this.getSatisfactoryDegreeScore()!=null)
         {
-            totalScore=totalScore+this.getSatisfactoryDegreeScore();
+            totalScore=totalScore+this.getSatisfactoryDegreeScore();//满意度回访得分
         }
         if(this.getComplianceScore()!=null)
         {
-            totalScore=totalScore+this.getComplianceScore();
+            totalScore=totalScore+this.getComplianceScore();//合规及健康安全得分
         }
         if(this.getEngineerScore()!=null)
         {
-            totalScore=totalScore+this.getEngineerScore();
+            totalScore=totalScore+this.getEngineerScore();//工程师配置得分
         }
         return totalScore;
     }
@@ -457,4 +465,11 @@ public class ZkbKeyBehaviorIndex {
         this.recalculate = recalculate;
     }
 
+    public String getRemarkCcsb() {
+        return remarkCcsb;
+    }
+
+    public void setRemarkCcsb(String remarkCcsb) {
+        this.remarkCcsb = remarkCcsb;
+    }
 }
