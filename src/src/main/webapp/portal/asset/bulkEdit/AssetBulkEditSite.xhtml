@@ -159,8 +159,8 @@
 
                             </p:fieldset>
 
-                            <p:commandButton id="btnBulkEditSite" value="确认批量修改院区" actionListener="#{assetInfoBulkEditController.commitBulkEditSite}"
-                                             disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}" update="@form" class="clsBtnChangeSite"/>
+                            <p:commandButton id="btnBulkEditSite" value="确认批量修改院区" actionListener="#{assetInfoBulkEditController.checkedIfNessesaryBeforeCommitBulkEditSite}"
+                                             disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}" oncomplete="handleComplete(xhr, status, args)" update="@form" class="clsBtnChangeSite"/>
                         </p:tab>
 
 
@@ -172,6 +172,25 @@
 
             </div>
         </div>
+        <script>
+            //<![CDATA[
 
+            function handleComplete(xhr, status, args) {
+                var unCheckedNurseSite = args.unCheckedNurseSite;
+                var toDeleteNurseMaintainSite = args.toDeleteNurseMaintainSite
+                if(unCheckedNurseSite==true && toDeleteNurseMaintainSite == false) {
+                    PF('toDeleteCheckedNurseSite').show()
+                }
+            }
+
+            //]]>
+        </script>
+        <p:dialog widgetVar="toDeleteCheckedNurseSite" modal="true" class="toDeleteCheckedNurseSiteDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:fieldset legend="设备存在未完成的日常检查，需要删除吗？">
+                <p:commandButton validateClient="true" actionListener="#{assetInfoBulkEditController.todelete()}" value="是" update="bulkEditForm :growl" icon="ui-icon-check"
+                                 oncomplete="PF('toDeleteCheckedNurseSite').hide()"/>
+                <p:commandButton immediate="true" value="否" icon="ui-icon-arrow-back" oncomplete="PF('toDeleteCheckedNurseSite').hide()"  update="bulkEditForm :growl"/>
+            </p:fieldset>
+        </p:dialog>
     </ui:define>
 </ui:composition>

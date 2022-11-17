@@ -111,6 +111,9 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','asset.mgt','合同管理','Contract Management',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SupplierMgmt','供应商管理','Supplier Management',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','asset.supplierMgt','供应商管理','Supplier Management',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','asset.supplierEvaluation','供应商评价','Supplier evaluation',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SupplierEvaluation','供应商评价','Supplier evaluation',NULL,-1);
+
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AssetValueAnalysis','设备价值统计','Equipment Value Analysis',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ServiceRequestMgmt','报修管理','Request Management',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','MyWorkOrder','报修处理','Request Acceptance',NULL,-1);
@@ -4684,6 +4687,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- 预算管理 👇
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'Blank', '', ' ', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu', 'budgetMgr', '预算管理', 'Budget Management', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','budgetMgr.deptPurchaseManage','科室预算管理','Department budget management',NULL,-1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetMgr', '预算管理', 'Budget Management', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetApplication', '预算申请', 'Budget Application', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetInfo', '预算详情', 'Budget Details', NULL, -1);
@@ -4692,6 +4696,8 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'BudgetApprovalInfo', '预算审核详情', 'Budget Approval Details', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'TemporallyPurchase', '临时申购管理', 'Temporally Purchase', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'YearPurchase', '年度申购管理', 'Year Purchase', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'DeptPurchaseManage', '科室预算额度管理', 'Dept Purchase Manage', NULL, -1);
+
 
 
 
@@ -4812,3 +4818,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customI18n','transaction','事务名称','Transaction name',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('transaction','13','参数讨论','Parameter discussion',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('transaction','14','院内招标磋商','Bidding consultation in the hospital',NULL,-1);
+-- YHAAO-17203 维修管理-web端分时段录入工时
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','entryType','工时填写方式','Hours EntryType',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('hoursEntryType','0','填写总工时','Hours EntryType',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('hoursEntryType','1','填写工时段','Hours EntryType',NULL,-1);
