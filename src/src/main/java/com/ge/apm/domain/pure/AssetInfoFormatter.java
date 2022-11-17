@@ -949,6 +949,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("powerOnThreshold"), assetInfo.getPowerOnThreshold());
         map.put(getMessage("assetQuality"), this.getAssetQualityAsString());
         map.put(getMessage("currentId"), assetInfo.getCurrentId());
+        map.put(getMessage("assetUsedLifecycle"), assetInfo.getAssetUsedLifecycle());
         return map;
 
     }

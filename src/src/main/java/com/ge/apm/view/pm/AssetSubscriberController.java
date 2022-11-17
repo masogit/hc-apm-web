@@ -1,5 +1,6 @@
 package com.ge.apm.view.pm;
 
+import cn.hutool.core.collection.ListUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
@@ -362,25 +363,27 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 	public void saveAssetSub(){
         MessageSubscriber msgsub= null;
-        List<MessageSubscriber> msgsubList = new ArrayList<MessageSubscriber>();
+        List<MessageSubscriber> msgsubList = new ArrayList<>();
 		if(this.getCRUDActionName().equals(WebUtil.getMessage("Create"))) {
 			if(targetAssets.isEmpty()){
 				WebUtil.addErrorMessage(WebUtil.getMessage("EquipmentMustBeSelectedErrMsg"));
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
-				msgsubList = new ArrayList<MessageSubscriber>();
 				return;
 			}
 			/* 如果加上合同等消息推送 替换成这个if
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
 					selected.getContractDueHit()==false && selected.getMeterHit()==false && selected.getIsReceiveTimeoutMsg()==false){*/
-				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false ){
-					if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh") && selected.getMeterHit()==false){
-						WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
-					}else{
-						WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
-					}
-				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
-				msgsubList = new ArrayList<MessageSubscriber>();
+            List<Boolean> messages = ListUtil.toList(selected.getLevel0(), selected.getLevel1(), selected.getLevel2(), selected.getIsReceiveTimeoutMsg(),
+                    selected.getMeterHit(), selected.getExpirationReminderEvent());
+//            if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false ){
+//                if((LocaleHolder.getLocale().toString().equalsIgnoreCase("zh") && selected.getMeterHit()==false) || selected.getExpirationReminderEvent()==false){
+//                    WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
+//                } else {
+//                    WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
+//                }
+            if (!messages.contains(Boolean.TRUE)) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
+                RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;
 			}
 
@@ -388,7 +391,6 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
 					WebUtil.addErrorMessage(WebUtil.getMessage("BeSureToSelectPriority"));
 					RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
-					msgsubList = new ArrayList<MessageSubscriber>();
 					return;
 				}
 			}
@@ -409,6 +411,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 				msgsub.setContractDueHit(selected.getContractDueHit());
 				msgsub.setMainRepHit(selected.getMainRepHit());
 				msgsub.setMeterHit(selected.getMeterHit());
+				msgsub.setExpirationReminderEvent(selected.getExpirationReminderEvent());
 				msgsub.setTenantUID(assetInfo.getTenantUID());
 				msgsub.setHospitalUID(assetInfo.getHospitalUID());
 				msgsub.setInstitutionUID(assetInfo.getInstitutionUID());
@@ -443,7 +446,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			/* 如果加上合同等消息推送 替换成这个if
 			* if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
 					selected.getContractDueHit()==false && selected.getMeterHit()==false)*/
-			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getMeterHit()==false){
+			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getMeterHit()==false && selected.getExpirationReminderEvent()==false){
 				WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;
