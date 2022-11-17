@@ -14,11 +14,13 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class DeptPurchaseController {
     @Getter@Setter
-    private List<DeptPurchaseLog> summary = new ArrayList<>();
+    private List<DeptPurchaseLog> summary;
     @Getter@Setter
-    private List<DeptPurchaseLog> logList = new ArrayList<>();
+    private List<DeptPurchaseLog> logList;
 
     public List<DeptPurchaseLog> getSummary(){
+        summary = new ArrayList<>();
+        logList = new ArrayList<>();
         logList.add(DeptPurchaseLog.builder().yearPurchase("2022").amount(new BigDecimal("100")).clinicalDeptName("放射科").remark("2022预算").recordDate("2022-01-01 10:20:30").build());
         logList.add(DeptPurchaseLog.builder().yearPurchase("2022").amount(new BigDecimal("100")).clinicalDeptName("影像科").remark("2022预算").recordDate("2022-01-01 10:20:30").build());
         logList.add(DeptPurchaseLog.builder().yearPurchase("2021").amount(new BigDecimal("100")).clinicalDeptName("放射科").remark("2021预算").recordDate("2022-01-01 10:20:30").build());
@@ -32,6 +34,8 @@ public class DeptPurchaseController {
     }
 
     public List<DeptPurchaseLog> getLogList(){
+        logList = new ArrayList<>();
+        summary = new ArrayList<>();
         logList.add(DeptPurchaseLog.builder().yearPurchase("2022").amount(new BigDecimal("100")).clinicalDeptName("放射科").remark("2022预算").recordDate("2022-01-01 10:20:30").build());
         logList.add(DeptPurchaseLog.builder().yearPurchase("2022").amount(new BigDecimal("100")).clinicalDeptName("影像科").remark("2022预算").recordDate("2022-01-01 10:20:30").build());
         logList.add(DeptPurchaseLog.builder().yearPurchase("2021").amount(new BigDecimal("100")).clinicalDeptName("放射科").remark("2021预算").recordDate("2022-01-01 10:20:30").build());
@@ -41,7 +45,7 @@ public class DeptPurchaseController {
         logList.add(DeptPurchaseLog.builder().yearPurchase("2019").amount(new BigDecimal("100")).clinicalDeptName("放射科").remark("2019预算").recordDate("2022-01-01 10:20:30").build());
         summary = logList.stream().collect(Collectors.toMap(key -> summaryKey(key), value -> value
                 , (o, n) -> summaryAmount(o, n))).values().stream().collect(Collectors.toList());
-        return summary;
+        return logList;
     }
 
 

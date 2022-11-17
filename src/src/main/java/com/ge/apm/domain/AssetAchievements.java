@@ -47,6 +47,9 @@ public class AssetAchievements implements Serializable{
 	@Column(name="site_uid",columnDefinition = "CHAR(32)")
 	private String siteUID;
 
+	@Column(name="user_uid",columnDefinition = "CHAR(32)")
+	private String userUid;
+
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "site_id")
@@ -54,6 +57,9 @@ public class AssetAchievements implements Serializable{
     
     @Column(name="uid",columnDefinition = "CHAR(32)")
     private String uid;
+
+	@Column(name="asset_uid")
+	private String assetUid;
     
     @Column(name = "achievements_report")
 	private String achievementsReport;//绩效报告
