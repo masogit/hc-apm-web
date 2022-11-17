@@ -33,6 +33,7 @@
                 <p:menuitem id="um090" value="#{msg.HistoryOperations}" outcome="/portal/asset/info/HistoryOperations.xhtml" rendered="#{!userContextService.isDeparmentUser()}"/>
                 <p:menuitem id="um092" value="#{msg.AssetRiskAssessment}" outcome="/portal/asset/riskAssessment/assetRiskAssessmentList.xhtml" rendered="true"/>
                 <p:menuitem id="um093" value="#{msg.AssetAchievementsRecord}" outcome="/portal/asset/assetAchievements/assetAchievementsList.xhtml" rendered="#{userContextService.accessContains('asset.achievements')}"/>
+                <p:menuitem id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.versionContains('asset.supplierEvaluation')}"/>
             </p:submenu>
 
             <!--多级审批  -->
@@ -124,6 +125,8 @@
                             rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
                 <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/YearPurchase/YearList.xhtml"
                             rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
+                <p:menuitem value="#{msg.DeptPurchaseManage}" outcome="/portal/budget/deptPurchase/deptPurchaseManage.xhtml" rendered="#{userContextService.versionContains('budgetMgr.deptPurchaseManage')}"/>
+
             </p:submenu>
 
             <p:submenu id="um25" label="#{msg.MyTrain}" icon="fa fa-check-square-o" rendered="#{userContextService.isAccessMyTrain()}">
