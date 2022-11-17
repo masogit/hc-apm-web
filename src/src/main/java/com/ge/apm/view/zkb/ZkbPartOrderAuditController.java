@@ -982,15 +982,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(StrUtil.isEmpty(selected.getReturnType())){
                     errorLog.append("归还类型不能为空，\r\n");
                 }
-                if(StrUtil.isEmpty(selected.getPartSerialNumber())){
-                    errorLog.append("Part Serial Number不能为空，\r\n");
+                if("DOA".equals(selected.getReturnType())){
+                    if(StrUtil.isEmpty(selected.getPartSerialNumber())){
+                        errorLog.append("Part Serial Number不能为空，\r\n");
+                    }
+                    if(StrUtil.isEmpty(selected.getPartQualityIssue())){
+                        errorLog.append("故障描述不能为空，\r\n");
+                    }
                 }
-                if(StrUtil.isEmpty(selected.getPartQualityIssue())){
-                    errorLog.append("故障描述不能为空，\r\n");
-                }
-                if(selected.getReturnQty() != null){
-                    errorLog.append("归还数量不能为空，\r\n");
-                }
+
                 if(StrUtil.isEmpty(selected.getWaybillNo())){
                     errorLog.append("运单号不能为空，\r\n");
                 }

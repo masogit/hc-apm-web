@@ -1231,31 +1231,6 @@ public void test1(){
         return pList;
     }
 
-    public Double getTotalPrice(String id,Double totalPrice){
-        List<V2_WorkOrder_Detail> WorkOrderDetails = getWorkOrderDetail(id);
-
-        Double totalPriceToTotal = totalPrice != null ? totalPrice : 0;
-        double detail = 0;
-        double detailOld = 0;
-        for(V2_WorkOrder_Detail item : WorkOrderDetails){
-//            if(item.getApartsQuantity() != null && item.getPartsPrice() != null){
-//                detailOld += item.getApartsQuantity() * item.getPartsPrice();
-//            }
-            V2_WorkOrder workOrderById = woService.getWorkOrderById(item.getWoId());
-            detail=workOrderById.getTotalPrice();
-//            if(item.getClosedPrice() != null){
-//                detail += item.getClosedPrice();
-//            }
-        }
-//        double total = 0;
-//        if(totalPriceToTotal == 0 ){
-//            total= detail;
-//        }else{
-//            total= totalPriceToTotal - detailOld + detail;
-//        }
-        return detail;
-    }
-
     /*
      *   if type =1 -->picList
      *
