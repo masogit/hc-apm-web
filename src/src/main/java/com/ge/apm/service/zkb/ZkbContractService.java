@@ -709,6 +709,32 @@ public class ZkbContractService {
             if(nullToZero(oldContract.getProbeQuotaUse()) - nullToZero(zkbContract.getProbeQuotaUse()) != 0){
                 f = true;
             }
+        } else if(ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString().equals(orderType)){
+            if(nullToZero(oldContract.getCcsbMaintenanceQuota()) - nullToZero(zkbContract.getCcsbMaintenanceQuota()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getCcsbMaintenanceQuotaTotal()) - nullToZero(zkbContract.getCcsbMaintenanceQuotaTotal()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getCcsbMaintenanceQuotaApply()) - nullToZero(zkbContract.getCcsbMaintenanceQuotaApply()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getCcsbMaintenanceQuotaUse()) - nullToZero(zkbContract.getCcsbMaintenanceQuotaUse()) != 0){
+                f = true;
+            }
+        } else if(ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.toString().equals(orderType)){
+            if(nullToZero(oldContract.getPartHighQuota()) - nullToZero(zkbContract.getPartHighQuota()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getPartHighQuotaTotal()) - nullToZero(zkbContract.getPartHighQuotaTotal()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getPartHighQuotaApply()) - nullToZero(zkbContract.getPartHighQuotaApply()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getPartHighQuotaUse()) - nullToZero(zkbContract.getPartHighQuotaUse()) != 0){
+                f = true;
+            }
         }
         if(f){
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractUpdate",orderType,ZkbContract.class.getSimpleName(),currentUser,null);
