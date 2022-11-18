@@ -38,7 +38,7 @@
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{supplierEvaluationController.onFilter}" oncomplete="rc();"/>
 
-                        <p:column headerText="#{msg.SupplierName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.SupplierRealName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbHistory_type}" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="LIKE">
