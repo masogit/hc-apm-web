@@ -138,17 +138,14 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     }
 
     public void setUserSearchFilters() {
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
-        if (!ObjectUtils.isEmpty(selectSite)) {
-            String[] fields = new String[]{"siteUID", "hospitalUID", "institutionUID"};
-            Arrays.asList(fields).forEach(field -> this.updateSearchFilter(new SearchFilter(field, SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+")));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
-        }
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
         if (null != assetGroup) {
-            this.updateSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,  assetGroup, "1*"));
+            this.updateSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,  assetGroup, "2*"));
         } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetGroup".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetGroup".equals(item.fieldName) && item.conditionPath.equals("2*")).collect(Collectors.toList()));
         }
         if (!StringUtils.isEmpty(functionType)) {
             this.updateSearchFilter(new SearchFilter("functionType", SearchFilter.Operator.LIKE,  functionType, "1*3+"));
@@ -194,15 +191,15 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     }
 
     public void delete(AssetAchievements assetAchievements) {
-        assetSearchFilters = new ArrayList<>();
-        selected = assetAchievements;
-        setAssetSearchFilters();
-        List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(assetSearchFilters);
-        assetInfos.forEach(assetInfo -> {
-            assetInfo.setAssetAchievements(null);
-            assetInfoRepository.save(assetInfos);
-        });
-        selected = null;
+//        assetSearchFilters = new ArrayList<>();
+//        selected = assetAchievements;
+//        setAssetSearchFilters();
+//        List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(assetSearchFilters);
+//        assetInfos.forEach(assetInfo -> {
+//            assetInfo.setAssetAchievements(null);
+//            assetInfoRepository.save(assetInfos);
+//        });
+//        selected = null;
         assetAchievementsRepository.delete(assetAchievements);
     }
 
@@ -220,11 +217,14 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
             selected.setSiteId(selectSite.getSiteId());
             selected.setTenantUID(selectSite.getTenantUID());
         }
+        selected.setUserUid(UserContextService.getCurrentUserAccount().getUid());
         setAssetToAchievements();
         assetAchievementsRepository.save(selected);
         unstructuredDataCollectionRepository.save(buildUdc(selected));
-        selectedAssetInfo.setAssetAchievements(selected.getUid());
+        selected.setAssetUid(selectedAssetInfo.getUid());
+        //selectedAssetInfo.setAssetAchievements(selected.getUid());
         assetInfoRepository.save(selectedAssetInfo);
+        searchFilters.clear();
         WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
     }
 
@@ -248,13 +248,9 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     }
 
     public void cancelSave(){
-        if(crudActionName.equalsIgnoreCase("Create")){
-            prepareCreate();
-            removeReportTemplate();
-        }
-        if(crudActionName.equalsIgnoreCase("Edit")){
-            prepareEdit();
-        }
+        selected = null;
+        selectedAssetInfo = null;
+        searchAsset();
     }
 
     public void removeReportTemplate() {
@@ -290,14 +286,18 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     }
 
     public void setAssetSearchFilters() {
-        assetSearchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
-        if (!ObjectUtils.isEmpty(selectSite)) {
-            assetSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID(), "1*5+"));
-            assetSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getHospitalUID(), "1*5+"));
-            assetSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getInstitutionUID(), "1*5+"));
-        } else {
-            assetSearchFilters.removeAll(assetSearchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
-        }
+        assetSearchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        assetSearchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+        assetSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+        assetSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+        assetSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+//        if (!ObjectUtils.isEmpty(selectSite)) {
+//            assetSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID(), "1*"));
+//            assetSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getHospitalUID(), "1*"));
+//            assetSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getInstitutionUID(), "1*"));
+//        } else {
+//            assetSearchFilters.removeAll(assetSearchFilters.stream().filter(item -> item.conditionPath.equals("1*")).collect(Collectors.toList()));
+//        }
         if (selected != null) {
             if (null != selected.getAssetGroup()) {
                 assetSearchFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,  selected.getAssetGroup(), "1*"));
@@ -319,16 +319,18 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
             } else {
                 assetSearchFilters.removeAll(assetSearchFilters.stream().filter(item -> "manufacture".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
-            if (!StringUtils.isEmpty(selected.getUid())) {
-                assetSearchFilters.add(new SearchFilter("assetAchievements", SearchFilter.Operator.EQ,  selected.getUid(), "1*"));
+            if (!StringUtils.isEmpty(selected.getAssetUid())) {
+                assetSearchFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ,  selected.getAssetUid(), "1*"));
             } else {
-                assetSearchFilters.removeAll(assetSearchFilters.stream().filter(item -> "assetAchievements".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+                assetSearchFilters.removeAll(assetSearchFilters.stream().filter(item -> "uid".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
         }
     }
 
     public void searchAsset() {
-        selected.setAchievementsReport(null);
+        if (selected != null) {
+            selected.setAchievementsReport(null);
+        }
         try {
             assetSearchFilters = new ArrayList<>();
             setAssetSearchFilters();
@@ -400,9 +402,9 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         tempFilter.add(new SearchFilter("templateType", SearchFilter.Operator.EQ, TableDefinition.TableTemplateType.AssetAchievements.name()));
         tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
-        if (selected.getAssetGroup() != null) {
-            tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
-        }
+//        if (selected.getAssetGroup() != null) {
+//            tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
+//        }
         return templateDao.findBySearchFilter(tempFilter);
     }
 

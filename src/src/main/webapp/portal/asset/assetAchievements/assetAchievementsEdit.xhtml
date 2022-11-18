@@ -14,7 +14,8 @@
 			}
 		</style>
 
-        <p:dialog id="assetAchievementsEditDlg" widgetVar="assetAchievementsEditDialog" width="1000" height="480" modal="true" resizable="true" draggable="true" appendTo="@this" header="设备绩效记录">
+        <p:dialog id="assetAchievementsEditDlg" widgetVar="assetAchievementsEditDialog" width="1000" height="650" modal="true" resizable="true" draggable="true" appendTo="@this" header="设备绩效记录" closable="false">
+
             <h:form id="assetAchievementsEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -58,7 +59,7 @@
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">#{msg.RecordData}</label>
+                            <label class ="label">#{msg.RecordDate}</label>
                             <p:inputText id="recordData" value="#{assetAchievementsController.selected.recordDate}"  />
                         </h:panelGroup>
                         <h:panelGroup >
@@ -78,7 +79,7 @@
                        </h:panelGroup>
                        <h:panelGroup>
                            <label class ="label" >#{msg.templateType}</label>
-		                   <p:selectOneMenu  value="#{assetAchievementsController.selected.achievementsReport}"  disabled="#{assetAchievementsController.selected.assetGroup == null}">
+		                   <p:selectOneMenu  value="#{assetAchievementsController.selected.achievementsReport}"  >
                                <p:ajax update="report" />
                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                <f:selectItems value="#{assetAchievementsController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
@@ -91,7 +92,7 @@
                     <p:panelGrid columns="1" >
                         <h:panelGroup>
                             <label class="label">#{msg.RelatedEquipment}</label>
-                            <p:dataTable id="assetList" value="#{assetAchievementsController.assetInfoList}" var="item" widgetVar="assetList" lazy="false" paginator="false"
+                            <p:dataTable id="assetList" value="#{assetAchievementsController.assetInfoList}" style="height: 300px;width: 100%" scrollHeight="250" scrollable="true" var="item" widgetVar="assetList" lazy="false" paginator="false"
                                          selectionMode="single" selection="#{assetAchievementsController.selectedAssetInfo}"
                                          rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                 <p:column headerText="#{msg.name}">
@@ -113,8 +114,8 @@
                     update="display,:assetAchievementsEditForm, :AssetAchievementsForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'assetAchievementsEditDialog');"/>
                     &nbsp;&nbsp;
 
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetAchievementsController.cancelSave()}" icon="ui-icon-cancel"
-                    onclick="PF('assetAchievementsEditDialog').hide()" update = ":AssetAchievementsForm" />
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetAchievementsController.cancelSave()}" icon="ui-icon-cancel" update=":assetAchievementsEditForm:assetList"
+                    onclick="PF('assetAchievementsEditDialog').hide()" />
                     &nbsp;&nbsp;
                 </h:panelGroup>
             </h:form>

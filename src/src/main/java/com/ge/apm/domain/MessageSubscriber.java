@@ -99,6 +99,10 @@ public class MessageSubscriber implements Serializable {
     @Column(name = "meter_hit")
     private Boolean meterHit;
 
+    @Basic(optional = true)
+    @Column(name = "expiration_reminder_event")
+    private Boolean expirationReminderEvent;
+
     @CreatedBy
     @Column(name = "created_by", nullable = true, length = 50)
     private String createdBy;
@@ -358,6 +362,14 @@ public class MessageSubscriber implements Serializable {
 
     public Boolean getMeterHit() {
         return meterHit;
+    }
+
+    public Boolean getExpirationReminderEvent() {
+        return expirationReminderEvent;
+    }
+
+    public void setExpirationReminderEvent(Boolean expirationReminderEvent) {
+        this.expirationReminderEvent = expirationReminderEvent;
     }
 
     public void setMeterHit(Boolean meterHit) {
