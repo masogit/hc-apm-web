@@ -113,6 +113,8 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','asset.supplierMgt','供应商管理','Supplier Management',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','asset.supplierEvaluation','供应商评价','Supplier evaluation',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SupplierEvaluation','供应商评价','Supplier evaluation',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SupplierName','供应商名称','Supplier name',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SupplierRealName','供应商名称','Supplier real name',NULL,-1);
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AssetValueAnalysis','设备价值统计','Equipment Value Analysis',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ServiceRequestMgmt','报修管理','Request Management',NULL,-1);
@@ -4822,3 +4824,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','entryType','工时填写方式','Hours EntryType',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('hoursEntryType','0','填写总工时','Hours EntryType',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('hoursEntryType','1','填写工时段','Hours EntryType',NULL,-1);
+-- YHAAO-17265 新增权限组菜单
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','PermissionGroup','权限组管理','Permission group management',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'PermissionGroupSetting', '权限组设置', 'Permission group setting', NULL, '-1');
+-- YHAAO-17126 设备消息订阅添加试用到期提醒事件
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ExpirationReminderEvent', '使用到期提醒事件', 'expiration reminder event', NULL, '-1');

@@ -12,7 +12,7 @@
                 <p:fieldset legend="供应商评价基本信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierEvaluationController.selected != null}">
                         <h:panelGroup>
-                            <label class="label">#{msg.name}*</label>
+                            <label class="label">#{msg.SupplierRealName}*</label>
                             <p:inputText id="name" value="#{supplierEvaluationController.selected.name}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>

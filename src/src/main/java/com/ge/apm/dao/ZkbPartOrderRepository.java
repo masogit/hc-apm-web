@@ -59,10 +59,11 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @param orderedDate 时间
      * @param orderType 订单类型
      * @param tenantUID 租户tenantUID
+     * 探头多了400开单拒绝  技术审批拒绝  经理拒绝  400下单拒绝  commercial拒绝  400取消派工这个是人工的状态 总监审批拒绝
      * @return
      */
     @Query(value = "SELECT count(zkbp.id) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where  zkbp.order_type = ?2 and zkbp.ordered_date< ?1 " +
-            "AND (zkbp.status!='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
+            "AND (zkbp.status!='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed' and zkbp.status != 'UnOrderedReject' and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' and zkbp.status != 'DirectorReject') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
     Integer fetchUnReturnCount(Date orderedDate,String orderType,String tenantUID);
 
     /**
@@ -70,10 +71,11 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @param orderedDate 时间
      * @param orderType 订单类型
      * @param tenantUID 租户tenantUID
+     * 探头多了400开单拒绝  技术审批拒绝  经理拒绝  400下单拒绝  commercial拒绝  400取消派工这个是人工的状态 总监审批拒绝
      * @return
      */
     @Query(value = "SELECT coalesce(count(zkbp.id),0) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where zkbc.contract_type <> 'CCSB' and zkbp.order_type = ?2 and zkbp.ordered_date< ?1 " +
-            "AND (zkbp.status!='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
+            "AND (zkbp.status!='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed' and zkbp.status != 'UnOrderedReject' and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' and zkbp.status != 'DirectorReject') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
     Integer fetchUnReturnCountOfCCSB(Date orderedDate,String orderType,String tenantUID);
 
 
