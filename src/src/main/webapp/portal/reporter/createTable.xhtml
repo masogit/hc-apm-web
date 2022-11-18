@@ -194,7 +194,7 @@
                                              required="true" requiredMessage="#{msg.templateType}#{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <c:forEach var="item" items="#{fieldMsg.getFieldValueList('templateType')}">
-                                    <c:if test="#{(userContextService.accessContains('asset.achievements')) and (item.value eq '设备绩效')}">
+                                    <c:if test="#{(userContextService.versionContains('asset.achievements')) and (item.value eq '设备绩效')}">
                                         <f:selectItem itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </c:if>
                                     <c:if test="#{item.value != '设备绩效'}">
