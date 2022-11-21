@@ -68,9 +68,11 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     @Getter@Setter
     private AssetInfo selectedAssetInfo;
     @Getter@Setter
-    private AssetAchievements selected; //选定的所属院区
+    private AssetAchievements selected;
     @Getter@Setter
     private OrgInfo selectSite; //选定的所属院区
+    @Getter@Setter
+    private OrgInfo userSite; //用户所属所属层级
     @Getter@Setter
     private TreeNode orgTree;
     @Getter@Setter
@@ -138,15 +140,6 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     }
 
     public void setUserSearchFilters() {
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-        if (null != assetGroup) {
-            this.updateSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,  assetGroup, "2*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetGroup".equals(item.fieldName) && item.conditionPath.equals("2*")).collect(Collectors.toList()));
-        }
         if (!StringUtils.isEmpty(functionType)) {
             this.updateSearchFilter(new SearchFilter("functionType", SearchFilter.Operator.LIKE,  functionType, "1*3+"));
         } else {
@@ -165,6 +158,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
+        setFilters(searchFilters, userSite);
         setUserSearchFilters();
         Page<AssetAchievements> res = assetAchievementsRepository.findBySearchFilter(this.searchFilters, pageRequest);
         lastPageSort = pageRequest.getSort(); //export excel use
@@ -216,6 +210,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
             selected.setSiteUID(selectSite.getSiteUID());
             selected.setSiteId(selectSite.getSiteId());
             selected.setTenantUID(selectSite.getTenantUID());
+            selected.setOrgUid(selectSite.getUid());
         }
         selected.setUserUid(UserContextService.getCurrentUserAccount().getUid());
         setAssetToAchievements();
@@ -250,6 +245,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     public void cancelSave(){
         selected = null;
         selectedAssetInfo = null;
+        selectSite = userSite;
         searchAsset();
     }
 
@@ -285,19 +281,27 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         selected.setName(name);
     }
 
+    private void setFilters(List<SearchFilter> assetSearchFilters, OrgInfo selectSite) {
+        if (!ObjectUtils.isEmpty(selectSite)) {
+            switch (selectSite.getOrgType()) {
+                case 4:
+                    assetSearchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selectSite.getUid()));
+                case 3:
+                    assetSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID()));
+                case 2:
+                    assetSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getHospitalUID()));
+                case 1:
+                    assetSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getInstitutionUID()));
+                default:
+                    assetSearchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getTenantUID()));
+                    break;
+            }
+        }
+    }
+
     public void setAssetSearchFilters() {
         assetSearchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetSearchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-        assetSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-        assetSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-        assetSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-//        if (!ObjectUtils.isEmpty(selectSite)) {
-//            assetSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID(), "1*"));
-//            assetSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getHospitalUID(), "1*"));
-//            assetSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getInstitutionUID(), "1*"));
-//        } else {
-//            assetSearchFilters.removeAll(assetSearchFilters.stream().filter(item -> item.conditionPath.equals("1*")).collect(Collectors.toList()));
-//        }
+        setFilters(assetSearchFilters, selectSite);
         if (selected != null) {
             if (null != selected.getAssetGroup()) {
                 assetSearchFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,  selected.getAssetGroup(), "1*"));
@@ -346,7 +350,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
             this.selected = null;
             this.uploadedFile = null;
             super.prepareCreate();
-            selectSite = orgInfoRepository.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+//            selectSite = user.getOrgInfo();
             assetSearchFilters = new ArrayList<>();
             setAssetSearchFilters();
             assetInfoList = assetInfoRepository.findBySearchFilter(assetSearchFilters);
@@ -359,7 +363,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         isDisabel = true;
         selected = assetAchievements;
         super.prepareEdit();
-        selectSite = orgInfoRepository.findByUid(selected.getSiteUID());
+//        selectSite = orgInfoRepository.findByUid(selected.getSiteUID());
         assetSearchFilters = new ArrayList<>();
         setAssetSearchFilters();
         assetInfoList = assetInfoRepository.findBySearchFilter(assetSearchFilters);
@@ -375,22 +379,26 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     }
 
     public void initOrgTree() {
-        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(user.getSiteUID(), user.getUid());
-        OrgInfo rootOrg = new OrgInfo();
-        rootOrg.setId(-1);
-        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        orgTree = new DefaultTreeNode("root", null, null);
-        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-        if (null != treeNode) {
-            rootNode.getChildren().add(treeNode);
-        }
-        rootNode.setExpanded(true);
+       // TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(user.getSiteUID(), user.getUid());
+        orgTree = uaaService.getOrgAccessTreeByUser(user);
+        selectSite = (OrgInfo) orgTree.getChildren().get(0).getData();
+        userSite = (OrgInfo) orgTree.getChildren().get(0).getData();
+//        OrgInfo rootOrg = new OrgInfo();
+//        rootOrg.setId(-1);
+//        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+//        orgTree = new DefaultTreeNode("root", null, null);
+//        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+//        if (null != treeNode) {
+//            rootNode.getChildren().add(treeNode);
+//        }
+//        rootNode.setExpanded(true);
     }
 
     public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         selectSite = (OrgInfo) node.getData();
         selected.setSiteUID(selectSite.getSiteUID());
+        searchAsset();
     }
 
     public List<String> getSupplier(String name){
