@@ -682,7 +682,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public String checkIfRequireBeforeApplyChange() {
         if(!unCheckedNursesiteMaintainSite && selected.getUid()!=null) {
             AssetInfo old = dao.findByUid(selected.getUid());
-            if(old.getClinicalDeptId()!=selected.getClinicalDeptId()) {
+            Integer oldClinicalId = old.getClinicalDeptId() == null ? 0 : old.getClinicalDeptId();
+            Integer newClinicalId = selected.getClinicalDeptId() == null ? 0 : selected.getClinicalDeptId();
+            if(oldClinicalId != newClinicalId) {
                 List<AssetInfo> assets = new ArrayList<>();
                 assets.add(old);
                 unCheckNurseSiteMaintain = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets);
