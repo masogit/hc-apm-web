@@ -684,7 +684,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             AssetInfo old = dao.findByUid(selected.getUid());
             Integer oldClinicalId = old.getClinicalDeptId() == null ? 0 : old.getClinicalDeptId();
             Integer newClinicalId = selected.getClinicalDeptId() == null ? 0 : selected.getClinicalDeptId();
-            if(!oldClinicalId.equals(newClinicalId)) {
+            if((!oldClinicalId.equals(newClinicalId)) || (old.getAssetDeptUID() != selected.getAssetDeptUID()) ) {
                 List<AssetInfo> assets = new ArrayList<>();
                 assets.add(old);
                 unCheckNurseSiteMaintain = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets);
