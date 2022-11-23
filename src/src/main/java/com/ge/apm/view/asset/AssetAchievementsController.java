@@ -72,7 +72,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     @Getter@Setter
     private OrgInfo selectSite; //选定的所属院区
     @Getter@Setter
-    private OrgInfo userSite; //用户所属所属层级
+    private List<OrgInfo> userSite; //用户所属所属层级
     @Getter@Setter
     private TreeNode orgTree;
     @Getter@Setter
@@ -158,7 +158,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        setFilters(searchFilters, userSite);
+        setFilters(searchFilters, userSite, "orgUid");
         setUserSearchFilters();
         Page<AssetAchievements> res = assetAchievementsRepository.findBySearchFilter(this.searchFilters, pageRequest);
         lastPageSort = pageRequest.getSort(); //export excel use
@@ -205,12 +205,12 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         }
         getName();
         if(selectSite != null){
-            selected.setInstitutionUID(selectSite.getInstitutionUID());
-            selected.setHospitalUID(selectSite.getHospitalUID());
-            selected.setSiteUID(selectSite.getSiteUID());
-            selected.setSiteId(selectSite.getSiteId());
-            selected.setTenantUID(selectSite.getTenantUID());
-            selected.setOrgUid(selectSite.getUid());
+            selected.setInstitutionUID(selectedAssetInfo.getInstitutionUID());
+            selected.setHospitalUID(selectedAssetInfo.getHospitalUID());
+            selected.setSiteUID(selectedAssetInfo.getSiteUID());
+            selected.setSiteId(selectedAssetInfo.getSiteId());
+            selected.setTenantUID(selectedAssetInfo.getTenantUID());
+            selected.setOrgUid(selectedAssetInfo.getClinicalDeptUID());
         }
         selected.setUserUid(UserContextService.getCurrentUserAccount().getUid());
         setAssetToAchievements();
@@ -245,7 +245,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
     public void cancelSave(){
         selected = null;
         selectedAssetInfo = null;
-        selectSite = userSite;
+        selectSite = null;
         searchAsset();
     }
 
@@ -281,27 +281,33 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         selected.setName(name);
     }
 
-    private void setFilters(List<SearchFilter> assetSearchFilters, OrgInfo selectSite) {
-        if (!ObjectUtils.isEmpty(selectSite)) {
-            switch (selectSite.getOrgType()) {
-                case 4:
-                    assetSearchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selectSite.getUid()));
-                case 3:
-                    assetSearchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID()));
-                case 2:
-                    assetSearchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getHospitalUID()));
-                case 1:
-                    assetSearchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getInstitutionUID()));
-                default:
-                    assetSearchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getTenantUID()));
-                    break;
-            }
+    private void setFilters(List<SearchFilter> searchFilters, List<OrgInfo> selectSite, String org) {
+        if (CollectionUtils.isEmpty(selectSite)) {
+            selectSite = userSite;
+        }
+        OrgInfo orgInfo = selectSite.get(0);
+        switch (orgInfo.getOrgType()) {
+            case 4:
+                searchFilters.add(new SearchFilter(org, SearchFilter.Operator.IN, selectSite.stream().map(OrgInfo::getUid).collect(Collectors.toList())));
+            case 3:
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getSiteUID()));
+            case 2:
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getHospitalUID()));
+            case 1:
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getInstitutionUID()));
+            default:
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getTenantUID()));
+                break;
         }
     }
 
     public void setAssetSearchFilters() {
         assetSearchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        setFilters(assetSearchFilters, selectSite);
+        if (ObjectUtils.isEmpty(selectSite)) {
+            setFilters(assetSearchFilters, userSite, "clinicalDeptUID");
+        }else {
+            setFilters(assetSearchFilters, Arrays.asList(selectSite), "clinicalDeptUID");
+        }
         if (selected != null) {
             if (null != selected.getAssetGroup()) {
                 assetSearchFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,  selected.getAssetGroup(), "1*"));
@@ -350,7 +356,6 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
             this.selected = null;
             this.uploadedFile = null;
             super.prepareCreate();
-//            selectSite = user.getOrgInfo();
             assetSearchFilters = new ArrayList<>();
             setAssetSearchFilters();
             assetInfoList = assetInfoRepository.findBySearchFilter(assetSearchFilters);
@@ -363,7 +368,7 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
         isDisabel = true;
         selected = assetAchievements;
         super.prepareEdit();
-//        selectSite = orgInfoRepository.findByUid(selected.getSiteUID());
+        selectSite = orgInfoRepository.findByUid(selected.getOrgUid());
         assetSearchFilters = new ArrayList<>();
         setAssetSearchFilters();
         assetInfoList = assetInfoRepository.findBySearchFilter(assetSearchFilters);
@@ -380,9 +385,11 @@ public class AssetAchievementsController extends JpaCRUDController<AssetAchievem
 
     public void initOrgTree() {
        // TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(user.getSiteUID(), user.getUid());
+        userSite = new ArrayList<>();
         orgTree = uaaService.getOrgAccessTreeByUser(user);
-        selectSite = (OrgInfo) orgTree.getChildren().get(0).getData();
-        userSite = (OrgInfo) orgTree.getChildren().get(0).getData();
+        orgTree.getChildren().forEach(item -> userSite.add((OrgInfo) item.getData()));
+        //selectSite = (OrgInfo) orgTree.getChildren().get(0).getData();
+        //userSite = (OrgInfo) orgTree.getChildren().get(0).getData();
 //        OrgInfo rootOrg = new OrgInfo();
 //        rootOrg.setId(-1);
 //        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
