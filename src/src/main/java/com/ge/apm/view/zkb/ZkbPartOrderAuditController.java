@@ -994,7 +994,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(StrUtil.isEmpty(selected.getWaybillNo())){
                     errorLog.append("运单号不能为空，\r\n");
                 }
-                if(selected.getReturnDate() != null){
+                if(selected.getReturnDate() == null){
                     errorLog.append("归还日期不能为空，\r\n");
                 }
                 if(StrUtil.isEmpty(selected.getNewCatSn())){
