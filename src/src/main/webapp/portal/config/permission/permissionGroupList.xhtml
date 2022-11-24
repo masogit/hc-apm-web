@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:p="http://primefaces.org/ui"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="#{msg.PermissionGroup}"/>
+			</div>
+			<div class="ui-g-12 card">
+				<h:form id="PermissionGroupListForm">
+					<p:dataTable id="datalist" value="#{permissionGroupController.lazyModel}" var="item" widgetVar="varDataList"
+								 selectionMode="single" selection="#{permissionGroupController.selected}"
+								 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+								 sortMode="single" sortBy="#{item.uid}" sortOrder="descending"
+								 paginatorTemplate="{CurrentPageReport}  {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {JumpToPageDropdown} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+								 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+								 emptyMessage="#{msg.noRecordFound}" rows="20"
+								 rowsPerPageTemplate="20,50,100,500">
+
+						<p:ajax event="rowSelect" update="editButton"/>
+						<p:ajax event="filter" listener="#{permissionGroupController.onFilter}"/>
+						<p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.name}"/>
+						</p:column>
+						<f:facet name="{Toolbar}">
+							<p:commandButton id="createButton" actionListener="#{permissionGroupController.prepareCreate}" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":permissionGroupEditDlg" oncomplete="PF('permissionGroupEditDialog').show()"/>
+							<p:commandButton id="editButton" actionListener="#{permissionGroupController.prepareEdit}" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" update=":permissionGroupEditDlg" oncomplete="PF('permissionGroupEditDialog').show()" disabled="#{empty permissionGroupController.selected}"/>
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</div>
+		</div>
+		<ui:include src="permissionGroupEdit.xhtml"/>
+	</ui:define>
+</ui:composition>

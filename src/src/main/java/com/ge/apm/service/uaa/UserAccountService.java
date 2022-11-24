@@ -368,7 +368,7 @@ public class UserAccountService {
 	}
 
 	public List<String> getLoginNameBySiteUid(String siteUid) {
-		return userAccountMapper.getLoginNameBySiteUid(siteUid);
+		return userAccountMapper.getBySiteUid(siteUid).stream().map(UserAccount::getLoginName).distinct().collect(Collectors.toList());
 	}
 
     public String getDefaultLanguage(String loginName) {

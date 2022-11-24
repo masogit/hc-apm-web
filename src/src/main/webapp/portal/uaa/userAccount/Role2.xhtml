@@ -8,7 +8,6 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:composition>
-
         <p:dialog id="RoleEditDlg2" widgetVar="RoleEditDialog2" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.AssignRole}">
             <h:form id="UserRoleEditForm2">
                 <h:panelGroup id="display2">
@@ -90,6 +89,12 @@
                                 </p:tab>
                             </c:otherwise>
                         </c:choose>
+                        <p:tab title="#{msg.PermissionGroupSetting}" class="ui-g-12" >
+                            <p:selectManyCheckbox id="permissionGroups" value="#{userAccountController.assignedPermissionGroupNames}" layout="pageDirection" valueChangeListener="#{userAccountController.permissionGroupChangeListener}">
+                                <p:ajax update=":userAccountTab:UserRoleEditForm2:tabview2:permissionGroups"/>
+                                <f:selectItems value="#{userAccountController.permissionGroups}" var="permissionGroupItem" itemValue="#{permissionGroupItem.uid}" itemLabel="#{permissionGroupItem.name}"/>
+                            </p:selectManyCheckbox>
+                        </p:tab>
                     </p:tabView>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{userAccountController.saveRoles}" value="#{msg.Save}" update="display2,:userAccountTab, :userAccountTab:UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'RoleEditDialog2');"/>
