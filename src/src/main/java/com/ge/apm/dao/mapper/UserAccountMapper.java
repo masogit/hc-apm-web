@@ -41,7 +41,7 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
             "(select hospital_id from user_account where id=#{requestorId}))")
     public List<Integer> fetchDispaterUser(@Param("requestorId") Integer requestorId, @Param("sysRole") Integer sysRole);
 
-    @Select("select id from user_account where wechat_id =#{wechatId}")
+    @Select("select id, name, wechat_id from user_account where wechat_id =#{wechatId}")
     public UserAccount getUserByWechatId(String wechatId);
 
     @Select("select id from user_account where login_name =#{loginName}")
@@ -95,7 +95,8 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
     @Select("select distinct login_name from user_account where site_id = #{siteId}")
     public List<String> getLoginNameBySiteId(Integer siteId);
 
-    @Select("select distinct login_name from user_account where tenant_uid = #{siteUid} or institution_uid = #{siteUid} or hospital_uid = #{siteUid} or site_uid = #{siteUid}")
-    public List<String> getLoginNameBySiteUid(String siteUid);
+    @Select("select id, name, login_name from user_account where is_deleted is not true and is_disable is not true and(" +
+            "tenant_uid = #{siteUid} or institution_uid = #{siteUid} or hospital_uid = #{siteUid} or site_uid = #{siteUid})")
+    public List<UserAccount> getBySiteUid(String siteUid);
 
 }

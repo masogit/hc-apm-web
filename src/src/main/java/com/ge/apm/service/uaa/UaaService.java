@@ -1,6 +1,8 @@
 package com.ge.apm.service.uaa;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.PermissionGroupMapper;
+import com.ge.apm.dao.mapper.PermissionGroupUserMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -55,6 +57,11 @@ public class UaaService {
 
     @Autowired
     private UserRoleRepository userRoleRepository;
+
+    @Autowired
+    private PermissionGroupMapper permissionGroupMapper;
+    @Autowired
+    private PermissionGroupUserMapper permissionGroupUserMapper;
 
 
 
@@ -499,6 +506,10 @@ public class UaaService {
     //origin user accessible org list
     public List<OrgInfo> getOrgListByUser(String userUid){
         return orgInfoDao.getByUser(userUid);
+    }
+
+    public List<OrgInfo> getOrgListPermissionGroup(String permissionGroupUid){
+        return orgInfoDao.getByPermissionGroup(permissionGroupUid);
     }
 
     public boolean isIbSiteAdmin(UserAccount userAccount) {
@@ -1582,5 +1593,13 @@ public class UaaService {
             zkbFePartOrderUserConfig.setTenantUid(userAccount.getTenantUID());
             zkbFePartOrderUserConfigRepository.save(zkbFePartOrderUserConfig);
         }
+    }
+
+    public List<PermissionGroup> getPermissionGroups(String siteUid) {
+        return permissionGroupMapper.getBySiteUid(siteUid);
+    }
+
+    public List<String> getPermissionGroupsByUserUid(String uid) {
+        return permissionGroupUserMapper.getPermissionGroupsByUserUid(uid);
     }
 }
