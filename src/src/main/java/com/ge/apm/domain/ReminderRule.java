@@ -1,5 +1,8 @@
 package com.ge.apm.domain;
 
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.ge.apm.domain.reminder.WechatParam;
+import com.ge.apm.domain.reminder.rule.RuleParam;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -51,5 +54,13 @@ public class ReminderRule implements Serializable {
 
     @Column(name = "parameters", columnDefinition = "text")
     private String parameters;
+
+    @Transient
+    @TableField(exist = false)
+    private RuleParam ruleParam = new RuleParam();
+
+    @Transient
+    @TableField(exist = false)
+    private WechatParam wechatParam = new WechatParam();
 
 }
