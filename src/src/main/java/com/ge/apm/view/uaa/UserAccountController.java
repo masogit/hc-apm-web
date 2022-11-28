@@ -1,5 +1,7 @@
 package com.ge.apm.view.uaa;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
@@ -467,7 +469,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private List<String> allRoles;
     private List<String> assignedRoles;
-    private List<String> assignedPermissionGroupNames;
+    private List<String> assignedPermissionGroupUidList;
 
     public List<String> getAllRoles() {
         return allRoles;
@@ -493,7 +495,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         roleListVO = new ArrayList<>();//
         assignedRoles = new ArrayList<>();
         permissionGroups = uaaService.getPermissionGroups(selected.getSiteUID());
-        assignedPermissionGroupNames = uaaService.getPermissionGroupsByUserUid(selected.getUid());
+        assignedPermissionGroupUidList = uaaService.getPermissionGroupsByUserUid(selected.getUid());
         if(loginUser.getType() != null && loginUser.getType() == UserAccount.LI_XIANG){
             SysRoleVO sysRoleVO = getVOBySysRoleName(SYSTEM_ACTIVE);
             if(sysRoleVO == null){
@@ -640,6 +642,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         uaaService.setUserRoles(selected, assignedRoles);
+        uaaService.setUserPermissionGroup(selected, assignedPermissionGroupUidList);
         updateUserScope();
         userApi.resetUser(selected.getLoginName());
         selected.getUserRoleList().clear();
@@ -1210,7 +1213,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void updateUserScope() {
 
-        Set<OrgInfo> selectedOrgList = new HashSet<>();
+        Set<OrgInfo> selectedOrgList = new HashSet<>(uaaService.getOrgListByPermissionGroup(ObjectUtil.isNotEmpty(assignedPermissionGroupUidList) ? assignedPermissionGroupUidList : ListUtil.toList("-1")));
         if(46==selected.getSiteId()){
             //only add parent if all children is selected
             readSelectedOrgTree46(accessOrgTree, selectedOrgList);
@@ -1427,17 +1430,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
 
-    }
-
-    public void permissionGroupChangeListener(ValueChangeEvent e) {
-        if (e.getPhaseId() != PhaseId.INVOKE_APPLICATION) {
-            e.setPhaseId(PhaseId.INVOKE_APPLICATION);
-            e.queue();
-            return;
-        }
-        List<String> newValues = (List<String>) e.getNewValue();
-        List<String> oldValues = (List<String>) e.getOldValue();
-        List<String> newlyCheckedPermissions = (List<String>) CollectionUtils.subtract(newValues, oldValues);
     }
 
     private Boolean agree = false;
@@ -1706,12 +1698,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.permissionGroups = permissionGroups;
     }
 
-    public List<String> getAssignedPermissionGroupNames() {
-        return assignedPermissionGroupNames;
+    public List<String> getAssignedPermissionGroupUidList() {
+        return assignedPermissionGroupUidList;
     }
 
-    public void setAssignedPermissionGroupNames(List<String> assignedPermissionGroupNames) {
-        this.assignedPermissionGroupNames = assignedPermissionGroupNames;
+    public void setAssignedPermissionGroupUidList(List<String> assignedPermissionGroupUidList) {
+        this.assignedPermissionGroupUidList = assignedPermissionGroupUidList;
     }
 
     public List<String> autoCompleteTags(String query) {

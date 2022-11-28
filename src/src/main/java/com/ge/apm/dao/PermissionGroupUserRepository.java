@@ -8,4 +8,6 @@ import webapp.framework.dao.GenericRepositoryUUID;
  */
 public interface PermissionGroupUserRepository extends GenericRepositoryUUID<PermissionGroupUser> {
 
+    void deleteByUserUid(String uid);
+
 }

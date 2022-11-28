@@ -90,7 +90,7 @@
                             </c:otherwise>
                         </c:choose>
                         <p:tab title="#{msg.PermissionGroupSetting}" class="ui-g-12" >
-                            <p:selectManyCheckbox id="permissionGroups" value="#{userAccountController.assignedPermissionGroupNames}" layout="pageDirection" valueChangeListener="#{userAccountController.permissionGroupChangeListener}">
+                            <p:selectManyCheckbox id="permissionGroups" value="#{userAccountController.assignedPermissionGroupUidList}" layout="pageDirection">
                                 <p:ajax update=":userAccountTab:UserRoleEditForm2:tabview2:permissionGroups"/>
                                 <f:selectItems value="#{userAccountController.permissionGroups}" var="permissionGroupItem" itemValue="#{permissionGroupItem.uid}" itemLabel="#{permissionGroupItem.name}"/>
                             </p:selectManyCheckbox>

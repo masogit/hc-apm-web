@@ -2,10 +2,7 @@ package com.ge.apm.view;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PermissionGroupOrgRepository;
-import com.ge.apm.dao.PermissionGroupRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
@@ -17,6 +14,7 @@ import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -42,6 +40,7 @@ public class PermissionGroupController extends GenericCRUDUUIDController<Permiss
     private UaaService uaaService;
     private UserOrgInfoRepository userOrgDao;
     private OrgInfoRepository orgInfoDao;
+    private UserAccountRepository userDao;
     private PermissionGroupOrgRepository permissionGroupOrgRepository;
 
     private TreeNode accessOrgTree;
@@ -59,6 +58,7 @@ public class PermissionGroupController extends GenericCRUDUUIDController<Permiss
         dao = WebUtil.getBean(PermissionGroupRepository.class);
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+        userDao = WebUtil.getBean(UserAccountRepository.class);
         permissionGroupOrgRepository = WebUtil.getBean(PermissionGroupOrgRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         uaaService = WebUtil.getBean(UaaService.class);
@@ -67,24 +67,58 @@ public class PermissionGroupController extends GenericCRUDUUIDController<Permiss
     @Override
     protected Page<PermissionGroup> loadData(PageRequest pageRequest) {
         searchFilters = ObjectUtil.isEmpty(searchFilters) ? ListUtil.toList() : searchFilters;
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        boolean createdByBoolean = false;
+        String value = null;
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("createdBy".equals(searchFilter.fieldName)) {
+                createdByBoolean = true;
+                value = (String)searchFilter.value;
+            }
+        }
+        if(createdByBoolean) {
+            searchFilters.removeIf(e -> e.fieldName.equals("createdBy"));
+            List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
+            List<String> loginNamList = new ArrayList<>();
+            if(!userAccountList.isEmpty()){
+                for (UserAccount userAccount:userAccountList) {
+                    loginNamList.add(userAccount.getLoginName());
+                }
+            }
+            searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
+        }
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     @Override
     public void save() {
-        dao.save(selected);
-        if ("Edit".equals(crudActionName)) {
+        if ("Create".equals(crudActionName)) {
+            selected.setTenantUid(loginUser.getTenantUID());
+            selected.setInstitutionUid(loginUser.getInstitutionUID());
+            selected.setHospitalUid(loginUser.getHospitalUID());
+            selected.setSiteUid(loginUser.getSiteUID());
+            selected.setCreatedBy(loginUser.getLoginName());
+        } else {
             updateUserScope();
         }
+        dao.save(selected);
     }
 
     @Override
     public void prepareEdit() {
         crudActionName = "Edit";
-        accessOrgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
-        List<OrgInfo> orgList = uaaService.getOrgListPermissionGroup(selected.getUid());
+        accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUid());
+        List<OrgInfo> orgList = uaaService.getOrgListByPermissionGroup(ListUtil.toList(selected.getUid()));
         setSelectedOrgTree(accessOrgTree, orgList);
         TreeNodeUtil.expandTreeNode(accessOrgTree);
+    }
+
+    public String selectCreatedBy(String loginName) {
+        UserAccount user = userDao.getByLoginName(loginName);
+        if(user != null){
+            return user.getName();
+        }
+        return null;
     }
 
     public boolean isCreateAction(){

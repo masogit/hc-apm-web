@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface PermissionGroupUserMapper extends BaseMapper<PermissionGroupUser> {
 
-    @Select("SELECT pg.* FROM permission_group pg LEFT JOIN permission_group_user pgu ON pg.uid = pgu.permission_group_uid WHERE pgu.user_uid = #{uid}")
+    @Select("SELECT pg.uid FROM permission_group pg LEFT JOIN permission_group_user pgu ON pg.uid = pgu.permission_group_uid WHERE pgu.user_uid = #{uid}")
     List<String> getPermissionGroupsByUserUid(String uid);
 }

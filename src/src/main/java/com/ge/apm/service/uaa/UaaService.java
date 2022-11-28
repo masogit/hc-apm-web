@@ -1,5 +1,6 @@
 package com.ge.apm.service.uaa;
 
+import cn.hutool.core.collection.ListUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.PermissionGroupMapper;
 import com.ge.apm.dao.mapper.PermissionGroupUserMapper;
@@ -62,6 +63,8 @@ public class UaaService {
     private PermissionGroupMapper permissionGroupMapper;
     @Autowired
     private PermissionGroupUserMapper permissionGroupUserMapper;
+    @Autowired
+    private PermissionGroupUserRepository permissionGroupUserRepository;
 
 
 
@@ -319,6 +322,19 @@ public class UaaService {
         }
     }
 
+    @Transactional
+    public void setUserPermissionGroup(UserAccount userAccount, List<String> permissionGroupUidList){
+        permissionGroupUserRepository.deleteByUserUid(userAccount.getUid());
+        List<PermissionGroupUser> saveList = ListUtil.toList();
+        for (String permissionGroupUid : permissionGroupUidList) {
+            PermissionGroupUser permissionGroupUser = new PermissionGroupUser();
+            permissionGroupUser.setPermissionGroupUid(permissionGroupUid);
+            permissionGroupUser.setUserUid(userAccount.getUid());
+            saveList.add(permissionGroupUser);
+        }
+        permissionGroupUserRepository.save(saveList);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void addZkbIbCrossUserStatus(UserAccount userAccount, List<String> newRoleNames){
         List<UserRole> old = userRoleRepository.findByUserId(userAccount.getId());
@@ -508,8 +524,8 @@ public class UaaService {
         return orgInfoDao.getByUser(userUid);
     }
 
-    public List<OrgInfo> getOrgListPermissionGroup(String permissionGroupUid){
-        return orgInfoDao.getByPermissionGroup(permissionGroupUid);
+    public List<OrgInfo> getOrgListByPermissionGroup(List<String> permissionGroupUidList){
+        return orgInfoDao.getOrgListByPermissionGroup(permissionGroupUidList);
     }
 
     public boolean isIbSiteAdmin(UserAccount userAccount) {
