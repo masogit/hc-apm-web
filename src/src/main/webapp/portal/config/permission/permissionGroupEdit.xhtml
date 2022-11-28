@@ -7,15 +7,19 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="permissionGroupEditDlg" widgetVar="permissionGroupEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="权限组管理" max-height="600" width="520">
+        <p:dialog id="permissionGroupEditDlg" widgetVar="permissionGroupEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PermissionGroup}" max-height="600" width="520">
             <h:form id="permissionGroupEditForm">
                 <h:panelGroup>
                     <p:tabView class="ui-g-12" id="tabview" style="height: 362px; overflow: auto;" dynamic="false" cache="false">
                         <p:tab title="#{msg.PermissionGroupSetting}" class="ui-g-12" >
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
-                                    <label class="label">权限组名称<span style="color:red">*</span></label>
-                                    <p:inputText id="name" value="#{permissionGroupController.selected.name}" style="width: 95%;" required="true" requiredMessage="权限组名称不可为空！"/>
+                                    <label class="label">#{msg.name}<span style="color:red">*</span></label>
+                                    <p:inputText id="name" value="#{permissionGroupController.selected.name}" style="width: 95%;" required="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.Description}</label>
+                                    <p:inputText id="description" value="#{permissionGroupController.selected.description}" style="width: 95%;"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>

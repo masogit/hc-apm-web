@@ -37,5 +37,10 @@ public class PermissionGroup implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUid;
 
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "created_by")
+    private String createdBy;
 
 }
