@@ -79,7 +79,7 @@
                             <h:outputText rendered="#{item.valueType == '8'}"
                                           value="#{superAdminConfigItemController.transferEnum(item.valueType, item.showValue,item.enumList)}"/>
                             <h:outputText rendered="#{item.valueType != '3' and item.valueType != '7' and item.valueType != '8'}"
-                                          value="#{item.showValue}"/>
+                                          value="#{item.showValue}" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"/>
                         </p:column>
                         <!--<p:column headerText="#{msg.ConfigItemUseParent}">
                             <h:outputText value="#{item.userParentConfig == 'true' ? '是' : '否'}"/>
