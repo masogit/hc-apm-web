@@ -4851,3 +4851,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'pushNum', '推送次数', 'number of push', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'reminderEvent', '提醒事件信息', 'reminder event', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name', 'reminderDate', '提醒日期', 'reminder date', NULL, '-1');
+-- YHAAO-17272 维修管理-分时段录入工时导出
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','workHourDetail','维修工时详情','Details of maintenance hours',NULL,-1);
+
