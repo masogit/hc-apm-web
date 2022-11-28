@@ -33,8 +33,8 @@
 							<h:outputText value="#{permissionGroupController.selectCreatedBy(item.createdBy)}"/>
 						</p:column>
 						<f:facet name="{Toolbar}">
-							<p:commandButton id="createButton" actionListener="#{permissionGroupController.prepareCreate}" icon="ui-icon-plus" title="#{msg.Create}" update=":permissionGroupEditDlg" oncomplete="PF('permissionGroupEditDialog').show()"/>
-							<p:commandButton id="editButton" actionListener="#{permissionGroupController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":permissionGroupEditDlg" oncomplete="PF('permissionGroupEditDialog').show()" disabled="#{empty permissionGroupController.selected}"/>
+							<p:commandButton id="createButton" actionListener="#{permissionGroupController.prepareCreate}" action="#{permissionGroupController.preparePermissionData}" icon="ui-icon-plus" title="#{msg.Create}" update=":permissionGroupEditDlg" oncomplete="PF('permissionGroupEditDialog').show()"/>
+							<p:commandButton id="editButton" actionListener="#{permissionGroupController.prepareEdit}" action="#{permissionGroupController.preparePermissionData}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":permissionGroupEditDlg" oncomplete="PF('permissionGroupEditDialog').show()" disabled="#{empty permissionGroupController.selected}"/>
 							<p:commandButton id="deleteButton" actionListener="#{permissionGroupController.delete}" icon="ui-icon-close" title="#{msg.Delete}" update="datalist" disabled="#{empty permissionGroupController.selected}">
 								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 							</p:commandButton>

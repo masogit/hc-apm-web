@@ -31,7 +31,7 @@ import java.util.Set;
 @ManagedBean
 @ViewScoped
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class PermissionGroupController extends GenericCRUDUUIDController<PermissionGroup> {
 
     private static final long serialVersionUID = -1523958787545937126L;
@@ -70,23 +70,27 @@ public class PermissionGroupController extends GenericCRUDUUIDController<Permiss
         UserAccount user = UserContextService.getCurrentUserAccount();
         boolean createdByBoolean = false;
         String value = null;
-        for (SearchFilter searchFilter :searchFilters) {
+        for (SearchFilter searchFilter : searchFilters) {
             if ("createdBy".equals(searchFilter.fieldName)) {
                 createdByBoolean = true;
-                value = (String)searchFilter.value;
+                value = (String) searchFilter.value;
             }
         }
-        if(createdByBoolean) {
+        if (createdByBoolean) {
             searchFilters.removeIf(e -> e.fieldName.equals("createdBy"));
-            List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
+            List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(), String.valueOf(value));
             List<String> loginNamList = new ArrayList<>();
-            if(!userAccountList.isEmpty()){
-                for (UserAccount userAccount:userAccountList) {
+            if (!userAccountList.isEmpty()) {
+                for (UserAccount userAccount : userAccountList) {
                     loginNamList.add(userAccount.getLoginName());
                 }
             }
             searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
         }
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, loginUser.getSiteUID(), "1*2+"));
+        searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.EQ, loginUser.getSiteUID(), "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.EQ, loginUser.getSiteUID(), "1*2+"));
+        searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.EQ, loginUser.getSiteUID(), "1*2+"));
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
@@ -104,24 +108,25 @@ public class PermissionGroupController extends GenericCRUDUUIDController<Permiss
         dao.save(selected);
     }
 
-    @Override
-    public void prepareEdit() {
-        crudActionName = "Edit";
-        accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUid());
-        List<OrgInfo> orgList = uaaService.getOrgListByPermissionGroup(ListUtil.toList(selected.getUid()));
+    public void preparePermissionData() {
+        accessOrgTree = uaaService.getOrgTreeBySite(loginUser.getTenantUID());
+        List<OrgInfo> orgList = ListUtil.toList();
+        if (ObjectUtil.isNotEmpty(selected.getUid())) {
+            orgList = uaaService.getOrgListByPermissionGroup(ListUtil.toList(selected.getUid()));
+        }
         setSelectedOrgTree(accessOrgTree, orgList);
         TreeNodeUtil.expandTreeNode(accessOrgTree);
     }
 
     public String selectCreatedBy(String loginName) {
         UserAccount user = userDao.getByLoginName(loginName);
-        if(user != null){
+        if (user != null) {
             return user.getName();
         }
         return null;
     }
 
-    public boolean isCreateAction(){
+    public boolean isCreateAction() {
         return "Create".equals(crudActionName);
     }
 
@@ -148,7 +153,7 @@ public class PermissionGroupController extends GenericCRUDUUIDController<Permiss
     private void readSelectedOrgTree(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
         if (node.isSelected()) {
             if (!node.getParent().isSelected()) {
-                selectedTreeNodeList.add((OrgInfo)node.getData());
+                selectedTreeNodeList.add((OrgInfo) node.getData());
             }
         } else {
             for (TreeNode item : node.getChildren()) {
@@ -159,12 +164,13 @@ public class PermissionGroupController extends GenericCRUDUUIDController<Permiss
 
     /**
      * 大科室下面可以有小科室，如果选择了把小科室加进来，这样不影响已有的应用
-     * @param node 可访问的组织书
+     *
+     * @param node                 可访问的组织书
      * @param selectedTreeNodeList 选中的组织列表
      */
     private void addMissingChildClinical(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
 
-        OrgInfo data = (OrgInfo)node.getData();
+        OrgInfo data = (OrgInfo) node.getData();
         if (data == null) {
             //root
             for (TreeNode item : node.getChildren()) {
