@@ -4,9 +4,11 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.ServiceRequestMsgRepository;
 import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
+import com.ge.apm.dao.V2_WorkOrderManHoursDetailRepository;
 import com.ge.apm.dao.V2_WorkOrderStepRepository;
 import com.ge.apm.domain.ServiceRequestMsg;
 import com.ge.apm.domain.V2_WorkOrderCoworker;
+import com.ge.apm.domain.V2_WorkOrderManHoursDetail;
 import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.wo.WorkOrderExportService;
@@ -23,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -46,7 +49,11 @@ public class WorkOrderDocxRenderService {
     @Autowired
     V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
 
+    @Autowired
+    private V2_WorkOrderManHoursDetailRepository manHoursDetailRepository;
+
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private DecimalFormat df = new DecimalFormat("#0.00");
 
     private void copyKeyMapping(Map<String,String> COPY_KEY_MAPPING) {
         COPY_KEY_MAPPING.put("device_name", WebUtil.getMessage("EquipmentName_xlsx"));
@@ -103,6 +110,7 @@ public class WorkOrderDocxRenderService {
             template.registerPolicy("part_table", new PartTableRenderPolicy());
             template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
             template.registerPolicy("audit_table", new AuditTableRenderPolicy());
+            template.registerPolicy("work_hours_table", new WorkHourTableRenderPolicy());
             template.render(datas);
             template.write(out);
             bytes = out.toByteArray();
@@ -224,6 +232,7 @@ public class WorkOrderDocxRenderService {
         putWorkOrderStep(target, (String) source.get("woId"));
         putServiceRequestMessage(target, (String) source.get("woId"));
         putWorkOrderCoworker(target, (String) source.get("woId"));
+        putWorkHourList(target, (String) source.get("woId"));
         Map<String, String> COPY_KEY_MAPPING = new HashMap<>();
         copyKeyMapping(COPY_KEY_MAPPING);
         for (Map.Entry<String, String> entry : COPY_KEY_MAPPING.entrySet()) {
@@ -308,6 +317,22 @@ public class WorkOrderDocxRenderService {
         workOrderMap.put("proceed_table", woSteps);
     }
 
+    private void putWorkHourList(Map<String, Object> workOrderMap, String id){
+
+        List<V2_WorkOrderManHoursDetail> steps = manHoursDetailRepository.findByWoIdOrderByStartTime(id);
+        List<Map<String, Object>> workHourList = new ArrayList<>();
+        for (V2_WorkOrderManHoursDetail detail : steps) {
+            Map<String, Object> workHour = new HashedMap();
+            workHour.put("开始时间", formatDate(detail.getStartTime()));
+            workHour.put("结束时间", formatDate(detail.getEndTime()));
+            workHour.put("工时(小时)", formatDouble(detail.getHours()));
+            workHour.put("备注", detail.getRemark());
+            workHourList.add(workHour);
+        }
+
+        workOrderMap.put("work_hours_table", workHourList);
+    }
+
     private void putWorkOrderCoworker(Map<String, Object> workOrderMap, String id){
         List<V2_WorkOrderCoworker> workOrderList = workOrderCoworkerDao.findByWoId(id);
 
@@ -321,5 +346,9 @@ public class WorkOrderDocxRenderService {
 
     private String formatDate(Date date) {
         return date != null ? sdf.format(date) : "";
+    }
+
+    private String formatDouble(Double num) {
+        return num != null ? df.format(num) : "";
     }
 }
