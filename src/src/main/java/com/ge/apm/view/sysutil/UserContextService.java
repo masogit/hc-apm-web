@@ -65,6 +65,7 @@ public class UserContextService implements Serializable {
     private String selectedSiteUid;
     //选定的院区
     private OrgInfo selectSite;
+    private OrgInfo selectSiteSchedule;
     private List<OrgInfo> child = new ArrayList<>();
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -1608,5 +1609,13 @@ public class UserContextService implements Serializable {
             }
         }
         return selectItems;
+    }
+
+    public OrgInfo getSelectSiteSchedule() {
+        return selectSiteSchedule;
+    }
+
+    public void setSelectSiteSchedule(OrgInfo selectSiteSchedule) {
+        this.selectSiteSchedule = selectSiteSchedule;
     }
 }

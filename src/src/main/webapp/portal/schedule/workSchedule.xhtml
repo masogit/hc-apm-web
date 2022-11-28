@@ -17,7 +17,19 @@
             </div>
 
             <div class="ui-g-12 card">
-                <h:form>
+                <h:form id="IouListForm">
+                    <p:commandButton id="basic" value="#{workScheduleController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:overlayPanel widgetVar="varPanelOrg" for="basic" hideEffect="fade" style="width:350px">
+                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="docs"  class="tree" style="width:98%;border:0;" value="#{workScheduleController.hospitalTree}" var="node" selectionMode="single"
+                                    selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
+                                <p:ajax process="@this" event="select" listener="#{workScheduleController.onSelectSiteTreeNode}" update="IouListForm workScheduleForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                <p:treeNode type="org">
+                                    <h:outputText value="#{node.name}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
                     <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="#{msg.CreateWorkScheduleInBatch}" title="#{msg.CreateWorkScheduleInBatch}" update=":workScheduleBatchDlg" oncomplete="PF('workScheduleBatchDialog').show()"/>
                     <p:commandButton id="batchDeleteButton" icon="ui-icon-extlink" value="批量删除" title="批量删除" update=":workScheduleBatchDeleteDlg" oncomplete="PF('workScheduleBatchDeleteDlg').show()"/>
                     <p:commandButton id="scheduleDateStageButton" icon="ui-icon-extlink" value="#{msg.SequenceTimeSettings}" title="#{msg.SequenceTimeSettings}" update=":scheduleDateStageDlg" oncomplete="PF('scheduleDateStageDialog').show()"/>
@@ -52,7 +64,7 @@
                             <p:selectOneMenu value="#{workScheduleController.userUID}" style="width:125px" required="true" requiredMessage="#{msg.PersonnelCannotBeEmpty}">
                                 <p:ajax listener="#{workScheduleController.onScheduleValidateNew}" update="workScheduleForm:addButton"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{workScheduleController.userList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                <f:selectItems value="#{workScheduleController.loadUserList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <br/>
