@@ -23,9 +23,9 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
-                        <p:tab title="#{msg.AccessPermission}" class="ui-g-12" rendered="#{!permissionGroupController.createAction}">
+                        <p:tab title="#{msg.AccessPermission}" class="ui-g-12">
                             <p:scrollPanel style="height: 300px; border: 0;" mode="native">
-                                <p:tree id="orgTree" class="tree" style="border:0;height:362px" value="#{permissionGroupController.accessOrgTree}" selection="#{permissionGroupController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
+                                <p:tree id="orgTree" class="tree" style="border:0;height:362px" value="#{permissionGroupController.accessOrgTree}" selection="#{permissionGroupController.selectedAccessOrgNodes}" var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true" required="true" requiredMessage="#{msg.AccessPermission} #{msg.Required}">
                                     <p:ajax event="select" listener="#{permissionGroupController.onSelectAccessTreeNode}" />
                                     <p:ajax event="unselect" listener="#{permissionGroupController.onUnselectAccessTreeNode}" />
                                     <p:treeNode type="org">

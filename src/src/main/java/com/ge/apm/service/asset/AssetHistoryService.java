@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.callback.MqContext;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -9,10 +10,14 @@ import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -58,6 +63,9 @@ public class AssetHistoryService {
 
     @Autowired
     private CustomConfigService ccService;
+
+    @Autowired
+    private MqUtils mqUtils;
 
     /**
      * @return void
@@ -344,34 +352,28 @@ public class AssetHistoryService {
     }
 
     public void saveAssetHistoryIfUpdated(AssetInfo oldAsset, AssetInfo newAsset) {
-
-        List<AssetHistory.AssetHistoryInfo> resultList = getAssetsHistoryModifiedFields(oldAsset, newAsset);
-
-        //no change, just return
-        if (resultList.isEmpty()) {
-            return;
-        }
-
-        //save changes
+        AssetInfo assetInfo = new AssetInfo();
+        BeanUtils.copyProperties(newAsset,assetInfo);
+        MqContext mqContext = new MqContext();
+        mqContext.setTime(new Date());
+        mqContext.setType("asset");
+        mqContext.setRoutingKey("asset.update");
+        mqContext.setExChange("assetChange");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-
-        String jsonData = JSONArray.toJSONString(resultList);
-
-        AssetHistory assetHistory = new AssetHistory();
-        assetHistory.setAssetUid(newAsset.getUid());
-        assetHistory.setAssetName(newAsset.getName());
-        assetHistory.setFinancingNum(newAsset.getFinancingNum());
-        assetHistory.setJsonData(jsonData);
-        assetHistory.setCreatedDate(new Date());
-        assetHistory.setCreatedBy(currentUserAccount.getName());
-
-        assetHistory.setSiteUID(currentUserAccount.getSiteUID());
-        assetHistory.setHospitalUID(currentUserAccount.getHospitalUID());
-        assetHistory.setTenantUID(currentUserAccount.getTenantUID());
-        assetHistory.setInstitutionUID(currentUserAccount.getInstitutionUID());
-        assetHistory.setClinicalDeptUid(newAsset.getClinicalDeptUID());
-
-        this.save(assetHistory);
+        JSONObject jsonObject =new JSONObject();
+        assetInfo.setHospital(null);
+        assetInfo.setQrCodeLib(null);
+        assetInfo.setAssetTags(null);
+        assetInfo.setBrand(null);
+        assetInfo.setTags(null);
+        //gson序列化只与属性(字段)有关，与get开头的方法无关
+        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String str = g.toJson(assetInfo);
+        jsonObject.put("assetInfo",str);
+//        jsonObject.put("assetInfo",selected);
+        jsonObject.put("currentUserAccount",currentUserAccount);
+        mqContext.setJsonObject(jsonObject);
+        mqUtils.sendToMq(mqContext);
     }
 
     public  <T> T depCopy(T srcList) {
