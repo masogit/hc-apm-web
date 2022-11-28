@@ -2,14 +2,13 @@ package com.ge.apm.view.schedule;
 
 import cn.hutool.core.date.Week;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.MaintainDataPair;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserSchedule;
-import com.ge.apm.domain.UserScheduleStageConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.schedule.UserScheduleService;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.SetUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
@@ -77,7 +76,9 @@ public class WorkScheduleController{
     private Date endTime_pm;
     private UserSchedule.Type type;
     private String resultInfo;
-
+    private OrgInfo selectSite;
+    private List<OrgInfo> selectOrgInfo;
+    private UserContextService userContextService;
     @PostConstruct
     protected void init() {
 
@@ -87,8 +88,8 @@ public class WorkScheduleController{
         userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         userScheduleStageConfigDao = WebUtil.getBean(UserScheduleStageConfigRepository.class);
         userScheduleService = WebUtil.getBean(UserScheduleService.class);
-
-        currentUser = UserContextService.getCurrentUserAccount();
+        userContextService = WebUtil.getBean(UserContextService.class);
+        currentUser = userContextService.getLoginUser();
 
         event = new DefaultScheduleEvent();
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -98,6 +99,7 @@ public class WorkScheduleController{
         }else{
             type=UserSchedule.Type.W;
         }
+        this.initSite();
         this.loadScheduleData();
         this.loadScheduleConfig();
         this.userList = loadUserList();
@@ -109,16 +111,13 @@ public class WorkScheduleController{
         shiftType=new String[]{"AM","PM","ALL"};
         this.resultInfo = "";
 
+
     }
-
-    private void loadScheduleData(){
-        eventModel = new DefaultScheduleModel();
-
+    private void initSite(){
         List<SearchFilter> searchFilters = new ArrayList<>();
-
-        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, type.name()));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
-        /*if(currentUser.getOrgLevel() == 0){
+        SearchFilter orgLevel = new SearchFilter("orgType", SearchFilter.Operator.EQ, 3);
+        searchFilters.add(orgLevel);
+        if(currentUser.getOrgLevel() == 0){
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
         }else if(currentUser.getOrgLevel() == 1){
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
@@ -126,7 +125,26 @@ public class WorkScheduleController{
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
         }else{
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
-        }*/
+        }
+        selectOrgInfo = orgInfoDao.findBySearchFilter(searchFilters);
+        OrgInfo selectSiteSchedule = userContextService.getSelectSiteSchedule();
+        if(selectSiteSchedule == null){
+            OrgInfo orgInfo = selectOrgInfo.get(0);
+            userContextService.setSelectSiteSchedule(orgInfo);
+            selectSite=orgInfo;
+        }else{
+            selectSite=selectSiteSchedule;
+        }
+
+    }
+    private void loadScheduleData(){
+        eventModel = new DefaultScheduleModel();
+
+        List<SearchFilter> searchFilters = new ArrayList<>();
+
+        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, type.name()));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid()));
+
         List<UserSchedule> tempUserScheduleList = dao.findBySearchFilter(searchFilters);
 
         for (UserSchedule us : tempUserScheduleList) {
@@ -145,10 +163,10 @@ public class WorkScheduleController{
         if(event.getId() == null){
             //新增记录
             tempUserSchedule = new UserSchedule();
-            tempUserSchedule.setTenantUID(currentUser.getTenantUID());
-            tempUserSchedule.setInstitutionUID(currentUser.getInstitutionUID());
-            tempUserSchedule.setHospitalUID(currentUser.getHospitalUID());
-            tempUserSchedule.setSiteUID(currentUser.getSiteUID());
+            tempUserSchedule.setTenantUID(selectSite.getTenantUID());
+            tempUserSchedule.setInstitutionUID(selectSite.getInstitutionUID());
+            tempUserSchedule.setHospitalUID(selectSite.getHospitalUID());
+            tempUserSchedule.setSiteUID(selectSite.getSiteUID());
             tempUserSchedule.setType(type.name());
             tempUserSchedule.setScheduleDateStage(this.scheduleDateStage);
             tempUserSchedule.setUserUID(this.userUID);
@@ -293,12 +311,12 @@ public class WorkScheduleController{
             this.isDisableSave = false;
         }
     }
-    private void loadScheduleConfig(){
+    public void loadScheduleConfig(){
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentDateStr = sdf.format(new Date());
 
-        Map<String, UserScheduleStageConfig> usscMap = userScheduleService.loadScheduleStageConfig(currentUser,type);
+        Map<String, UserScheduleStageConfig> usscMap = userScheduleService.loadScheduleStageConfig(currentUser,type,selectSite);
 
         UserScheduleStageConfig ussc_all = usscMap.get(UserScheduleService.SCHEDULE_STAGE_ALL);
         UserScheduleStageConfig ussc_am = usscMap.get(UserScheduleService.SCHEDULE_STAGE_AM);
@@ -348,7 +366,7 @@ public class WorkScheduleController{
         if(this.isValideDate(startBatchDate,endBatchDate)){
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             List<Integer> collect = Arrays.asList(selectedOptions2).stream().map(item -> Integer.valueOf(item)).collect(Collectors.toList());
-            Map<String, List<UserSchedule>> resultMap = userScheduleService.batchSaveWorkSchedule(selectedUserList, startBatchDate, endBatchDate, shiftType, currentUser, type,collect);
+            Map<String, List<UserSchedule>> resultMap = userScheduleService.batchSaveWorkSchedule(selectedUserList, startBatchDate, endBatchDate, shiftType, selectSite, type,collect);
 
             List<UserSchedule> successList = resultMap.get(UserScheduleService.BATCH_SUCCESS_LIST);//没有创建成功排班记录
             List<UserSchedule> failedList = resultMap.get(UserScheduleService.BATCH_FAILED_LIST);//没有创建成功排班记录
@@ -371,7 +389,7 @@ public class WorkScheduleController{
     public void batchDeleteWorkSchedule(){
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(this.isValideDate(deleteStartBatchDate,deleteEndBatchDate)){
-            userScheduleService.batchDeleteWorkSchedule(deleteSelectedUserList,deleteStartBatchDate, deleteEndBatchDate,currentUser, type,Arrays.asList(shiftType));
+            userScheduleService.batchDeleteWorkSchedule(deleteSelectedUserList,deleteStartBatchDate, deleteEndBatchDate,selectSite, type,Arrays.asList(shiftType));
             requestContext.addCallbackParam("flag", "Success");
         }else {
             requestContext.addCallbackParam("flag", "Failed");
@@ -383,7 +401,7 @@ public class WorkScheduleController{
 
     public void saveStageConfig(){
 
-        userScheduleService.saveScheduleStageConfig(startTime_all,endTime_all,startTime_am,endTime_am,startTime_pm,endTime_pm,currentUser,type);
+        userScheduleService.saveScheduleStageConfig(startTime_all,endTime_all,startTime_am,endTime_am,startTime_pm,endTime_pm,selectSite,type);
 
     }
 
@@ -662,5 +680,39 @@ public class WorkScheduleController{
 
     public void setDeleteSelectedUserList(List<UserAccount> deleteSelectedUserList) {
         this.deleteSelectedUserList = deleteSelectedUserList;
+    }
+    public TreeNode getHospitalTree(){
+        List<OrgInfo> orgList = selectOrgInfo;
+        if(org.springframework.util.CollectionUtils.isEmpty(orgList)){
+            return null;
+        }
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+//        expandedByOrgType(rootNode, 2);
+        return rootNode;
+    }
+    public OrgInfo getSelectSite() {
+        return selectSite;
+    }
+
+    public void setSelectSite(OrgInfo selectSite) {
+        this.selectSite = selectSite;
+    }
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        if(event == null ) return;
+        OrgInfo orgInfo = (OrgInfo) event.getTreeNode().getData();
+        userContextService.setSelectSiteSchedule(orgInfo);
+        selectSite=userContextService.getSelectSiteSchedule();
+        this.loadScheduleData();
+        this.loadScheduleConfig();
     }
 }

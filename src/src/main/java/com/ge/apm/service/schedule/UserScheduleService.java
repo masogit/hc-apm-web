@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.UserScheduleRepository;
 import com.ge.apm.dao.UserScheduleStageConfigRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserSchedule;
-import com.ge.apm.domain.UserScheduleStageConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -238,7 +235,7 @@ public class UserScheduleService {
         return resultMap;
     }
     @Transactional
-    public Map<String, List<UserSchedule>> batchSaveWorkSchedule(List<UserAccount> userAccountList, Date startDate, Date endDate, String[] batchType, UserAccount userAccount,UserSchedule.Type type,List<Integer> selectedOptions2) {
+    public Map<String, List<UserSchedule>> batchSaveWorkSchedule(List<UserAccount> userAccountList, Date startDate, Date endDate, String[] batchType, OrgInfo selectSite, UserSchedule.Type type, List<Integer> selectedOptions2) {
         Map<String, List<UserSchedule>> resultMap = new HashedMap();
         List<UserSchedule> successList = new ArrayList<>();//创建成功排班记录
         List<UserSchedule> failedList = new ArrayList<>();//没有创建成功排班记录
@@ -261,14 +258,14 @@ public class UserScheduleService {
             if(selectedOptions2.contains(dayOfWeek)){
                 // 删除已经有的排班
                 if(!UserSchedule.Type.A.equals(type)){
-                    userScheduleDao.deleteByTypeAndScheduleDateAndSiteUID(type.name(), Date.from(scheduleDateInstant), userAccount.getSiteUID());
+                    userScheduleDao.deleteByTypeAndScheduleDateAndSiteUID(type.name(), Date.from(scheduleDateInstant), selectSite.getSiteUID());
                 }
                 for (UserAccount ua : userAccountList) {
                     String[] types=batchType;
                     if(UserSchedule.Type.A.equals(type)){
                         types=changeType(types,scheduleDateInstant,ua);
                     }
-                    createUserWorkSchedule(scheduleDateInstant,types,successList,failedList,userAccount,ua,type);
+                    createUserWorkSchedule(scheduleDateInstant,types,successList,failedList,selectSite,ua,type);
                 }
             }
         }
@@ -288,35 +285,35 @@ public class UserScheduleService {
         }
         return types;
     }
-    private void createUserWorkSchedule(Instant scheduleDateInstant,String[] batchType,List<UserSchedule> successList,List<UserSchedule> failedList,UserAccount userAccount,UserAccount ua,UserSchedule.Type type){
+    private void createUserWorkSchedule(Instant scheduleDateInstant, String[] batchType, List<UserSchedule> successList, List<UserSchedule> failedList, OrgInfo selectSite, UserAccount ua, UserSchedule.Type type){
         for (int j=0;j<batchType.length;j++) {
             if (SCHEDULE_STAGE_AM.equals(batchType[j])) {
                 if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.AM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
-                    successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
                 } else {
-                    failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    failedList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
                 }
             } else if (SCHEDULE_STAGE_PM.equals(batchType[j])) {
                 if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.PM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
-                    successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
                 } else {
-                    failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    failedList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
                 }
             } else if (SCHEDULE_STAGE_ALL.equals(batchType[j])) {
                 if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.ALL.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
-                    successList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
                 } else {
-                    failedList.add(this.createWorkSchedule(userAccount, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    failedList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
                 }
             }
         }
     }
-    private UserSchedule createWorkSchedule(UserAccount loginUserAccount, UserAccount scheduleUserAccount, String scheduleDateStage, Date scheduleDate, boolean isSave,UserSchedule.Type type) {
+    private UserSchedule createWorkSchedule(OrgInfo selectSite, UserAccount scheduleUserAccount, String scheduleDateStage, Date scheduleDate, boolean isSave,UserSchedule.Type type) {
         UserSchedule userSchedule = new UserSchedule();
-        userSchedule.setTenantUID(loginUserAccount.getTenantUID());
-        userSchedule.setInstitutionUID(loginUserAccount.getInstitutionUID());
-        userSchedule.setHospitalUID(loginUserAccount.getHospitalUID());
-        userSchedule.setSiteUID(loginUserAccount.getSiteUID());
+        userSchedule.setTenantUID(selectSite.getTenantUID());
+        userSchedule.setInstitutionUID(selectSite.getInstitutionUID());
+        userSchedule.setHospitalUID(selectSite.getHospitalUID());
+        userSchedule.setSiteUID(selectSite.getSiteUID());
         userSchedule.setType(type.name());
         userSchedule.setUserUID(scheduleUserAccount.getUid());
         userSchedule.setScheduleDate(scheduleDate);
@@ -345,20 +342,20 @@ public class UserScheduleService {
         return userSchedule;
     }
 
-    public void saveScheduleStageConfig(Date startTime_all, Date endTime_all, Date startTime_am, Date endTime_am, Date startTime_pm, Date endTime_pm, UserAccount userAccount,UserSchedule.Type type){
+    public void saveScheduleStageConfig(Date startTime_all, Date endTime_all, Date startTime_am, Date endTime_am, Date startTime_pm, Date endTime_pm, OrgInfo selectSite, UserSchedule.Type type){
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<SearchFilter> searchFilters=new ArrayList<>();
         for(int i = 0 ; i < 3 ; i++){
             UserScheduleStageConfig ussc = new UserScheduleStageConfig();
-            ussc.setTenantUID(userAccount.getTenantUID());
-            ussc.setInstitutionUID(userAccount.getInstitutionUID());
-            ussc.setHospitalUID(userAccount.getHospitalUID());
-            ussc.setSiteUID(userAccount.getSiteUID());
+            ussc.setTenantUID(selectSite.getTenantUID());
+            ussc.setInstitutionUID(selectSite.getInstitutionUID());
+            ussc.setHospitalUID(selectSite.getHospitalUID());
+            ussc.setSiteUID(selectSite.getSiteUID());
             ussc.setType(type.name());
             if(i == 0){
                 ussc.setScheduleDateStage(UserScheduleService.SCHEDULE_STAGE_ALL);
-                buildSearchFilter(type,searchFilters,userAccount.getSiteUID(),UserScheduleService.SCHEDULE_STAGE_ALL);
+                buildSearchFilter(type,searchFilters,selectSite.getSiteUID(),UserScheduleService.SCHEDULE_STAGE_ALL);
 //                List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findByScheduleDateStageAndSiteUID(UserScheduleService.SCHEDULE_STAGE_ALL, userAccount.getSiteUID());
                 List<UserScheduleStageConfig> usscList= userScheduleStageConfigDao.findBySearchFilter(searchFilters);
                 if(!usscList.isEmpty()){
@@ -369,7 +366,7 @@ public class UserScheduleService {
                 ussc.setEndTime(sdf.format(endTime_all).split(" ")[1]);
             }else if(i == 1){
                 ussc.setScheduleDateStage(UserScheduleService.SCHEDULE_STAGE_AM);
-                buildSearchFilter(type,searchFilters,userAccount.getSiteUID(),UserScheduleService.SCHEDULE_STAGE_AM);
+                buildSearchFilter(type,searchFilters,selectSite.getSiteUID(),UserScheduleService.SCHEDULE_STAGE_AM);
 //                List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findByScheduleDateStageAndSiteUID(UserScheduleService.SCHEDULE_STAGE_AM, userAccount.getSiteUID());
                 List<UserScheduleStageConfig> usscList= userScheduleStageConfigDao.findBySearchFilter(searchFilters);
                 if(!usscList.isEmpty()){
@@ -380,7 +377,7 @@ public class UserScheduleService {
                 ussc.setEndTime(sdf.format(endTime_am).split(" ")[1]);
             }else if(i == 2){
                 ussc.setScheduleDateStage(UserScheduleService.SCHEDULE_STAGE_PM);
-                buildSearchFilter(type,searchFilters,userAccount.getSiteUID(),UserScheduleService.SCHEDULE_STAGE_PM);
+                buildSearchFilter(type,searchFilters,selectSite.getSiteUID(),UserScheduleService.SCHEDULE_STAGE_PM);
 //                List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findByScheduleDateStageAndSiteUID(UserScheduleService.SCHEDULE_STAGE_PM, userAccount.getSiteUID());
                 List<UserScheduleStageConfig> usscList= userScheduleStageConfigDao.findBySearchFilter(searchFilters);
                 if(!usscList.isEmpty()){
@@ -407,14 +404,14 @@ public class UserScheduleService {
         }
         return searchFilters;
     }
-    public Map<String,UserScheduleStageConfig> loadScheduleStageConfig(UserAccount ua,UserSchedule.Type type){
+    public Map<String,UserScheduleStageConfig> loadScheduleStageConfig(UserAccount ua, UserSchedule.Type type, OrgInfo selectSite){
         Map<String,UserScheduleStageConfig> scheduleStageConfigMap = new HashedMap();
         scheduleStageConfigMap.put(SCHEDULE_STAGE_ALL, null);
         scheduleStageConfigMap.put(SCHEDULE_STAGE_AM, null);
         scheduleStageConfigMap.put(SCHEDULE_STAGE_PM, null);
         //List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findBySiteUID(ua.getSiteUID());
         List<SearchFilter> searchFilters=new ArrayList<>();
-        searchFilters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, ua.getSiteUID(),"1*"));
+        searchFilters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, selectSite.getUid(),"1*"));
         if(UserSchedule.Type.W == type){
             searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ,type.name(),"1*2+"));
             searchFilters.add(new SearchFilter("type", SearchFilter.Operator.IsNull,null,"1*2+"));
@@ -548,23 +545,23 @@ public class UserScheduleService {
         return tempUserScheduleList;
     }
 
-    public void batchDeleteWorkSchedule(List<UserAccount> selectedUserList, Date startBatchDate, Date endBatchDate, UserAccount currentUser, UserSchedule.Type type,List<String> scheduleDateStage) {
+    public void batchDeleteWorkSchedule(List<UserAccount> selectedUserList, Date startBatchDate, Date endBatchDate, OrgInfo selectSite, UserSchedule.Type type,List<String> scheduleDateStage) {
         List<String> collect = selectedUserList.stream().map(UserAccount::getUid).collect(Collectors.toList());
-        Date date = deleteOneDay(collect, startBatchDate, currentUser, type);
+        Date date = deleteOneDay(collect, startBatchDate, selectSite, type);
         if(date.compareTo(endBatchDate) != 1){
-            userScheduleDao.batchDeleteWorkSchedule(collect,date,endBatchDate,type.name(),scheduleDateStage);
+            userScheduleDao.batchDeleteWorkSchedule(collect,date,endBatchDate,type.name(),scheduleDateStage,selectSite.getUid());
         }
     }
-    private Date deleteOneDay(List<String> userUidCollect,Date startBatchDate, UserAccount currentUser,UserSchedule.Type type){
+    private Date deleteOneDay(List<String> userUidCollect,Date startBatchDate, OrgInfo selectSite,UserSchedule.Type type){
         LocalDate localDate = startBatchDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         if(LocalDate.now().compareTo(localDate) == 0){
             LocalDate nowDate = LocalDate.now();
             LocalDateTime nowDateTime=LocalDateTime.now();
             List<UserScheduleStageConfig> bySiteUID ;
             if(UserSchedule.Type.W.equals(type)){
-                bySiteUID=userScheduleStageConfigDao.findBySiteUIDAndTypeW(currentUser.getSiteUID(),type.name());
+                bySiteUID=userScheduleStageConfigDao.findBySiteUIDAndTypeW(selectSite.getSiteUID(),type.name());
             }else{
-                bySiteUID=userScheduleStageConfigDao.findBySiteUIDAndTypeA(currentUser.getSiteUID(),type.name());
+                bySiteUID=userScheduleStageConfigDao.findBySiteUIDAndTypeA(selectSite.getSiteUID(),type.name());
             }
             if(CollectionUtils.isEmpty(bySiteUID)) bySiteUID=DEFAULT_USER_SCHEDULE_STAGE_CONFIG;
             List<String> scheduleDateStage = bySiteUID.stream()
@@ -585,7 +582,7 @@ public class UserScheduleService {
                     .map(item -> item.getScheduleDateStage())
                     .collect(Collectors.toList());
             if(!CollectionUtils.isEmpty(scheduleDateStage)){
-                userScheduleDao.batchDeleteWorkSchedule(userUidCollect,startBatchDate,startBatchDate,type.name(),scheduleDateStage);
+                userScheduleDao.batchDeleteWorkSchedule(userUidCollect,startBatchDate,startBatchDate,type.name(),scheduleDateStage,selectSite.getUid());
             }
             LocalDate plus = localDate.plus(1, ChronoUnit.DAYS);
             return  Date.from(plus.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
