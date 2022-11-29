@@ -4,21 +4,27 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 
     <ui:composition>
         <p:dialog id="addCustomI18nDlg" widgetVar="addCustomI18nDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.addI18nConfig}" max-height="480" width="400">
             <h:form id="addCustomI18nCForm">
 
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup rendered="#{i18nConfigController.selected.msgKey ne 'transaction'}">
-                        <label class="label">#{msg.ConfigItemKey}*</label>
-                        <p:inputText id="configItemKeyStr" autocomplete="off" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
-                    </h:panelGroup>
-                    <h:panelGroup rendered="#{i18nConfigController.selected.msgKey eq 'transaction'}">
-                        <label class="label">#{msg.ConfigItemKey}*</label>
-                        <p:inputNumber id="configItemKeyNum" autocomplete="off" decimalPlaces="0" thousandSeparator="" placeholder="请输入数字" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
-                    </h:panelGroup>
+                    <c:choose>
+                        <c:when test="#{i18nConfigController.selected.msgKey eq 'transaction' or i18nConfigController.selected.msgKey eq 'assetClass'}">
+                            <h:panelGroup>
+                                <label class="label">#{msg.ConfigItemKey}*</label>
+                                <p:inputNumber id="configItemKeyNum" autocomplete="off" decimalPlaces="0" thousandSeparator="" placeholder="请输入数字" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
+                            </h:panelGroup>
+                        </c:when>
+                        <c:otherwise>
+                            <h:panelGroup>
+                                <label class="label">#{msg.ConfigItemKey}*</label>
+                                <p:inputText id="configItemKeyStr" autocomplete="off" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
+                            </h:panelGroup>
+                        </c:otherwise>
+                    </c:choose>
                     <h:panelGroup>
                         <label class="label">#{msg.ConfigItemName}-#{msg.Chinese}*</label>
                         <p:inputText id="chinese" autocomplete="off" value="#{i18nConfigController.editI18n.valueZh}" required="true" requiredMessage="#{msg.ConfigItemName}-#{msg.Chinese}#{msg.ValidationRequire}" style="width: 95%;"/>

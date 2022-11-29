@@ -23,6 +23,8 @@ import java.util.List;
 @ViewScoped
 public class UserSiteOrgTreeComponentController {
 
+    public static final String EDIT_SITE_ORG_CHANGE = "EDIT_SITE_ORG_CHANGE";
+
     public static final String ORG_CHANGE = "ORG_CHANGE";
 
     private UaaService uaaService;

@@ -62,6 +62,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query("select o from OrgInfo o,UserOrgInfo u where o.uid=u.orgUid and u.userUid=?1")
     public List<OrgInfo> getByUser(String userUid);
 
+    @Query("select o from OrgInfo o,PermissionGroupOrg p where o.uid=p.orgUid and p.permissionGroupUid in ?1")
+    public List<OrgInfo> getOrgListByPermissionGroup(List<String> permissionGroupUidList);
+
     @Query(value = "select name from org_info where id=?1", nativeQuery = true)
     public String getDepName(int id);
 
@@ -303,4 +306,16 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 //    @Query(nativeQuery = true, value = "select o from org_info o where o.site_uid = ?1 and o.name_py_code= ?2")
     OrgInfo findBySiteUIDAndNamePyCode(String siteUID,String name);
+
+    @Query(value = "with recursive cte_org as (\n" +
+            "    select oi.uid\n" +
+            "    from org_info oi\n" +
+            "    where oi.uid = ?1 \n" +
+            "    union all\n" +
+            "    select oi.uid\n" +
+            "    from org_info oi\n" +
+            "    join cte_org cte on oi.parent_uid = cte.uid\n" +
+            "    where oi.org_type < 4\n" +
+            ") select * from cte_org", nativeQuery = true)
+    List<String> getSiteOrgUidsByParentUid(String uid);
 }

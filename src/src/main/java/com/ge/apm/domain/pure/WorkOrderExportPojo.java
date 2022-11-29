@@ -167,6 +167,11 @@ public class WorkOrderExportPojo {
     // 县域需求call center单号
     private String callCenterNumber;
 
+    // 工时填写方式
+    private Integer entryType;
+    // 工时明细
+    private String workHourDetail;
+
     public List<String> getAuditSignatureList() {
         return auditSignatureList;
     }
@@ -785,4 +790,20 @@ public class WorkOrderExportPojo {
     public String getSrId() { return srId; }
 
     public void setSrId(String srId) { this.srId = srId; }
+
+    public Integer getEntryType() {
+        return entryType;
+    }
+
+    public void setEntryType(Integer entryType) {
+        this.entryType = entryType;
+    }
+
+    public String getWorkHourDetail() {
+        return workHourDetail;
+    }
+
+    public void setWorkHourDetail(String workHourDetail) {
+        this.workHourDetail = workHourDetail;
+    }
 }

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card">
+                <h:form id="transferDeptEditForm">
+                    <p:fieldset legend="科室匹配列表">
+                        <div style="display:inline-block;float: left;">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" style=" width: 500px;float: right;">
+                                <h:panelGroup>
+                                    <label class='label'>apm科室名称</label>
+                                    <p:inputText id="name" rows="1" cols="10" minQueryLength="1"
+                                                 value="#{hisClinicalMatchController.name}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class='label'>apm科室编号</label>
+                                    <p:inputText id="namePyCode" rows="1" cols="10" minQueryLength="1"
+                                                 value="#{hisClinicalMatchController.namePyCode}"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+                       <div style="width: 110px;float: left;margin: 25px -80px 0px 15px;">
+                            <p:commandButton validateClient="true" action="#{hisClinicalMatchController.firstQueryOrder}"
+                                             value="apm检索" update="apmDeptPickList"/>
+                        </div>
+
+                        <div id="picklist" style="margin: 10px 10px 10px -8px;">
+                            <p:pickList id="apmDeptPickList" widgetVar="apmPickList" value="#{hisClinicalMatchController.availableApmDepts}" var="item"
+                                        itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true"
+                                        showSourceFilter="false" showTargetFilter="false" filterMatchMode="contains" converter="orgInfoConverter"
+                                        required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
+                                <f:facet name="sourceCaption">APM源科室</f:facet>
+                                <f:facet name="targetCaption">APM目标科室</f:facet>
+                                <p:ajax event="transfer" listener="#{hisClinicalMatchController.moveApmDeptByTransfer}" />
+                                <p:column style="float: left;width:25%;">
+                                    <h:outputText value="#{item.name}"/>
+                                </p:column>
+                                <p:column style="float: left;width:30%;">
+                                    <h:outputText value="#{item.namePyCode}"/>
+                                </p:column>
+                                <p:column style="float: left;width:25%;">
+                                    <h:outputText value="#{item.orgCode}"/>
+                                </p:column>
+                            </p:pickList>
+
+                            <div style="display:inline-block;float: left;">
+                                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                             style=" width: 500px;float: right;">
+                                    <h:panelGroup>
+                                        <label class='label'>his科室名称</label>
+                                        <p:inputText id="name22" rows="1" cols="10" minQueryLength="1"
+                                                     value="#{hisClinicalMatchController.name2}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class='label'>his科室编号</label>
+                                        <p:inputText id="namePyCode22" rows="1" cols="10" minQueryLength="1"
+                                                     value="#{hisClinicalMatchController.namePyCode2}"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </div>
+                            <div style="width: 110px;float: left;margin: 25px -80px 0px 15px;">
+                                <p:commandButton validateClient="true" actionListener="#{hisClinicalMatchController.secondQueryOrder}"
+                                                 value="his检索" update="hisDeptPickList"/>
+                            </div>
+
+                            <p:pickList id="hisDeptPickList" widgetVar="hisDeptPickList" value="#{hisClinicalMatchController.availableOffices}" var="offices"
+                                        itemValue="#{offices}" itemLabel="#{offices.hisKsname}" showCheckbox="false" responsive="true"
+                                        showSourceFilter="false" showTargetFilter="false" filterMatchMode="contains"  converter="hisAdministrativeOffices"
+                                        required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
+                                <f:facet name="sourceCaption">HIS源科室</f:facet>
+                                <f:facet name="targetCaption">HIS目标科室</f:facet>
+                                <p:ajax event="transfer" listener="#{hisClinicalMatchController.moveHisOfficesByTransfer}" update="hisDeptPickList"/>
+                                <p:column style="float: left;width:25%;">
+                                    <h:outputText value="#{offices.hisKsname}"/>
+                                </p:column>
+                                <p:column style="float: left;width:30%;">
+                                    <h:outputText value="#{offices.hisKsid}"/>
+                                </p:column>
+                                <p:column style="float: left;width:25%;">
+                                    <h:outputText value="#{offices.hosId}"/>
+                                </p:column>
+                            </p:pickList>
+                        </div>
+                        <div style="width: 110px;float: left;margin: 25px -80px 0px 550px;">
+                            <p:commandButton validateClient="true" actionListener="#{hisClinicalMatchController.match}"
+                                             value="匹配" style="float:left" icon="ui-icon-check" update="@(form)"/>
+                        </div>
+                    </p:fieldset>
+                </h:form>
+            </div>
+        </div>
+
+
+
+</html>

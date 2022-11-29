@@ -701,11 +701,31 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void onContractChange() {
         if (!Strings.isNullOrEmpty(selectedContractId)) {
             contractItemList = contractService.getContractItems(selectedContractId).stream()
-                    .filter(item -> ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
+                    .filter(item -> {
+                                if(item.getContractAssetQuantity()!=null) {
+                                    Integer installedSum = dao.sumQuantityByContractItemId(item.getId());
+                                    if(installedSum == null) installedSum = 0;
+                                    item.setNoInstallQuntity(item.getContractAssetQuantity()-installedSum > 0 ? item.getContractAssetQuantity()-installedSum : 0);
+                                } else {
+                                    item.setNoInstallQuntity(0);
+                                }
+                                return ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType()) && item.getNoInstallQuntity() > 0;
+                      }
+                      ).collect(Collectors.toList());
             //TODO 去除到货数量等于订购数量的条目
         } else {
             contractItemList = new ArrayList();
             selectedContractItemId = null;
+        }
+    }
+
+    public void onQuantityChange() {
+        if(StringUtils.isNotEmpty(selectedContractItemId)) {
+            ContractInfoItem selectedContractItem = contractItemList.stream().filter(item -> item.getId().equals(selectedContractItemId)).findAny().orElse(null);
+            if(selected.getQuantity() > selectedContractItem.getNoInstallQuntity()) {
+                WebUtil.addErrorMessage("填写数量超过合同中待安装数量" + selectedContractItem.getNoInstallQuntity() + ",请考虑重新填写");
+                return;
+            }
         }
     }
 
@@ -721,7 +741,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 this.selected.setContractPrice(0d);
             }
 //        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
-            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+            this.selected.setQuantity(selectedContractItem.getNoInstallQuntity());
             this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
             this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
             this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
@@ -736,7 +756,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                     this.manufacture=manufacture;
                 }
             }
-            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
             this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
             this.selected.setOrigin(selectedContractItem.getProductionPlace());
             String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();

@@ -54,4 +54,7 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
     @Transactional
     @Query(value = "UPDATE arrival_list SET vendor=?1,supplier_id=?2,supplier_user_id=?3 WHERE id in ?4", nativeQuery = true)
     public void updateBatchSupplier(String vendor, Integer supplierId, Integer SupplierUserId, List<String> ids);
+
+    @Query(value = "SELECT SUM(quantity) FROM arrival_list WHERE contract_item_id = ?1",nativeQuery = true)
+    public Integer sumQuantityByContractItemId(String contractItemId);
 }

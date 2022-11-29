@@ -25,7 +25,7 @@
                     <h:panelGroup rendered="#{superAdminConfigItemController.selected.valueType eq 1}">
                         <label class="label">#{msg.ConfigItemValue}</label>
                         <p:inputTextarea id="valueStr" value="#{superAdminConfigItemController.selected.showValue}"
-                                         rows="5" cols="50" required="true" style="width: 95%;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                                         rows="5" cols="50" required="true" style="width: 95%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
                             <f:validateRegex disabled="#{empty superAdminConfigItemController.selected.validation}" pattern="#{superAdminConfigItemController.selected.validation}"/>
                         </p:inputTextarea>
                     </h:panelGroup>

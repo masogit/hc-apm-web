@@ -22,7 +22,7 @@
                     <h:panelGroup>
                         <label class="label">#{msg.Personnel}*</label>
                         <p:selectManyMenu value="#{workScheduleController.deleteSelectedUserList}" var="t" converter="userAccountConverter" required="true" filter="true" filterMatchMode="contains" showCheckbox="true" requiredMessage="#{msg.PersonnelCannotBeEmpty}">
-                            <f:selectItems value="#{workScheduleController.userList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                            <f:selectItems value="#{workScheduleController.loadUserList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
                             <p:column>
                                 <h:outputText value="#{t.name}" />
                             </p:column>
