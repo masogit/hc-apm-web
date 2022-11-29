@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
 
-    <p:dialog class="manHoursDetailDlg" id="manHoursDetailDlg" widgetVar="manHoursDetailDlg" modal="true" width="600" height="480"  resizable="true" draggable="true" appendTo="@(body)" header="添加工时">
+    <p:dialog class="manHoursDetailDlg" id="manHoursDetailDlg" widgetVar="manHoursDetailDlg" modal="true" width="600" height="320"  resizable="true" draggable="true" appendTo="@(body)" header="添加工时">
         <h:form id="manHoursDetailDlgForm" >
             <h:panelGroup  rendered="#{not empty workOrderMgrController.selectedWorkOrderManHoursDetail}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
