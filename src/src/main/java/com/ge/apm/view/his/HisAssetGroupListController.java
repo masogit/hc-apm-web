@@ -1,0 +1,111 @@
+package com.ge.apm.view.his;
+
+import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
+import com.ge.apm.dao.HisAssetGroupClinicalMatchRepository;
+import com.ge.apm.dao.HisEquipmentSfxmMatchRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
+import com.ge.apm.domain.his.HisEquipmentSfxmMatch;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StringUtils;
+import webapp.framework.dao.GenericRepository;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.JpaCRUDController;
+import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
+import java.util.List;
+
+@ManagedBean
+@ViewScoped
+public class HisAssetGroupListController extends JpaCRUDController<HisAssetGroupAssetMatch> implements ServerEventInterface {
+
+    private HisAssetGroupAssetMatchRepository hisAssetGroupAssetMatchDao;
+    private OrgInfoRepository orgInfoRepository;
+    private HisAssetGroupClinicalMatchRepository hisAssetGroupClinicalMatchDao;
+    private HisEquipmentSfxmMatchRepository hisEquipmentSfxmMatchDao;
+    private HisOrgComponentController orgComponentController;
+    private HisAssetGroupEditController hisAssetGroupEditController;
+
+    @Override
+    protected void init(){
+        hisAssetGroupAssetMatchDao = WebUtil.getBean(HisAssetGroupAssetMatchRepository.class);
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        hisEquipmentSfxmMatchDao = WebUtil.getBean(HisEquipmentSfxmMatchRepository.class);
+        hisAssetGroupClinicalMatchDao = WebUtil.getBean(HisAssetGroupClinicalMatchRepository.class);
+        orgComponentController = WebUtil.getBean(HisOrgComponentController.class);
+        hisAssetGroupEditController = WebUtil.getBean(HisAssetGroupEditController.class);
+
+        filterBySite = false;
+    }
+
+    @Override
+    protected GenericRepository<HisAssetGroupAssetMatch> getDAO() {
+        return null;
+    }
+
+    @Override
+    protected Page<HisAssetGroupAssetMatch> loadData(PageRequest pageRequest) {
+        if (null == searchFilters) {
+            searchFilters = new ArrayList<>();
+        }
+
+        removeFilterOnField("orgInfoUid");
+
+        if (orgComponentController.getSelectedOrg() != null) {
+            List<String> orgInfoUids = orgInfoRepository.getSiteOrgUidsByParentUid(orgComponentController.getSelectedOrg().getUid());
+            searchFilters.add(new SearchFilter("orgInfoUid", SearchFilter.Operator.IN, orgInfoUids));
+        }
+
+        return hisAssetGroupAssetMatchDao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+
+    @Override
+    public void prepareCreate(){
+        hisAssetGroupEditController.onServerEvent(null, null);
+
+    }
+
+    @Override
+    public void prepareEdit() {
+        hisAssetGroupEditController.onServerEvent(null, selected);
+    }
+
+    @Override
+    public void delete(){
+
+        List<HisEquipmentSfxmMatch> hisEquipmentSfxmMatchList = hisEquipmentSfxmMatchDao.findByHisGroupMatchUid(selected.getUuid());
+        if(!hisEquipmentSfxmMatchList.isEmpty()){
+            WebUtil.addErrorMessage("已绑定收费项目，请先取消匹配收费项目");
+            return;
+        }
+
+        String hisAssetGroupUidAndClinicalDeptUid = selected.getAssetGroupUid() + selected.getClinicalDeptUid();
+        hisAssetGroupClinicalMatchDao.deleteById(hisAssetGroupUidAndClinicalDeptUid);
+        hisAssetGroupAssetMatchDao.delete(selected);
+
+        selected = null;
+    }
+
+    public HisAssetGroupAssetMatch onSelectAssetGroupAssetMatch() {
+        return selected;
+    }
+
+    public String getOrgNameByUid(String orgInfoUid){
+        OrgInfo orgInfo = orgInfoRepository.findByUid(orgInfoUid);
+        if(!StringUtils.isEmpty(orgInfo)){
+            return orgInfo.getName();
+        }
+        return orgInfoUid;
+    }
+
+    public Integer getAssetCountsByGroupUidAndDeptUid(String assetGroupUid,String clinicalDeptUid){
+        return hisAssetGroupClinicalMatchDao.countByGroupUidAndDeptUid(assetGroupUid+clinicalDeptUid);
+    }
+
+}

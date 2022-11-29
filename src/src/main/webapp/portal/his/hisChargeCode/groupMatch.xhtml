@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<body>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card">
+                <h:form id="transferAssetEditForm">
+                    <p:fieldset legend="收费项目">
+                        <div style="display:inline-block;width: 49%;float: left;">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class='label'>His收费项目名称</label>
+                                    <p:inputText id="name1" rows="1" cols="10" minQueryLength="4"
+                                                 value="#{hisChargeCodeMatchController.name}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class='label'>His收费项目代码</label>
+                                    <p:inputText id="departNum1" rows="1" cols="10" minQueryLength="4"
+                                                 value="#{hisChargeCodeMatchController.departNum}"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+                        <div style="float: left;margin: 20px -80px 0px -90px">
+                            <p:commandButton validateClient="true" action="#{hisChargeCodeMatchController.firstQueryOrder}"
+                                             value="检索" update="hisEquipmentSfxmPickList" />
+                        </div>
+
+                        <div id="picklist" style="border:0px solid;margin: 10px 10px 10px 10px;width: 52%;display: inline-block;">
+                            <p:pickList id="hisEquipmentSfxmPickList" widgetVar="hisEquipmentSfxmPickList" style="border: 0px solid green;"
+                                        value="#{hisChargeCodeMatchController.availableAssets}" var="item"
+                                        itemValue="#{item}" itemLabel="#{item.sfxmId}" showCheckbox="false" responsive="true"
+                                        filterMatchMode="contains" converter="hisEquipmentSfxm"
+                                        required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
+                                <p:ajax event="transfer" listener="#{hisChargeCodeMatchController.groupTransfer}" update="hisEquipmentSfxmPickList" />
+                                <f:facet name="sourceCaption">所有收费项目</f:facet>
+                                <f:facet name="targetCaption">已选收费项目</f:facet>
+                                <p:column style="float: left;width:40%;">
+                                    <h:outputText value="#{item.sfxmName}"/>
+                                </p:column>
+                                <p:column style="float: left;width:40%;">
+                                    <h:outputText value="#{item.sfxmId}"/>
+                                </p:column>
+                                <p:column style="float: left;width:20%;">
+                                    <h:outputText value="#{item.sfxmLb}"/>
+                                </p:column>
+                            </p:pickList>
+                        </div>
+
+                        <div style="border: 0px solid red;width: 45%;display: inline-block;float: right;">
+                            <p:fieldset legend="设备分组明细" style="margin-bottom:20px">
+                                <p:dataTable id="datalistDetail" value="#{hisChargeCodeMatchController.sartList}"
+                                             var="item" widgetVar="varDataListDetail"
+                                             paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                             lazy="true" rowKey="#{item.id}"
+                                             sortMode="single" sortOrder="descending"
+                                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                             rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500"
+                                             cellEditMode="true" editable="true">
+
+                                    <p:ajax event="rowSelect" update= "createButton"/>
+                                    <p:ajax event="cellEdit"  update= "datalistDetail"/>
+
+                                    <p:column headerText="设备分组" sortBy="#{item.assetGroupName}" >
+                                        <h:outputText value="#{item.assetGroupName}"/>
+                                    </p:column>
+                                    <p:column headerText="所属科室" sortBy="#{item.clinicalDeptName}" >
+                                        <h:outputText value="#{item.clinicalDeptName}"/>
+                                    </p:column>
+                                    <p:column headerText="分摊比例(%)">
+                                        <p:inputNumber value="#{item.groupRate}" decimalPlaces="0" required="true" emptyValue="0"
+                                                       requiredMessage="实际借用数不能为空！" minValue="0" maxValue="100">
+                                        </p:inputNumber>
+                                    </p:column>
+                                    <p:column headerText="操作" exportable="false">
+                                        <p:commandButton value="删除"  action="#{hisChargeCodeMatchController.onDeleteSelectedGroup(item.uuid)}"
+                                                         update="HisGroupTab:transferAssetEditForm:datalistDetail"/>
+                                    </p:column>
+                                    <f:facet name="{Toolbar}">
+                                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{hisChargeCodeMatchController.prepareCreateSart}" update="HisGroupTab:DetailEditDlg HisGroupTab:transferAssetEditForm:datalistDetail" oncomplete="PF('SharedAssetReqTypeEditDialog').show()" />
+                                    </f:facet>
+                                </p:dataTable>
+                            </p:fieldset>
+
+                        </div>
+                        <div style="width: 110px;float: left;margin: 25px -80px 0px 510px;">
+                            <p:commandButton validateClient="true" actionListener="#{hisChargeCodeMatchController.submmitOrder}"
+                                             value="匹配" style="float:left" icon="ui-icon-check" update=":HisGroupTab:transferAssetEditForm :HisGroupTab:IouListForm @(form) :HisGroupTab:SharedAssetReqTypeEditForm"/>
+                        </div>
+                    </p:fieldset>
+
+                </h:form>
+                <ui:include src="Detail_Edit.xhtml" />
+            </div>
+        </div>
+</body>
+</html>

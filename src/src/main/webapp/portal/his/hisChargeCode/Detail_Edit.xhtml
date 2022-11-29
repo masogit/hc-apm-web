@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition >
+    <p:dialog id="DetailEditDlg" widgetVar="SharedAssetReqTypeEditDialog"  width="50%"
+              modal="true" resizable="true" draggable="true" appendTo="@(body)" header="分组项目">
+        <h:form id="SharedAssetReqTypeEditForm" >
+            <div style="border: 0px solid ">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class='label'>分组名称</label>
+                        <p:inputText id="sfxmName" rows="1" cols="10" minQueryLength="4"
+                                     value="#{hisChargeCodeMatchController.sfxmName}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class='label'>使用科室</label>
+                        <p:inputText id="sfxmId" rows="1" cols="10" minQueryLength="4"
+                                     value="#{hisChargeCodeMatchController.sfxmId}"/>
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class = "label">是否子设备</label>
+                        <p:selectBooleanCheckbox id="subEquipmentButton" value="#{hisChargeCodeMatchController.subEquipment}" required="false">
+                        </p:selectBooleanCheckbox>
+                    </h:panelGroup >
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" value="检索" update="SharedAssetReqTypeEditForm:datalist"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </div>
+
+                <p:dataTable id="datalist" value="#{hisChargeCodeMatchController.lazyModel}" var="item" widgetVar="varDataList"
+                             selectionMode="single" selection="#{hisChargeCodeMatchController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                             rowKey="#{item.uuid}" sortMode="single" sortOrder="descending"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="filter" listener="#{hisChargeCodeMatchController.onFilter}"/>
+                    <p:column width="36" exportable="false">
+                        <p:selectBooleanCheckbox value="#{hisChargeCodeMatchController.selectedMap[item.uuid]}" class="selectCheckBox">
+                            <p:ajax process="@this" listener="#{hisChargeCodeMatchController.pick()}" update="@(.selectCheckBoxHeader)"  />
+                        </p:selectBooleanCheckbox>
+                        <f:facet name="header">
+                            <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
+                                <p:ajax listener="#{hisChargeCodeMatchController.onSelectAllOfPage}" update="@(.selectCheckBox)"  />
+                            </p:selectBooleanCheckbox>
+                        </f:facet>
+                    </p:column>
+<!--                    <p:column headerText="His收费代码" sortBy="#{item.}" filterBy="#{item.}" filterMatchMode="LIKE">-->
+<!--                        <h:outputText value="#{item.}"/>-->
+<!--                    </p:column>-->
+                    <p:column headerText="分组名称" sortBy="#{item.assetGroupName}" filterBy="#{item.assetGroupName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetGroupName}"/>
+                    </p:column>
+                    <p:column headerText="使用科室" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.clinicalDeptName}"/>
+                    </p:column>
+                    <p:column headerText="是否子设备" sortBy="#{item.isSubEquipment}" filterBy="#{item.isSubEquipment}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.isSubEquipment eq false ? '否' : '是'}"/>
+                    </p:column>
+                </p:dataTable>
+            <br/>
+            <h:panelGroup>
+                <p:commandButton action="#{hisChargeCodeMatchController.confirm}" value="暂存" icon="ui-icon-check"
+                                 oncomplete="openSwapTypeViewWindow(xhr, status, args)"
+                                 update="HisGroupTab:transferAssetEditForm:datalistDetail HisGroupTab:transferAssetEditForm:hisEquipmentSfxmPickList"  />
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SharedAssetReqTypeEditDialog').hide()"/>
+            </h:panelGroup>
+        </h:form>
+        <script>
+            function openSwapTypeViewWindow(xhr, status, args) {
+                var message = args.message;
+                if (message == "wrong") {
+
+                } else {
+                    PF('SharedAssetReqTypeEditDialog').hide();
+                }
+            }
+        </script>
+    </p:dialog>
+</ui:composition>
+
+</html>

@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="preRenderView">
+        <h:outputScript name="js/main.js"/>
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="#{msg.chargeDetailResult}"/>
+                </div>
+                <h:form id="IouListForm">
+
+                    <p:dataTable id="datalist" value="#{jobController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{jobController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.orgCode}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}" expandableRowGroups="true"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <!--                            <p:ajax event="rowSelect" update="exportPdfButton"-->
+                        <!--                                    listener="#{jobController.onSelectB}"-->
+                        <!--                                    oncomplete="openSwapTypeViewWindow(xhr, status, args)" />-->
+
+                        <!--                            <p:ajax event="rowSelect" update="exportPdfButton" />-->
+
+                        <p:ajax event="filter" listener="#{jobController.onFilter}"/>
+
+                        <p:column headerText="所属医院" sortBy="#{item.orgName}" filterBy="#{item.orgName}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.orgName}"/>
+                        </p:column>
+                        <p:column headerText="设备UID" sortBy="#{item.assetUid}" filterBy="#{item.assetUid}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetUid}"/>
+                        </p:column>
+                        <p:column headerText="资产名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetName}"/>
+                        </p:column>
+                        <p:column headerText="所属科室" sortBy="#{item.ksbm}" filterBy="#{item.ksbm}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.ksbm}"/>
+                        </p:column>
+                        <p:column headerText="所属科室名称" sortBy="#{item.KsName}" filterBy="#{item.KsName}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.ksName}"/>
+                        </p:column>
+                        <p:column headerText="分摊金额" sortBy="#{item.totalAmount}" filterBy="#{item.totalAmount}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.totalAmount}"/>
+                        </p:column>
+                        <p:column headerText="检查人次" sortBy="#{item.assetCounts}" filterBy="#{item.assetCounts}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetCounts}"/>
+                        </p:column>
+                        <p:column headerText="检查时间" sortBy="#{item.execTime}" filterBy="#{item.execTime}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.execTime}"/>
+                        </p:column>
+                        <p:column headerText="创建时间" sortBy="#{item.createDate}" filterBy="#{item.createDate}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.createDate}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                             class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true" resizable="true"
+                          draggable="true" appendTo="@(body)" header="提示信息">
+                </p:dialog>
+                <!--</div>-->
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

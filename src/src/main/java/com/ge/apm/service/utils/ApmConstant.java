@@ -34,4 +34,6 @@ public interface ApmConstant {
     static String stepNameWaitForClosed="待关单";
 
     String MVS_TENANT_NAME = "GE MVS";
+
+    String DEVELOPER_USE_CONTRACT_NUM = "WBSXXXXXXXX";
 }

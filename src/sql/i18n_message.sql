@@ -4853,4 +4853,26 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name', 'reminderDate', '提醒日期', 'reminder date', NULL, '-1');
 -- YHAAO-17272 维修管理-分时段录入工时导出
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','workHourDetail','维修工时详情','Details of maintenance hours',NULL,-1);
-
+-- YHAAO-17289 漳州市医院演示环境-常用故障模板
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetRepairQuickTemplateType','1','故障原因','Asset Repair Quick Template Type 1',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetRepairQuickTemplateType','2','解决方案','Asset Repair Quick Template Type 2',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetRepairQuickTemplateType','3','交付检测','Asset Repair Quick Template Type 3',NULL,-1);
+-- YHAAO-17290 his 设备绩效管理
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform','His绩效分析','His Performance analysis',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.deviceMatching','设备匹配','Device matching',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.deptMatching','科室匹配','Device matching',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.deviceGrouping','设备分组','Device grouping',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.chargeCode','收费代码与分组匹配','The charge code matches the group',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.manualTasks','手动任务抓取数据','Manual tasks fetch data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.chargeDetailSource','收费明细源数据','Charge details source data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.chargeDetailResult','收费明细结果数据','Charge details source result data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','repair.commonFaults','常用故障及分类','Common faults and classification',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','hisPerform','His绩效分析','His Performance analysis',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','deviceMatching','设备匹配','Device matching',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','deptMatching','科室匹配','Device matching',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','deviceGrouping','设备分组','Device grouping',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','chargeCode','收费代码与分组匹配','The charge code matches the group',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','manualTasks','手动任务抓取数据','Manual tasks fetch data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','chargeDetailSource','收费明细源数据','Charge details source data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','chargeDetailResult','收费明细结果数据','Charge details source result data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','commonFaults','常用故障及分类','Common faults and classification',NULL,-1);

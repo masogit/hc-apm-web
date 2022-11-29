@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.commonFaults}"/>
+            </div>
+            <div class="ui-g-12">
+            <h:form id="AssetRepairQuickTemplateListForm">
+                <p:dataTable id="datalist" value="#{assetRepairQuickTemplateController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{assetRepairQuickTemplateController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
+                    rowsPerPageTemplate="20,40,60,90">
+
+                    <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                    <p:ajax event="filter" listener="#{assetRepairQuickTemplateController.onFilter}" update="createButton editButton deleteButton"/>
+                   <!-- sortBy="#{item.templateType}" filterBy="#{item.templateType}" filterMatchMode="EQ"
+                    sortBy="#{item.createDate}" filterBy="#{item.createDate}" filterMatchMode="GTE-->
+                    <p:column headerText="模板类别">
+                        <h:outputText value="#{assetRepairQuickTemplateController.findTemplateTypeStr(item.templateType)}"/>
+                    </p:column>
+                    <p:column headerText="设备分类" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="LIKE">
+                        <h:outputText value="#{assetRepairQuickTemplateController.findAssetGroup(item.assetGroup)}"/>
+                    </p:column>
+                    <!--<p:column headerText="所属机构">
+                        <h:outputText value="#{assetRepairQuickTemplateController.findHierOrgUid(item.hierOrgUid)}"/>
+                    </p:column>-->
+                    <p:column headerText="模板主题" >
+                        <h:outputText value="#{item.templateTitle}"/>
+                    </p:column>
+                    <p:column headerText="模板内容">
+                        <h:outputText value="#{item.templateContent}"/>
+                    </p:column>
+                    <p:column headerText="创建人">
+                        <h:outputText value="#{item.createdBy}"/>
+                    </p:column>
+                    <p:column headerText="创建日期">
+                        <f:facet name="filter">
+                            <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
+                        </f:facet>
+                        <h:outputText value="#{item.createDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="修改人">
+                        <h:outputText value="#{item.modifyBy}"/>
+                    </p:column>
+                    <p:column headerText="修改日期">
+                        <f:facet name="filter">
+                            <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
+                        </f:facet>
+                        <h:outputText value="#{item.modifyDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="AssetRepairQuickTemplate_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetRepairQuickTemplateController.prepareCreate}" update=":AssetRepairQuickTemplateEditDlg" oncomplete="PF('AssetRepairQuickTemplateEditDialog').show()"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetRepairQuickTemplateController.prepareEdit}" update=":AssetRepairQuickTemplateEditDlg" oncomplete="PF('AssetRepairQuickTemplateEditDialog').show()" disabled="#{empty assetRepairQuickTemplateController.selected}"/>
+                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetRepairQuickTemplateController.delete}" update=":AssetRepairQuickTemplateEditDlg" disabled="#{empty assetRepairQuickTemplateController.selected}">
+                            <p:confirm header="删除" message="确定删除该快捷模板？" icon="ui-icon-alert"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+                </h:form>
+            </div>
+            <ui:include src="Edit.xhtml"/>
+
+            </div>
+        </ui:define>
+</ui:composition>
