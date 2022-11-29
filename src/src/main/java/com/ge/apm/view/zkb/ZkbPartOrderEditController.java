@@ -64,6 +64,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private Integer currentScore = 0;
     private String currentScoreText;
     private boolean currentScoreFlag =false;
+    private boolean radiationQuotaTypeFlag = false;
     private List<HashMap<String, String>> highCatList = new ArrayList<>();
     private ZkbContractAssetRepository zkbContractAssetRepository;
     private ZkbContractAssetService zkbContractAssetService;
@@ -444,6 +445,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }else if(ZkbContractAsset.AssetTypeEnum.empty.toString().equals(zkbContractAsset.getAssetType())){
                     selected.setArtificialType(CopyByInvok.NORMAL_THREE);
                 }
+
+                //判断是否是放射类以及合同类型是否是DI或者PCB
+                if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
+                    if(assetInfo.getAssetGroup().equals(1)){
+                        radiationQuotaTypeFlag = true;
+                    }
+                }
             }
             selected.setRegion(selectedContract.getRegion());
             initZknPartCat(selectedContract.getStartDate());
@@ -629,17 +637,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 return;
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
-                if(ZkbContract.ContractType.CCSB.toString().equals(selectedContract.getContractType())){
-                    Integer remindQty = 0;
-                    if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(selected.getCcsbApplyType())){
-                        remindQty = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
-                    }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(selected.getCcsbApplyType())){
-                        remindQty = selectedContract.getCcsbMaintenanceQuota() == null ? 0 : selectedContract.getCcsbMaintenanceQuota();
-                    }
-                    if(remindQty >= 1){
-                        this.selected.setRemainQty(remindQty - 1);
-                    }else{
-                        this.selected.setRemainQty(0);
+                if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) &&
+                        (ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) &&
+                        assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup().equals(1)){
+                    if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
+                        Integer contractCount = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
+                        this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                        Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
+                        this.selected.setRemainQty(contractCount - this.selected.getQty());
                     }
                 }else if(!CopyByInvok.NORMAL_TWO.equals(selected.getArtificialType())) {
                     if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
@@ -1560,6 +1566,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setSupplementFlag(String supplementFlag) {
         this.supplementFlag = supplementFlag;
+    }
+
+    public boolean isRadiationQuotaTypeFlag() {
+        return radiationQuotaTypeFlag;
+    }
+
+    public void setRadiationQuotaTypeFlag(boolean radiationQuotaTypeFlag) {
+        this.radiationQuotaTypeFlag = radiationQuotaTypeFlag;
     }
 
     @Override

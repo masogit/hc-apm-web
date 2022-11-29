@@ -1148,6 +1148,30 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             WebUtil.addErrorMessage("备件申请名额不足，请联系供应商！","");
                             return "";
                         }
+                    }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+                        if(selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup().equals(1)){
+                            if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
+                                if(c.getPartHighQuotaApply() < selected.getQty()){
+                                    WebUtil.addErrorMessage("高值备件申请名额不足，请联系供应商！","");
+                                    return "";
+                                }
+                            }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                                if(c.getSpareArtificailApply() < selected.getQty()){
+                                    WebUtil.addErrorMessage("联合申请名额不足，请联系供应商！","");
+                                    return "";
+                                }
+                            }else{
+                                if(c.getSpareArtificailApply() < selected.getQty()){
+                                    WebUtil.addErrorMessage("联合申请名额不足，请联系供应商！","");
+                                    return "";
+                                }
+                            }
+                        }else{
+                            if(c.getSpareArtificailApply() < selected.getQty()){
+                                WebUtil.addErrorMessage("联合申请名额不足，请联系供应商！","");
+                                return "";
+                            }
+                        }
                     }else{
                         if(c.getSpareArtificailApply() < selected.getQty()){
                             WebUtil.addErrorMessage("联合申请名额不足，请联系供应商！","");
