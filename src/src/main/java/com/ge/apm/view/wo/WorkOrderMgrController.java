@@ -2743,6 +2743,7 @@ public void test1(){
             strHours = df.format(f1);
         } else {
             WebUtil.addErrorMessage("结束时间不能小于开始时间");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         selectedWorkOrderManHoursDetail.setHours(Double.valueOf(strHours));
@@ -2750,6 +2751,37 @@ public void test1(){
         selectedWorkOrderManHoursDetail.setEndTime(secondDate);
         if (workHoursList.contains(selectedWorkOrderManHoursDetail)) {
             workHoursList.remove(selectedWorkOrderManHoursDetail);
+        }
+
+        // 重复性校验
+        boolean check = false;
+        for (V2_WorkOrderManHoursDetail detail : workHoursList) {
+            if("000".equals(detail.getId())){
+                continue;
+            }
+            // 开始时间结束时间不能相等
+            if(firstDate.getTime() == detail.getStartTime().getTime()
+                    || secondDate.getTime() == detail.getEndTime().getTime()){
+                check = true;
+                break;
+            }
+            // 当前开始时间小于结束时间 && 大于开始时间
+            if(firstDate.getTime() < detail.getEndTime().getTime()
+                    && firstDate.getTime() > detail.getStartTime().getTime()){
+                check = true;
+                break;
+            }
+            // 当前结束时间大于开始时间 && 小于结束时间
+            if(secondDate.getTime() > detail.getStartTime().getTime()
+                    && firstDate.getTime() < detail.getEndTime().getTime()){
+                check = true;
+                break;
+            }
+        }
+        if(check){
+            WebUtil.addErrorMessage("工时段重复，请重新填写");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
         }
         workHoursList.add(selectedWorkOrderManHoursDetail);
         Double hours = 0d;
