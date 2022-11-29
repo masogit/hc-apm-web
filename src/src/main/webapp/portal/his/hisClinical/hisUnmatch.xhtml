@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<div class="ui-g">
+    <div class="ui-g-12">
+        <div class="ui-g-12 card">
+            <h:form id="IouListForm">
+
+                <p:dataTable id="dataList" value="#{hisClinicalUnmatchController.lazyModel}" var="item"
+                             widgetVar="varDataList"
+                             selectionMode="single" selection="#{hisClinicalUnmatchController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createDate}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="filter" listener="#{hisClinicalUnmatchController.onFilter}"  />
+                    <p:column headerText="所属医院" sortBy="#{item.hosId}" filterBy="#{item.hosId}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.hosId}"/>
+                    </p:column>
+                    <p:column headerText="APM科室名称" sortBy="#{item.orgName}" filterBy="#{item.orgName}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.orgName}"/>
+                    </p:column>
+                    <p:column headerText="APM科室编码" sortBy="#{item.namePyCode}" filterBy="#{item.namePyCode}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.namePyCode}"/>
+                    </p:column>
+                    <p:column headerText="HIS科室名称" sortBy="#{item.hisKsname}" filterBy="#{item.hisKsname}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.hisKsname}"/>
+                    </p:column>
+                    <p:column headerText="HIS科室编码" sortBy="#{item.hisKsid}" filterBy="#{item.hisKsid}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.hisKsid}"/>
+                    </p:column>
+
+                    <p:column headerText="创建日期" sortBy="#{item.createDate}" filterBy="#{item.createDate}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.createDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="操作" filterMatchMode="LIKE">
+                        <p:commandButton value="取消匹配" action="#{hisClinicalUnmatchController.cancelMatch(item.id)}" update="@(form)">
+                            <p:confirm header="取消匹配科室" message="确定取消该条科室匹配吗?取消之后可能会使该科室对应的设备将不再参与绩效计算哦,请慎重操作！！！" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                         class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="dataList" fileName="Iou_export"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+
+        </div>
+    </div>
+</div>
+</html>

@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="preRenderView">
+        <h:outputScript name="js/main.js"/>
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="#{msg.manualTasks}"/>
+                </div>
+                <div class="ui-g-12 card">
+
+                    <h:form id="hisManualDataForm">
+                        <div style="border:0px solid ;display:inline-block;width: 95%;float: left;">
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                                <h:panelGroup style="float: left">
+                                    <label class="label">数据起始时间</label>
+                                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="startDate" value="#{hisManualJobController.hisRequestParamsDto.startDate}"
+                                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup style="float: left">
+                                    <label class="label">数据结束时间</label>
+                                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="endDate" value="#{hisManualJobController.hisRequestParamsDto.endDate}"
+                                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">任务类型</label>
+                                    <p:autoComplete id="taskNameSearch" dropdown="true" inputStyle="width: 160px"
+                                                    readonly="false" forceSelection="true"
+                                                    value="#{hisManualJobController.hisRequestParamsDto.taskTypeName}"
+                                                    completeMethod="#{hisManualJobController.getTaskTypeList()}"
+                                                    var="it" itemLabel="#{it}" itemValue="#{it}" >
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">执行结果</label>
+                                    <p:autoComplete id="execResult" dropdown="true" inputStyle="width: 160px"
+                                                    readonly="false" forceSelection="true"
+                                                    value="#{hisManualJobController.hisRequestParamsDto.taskResultStatus}"
+                                                    completeMethod="#{hisManualJobController.getExecResultList()}"
+                                                    var="it" itemLabel="#{it}" itemValue="#{it}">
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+                        <div style="float: left;margin: 30px -80px 0px -50px">
+                            <p:commandButton validateClient="true" value="检索" update="hisManualDataForm:dataList" />
+                        </div>
+
+
+                        <p:dataTable id="dataList" value="#{hisManualJobController.lazyModel}" var="item"
+                                     widgetVar="varDataList"
+                                     selectionMode="single" selection="#{hisManualJobController.selected}"
+                                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                     sortBy="#{item.createdDate}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}" expandableRowGroups="true"
+                                     rowsPerPageTemplate="5,20,50,100,500">
+
+                          <p:ajax event="filter" listener="#{hisManualJobController.onFilter}"/>
+                            <p:ajax event="rowSelect"  update=":hisManualDataForm:commentInfo"/>
+                            <p:column headerText="所属医院">
+                                <h:outputText value="#{item.orgName}"/>
+                            </p:column>
+                            <p:column headerText="任务类型">
+                                <h:outputText value="#{item.taskTypeName}"/>
+                            </p:column>
+                            <p:column headerText="任务执行时间">
+                                <h:outputText value="#{item.taskStartDate}"/>
+                            </p:column>
+                            <p:column headerText="任务结束时间">
+                                <h:outputText value="#{item.taskEndDate}"/>
+                            </p:column>
+                            <p:column headerText="数据起始时间">
+                                <h:outputText value="#{item.dataStartDate}"/>
+                            </p:column>
+                            <p:column headerText="数据结束时间">
+                                <h:outputText value="#{item.dataEndDate}"/>
+                            </p:column>
+                            <p:column headerText="任务状态">
+                                <h:outputText value="#{hisManualJobController.getStatusName(item.taskStatus)}"/>
+                            </p:column>
+                            <p:column headerText="执行结果" sortBy="#{item.taskResultStatus}">
+                                <h:outputText value="#{item.taskResultStatus}"/>
+                            </p:column>
+                            <p:column headerText="数据抓取时间(毫秒)" sortBy="#{item.sqlExecuteTime}">
+                                <h:outputText value="#{item.sqlExecuteTime}"/>
+                            </p:column>
+                            <p:column headerText="数据抓取条数" sortBy="#{item.queryQuantity}">
+                                <h:outputText value="#{item.queryQuantity}"/>
+                            </p:column>
+                            <p:column headerText="成功条数" sortBy="#{item.totalQuantity}">
+                                <h:outputText value="#{item.totalQuantity}"/>
+                            </p:column>
+                            <p:column headerText="创建人">
+                                <h:outputText value="#{item.createdBy}"/>
+                            </p:column>
+                            <p:column headerText="创建时间" sortBy="#{item.createdDate}">
+                                <h:outputText value="#{item.createdDate}"/>
+                            </p:column>
+                            <p:column headerText="执行停止" width="9%" exportable="false">
+                                <p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}"
+                                                 actionListener="#{hisManualJobController.setToWaiting(item.id)}"
+                                                 update="hisManualDataForm  taskTypeEditForm" rendered="#{item.taskStatus=='init'||(item.taskStatus == 'done' and item.taskResultStatus == 'fail')}"/>
+                                <p:commandButton icon="ui-icon-close" style="zoom:0.7" title="#{msg.Disabled}"
+                                                 actionListener="#{hisManualJobController.setNotWaiting(item.id)}"
+                                                 update="hisManualDataForm  taskTypeEditForm" rendered="#{item.taskStatus=='wait'}"/>
+                            </p:column>
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
+                                                 title="#{msg.Create}"
+                                                 actionListener="#{hisManualJobController.prepareCreate()}"
+                                                 oncomplete="PF('taskTypeDialog').show()"
+                                                 update="hisManualDataForm  taskTypeEditForm"/>
+                            </f:facet>
+                        </p:dataTable>
+                        <p:panel id="commentInfo" style="border: none; background: transparent;" >
+                            <p:inputTextarea  rendered="#{hisManualJobController.selected.comment != null}" cols="50" autoResize="true" value="#{hisManualJobController.selected.comment}"/>
+                        </p:panel>
+                    </h:form>
+                </div>
+                <p:dialog id="taskTypeDialog" widgetVar="taskTypeDialog" modal="true" width="1200"
+                          height="300"
+                          resizable="true" draggable="true" appendTo="@this" header="新增任务">
+                    <h:form id="taskTypeEditForm">
+                        <h:panelGroup id="display">
+                            <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                         rendered="true">
+
+                                <h:panelGroup>
+                                    <label class="label">任务类型<span style="color: red;"> *</span></label>
+                                    <p:autoComplete id="taskName" dropdown="true" inputStyle="width: 160px"
+                                                    readonly="false" forceSelection="true"
+                                                    value="#{hisManualJobController.hisManualJob.taskTypeName}"
+                                                    completeMethod="#{hisManualJobController.getTaskTypeList()}"
+                                                    var="it" itemLabel="#{it}" itemValue="#{it}" required="true"
+                                                    requiredMessage="请选择任务类型">
+                                        <p:ajax event="itemSelect"
+                                                listener="#{hisManualJobController.onTaskChange()}"
+                                                update="taskTypeEditForm"/>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">所属医院<span style="color: red;"> *</span></label>
+                                    <p:selectOneMenu value="#{hisManualJobController.selectedOrg}" required="true" requiredMessage="请选择所属医院" converter="orgInfoConverter">
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{hisShareController.orgInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+                                <h:panelGroup rendered="#{hisManualJobController.openFlag}" id="dateSelector1">
+                                    <label class="label">数据起始时间<span style="color: red;"> *</span></label>
+                                    <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}"
+                                                required="true"
+                                                pattern="yyyy/MM/dd"
+                                                value="#{hisManualJobController.hisManualJob.dataStartDate}"
+                                                showOn="button" readonlyInput="false" showButtonPanel="true"
+                                                navigator="true" mask="true"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup rendered="#{hisManualJobController.openFlag}" id="dateSelector2">
+                                    <label class="label">数据结束时间<span style="color: red;"> *</span></label>
+                                    <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}"
+                                                required="true"
+                                                pattern="yyyy/MM/dd"
+                                                value="#{hisManualJobController.hisManualJob.dataEndDate}"
+                                                showOn="button" readonlyInput="false" showButtonPanel="true"
+                                                navigator="true" mask="true"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <p:commandButton
+                                    actionListener="#{hisManualJobController.saveManualData()}"
+                                    value="#{msg.Confirm}"
+                                    update="hisManualDataForm"
+                                    icon="ui-icon-check"
+                                    oncomplete="PF('taskTypeDialog').hide()"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                             onclick="PF('taskTypeDialog').hide()"
+                                             update="hisManualDataForm"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

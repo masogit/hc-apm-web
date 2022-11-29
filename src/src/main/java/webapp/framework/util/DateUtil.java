@@ -139,4 +139,11 @@ public class DateUtil {
 		cal.add(Calendar.MILLISECOND, -1);
 		return cal.getTime();
 	}
+
+	public static Date getDateAddOneDay(Date date){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.DATE,1);
+		return calendar.getTime();
+	}
 }
