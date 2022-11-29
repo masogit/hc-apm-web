@@ -3897,9 +3897,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','GEIBTableExcel','全量IB台账信息导入','GE IB Table Info List',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','DealerFEAndSalesExcel','代理商FE/Sales列表','Dealer FE and Sales List',NULL,-1);
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetClass','资产分类','Asset Classification',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetClass','管理分类','Manage classifications',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetClass','1','医疗设备','Medical Equipment',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetClass','2','家具','Furniture',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetClass','2','后勤资产','Logistical assets',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetClass','3','信息类设备','Information Equipment',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','oneQrCode','一机一码','One QR Code',NULL,-1);
@@ -4839,3 +4839,52 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'PermissionGroupSetting', '权限组设置', 'Permission group setting', NULL, '-1');
 -- YHAAO-17126 设备消息订阅添加试用到期提醒事件
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ExpirationReminderEvent', '使用到期提醒事件', 'expiration reminder event', NULL, '-1');
+-- 添加提醒消息推送菜单
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'ReminderConfiguration', '消息提醒配置', 'Message reminder configuration', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'reminderRule', '提醒规则类型', 'asset expire reminder', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'Default', '默认到期提醒', 'default expire reminder', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'AssetLifecycle', '资产到期提醒', 'asset expire reminder', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderRule', 'Measuring', '计量到期提醒', 'measuring expire reminder', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'reminderType', '提醒类型', 'wechat', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderType', 'wechat', '微信', 'wechat', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderType', 'email', '邮件', 'email', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reminderType', 'sms', '短信', 'sms', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'noticeType', '通知类型', 'notice type', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('noticeType', 'noticeTypeRole', '角色', 'role', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('noticeType', 'noticeTypeUser', '用户', 'user', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'noticeType', '通知类型', 'notice type', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'multiplePush', '多次推送', 'multiple push', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'noticeSetting', '通知配置', 'notice setting', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'pushSetting', '推送配置', 'push setting', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'wechatTemplateSetting', '微信模板配置', 'wechat template setting', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'pushCycle', '推送周期(天)', 'push cycle', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'pushNum', '推送次数', 'number of push', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'reminderEvent', '提醒事件信息', 'reminder event', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name', 'reminderDate', '提醒日期', 'reminder date', NULL, '-1');
+-- YHAAO-17272 维修管理-分时段录入工时导出
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','workHourDetail','维修工时详情','Details of maintenance hours',NULL,-1);
+-- YHAAO-17289 漳州市医院演示环境-常用故障模板
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetRepairQuickTemplateType','1','故障原因','Asset Repair Quick Template Type 1',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetRepairQuickTemplateType','2','解决方案','Asset Repair Quick Template Type 2',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetRepairQuickTemplateType','3','交付检测','Asset Repair Quick Template Type 3',NULL,-1);
+-- YHAAO-17290 his 设备绩效管理
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform','His绩效分析','His Performance analysis',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.deviceMatching','设备匹配','Device matching',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.deptMatching','科室匹配','Device matching',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.deviceGrouping','设备分组','Device grouping',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.chargeCode','收费代码与分组匹配','The charge code matches the group',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.manualTasks','手动任务抓取数据','Manual tasks fetch data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.chargeDetailSource','收费明细源数据','Charge details source data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','hisPerform.chargeDetailResult','收费明细结果数据','Charge details source result data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','repair.commonFaults','常用故障及分类','Common faults and classification',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','hisPerform','His绩效分析','His Performance analysis',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','deviceMatching','设备匹配','Device matching',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','deptMatching','科室匹配','Device matching',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','deviceGrouping','设备分组','Device grouping',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','chargeCode','收费代码与分组匹配','The charge code matches the group',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','manualTasks','手动任务抓取数据','Manual tasks fetch data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','chargeDetailSource','收费明细源数据','Charge details source data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','chargeDetailResult','收费明细结果数据','Charge details source result data',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','commonFaults','常用故障及分类','Common faults and classification',NULL,-1);
+-- YHAAO-17037 需求-非医疗设备的管理
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customI18n','assetClass','资产分类','Asset Classification',NULL,-1);

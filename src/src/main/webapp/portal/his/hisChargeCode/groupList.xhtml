@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<body>
+<div class="ui-g">
+    <div class="ui-g-12">
+        <div class="ui-g-12 card">
+            <h:form id="IouListForm">
+                <div style="border:0px solid ;display:inline-block;width: 98%;float: left;">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class='label'>His收费代码</label>
+                            <p:inputText id="departNum1" rows="1" cols="10" minQueryLength="4"
+                                         value="#{hisChargeCodeUnmatchController.eqId}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class='label'>His收费项目名称</label>
+                            <p:inputText id="name1" rows="1" cols="10" minQueryLength="4"
+                                         value="#{hisChargeCodeUnmatchController.assetName}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class='label'>His分组名称</label>
+                            <p:inputText rows="1" cols="10" minQueryLength="4"
+                                         value="#{hisChargeCodeUnmatchController.hisGroupName}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </div>
+                <div style="float: left;margin: 30px -80px 0px -400px">
+                    <p:commandButton validateClient="true" value="检索" update="datalist" />
+                </div>
+                <p:dataTable id="datalist" value="#{hisChargeCodeUnmatchController.lazyModel}" var="item"
+                             widgetVar="varDataList"
+                             selectionMode="single" selection="#{hisChargeCodeUnmatchController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createDate}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}" expandableRowGroups="true"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="filter" listener="#{hisChargeCodeUnmatchController.onFilter}"/>
+
+                    <p:column headerText="所属医院" sortBy="#{item.hosId}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.hosId}"/>
+                    </p:column>
+                    <p:column headerText="His收费项目代码" sortBy="#{item.sfxmId}" groupRow="true"
+                              filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.sfxmId}"/>
+                    </p:column>
+                    <p:column headerText="His收费项目名称" sortBy="#{item.sfxmName}" groupRow="true"
+                              filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.sfxmName}"/>
+                    </p:column>
+                    <p:column headerText="自定义分组名称" sortBy="#{item.assetGroupName}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetGroupName}"/>
+                    </p:column>
+                    <p:column headerText="科室名称" sortBy="#{item.clinicalDeptName}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.clinicalDeptName}"/>
+                    </p:column>
+                    <p:column headerText="收费项目分类" sortBy="#{item.sfxmLb}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.sfxmLb}"/>
+                    </p:column>
+                    <p:column headerText="自定义分组占比(%)" sortBy="#{item.groupRate}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.groupRate}"/>
+                    </p:column>
+                    <p:column headerText="创建日期" sortBy="#{item.createDate}"
+                              filterMatchMode="GTE">
+                        <h:outputText value="#{item.createDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="操作"  groupRow="true">
+                        <p:commandButton value="取消#{item.sfxmId}匹配" action="#{hisChargeCodeUnmatchController.initDate(item.sfxmId)}"
+                                         oncomplete="PF('hisGroupMatchAdjustBusinessDialog').show()"  update=":HisGroupTab:selectAssetForm">
+                        </p:commandButton>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                         class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
+                        </p:commandButton>
+                    </f:facet>
+
+                </p:dataTable>
+            </h:form>
+            <ui:include src="HisGroupMatchAdjustBusiness.xhtml"/>
+        </div>
+    </div>
+</div>
+</body>
+</html>

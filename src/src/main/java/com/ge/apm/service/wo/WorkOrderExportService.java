@@ -45,6 +45,7 @@ public class WorkOrderExportService {
     private static final String I18N_REPAIR_TYPE = "repairType";
     private static final String I18N_CURRENT_STEP_ = "woSteps";
     private static final String I18N_REPAIR_RESULT = "repairResult";
+    private static final String I18N_HOUR_TYPE = "hoursEntryType";
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final Logger log = LoggerFactory.getLogger(WorkOrderExportService.class);
@@ -320,6 +321,9 @@ public class WorkOrderExportService {
 
             workOrderMap.put("siebleNumber", workOrderExportPojo.getSiebleNumber());
             workOrderMap.put("callCenterNumber", workOrderExportPojo.getCallCenterNumber());
+
+            workOrderMap.put(WebUtil.getMessage("entryType"), FieldValueMessageController.fieldValue(I18N_HOUR_TYPE, workOrderExportPojo.getEntryType() == null ? "0" : workOrderExportPojo.getEntryType().toString()));
+            workOrderMap.put(WebUtil.getMessage("workHourDetail"), workOrderExportPojo.getWorkHourDetail());
 
             String attributesStr = "";
             if(!StringUtils.isEmpty(workOrderExportPojo.getAttributes())){

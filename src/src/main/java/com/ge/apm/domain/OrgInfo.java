@@ -102,6 +102,9 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "other")
     private String other;
 
+    @Column(name = "org_code")
+    private String orgCode;
+
     @Transient
     private int lineNum;
 
@@ -173,6 +176,14 @@ public class OrgInfo implements Serializable, ChineseName {
         this.name = name;
         this.orgType = orgType;
         this.parentUID = parentUID;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
     }
 
     public String getTenantUID() {

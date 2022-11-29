@@ -1,5 +1,7 @@
 package com.ge.apm.view.uaa;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
@@ -115,6 +117,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private String previousOrgUid;  //used in update
 
     private List<SysRoleVO> roleListVO;
+
+    private List<PermissionGroup> permissionGroups;
 
     private UserAccountService userAccountService;
 
@@ -465,6 +469,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private List<String> allRoles;
     private List<String> assignedRoles;
+    private List<String> assignedPermissionGroupUidList;
 
     public List<String> getAllRoles() {
         return allRoles;
@@ -489,6 +494,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selected = uaaService.loadUserWithUserRoles(selected.getId());
         roleListVO = new ArrayList<>();//
         assignedRoles = new ArrayList<>();
+        permissionGroups = uaaService.getPermissionGroups(selected.getSiteUID());
+        assignedPermissionGroupUidList = uaaService.getPermissionGroupsByUserUid(selected.getUid());
         if(loginUser.getType() != null && loginUser.getType() == UserAccount.LI_XIANG){
             SysRoleVO sysRoleVO = getVOBySysRoleName(SYSTEM_ACTIVE);
             if(sysRoleVO == null){
@@ -635,6 +642,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         uaaService.setUserRoles(selected, assignedRoles);
+        uaaService.setUserPermissionGroup(selected, assignedPermissionGroupUidList);
         updateUserScope();
         userApi.resetUser(selected.getLoginName());
         selected.getUserRoleList().clear();
@@ -1205,7 +1213,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void updateUserScope() {
 
-        Set<OrgInfo> selectedOrgList = new HashSet<>();
+        Set<OrgInfo> selectedOrgList = new HashSet<>(uaaService.getOrgListByPermissionGroup(ObjectUtil.isNotEmpty(assignedPermissionGroupUidList) ? assignedPermissionGroupUidList : ListUtil.toList("-1")));
         if(46==selected.getSiteId()){
             //only add parent if all children is selected
             readSelectedOrgTree46(accessOrgTree, selectedOrgList);
@@ -1258,9 +1266,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     }
 
-    public void onSelectAccessTreeNode(NodeSelectEvent event) {
-        setTreeNodes(event.getTreeNode(), true);
-    }
     public void onSelectAccessTreeNode46(NodeSelectEvent event) {
         if(orgInfoTableData46.size()==1 && "GE后台运维".equals(orgInfoTableData46.get(0).getName())){
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning!", "如要继续操作，请先删除顶级权限！"));
@@ -1332,13 +1337,23 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     }
 
-    public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
+    public void onSelectAccessTreeNode(NodeSelectEvent event) {
+        setTreeNodes(event.getTreeNode(), true);
+    }
 
+    public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
         TreeNode node = event.getTreeNode();
         setTreeNodes(node, false);
         while (node.getParent() != null) {
             node.getParent().setSelected(false);
             node = node.getParent();
+        }
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
         }
     }
 
@@ -1359,12 +1374,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         updateOrgInfoTable("2" , orgInfo);
     }
 
-    private void setTreeNodes(TreeNode root, Boolean isSelected) {
-        root.setSelected(isSelected);
-        for (TreeNode item : root.getChildren()) {
-            setTreeNodes(item, isSelected);
-        }
-    }
     private void setTreeNodes46(TreeNode root, Boolean isSelected) {
         root.setSelected(isSelected);
         selectedAccessOrgNodesCopy.add(root);//放入需要去除的node
@@ -1681,6 +1690,22 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         isShowButton = showButton;
     }
 
+    public List<PermissionGroup> getPermissionGroups() {
+        return permissionGroups;
+    }
+
+    public void setPermissionGroups(List<PermissionGroup> permissionGroups) {
+        this.permissionGroups = permissionGroups;
+    }
+
+    public List<String> getAssignedPermissionGroupUidList() {
+        return assignedPermissionGroupUidList;
+    }
+
+    public void setAssignedPermissionGroupUidList(List<String> assignedPermissionGroupUidList) {
+        this.assignedPermissionGroupUidList = assignedPermissionGroupUidList;
+    }
+
     public List<String> autoCompleteTags(String query) {
 
         List<String> tags = userTagsMapper.getTagsByTenant(UserContextService.getCurrentUserAccount().getTenantUID());
@@ -1703,18 +1728,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if(null==selected || null==selected.getSiteId()){
             return false;
         }
-        if(46==selected.getSiteId()){
-            return true;
-        }else{
-            return false;
-        }
+        return 46 == selected.getSiteId();
     }
 
     public boolean getIsSelect46Account() {
-        if (selectedTenant!=null&&selectedTenant.getId() == 46) {
-            return true;
-        }
-        return false;
+        return selectedTenant != null && selectedTenant.getId() == 46;
     }
 
     public void filterTreeNodeByUid(){

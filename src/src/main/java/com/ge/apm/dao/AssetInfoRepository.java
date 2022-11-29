@@ -325,4 +325,6 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value="select uid from asset_info o where o.brand_id=?1 and o.is_valid=true and o.is_deleted=false",nativeQuery=true)
     List<String> findByBrandId(Integer value);
+
+    List<AssetInfo> findAllByUidIn(List<String> orgUids);
 }
