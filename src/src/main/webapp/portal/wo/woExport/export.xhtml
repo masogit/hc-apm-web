@@ -195,7 +195,7 @@
             </p:column><p:column headerText="资产编号">
                 <h:outputText value="#{item.资产编号}"/>
             </p:column>-->
-            <p:column headerText="院区" filterBy="#{item.院区}" filterValue="#{workOrderReportExportController.filterMap.siteUID}" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+            <p:column headerText="所属院区" filterBy="#{item.院区}" filterValue="#{workOrderReportExportController.filterMap.siteUID}" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
                 <h:outputText value="#{item.院区}"/>
             </p:column>
             <p:column headerText="#{msg.Department}">
