@@ -13,26 +13,24 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetRepairQuickTemplateController.selected != null}">
                         <h:panelGroup>
-                            <label class="label">模板类型</label>
-                            <p:selectOneMenu id="templateType" value="#{assetRepairQuickTemplateController.selected.templateType}">
+                            <label class="label">模板类型*</label>
+                            <p:selectOneMenu id="templateType" value="#{assetRepairQuickTemplateController.selected.templateType}"
+                                             required="true" requiredMessage="模板类型 #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetRepairQuickTemplateType')}" var="item" itemLabel="#{item.value}"
                                                itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">设备分类<span style="color: red;">*</span></label>
-                            <p:selectOneMenu id="assetGroup" value="#{assetRepairQuickTemplateController.selected.assetGroup}">
+                            <label class="label">设备分类*</label>
+                            <p:selectOneMenu id="assetGroup" value="#{assetRepairQuickTemplateController.selected.assetGroup}"
+                                             required="true" requiredMessage="设备分类 #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}"
                                                itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
 
-                        <!--<h:panelGroup styleClass="md-inputfield">
-                            <p:inputText id="assetGroup" value="#{assetRepairQuickTemplateController.selected.assetGroup}" />
-                            <label>设备分类</label>
-                        </h:panelGroup>-->
                         <h:panelGroup styleClass="md-inputfield">
                             <p:inputText id="templateTitle" value="#{assetRepairQuickTemplateController.selected.templateTitle}" />
                             <label>模板主题</label>
