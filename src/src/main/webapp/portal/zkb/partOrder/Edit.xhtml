@@ -118,6 +118,9 @@
                             <p:column headerText="#{msg.zkbContract_spareArtificail}">
                                 <h:outputText value="#{item.spareArtificail}"/>
                             </p:column>
+                            <p:column headerText="高值备件剩余名额">
+                                <h:outputText value="#{item.partHighQuota}"/>
+                            </p:column>
                         </c:when>
                         <c:when test="#{zkbPartOrderEditController.orderType eq 'Probe'}">
                             <p:column headerText="探头任意剩余名额" >
@@ -190,13 +193,32 @@
 
                        <!-- <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">-->
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts'}">
-                            <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 1}">
+                            <h:panelGroup rendered="#{zkbPartOrderEditController.assetInfo.assetGroup eq 1}">
                                 <label class="label">设备类型（DI）*</label>
                                 <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderEditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItem itemLabel="CT" itemValue="CT"/>
                                     <f:selectItem itemLabel="XR" itemValue="XR"/>
                                     <p:ajax event="change" update="zkbPartOrderEditForm:warmMessageCT"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.radiationQuotaTypeFlag}">
+                            <label class="label">放射名额扣除类型*</label>
+                            <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.radiationQuotaType}" required="true" requiredMessage="放射名额扣除类型 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="partsHighTypeGroup"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="联合名额" itemValue="SpareArtificial"/>
+                                <f:selectItem itemLabel="高值备件名额" itemValue="PartsHigh"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup id="partsHighTypeGroup" >
+                            <h:panelGroup  rendered="#{zkbPartOrderEditController.selected.radiationQuotaType eq 'PartsHigh'}">
+                                <label class="label">备件类型*</label>
+                                <p:selectOneMenu value="#{zkbPartOrderEditController.selected.partsHighType}" required="true" requiredMessage="备件类型 #{msg.ValidationRequire}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartsHighTypeGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>

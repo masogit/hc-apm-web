@@ -37,6 +37,7 @@
 				<p:fieldset id="authConfig" legend="#{msg.WebAuthorityConfiguration}"  rendered="#{userContextService.isLocale()}">
 					<p:repeat var="domainAuth" value="#{customRoleController.authJSONArr}">
 						<label class="label">#{domainAuth['v']}</label>
+						<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 						<p:selectBooleanCheckbox value="#{domainAuth['s']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 's')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 's')}">
 						</p:selectBooleanCheckbox>
 						<p:selectBooleanCheckbox value="#{domainAuth['a']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'a')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'a')}">
@@ -49,6 +50,7 @@
 						</p:selectBooleanCheckbox>
 						<p:selectBooleanCheckbox value="#{domainAuth['o']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'o')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'o')}">
 						</p:selectBooleanCheckbox>
+						</p:panelGrid>
 					</p:repeat>
 				</p:fieldset>
 				<p:fieldset id="cardConfig" legend="#{msg.WeChatCardConfiguration}">

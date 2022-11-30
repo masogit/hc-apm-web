@@ -53,6 +53,10 @@ public class ZkbPartOrder implements Serializable {
         Repair, Maintain
     }
 
+    public enum RadiationQuotaTypeEnum{
+        SpareArtificial,PartsHigh
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -618,6 +622,28 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "ccsb_apply_type")
     private String ccsbApplyType;// apply maintain
+
+    @Column(name = "radiation_quota_type")
+    private String radiationQuotaType;
+
+    @Column(name = "parts_high_type")
+    private String partsHighType;
+
+    public String getPartsHighType() {
+        return partsHighType;
+    }
+
+    public void setPartsHighType(String partsHighType) {
+        this.partsHighType = partsHighType;
+    }
+
+    public String getRadiationQuotaType() {
+        return radiationQuotaType;
+    }
+
+    public void setRadiationQuotaType(String radiationQuotaType) {
+        this.radiationQuotaType = radiationQuotaType;
+    }
 
     public String getProductRemark() {
         return productRemark;
