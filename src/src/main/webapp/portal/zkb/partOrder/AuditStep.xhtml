@@ -183,6 +183,22 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 1 and (zkbPartOrderAuditController.zkbContract.contractType eq 'DI' or zkbPartOrderAuditController.zkbContract.contractType eq 'PCB')}">
+                            <label class="label">放射名额扣除类型*</label>
+                            <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.radiationQuotaType}" requiredMessage="放射名额扣除类型 #{msg.ValidationRequire}"  disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="联合名额" itemValue="SpareArtificial"/>
+                                <f:selectItem itemLabel="高值备件名额" itemValue="PartsHigh"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.radiationQuotaType eq 'PartsHigh'}">
+                            <label class="label">备件类型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.partsHighType}" requiredMessage="备件类型 #{msg.ValidationRequire}"  disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartsHighTypeGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.maintainFlag != 't' and zkbPartOrderEditController.selectedContract.contractType != 'CCSB'}">
                             <c:if test="#{zkbPartOrderAuditController.selected.artificialType eq '1'}">
                                 <label class="label" >是否需要SSA Key*</label>
