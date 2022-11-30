@@ -64,6 +64,15 @@
                 <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.functionType}"/>
                 </p:column>
+                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.siteUidFilter}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{workOrderMgrController.LoadSiteNameListMVS()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{workOrderMgrController.getSiteOrgName(item.siteUID)}"/>
+                </p:column>
                 <!--所属科室-->
                 <p:column headerText="#{msg.clinicalDeptName}"  width="100" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <f:facet name="header">

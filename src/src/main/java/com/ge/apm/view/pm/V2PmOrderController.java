@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONPath;
@@ -254,6 +249,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private StreamedContent signatureContentStream;
     private String signatureId;
     private boolean newSignature = true;
+
+    @Getter @Setter
+    private String siteUidFilter;
+    @Getter @Setter
+    private List<OrgInfo> orgListMVS;
+    @Getter @Setter
+    List<V2_PmOrder> bySearchFilterMVS = null;
+    @Getter @Setter
+    List<V2_PmOrder> bySearchFilterInternal = null;
+    @Getter @Setter
+    private List<OrgInfo> orgList;
+
 
     private WorkflowService workflowService;
 
@@ -1848,8 +1855,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if("MVS保养".equals(tabTitle)){
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 result  = dao.findBySearchFilter(filters, pageRequest);
+                bySearchFilterMVS = result.getContent();
             }else{
                 result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
+                bySearchFilterInternal = result.getContent();
             }
 //            Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
@@ -1887,8 +1896,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if("MVS保养".equals(tabTitle)){
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 result  = dao.findBySearchFilter(filters, pageRequest);
+                bySearchFilterMVS = result.getContent();
             }else{
                 result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
+                bySearchFilterInternal = result.getContent();
             }
 //            Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
            // result.getContent().forEach(item->pmIdList.add(item.getId()));
@@ -1996,8 +2007,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if("MVS保养".equals(tabTitle)){
             List<SearchFilter> filters = buildMvsSearchFilter();
             result = dao.findBySearchFilter(filters, pageRequest);
+            bySearchFilterMVS = result.getContent();
         }else{
             result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
+            bySearchFilterInternal = result.getContent();
         }
         currentPagePmOrders = result.getContent();
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
@@ -2023,10 +2036,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<SearchFilter> filters = new ArrayList<>();
 
         List<String> orderIds = getVisableMvsAssetSystemId();
-        filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+        if (!CollectionUtils.isEmpty(orderIds)) {
+            filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+        }
 
         for (SearchFilter searchFilter : filterArrayList) {
-            if ("currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
+            if ("siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
@@ -2873,6 +2888,26 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }else { //批量
             pmOrderService.invokeAcceptanceInBatch(selectedMap, remarks, pass);
         }
+    }
+
+    public List<OrgInfo> LoadSiteNameList() {
+        if (org.springframework.util.CollectionUtils.isEmpty(orgList)) {
+            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterInternal)) {
+                orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+            }
+            orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+        }
+        return orgList;
+    }
+
+    public List<OrgInfo> LoadSiteNameListMVS() {
+        if (org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
+            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+            }
+            orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+        }
+        return orgListMVS;
     }
 
     public V2_WorkOrder_Detail getItemDetail() {
