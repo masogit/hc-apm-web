@@ -131,31 +131,31 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Transactional
 	@Modifying
 	//@Query(value = "update nurse_site_maintain_item set check_date=?5,modify_date=?5,status=?6 where schedule_date>=?1 and schedule_date<?2 and id in (select b.id from nurse_site_maintain_item b where b.status=0 and b.schedule_date>=?1 and b.schedule_date<?2 and b.asset_uid in(select a.uid from asset_info a where a.uid in (select d.asset_uid from nurse_site_maintain_item d where d.schedule_date>=?1 and d.schedule_date<?2) and (a.status in ?3 or a.is_valid=false or a.is_deleted=true) ) and b.config_id in (select c.id from nurse_site_maintain_config c where c.type=?4))", nativeQuery = true)
-	@Query(value = "update nurse_site_maintain_item nsmi set check_date=?5,modify_date=?5,status=?6 where nsmi.status = 0 and nsmi.schedule_date>=?1 and nsmi.schedule_date<?2 and exists(select * from asset_info ai where ai.uid=nsmi.asset_uid and (ai.status in ?3 or ai.is_valid=false or ai.is_deleted=true) and not exists(select * from nurse_tenant_exception nte where nte.tenant_uid=ai.tenant_uid)) and exists(select * from nurse_site_maintain_config nsmc where nsmc.id=nsmi.config_id and nsmc.type=?4)", nativeQuery = true)
-	void updateDailyByStatus(Date startDate, Date endDate, Collection<Integer> statusArr, int configType, Date currentDate, int status);
+	@Query(value = "update nurse_site_maintain_item nsmi set check_date=?5,modify_date=?5,status=?6,is_finish = ?7 where nsmi.status = 0 and nsmi.schedule_date>=?1 and nsmi.schedule_date<?2 and exists(select * from asset_info ai where ai.uid=nsmi.asset_uid and (ai.status in ?3 or ai.is_valid=false or ai.is_deleted=true) and not exists(select * from nurse_tenant_exception nte where nte.tenant_uid=ai.tenant_uid)) and exists(select * from nurse_site_maintain_config nsmc where nsmc.id=nsmi.config_id and nsmc.type=?4)", nativeQuery = true)
+	void updateDailyByStatus(Date startDate, Date endDate, Collection<Integer> statusArr, int configType, Date currentDate, int status,boolean isFinish);
 
 	@Query(value="select o.id from nurse_site_maintain_item o where o.parent_id in ?1 and o.status=0",nativeQuery=true)
 	public Set<String> findIdsByParentId0(Set<String> parentIds);
 
 	@Transactional
 	@Modifying
-	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=2,update_by=?6 where id in ?1 and schedule_date>=?5 and (comment is null or comment='')", nativeQuery = true)
-	void completeMaintainItem2(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate,String updateByUid);
+	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=2,update_by=?6,is_finish=?7 where id in ?1 and schedule_date>=?5 and (comment is null or comment='')", nativeQuery = true)
+	void completeMaintainItem2(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate,String updateByUid,Boolean isFinish);
 
 	@Transactional
 	@Modifying
-	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=5,update_by=?6 where id in ?1 and schedule_date>=?5 and (comment is not null and comment!='')", nativeQuery = true)
-	void completeMaintainItem5(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate,String updateByUid);
+	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=5,update_by=?6,is_finish=?7 where id in ?1 and schedule_date>=?5 and (comment is not null and comment!='')", nativeQuery = true)
+	void completeMaintainItem5(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate,String updateByUid,Boolean isFinish);
 
 	@Transactional
 	@Modifying
-	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=6,update_by=?6 where id in ?1 and schedule_date<?5 and (comment is not null and comment!='')", nativeQuery = true)
-	void completeMaintainItem6(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate,String updateByUid);
+	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=6,update_by=?6,is_finish=?7 where id in ?1 and schedule_date<?5 and (comment is not null and comment!='')", nativeQuery = true)
+	void completeMaintainItem6(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate,String updateByUid,boolean isFinish);
 
 	@Transactional
 	@Modifying
-	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=7 ,update_by=?6 where id in ?1 and schedule_date<?5 and (comment is null or comment='')", nativeQuery = true)
-	void completeMaintainItem7(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate,String updateByUid );
+	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=7 ,update_by=?6,is_finish=?7 where id in ?1 and schedule_date<?5 and (comment is null or comment='')", nativeQuery = true)
+	void completeMaintainItem7(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate,String updateByUid,Boolean isFinish);
 
 	@Query(value="select o.* from nurse_site_maintain_item o where o.asset_uid=?1 and o.parent_id in ?2",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findByParentIdAndAssetUid(String assetUid,Set<String> parentIds);
@@ -166,5 +166,8 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 
 	@Query(value="select * from nurse_site_maintain_item where asset_uid=?1 and schedule_date >=?2 and schedule_date<=?3 ",nativeQuery = true)
 	List<NurseSiteMaintainItem> getMaintainItemDataList(String assetUid,Date startDate,Date endDate);
+
+	@Query(value = "SELECT count(*) FROM nurse_site_maintain_item WHERE is_finish = FALSE AND parent_id = ?1",nativeQuery = true)
+	int noCheckCount(String parentId);
 
 }

@@ -94,6 +94,9 @@ public class NurseSiteMaintain implements Serializable {
 	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
 	@Column(name = "status")
 	private Integer status=0;
+
+	@Column(name = "is_finish")
+	private Boolean isFinish = false; //是否完成，以所有检测项都已勾选为准
 	
 	@Column(name="config_id")
 	private String configId;
@@ -404,4 +407,8 @@ public class NurseSiteMaintain implements Serializable {
 	public void setListCheckData(List<NurseSiteMaintainConfigCheckItem> listCheckData) {
 		this.listCheckData = listCheckData;
 	}
+
+	public Boolean getIsFinish() { return isFinish; }
+
+	public void setIsFinish(Boolean finish) { isFinish = finish; }
 }

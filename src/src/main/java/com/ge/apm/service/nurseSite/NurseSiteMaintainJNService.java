@@ -111,26 +111,6 @@ public class NurseSiteMaintainJNService {
 	}
 
 	@Transactional
-	public void tBatchCompleteMaintain(NurseSiteMaintain maintain, String signatureId,String userUid, Date date,Date delayDate) {
-		int status = maintain.getStatus();
-		if (status==0 || status == 2 || status == 5 || status == 6 || status == 7) {
-			Set<String> setMaintainIds = new HashSet<String>();
-			Set<String> setMaintainItemIds = new HashSet<String>();
-			setMaintainIds.add(maintain.getId());
-			if (setMaintainIds.size() > 0) {
-				setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId0(setMaintainIds);
-				if (setMaintainItemIds!=null && setMaintainItemIds.size() > 0) {
-                    nurseSiteMaintainDataRepository.completeMaintainDataByParent(setMaintainItemIds);
-					nurseSiteMaintainItemRepository.completeMaintainItem2(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
-					nurseSiteMaintainItemRepository.completeMaintainItem5(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
-					nurseSiteMaintainItemRepository.completeMaintainItem6(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
-					nurseSiteMaintainItemRepository.completeMaintainItem7(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
-				}
-			}
-		}
-	}
-
-	@Transactional
 	public void nativeDeleteMaintain(String id) {
 		Set<String> setMaintainItemIds = null;
 		setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(id);
@@ -1051,7 +1031,7 @@ public class NurseSiteMaintainJNService {
 			if(delay){
 				status=7;
 			}
-			nurseSiteMaintainRepository.completeMaintain(tempMaintain.getId(), signatureId, user.getUid(), date,status);
+			nurseSiteMaintainRepository.completeMaintain(tempMaintain.getId(), signatureId, user.getUid(), date,status,true);
 		}
 		return true;
 	}
