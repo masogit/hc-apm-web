@@ -1,5 +1,6 @@
 package com.ge.apm.service.i18n;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.DeptTransactionLogRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.TenantInfoRepository;
@@ -17,11 +18,13 @@ import java.util.List;
 public class I18nConfigService {
 
     @Autowired
-    I18nMessageRepository i18nMessageRepository;
+    private I18nMessageRepository i18nMessageRepository;
     @Autowired
-    TenantInfoRepository tenantInfoRepository;
+    private TenantInfoRepository tenantInfoRepository;
     @Autowired
-    DeptTransactionLogRepository deptTransactionLogRepository;
+    private DeptTransactionLogRepository deptTransactionLogRepository;
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteAndInsertI18n(List<I18nMessage> list, List<I18nMessage> removeList){
@@ -43,6 +46,13 @@ public class I18nConfigService {
                 if(count > 0){
                     return false;
                 }
+                break;
+            case "assetClass":
+                int assetCount = assetInfoRepository.countByAssetClassAndTenant(Integer.valueOf(msgKey), tenantInfo.getUid());
+                if(assetCount > 0){
+                    return false;
+                }
+                break;
             default:
         }
         return true;
