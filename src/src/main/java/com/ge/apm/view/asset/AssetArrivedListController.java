@@ -170,6 +170,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
                     } else if (status == 2) {
                         List<ArrivalListItem> items = aiService.getListItem(arrivalList.getId());
                         if (items != null) {
+                            arrivalList.setCannotDeleted(true);
                             boolean installed = false;
                             for (ArrivalListItem item : items) {
                                 if (item.getInstallStatus() != null && (!item.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW))) {
@@ -179,8 +180,17 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
                             }
                             if (installed) {
                                 arrivalList.setCannotDeleted(true);
+                            } else {
+                                if (UserContextService.checkRole("AssetHead")) {
+                                    arrivalList.setCannotDeleted(false);
+                                } else {
+                                    arrivalList.setCannotDeleted(true);
+                                }
                             }
-                        }
+                            if(arrivalList.getContractItemId()!=null) {
+                                arrivalList.setCannotDeleted(true);
+                            }
+
                     } else {
                         arrivalList.setCannotDeleted(true);
                     }
