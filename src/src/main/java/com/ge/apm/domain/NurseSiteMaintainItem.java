@@ -97,6 +97,9 @@ public class NurseSiteMaintainItem implements Serializable {
 	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
 	private Integer status=0;
+
+	@Column(name = "is_finish")
+	private Boolean isFinish = false; //是否完成，以所有检测项都已勾选为准
 	
 	@Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
@@ -430,4 +433,8 @@ public class NurseSiteMaintainItem implements Serializable {
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
 	}
+
+	public Boolean getIsFinish() { return isFinish; }
+
+	public void setIsFinish(Boolean finish) { isFinish = finish; }
 }

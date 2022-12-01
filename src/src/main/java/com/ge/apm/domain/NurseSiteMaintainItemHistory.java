@@ -75,6 +75,9 @@ public class NurseSiteMaintainItemHistory {
     @Column(name = "status")
     private Integer status;
 
+    @Column(name = "is_finish")
+    private Boolean isFinish = false; //是否完成，以所有检测项都已勾选为准
+
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
 
@@ -166,5 +169,7 @@ public class NurseSiteMaintainItemHistory {
         return "NurseSiteMaintainItemHistory [ id=" + id + " ]";
     }
 
+    public Boolean getIsFinish() { return isFinish; }
 
+    public void setIsFinish(Boolean finish) { isFinish = finish; }
 }
