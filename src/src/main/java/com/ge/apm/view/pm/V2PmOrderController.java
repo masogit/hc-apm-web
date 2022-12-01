@@ -2895,9 +2895,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterInternal)) {
                 orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
             }
-            orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            if (org.springframework.util.CollectionUtils.isEmpty(orgList)) {
+                orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            }
         }
-        return orgList;
+        return Optional.ofNullable(orgList).orElse(new ArrayList<OrgInfo>());
     }
 
     public List<OrgInfo> LoadSiteNameListMVS() {
@@ -2905,9 +2907,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
                 orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
             }
-            orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            if (org.springframework.util.CollectionUtils.isEmpty(orgList)) {
+                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            }
         }
-        return orgListMVS;
+        return Optional.ofNullable(orgListMVS).orElse(new ArrayList<OrgInfo>());
     }
 
     public V2_WorkOrder_Detail getItemDetail() {

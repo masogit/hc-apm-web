@@ -3600,7 +3600,9 @@ public void test1(){
             if (!CollectionUtils.isEmpty(bySearchFilterInternal)) {
                 orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
             }
-            orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(orgList)) {
+                orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            }
         }
         return orgList;
     }
@@ -3610,7 +3612,9 @@ public void test1(){
             if (!CollectionUtils.isEmpty(bySearchFilterMVS)) {
                 orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
             }
-            orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(orgList)) {
+                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            }
         }
         return orgListMVS;
     }
