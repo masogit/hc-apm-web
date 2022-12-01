@@ -25,11 +25,23 @@
                     <p:ajax event="filter" listener="#{assetRepairQuickTemplateController.onFilter}" update="createButton editButton deleteButton"/>
                    <!-- sortBy="#{item.templateType}" filterBy="#{item.templateType}" filterMatchMode="EQ"
                     sortBy="#{item.createDate}" filterBy="#{item.createDate}" filterMatchMode="GTE-->
-                    <p:column headerText="模板类别">
-                        <h:outputText value="#{assetRepairQuickTemplateController.findTemplateTypeStr(item.templateType)}"/>
+                    <p:column headerText="模板类别" filterBy="#{item.templateType}" filterMatchMode="EQ">
+                        <h:outputText value="#{fieldMsg.fieldValue('assetRepairQuickTemplateType',item.templateType)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetRepairQuickTemplateType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                     </p:column>
-                    <p:column headerText="设备分类" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="LIKE">
+                    <p:column headerText="设备分类" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                         <h:outputText value="#{assetRepairQuickTemplateController.findAssetGroup(item.assetGroup)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                     </p:column>
                     <!--<p:column headerText="所属机构">
                         <h:outputText value="#{assetRepairQuickTemplateController.findHierOrgUid(item.hierOrgUid)}"/>
@@ -68,7 +80,7 @@
                         </p:commandButton>
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetRepairQuickTemplateController.prepareCreate}" update=":AssetRepairQuickTemplateEditDlg" oncomplete="PF('AssetRepairQuickTemplateEditDialog').show()"/>
                         <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetRepairQuickTemplateController.prepareEdit}" update=":AssetRepairQuickTemplateEditDlg" oncomplete="PF('AssetRepairQuickTemplateEditDialog').show()" disabled="#{empty assetRepairQuickTemplateController.selected}"/>
-                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetRepairQuickTemplateController.delete}" update=":AssetRepairQuickTemplateEditDlg" disabled="#{empty assetRepairQuickTemplateController.selected}">
+                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetRepairQuickTemplateController.delete}" update="datalist" disabled="#{empty assetRepairQuickTemplateController.selected}">
                             <p:confirm header="删除" message="确定删除该快捷模板？" icon="ui-icon-alert"/>
                         </p:commandButton>
                     </f:facet>
