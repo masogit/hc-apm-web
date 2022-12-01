@@ -327,4 +327,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     List<String> findByBrandId(Integer value);
 
     List<AssetInfo> findAllByUidIn(List<String> orgUids);
+
+    @Query(value="select count(1) from asset_info where asset_class = ?1 and tenant_uid = ?2", nativeQuery = true)
+    int countByAssetClassAndTenant(Integer category, String tenantUid);
 }
