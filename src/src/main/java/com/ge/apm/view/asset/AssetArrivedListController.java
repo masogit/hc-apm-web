@@ -179,12 +179,6 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
                             }
                             if (installed) {
                                 arrivalList.setCannotDeleted(true);
-                            } else {
-                                if (UserContextService.checkRole("AssetHead")) {
-                                    arrivalList.setCannotDeleted(false);
-                                } else {
-                                    arrivalList.setCannotDeleted(true);
-                                }
                             }
                         }
                     } else {
