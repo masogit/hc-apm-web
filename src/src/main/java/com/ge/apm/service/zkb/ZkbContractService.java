@@ -566,7 +566,7 @@ public class ZkbContractService {
             if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
                 quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),currentUser);
             }
-            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
                 quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.PartsHigh.toString(),currentUser);
             }
             zkbContract = contractRepository.save(zkbContract);
