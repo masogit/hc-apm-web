@@ -503,6 +503,28 @@ public class ZkbContractService {
             errorLog += "备件/人工/保养总额不等于备件/人工/保养剩余名额、备件/人工/保养申请名额、备件/人工/保养已使用名额之和,";
         }
 
+        if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+            int ccsbMaintenanceQuotaTotal = zkbContract.getCcsbMaintenanceQuotaTotal() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaTotal();
+            int ccsbMaintenanceQuota = zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota();
+            int ccsbMaintenanceQuotaApply = zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply();
+            int ccsbMaintenanceQuotaUse = zkbContract.getCcsbMaintenanceQuotaUse() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaUse();
+            if(ccsbMaintenanceQuotaTotal != (ccsbMaintenanceQuota + ccsbMaintenanceQuotaApply + ccsbMaintenanceQuotaUse)){
+                flag = false;
+                errorLog += "保养总额不等保养剩余名额、保养申请名额、保养已使用名额之和,";
+            }
+        }
+
+        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+            int partHighQuotaTotal = zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal();
+            int partHighQuota = zkbContract.getPartHighQuota() == null ? 0 : zkbContract.getPartHighQuota();
+            int partHighQuotaApply = zkbContract.getPartHighQuotaApply() == null ? 0 : zkbContract.getPartHighQuotaApply();
+            int partHighQuotaUse = zkbContract.getPartHighQuotaUse() == null ? 0 : zkbContract.getPartHighQuotaUse();
+            if(partHighQuotaTotal != (partHighQuota + partHighQuotaApply + partHighQuotaUse)){
+                flag = false;
+                errorLog += "备件高值总额不等于备件高值剩余名额、备件高值申请名额、备件高值已使用名额之和,";
+            }
+        }
+
         if(zkbContract.getZkbContractCourses() != null && zkbContract.getZkbContractCourses().size() > 0){
             for(ZkbContractCourse c : zkbContract.getZkbContractCourses()){
                 double courseCountTotal = c.getMainCourseCountTotal() == null ? 0 : c.getMainCourseCountTotal();
