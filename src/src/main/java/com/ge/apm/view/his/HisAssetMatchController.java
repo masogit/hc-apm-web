@@ -87,6 +87,8 @@ public class HisAssetMatchController extends GenericCRUDUUIDController<HisEquipm
         List<SearchFilter> searchFiltersAsset = new ArrayList<>();
 
         searchFiltersAsset.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        searchFiltersAsset.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        searchFiltersAsset.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 
         OrgInfo selectedOrg = orgComponentController.getSelectedOrg();
         if (selectedOrg != null) {

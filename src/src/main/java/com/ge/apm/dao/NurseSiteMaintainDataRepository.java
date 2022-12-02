@@ -34,6 +34,9 @@ public interface NurseSiteMaintainDataRepository extends GenericRepositoryUUID<N
 	@Modifying
 	@Query(value = "update nurse_site_maintain_data set check_value=true where id in ?1", nativeQuery = true)
 	void completeMaintainData(Set<String> ids);
+
+	@Query(value = "SELECT count(parent_id) - count(check_value) FROM nurse_site_maintain_data WHERE parent_id = ?1",nativeQuery = true)
+	int noCheckCount(String parentId);
 	
 	@Transactional
 	@Modifying

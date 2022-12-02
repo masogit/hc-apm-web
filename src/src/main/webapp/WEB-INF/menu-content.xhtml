@@ -89,6 +89,7 @@
                 <p:menuitem id="his005" value="#{msg.manualTasks}" outcome="/portal/his/other/manualJob.xhtml" rendered="#{userContextService.accessContains('hisPerform.manualTasks')}"/>
                 <p:menuitem id="his007" value="#{msg.chargeDetailSource}" outcome="/portal/his/dataDetail/dataSource.xhtml" rendered="#{userContextService.accessContains('hisPerform.chargeDetailSource')}"/>
                 <p:menuitem id="his008" value="#{msg.chargeDetailResult}" outcome="/portal/his/dataDetail/dataResult.xhtml" rendered="#{userContextService.accessContains('hisPerform.chargeDetailResult')}"/>
+                <p:menuitem id="his009" value="#{msg.importData}" outcome="/portal/his/import/import.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}" />
             </p:submenu>
             <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.accessContains('repair')}">
                 <p:menuitem id="um89" value="#{msg.WorkOrder}" outcome="/portal/workorder/repaireWorkOrder.xhtml" rendered="false"/>

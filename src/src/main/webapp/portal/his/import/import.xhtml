@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.importData}"/>
+            </div>
+            <div class="ui-g-12 card">
+                
+                <h:form id="importForm">
+                    <p:fieldset  legend="导入设备绩效基础数据" id="uploaderContainer">
+
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <label class="label">#{msg.choseFileToUpload}</label>
+                                <h:outputText   value="#{hisDataExcelImportController.file.fileName}"  rendered="#{not empty hisDataExcelImportController.file}"/>
+                                <p:fileUpload  id="fileUpload" fileUploadListener="#{hisDataExcelImportController.uploadDataFile}" value="#{hisDataExcelImportController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                               multiple="false" sizeLimit="10000000" update="uploaderContainer :importDataForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty hisDataExcelImportController.file}" />
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p>#{msg.Description}</p>
+                                <p>1. 每个文件名必须对应每个表，按照文件名导入相应的表</p>
+                                <p>2. #{msg.UpFileImport}</p>
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+                    </p:fieldset>
+                </h:form>
+            </div>
+            <div class="ui-g-12 card ">
+
+                <h:form id="importDataForm">
+                    <p:messages id="messages" showDetail="false" closable="false" autoUpdate="false">
+                    </p:messages>
+
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+                        <h:panelGroup>
+                            
+                            <p:commandButton validateClient="true" actionListener="#{hisDataExcelImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check"
+                                            onstart="PF('statusDialogForImport').show()" oncomplete="PF('statusDialogForImport').hide()" rendered="false"/>
+                        </h:panelGroup>
+
+                    </p:panelGrid>
+                </h:form>
+            </div>
+
+        </div>
+
+        
+    <p:dialog widgetVar="statusDialogForImport" modal="true" class="ajaxStatusDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+        <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"></i>
+    </p:dialog>
+    </ui:define>
+
+</ui:composition>

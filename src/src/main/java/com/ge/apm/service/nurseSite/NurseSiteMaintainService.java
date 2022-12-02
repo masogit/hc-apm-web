@@ -149,10 +149,10 @@ public class NurseSiteMaintainService {
 				if (setMaintainItemIds!=null && setMaintainItemIds.size() > 0) {
 //					nurseSiteMaintainDataRepository.completeMaintainDataByParent(setMaintainItemIds);
 					getListPairCheckItems(maintain,setMaintainItemIds);
-					nurseSiteMaintainItemRepository.completeMaintainItem2(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
-					nurseSiteMaintainItemRepository.completeMaintainItem5(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
-					nurseSiteMaintainItemRepository.completeMaintainItem6(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
-					nurseSiteMaintainItemRepository.completeMaintainItem7(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
+					nurseSiteMaintainItemRepository.completeMaintainItem2(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid,true);
+					nurseSiteMaintainItemRepository.completeMaintainItem5(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid,true);
+					nurseSiteMaintainItemRepository.completeMaintainItem6(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid,true);
+					nurseSiteMaintainItemRepository.completeMaintainItem7(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid,true);
 				}
 			}
 		}
@@ -1024,6 +1024,8 @@ public class NurseSiteMaintainService {
 				itemStatus=nullNum==listData.size()?0:4;
 			}
 			tempItem.setStatus(itemStatus);
+			int noCheckCount = nurseSiteMaintainDataRepository.noCheckCount(tempItem.getId());
+			if(noCheckCount==0) tempItem.setIsFinish(true);
 		}
 		return true;
 	}
@@ -1088,6 +1090,8 @@ public class NurseSiteMaintainService {
 		obj.setModifyBy(user);
 		obj.setModifyByUid(user.getUid());
 		obj.setModifyDate(date);
+		int noCheckCount = nurseSiteMaintainItemRepository.noCheckCount(obj.getId());
+		if(noCheckCount == 0) obj.setIsFinish(true);
 	}
 
 	private void completeMaintainData(List<NurseSiteMaintain> listMaintain) {
@@ -1165,7 +1169,7 @@ public class NurseSiteMaintainService {
 			if(delay){
 				status=7;
 			}
-			nurseSiteMaintainRepository.completeMaintain(tempMaintain.getId(), signatureId, user.getUid(), date,status);
+			nurseSiteMaintainRepository.completeMaintain(tempMaintain.getId(), signatureId, user.getUid(), date,status,true);
 		}
 		return true;
 	}

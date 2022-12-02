@@ -24,7 +24,6 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.simpleparts.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
-import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -43,7 +42,6 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
-import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +65,6 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -247,6 +244,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private V2_WorkOrderManHoursDetail selectedWorkOrderManHoursDetail;
     private List<V2_WorkOrderManHoursDetail> workHoursList;
+
+    @Getter @Setter
+    private String siteUidFilter;
+    @Getter @Setter
+    private List<OrgInfo> orgListMVS;
+    @Getter @Setter
+    List<V2_WorkOrder> bySearchFilterMVS = null;
+    @Getter @Setter
+    List<V2_WorkOrder> bySearchFilterInternal = null;
+    @Getter @Setter
+    private List<OrgInfo> orgList;
 
     @Override
     protected void init() {
@@ -1035,8 +1043,10 @@ public void test1(){
 
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 bySearchFilter = dao.findBySearchFilter(filters, pageRequest);
+                bySearchFilterMVS = bySearchFilter.getContent();
             }else{
                 bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
+                bySearchFilterInternal = bySearchFilter.getContent();
             }
             UserAccount userAccount = userContextService.getCurrentUserAccount();
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
@@ -1091,14 +1101,20 @@ public void test1(){
         List<SearchFilter> filters = new ArrayList<>();
 
         List<Integer> assetIds = serviceRequestApiService.getVisableMvsAssetSystemId(UserContextService.getAccessToken());
-        filters.add(new SearchFilter("assetId",SearchFilter.Operator.IN,assetIds));
-
+        if (!CollectionUtils.isEmpty(assetIds)) {
+            filters.add(new SearchFilter("assetId",SearchFilter.Operator.IN,assetIds));
+        }
         for (SearchFilter searchFilter :searchFilters) {
-            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
+            if ("siteUID,status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
+                if ("siteUID".equals(searchFilter.fieldName)) {
+                    if (!StringUtils.isEmpty(siteUidFilter)) {
+                        filters.add(searchFilter);
+                    }
+                    continue;
+                }
                 filters.add(searchFilter);
             }
         }
-
         return filters;
     }
 
@@ -2743,6 +2759,7 @@ public void test1(){
             strHours = df.format(f1);
         } else {
             WebUtil.addErrorMessage("结束时间不能小于开始时间");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         selectedWorkOrderManHoursDetail.setHours(Double.valueOf(strHours));
@@ -2750,6 +2767,37 @@ public void test1(){
         selectedWorkOrderManHoursDetail.setEndTime(secondDate);
         if (workHoursList.contains(selectedWorkOrderManHoursDetail)) {
             workHoursList.remove(selectedWorkOrderManHoursDetail);
+        }
+
+        // 重复性校验
+        boolean check = false;
+        for (V2_WorkOrderManHoursDetail detail : workHoursList) {
+            if("000".equals(detail.getId())){
+                continue;
+            }
+            // 开始时间结束时间不能相等
+            if(firstDate.getTime() == detail.getStartTime().getTime()
+                    || secondDate.getTime() == detail.getEndTime().getTime()){
+                check = true;
+                break;
+            }
+            // 当前开始时间小于结束时间 && 大于开始时间
+            if(firstDate.getTime() < detail.getEndTime().getTime()
+                    && firstDate.getTime() > detail.getStartTime().getTime()){
+                check = true;
+                break;
+            }
+            // 当前结束时间大于开始时间 && 小于结束时间
+            if(secondDate.getTime() > detail.getStartTime().getTime()
+                    && firstDate.getTime() < detail.getEndTime().getTime()){
+                check = true;
+                break;
+            }
+        }
+        if(check){
+            WebUtil.addErrorMessage("工时段重复，请重新填写");
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
         }
         workHoursList.add(selectedWorkOrderManHoursDetail);
         Double hours = 0d;
@@ -3545,6 +3593,38 @@ public void test1(){
             workHoursList.add(v2_WorkOrderManHoursDetail2);
         }
         return workHoursList;
+    }
+
+    public List<OrgInfo> LoadSiteNameList() {
+        if (CollectionUtils.isEmpty(orgList)) {
+            if (!CollectionUtils.isEmpty(bySearchFilterInternal)) {
+                orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+            }
+            if (!CollectionUtils.isEmpty(orgList)) {
+                orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            }
+        }
+        return orgList;
+    }
+
+    public List<OrgInfo> LoadSiteNameListMVS() {
+        if (CollectionUtils.isEmpty(orgListMVS)) {
+            if (!CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+            }
+            if (!CollectionUtils.isEmpty(orgList)) {
+                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            }
+        }
+        return orgListMVS;
+    }
+
+    public String getSiteOrgName(String siteUID) {
+        OrgInfo org = orgDao.getByUid(siteUID);
+        if (org != null) {
+            return org.getName();
+        }
+        return null;
     }
 
     public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
