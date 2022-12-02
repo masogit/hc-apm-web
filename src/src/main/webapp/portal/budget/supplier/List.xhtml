@@ -16,9 +16,6 @@
             </div>
 
             <div class="ui-g-12 card">
-                <h:form rendered="#{supplierController.activeSupplier()}">
-                    <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update=":supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
-                </h:form>
 
                 <h:form id="SupplierListForm">
                     <p:dataTable id="datalist" value="#{supplierController.lazyModel}" var="item" widgetVar="varDataList"
@@ -30,7 +27,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" update="createButton editButton editSupplierUserButton deleteButton"/>
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
 
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -66,7 +63,6 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update=":SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected}"/>
-                            <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update=":supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{supplierController.deleteSupplier}" update="datalist" disabled="#{empty supplierController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
@@ -75,12 +71,10 @@
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
-                    <p:remoteCommand name="rc" update="datalist:createButton datalist:editButton datalist:editSupplierUserButton datalist:deleteButton" immediate="true"/>
+                    <p:remoteCommand name="rc" update="datalist:createButton datalist:editButton datalist:deleteButton" immediate="true"/>
                 </h:form>
 
                 <ui:include src="Edit.xhtml"/>
-                <ui:include src="supplierUser.xhtml"/>
-                <ui:include src="supplierQrCode.xhtml"/>
             </div>
         </div>
 
