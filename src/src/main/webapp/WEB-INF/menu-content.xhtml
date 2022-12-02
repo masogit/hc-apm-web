@@ -137,6 +137,7 @@
                 <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/YearPurchase/YearList.xhtml"
                             rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
                 <p:menuitem value="#{msg.DeptPurchaseManage}" outcome="/portal/budget/deptPurchase/deptPurchaseManage.xhtml" rendered="#{userContextService.versionContains('budgetMgr.deptPurchaseManage')}"/>
+                <p:menuitem id="um0819" value="#{msg.preSupplierMgr}" outcome="/portal/budget/supplier/List.xhtml" rendered="#{userContextService.accessContains('budgetMgr.preSupplierMgr')}"/>
 
             </p:submenu>
 

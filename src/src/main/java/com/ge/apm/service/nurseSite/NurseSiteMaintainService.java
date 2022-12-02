@@ -375,6 +375,14 @@ public class NurseSiteMaintainService {
 	public void saveMaintainItem(NurseSiteMaintain obj) {
 		List<NurseSiteMaintainItem> listItem=obj.getListNurseSiteMaintainItem();
 		if(listItem!=null && listItem.size()>0){
+			for(NurseSiteMaintainItem item : listItem) {
+				boolean isFinish = true;
+				List<NurseSiteMaintainData> listData = item.getListData();
+				for(NurseSiteMaintainData data : listData) {
+					if(data.getCheckValue()==null) isFinish = false;
+				}
+				item.setIsFinish(isFinish);
+			}
 			nurseSiteMaintainItemRepository.save(listItem);
 		}
 	}
@@ -1024,8 +1032,6 @@ public class NurseSiteMaintainService {
 				itemStatus=nullNum==listData.size()?0:4;
 			}
 			tempItem.setStatus(itemStatus);
-			int noCheckCount = nurseSiteMaintainDataRepository.noCheckCount(tempItem.getId());
-			if(noCheckCount==0) tempItem.setIsFinish(true);
 		}
 		return true;
 	}
