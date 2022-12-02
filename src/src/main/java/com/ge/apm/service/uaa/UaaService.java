@@ -1611,8 +1611,8 @@ public class UaaService {
         }
     }
 
-    public List<PermissionGroup> getPermissionGroups(String siteUid) {
-        return permissionGroupMapper.getBySiteUid(siteUid);
+    public List<PermissionGroup> getPermissionGroups(String tenantUid) {
+        return permissionGroupMapper.getBySiteUid(tenantUid);
     }
 
     public List<String> getPermissionGroupsByUserUid(String uid) {
