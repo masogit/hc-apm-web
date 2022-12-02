@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+
+    <ui:composition>
+        <p:dialog id="supplierQrCodeDlg" widgetVar="supplierQrCodeDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="邀请二维码">
+            <h:form id="supplierQrCodeForm">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.showQrCode}">
+                    <h:panelGroup>
+                        <p:panel header="小程序二维码" style="text-align:center">
+                            <!--<p:barcode value="#{qrCodeLibController.qrCode}" type="qr" height="200" width="200" format="png"/>-->
+                            <img src="#{supplierController.wxaCodeImage}" height="200" width="200" />
+                        </p:panel>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:panel header="公众号二维码" style="text-align:center">
+                            <img src="#{supplierController.weChatQrCodeImage}" height="200" width="200" />
+                        </p:panel>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+
+
+</ui:composition>
