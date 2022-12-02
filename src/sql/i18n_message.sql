@@ -4897,5 +4897,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 -- YHAAO-17403 预供应商管理
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'preSupplierMgr', '预供应商管理', 'Pre-vendor management', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'taxpayerIdentityNumber', '纳税人识别号', 'Taxpayer identification number', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','budgetMgr.preSupplierMgr','预供应商管理','Pre-vendor management',NULL,-1);
 -- YHAAO-16852 增加字段“数量”
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetQuantity','数量','Quantity',NULL,-1);

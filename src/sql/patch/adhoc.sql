@@ -5,7 +5,8 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 update sys_role set menus = menus || ',hisPerform,hisPerform.deviceMatching,hisPerform.deptMatching,hisPerform.deviceGrouping,hisPerform.chargeCode,hisPerform.manualTasks,hisPerform.chargeDetailSource,hisPerform.chargeDetailResult' where name = 'ITAdmin' and menus not like '%,hisPerform,hisPerform.deviceMatching,hisPerform.deptMatching,hisPerform.deviceGrouping,hisPerform.chargeCode,hisPerform.manualTasks,hisPerform.chargeDetailSource,hisPerform.chargeDetailResult%';
 -- YHAAO-17289 漳州市医院演示环境-常用故障模板 权限控制
 update sys_role set menus = menus || ',repair.commonFaults' where name in ('AssetHead','AssetStaff') and menus not like '%,repair.commonFaults%';
-
+-- YHAAO-17403 预供应商管理 权限控制
+update sys_role set menus = menus || ',budgetMgr.preSupplierMgr' where name in ('DeptHead','ClinicalStaff','AssetHead','AssetStaff') and menus not like '%,budgetMgr.preSupplierMgr%';
 --YHAAO-17341 start
 UPDATE nurse_site_maintain_item SET is_finish = (CASE WHEN view_mount.no_check_count > 0 THEN FALSE ELSE TRUE END) FROM (SELECT nsmd.parent_id,count(nsmd.id)-count(nsmd.check_value) AS no_check_count FROM nurse_site_maintain_item nsmi,nurse_site_maintain_data nsmd WHERE nsmi.id = nsmd.parent_id GROUP BY nsmd.parent_id) AS view_mount WHERE id = view_mount.parent_id;
 UPDATE nurse_site_maintain SET is_finish = (CASE WHEN view_mount.no_check_count > 0 THEN FALSE ELSE TRUE END) FROM (SELECT item2.parent_id,count(item2.parent_id) - SUM(item2.checked_count) AS no_check_count FROM (SELECT item1.parent_id,(CASE WHEN item1.is_finish = TRUE THEN 1 ELSE 0 END) AS checked_count  FROM nurse_site_maintain_item item1)AS item2 GROUP BY item2.parent_id) AS view_mount WHERE id = view_mount.parent_id;
@@ -16,3 +17,6 @@ CREATE INDEX nurse_site_maintain_history_is_finish ON nurse_site_maintain_histor
 CREATE INDEX nurse_site_maintain_item_is_finish ON nurse_site_maintain_item (is_finish);
 CREATE INDEX nurse_site_maintain_item_history_is_finish ON nurse_site_maintain_item_history (is_finish);
 --YHAAO-17341 end
+
+--YHAAO-15888 增加日常检查汇总消息推送配置项
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select '79fb9c1ed56943bc8df24ee29fef6472', 8, 'false', '日常检查消息推送', 'dailyCheckMessagePush', '日常检查微信消息推送', 'f', 't', 3 where not exists (select * from config_item where key = 'dailyCheckMessagePush');

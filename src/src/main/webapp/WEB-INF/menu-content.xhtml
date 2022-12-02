@@ -137,7 +137,7 @@
                 <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/YearPurchase/YearList.xhtml"
                             rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
                 <p:menuitem value="#{msg.DeptPurchaseManage}" outcome="/portal/budget/deptPurchase/deptPurchaseManage.xhtml" rendered="#{userContextService.versionContains('budgetMgr.deptPurchaseManage')}"/>
-                <p:menuitem id="um0819" value="#{msg.preSupplierMgr}" outcome="/portal/budget/supplier/List.xhtml" rendered="#{userContextService.accessContains('asset.supplierMgt')}"/>
+                <p:menuitem id="um0819" value="#{msg.preSupplierMgr}" outcome="/portal/budget/supplier/List.xhtml" rendered="#{userContextService.accessContains('budgetMgr.preSupplierMgr')}"/>
 
             </p:submenu>
 
@@ -234,7 +234,7 @@
                 <p:menuitem id="um508" value="#{msg.Accountdash}" url="/account-dashboard/#/" target="_blank" rendered="#{userContextService.accessContains('config.accountdash')}"/>
                 <p:menuitem id="um514" value="导出记录信息" outcome="/portal/export/tenant/TenantRecord.xhtml"/>
                 <p:menuitem id="um523" value="#{msg.ConfigItemManage}" outcome="/portal/config/sysConfig/configItemList.xhtml" rendered="#{userContextService.hasAnyRole('ITAdmin')}"/>
-                <p:menuitem id="um524" value="#{msg.PermissionGroup}" outcome="/portal/config/permission/permissionGroupList.xhtml" rendered="#{userContextService.hasAnyRole('ITAdmin')}"/>
+<!--                <p:menuitem id="um524" value="#{msg.PermissionGroup}" outcome="/portal/config/permission/permissionGroupList.xhtml" rendered="#{userContextService.hasAnyRole('ITAdmin')}"/>-->
                 <p:menuitem id="um525" value="#{msg.ReminderConfiguration}" outcome="/portal/config/reminder/reminderRuleList.xhtml" rendered="#{userContextService.hasAnyRole('ITAdmin')}"/>
                 <p:menuitem id="um526" value="#{msg.BuildManagement}" outcome="/portal/config/buildManagement/Main.xhtml" rendered="#{userContextService.versionContains('config.buildManagement')}"/>
             </p:submenu>

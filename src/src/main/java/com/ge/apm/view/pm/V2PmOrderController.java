@@ -597,7 +597,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
-        System.out.println();
         List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
         if(CollectionUtils.isEmpty(pmRuleByPmNum)){
             return new PmOrderRule();
