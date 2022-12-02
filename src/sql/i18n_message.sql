@@ -4890,3 +4890,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customI18n','assetClass','管理分类','Manage classifications',NULL,-1);
 -- YHAAO-17290 his 设备绩效管理
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','importData','导入数据','Import data',NULL,-1);
+-- YHAAO-17403 预供应商管理
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'preSupplierMgr', '预供应商管理', 'Pre-vendor management', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'taxpayerIdentityNumber', '纳税人识别号', 'Taxpayer identification number', NULL, '-1');
