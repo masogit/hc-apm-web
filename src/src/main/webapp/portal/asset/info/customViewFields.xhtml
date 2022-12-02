@@ -682,4 +682,10 @@
             <p:inputText id="assetUsedLifecycle" value="#{assetInfoDetailController.selected.assetUsedLifecycle}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetQuantity')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetQuantity}</label>
+            <p:inputText id="assetQuantity" value="#{assetInfoDetailController.selected.assetQuantity}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

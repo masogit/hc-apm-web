@@ -801,6 +801,11 @@
                                     <h:outputText value="#{item.assetUsedLifecycle}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'assetQuantity'}">
+                                <p:column headerText="#{msg.assetQuantity}" exportable="true" sortBy="#{item.assetQuantity}" filterBy="#{item.assetQuantity}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.assetQuantity}"/>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
