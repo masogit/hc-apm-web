@@ -76,6 +76,25 @@
                                        value="#{budgetController.selectedAsset.price}">
                         </p:inputNumber>
                     </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">要求</p:outputLabel>
+                        <p:inputText value="#{budgetController.selectedAsset.requirement}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">是否需要进口</p:outputLabel>
+                        <p:selectOneMenu id="importedOrNot"
+                                         value="#{budgetController.selectedAsset.importedOrNot}">
+                            <f:selectItem itemValue="否" itemLabel="否" />
+                            <f:selectItem itemValue="是" itemLabel="是" />
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:outputLabel class="label">是否为特种设备</p:outputLabel>
+                        <p:selectOneMenu id="specialOrNot" value="#{budgetController.selectedAsset.specialOrNot}">
+                            <f:selectItem itemValue="否" itemLabel="否" />
+                            <f:selectItem itemValue="是" itemLabel="是" />
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                 </p:panelGrid>
 
                 <br/>

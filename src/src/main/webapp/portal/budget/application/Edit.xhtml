@@ -92,17 +92,8 @@
                             <!--                                </f:facet>-->
                             <!--                            </p:cellEditor>-->
                         </p:column>
-                        <p:column headerText="#{msg.ProductNumber}">
-                            <h:outputText value="#{item.asset.financingNum}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.EquipmentName}">
-                            <h:outputText value="#{item.asset.name}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.AssetBrand}">
+                        <p:column headerText="建议品牌">
                             <h:outputText value="#{item.asset.assetBrand}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.EquipmentModel}">
-                            <h:outputText value="#{item.asset.assetModel}"/>
                         </p:column>
                         <p:column headerText="#{msg.Unit}">
                             <h:outputText value="#{item.asset.unit}"/>
@@ -121,7 +112,45 @@
                             <!--                                </f:facet>-->
                             <!--                            </p:cellEditor>-->
                         </p:column>
-                        <p:column headerText="#{msg.ApplicationPrice}">
+                        <p:column headerText="要求">
+                            <h:outputText value="#{item.asset.requirement}"/>
+                        </p:column>
+                        <p:column headerText="是否需要进口设备">
+                            <h:outputText value="#{item.asset.importedOrNot}"/>
+                        </p:column>
+                        <p:column headerText="是否为特种设备">
+                            <h:outputText value="#{item.asset.specialOrNot}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ProductNumber}" rendered="false">
+                            <h:outputText value="#{item.asset.financingNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.EquipmentName}" rendered="false">
+                            <h:outputText value="#{item.asset.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.AssetBrand}" rendered="false">
+                            <h:outputText value="#{item.asset.assetBrand}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.EquipmentModel}" rendered="false">
+                            <h:outputText value="#{item.asset.assetModel}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Unit}" rendered="false">
+                            <h:outputText value="#{item.asset.unit}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationQuantity}" rendered="false">
+                            <!--                            <p:cellEditor>-->
+                            <!--                                <f:facet name="output">-->
+                            <!--                                    <h:outputText converter="javax.faces.Number" value="#{item.applicationQuantity}"/>-->
+                            <!--                                </f:facet>-->
+                            <!--                                <f:facet name="input">-->
+                            <p:inputNumber inputStyleClass="width-pct-100" minValue="0" decimalPlaces="0"
+                                           value="#{item.applicationQuantity}">
+                                <p:ajax listener="#{budgetController.calcAmount(item)}"
+                                        update="@this amount BudgetApplicationEditForm"/>
+                            </p:inputNumber>
+                            <!--                                </f:facet>-->
+                            <!--                            </p:cellEditor>-->
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationPrice}" rendered="false">
                             <!--                            <p:cellEditor>-->
                             <!--                                <f:facet name="output">-->
                             <!--                                    <h:outputText value="#{item.applicationPrice}">-->
@@ -137,7 +166,7 @@
                             <!--                                </f:facet>-->
                             <!--                            </p:cellEditor>-->
                         </p:column>
-                        <p:column headerText="#{msg.ApplicationAmount}">
+                        <p:column headerText="#{msg.ApplicationAmount}" rendered="false">
                             <h:outputText id="amount" value="#{item.applicationAmount}">
                                 <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
                             </h:outputText>
