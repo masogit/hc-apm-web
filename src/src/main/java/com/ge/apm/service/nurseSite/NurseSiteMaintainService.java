@@ -1097,7 +1097,11 @@ public class NurseSiteMaintainService {
 		obj.setModifyByUid(user.getUid());
 		obj.setModifyDate(date);
 		int noCheckCount = nurseSiteMaintainItemRepository.noCheckCount(obj.getId());
-		if(noCheckCount == 0) obj.setIsFinish(true);
+		if(noCheckCount == 0) {
+			obj.setIsFinish(true);
+		} else {
+			obj.setIsFinish(false);
+		}
 	}
 
 	private void completeMaintainData(List<NurseSiteMaintain> listMaintain) {
