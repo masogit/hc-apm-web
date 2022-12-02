@@ -692,6 +692,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_achievements")
     private String assetAchievements; //设备绩效
 
+    @Getter@Setter
+    @Column(name = "asset_quantity")
+    private String assetQuantity; //设备数量 YHAAO-16852
+
     @Transient
     @TableField(exist = false)
     private int lineNum;
