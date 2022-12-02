@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface PermissionGroupMapper extends BaseMapper<PermissionGroup> {
 
-    @Select("SELECT * FROM permission_group WHERE tenant_uid = #{siteUid} or institution_uid = #{siteUid} or hospital_uid = #{siteUid} or site_uid = #{siteUid}")
-    List<PermissionGroup> getBySiteUid(String siteUid);
+    @Select("SELECT * FROM permission_group WHERE tenant_uid = #{tenantUid}")
+    List<PermissionGroup> getBySiteUid(String tenantUid);
 }
