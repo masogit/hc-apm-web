@@ -221,6 +221,13 @@ public class WorkOrderExportService {
                     isReturn = false;
                 }
             }
+            if(filterMap.get("hospitalName") != null && filterMap.get("hospitalName").length() > 0) {   //所属院区
+                if(workOrderExportPojo.getSrNum()!=null) {
+                    isReturn = workOrderExportPojo.getHospitalName().contains(filterMap.get("hospitalName").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
             return isReturn;
         }).collect(Collectors.toList());
 

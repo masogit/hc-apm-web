@@ -4887,4 +4887,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','chargeDetailResult','收费明细结果数据','Charge details source result data',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','commonFaults','常用故障及分类','Common faults and classification',NULL,-1);
 -- YHAAO-17037 需求-非医疗设备的管理
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customI18n','assetClass','资产分类','Asset Classification',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customI18n','assetClass','管理分类','Manage classifications',NULL,-1);
+-- YHAAO-17290 his 设备绩效管理
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','importData','导入数据','Import data',NULL,-1);
