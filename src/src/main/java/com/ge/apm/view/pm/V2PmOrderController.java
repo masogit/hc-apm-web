@@ -2894,7 +2894,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterInternal)) {
                 orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
             }
-            if (org.springframework.util.CollectionUtils.isEmpty(orgList)) {
+            if (!org.springframework.util.CollectionUtils.isEmpty(orgList)) {
                 orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
             }
         }
