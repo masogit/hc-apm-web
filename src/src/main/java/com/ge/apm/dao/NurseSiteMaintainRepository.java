@@ -113,8 +113,13 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	@Transactional
 	@Modifying
 	//@Query(value = "update nurse_site_maintain set check_date=?5,modify_date=?5,status=?6 where schedule_date>=?1 and schedule_date<?2 and id in (select b.parent_id from nurse_site_maintain_item b where b.status=?7 and b.schedule_date>=?1 and b.schedule_date<?2 and b.asset_uid in(select a.uid from asset_info a where a.uid in (select d.asset_uid from nurse_site_maintain_item d where d.schedule_date>=?1 and d.schedule_date<?2) and (a.status in ?3 or a.is_valid=false or a.is_deleted=true) ) and b.config_id in (select c.id from nurse_site_maintain_config c where c.type=?4))", nativeQuery = true)
-	@Query(value = "update nurse_site_maintain nsm set check_date=?5,modify_date=?5,status=?6,is_finish = ?8 where schedule_date>=?1 and schedule_date<?2 and exists(select * from nurse_site_maintain_item nsmi where nsmi.parent_id=nsm.id and nsmi.status=?7 and exists(select * from asset_info ai where ai.uid=nsmi.asset_uid and (ai.status in ?3 or ai.is_valid=false or ai.is_deleted=true) and not exists(select * from nurse_tenant_exception nte where nte.tenant_uid=ai.tenant_uid)) and exists(select * from nurse_site_maintain_config nsmc where nsmc.id=nsmi.config_id and nsmc.type=?4))", nativeQuery = true)
-	void updateDailyByStatus(Date startDate, Date endDate, Collection<Integer> statusArr, int configType, Date currentDate, int status, int originStatus,boolean isFinish);
+	@Query(value = "update nurse_site_maintain nsm set check_date=?5,modify_date=?5,status=?6 where schedule_date>=?1 and schedule_date<?2 and exists(select * from nurse_site_maintain_item nsmi where nsmi.parent_id=nsm.id and nsmi.status=?7 and exists(select * from asset_info ai where ai.uid=nsmi.asset_uid and (ai.status in ?3 or ai.is_valid=false or ai.is_deleted=true) and not exists(select * from nurse_tenant_exception nte where nte.tenant_uid=ai.tenant_uid)) and exists(select * from nurse_site_maintain_config nsmc where nsmc.id=nsmi.config_id and nsmc.type=?4))", nativeQuery = true)
+	void updateDailyByStatus(Date startDate, Date endDate, Collection<Integer> statusArr, int configType, Date currentDate, int status, int originStatus);
+
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE nurse_site_maintain SET is_finish = (CASE WHEN view_mount.no_check_count > 0 THEN FALSE ELSE TRUE END) FROM (SELECT item2.parent_id,count(item2.parent_id) - SUM(item2.checked_count) AS no_check_count FROM (SELECT item1.parent_id,(CASE WHEN item1.is_finish = TRUE THEN 1 ELSE 0 END) AS checked_count  FROM nurse_site_maintain_item item1)AS item2 GROUP BY item2.parent_id) AS view_mount WHERE id = view_mount.parent_id",nativeQuery = true)
+	void updaIsFinish();
 
 	@Query(value="select distinct o.* from nurse_site_maintain o where o.schedule_date>=?2 and o.schedule_date<=?3 and o.clinical_dept_uid in (?1) order by o.schedule_date",nativeQuery=true)
 	public List<NurseSiteMaintain> findDefaultData(Set<String> orgUids,Date startDate,Date endDate);
