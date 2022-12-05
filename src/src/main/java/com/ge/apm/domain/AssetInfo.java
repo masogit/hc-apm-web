@@ -694,7 +694,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Getter@Setter
     @Column(name = "asset_quantity")
-    private String assetQuantity; //设备数量 YHAAO-16852
+    private Integer assetQuantity; //设备数量 YHAAO-16852
 
     @Transient
     @TableField(exist = false)
