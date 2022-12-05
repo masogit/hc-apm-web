@@ -207,7 +207,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query("select u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name=?2")
     List<UserAccount> findByTenantUIDAndRoleName(String tenantUID, String roleName);
 
-    @Query("select distinct u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name in ?2 and (u.isDisable =false or u.isDisable is null)")
+    @Query("select distinct u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name in ?2 and (u.isDisable =false or u.isDisable is null) and (u.isDeleted =false or u.isDeleted is null)")
     List<UserAccount> findByTenantUIDAndRoleNames(String tenantUID, List<String> roleName);
 
     @Query(value= "select exists(select 1 from user_account where tenant_uid = ?1)",nativeQuery = true)
