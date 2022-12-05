@@ -975,9 +975,12 @@
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetQuantity')}">
-        <h:panelGroup >
+        <h:panelGroup>
             <label class="label">#{msg.assetQuantity}</label>
-            <p:inputText id="assetQuantity" value="#{assetInfoEditController.selected.assetQuantity}" readonly="#{!assetInfoEditController.needEdit('assetQuantity')}"/>
+            <p:inputNumber minValue="0" decimalPlaces="0" id="assetQuantity"
+                required="#{assetInfoEditController.customConfig.assetFields['assetQuantity'].required}"
+                requiredMessage="#{msg.assetQuantity} #{msg.ValidationRequire}"
+                value="#{assetInfoEditController.selected.assetQuantity}" readonly="#{!assetInfoEditController.needEdit('assetQuantity')}"/>
         </h:panelGroup>
     </c:if>
 </ui:composition>
