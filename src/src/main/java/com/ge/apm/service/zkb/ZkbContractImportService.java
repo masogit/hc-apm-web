@@ -497,6 +497,27 @@ public class ZkbContractImportService {
             }
         }
 
+        if(ZkbContract.ContractType.CCSB.toString().equals(contractInfoVO.getContractType())){
+            int ccsbMaintenanceQuotaTotal = contractInfoVO.getCcsbMaintenanceQuotaTotal() == null ? 0 : contractInfoVO.getCcsbMaintenanceQuotaTotal();
+            int ccsbMaintenanceQuota = contractInfoVO.getCcsbMaintenanceQuota() == null ? 0 : contractInfoVO.getCcsbMaintenanceQuota();
+            int ccsbMaintenanceQuotaUse = contractInfoVO.getCcsbMaintenanceQuotaUse() == null ? 0 : contractInfoVO.getCcsbMaintenanceQuotaUse();
+            if(ccsbMaintenanceQuotaTotal < (ccsbMaintenanceQuota  + ccsbMaintenanceQuotaUse)){
+                item.put("status", ImportStatus.Failure);
+                ZkbContractRow.addErrMessage(item,  "保养总额小于保养剩余名额、保养已使用名额之和");
+                isValidateData = false;
+            }
+        }
+
+        if(ZkbContract.ContractType.DI.toString().equals(contractInfoVO.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(contractInfoVO.getContractType())){
+            int partHighQuotaTotal = contractInfoVO.getPartHighQuotaTotal() == null ? 0 : contractInfoVO.getPartHighQuotaTotal();
+            int partHighQuota = contractInfoVO.getPartHighQuota() == null ? 0 : contractInfoVO.getPartHighQuota();
+            int partHighQuotaUse = contractInfoVO.getPartHighQuotaUse() == null ? 0 : contractInfoVO.getPartHighQuotaUse();
+            if(partHighQuotaTotal < (partHighQuota + partHighQuotaUse)){
+                item.put("status", ImportStatus.Failure);
+                ZkbContractRow.addErrMessage(item,  "备件高值总额小于备件高值剩余名额、备件高值已使用名额之和");
+                isValidateData = false;
+            }
+        }
 
         for (Map<String, Object> tempContractMap: importContractMapList) {
             ZkbContractVO tempZkbContractVO = (ZkbContractVO)tempContractMap.get("contractInfoVO");

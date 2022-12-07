@@ -5,6 +5,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.schedule.UserScheduleService;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.view.SharedAssetConfigController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.SetUtils;
 import org.primefaces.context.RequestContext;
@@ -79,6 +80,9 @@ public class WorkScheduleController{
     private OrgInfo selectSite;
     private List<OrgInfo> selectOrgInfo;
     private UserContextService userContextService;
+    private Boolean isEdited=Boolean.FALSE;
+    private List<UserAccount> editUserList;
+    private SharedAssetConfigController sharedAssetConfigController;
     @PostConstruct
     protected void init() {
 
@@ -89,6 +93,7 @@ public class WorkScheduleController{
         userScheduleStageConfigDao = WebUtil.getBean(UserScheduleStageConfigRepository.class);
         userScheduleService = WebUtil.getBean(UserScheduleService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        sharedAssetConfigController = WebUtil.getBean(SharedAssetConfigController.class);
         currentUser = userContextService.getLoginUser();
 
         event = new DefaultScheduleEvent();
@@ -288,7 +293,7 @@ public class WorkScheduleController{
 
     public void onEventSelect(SelectEvent selectEvent) {
         event = (ScheduleEvent) selectEvent.getObject();
-
+        this.setEdited(Boolean.TRUE);
         this.userScheduleID = ((UserSchedule)event.getData()).getId();
         this.scheduleDate = ((UserSchedule)event.getData()).getScheduleDate();
         this.scheduleDateStage = ((UserSchedule)event.getData()).getScheduleDateStage();
@@ -303,13 +308,24 @@ public class WorkScheduleController{
             this.isDisableDelete = false;
             this.isDisableSave = false;
         }
+        List<UserAccount> userAccounts =new ArrayList<>();
+        if(UserSchedule.Type.A == type){
+            userAccounts=sharedAssetConfigController.loadUserList();
+        }else{
+            userAccounts=this.loadUserList();
+        }
+        boolean b = userAccounts.stream().anyMatch(item -> item.getUid().equals(this.userUID));
+        if(!b){
+            userAccounts.add(userAccountDao.getUsers(this.userUID));
+        }
+        this.setEditUserList(userAccounts);
     }
 
     public void onDateSelect(SelectEvent selectEvent) {
         DefaultScheduleEvent tempEvent = new DefaultScheduleEvent("", (Date) selectEvent.getObject(), (Date) selectEvent.getObject(), true);
         tempEvent.setData(null);
         event = tempEvent;
-
+        this.setEdited(Boolean.FALSE);
         this.userScheduleID = null;
         this.scheduleDate = (Date) selectEvent.getObject();
         this.scheduleDateStage = null;
@@ -748,5 +764,21 @@ public class WorkScheduleController{
         selectSite=userContextService.getSelectSiteSchedule();
         this.loadScheduleData();
         this.loadScheduleConfig();
+    }
+
+    public Boolean getEdited() {
+        return isEdited;
+    }
+
+    public void setEdited(Boolean edited) {
+        isEdited = edited;
+    }
+
+    public List<UserAccount> getEditUserList() {
+        return editUserList;
+    }
+
+    public void setEditUserList(List<UserAccount> editUserList) {
+        this.editUserList = editUserList;
     }
 }

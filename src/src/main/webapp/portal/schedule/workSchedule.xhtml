@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <!--<ui:define name="head">
@@ -64,7 +65,14 @@
                             <p:selectOneMenu value="#{workScheduleController.userUID}" style="width:125px" required="true" requiredMessage="#{msg.PersonnelCannotBeEmpty}">
                                 <p:ajax listener="#{workScheduleController.onScheduleValidateNew}" update="workScheduleForm:addButton"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{workScheduleController.loadUserList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                <c:choose >
+                                    <c:when test="#{workScheduleController.edited}">
+                                        <f:selectItems value="#{workScheduleController.editUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <f:selectItems value="#{workScheduleController.loadUserList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    </c:otherwise>
+                                </c:choose>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <br/>

@@ -514,7 +514,7 @@ public class ZkbContractService {
             }
         }
 
-        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
             int partHighQuotaTotal = zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal();
             int partHighQuota = zkbContract.getPartHighQuota() == null ? 0 : zkbContract.getPartHighQuota();
             int partHighQuotaApply = zkbContract.getPartHighQuotaApply() == null ? 0 : zkbContract.getPartHighQuotaApply();
