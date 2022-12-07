@@ -286,22 +286,30 @@ public class UserScheduleService {
         return types;
     }
     private void createUserWorkSchedule(Instant scheduleDateInstant, String[] batchType, List<UserSchedule> successList, List<UserSchedule> failedList, OrgInfo selectSite, UserAccount ua, UserSchedule.Type type){
+        List<UserSchedule> byTypeAndUserUIDAndScheduleDate = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(type.name(), ua.getUid(), Date.from(scheduleDateInstant));
+        Map<String, UserSchedule> collect = byTypeAndUserUIDAndScheduleDate.stream().collect(Collectors.toMap(item -> item.getScheduleDateStage(), item -> item));
         for (int j=0;j<batchType.length;j++) {
             if (SCHEDULE_STAGE_AM.equals(batchType[j])) {
                 if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.AM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
-                    successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    if(!collect.containsKey(SCHEDULE_STAGE_AM)){
+                        successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    }
                 } else {
                     failedList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
                 }
             } else if (SCHEDULE_STAGE_PM.equals(batchType[j])) {
-                if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.PM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
-                    successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.PM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty() ) {
+                    if(!collect.containsKey(SCHEDULE_STAGE_PM)){
+                        successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    }
                 } else {
                     failedList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
                 }
             } else if (SCHEDULE_STAGE_ALL.equals(batchType[j])) {
                 if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.ALL.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
-                    successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    if(!collect.containsKey(SCHEDULE_STAGE_ALL)){
+                        successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    }
                 } else {
                     failedList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
                 }
