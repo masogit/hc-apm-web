@@ -11,7 +11,11 @@
        <div class="ui-g-12 card cardTitle">
            <p:outputLabel class="pageTitle" value="#{msg.RelRuleAsset}"/>
        </div>
-
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
        <div class="ui-g-12 card">
     
         <h:form id="BatchCreateForm" class="bcls">
@@ -254,7 +258,7 @@
                     <br/> <br/>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{relRuleAssetController.saveRel()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" />
-                        <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
+                        <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back"  immediate="true" onclick="javascript:goBack();"/>
                     </h:panelGroup>
                     <!--<p:panelGrid id ="buttonGrid" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
                         <!---->
