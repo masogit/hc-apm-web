@@ -933,6 +933,25 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(contractCount - selected.getQty() < 0){
                         reLog = "合同备件剩余名额不足，请检查！";
                     }
+                }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())) {
+                    if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup().equals(1)){
+                        if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
+                            Integer contractCount = zkbContract.getPartHighQuota() == null ? 0 : zkbContract.getPartHighQuota();
+                            if(contractCount - selected.getQty() < 0){
+                                reLog = "备件高值剩余名额不足，请检查！";
+                            }
+                        }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                            Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                            if(contractCount - selected.getQty() < 0){
+                                reLog = "合同备件+人工+保养剩余名额不足，请检查！";
+                            }
+                        }
+                    }else{
+                        Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                        if(contractCount - selected.getQty() < 0){
+                            reLog = "合同备件+人工+保养剩余名额不足，请检查！";
+                        }
+                    }
                 }else{
                     Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
                     if(contractCount - selected.getQty() < 0){
@@ -940,7 +959,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }
-
         } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             String probeType = "";
             if(StringUtils.isEmpty(zkbContract.getQuotaDeductType())){

@@ -99,7 +99,21 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                         }
                     }
                 }else{
-                    value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getSiteUID());
+                    if (configItem.getCategory() == 13) {
+                        switch (selectSite.getOrgType()) {
+                            case 4:
+                            case 3:
+                                value = Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getSiteUID()))
+                                        .orElse(configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getTenantUID()));
+                                break;
+                            default:
+                                value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getTenantUID());
+                                break;
+                        }
+
+                    } else {
+                        value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getSiteUID());
+                    }
                 }
                 if(value != null){
                     configItem.setConfigItemValue(value);
