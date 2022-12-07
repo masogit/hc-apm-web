@@ -108,8 +108,11 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private V2_WorkOrderRepository dao;
     private String supplierName;
     private String fileterOrgName;
+    @Getter @Setter
+    private String fileterOrgNameMVS;
     private String fileterAssetDeptOrgName;
     private List<OrgInfo> clinicalDeptList;
+    private List<OrgInfo> clinicalDeptListMVS;
     private boolean terminate = false;
     private OrgInfoRepository orgDao;
     private TenantInfoRepository tenantInfoRepository;
@@ -130,6 +133,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
     private Set<String> clinicalDeptOrgUidSet;
+    @Setter @Getter
+    private Set<String> clinicalDeptOrgUidSetMVS;
     private Set<String> assetDeptOrgUidSet;
     private  UserOrgInfoRepository userOrgInfoRepository;
     private BlobObjectRepository blobObjectRepository;
@@ -244,7 +249,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     private V2_WorkOrderManHoursDetail selectedWorkOrderManHoursDetail;
     private List<V2_WorkOrderManHoursDetail> workHoursList;
-
+    @Getter @Setter
+    private String siteUidFilterMVS;
     @Getter @Setter
     private String siteUidFilter;
     @Getter @Setter
@@ -583,6 +589,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
+    public List<String> autoCompleteDeptNameMVS(String query) {
+        if (clinicalDeptListMVS == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.clinicalDeptListMVS.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             fileterOrgName = (String) ((SelectEvent) event).getObject();
@@ -599,6 +615,25 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
+
+    public void onClinicalDeptNameFilterChangeMVS(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            fileterOrgNameMVS = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(fileterOrgNameMVS) && !clinicalDeptListMVS.stream().anyMatch(item -> fileterOrgNameMVS.equals(item.getName()))) {
+            fileterOrgNameMVS = null;
+        }
+
+        if (fileterOrgNameMVS != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptListMVS.stream().filter(item -> item.getName().equals(fileterOrgNameMVS)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptListMVS);
+            clinicalDeptOrgUidSetMVS = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSetMVS = Collections.emptySet();
         }
     }
 
@@ -1044,6 +1079,7 @@ public void test1(){
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 bySearchFilter = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = bySearchFilter.getContent();
+                loadMVSClinicalDeptList();
             }else{
                 bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
                 bySearchFilterInternal = bySearchFilter.getContent();
@@ -1104,14 +1140,14 @@ public void test1(){
         if (!CollectionUtils.isEmpty(assetIds)) {
             filters.add(new SearchFilter("assetId",SearchFilter.Operator.IN,assetIds));
         }
+        if (!CollectionUtils.isEmpty(clinicalDeptOrgUidSetMVS)) {
+            filters.add(new SearchFilter("serviceRequest.fromDeptUID",SearchFilter.Operator.IN, clinicalDeptOrgUidSetMVS));
+        }
+        if (!StringUtils.isEmpty(siteUidFilterMVS)) {
+            filters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
+        }
         for (SearchFilter searchFilter :searchFilters) {
-            if ("siteUID,status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
-                if ("siteUID".equals(searchFilter.fieldName)) {
-                    if (!StringUtils.isEmpty(siteUidFilter)) {
-                        filters.add(searchFilter);
-                    }
-                    continue;
-                }
+            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
@@ -1137,6 +1173,10 @@ public void test1(){
             this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
+        if (StringUtils.isNotEmpty(siteUidFilter)) {
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*"));
         }
         if (!this.hasFilterOnField("siteUID")) {
             UserAccount userAccount = userContextService.getCurrentUserAccount();
@@ -3625,6 +3665,18 @@ public void test1(){
             return org.getName();
         }
         return null;
+    }
+
+    private void loadMVSClinicalDeptList() {
+        try {
+            if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
+                if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                    clinicalDeptListMVS = bySearchFilterMVS.stream().map(item -> item.getServiceRequest().getFromDeptUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+                }
+            }
+        } catch (Exception e) {
+            logger.info("暂无MVS列表");
+        }
     }
 
     public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
