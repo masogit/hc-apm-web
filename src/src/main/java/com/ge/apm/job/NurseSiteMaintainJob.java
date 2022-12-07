@@ -194,7 +194,7 @@ public class NurseSiteMaintainJob {
         nurseSiteMaintainItemRepository.updateDailyByValid(startDate, nextDate, false, 1, "报废");
         nurseSiteMaintainItemRepository.updateDailyByDelete(startDate, nextDate, true, 1, "已删除");
         nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, nextDate, listStatus, 1, currentDate, 8,true);
-        nurseSiteMaintainRepository.updateDailyByStatus(startDate, nextDate, listStatus, 1, currentDate, 8, 8,true);
+        nurseSiteMaintainRepository.updateDailyByStatus(startDate, nextDate, listStatus, 1, currentDate, 8, 8);
         //week
         nurseSiteMaintainDataRepository.updateDailyByStatus(weekFirst, nextWeekFirst, listStatus, 2);
         nurseSiteMaintainItemRepository.updateDailyByStatus(weekFirst, nextWeekFirst, 2, 2, "停机");
@@ -204,7 +204,7 @@ public class NurseSiteMaintainJob {
         nurseSiteMaintainItemRepository.updateDailyByValid(weekFirst, nextWeekFirst, false, 2, "报废");
         nurseSiteMaintainItemRepository.updateDailyByDelete(weekFirst, nextWeekFirst, true, 2, "已删除");
         nurseSiteMaintainItemRepository.updateDailyByStatus(weekFirst, nextWeekFirst, listStatus, 2, currentDate, 8,true);
-        nurseSiteMaintainRepository.updateDailyByStatus(weekFirst, nextWeekFirst, listStatus, 2, currentDate, 8, 8,true);
+        nurseSiteMaintainRepository.updateDailyByStatus(weekFirst, nextWeekFirst, listStatus, 2, currentDate, 8, 8);
         //month
         nurseSiteMaintainDataRepository.updateDailyByStatus(monthFirst, nextMonthFirst, listStatus, 3);
         nurseSiteMaintainItemRepository.updateDailyByStatus(monthFirst, nextMonthFirst, 2, 3, "停机");
@@ -214,7 +214,8 @@ public class NurseSiteMaintainJob {
         nurseSiteMaintainItemRepository.updateDailyByValid(monthFirst, nextMonthFirst, false, 3, "报废");
         nurseSiteMaintainItemRepository.updateDailyByDelete(monthFirst, nextMonthFirst, true, 3, "已删除");
         nurseSiteMaintainItemRepository.updateDailyByStatus(monthFirst, nextMonthFirst, listStatus, 3, currentDate, 8,true);
-        nurseSiteMaintainRepository.updateDailyByStatus(monthFirst, nextMonthFirst, listStatus, 3, currentDate, 8, 8,true);
+        nurseSiteMaintainRepository.updateDailyByStatus(monthFirst, nextMonthFirst, listStatus, 3, currentDate, 8, 8);
+        nurseSiteMaintainRepository.updaIsFinish();
     }
 
     public void doJobDeleteAssetInfo(String[] params) {

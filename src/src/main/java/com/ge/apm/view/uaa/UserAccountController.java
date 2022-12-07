@@ -494,7 +494,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selected = uaaService.loadUserWithUserRoles(selected.getId());
         roleListVO = new ArrayList<>();//
         assignedRoles = new ArrayList<>();
-        permissionGroups = uaaService.getPermissionGroups(selected.getSiteUID());
+//        permissionGroups = uaaService.getPermissionGroups(selected.getTenantUID());
         assignedPermissionGroupUidList = uaaService.getPermissionGroupsByUserUid(selected.getUid());
         if(loginUser.getType() != null && loginUser.getType() == UserAccount.LI_XIANG){
             SysRoleVO sysRoleVO = getVOBySysRoleName(SYSTEM_ACTIVE);
@@ -642,7 +642,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         uaaService.setUserRoles(selected, assignedRoles);
-        uaaService.setUserPermissionGroup(selected, assignedPermissionGroupUidList);
+//        uaaService.setUserPermissionGroup(selected, assignedPermissionGroupUidList);
         updateUserScope();
         userApi.resetUser(selected.getLoginName());
         selected.getUserRoleList().clear();
@@ -1213,7 +1213,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void updateUserScope() {
 
-        Set<OrgInfo> selectedOrgList = new HashSet<>(uaaService.getOrgListByPermissionGroup(ObjectUtil.isNotEmpty(assignedPermissionGroupUidList) ? assignedPermissionGroupUidList : ListUtil.toList("-1")));
+//        Set<OrgInfo> selectedOrgList = new HashSet<>(uaaService.getOrgListByPermissionGroup(ObjectUtil.isNotEmpty(assignedPermissionGroupUidList) ? assignedPermissionGroupUidList : ListUtil.toList("-1")));
+        Set<OrgInfo> selectedOrgList = new HashSet<>();
         if(46==selected.getSiteId()){
             //only add parent if all children is selected
             readSelectedOrgTree46(accessOrgTree, selectedOrgList);

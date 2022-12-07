@@ -17,3 +17,6 @@ CREATE INDEX nurse_site_maintain_history_is_finish ON nurse_site_maintain_histor
 CREATE INDEX nurse_site_maintain_item_is_finish ON nurse_site_maintain_item (is_finish);
 CREATE INDEX nurse_site_maintain_item_history_is_finish ON nurse_site_maintain_item_history (is_finish);
 --YHAAO-17341 end
+
+--YHAAO-15888 增加日常检查汇总消息推送配置项
+INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select '79fb9c1ed56943bc8df24ee29fef6472', 8, 'false', '日常检查消息推送', 'dailyCheckMessagePush', '日常检查微信消息推送', 'f', 't', 3 where not exists (select * from config_item where key = 'dailyCheckMessagePush');

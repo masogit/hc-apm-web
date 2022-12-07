@@ -121,9 +121,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //选定的院区
     private OrgInfo selectSite;
     private List<OrgInfo> clinicalDeptList;
+    private List<OrgInfo> clinicalDeptListMVS;
     private OrgInfoTreeService orgInfoTreeService;
     @Setter @Getter
     private Set<String> clinicalDeptOrgUidSet;
+    @Setter @Getter
+    private Set<String> clinicalDeptOrgUidSetMVS;
     @Setter @Getter
     List<PmOrderRuleCheckList> pmOrderRuleCheckList;
     private ServiceRequestApiService serviceRequestApiService;
@@ -145,6 +148,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     Boolean switchTmp= false;
     @Getter @Setter
     private String fileterOrgName;
+    @Getter @Setter
+    private String fileterOrgNameMVS;
     @Getter @Setter
     private String filterRule;
     @Getter @Setter
@@ -252,6 +257,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     @Getter @Setter
     private String siteUidFilter;
+    @Getter @Setter
+    private String siteUidFilterMVS;
     @Getter @Setter
     private List<OrgInfo> orgListMVS;
     @Getter @Setter
@@ -597,7 +604,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
-        System.out.println();
         List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
         if(CollectionUtils.isEmpty(pmRuleByPmNum)){
             return new PmOrderRule();
@@ -1856,6 +1862,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 result  = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = result.getContent();
+                loadMVSClinicalDeptList();
             }else{
                 result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
                 bySearchFilterInternal = result.getContent();
@@ -1897,6 +1904,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 result  = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = result.getContent();
+                loadMVSClinicalDeptList();
             }else{
                 result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
                 bySearchFilterInternal = result.getContent();
@@ -2008,6 +2016,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             List<SearchFilter> filters = buildMvsSearchFilter();
             result = dao.findBySearchFilter(filters, pageRequest);
             bySearchFilterMVS = result.getContent();
+            loadMVSClinicalDeptList();
         }else{
             result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
             bySearchFilterInternal = result.getContent();
@@ -2041,7 +2050,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 
         for (SearchFilter searchFilter : filterArrayList) {
-            if ("siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
+            if ("clinicalDeptId,siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
@@ -2398,18 +2407,30 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters = new ArrayList();
         }
         filterArrayList.clear();
-        filterArrayList.addAll(searchFilters);
-
-            //先获取 filterOrgName-手术科的 uid
-          //  List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-           // List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
-
+        searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
+        if ("MVS保养".equals(tabTitle)){
+            if (StringUtils.isNotEmpty(siteUidFilterMVS)) {
+                searchFilters.add((new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilterMVS, "1*")));
+            }
+            if (clinicalDeptOrgUidSetMVS != null && !clinicalDeptOrgUidSetMVS.isEmpty()) {
+                filterArrayList.add((new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetMVS), "1*")));
+            }
+        } else {
+            if (StringUtils.isNotEmpty(siteUidFilter)) {
+                searchFilters.add((new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*")));
+            }
             if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
                 filterArrayList.add((new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*")));
 //                this.updateSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
             } else {
 //                searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
+        }
+        filterArrayList.addAll(searchFilters);
+
+            //先获取 filterOrgName-手术科的 uid
+          //  List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+           // List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
 
         if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -2577,6 +2598,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
+    public List<String> autoCompleteDeptNameMVS(String query) {
+        if (clinicalDeptListMVS == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.clinicalDeptListMVS.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             fileterOrgName = (String) ((SelectEvent) event).getObject();
@@ -2593,6 +2624,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
+
+    public void onClinicalDeptNameFilterChangeMVS(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            fileterOrgNameMVS = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(fileterOrgNameMVS) && !clinicalDeptListMVS.stream().anyMatch(item -> fileterOrgNameMVS.equals(item.getName()))) {
+            fileterOrgNameMVS = null;
+        }
+
+        if (fileterOrgNameMVS != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptListMVS.stream().filter(item -> item.getName().equals(fileterOrgNameMVS)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptListMVS);
+            clinicalDeptOrgUidSetMVS = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSetMVS = Collections.emptySet();
         }
     }
 
@@ -2895,7 +2945,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterInternal)) {
                 orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
             }
-            if (org.springframework.util.CollectionUtils.isEmpty(orgList)) {
+            if (!org.springframework.util.CollectionUtils.isEmpty(orgList)) {
                 orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
             }
         }
@@ -2907,11 +2957,23 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
                 orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
             }
-            if (!org.springframework.util.CollectionUtils.isEmpty(orgList)) {
+            if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
                 orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
             }
         }
         return orgListMVS;
+    }
+
+    private void loadMVSClinicalDeptList() {
+        try {
+            if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
+                if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                    clinicalDeptListMVS = bySearchFilterMVS.stream().map(item -> item.getClinicalDeptId()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+                }
+            }
+        } catch (Exception e) {
+            logger.info("暂无MVS列表");
+        }
     }
 
     public V2_WorkOrder_Detail getItemDetail() {

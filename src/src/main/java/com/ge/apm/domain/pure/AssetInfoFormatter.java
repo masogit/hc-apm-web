@@ -950,6 +950,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetQuality"), this.getAssetQualityAsString());
         map.put(getMessage("currentId"), assetInfo.getCurrentId());
         map.put(getMessage("assetUsedLifecycle"), assetInfo.getAssetUsedLifecycle());
+        map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
         return map;
 
     }
