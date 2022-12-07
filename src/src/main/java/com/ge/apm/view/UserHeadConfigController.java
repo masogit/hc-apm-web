@@ -85,8 +85,10 @@ public class UserHeadConfigController {
             case 4:
             case 3:
                 //如果用户是院区及以下级别 则取选区标题配置
-                configItemHead = configItemValueRepository.findFirstByKeyAndSiteUid("systemHead" ,selectSite.getSiteUID());
-                configItemLogo = configItemValueRepository.findFirstByKeyAndSiteUid("systemLogo" ,selectSite.getSiteUID());
+                configItemHead = Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid("systemHead" ,selectSite.getSiteUID()))
+                        .orElse(configItemValueRepository.findFirstByKeyAndSiteUid("systemHead" ,selectSite.getTenantUID()));
+                configItemLogo = Optional.ofNullable(configItemValueRepository.findFirstByKeyAndSiteUid("systemLogo" ,selectSite.getSiteUID()))
+                        .orElse(configItemLogo = configItemValueRepository.findFirstByKeyAndSiteUid("systemLogo" ,selectSite.getTenantUID()));
                 break;
             default:
                 //如果用户是院区以上级别 则取租户标题配置
