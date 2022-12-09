@@ -1,10 +1,14 @@
 package com.ge.apm.view.simpleparts;
 
+import cn.hutool.core.map.MapUtil;
+import com.ge.apm.dao.simpleparts.SimplePartsWarehouseUserRepository;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.domain.simpleparts.SimplePartsReportVo;
 import com.ge.apm.service.simpleparts.SimplePartsItemService;
 import com.ge.apm.service.simpleparts.SimplePartsReportService;
+import com.ge.apm.service.simpleparts.SimplePartsWarehouseUserService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +35,8 @@ public class SimplePartsReportController extends GenericCRUDUUIDController<Simpl
 
     private UserContextService userContextService;
 
+    private SimplePartsWarehouseUserService partsWarehouseUserService;
+
     private Date startTime;
     private Date endTime;
 
@@ -45,15 +51,18 @@ public class SimplePartsReportController extends GenericCRUDUUIDController<Simpl
     protected void init() {
         simplePartsReportService = WebUtil.getBean(SimplePartsReportService.class);
         userContextService =  WebUtil.getBean(UserContextService.class);
+        partsWarehouseUserService = WebUtil.getBean(SimplePartsWarehouseUserService.class);
     }
 
     public void previewData(){
-        String tenantInfoUid = new String();
-        TenantInfo tenantInfo = userContextService.getCurrentUserTenantInfo();
         if(userContextService.isCountyArea()){
-            tenantInfoUid = tenantInfo.getUid();
+            TenantInfo tenantInfo = userContextService.getCurrentUserTenantInfo();
+            simplePartsReportVoList = this.simplePartsReportService.querySimplePartsReportList(startTime, endTime, MapUtil.of("tenantUid", tenantInfo.getUid()));
+        } else {
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            List<String> partsWarehouses = partsWarehouseUserService.findAllByPartsWarehouseByUserUid(currentUserAccount.getUid());
+            simplePartsReportVoList = this.simplePartsReportService.querySimplePartsReportList(startTime, endTime, MapUtil.of("partsWarehouseId", partsWarehouses));
         }
-        simplePartsReportVoList = this.simplePartsReportService.querySimplePartsReportList(startTime, endTime,tenantInfoUid);
     }
 
     public List<SimplePartsReportVo> getSimplePartsReportVoList() {

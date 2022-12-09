@@ -5,6 +5,7 @@ import com.ge.apm.domain.simpleparts.SimplePartsReportVo;
 import org.apache.ibatis.annotations.SelectProvider;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author by lyj 503277717
@@ -14,7 +15,7 @@ public interface SimplePartsReportMapper {
 
 
     @SelectProvider(type = SimplePartsReportProvider.class,method="querySimplePartsReportList")
-    List<SimplePartsReportVo> querySimplePartsReportList(String startDate, String endDate,String tenantUID);
+    List<SimplePartsReportVo> querySimplePartsReportList(String startDate, String endDate, Map<String, Object> param);
 
 
 }
