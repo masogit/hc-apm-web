@@ -35,7 +35,14 @@
                 <p:menuitem id="um093" value="#{msg.AssetAchievementsRecord}" outcome="/portal/asset/assetAchievements/assetAchievementsList.xhtml" rendered="#{userContextService.accessContains('asset.achievements')}"/>
                 <p:menuitem id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.versionContains('asset.supplierEvaluation')}"/>
             </p:submenu>
-
+            <p:submenu id="um011" label="特种设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.versionContains('specialAsset')}">
+                <p:menuitem id="um0111" value="台账管理" outcome="/portal/asset/info/specialAssetList"/>
+                <p:menuitem id="um0112" value="维修管理" outcome="/portal/woMgr/specialWorkOrderList.xhtml"/>
+                <p:menuitem id="um0113" value="保养管理" outcome="/portal/pm/specialPmOrderListAll.xhtml"/>
+                <p:menuitem id="um0114" value="年检管理" outcome="/portal/measuring/specialMeasuringResultMain.xhtml"/>
+                <p:menuitem id="um0115" value="档案管理" outcome="/portal/asset/fileAttachment/specialList.xhtml"/>
+                <p:menuitem id="um0116" value="风险管理" outcome="/portal/asset/riskAssessment/specialAssetRiskAssessmentList.xhtml" />
+            </p:submenu>
             <!--多级审批  -->
             <p:submenu id="um001" label="审批" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRole('MultiLevelAuditor')}">
                 <p:menuitem id="um0011" value="多级审批" outcome="/portal/approval/MultiLevelApproval.xhtml" rendered="true"/>
