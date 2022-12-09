@@ -1,0 +1,53 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="年检管理"/>
+            </div>
+
+            <div class="ui-g-12">
+                <p:tabView id="measuringTab" class="ui-g-12">
+                    <p:ajax event="tabChange" listener="#{measureAssetListController.onTabChange}" oncomplete="openAssetViewWindow(xhr, status, args)"/>
+                    <p:tab title="计量结果" id="measuringAssetList">
+                        <ui:include src="specialMeasuringAssetList.xhtml"/>
+                    </p:tab>
+<!--                    <p:tab title="未检计量设备" id="unmeasuredAssetList">-->
+<!--                        <ui:include src="unmeasuredAssetList.xhtml"/>-->
+<!--                    </p:tab>-->
+<!--                    <p:tab title="计量结果导入" id="resultImport">-->
+<!--                        <ui:include src="resultImport.xhtml"/>-->
+<!--                    </p:tab>-->
+<!--                    <p:tab title="计量附件批量上传" id="fileImport" rendered="#{measureAssetListController.canBatchUpload()}">-->
+<!--                        <ui:include src="fileImport.xhtml"/>-->
+<!--                    </p:tab>-->
+                </p:tabView>
+            </div>
+        </div>
+        <script>
+            function openAssetViewWindow(xhr, status, args) {
+                if(args.url != null){
+                    window.location.href = args.url;
+                }
+
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                $("#measuringAssetListForm\\:datalist_measuringAsset\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+        </script>
+    </ui:define>
+</ui:composition>
