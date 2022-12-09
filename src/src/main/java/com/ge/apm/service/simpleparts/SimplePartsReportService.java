@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author by lyj 503277717
@@ -23,7 +24,7 @@ public class SimplePartsReportService {
 
 
 
-    public List<SimplePartsReportVo> querySimplePartsReportList(Date startTime, Date endTime,String tenantUID) {
+    public List<SimplePartsReportVo> querySimplePartsReportList(Date startTime, Date endTime, Map<String, Object> param) {
         String startDate = null;
         String endDate = null;
         if(startTime != null){
@@ -32,6 +33,6 @@ public class SimplePartsReportService {
         if(endTime != null){
             endDate = TimeUtils.getStrDate(endTime, null) + " 23:59:59";
         }
-        return simplePartsReportMapper.querySimplePartsReportList(startDate,endDate,tenantUID);
+        return simplePartsReportMapper.querySimplePartsReportList(startDate, endDate, param);
     }
 }
