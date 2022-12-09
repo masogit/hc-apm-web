@@ -231,10 +231,15 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
         if(size > numEnd && CollectionUtils.isNotEmpty(relRuleAssetList)){
             relRuleAssetList = relRuleAssetList.subList(numStart ,numEnd);
         }else {
-            relRuleAssetList = relRuleAssetList.subList(numStart ,size);
+            if (size > numStart) {
+                relRuleAssetList = relRuleAssetList.subList(numStart ,size);
+            } else {
+                relRuleAssetList = new ArrayList<>();
+            }
         }
         return relRuleAssetList;
     }
+
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
