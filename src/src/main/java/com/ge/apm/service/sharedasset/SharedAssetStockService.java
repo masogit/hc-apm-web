@@ -269,7 +269,7 @@ public class SharedAssetStockService {
                 AssetInfo realTimeAssetInfo = getRealTimeAssetInfo(asset.getUid());
                 
                 voucherInfo.put("设备型号", realTimeAssetInfo.getFunctionType());
-                voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
+                voucherInfo.put("设备分类", asset.getSharedAssetTypeEntity() == null ? null : asset.getSharedAssetTypeEntity().getSwapName());
                 voucherInfo.put("租金", AllocationCenterUtils.getPdfUnitPrice(sharedAssetReqDetail));
                 voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(realTimeAssetInfo));
                 voucherInfo.put("借用时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
@@ -369,8 +369,8 @@ public class SharedAssetStockService {
             SharedAssetReqDetail reqDetail = asset.getSharedAssetReqDetail();
             if(reqDetail != null) {
                 if(StringUtils.isBlank(reqDetail.getChargingType())) {
-                    logger.info("charging_type is missed in request, so set charging_type from share_asset_type: " + asset.getUid() + ":" + asset.getSharedAssetType().getChargingType());
-                    reqDetail.setChargingType(asset.getSharedAssetType().getChargingType());
+                    logger.info("charging_type is missed in request, so set charging_type from share_asset_type: " + asset.getUid() + ":" + asset.getSharedAssetTypeEntity().getChargingType());
+                    reqDetail.setChargingType(asset.getSharedAssetTypeEntity().getChargingType());
                 }
                 SharedAssetReqDetail sharedAssetReqDetail = this.calcRentTimeAndFeeByReqDetail(asset, reqDetail);
                 ValuationFactory.valuation(null,sharedAssetReqDetail);
@@ -380,7 +380,7 @@ public class SharedAssetStockService {
     }
 
     private SharedAssetReqDetail calcRentTimeAndFeeByReqDetail(AssetInfo asset, SharedAssetReqDetail reqDetail) {
-        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(asset.getSharedAssetType(), reqDetail);
+        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(asset.getSharedAssetTypeEntity(), reqDetail);
         reqDetail.setRentalTime(billingDetail._2);
         reqDetail.setTotalAmount(billingDetail._3);
         if(StringUtils.isNotEmpty(reqDetail.getReturnId())) {
