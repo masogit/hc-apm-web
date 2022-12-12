@@ -684,7 +684,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             AssetInfo old = dao.findByUid(selected.getUid());
             Integer oldClinicalId = old.getClinicalDeptId() == null ? 0 : old.getClinicalDeptId();
             Integer newClinicalId = selected.getClinicalDeptId() == null ? 0 : selected.getClinicalDeptId();
-            if((!oldClinicalId.equals(newClinicalId)) || (!old.getAssetDeptUID().equals(selected.getAssetDeptUID()))) {
+            if((!oldClinicalId.equals(newClinicalId)) || (old.getAssetDeptUID() != selected.getAssetDeptUID()) ) {
                 List<AssetInfo> assets = new ArrayList<>();
                 assets.add(old);
                 unCheckNurseSiteMaintain = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets);
@@ -782,7 +782,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             String uid = UUID.randomUUID().toString().replace("-", "");
             selected.setUid(uid);
         }
-        selected.setOfflineUpdateDate(new Date());
         this.saveAssetHistory();
         this.save();
         if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain) && toDeleteNurseMaintainSite) {
