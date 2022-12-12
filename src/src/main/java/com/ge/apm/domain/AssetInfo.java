@@ -816,6 +816,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Setter
     private String assetUsedLifecycle;
 
+    @Getter
+    @Setter
+    @Column(name = "offline_update_date")
+    private Date offlineUpdateDate;
+
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
     }
