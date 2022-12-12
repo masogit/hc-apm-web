@@ -138,7 +138,7 @@ public class SharedAssetInfoUtils {
             info.put("设备编号", asset.getDepartNum());
             info.put("设备名称", asset.getName());
             info.put("设备型号", asset.getFunctionType());
-            info.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
+            info.put("设备分类", asset.getSharedAssetTypeEntity() == null ? null : asset.getSharedAssetTypeEntity().getSwapName());
             info.put("租金", getPdfUnitPrice(reqDetail));
             info.put("状态", getPdfStatus(asset));
             info.put("借用时间", year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second);
@@ -279,7 +279,7 @@ public class SharedAssetInfoUtils {
 
     public static String getPdfAccessories(AssetInfo asset)
     {
-        List<SharedAssetTypeAccesssory> accList = asset.getSharedAssetType().getAccessoryList();
+        List<SharedAssetTypeAccesssory> accList = asset.getSharedAssetTypeEntity().getAccessoryList();
         String accessories = "";
 
         if(accList == null)
