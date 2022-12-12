@@ -111,11 +111,11 @@
     </p:column>
 
     <!-- 修改时间 -->
-    <p:column headerText="#{msg.modifiedTime}" width="160" filterBy="#{item.offlineUpdateDate}" filterMatchMode="GTE">
+    <p:column headerText="#{msg.modifiedTime}" width="160" filterBy="#{item.createdDate}" filterMatchMode="GTE">
         <f:facet name="filter">
             <p:inputText id="filterLastModifiedDateAll" widgetVar="varFilterLastModifiedDateAll" />
         </f:facet>
-        <h:outputText value="#{item.offlineUpdateDate}">
+        <h:outputText value="#{item.createdDate}">
             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
         </h:outputText>
     </p:column>

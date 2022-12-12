@@ -710,7 +710,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     @TableField(exist = false)
-    private SharedAssetType sharedAssetTypeEntity;
+    private SharedAssetType sharedAssetType;
 
     @Transient
     @TableField(exist = false)
@@ -815,11 +815,6 @@ public class AssetInfo implements ChineseName,Serializable {
     @Getter
     @Setter
     private String assetUsedLifecycle;
-
-    @Getter
-    @Setter
-    @Column(name = "offline_update_date")
-    private Date offlineUpdateDate;
 
     public String getSharedAssetSwapIndexId() {
         return sharedAssetSwapIndexId;
@@ -1040,13 +1035,13 @@ public class AssetInfo implements ChineseName,Serializable {
 	public void setSharedAssetReqDetail(SharedAssetReqDetail sharedAssetReqDetail) {
 		this.sharedAssetReqDetail = sharedAssetReqDetail;
 	}
-	
-	public SharedAssetType getSharedAssetTypeEntity() {
-		return sharedAssetTypeEntity;
+
+	public SharedAssetType getSharedAssetType() {
+		return sharedAssetType;
 	}
 
-	public void setSharedAssetTypeEntity(SharedAssetType sharedAssetTypeEntity) {
-		this.sharedAssetTypeEntity = sharedAssetTypeEntity;
+	public void setSharedAssetType(SharedAssetType sharedAssetType) {
+		this.sharedAssetType = sharedAssetType;
 	}
 
     public OrgInfo getAssetDeptOrg() {
