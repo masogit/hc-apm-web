@@ -88,7 +88,7 @@
                         </p:column>
 
                         <p:column headerText="调剂设备名称" sortBy="#{asset.swap_name}" filterBy="#{asset.swap_name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{asset.sharedAssetTypeEntity.swapName}"/>
+                            <h:outputText value="#{asset.sharedAssetType.swapName}"/>
                         </p:column>
                         <p:column rendered="#{sharedAssetStockController.isWhethertoenableunattended()}" headerText="调剂编号" sortBy="#{asset.shared_asset_swap_index}" filterBy="#{asset.shared_asset_swap_index}" filterMatchMode="LIKE">
                             <h:outputText value="#{asset.sharedAssetSwapIndex}"/>
