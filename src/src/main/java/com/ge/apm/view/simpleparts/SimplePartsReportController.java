@@ -1,12 +1,12 @@
 package com.ge.apm.view.simpleparts;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
-import com.ge.apm.dao.simpleparts.SimplePartsWarehouseUserRepository;
+import cn.hutool.core.util.ObjectUtil;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.domain.simpleparts.SimplePartsReportVo;
-import com.ge.apm.service.simpleparts.SimplePartsItemService;
 import com.ge.apm.service.simpleparts.SimplePartsReportService;
 import com.ge.apm.service.simpleparts.SimplePartsWarehouseUserService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -61,7 +61,7 @@ public class SimplePartsReportController extends GenericCRUDUUIDController<Simpl
         } else {
             UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             List<String> partsWarehouses = partsWarehouseUserService.findAllByPartsWarehouseByUserUid(currentUserAccount.getUid());
-            simplePartsReportVoList = this.simplePartsReportService.querySimplePartsReportList(startTime, endTime, MapUtil.of("partsWarehouseId", partsWarehouses));
+            simplePartsReportVoList = this.simplePartsReportService.querySimplePartsReportList(startTime, endTime, MapUtil.of("partsWarehouseId", ObjectUtil.isNotEmpty(partsWarehouses) ? partsWarehouses : ListUtil.toList("-1")));
         }
     }
 
