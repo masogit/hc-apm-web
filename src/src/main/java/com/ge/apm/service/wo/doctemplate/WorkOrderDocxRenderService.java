@@ -61,6 +61,7 @@ public class WorkOrderDocxRenderService {
         COPY_KEY_MAPPING.put("device_serial", WebUtil.getMessage("EquipmentSerialNumber_xlsx"));
         COPY_KEY_MAPPING.put("device_qr", WebUtil.getMessage("QRCode_xlsx"));
         COPY_KEY_MAPPING.put("device_department", WebUtil.getMessage("Department"));
+        COPY_KEY_MAPPING.put("device_site", WebUtil.getMessage("Site"));
         COPY_KEY_MAPPING.put("device_oem", WebUtil.getMessage("manufacture"));
         COPY_KEY_MAPPING.put("device_number", WebUtil.getMessage("EquipmentID_xlsx"));
         COPY_KEY_MAPPING.put("device_location", WebUtil.getMessage("CurrentLocation_xlsx"));
