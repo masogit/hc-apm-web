@@ -82,6 +82,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private TreeNode orgTree;
     private TreeNode selectedNode;
     private TenantInfoRepository tenantInfoRepository;
+    private TableDefinitionRepository tableDao;
     private UaaService uaaService;
     private OrgInfoTreeService orgInfoTreeService;
     private OrgInfo clinicalOrgInfo;
@@ -93,6 +94,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         user = UserContextService.getCurrentUserAccount();
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
         zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
@@ -448,9 +450,32 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (targetAssets.isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
         } else {
+            //只有智康保的走这段逻辑
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            boolean zkbAccountBoolean = userContextService.isZkbAccount();
+            Set<String> directorySets = new HashSet<String>();
+            if (zkbAccountBoolean){
+                PmOrderRule pmOrderRule = this.pmOrderRuleRepository.findByUid(this.getPmOrderRule().getUid());
+                List<SearchFilter> filter = new ArrayList<>();
+                filter.add(new SearchFilter("id", SearchFilter.Operator.EQ, pmOrderRule.getPerformanceReport()));
+                List<TableDefinition> tableDefinitions = tableDao.findBySearchFilter(filter);
+                tableDefinitions.stream().forEach(tableDefinition -> {
+                    if(StringUtils.isNotBlank(tableDefinition.getMainDirectory())&&StringUtils.isNotBlank(tableDefinition.getSecondDirectory())){
+                        directorySets.add(tableDefinition.getMainDirectory()+tableDefinition.getSecondDirectory());
+                    }
+                });
+             }
             List<RelRuleAsset> rels = new ArrayList<>(targetAssets.size());
             targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
             for (AssetInfo ai : targetAssets) {
+                //只有智康保的走这段逻辑
+                if(zkbAccountBoolean){
+                    if(!directorySets.contains(ai.getMainDirectory()+ai.getSecondDirectory())){
+                        WebUtil.addErrorMessage(WebUtil.getMessage("设备"+ai.getName()+"不适用当前规则，请检查"));
+                        return;
+                    };
+                }
+
                 RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
                 if (rel == null) {
                     rel = new RelRuleAsset();

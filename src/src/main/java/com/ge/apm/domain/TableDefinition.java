@@ -114,6 +114,18 @@ public class TableDefinition implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    /**
+     * 主目录
+     */
+    @Column(name = "main_directory")
+    private String mainDirectory;
+
+    /**
+     * 子目录
+     */
+    @Column(name = "second_directory")
+    private String secondDirectory;
+
     public Integer getType() {
         return type;
     }
@@ -271,6 +283,22 @@ public class TableDefinition implements Serializable {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);
         return hash;
+    }
+
+    public String getMainDirectory() {
+        return mainDirectory;
+    }
+
+    public void setMainDirectory(String mainDirectory) {
+        this.mainDirectory = mainDirectory;
+    }
+
+    public String getSecondDirectory() {
+        return secondDirectory;
+    }
+
+    public void setSecondDirectory(String secondDirectory) {
+        this.secondDirectory = secondDirectory;
     }
 
     @Override
