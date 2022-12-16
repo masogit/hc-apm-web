@@ -471,7 +471,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                 //只有智康保的走这段逻辑
                 if(zkbAccountBoolean){
                     if(!directorySets.contains(ai.getMainDirectory()+ai.getSecondDirectory())){
-                        WebUtil.addErrorMessage(WebUtil.getMessage("设备"+ai.getName()+"不适用当前规则，请检查"));
+                        WebUtil.addErrorMessage(WebUtil.getMessage("设备"+ai.getName()+"不适用当前规则，请检查设备[modality，product]是否匹配"));
                         return;
                     };
                 }
