@@ -879,7 +879,7 @@ public void test1(){
             removeFilterOnField("assetInfo.assetOwnerId2");
             removeFilterOnField("assetInfo.assetOwnerId3");
             removeFilterOnField("assetInfo.uid");
-            Integer  fillterStepId;
+            Integer fillterStepId;
             if (queryIndex == 1) {//已报修 可取消
                 if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                     searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
@@ -975,17 +975,18 @@ public void test1(){
                 UserAccount userAccount = userContextService.getCurrentUserAccount();
                 String tenantUID = userAccount.getTenantUID();
                 TenantInfo tenantInfo = tenantInfoRepository.findByuid(tenantUID);
-                if(WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())){
+                if (WorkOrderConstant.DESIGNATED_USER.equals(tenantInfo.getName().trim())) {
                     List<UserAccount> userAccountList = new ArrayList<>();
                     AuditGroupConfiguration auditGroupConfiguration = auditGroupConfigurationRepository.findByHierOrgUidAndGroupName(userAccount.getHospitalUID(), WorkOrderConstant.CORE_GROUP_MEMBERS);
-                    if(auditGroupConfiguration!=null){
+                    if (auditGroupConfiguration != null) {
                         String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
-                        List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
+                        List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {
+                        });
                         if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
                             for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
                                 AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
                                 List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                                if(userUids!=null){
+                                if (userUids != null) {
                                     UserAccount account = userDao.getByUid(userUids.get(0));
                                     userAccountList.add(account);
                                 }
@@ -993,15 +994,15 @@ public void test1(){
 
                         }
                     }
-                    if (userAccountList.contains(userAccount)){
-                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1,"1*approve+"));
-                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId(),"1*approve+9*"));
-                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0,"1*approve+9*"));
-                    }else {
+                    if (userAccountList.contains(userAccount)) {
+                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 1, "1*approve+"));
+                        searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId(), "1*approve+9*"));
+                        searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0, "1*approve+9*"));
+                    } else {
                         searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
                         searchFilters.add(new SearchFilter("isCoreMemberApproval", SearchFilter.Operator.EQ, 0));
                     }
-                }else {
+                } else {
                     if (!(userContextService.hasRole("AssetHead") || userContextService.hasRole("DeptHead"))) {
                         searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
                     }
@@ -1017,18 +1018,18 @@ public void test1(){
 
 
             } else if (queryIndex == 11) { //全部维修单
-                if(stepFileter!=null) {
+                if (stepFileter != null) {
                     fillterStepId = woStatus.get(stepFileter);
                     if (fillterStepId > 6) {
-                        if(userContextService.hasCurrentTenantName("")) {
-                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(7,9)));
-                        }else {
+                        if (userContextService.hasCurrentTenantName("")) {
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(7, 9)));
+                        } else {
                             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
                         }
                     } else {
-                        if( fillterStepId == 3 && userContextService.hasCurrentTenantName("")) {
+                        if (fillterStepId == 3 && userContextService.hasCurrentTenantName("")) {
                             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
-                        }else{
+                        } else {
                             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
                         }
                     }
@@ -1038,7 +1039,12 @@ public void test1(){
                 if (!Strings.isNullOrEmpty(queryAssetUid)) {
                     searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
                 }
-            } else {//待办
+            } else if (queryIndex == 13) {
+                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 10));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+            }else {//待办
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 if(stepFileter!=null) {
                     fillterStepId = woStatus.get(stepFileter);
