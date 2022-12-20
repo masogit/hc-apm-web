@@ -3,7 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
         <div class="ui-g">
@@ -37,16 +38,39 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+
                         <p:column headerText="#{msg.hospitalId}">
                             <h:outputText value="#{not empty tableDefinitionController.orgInfoMap[item.siteUID] ? tableDefinitionController.orgInfoMap[item.siteUID] : 'NA'}"/>
                         </p:column>
                         <p:column headerText="#{msg.Description}" >
                             <h:outputText value="#{item.description}"/>
                         </p:column>
+                        <c:if test="#{userContextService.zkbAccount}" >
+                            <p:column headerText="Modality" filterBy="#{item.mainDirectory}" filterMatchMode="EQ" >
+                                <h:outputText value="#{item.mainDirectory}"/>
+                                <f:facet name="filter">
+                                    <p:selectOneMenu  onchange="PF('varDataList').filter()" value="#{tableDefinitionController.tableDefinition.mainDirectory}"  autoWidth="false" style="max-width: 150px;" height="200">
+                                        <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="fileSecondDirectory"/>
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}"   itemValue="#{null}"  noSelectionOption="true" />
+                                        <f:selectItems value="#{tableDefinitionController.findMainDirectory()}" var="item" itemLabel="#{item.name}" itemValue="#{item.name}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:column>
+                            <p:column headerText="Product" filterBy="#{item.secondDirectory}" filterMatchMode="EQ">
+                                <h:outputText value="#{item.secondDirectory}"/>
+                                <f:facet name="filter">
+                                    <p:selectOneMenu id="fileSecondDirectory"  onchange="PF('varDataList').filter()" value="#{tableDefinitionController.tableDefinition.secondDirectory}" autoWidth="false" style="max-width: 150px;" height="200">
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}"  itemValue="#{null}"  noSelectionOption="true" />
+                                        <f:selectItems value="#{tableDefinitionController.subZkbFileDirectoryList}" var="item" itemLabel="#{item.name}" itemValue="#{item.name}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:column>
+                        </c:if>
                         <p:column headerText="#{msg.Status}" >
                             <h:outputText value="#{msg.NotEnabled}"  rendered="#{empty item.status or item.status eq 'Draft'}"/>
                             <h:outputText value="#{msg.Released}"  rendered="#{item.status eq 'Released'}"/>
                         </p:column>
+
                         <p:column headerText="" exportable="false">
                             <p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}" actionListener="#{tableDefinitionController.setToUsing(item.id,false)}" update=":SchemaListForm:datalist"  rendered="#{empty item.status or item.status eq 'Draft'}" disabled="#{tableDefinitionController.getIsReadOnly(item)}"/>
                             <p:commandButton icon="ui-icon-close" style="zoom:0.7" title="#{msg.Disabled}" actionListener="#{tableDefinitionController.setToUsing(item.id,true)}" update=":SchemaListForm:datalist"  rendered="#{item.status eq 'Released'}" disabled="#{tableDefinitionController.getIsReadOnly(item)}"/>

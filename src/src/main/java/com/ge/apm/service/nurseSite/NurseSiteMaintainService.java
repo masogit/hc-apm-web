@@ -2344,7 +2344,7 @@ public class NurseSiteMaintainService {
 			NurseSiteMaintainExport nurseSiteMaintainExport = new NurseSiteMaintainExport();
 			nurseSiteMaintainExport.setScheduleDate(item.getScheduleDate());
 			nurseSiteMaintainExport.setCheckDate(item.getCheckDate());
-			nurseSiteMaintainExport.setPrincipal(getUserName(item.getCreateByUid()));
+/*			nurseSiteMaintainExport.setPrincipal(getUserName(item.getCreateByUid()));*/
 			nurseSiteMaintainExport.setChecker(getUserName(item.getUpdateByUid()));
 			String signatureId = item.getSignatureId();
 			if ((StringUtils.isBlank(signatureId)|| "".equals(signatureId)) && signatureIdMap != null && signatureIdMap.size() > 0) {
