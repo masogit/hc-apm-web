@@ -38,9 +38,7 @@ import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -52,7 +50,6 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -501,7 +498,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             for(AssetInfo info : currentPageAssets) {
                 //Since can't use fetch mode in Lazy, so load mapped objects by standalone search
                 SharedAssetType sharedAssetType = findSharedAssetType(info);
-                info.setSharedAssetType(sharedAssetType);
+                info.setSharedAssetTypeEntity(sharedAssetType);
             	SharedAssetReqDetail reqDetail = selectProperReqDetail(info);
             	info.setSharedAssetReqDetail(reqDetail);
             }
@@ -2015,7 +2012,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             return;
         }
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
-        asset.setSharedAssetType(sharedAssetType);
+        asset.setSharedAssetTypeEntity(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
 		SharedAssetRequest assetRequest = reqDetail.getLeaseRequest();
@@ -2032,7 +2029,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             return;
         }
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
-        asset.setSharedAssetType(sharedAssetType);
+        asset.setSharedAssetTypeEntity(sharedAssetType);
 		SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
 		reqDetail = (reqDetail == null) ? new SharedAssetReqDetail() : reqDetail;
 		//set default value for isIntact
@@ -2153,8 +2150,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         Date beginTime = sharedAssetReqDetail.getChargingBeginTime();
         Date endTime = sharedAssetReqDetail.getChargingEndTime();
 
-        String chargingType = item.getSharedAssetType().getChargingType();
-        Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(item.getSharedAssetType(), sharedAssetReqDetail);
+        String chargingType = item.getSharedAssetTypeEntity().getChargingType();
+        Tuple2<BigDecimal, String> unitAndTotalTime = SharedAssetInfoUtils.getChargingUnitAndTotalTime(item.getSharedAssetTypeEntity(), sharedAssetReqDetail);
         BigDecimal unit = unitAndTotalTime._1;
         String totalTime = unitAndTotalTime._2;
 
@@ -2169,7 +2166,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         sharedAssetReqDetail.setRentalTime(totalTime);
 
-        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, item.getSharedAssetType(), sharedAssetReqDetail);
+        BigDecimal totalAmount = SharedAssetInfoUtils.getTotalAmount(unit, item.getSharedAssetTypeEntity(), sharedAssetReqDetail);
         sharedAssetReqDetail.setTotalAmount(totalAmount);
         return sharedAssetReqDetail;
     }
@@ -2274,7 +2271,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private void getPdfContent(AssetInfo asset, Map<String, Object> info)
     {
         SharedAssetType sharedAssetType = findSharedAssetType(asset);
-        asset.setSharedAssetType(sharedAssetType);
+        asset.setSharedAssetTypeEntity(sharedAssetType);
         SharedAssetReqDetail reqDetail = this.selectProperReqDetail(asset);
         reqDetail = (reqDetail == null) ? this.findLatestReqDetail(asset) : reqDetail;
         if(reqDetail != null) {

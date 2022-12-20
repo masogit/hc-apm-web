@@ -192,9 +192,9 @@ public class ZkbAssetStatisticService {
         Date date = new Date();
         if(qrCodeCountState == null || qrCodeCountState.equals("N")){
             if("Y".equals(zkbAssetQrCodeInfo.getIbQrCodeState())){
-                zkbAssetQrCodeInfo.setQrCodeDate(date);
-                zkbAssetQrCodeInfo.setQrCodeCountState("Y");
-                zkbAssetQrCodeInfo.setQrCodeState(null);
+                zkbAssetQrCodeInfo.setQrCodeDate(date);//为Y 时需要记录时间
+                zkbAssetQrCodeInfo.setQrCodeCountState("Y");//二维码是否已实施
+                zkbAssetQrCodeInfo.setQrCodeState(null);//是否已贴旧二维码
             }else{
                 zkbAssetQrCodeInfo.setQrCodeState(null);
                 Integer qrCodeCount = zkbAssetQrCodeInfoRepository.findAttachedCount(zkbAssetQrCodeInfo.getAssetUid());
@@ -205,7 +205,6 @@ public class ZkbAssetStatisticService {
                 }
             }
             if(zkbAssetQrCodeInfo.getId() == null){//ID == null 则新增记录
-                zkbAssetQrCodeInfo.setQrCodeCountState("N");
                 zkbAssetQrCodeInfo.setCreatedDate(date);
             }
         }

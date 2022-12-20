@@ -710,7 +710,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     @TableField(exist = false)
-    private SharedAssetType sharedAssetType;
+    private SharedAssetType sharedAssetTypeEntity;
 
     @Transient
     @TableField(exist = false)
@@ -1035,13 +1035,13 @@ public class AssetInfo implements ChineseName,Serializable {
 	public void setSharedAssetReqDetail(SharedAssetReqDetail sharedAssetReqDetail) {
 		this.sharedAssetReqDetail = sharedAssetReqDetail;
 	}
-	
-	public SharedAssetType getSharedAssetType() {
-		return sharedAssetType;
+
+	public SharedAssetType getSharedAssetTypeEntity() {
+		return sharedAssetTypeEntity;
 	}
 
-	public void setSharedAssetType(SharedAssetType sharedAssetType) {
-		this.sharedAssetType = sharedAssetType;
+	public void setSharedAssetTypeEntity(SharedAssetType sharedAssetTypeEntity) {
+		this.sharedAssetTypeEntity = sharedAssetTypeEntity;
 	}
 
     public OrgInfo getAssetDeptOrg() {

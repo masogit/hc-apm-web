@@ -17,7 +17,6 @@
        <div class="ui-g-12 card cardTitle">
            <p:outputLabel class="pageTitle" value="#{msg.GenerateMaintenanceWorkordersInBatch}"/>
        </div>
-
        <div class="ui-g-12 card">
     
         <h:form id="GeneratePmOrderForm">
@@ -248,7 +247,7 @@
 					<p:commandButton id ="hidden" value="hello" style="display:none"/>
 					<h:panelGroup>
 						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="#{msg.Generate}" icon="ui-icon-check" update=":growl" />
-						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
+						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="javascript:goBack();" immediate="true" />
 					</h:panelGroup>
                     <p:panelGrid id ="PmOrderRule" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     </p:panelGrid>
@@ -269,6 +268,10 @@
 				} else {
 					$(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
 				}
+			}
+
+			function goBack() {
+				window.history.back();
 			}
 		</script>
     </ui:define>

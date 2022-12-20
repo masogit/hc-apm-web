@@ -244,6 +244,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("EquipmentName_xlsx"), workOrderExportPojo.getAssetName());
             workOrderMap.put(WebUtil.getMessage("Site"), workOrderExportPojo.getHospitalName());
             workOrderMap.put(WebUtil.getMessage("Department"), workOrderExportPojo.getAssetClinicalDeptName());
+            workOrderMap.put(WebUtil.getMessage("Site"), workOrderExportPojo.getHospitalName());
             workOrderMap.put(WebUtil.getMessage("manufacture"), workOrderExportPojo.getAssetManufacture());
             workOrderMap.put(WebUtil.getMessage("brand"), workOrderExportPojo.getAssetMakerShortName());
             workOrderMap.put(WebUtil.getMessage("MaintenanceSubStatus"), getSubStatus(workOrderExportPojo.getSubStatus()));

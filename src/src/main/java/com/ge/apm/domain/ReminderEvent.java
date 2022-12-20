@@ -63,7 +63,7 @@ public class ReminderEvent implements Serializable {
     private String reminderType;
 
     @Column(name = "reminder_date")
-    private String reminderDate;
+    private Date reminderDate;
 
     @Column(name = "created_date")
     private Date createdDate;

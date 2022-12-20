@@ -118,7 +118,7 @@
                                         <h:outputText value="#{asset.departNum}"/>
                                     </p:column>
                                     <p:column headerText="调剂设备名称">
-                                        <h:outputText value="#{asset.sharedAssetType.swapName}"/>
+                                        <h:outputText value="#{asset.sharedAssetTypeEntity.swapName}"/>
                                     </p:column>
                                     <p:column headerText="计费开始时间">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
@@ -132,10 +132,10 @@
                                         <h:outputText value="#{asset.sharedAssetReqDetail.patientBedNum}"/>
                                     </p:column>
                                     <p:column headerText="单价">
-                                        <h:outputText value="#{asset.sharedAssetType.unitPrice}"/>
+                                        <h:outputText value="#{asset.sharedAssetTypeEntity.unitPrice}"/>
                                     </p:column>
                                     <p:column headerText="计价方式">
-                                        <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetType.chargingType)}"/>
+                                        <h:outputText value="#{fieldMsg.fieldValue('chargingType',asset.sharedAssetTypeEntity.chargingType)}"/>
                                     </p:column>
                                     <p:column rendered="#{sharedAssetStockController.validate301() and sharedAssetBatchController.enableLeasePrintCol()}">
 										<p:commandButton value="打印" ajax="false"
@@ -283,7 +283,7 @@
                                         <h:outputText value="#{asset.departNum}"/>
                                     </p:column>
                                     <p:column headerText="调剂设备名称">
-                                        <h:outputText value="#{asset.sharedAssetType.swapName}"/>
+                                        <h:outputText value="#{asset.sharedAssetTypeEntity.swapName}"/>
                                     </p:column>
                                     <p:column headerText="计费开始时间">
                                         <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
