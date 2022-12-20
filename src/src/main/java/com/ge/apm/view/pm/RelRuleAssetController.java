@@ -83,6 +83,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private TreeNode selectedNode;
     private TenantInfoRepository tenantInfoRepository;
     private TableDefinitionRepository tableDao;
+    private ZkbDirectoryTableDefineRepository zkbDirectoryRepository;
     private UaaService uaaService;
     private OrgInfoTreeService orgInfoTreeService;
     private OrgInfo clinicalOrgInfo;
@@ -95,6 +96,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
+        zkbDirectoryRepository = WebUtil.getBean(ZkbDirectoryTableDefineRepository.class);
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
         zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
@@ -456,12 +458,14 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             Set<String> directorySets = new HashSet<String>();
             if (zkbAccountBoolean){
                 PmOrderRule pmOrderRule = this.pmOrderRuleRepository.findByUid(this.getPmOrderRule().getUid());
+                TableDefinition tableDefinition = tableDao.findById(pmOrderRule.getPerformanceReport());
                 List<SearchFilter> filter = new ArrayList<>();
-                filter.add(new SearchFilter("id", SearchFilter.Operator.EQ, pmOrderRule.getPerformanceReport()));
-                List<TableDefinition> tableDefinitions = tableDao.findBySearchFilter(filter);
-                tableDefinitions.stream().forEach(tableDefinition -> {
-                    if(StringUtils.isNotBlank(tableDefinition.getMainDirectory())&&StringUtils.isNotBlank(tableDefinition.getSecondDirectory())){
-                        directorySets.add(tableDefinition.getMainDirectory()+tableDefinition.getSecondDirectory());
+                filter.add(new SearchFilter("name", SearchFilter.Operator.EQ, tableDefinition.getName()));
+                filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "0"));
+                List<ZkbDirectoryTableDefine> zkbDirectoryTableDefineList = zkbDirectoryRepository.findBySearchFilter(filter);
+                zkbDirectoryTableDefineList.stream().forEach(zkbDirectory -> {
+                    if(StringUtils.isNotBlank(zkbDirectory.getMainDirectory())&&StringUtils.isNotBlank(zkbDirectory.getSecondDirectory())){
+                        directorySets.add(zkbDirectory.getMainDirectory()+zkbDirectory.getSecondDirectory());
                     }
                 });
              }

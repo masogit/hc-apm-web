@@ -204,28 +204,7 @@
                                 <p:ajax event="itemSelect" listener="#{tableCreateController.chengeIsMaintainanceReport}" update="tabView"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <c:if test="#{userContextService.zkbAccount}" >
-                            <h:panelGroup>
-                                <label class="label">Modality</label>
-                                <p:selectOneMenu id="fileMainDirectory" value="#{tableCreateController.selectedTableDefinition.mainDirectory}"  required="true" requiredMessage="mainDirectory#{msg.ValidationRequire}" >
-                                    <p:ajax process="@this" event="itemSelect" update="fileSecondDirectory"/>
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <c:forEach items="#{tableCreateController.findMainDirectory()}" var="v">
-                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
-                                    </c:forEach>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                           <h:panelGroup>
-                                <label class="label">Product</label>
-                                <p:selectOneMenu id="fileSecondDirectory" value="#{tableCreateController.selectedTableDefinition.secondDirectory}"  required="true" requiredMessage="product#{msg.ValidationRequire}">
-                                    <p:ajax process="@this" event="itemSelect" />
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <c:forEach items="#{tableCreateController.subZkbFileDirectoryList}" var="v">
-                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
-                                    </c:forEach>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                        </c:if>
+
                     </p:panelGrid>
                     <h:panelGroup>
                         <!--<p:commandButton icon="ui-icon-remove-red-eye" immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>-->
