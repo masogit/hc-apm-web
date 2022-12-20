@@ -2,12 +2,15 @@ package com.ge.apm.view.asset;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.pm.RelRuleAssetController;
@@ -64,6 +67,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private TenantOptionConfigRepository tenantOptionConfigRepository;
     private AssetHistoryService assetHistoryService;
     private RelRuleAssetRepository relRuleAssetRepository;
+    private UserRoleRepository userRoleRepository;
+    private CustomRoleRepository customRoleRepository;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -173,6 +178,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
+        userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
+        customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
@@ -998,6 +1005,35 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             return user.getName();
         }
         return null;
+    }
+
+    /**
+     *
+     * @param authKey
+     * @param roleName
+     *        a - create
+     *        d - delete
+     *        m - modify
+     *        s - search
+     *        o - export
+     *        i - import
+     * @return
+     */
+    public boolean hasCustomRole(String authKey, String roleName){
+        List<UserRole> userRoleList = userRoleRepository.findByUserIdAndRoleType(UserContextService.getUserID(), ApmConstant.CUSTOME_ROLE_TYPE);
+        for (UserRole userRole : userRoleList) {
+            String webAuthorities = customRoleRepository.findById(userRole.getRoleId()).getWebAuthorities();
+            if(null != webAuthorities){
+                JSONArray authJSONArr= JSONArray.parseArray(webAuthorities);
+                for (int i = 0; i < authJSONArr.size(); i++) {
+                    JSONObject ob = authJSONArr.getJSONObject(i);
+                    if(authKey.equals(ob.get("k")) && (Boolean) ob.get(roleName)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public OrgInfo getSelectSite() {
