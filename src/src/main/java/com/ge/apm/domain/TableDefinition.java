@@ -7,12 +7,7 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
@@ -117,13 +112,13 @@ public class TableDefinition implements Serializable {
     /**
      * 主目录
      */
-    @Column(name = "main_directory")
+    @Transient
     private String mainDirectory;
 
     /**
      * 子目录
      */
-    @Column(name = "second_directory")
+    @Transient
     private String secondDirectory;
 
     public Integer getType() {

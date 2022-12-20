@@ -46,24 +46,11 @@
                             <h:outputText value="#{item.description}"/>
                         </p:column>
                         <c:if test="#{userContextService.zkbAccount}" >
-                            <p:column headerText="Modality" filterBy="#{item.mainDirectory}" filterMatchMode="EQ" >
+                            <p:column headerText="Modality" >
                                 <h:outputText value="#{item.mainDirectory}"/>
-                                <f:facet name="filter">
-                                    <p:selectOneMenu  onchange="PF('varDataList').filter()" value="#{tableDefinitionController.tableDefinition.mainDirectory}"  autoWidth="false" style="max-width: 150px;" height="200">
-                                        <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="fileSecondDirectory"/>
-                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}"   itemValue="#{null}"  noSelectionOption="true" />
-                                        <f:selectItems value="#{tableDefinitionController.findMainDirectory()}" var="item" itemLabel="#{item.name}" itemValue="#{item.name}"/>
-                                    </p:selectOneMenu>
-                                </f:facet>
                             </p:column>
-                            <p:column headerText="Product" filterBy="#{item.secondDirectory}" filterMatchMode="EQ">
+                            <p:column headerText="Product" >
                                 <h:outputText value="#{item.secondDirectory}"/>
-                                <f:facet name="filter">
-                                    <p:selectOneMenu id="fileSecondDirectory"  onchange="PF('varDataList').filter()" value="#{tableDefinitionController.tableDefinition.secondDirectory}" autoWidth="false" style="max-width: 150px;" height="200">
-                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}"  itemValue="#{null}"  noSelectionOption="true" />
-                                        <f:selectItems value="#{tableDefinitionController.subZkbFileDirectoryList}" var="item" itemLabel="#{item.name}" itemValue="#{item.name}"/>
-                                    </p:selectOneMenu>
-                                </f:facet>
                             </p:column>
                         </c:if>
                         <p:column headerText="#{msg.Status}" >
