@@ -4902,3 +4902,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','budgetMgr.preSupplierMgr','预供应商管理','Pre-vendor management',NULL,-1);
 -- YHAAO-16852 增加字段“数量”
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetQuantity','数量','Quantity',NULL,-1);
+-- YHAAO-17377 增加资产编辑权限支持
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('customRoleAuth','assetInfoAuth','资产信息','Asset information',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetInfoAuth','a','创建资产信息','Create asset information',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetInfoAuth','m','修改资产信息','Modify asset information',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetInfo','资产信息','Asset information',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetInfo','assetInfo.modify','修改资产信息','Modify asset information',NULL,-1);
