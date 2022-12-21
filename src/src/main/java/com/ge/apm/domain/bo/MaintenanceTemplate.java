@@ -272,6 +272,7 @@ public class MaintenanceTemplate {
     public enum Device {
         NAME("name", Widget.TEXT),
         DEPARTMENT("department", Widget.TEXT),
+        Site("site", Widget.TEXT),
         TYPE("type", Widget.TEXT),
         OEM("oem", Widget.TEXT),
         SERIAL("serial", Widget.TEXT),

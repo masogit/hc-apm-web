@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
 import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
 import com.ge.apm.domain.bo.parser.SchemaParser;
@@ -68,6 +69,9 @@ public class PmReportService {
 
     @Autowired
     private BlobObjectRepository blobObjectRepository;
+
+    @Autowired
+    private OrgInfoRepository orgInfoRepository;
 
     /**
      * Render Dynamic Table content.
@@ -188,6 +192,7 @@ public class PmReportService {
         // Device information
         content.put(MaintenanceTemplate.Device.NAME.toString(), pmOrder.getAssetInfo().getName());
         content.put(MaintenanceTemplate.Device.DEPARTMENT.toString(), pmOrder.getAssetInfo().getClinicalDeptName());
+        content.put(MaintenanceTemplate.Device.Site.toString(), orgInfoRepository.findByUid(pmOrder.getSiteUID()).getName());
         content.put(MaintenanceTemplate.Device.TYPE.toString(), pmOrder.getAssetInfo().getFunctionType());
         content.put(MaintenanceTemplate.Device.OEM.toString(), pmOrder.getAssetInfo().getManufacture());
         content.put(MaintenanceTemplate.Device.SERIAL.toString(), pmOrder.getAssetInfo().getSerialNum());
