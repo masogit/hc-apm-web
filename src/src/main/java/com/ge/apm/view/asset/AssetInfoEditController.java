@@ -782,6 +782,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             String uid = UUID.randomUUID().toString().replace("-", "");
             selected.setUid(uid);
         }
+        selected.setOfflineUpdateDate(new Date());
         this.saveAssetHistory();
         this.save();
         if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain) && toDeleteNurseMaintainSite) {
