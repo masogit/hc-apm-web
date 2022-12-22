@@ -2212,6 +2212,14 @@ public void test1(){
         woService.acceptWorkOrder(selectedWorkOrder, esTime, repairType, comments);
         cancel();
     }
+    public void confirmSend(String woid) {
+
+        selectedWorkOrder = dao.findById(woid);
+        Integer repairType = selectedWorkOrder.getRepairType();
+
+        woService.confirmSend(selectedWorkOrder);
+        cancel();
+    }
 
     public void reassignWorkOrder() {
         if(StringUtils.isEmpty(comments)){

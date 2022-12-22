@@ -306,6 +306,18 @@ public class V2_WorkOrderService {
         }
         selectedWorkOrder.setCurrentStepId(4);
     }
+    public void confirmSend(V2_WorkOrder selectedWorkOrder) {
+        //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+        //   selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String res = srApi.invokeWorkOrderAction(token, formData, "confirmSend", selectedWorkOrder.getId());
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "送修"));
+        }
+        selectedWorkOrder.setCurrentStepId(4);
+    }
 
     public void takeWorkOrder(V2_WorkOrder selectedWorkOrder, Date takeTime, String taker) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
