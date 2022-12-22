@@ -78,7 +78,7 @@
                         <h:outputText value="#{item.serviceRequest.hospitalName}"/>
                     </p:column>
                 </c:if>
-                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                <p:column id="hospitalIdShow" headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{workOrderMgrController.hospitalShow}">
                     <f:facet name="filter" >
                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.siteUidFilter}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>

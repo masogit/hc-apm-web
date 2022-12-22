@@ -21,6 +21,7 @@ import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -29,6 +30,7 @@ import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -77,16 +79,18 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private ConfigService configService;
     private TenantInfo selectedTenant;
     private ZkbFileDirectoryService zkbFileDirectoryService;
-    private OrgInfo selectedUserOrg;
+    private List<OrgInfo> selectedUserOrg;
     private OrgInfo selectedOrg;
     private TreeNode orgTree;
-    private TreeNode selectedNode;
+    private TreeNode[] selectedNode;
     private TenantInfoRepository tenantInfoRepository;
     private TableDefinitionRepository tableDao;
     private ZkbDirectoryTableDefineRepository zkbDirectoryRepository;
     private UaaService uaaService;
     private OrgInfoTreeService orgInfoTreeService;
     private OrgInfo clinicalOrgInfo;
+    private boolean isYmyg = false;
+    private OrgInfo userOrgInfo;
 
     @Override
     protected void init() {
@@ -114,9 +118,15 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
-        selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
+        selectedUserOrg = new ArrayList<>();
+        userOrgInfo = orgInfoRepository.getByUid(user.getSiteUID());
+        selectedUserOrg.add(userOrgInfo);
+        isYmyg = UserContextService.isYiMaiYangGuangTenantForServer();
         //initTree(user.getTenantUID());
         initOrgTree();
+        if (isYmyg) {
+            getAssetList();
+        }
     }
 
     public boolean getPmRule(){
@@ -189,8 +199,50 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
-        selectedUserOrg = (OrgInfo) node.getData();
+        if (!isYmyg) {
+            selectedUserOrg.clear();
+            //selectedUserOrg.add(userOrgInfo);
+        }  else {
+            setTreeNodes(node, true);
+        }
+        selectedUserOrg.add((OrgInfo) node.getData());
         addFilter();
+    }
+
+    public void onUnSelectOrgForUser(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        selectedUserOrg.remove((OrgInfo)node.getData());
+        addFilter();
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        if (root == null) {
+            return;
+        }
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            if (isSelected && !ObjectUtils.isEmpty(item)) {
+                selectedUserOrg.add((OrgInfo)item.getData());
+            } else {
+                selectedUserOrg.remove((OrgInfo)item.getData());
+            }
+            setTreeNodes(item, isSelected);
+        }
+    }
+
+    private void updateParentNode(TreeNode parentNode) {
+        if (parentNode == null) {
+            return;
+        }
+        boolean result = false;
+        for (TreeNode item : parentNode.getChildren()) {
+            result = item.isSelected();
+            if (result) {
+                break;
+            }
+        }
+        parentNode.setSelected(result);
     }
 
     public void initAssets() {
@@ -211,16 +263,23 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         return orgInfo.getName();
     }
 
-    public String getOrgFullName(OrgInfo org) {
-        if(null == org || org.getId() == -1) {
-            return null;
+    public String getOrgFullName(List<OrgInfo> org) {
+        StringBuilder sb = new StringBuilder();
+        if (CollectionUtils.isNotEmpty(org)) {
+            org.forEach(val -> sb.append(val.getName() + ","));
+            String name = sb.toString();
+            return name.substring(0, name.length()-1);
         }
-        String name = org.getName();
-/*        while (org.getParentOrg() != null) {
-            org = org.getParentOrg();
-            name = org.getName() + "/" + name;
-        }*/
-        return name;
+        return null;
+//        if(null == org || org.getId() == -1) {
+//            return null;
+//        }
+//        String name = org.getName();
+///*        while (org.getParentOrg() != null) {
+//            org = org.getParentOrg();
+//            name = org.getName() + "/" + name;
+//        }*/
+//        return name;
     }
     @Override
     public void onFilter(FilterEvent event) {
@@ -353,8 +412,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     public List<SearchFilter> getAssetFilter() {
         List<SearchFilter> filter = new ArrayList<>();
-        if(selectedUserOrg != null){
-            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID()));
+        if(CollectionUtils.isNotEmpty(selectedUserOrg)){
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedUserOrg.stream().map(OrgInfo::getSiteUID).collect(Collectors.toList())));
         }else{
             filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
             //filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
@@ -605,8 +664,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         //UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> filter = new ArrayList<>();
         filter.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4,"1*"));
-        if(selectedUserOrg != null){
-            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID(),"1*"));
+        if(CollectionUtils.isNotEmpty(selectedUserOrg)){
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedUserOrg.stream().map(OrgInfo::getSiteUID).collect(Collectors.toList()),"1*"));
         }else{
             filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
         }
@@ -627,19 +686,19 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         this.clinicalOrgInfo = clinicalOrgInfo;
     }
 
-    public TreeNode getSelectedNode() {
+    public TreeNode[] getSelectedNode() {
         return selectedNode;
     }
 
-    public void setSelectedNode(TreeNode selectedNode) {
+    public void setSelectedNode(TreeNode[] selectedNode) {
         this.selectedNode = selectedNode;
     }
 
-    public OrgInfo getSelectedUserOrg() {
+    public List<OrgInfo> getSelectedUserOrg() {
         return selectedUserOrg;
     }
 
-    public void setSelectedUserOrg(OrgInfo selectedUserOrg) {
+    public void setSelectedUserOrg(List<OrgInfo> selectedUserOrg) {
         this.selectedUserOrg = selectedUserOrg;
     }
 

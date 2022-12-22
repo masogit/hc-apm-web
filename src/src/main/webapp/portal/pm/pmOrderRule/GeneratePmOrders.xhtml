@@ -49,13 +49,14 @@
 					   </h:panelGroup>
 
 					   <h:panelGroup>
-						   <label class="label">#{msg.hospitalId}*</label>
+						   <label class="label">#{userContextService.isYiMaiYangGuangTenant()?'所属机构':msg.hospitalId}</label>
 						   <p:inputText id="selectedUserOrgName" value="#{generatePmOrdersController.getOrgFullName(generatePmOrdersController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
 						   <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
 						   <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
 							   <p:scrollPanel style="height:300px;border: 0" mode="native">
-								   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{generatePmOrdersController.orgTree}" selection="#{generatePmOrdersController.selectedNode}" var="node" selectionMode="single">
+								   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{generatePmOrdersController.orgTree}" selection="#{generatePmOrdersController.selectedNode}" var="node" selectionMode="#{userContextService.isYiMaiYangGuangTenant()?'checkbox':'single'}">
 									   <p:ajax process="@this" event="select" update="GeneratePmOrderForm" listener="#{generatePmOrdersController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+									   <p:ajax process="@this" event="unselect" update="GeneratePmOrderForm" listener="#{generatePmOrdersController.onUnSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
 									   <p:ajax process="@this" event="expand"/>
 									   <p:ajax process="@this" event="collapse"/>
 									   <p:treeNode type="org">

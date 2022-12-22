@@ -1117,6 +1117,14 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    public static boolean isYiMaiYangGuangTenantForServer() {
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
+        if (tenantOptionConfigOptional.isPresent()) {
+            return tenantOptionConfigOptional.get().getSynchronizeWorkOrder()!=null? tenantOptionConfigOptional.get().getSynchronizeWorkOrder():false;
+        }
+        return false;
+    }
+
     public static boolean isSuperAdminWithPartnerAccount(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.isPartnerAccount();
