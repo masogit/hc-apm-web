@@ -365,7 +365,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
             assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
         }
-        if (!assetFilters.isEmpty()) {
+        if (!assetFilters.isEmpty() || isYmyg) {
             if (queryAsset.getRuleStatus() != null) {
                 uids = new ArrayList<>();
                 if (queryAsset.getRuleStatus() == 1) {// 已配置
