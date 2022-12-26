@@ -140,6 +140,8 @@ public class CustomRoleService {
 				listNew.add(i18n);
 			}else if(key.equals("asset.supplierMgt")){
 				listNew.add(i18n);
+			}else if(key.equals("asset.info")){
+				listNew.add(i18n);
 			}
 		}
 		return listNew;
