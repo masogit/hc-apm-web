@@ -331,6 +331,19 @@ public class QrCodeService {
                     case "locationName":
                         itemObject.put("TextShowValue", textValue.concat(asset.getLocationName() == null ? "" : asset.getLocationName()));
                         break;
+                    case "riskGrade":
+                        if(asset.getRiskGrade() == null){
+                            itemObject.put("TextShowValue", textValue);
+                        }else{
+                            if(configService.useNewRiskGrade()){
+                                itemObject.put("TextShowValue",
+                                        textValue.concat(FieldValueMessageController.fieldValue("riskGradeNew", asset.getRiskGrade().toString())));
+                            }else {
+                                itemObject.put("TextShowValue",
+                                        textValue.concat(FieldValueMessageController.fieldValue("riskGrade", asset.getRiskGrade().toString())));
+                            }
+                        }
+                        break;
                 }
             }
         });

@@ -150,7 +150,7 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
                 this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.LT, new Date(), "1*"));
                 break;
             case 2:
-                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.GT, new Date(), "1*"));
+                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.GTE, new Date(), "1*"));
                 break;
             default:
                 break;

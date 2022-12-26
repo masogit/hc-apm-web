@@ -1,10 +1,7 @@
 package com.ge.apm.view.report;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.dao.UnstructuredDataCollectionRepository;
-import com.ge.apm.dao.UnstructuredDataRepository;
+import com.ge.apm.dao.*;
 
 
 import java.util.*;
@@ -12,9 +9,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.*;
-import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -38,28 +33,25 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
     private OrgInfoRepository orgDao;
     private TableDefinitionService templateService;
     private Map<String, OrgInfo> orgInfoMap;
-    private ZkbFileDirectoryService zkbFileDirectoryService;
-
+    private ZkbDirectoryTableDefineRepository zkbDirectoryTableDefineRepository;
     private UaaService uaaService;
 
     private String createType = "JSON";
-    private List<ZkbFileDirectory> subZkbFileDirectoryList=null;
     private TableDefinition tableDefinition =new TableDefinition() ;
-
+    private UserContextService userContextService;
 
 
 
     @Override
     protected void init() {
-
+        userContextService = WebUtil.getBean(UserContextService.class);
         dao = WebUtil.getBean(TableDefinitionRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        zkbDirectoryTableDefineRepository = WebUtil.getBean(ZkbDirectoryTableDefineRepository.class);
         templateService = WebUtil.getBean(TableDefinitionService.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
-        this.subZkbFileDirectoryList = findMainDirectory();
         this.orgInfoMap = populateOrgInfoMap();
     }
 
@@ -103,8 +95,39 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, TableDefinition.TableDefinitionStatus.Expired.toString()));
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<TableDefinition> pageResult= dao.findBySearchFilter(this.searchFilters, pageRequest);
+        handDirectory(pageResult.getContent());
+        return pageResult;
     }
+
+    public void handDirectory(List<TableDefinition> tableDefinitionList){
+        if(userContextService.isZkbAccount()&&CollectionUtils.isNotEmpty(tableDefinitionList)){
+            List<ZkbDirectoryTableDefine> zkbDirectorys = zkbDirectoryTableDefineRepository.queryAllDirectory();
+            Map<String,ZkbDirectoryTableDefineVo> stringZkbDirectoryTableDefineVoMap = new Hashtable<String,ZkbDirectoryTableDefineVo>();
+            for(ZkbDirectoryTableDefine zkbDirectoryW:zkbDirectorys){
+                if(stringZkbDirectoryTableDefineVoMap.containsKey(zkbDirectoryW.getName()))
+                    continue;
+                StringBuilder stringBuilderSecond = new StringBuilder();
+                ZkbDirectoryTableDefineVo zkbDirectoryTableDefineVo = new ZkbDirectoryTableDefineVo();
+                for(ZkbDirectoryTableDefine zkbDirectoryN:zkbDirectorys){
+                    if(zkbDirectoryW.getName().equals(zkbDirectoryN.getName())){
+                        stringBuilderSecond.append(zkbDirectoryN.getSecondDirectory()+",");
+                    }
+                }
+                zkbDirectoryTableDefineVo.setMainDirectory(zkbDirectoryW.getMainDirectory());
+                zkbDirectoryTableDefineVo.setSecondDirectory(stringBuilderSecond.toString().length()>0?(stringBuilderSecond.toString().substring(0,stringBuilderSecond.toString().length()-1)):"");
+                stringZkbDirectoryTableDefineVoMap.put(zkbDirectoryW.getName(),zkbDirectoryTableDefineVo);
+            }
+            tableDefinitionList.stream().forEach(t ->{
+                ZkbDirectoryTableDefineVo vo =  stringZkbDirectoryTableDefineVoMap.get(t.getName());
+                if (vo!=null){
+                    t.setMainDirectory(vo.getMainDirectory());
+                    t.setSecondDirectory(vo.getSecondDirectory());
+                }
+            });
+        }
+     }
+
 
     @Override
     public void onFilter(FilterEvent event) {
@@ -152,31 +175,6 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
         return !Arrays.asList(tableItem.getTenantUID(), tableItem.getInstitutionUID(), tableItem.getHospitalUID(), tableItem.getSiteUID()).contains(UserContextService.getCurrentUserAccount().getSiteUID());
     }
 
-
-    /**
-     * 获取所有主目录信息
-     * @return
-     */
-    public List<ZkbFileDirectory> findMainDirectory() {
-        return zkbFileDirectoryService.findMainDirectory(null);
-    }
-    /**
-     * 根据主目录值获取子目录信息
-     * @return
-     */
-    public List<ZkbFileDirectory> getSubZkbFileDirectoryList() {
-        if(StringUtils.isBlank(this.tableDefinition.getMainDirectory())){
-            return null;
-        }
-        List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
-                ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
-                this.tableDefinition.getMainDirectory());
-        if(CollectionUtils.isEmpty(mainZkbFileDirectory)){
-            return null;
-        }
-        subZkbFileDirectoryList=this.zkbFileDirectoryService.findByZkbFileDirectory(mainZkbFileDirectory.get(0));
-        return subZkbFileDirectoryList;
-    }
 
     public void updateAllTemplatesJsonField(TableDefinition selectedTable) {
         TableSchema table = JSONObject.parseObject(selectedTable.getSchema(), TableSchema.class);
@@ -305,10 +303,6 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
 
     public void setOrgInfoMap(Map<String, OrgInfo> orgInfoMap) {
         this.orgInfoMap = orgInfoMap;
-    }
-
-    public void setSubZkbFileDirectoryList(List<ZkbFileDirectory> subZkbFileDirectoryList) {
-        this.subZkbFileDirectoryList = subZkbFileDirectoryList;
     }
 
     public TableDefinition getTableDefinition() {
