@@ -663,7 +663,10 @@ public class UserAccountImportService {
 						getOrgInfoByHospitalKey(setAccessScope, new OrgInfo(user.getInstitutionUID(), user.getInstitutionName(), null, mapOrgInfo.get(user.getInstitutionName() + user.getTenantUID()).getParentUID()));
 					}
 				} else {
-					return true;
+					// 都为空 租户层级
+					if (!mapOrgInfo.containsKey(key)) {
+						getOrgInstitutionKey(setAccessScope, new OrgInfo(user.getInstitutionUID(), user.getInstitutionName(), null, null));
+					}
 				}
 				OrgInfo tempOrgInfo = mapOrgInfo.get(key);
                 if (key.equals(defaultName + user.getSiteUID())) {
@@ -680,7 +683,7 @@ public class UserAccountImportService {
 		return true;
 	}
 
-    private void getOrgInfoByDepartmentKey(Set<String> departmentNames, OrgInfo siteOrgInfo){
+	private void getOrgInfoByDepartmentKey(Set<String> departmentNames, OrgInfo siteOrgInfo){
         List<OrgInfo> listOrgInfo = orgInfoRepository.getDepartmentByName(departmentNames, siteOrgInfo.getUid());
         if(listOrgInfo!=null){
             for (OrgInfo tempOrgInfo : listOrgInfo) {
@@ -723,13 +726,12 @@ public class UserAccountImportService {
 				}
 			} else {
 				listOrgInfos.add(siteOrgInfo);
+				mapOrgInfo.put(hospitalOrgInfo.getName() + "/" + siteOrgInfo.getName() + hospitalOrgInfo.getParentUID(), siteOrgInfo);
 			}
 		}
 		for (OrgInfo tempOrgInfo : listOrgInfos) {
 			String key = tempOrgInfo.getName() + hospitalOrgInfo.getUid();
 			mapOrgInfo.put(key, tempOrgInfo);
-			String parentKey = hospitalOrgInfo.getName() + "/" + tempOrgInfo.getName() + hospitalOrgInfo.getParentUID();
-			mapOrgInfo.put(parentKey, tempOrgInfo);
 		}
     }
 
@@ -757,22 +759,74 @@ public class UserAccountImportService {
 		}
 
 		List<OrgInfo> listOrgInfos = new ArrayList<>();
-		List<OrgInfo> siteOrgInfos = orgInfoRepository.getInstitutionByName(hospitalNames, institutionOrgInfo.getUid());
-		for (OrgInfo hospitalOrgInfo : siteOrgInfos) {
+		List<OrgInfo> hospitalOrgInfos = orgInfoRepository.getHospitalByName(hospitalNames, institutionOrgInfo.getUid());
+		for (OrgInfo hospitalOrgInfo : hospitalOrgInfos) {
             Set<String> siteNames = siteMap.get(hospitalOrgInfo.getName());
 			if (ObjectUtil.isNotEmpty(siteNames)) {
 				getOrgInfoBySiteKey(siteNames, hospitalOrgInfo);
+				for (String siteName : siteNames) {
+					String siteOrgKey = hospitalOrgInfo.getName() + "/" + siteName + institutionOrgInfo.getUid();
+					OrgInfo siteOrg = mapOrgInfo.get(siteOrgKey);
+					if (ObjectUtil.isNotEmpty(siteOrg)) {
+						mapOrgInfo.put(institutionOrgInfo.getName() + "/" + hospitalOrgInfo.getName() + "/" + siteName + institutionOrgInfo.getParentUID(), siteOrg);
+					}
+				}
 			} else {
                 listOrgInfos.add(hospitalOrgInfo);
+				mapOrgInfo.put(institutionOrgInfo.getName() + "/" + hospitalOrgInfo.getName()+ institutionOrgInfo.getParentUID(), hospitalOrgInfo);
             }
 		}
 		for (OrgInfo tempOrgInfo : listOrgInfos) {
 			String key = tempOrgInfo.getName() + institutionOrgInfo.getUid();
 			mapOrgInfo.put(key, tempOrgInfo);
-			String parentKey = institutionOrgInfo.getName() + "/" + tempOrgInfo.getName() + institutionOrgInfo.getParentUID();
-			mapOrgInfo.put(parentKey, tempOrgInfo);
 		}
     }
+
+	private void getOrgInstitutionKey(Set<String> names, OrgInfo tenantOrgInfo) {
+		Set<String> institutionNames = new HashSet<>();
+		Map<String, Set<String>> siteMap = new HashMap<>();
+		for (String name : names) {
+			List<String> accessScopeNames = Arrays.asList(name.split("/"));
+			if (accessScopeNames.size() == 4) {
+				Set<String> siteNames = siteMap.get(accessScopeNames.get(0));
+				if (ObjectUtil.isEmpty(siteNames)) {
+					siteNames = new HashSet<>();
+				}
+				siteNames.add(accessScopeNames.get(1) + "/" + accessScopeNames.get(2) + "/" + accessScopeNames.get(3));
+				siteMap.put(accessScopeNames.get(0), siteNames);
+			} else if (accessScopeNames.size() == 3) {
+				Set<String> siteNames = siteMap.get(accessScopeNames.get(0));
+				if (ObjectUtil.isEmpty(siteNames)) {
+					siteNames = new HashSet<>();
+				}
+				siteNames.add(accessScopeNames.get(1) + "/" + accessScopeNames.get(2));
+				siteMap.put(accessScopeNames.get(0), siteNames);
+			} else if (accessScopeNames.size() == 2) {
+				Set<String> siteNames = siteMap.get(accessScopeNames.get(0));
+				if (ObjectUtil.isEmpty(siteNames)) {
+					siteNames = new HashSet<>();
+				}
+				siteNames.add(accessScopeNames.get(1));
+				siteMap.put(accessScopeNames.get(0), siteNames);
+			}
+			institutionNames.add(accessScopeNames.get(0));
+		}
+
+		List<OrgInfo> listOrgInfos = new ArrayList<>();
+		List<OrgInfo> institutionOrgInfos = orgInfoRepository.getInstitutionByName(institutionNames, tenantOrgInfo.getUid());
+		for (OrgInfo institutionOrgInfo : institutionOrgInfos) {
+			Set<String> siteNames = siteMap.get(institutionOrgInfo.getName());
+			if (ObjectUtil.isNotEmpty(siteNames)) {
+				getOrgInfoByHospitalKey(siteNames, institutionOrgInfo);
+			} else {
+				listOrgInfos.add(institutionOrgInfo);
+			}
+		}
+		for (OrgInfo tempOrgInfo : listOrgInfos) {
+			String key = tempOrgInfo.getName() + tenantOrgInfo.getUid();
+			mapOrgInfo.put(key, tempOrgInfo);
+		}
+	}
 
 	private void initParam(){
 		mapOrgInfo.clear();
