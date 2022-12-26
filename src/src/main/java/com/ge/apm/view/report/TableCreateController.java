@@ -233,31 +233,7 @@ public class TableCreateController extends TieWebSheetBean {
         }
 
     }
-    /**
-     * 获取所有主目录信息
-     * @return
-     */
-    public List<ZkbFileDirectory> findMainDirectory() {
-        return zkbFileDirectoryService.findMainDirectory(null);
-    }
 
-    /**
-     * 根据主目录值获取子目录信息
-     * @return
-     */
-    public List<ZkbFileDirectory> getSubZkbFileDirectoryList() {
-        if(org.apache.commons.lang.StringUtils.isBlank(this.selectedTableDefinition.getMainDirectory())){
-            return null;
-        }
-        List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
-                ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
-                this.selectedTableDefinition.getMainDirectory());
-        if(CollectionUtils.isEmpty(mainZkbFileDirectory)){
-            return null;
-        }
-        subZkbFileDirectoryList=this.zkbFileDirectoryService.findByZkbFileDirectory(mainZkbFileDirectory.get(0));
-        return subZkbFileDirectoryList;
-    }
     public void onTitleChange() {
         tableString = JSONObject.toJSONString(table);
     }

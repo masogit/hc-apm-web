@@ -261,6 +261,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     List<V2_WorkOrder> bySearchFilterInternal = null;
     @Getter @Setter
     private List<OrgInfo> orgList;
+    @Getter @Setter
+    private boolean hospitalShow = false;
 
     @Override
     protected void init() {
@@ -347,6 +349,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             LOGGER.error("init occur exception", e);
             throw e;
         }
+        initLoadInternalSiteNameList();
     }
 
 
@@ -3647,6 +3650,16 @@ public void test1(){
         return orgList;
     }
 
+    public void initLoadInternalSiteNameList() {
+        List<OrgInfo> orgInfoList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
+        orgList = orgInfoList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+        hospitalShow = orgList.size() > 1;
+    }
+
+    public List<OrgInfo> getLoadInternalSiteNameList() {
+        return orgList;
+    }
+
     public List<OrgInfo> LoadSiteNameListMVS() {
         if (CollectionUtils.isEmpty(orgListMVS)) {
             if (!CollectionUtils.isEmpty(bySearchFilterMVS)) {
@@ -3657,6 +3670,10 @@ public void test1(){
             }
         }
         return orgListMVS;
+    }
+
+    public boolean getHospitalShow() {
+        return hospitalShow;
     }
 
     public String getSiteOrgName(String siteUID) {
