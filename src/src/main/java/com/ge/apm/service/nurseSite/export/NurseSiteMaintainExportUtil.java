@@ -28,8 +28,8 @@ import java.util.*;
 public class NurseSiteMaintainExportUtil {
     private static final Logger log = LoggerFactory.getLogger(NurseSiteMaintainExportUtil.class);
 
-    private static final String [] title={"计划检查日期","实际检查日期","负责人","检查人"};
-    private static final int offsetRow=4;
+    private static final String [] title={"计划检查日期","实际检查日期","检查人"};
+    private static final int offsetRow=3;
 
     public  InputStream export(List<Map<String,String>> basicInfo, Map<String, List<NurseSiteMaintainExport>>  data, NurseSiteMaintainService siteMaintainService) {
         Workbook workbook=null;
@@ -219,10 +219,10 @@ public class NurseSiteMaintainExportUtil {
                         cell.setCellValue("");
                     }
                     break;
-                case 2:
+/*                case 2:
                     cell.setCellValue(aor.getPrincipal());
-                    break;
-                case 3:
+                    break;*/
+                case 2:
                     cell.setCellValue(aor.getChecker());
                     break;
                 default:

@@ -328,7 +328,18 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
             a = unReturnQty;
             b = zkbContract.getSpareQuotaTotal();
-        }else {
+        }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+            if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(zkbPartOrder.getRadiationQuotaType())){
+                a = unReturnQty;
+                b = zkbContract.getSpareArtificailTotal();
+            }else if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
+                a = unReturnQty;
+                b = zkbContract.getPartHighQuotaTotal();
+            }else{
+                a = unReturnQty;
+                b = zkbContract.getSpareArtificailTotal();
+            }
+        }else{
             a = unReturnQty;
             b = zkbContract.getSpareArtificailTotal();
         }
@@ -467,6 +478,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
                 a = unReturnQty;
                 b = zkbContract.getSpareQuotaTotal();
+            }else if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+                if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(zkbPartOrder.getRadiationQuotaType())){
+                    a = unReturnQty;
+                    b = zkbContract.getSpareArtificailTotal();
+                }else if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
+                    a = unReturnQty;
+                    b = zkbContract.getPartHighQuotaTotal();
+                }else{
+                    a = unReturnQty;
+                    b = zkbContract.getSpareArtificailTotal();
+                }
             }else {
                 a = unReturnQty;
                 b = zkbContract.getSpareArtificailTotal();

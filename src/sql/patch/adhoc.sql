@@ -22,3 +22,8 @@ CREATE INDEX nurse_site_maintain_item_history_is_finish ON nurse_site_maintain_i
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select '79fb9c1ed56943bc8df24ee29fef6472', 8, 'false', '日常检查消息推送', 'dailyCheckMessagePush', '日常检查微信消息推送', 'f', 't', 3 where not exists (select * from config_item where key = 'dailyCheckMessagePush');
 --YHAAO-14690 预防性维护-保养工单统计消息推送配置项
 INSERT INTO public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select '79fb9c1ed56943bc8df24ee29fef6473', 5, 'false', '保养工单统计消息推送', 'v2PmOrderStatisticsMessagePush', '保养工单统计微信消息推送', 'f', 't', 3 where not exists (select * from config_item where key = 'v2PmOrderStatisticsMessagePush');
+
+-- xxl-job
+UPDATE public.xxl_job_user SET username = 'admin', password = 'b8b69e5233c7fa64bd736c9a47db4ba0', role = 1, permission = null WHERE id = 1;
+INSERT INTO public.xxl_job_group (id, app_name, title, address_type, address_list) VALUES (2, 'my-application-task', 'task', 1, 'http://localhost:9999');
+

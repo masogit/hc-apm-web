@@ -292,7 +292,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     contractList = new ArrayList<>();
                     return;
                 }else{
-                    if(!CopyByInvok.NORMAL_THREE.equals(artificialType)){
+                    /*if(!CopyByInvok.NORMAL_THREE.equals(artificialType)){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "CCSB类型合同只能进行超声低端机申请！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         return;
@@ -301,7 +301,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "CCSB类型合同中设备不为超声低端机！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         return;
-                    }
+                    }*/
                 }
             }
 
