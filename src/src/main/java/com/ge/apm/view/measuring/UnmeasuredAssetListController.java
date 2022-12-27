@@ -21,6 +21,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = true)
 public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> {
 
+    private Integer queryIndex;
     private Map<String, Boolean> selectedMap;
     private OrgInfo filterOrg;
     private UserAccount currentUser;
@@ -57,6 +59,7 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
         assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
         this.selectedMap = MapUtil.newHashMap();
         this.searchFilters = new ArrayList<>();
+        queryIndex = 0;
     }
 
     @Override
@@ -135,7 +138,23 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
                 searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
             }
         }
-        this.updateSearchFilter(new SearchFilter("lastMeteringDate", SearchFilter.Operator.IsNull, null, "1*"));
+
+        // 删除计量条件
+        this.removeFilterOnField("lastMeteringDate");
+        this.removeFilterOnField("nextMeteringDate");
+        switch (queryIndex) {
+            case 0:
+                this.updateSearchFilter(new SearchFilter("lastMeteringDate", SearchFilter.Operator.IsNull, null, "1*"));
+                break;
+            case 1:
+                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.LT, new Date(), "1*"));
+                break;
+            case 2:
+                this.updateSearchFilter(new SearchFilter("nextMeteringDate", SearchFilter.Operator.GTE, new Date(), "1*"));
+                break;
+            default:
+                break;
+        }
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 

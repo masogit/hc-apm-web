@@ -21,7 +21,7 @@
         <result column="shared_status" property="sharedStatus"/>
         <result column="shared_asset_swap_index" property="sharedAssetSwapIndex"/>
         <association property="assetDeptOrg" resultMap="orgInfoResult"/>
-        <association property="sharedAssetType" resultMap="sharedAssetTypeResult"/>
+        <association property="sharedAssetTypeEntity" resultMap="sharedAssetTypeResult"/>
         <association property="sharedAssetReqDetail" resultMap="sharedAssetReqDetailResult"/>
     </resultMap>
 

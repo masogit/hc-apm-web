@@ -92,6 +92,12 @@
 								<f:selectItems value="#{fieldMsg.getFieldValueList('adverseEventsSupplementCard')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 							</p:selectManyCheckbox>
 						</h:panelGroup>
+						<h:panelGroup>
+							<label class="label">#{msg.assetInfo}</label>
+							<p:selectManyCheckbox value="#{customRoleController.mapAuthCard['assetInfo']}" layout="responsive" columns="4">
+								<f:selectItems value="#{fieldMsg.getFieldValueList('assetInfo')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+							</p:selectManyCheckbox>
+						</h:panelGroup>
 					</p:panelGrid>
 
 				</p:fieldset>
