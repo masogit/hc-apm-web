@@ -542,10 +542,6 @@ public class UserAccountImportService {
 	}
 
 	private boolean addUserAccessScope(UserAccount user,OrgInfo tempOrgInfo,boolean showError){
-//		if (1==1) {
-//			user.setStatusDisplay(UploadFileErrorTypeEnum.ACCESSSCOPE_NOT_EXISTS,"可见范围不存在;");
-//			return false;
-//		}
 		if(tempOrgInfo==null){
 			if(showError){
 				user.setStatusDisplay(UploadFileErrorTypeEnum.ACCESSSCOPE_NOT_EXISTS,"可见范围不存在;");
@@ -617,6 +613,8 @@ public class UserAccountImportService {
 					tempOrgInfo=getOrgInfoByHospitalKey(user.getInstitutionName(), user.getTenantUID());
 				}
                 return addUserAccessScope(user, tempOrgInfo, true);
+			} else {
+				return addUserAccessScope(user, orgInfoRepository.getOrgInfoUIDByUid(user.getTenantUID()), true);
 			}
 		} else {
 			String accessScope=user.getAccessScope();
