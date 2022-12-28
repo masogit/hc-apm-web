@@ -508,68 +508,73 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     @Transactional
     public void saveRel() {
-        if (targetAssets.isEmpty()) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
-        } else {
-            //只有智康保的走这段逻辑
-            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-            boolean zkbAccountBoolean = userContextService.isZkbAccount();
-            Set<String> directorySets = new HashSet<String>();
-            if (zkbAccountBoolean){
-                PmOrderRule pmOrderRule = this.pmOrderRuleRepository.findByUid(this.getPmOrderRule().getUid());
-                TableDefinition tableDefinition = tableDao.findById(pmOrderRule.getPerformanceReport());
-                List<SearchFilter> filter = new ArrayList<>();
-                filter.add(new SearchFilter("name", SearchFilter.Operator.EQ, tableDefinition.getName()));
-                filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "0"));
-                List<ZkbDirectoryTableDefine> zkbDirectoryTableDefineList = zkbDirectoryRepository.findBySearchFilter(filter);
-                zkbDirectoryTableDefineList.stream().forEach(zkbDirectory -> {
-                    if(StringUtils.isNotBlank(zkbDirectory.getMainDirectory())&&StringUtils.isNotBlank(zkbDirectory.getSecondDirectory())){
-                        directorySets.add(zkbDirectory.getMainDirectory()+zkbDirectory.getSecondDirectory());
-                    }
-                });
-             }
-            List<RelRuleAsset> rels = new ArrayList<>(targetAssets.size());
-            targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
-            for (AssetInfo ai : targetAssets) {
+        try {
+            if (targetAssets.isEmpty()) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
+            } else {
                 //只有智康保的走这段逻辑
-                if(zkbAccountBoolean){
-                    if(!directorySets.contains(ai.getMainDirectory()+ai.getSecondDirectory())){
-                        WebUtil.addErrorMessage(WebUtil.getMessage("设备"+ai.getName()+"不适用当前规则，请检查设备[modality，product]是否匹配"));
-                        return;
-                    };
+                UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+                boolean zkbAccountBoolean = userContextService.isZkbAccount();
+                Set<String> directorySets = new HashSet<String>();
+                if (zkbAccountBoolean){
+                    PmOrderRule pmOrderRule = this.pmOrderRuleRepository.findByUid(this.getPmOrderRule().getUid());
+                    TableDefinition tableDefinition = tableDao.findById(pmOrderRule.getPerformanceReport());
+                    List<SearchFilter> filter = new ArrayList<>();
+                    filter.add(new SearchFilter("name", SearchFilter.Operator.EQ, tableDefinition.getName()));
+                    filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "0"));
+                    List<ZkbDirectoryTableDefine> zkbDirectoryTableDefineList = zkbDirectoryRepository.findBySearchFilter(filter);
+                    zkbDirectoryTableDefineList.stream().forEach(zkbDirectory -> {
+                        if(StringUtils.isNotBlank(zkbDirectory.getMainDirectory())&&StringUtils.isNotBlank(zkbDirectory.getSecondDirectory())){
+                            directorySets.add(zkbDirectory.getMainDirectory()+zkbDirectory.getSecondDirectory());
+                        }
+                    });
                 }
-
-                RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
-                if (rel == null) {
-                    rel = new RelRuleAsset();
-                    rel.setAssetUID(ai.getUid());
-                    rel.setCreatedDate(new Date());
-                    rel.setTenantUID(ai.getTenantUID());
-                    rel.setInstitutionUID(ai.getInstitutionUID());
-                    rel.setHospitalUID(ai.getHospitalUID());
-                    rel.setSiteUID(ai.getSiteUID());
-                }
-                if (level != null) {
-                    if (level == 1) {
-                        rel.setRuleUIDInspection(pmOrderRule.getUid());
-                        rel.setRuleUID1(pmOrderRule.getUid());
-                    } else if (level == 2) {
-                        rel.setRuleUID2(pmOrderRule.getUid());
-                    } else if (level == 3) {
-                        rel.setRuleUID(pmOrderRule.getUid());
-                    }else if (level == 4) {
-                        rel.setRuleUID4(pmOrderRule.getUid());
+                List<RelRuleAsset> rels = new ArrayList<>(targetAssets.size());
+                targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
+                for (AssetInfo ai : targetAssets) {
+                    //只有智康保的走这段逻辑
+                    if(zkbAccountBoolean){
+                        if(!directorySets.contains(ai.getMainDirectory()+ai.getSecondDirectory())){
+                            WebUtil.addErrorMessage(WebUtil.getMessage("设备"+ai.getName()+"不适用当前规则，请检查设备[modality，product]是否匹配"));
+                            return;
+                        };
                     }
-                    rels.add(rel);
-                }
-            }
-            relRuleAssetRepository.save(rels);
-            this.level = null;
-            this.ruleUid = null;
-            this.pmOrderRule = null;
-            WebUtil.addSuccessMessage(WebUtil.getMessage("ConfigurationSuccess"));
-        }
 
+                    RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
+                    if (rel == null) {
+                        rel = new RelRuleAsset();
+                        rel.setAssetUID(ai.getUid());
+                        rel.setCreatedDate(new Date());
+                        rel.setTenantUID(ai.getTenantUID());
+                        rel.setInstitutionUID(ai.getInstitutionUID());
+                        rel.setHospitalUID(ai.getHospitalUID());
+                        rel.setSiteUID(ai.getSiteUID());
+                    }
+                    if (level != null) {
+                        if (level == 1) {
+                            rel.setRuleUIDInspection(pmOrderRule.getUid());
+                            rel.setRuleUID1(pmOrderRule.getUid());
+                        } else if (level == 2) {
+                            rel.setRuleUID2(pmOrderRule.getUid());
+                        } else if (level == 3) {
+                            rel.setRuleUID(pmOrderRule.getUid());
+                        }else if (level == 4) {
+                            rel.setRuleUID4(pmOrderRule.getUid());
+                        }
+                        rels.add(rel);
+                    }
+                }
+                relRuleAssetRepository.save(rels);
+                this.level = null;
+                this.ruleUid = null;
+                this.pmOrderRule = null;
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ConfigurationSuccess"));
+            }
+        } catch (Exception e) {
+            WebUtil.addSuccessMessage(WebUtil.getMessage("FAILED"));
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        }
     }
 
     public List<PmOrderRule> getPmOrderRuleList() {
