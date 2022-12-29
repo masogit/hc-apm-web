@@ -83,6 +83,10 @@
                 <p:menuitem id="mirage_SiteToSiteAllocation_stats"   value="科室借调情况" outcome="/portal/secondment/departmentSecondment.xhtml"  rendered="#{userContextService.hasAnyRole('AssetStaff,ClinicalStaff,NursingStaff,DeptHead') and userContextService.enableSiteToSiteAllocation()}"   />
             </p:submenu>
 
+            <p:submenu label="报表管理" icon="fa fa-folder-open-o"  rendered="true">
+                <p:menuitem  value="报表中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="true"   />
+            </p:submenu>
+
             <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('install')}">
                 <p:menuitem value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.accessContains('install.list')}"/>
                 <p:menuitem value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.accessContains('install.store')}"/>
