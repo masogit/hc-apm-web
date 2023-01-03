@@ -45,7 +45,6 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
     private ZkbContractRepository dao;
     private UserContextService userContextService;
     private ZkbContractService zkbContractService;
-
     private UserAccount currentUser;
     private List<TenantInfo> tenantInfoList;
     private String actionName;

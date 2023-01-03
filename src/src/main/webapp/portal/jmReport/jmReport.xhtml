@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:p="http://primefaces.org/ui"
+				template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<div class="ui-g-12 card cardTitle">
+					<p:outputLabel class="pageTitle" value="报表中心"/>
+				</div>
+				<h:form id="jmReportForm">
+<!--					<a href="http://127.0.0.1:8085/apmReport/jmreport/list" target="_blank">-->
+<!--						<p:outputLabel class="pageTitle" value="点击进入报表中心主页"/>-->
+<!--					</a>-->
+					<p:panelGrid columns="1" layout="grid">
+						<h:panelGroup>
+							<p:dataTable id="datalist" value="#{jmReportController.lazyModel}" var="item" widgetVar="varDataList"
+										 selectionMode="single" selection="#{jmReportController.selected}"
+										 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+										 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+										 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+										 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+										 rows="20" emptyMessage="#{msg.noRecordFound}"
+										 rowsPerPageTemplate="20,50,100,500">
+
+								<p:ajax event="rowSelect" update="addButton editButton deleteButton roleButton"/>
+								<p:ajax event="filter" listener="#{jmReportController.onFilter}" update="addButton editButton deleteButton roleButton"/>
+								<p:column headerText="报表名称">
+									<h:outputText value="#{item.name}"/>
+								</p:column>
+								<p:column headerText="报表描述">
+									<h:outputText value="#{item.description}" />
+								</p:column>
+								<p:column  headerText="预览/设计" >
+									<h:panelGroup>
+										<a id="viewReportButton" title="预览"  href="#{item.reportViewUrl}" target="_blank">
+											<p:graphicImage name="icons/find.png" style="width: 30px; height: 30px;"/>
+										</a>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{userContextService.authContains('SuperAdmin')}">
+										<a id="editReportButton" title="设计"  href="#{item.reportEditUrl}" target="_blank">
+											<p:graphicImage name="icons/pencil.png" style="width: 30px; height: 30px;"/>
+										</a>
+									</h:panelGroup>
+								</p:column>
+								<f:facet name="{Toolbar}">
+									<p:commandButton id="addButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{jmReportController.prepareCreate}" rendered="#{userContextService.authContains('SuperAdmin')}" oncomplete="PF('jmEditDialog').show()"/>
+
+									<p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btnEdit" actionListener="#{jmReportController.prepareEdit}" update="@(.updateTrCls) :jmEditDlg" disabled="#{empty jmReportController.selected.id}" rendered="#{userContextService.authContains('SuperAdmin')}" oncomplete="PF('jmEditDialog').show()"/>
+
+									<p:commandButton id="roleButton"  title="分配访问角色"  icon="ui-icon-people" class="btnEdit" actionListener="#{jmReportController.prepareEdit}" update="@(.updateTrCls) :JmRoleEditDlg" disabled="#{empty jmReportController.selected.id}" rendered="#{userContextService.authContains('ITAdmin')}" oncomplete="PF('JmRoleEditDialog').show()"/>
+
+									<p:commandButton id="deleteButton" disabled="#{empty jmReportController.selected.id}" title="#{msg.Delete}" process="@this" actionListener="#{jmReportController.delete}" update=":jmReportForm:datalist, :growl"  icon="ui-icon-close" class="delBtn" >
+										<p:confirm header="#{msg.DeleteConformation}"
+												   message="确定删除该报表？"
+												   icon="ui-icon-warning"/>
+									</p:commandButton>
+								</f:facet>
+							</p:dataTable>
+						</h:panelGroup>
+					</p:panelGrid>
+				</h:form>
+				<ui:include src="jmReportEdit.xhtml"/>
+				<ui:include src="jmReportRole.xhtml"/>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

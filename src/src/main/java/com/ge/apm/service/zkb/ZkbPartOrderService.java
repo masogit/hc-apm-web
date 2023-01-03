@@ -553,7 +553,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setCurrentStep("TechnicalPending");
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             //如果为超声高端则不需要进行区域经理审批
-            if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+            if("2".equals(zkbPartOrder.getArtificialType())){
+                if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()))){
+                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                }else{
+                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                }
+                zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
+            }else if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
                 Integer quota = 0;
                 if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(zkbPartOrder.getCcsbApplyType())){
                     quota = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
@@ -567,13 +574,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ProductPending.toString());
                 }
-            } else if("2".equals(zkbPartOrder.getArtificialType())){
-                if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()))){
-                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
-                }else{
-                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
-                }
-                zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
             }else{
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
                 zkbPartOrder.setCurrentStep("ManagePending");
@@ -1393,33 +1393,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         } else if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             //region  人工
-            if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
-                if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(zkbPartOrder.getCcsbApplyType())){
-                    if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1){
-                        Integer remindQty = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
-                        if(remindQty >= 1){
-                            return "当前合同剩余人工名额为"+zkbContract.getGeArtificialSupportTimes()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个人工名额！";
-                        }else{
-                            return "该申请不扣任何名额！";
-                        }
-                    }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2){
-                        return "该申请不扣任何名额！";
-                    }
-                }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(zkbPartOrder.getCcsbApplyType())){
-                    if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) {
-                        Integer remindQty = zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota();
-                        if (remindQty >= 1) {
-                            return "当前合同剩余保养名额为" + zkbContract.getCcsbMaintenanceQuota() + "；此次申请扣除" + zkbPartOrder.getQty() + "个保养名额！";
-                        } else {
-                            return "该申请不扣任何名额！";
-                        }
-                    }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2){
-                        return "该申请不扣任何名额！";
-                    }
-                }else{
-                    return "该申请名额扣除有误";
-                }
-            }else if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
                 if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
                     //扣除积分
                     return "该申请扣除积分:"+ zkbPartOrder.getQty() * 200;
@@ -1438,6 +1412,33 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }else{
                 if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
                     return "该申请不扣任何名额";
+                }
+                if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+                    if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(zkbPartOrder.getCcsbApplyType())){
+                        if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1){
+                            Integer remindQty = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
+                            if(remindQty >= 1){
+                                return "当前合同剩余人工名额为"+zkbContract.getGeArtificialSupportTimes()+"；此次申请扣除"+ zkbPartOrder.getQty() +"个人工名额！";
+                            }else{
+                                return "该申请不扣任何名额！";
+                            }
+                        }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2){
+                            return "该申请不扣任何名额！";
+                        }
+                    }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(zkbPartOrder.getCcsbApplyType())){
+                        if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) {
+                            Integer remindQty = zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota();
+                            if (remindQty >= 1) {
+                                return "当前合同剩余保养名额为" + zkbContract.getCcsbMaintenanceQuota() + "；此次申请扣除" + zkbPartOrder.getQty() + "个保养名额！";
+                            } else {
+                                return "该申请不扣任何名额！";
+                            }
+                        }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2){
+                            return "该申请不扣任何名额！";
+                        }
+                    }else{
+                        return "该申请名额扣除有误";
+                    }
                 }
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(), assetInfo.getUid());
                 if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) && CopyByInvok.T.equals(zkbContractAsset.getSupportMaintainFlag())){
@@ -1704,62 +1705,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             //endregion
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             //region  人工
-            if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
-                if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(zkbPartOrder.getCcsbApplyType())){
-                    Integer remindQty = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
-                    if(qty < 0){
-                        if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) || StrUtil.isNotEmpty(zkbPartOrder.getProductAuditerUid())){
-                            //如果是产品经理拒绝或者产品经理审批过说明申请时名额不足，并未扣除过名额
-                        }else{
-                            AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
-                            if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                                zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
-                                zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
-                                zkbContractRepository.save(zkbContract);
-                                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
-                            }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
-                            }
-                        }
-                    }else{
-                        if(remindQty >= 1){
-                            AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
-                            if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                                zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
-                                zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
-                                zkbContractRepository.save(zkbContract);
-                                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
-                            }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
-                            }
-                        }
-                    }
-                }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(zkbPartOrder.getCcsbApplyType())){
-                    Integer remindQty = zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota();
-                    if(qty < 0){
-                        if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) || StrUtil.isNotEmpty(zkbPartOrder.getProductAuditerUid())){
-                        }else{
-                            AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
-                            if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                                zkbContract.setCcsbMaintenanceQuota((zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota()) - qty);
-                                zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) + qty);
-                                zkbContractRepository.save(zkbContract);
-                                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
-                            }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
-                            }
-                        }
-                    }else{
-                        if(remindQty >= 1){
-                            AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
-                            if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                                zkbContract.setCcsbMaintenanceQuota((zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota()) - qty);
-                                zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) + qty);
-                                zkbContractRepository.save(zkbContract);
-                                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
-                            }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
-                            }
-                        }
-                    }
-                }
-            }else if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
                 if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
                     if(qty < 0){
                         zkbIntegralService.deductScore(zkbPartOrder.getTenantUID(),zkbPartOrder.getQty(),userAccount,ZkbIntegralRecord.RecordType.QuotaReturn.toString());
@@ -1795,6 +1741,63 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }else{
                 if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
+                    return;
+                }
+                if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+                    if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(zkbPartOrder.getCcsbApplyType())){
+                        Integer remindQty = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
+                        if(qty < 0){
+                            if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) || StrUtil.isNotEmpty(zkbPartOrder.getProductAuditerUid())){
+                                //如果是产品经理拒绝或者产品经理审批过说明申请时名额不足，并未扣除过名额
+                            }else{
+                                AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                                if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
+                                    zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
+                                    zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
+                                    zkbContractRepository.save(zkbContract);
+                                    zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                                }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
+                                }
+                            }
+                        }else{
+                            if(remindQty >= 1){
+                                AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                                if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
+                                    zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
+                                    zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
+                                    zkbContractRepository.save(zkbContract);
+                                    zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                                }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
+                                }
+                            }
+                        }
+                    }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(zkbPartOrder.getCcsbApplyType())){
+                        Integer remindQty = zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota();
+                        if(qty < 0){
+                            if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) || StrUtil.isNotEmpty(zkbPartOrder.getProductAuditerUid())){
+                            }else{
+                                AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                                if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
+                                    zkbContract.setCcsbMaintenanceQuota((zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota()) - qty);
+                                    zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) + qty);
+                                    zkbContractRepository.save(zkbContract);
+                                    zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                                }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
+                                }
+                            }
+                        }else{
+                            if(remindQty >= 1){
+                                AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                                if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
+                                    zkbContract.setCcsbMaintenanceQuota((zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota()) - qty);
+                                    zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) + qty);
+                                    zkbContractRepository.save(zkbContract);
+                                    zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                                }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
+                                }
+                            }
+                        }
+                    }
                     return;
                 }
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
@@ -1971,34 +1974,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
             zkbContractRepository.save(zkbContract);
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
-            if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
-                if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(zkbPartOrder.getCcsbApplyType())){
-                    if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) || StrUtil.isNotEmpty(zkbPartOrder.getProductAuditerUid())){
-
-                    }else{
-                        AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
-                        if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                            zkbContract.setGeArtificialSupportTimesUse((zkbContract.getGeArtificialSupportTimesUse() == null ? 0 : zkbContract.getGeArtificialSupportTimesUse()) + qty);
-                            zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) - qty);
-                            zkbContractRepository.save(zkbContract);
-                            zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
-                        }
-
-                    }
-                }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(zkbPartOrder.getCcsbApplyType())){
-                    if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) || StrUtil.isNotEmpty(zkbPartOrder.getProductAuditerUid())){
-
-                    }else{
-                        AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
-                        if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
-                            zkbContract.setCcsbMaintenanceQuotaUse((zkbContract.getCcsbMaintenanceQuotaUse() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaUse()) + qty);
-                            zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) - qty);
-                            zkbContractRepository.save(zkbContract);
-                            zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
-                        }
-                    }
-                }
-            }else if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
+            if(CopyByInvok.T.equals(zkbPartOrder.getMaintainFlag())){
                 if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
 
                 }else{
@@ -2012,6 +1988,33 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }else{
                 if(CopyByInvok.NORMAL_TWO.equals(zkbPartOrder.getArtificialType())){
+                    return;
+                }
+                if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+                    if(ZkbPartOrder.CcsbQuotaTypeEnum.Repair.toString().equals(zkbPartOrder.getCcsbApplyType())){
+                        if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) || StrUtil.isNotEmpty(zkbPartOrder.getProductAuditerUid())){
+                        }else{
+                            AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                            if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
+                                zkbContract.setGeArtificialSupportTimesUse((zkbContract.getGeArtificialSupportTimesUse() == null ? 0 : zkbContract.getGeArtificialSupportTimesUse()) + qty);
+                                zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) - qty);
+                                zkbContractRepository.save(zkbContract);
+                                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                            }
+                        }
+                    }else if(ZkbPartOrder.CcsbQuotaTypeEnum.Maintain.toString().equals(zkbPartOrder.getCcsbApplyType())){
+                        if(ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) || StrUtil.isNotEmpty(zkbPartOrder.getProductAuditerUid())){
+
+                        }else{
+                            AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                            if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
+                                zkbContract.setCcsbMaintenanceQuotaUse((zkbContract.getCcsbMaintenanceQuotaUse() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaUse()) + qty);
+                                zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) - qty);
+                                zkbContractRepository.save(zkbContract);
+                                zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
+                            }
+                        }
+                    }
                     return;
                 }
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
