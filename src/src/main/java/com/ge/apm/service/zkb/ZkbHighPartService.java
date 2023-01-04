@@ -124,7 +124,7 @@ public class ZkbHighPartService {
             isValidateData = false;
         }
 
-        for (Map<String, Object> tempContractMap: importContractMapList) {
+       /* for (Map<String, Object> tempContractMap: importContractMapList) {
             ZkbHighPartVO tempHighPartVO = (ZkbHighPartVO)tempContractMap.get("zkbHighPartVO");
             Integer tempHashCode = Integer.valueOf(tempContractMap.get("hashCode").toString());
             if(hashCode.equals(tempHashCode) && zkbHighPartVO.getLineNum() != tempHighPartVO.getLineNum()){
@@ -133,7 +133,7 @@ public class ZkbHighPartService {
                 isValidateData = false;
                 break;
             }
-        }
+        }*/
 
         return isValidateData;
     }

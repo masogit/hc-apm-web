@@ -147,7 +147,7 @@ public class ZkbHighPartController extends GenericCRUDUUIDController<ZkbHighPart
         try {
             doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
             int maxRowNum = ZkbHighPartService.EXCEL_HEADER_ROW + 5000;
-            if(doc.exceedMaxRowNum("高值备件", maxRowNum)){
+            if(doc.exceedMaxRowNum(0, maxRowNum)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;
             }
