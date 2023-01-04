@@ -957,9 +957,13 @@ public void test1(){
                 }
                 searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
+                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 10));
+                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 11));
             } else if (queryIndex == 7) { //待关单
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
+                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 10));
+                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 11));
                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             } else if (queryIndex == 8) { //已关单
