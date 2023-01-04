@@ -79,7 +79,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private String applyTimeFormatTime = null;
     private String filterApplyTime = null;
     private UserAccount selectedAssignee;
-
+    private UserContextService userContextService;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -191,6 +191,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         sharedAssetRequestService = WebUtil.getServiceBean(SharedAssetRequestService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         jdbcTemplate = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
@@ -218,7 +219,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
 
         if(currentWorkflowConfig == null) {
-            currentWorkflowConfig = wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+            currentWorkflowConfig = getWorkflowConfig();
             if(selected != null && selected.getBehavior() != null) {
                 if(selected.getBehavior().intValue() == 1) {
                     //借用
@@ -249,7 +250,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             }
         }
     }
-
+    private WorkflowConfig getWorkflowConfig(){
+        OrgInfo selectSite = userContextService.getSelectSite();
+        if(selectSite != null){
+          return  wfCfigDao.findFirstBySiteUID(selectSite.getUid());
+        }else{
+            return  wfCfigDao.findFirstBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        }
+    }
     @Override
     protected SharedAssetRequestRepository getDAO() {
         return dao;
