@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="备件号维护"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="zkbHighPartListForm">
+
+                    <p:dataTable id="datalist" value="#{zkbHighPartController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbHighPartController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500" >
+
+                        <p:ajax event="rowSelect" listener="#{zkbHighPartController.prepareEdit}" update="editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{zkbHighPartController.onFilter}" />
+
+                        <p:column headerText="备件号">
+                            <h:outputText value="#{item.partNo}"/>
+                        </p:column>
+
+                        <p:column headerText="类别" >
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbHighPartType', item.partType)}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbHighPartController.prepareCreate}" update=":zkbHighPartEditForm" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}" actionListener="#{zkbHighPartController.prepareEdit}"  update=":zkbHighPartEditForm" disabled="#{empty zkbHighPartController.selected.id}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" actionListener="#{zkbHighPartController.delete}" update=":zkbHighPartListForm :zkbHighPartEditForm :growl" disabled="#{empty zkbHighPartController.selected.id}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="ZKB_ContactPerson_Export"/>
+                            </p:commandButton>
+                            <p:commandButton title="#{msg.Import}" icon="ui-icon-arrowstop-1-n" class="btn btn-sm btn-gray" action="#{zkbHighPartController.importAction}"></p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>
