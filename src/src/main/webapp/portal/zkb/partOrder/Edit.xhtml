@@ -205,7 +205,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.radiationQuotaTypeFlag}">
                             <label class="label">放射名额扣除类型*</label>
-                            <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.radiationQuotaType}" required="true" requiredMessage="放射名额扣除类型 #{msg.ValidationRequire}">
+                            <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.radiationQuotaType}" disabled="#{zkbPartOrderEditController.spareArtificialFlag}" required="true" requiredMessage="放射名额扣除类型 #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="partsHighTypeGroup"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="联合名额" itemValue="SpareArtificial"/>

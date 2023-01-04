@@ -14,4 +14,5 @@ public interface ZkbHighPartInfoRepository extends GenericRepositoryUUID<ZkbHigh
 
 
     List<ZkbHighPartInfo> findByPartNo(String partNo);
+    ZkbHighPartInfo findFirstByPartNo(String partNo);
 }
