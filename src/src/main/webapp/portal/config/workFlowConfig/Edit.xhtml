@@ -336,6 +336,12 @@
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.measurementRepair}"/>
                         </h:panelGroup >
                     </p:panelGrid>
+                    <h:panelGroup>
+                        <label class="label">是否启用维修送修</label>
+                        <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableSendRepair}">
+                            <p:ajax process="@this" />
+                        </p:selectBooleanCheckbox>
+                    </h:panelGroup>
                 </p:fieldset>
 
                 <p:fieldset id="pm" legend="#{msg.MaintenanceConfiguration}">
@@ -815,12 +821,6 @@
                         <h:panelGroup>
                             <label class="label">是否启用主子设备信息</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableAssetPreview}">
-                                <p:ajax process="@this" />
-                            </p:selectBooleanCheckbox>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">是否启用维修送修</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableSendRepair}">
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
