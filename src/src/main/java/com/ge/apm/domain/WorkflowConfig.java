@@ -267,6 +267,10 @@ public class WorkflowConfig implements Serializable {
     @Getter
     @Column(name = "enable_asset_preview")
     private Boolean enableAssetPreview;
+    @Setter
+    @Getter
+    @Column(name = "enable_send_repair")
+    private Boolean enableSendRepair;
     //是否启用小型物联网设备(急救类)服务
     @Column(name = "is_io_tenabled")
     private Boolean isiotenabled;

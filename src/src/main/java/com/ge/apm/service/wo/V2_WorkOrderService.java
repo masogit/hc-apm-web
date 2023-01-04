@@ -248,6 +248,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setDesc(reason);
         formData.setAssetStatus(String.valueOf(status));
+        formData.setRepairType(tmpwo.getRepairType());
         String res = srApi.invokeWorkOrderAction(token, formData, "ackFailed", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Acknowledge")));
@@ -315,6 +316,18 @@ public class V2_WorkOrderService {
         String res = srApi.invokeWorkOrderAction(token, formData, "confirmSend", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "送修"));
+        }
+        selectedWorkOrder.setCurrentStepId(4);
+    }
+    public void confirmReturn(V2_WorkOrder selectedWorkOrder) {
+        //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+        //   selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String res = srApi.invokeWorkOrderAction(token, formData, "confirmReturn", selectedWorkOrder.getId());
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "返还"));
         }
         selectedWorkOrder.setCurrentStepId(4);
     }
@@ -446,7 +459,7 @@ public class V2_WorkOrderService {
         selectedWorkOrder.setCurrentStepName("维修中");
         formData.setDesc(comments);
         formData.setRepairResult(selectedWorkOrder.getRepairResult());
-
+        formData.setRepairType(selectedWorkOrder.getRepairType());
         if(selectedWorkOrder.getStatusCloseTime()!=null) {
             formData.setStatusCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusCloseTime()));
         }
