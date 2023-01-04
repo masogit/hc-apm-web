@@ -544,6 +544,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             case 8: //待审核
                 return "icons/4.png";
             case 4: //维修中
+            case 10: //待送修
+            case 11: //待返还
             {
                 if(v2_workOrder.getApprovalDate()!=null){
                     return  "icons/4.png";
@@ -1026,7 +1028,9 @@ public void test1(){
                     if (fillterStepId > 6) {
                         if (userContextService.hasCurrentTenantName("")) {
                             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(7, 9)));
-                        } else {
+                        } else if(fillterStepId==10 ||fillterStepId==11){
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
+                        }else {
                             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
                         }
                     } else {
@@ -1050,13 +1054,13 @@ public void test1(){
             } else if (queryIndex == 14) {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 11));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             }else {//待办
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 if(stepFileter!=null) {
                     fillterStepId = woStatus.get(stepFileter);
-                    if (fillterStepId > 6) {
+                    if (fillterStepId > 6 &&(fillterStepId != 10 && fillterStepId != 11)) {
                         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
                     } else {
                         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
@@ -1483,7 +1487,7 @@ public void test1(){
         dao.save(selectedWorkOrder);
     }
 
-    private Boolean hourRequired;
+    private Boolean hourRequired = false;
 
 
     public void prepareCompleteOrder(String woid) {
@@ -3725,6 +3729,18 @@ public void test1(){
 
     public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
         this.workHoursList = workHoursList;
+    }
+
+
+    public boolean hasPermissionConfirmReturn(String woId){
+        V2_WorkOrder workOrder = dao.findById(woId);
+        return workOrder.getServiceRequest().getRequestorId() == userContextService.getLoginUserId();
+
+    }
+    public boolean hasPermissionConfirmSend(String woId){
+         V2_WorkOrder workOrder = dao.findById(woId);
+        return workOrder.getCurrentPersonId() == userContextService.getLoginUserId();
+
     }
 
 }
