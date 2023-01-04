@@ -253,6 +253,14 @@ public class UserContextService implements Serializable {
         WorkflowConfig workflowConfig = bySiteUID.get(0);
         return workflowConfig.getEnableAssetPreview() != null && workflowConfig.getEnableAssetPreview();
     }
+    public boolean enableSendRepair() {
+        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID == null || bySiteUID.isEmpty()) {
+            return false;
+        }
+        WorkflowConfig workflowConfig = bySiteUID.get(0);
+        return workflowConfig.getEnableSendRepair() != null && workflowConfig.getEnableSendRepair();
+    }
 
     public boolean byOpWorker(){
         List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
