@@ -26,12 +26,18 @@
                         <p:ajax event="rowSelect" listener="#{zkbHighPartController.prepareEdit}" update="editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{zkbHighPartController.onFilter}" />
 
-                        <p:column headerText="备件号">
+                        <p:column headerText="备件号"  filterBy="#{item.partNo}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.partNo}"/>
                         </p:column>
 
-                        <p:column headerText="类别" >
+                        <p:column headerText="类别"  filterBy="#{item.partType}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbHighPartType', item.partType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbHighPartType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
 
                         <f:facet name="{Toolbar}">

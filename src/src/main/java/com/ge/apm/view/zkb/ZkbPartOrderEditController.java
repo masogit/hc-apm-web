@@ -65,6 +65,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String currentScoreText;
     private boolean currentScoreFlag =false;
     private boolean radiationQuotaTypeFlag = false;
+    private boolean spareArtificialFlag = false;
     private List<HashMap<String, String>> highCatList = new ArrayList<>();
     private ZkbContractAssetRepository zkbContractAssetRepository;
     private ZkbContractAssetService zkbContractAssetService;
@@ -72,6 +73,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String supplementFlag = CopyByInvok.F;;
     private List<I18nMessage> exchangeTypeList = new ArrayList<>();
     private I18nMessageRepository i18nMessageRepository;
+    private ZkbHighPartInfoRepository zkbHighPartInfoRepository;
 
     @Override
     protected void init() {
@@ -85,6 +87,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
         zkbContractAssetRepository = WebUtil.getBean(ZkbContractAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        zkbHighPartInfoRepository = WebUtil.getBean(ZkbHighPartInfoRepository.class);
         zkbContractAssetService = WebUtil.getBean(ZkbContractAssetService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -450,6 +453,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
                     if(assetInfo.getAssetGroup().equals(1)){
                         radiationQuotaTypeFlag = true;
+                        Integer q = selectedContract.getPartHighQuota() == null ? 0 : selectedContract.getPartHighQuota();
+                        if(q<= 0){
+                            selected.setRadiationQuotaType(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString());
+                            spareArtificialFlag = true;
+                        }
                     }
                 }
             }
@@ -956,6 +964,20 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
                     if(contractCount - selected.getQty() < 0){
                         reLog = "合同备件+人工+保养剩余名额不足，请检查！";
+                    }
+                }
+            }
+            if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
+                if(assetInfo.getAssetGroup().equals(1) && ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                    for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+                        ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(i.getPartNo());
+                        if(z != null ){
+                            if(ZkbHighPartInfo.PartTypeEnum.highPart.toString().equals(z.getPartType())){
+                                reLog = "备件号："+i.getPartNo()+"属于高值备件，不可订购";
+                            }else if(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())){
+                                reLog = "备件号："+i.getPartNo()+"属于球管，不可订购";
+                            }
+                        }
                     }
                 }
             }
@@ -1592,6 +1614,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setRadiationQuotaTypeFlag(boolean radiationQuotaTypeFlag) {
         this.radiationQuotaTypeFlag = radiationQuotaTypeFlag;
+    }
+
+    public boolean isSpareArtificialFlag() {
+        return spareArtificialFlag;
+    }
+
+    public void setSpareArtificialFlag(boolean spareArtificialFlag) {
+        this.spareArtificialFlag = spareArtificialFlag;
     }
 
     @Override
