@@ -3746,12 +3746,12 @@ public void test1(){
 
     public boolean hasPermissionConfirmReturn(String woId){
         V2_WorkOrder workOrder = dao.findById(woId);
-        return workOrder.getServiceRequest().getRequestorId() == userContextService.getLoginUserId();
+        return workOrder.getServiceRequest().getRequestorId() == userContextService.getLoginUserId()|| userContextService.hasAnyRole("DeptHead");
 
     }
     public boolean hasPermissionConfirmSend(String woId){
          V2_WorkOrder workOrder = dao.findById(woId);
-        return workOrder.getCurrentPersonId() == userContextService.getLoginUserId() || userContextService.hasAnyRole("DeptHead");
+        return workOrder.getCurrentPersonId() == userContextService.getLoginUserId() ;
 
     }
 
