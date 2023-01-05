@@ -1055,11 +1055,15 @@ public void test1(){
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 10));
                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             } else if (queryIndex == 14) {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 11));
                 searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
                 searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             }else {//待办
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 if(stepFileter!=null) {
