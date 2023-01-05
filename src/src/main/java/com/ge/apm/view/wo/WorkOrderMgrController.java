@@ -3755,5 +3755,16 @@ public void test1(){
 
     }
 
+    public boolean needTwoSubStatus(String woId){
+        V2_WorkOrder workOrder = dao.findById(woId);
+        return isConfigNeedTwoSubStatus(workOrder.getAssetId())&& (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10;
+
+    }
+
+
+    public Boolean isConfigNeedTwoSubStatus(Integer assetId) {
+        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(assetId);
+        return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
+    }
 }
 
