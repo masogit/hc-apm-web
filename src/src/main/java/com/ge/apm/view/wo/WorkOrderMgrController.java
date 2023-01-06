@@ -104,6 +104,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     Boolean switchTmp=false;
     @Setter@Getter
     private Boolean nochange=false;
+    @Setter@Getter
+    private Boolean needTwoSubStatus=false;
     private UserAccount ua1;
     private V2_WorkOrderRepository dao;
     private String supplierName;
@@ -311,6 +313,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
+            needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
             String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
@@ -3746,7 +3749,7 @@ public void test1(){
 
     public boolean hasPermissionConfirmReturn(String woId){
         V2_WorkOrder workOrder = dao.findById(woId);
-        return workOrder.getServiceRequest().getRequestorId() == userContextService.getLoginUserId()|| userContextService.hasAnyRole("DeptHead");
+        return workOrder.getServiceRequest().getRequestorId() == userContextService.getLoginUserId();
 
     }
     public boolean hasPermissionConfirmSend(String woId){
@@ -3765,6 +3768,16 @@ public void test1(){
     public Boolean isConfigNeedTwoSubStatus(Integer assetId) {
         WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(assetId);
         return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
+    }
+    public Boolean isConfigNeedTwoSubStatusByUser(UserAccount userAccount) {
+        WorkflowConfig woc = workflowService.getWorkflowByOrg(userAccount.getSiteUID());
+        return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
+    }
+
+    public List<I18nMessage> getWoSteps(String stepIds){
+        List<String> stepIdsList = Arrays.asList(stepIds.split(","));
+            return FieldValueMessageController.doGetFieldValueList("woSteps", -1).stream()
+                    .filter(item -> stepIdsList.contains(item.getMsgKey())).collect(Collectors.toList());
     }
 }
 
