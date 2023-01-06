@@ -974,9 +974,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(i.getPartNo());
                         if(z != null ){
                             if(ZkbHighPartInfo.PartTypeEnum.highPart.toString().equals(z.getPartType())){
-                                el += "备件号："+i.getPartNo()+"属于高值备件，不可订购";
+                                el += "备件号："+i.getPartNo()+"属于高值备件，不可订购！";
                             }else if(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())){
-                                el += "备件号："+i.getPartNo()+"属于球管，不可订购";
+                                el += "备件号："+i.getPartNo()+"属于球管，不可订购！";
                             }
                         }
                     }
