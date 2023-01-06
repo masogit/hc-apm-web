@@ -104,6 +104,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     Boolean switchTmp=false;
     @Setter@Getter
     private Boolean nochange=false;
+    @Setter@Getter
+    private Boolean needTwoSubStatus=false;
     private UserAccount ua1;
     private V2_WorkOrderRepository dao;
     private String supplierName;
@@ -311,6 +313,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
+            needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
             String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
@@ -1053,17 +1056,21 @@ public void test1(){
             } else if (queryIndex == 13) {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 10));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+//                if(!(userContextService.hasRole("AssetHead") || userContextService.hasRole("DeptHead") || userContextService.hasRole("ClinicalStaff"))) {
+//                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+//                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+//                    searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+//                    searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+//                  }
             } else if (queryIndex == 14) {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 11));
-                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+//                if(!(userContextService.hasRole("AssetHead") || userContextService.hasRole("DeptHead") || userContextService.hasRole("ClinicalStaff"))) {
+//                    searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+//                    searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+//                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+//                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+//                }
             }else {//待办
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 if(stepFileter!=null) {
@@ -3747,9 +3754,30 @@ public void test1(){
     }
     public boolean hasPermissionConfirmSend(String woId){
          V2_WorkOrder workOrder = dao.findById(woId);
-        return workOrder.getCurrentPersonId() == userContextService.getLoginUserId();
+        return workOrder.getCurrentPersonId() == userContextService.getLoginUserId() ;
 
     }
 
+    public boolean needTwoSubStatus(String woId){
+        V2_WorkOrder workOrder = dao.findById(woId);
+        return isConfigNeedTwoSubStatus(workOrder.getAssetId())&& (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10;
+
+    }
+
+
+    public Boolean isConfigNeedTwoSubStatus(Integer assetId) {
+        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(assetId);
+        return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
+    }
+    public Boolean isConfigNeedTwoSubStatusByUser(UserAccount userAccount) {
+        WorkflowConfig woc = workflowService.getWorkflowByOrg(userAccount.getSiteUID());
+        return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
+    }
+
+    public List<I18nMessage> getWoSteps(String stepIds){
+        List<String> stepIdsList = Arrays.asList(stepIds.split(","));
+            return FieldValueMessageController.doGetFieldValueList("woSteps", -1).stream()
+                    .filter(item -> stepIdsList.contains(item.getMsgKey())).collect(Collectors.toList());
+    }
 }
 
