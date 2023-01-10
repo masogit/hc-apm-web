@@ -61,6 +61,10 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         this.filterBySite = false;
         this.filterByHospital = false;
         initRole();
+        String reportId = WebUtil.getRequestParameter("reportId");
+        if (StringUtils.isNotEmpty(reportId)) {
+            selected = dao.findById(reportId);
+        }
     }
 
     @Override
@@ -162,6 +166,34 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
 
     public void delete() {
         dao.delete(selected);
+    }
+
+    public String getViewUrl(String reportId) {
+        if (StringUtils.isNotEmpty(reportId)) {
+            return "/portal/jmReport/jmReportView.xhtml?faces-redirect=true&amp;reportId=" +  reportId ;
+        }
+        return "";
+    }
+
+    public String getCheckUrl(String reportId) {
+        if (StringUtils.isNotEmpty(reportId)) {
+            return "/portal/jmReport/jmReportCheck.xhtml?faces-redirect=true&amp;reportId=" +  reportId ;
+        }
+        return "";
+    }
+
+    public String view() {
+        if (selected != null) {
+            return  selected.getReportViewUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+        }
+        return "";
+    }
+
+    public String check() {
+        if (selected != null) {
+            return  selected.getReportEditUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+        }
+        return "";
     }
 
 }
