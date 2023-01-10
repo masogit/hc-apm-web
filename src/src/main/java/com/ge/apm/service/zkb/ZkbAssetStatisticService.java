@@ -205,6 +205,9 @@ public class ZkbAssetStatisticService {
                 }
             }
             if(zkbAssetQrCodeInfo.getId() == null){//ID == null 则新增记录
+                if(StringUtils.isBlank(zkbAssetQrCodeInfo.getQrCodeCountState())){
+                    zkbAssetQrCodeInfo.setQrCodeCountState("N");
+                }
                 zkbAssetQrCodeInfo.setCreatedDate(date);
             }
         }
