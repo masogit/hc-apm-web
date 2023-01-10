@@ -8,6 +8,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.remote.ElasticService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
@@ -49,6 +50,7 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
     private CustomConfigService customConfigService;
     private CustomConfig customConfig;
     private CustomConfigObject customConfigObject;
+    private ElasticService elasticService;
 
     @Getter
     @Setter
@@ -65,7 +67,7 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         assetHistoryRepository = WebUtil.getBean(AssetHistoryRepository.class);
         uuaService = WebUtil.getBean(UaaService.class);
         customConfigService = WebUtil.getBean(CustomConfigService.class);
-
+        elasticService=WebUtil.getBean(ElasticService.class);
     }
 
 
@@ -86,10 +88,10 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uuaService.getOrgListByUser(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenant_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("institution_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospital_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("site_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         loadConfigForSite(userAccount.getSiteUID());
 //        CustomConfigObject  customConfig = customConfigService.getCurrentCustomConfig(userAccount.getSiteUID());
         List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
@@ -101,7 +103,11 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
 
         //convert to json data page
         pageRequest = addDefaultSort(pageRequest);
-        Page<AssetHistory> assetHistoryPage = assetHistoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), pageRequest.getPageNumber(), pageRequest.getPageSize());
+//        Page<AssetHistory> assetHistoryPage = assetHistoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+        if(assetHistoryPage==null){
+            return null;
+        }
         List<JSONObject> dataLists = assetHistoryService.parseFieldsByJson(assetHistoryPage.getContent());
         Page<JSONObject> jsonPage = new PageImpl<>(dataLists, pageRequest, assetHistoryPage.getTotalElements());
         searchFilters = new ArrayList<SearchFilter>();
