@@ -9,7 +9,7 @@
     http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
     <description>NA</description>
-<!--    <import resource="classpath*:config/applicationContext-rabbitmq.xml"/>-->
+    <import resource="classpath*:config/applicationContext-rabbitmq.xml"/>
     <import resource="classpath*:config/applicationContext.xml"/>
     <import resource="classpath*:config/applicationContext-security-http.xml"/>
     <import resource="classpath*:config/broker_context.xml"/>
