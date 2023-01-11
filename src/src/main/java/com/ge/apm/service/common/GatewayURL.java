@@ -146,6 +146,7 @@ public enum GatewayURL {
 
     //es查询设备修改历史记录
     SEARCH_ASSET_HISTORY("/assetHistory/searchAssetHistory"),
+    INSERT_ASSET_HISTORY("/assetHistory/insertAssetHistory"),
 
     ;
     private final String url;

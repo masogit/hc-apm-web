@@ -10,6 +10,7 @@ import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetHistoryService;
+import com.ge.apm.service.remote.ElasticService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
@@ -34,6 +35,9 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
     private AssetHistoryService assetHistoryService;
     @Autowired
     private AssetHistoryRepository assetHistoryRepository;
+
+    @Autowired
+    private ElasticService elasticService;
 
 
     @Override
@@ -104,12 +108,13 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             assetHistory.setInstitutionUID(currentUserAccount.getInstitutionUID());
             assetHistory.setClinicalDeptUid(newAsset.getClinicalDeptUID());
             assetHistory.setAssetJson(assetJson);
-            assetHistoryRepository.save(assetHistory);
+            elasticService.insertAssetHistory(assetHistory);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }catch (Exception e){
             LOGGER.info("mq 消息 error message:{}, e :",mqContext,e);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-//            channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
+//            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
         }
+
     }
 }
