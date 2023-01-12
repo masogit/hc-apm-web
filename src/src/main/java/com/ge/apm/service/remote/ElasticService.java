@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,6 +54,9 @@ public class ElasticService extends MicroServiceInvoker {
             LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
             String content = JSON.toJSONString(data.get("content"));
             List<AssetHistory> assetHistories = JSON.parseObject(content, new TypeReference<List<AssetHistory>>() {});
+            if(assetHistories==null){
+                assetHistories=new ArrayList<>();
+            }
             int totalElements = (int)data.get("totalElements");
             PageRequest  pageRequest=  new PageRequest(pageNum, pageSize, null);
             Page<AssetHistory> jsonPage = new PageImpl<>(assetHistories, pageRequest, totalElements);

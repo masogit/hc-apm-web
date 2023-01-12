@@ -105,8 +105,9 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         pageRequest = addDefaultSort(pageRequest);
         Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), pageRequest.getPageNumber(), pageRequest.getPageSize());
 //        Page<AssetHistory> assetHistoryPage = assetHistoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
-        if(assetHistoryPage==null){
-            return null;
+        if(assetHistoryPage==null || assetHistoryPage.getContent()==null){
+            Page<JSONObject> objects = new PageImpl<>(new ArrayList<>(), pageRequest, 0);
+            return objects;
         }
         List<JSONObject> dataLists = assetHistoryService.parseFieldsByJson(assetHistoryPage.getContent());
         Page<JSONObject> jsonPage = new PageImpl<>(dataLists, pageRequest, assetHistoryPage.getTotalElements());
