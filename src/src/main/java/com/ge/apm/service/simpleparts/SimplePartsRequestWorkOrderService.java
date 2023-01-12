@@ -243,6 +243,9 @@ public class SimplePartsRequestWorkOrderService {
         }
 
         String woId = v2_WorkOrder_Detail.getWoId();
+        // 保存维修保养工单id
+        partsRequest.setOrderType(type);
+        partsRequest.setOrderId(woId);
         if(SimplePartsConstant.WORK_ORDER == type){
             //添加维修工单号
             if(StringUtils.isNotEmpty(woId)){

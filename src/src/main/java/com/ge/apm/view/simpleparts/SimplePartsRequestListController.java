@@ -158,6 +158,20 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
 
     }
 
+    /**
+     * 删除备件申领申购单 YHAAO-17616
+     * @param id
+     */
+    public void deletePartsRequset(){
+        if(StringUtils.isNotEmpty(selected.getMaintenanceWorkOrderNumber())){
+            WebUtil.addErrorMessage("该工单是集成工单，无法手动删除！");
+            return;
+        }
+        partsRequestService.deletePartsRequest(selected.getId());
+        selected = null;
+        partsRequestLineItems = Collections.emptyList();
+    }
+
     private PageRequest addRequiredSortByRequestCode(PageRequest pageRequest) {
         Iterator<Sort.Order> orders = pageRequest.getSort().iterator();
         boolean exists = false;
@@ -310,6 +324,16 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
             return true;
         }
 
+        return false;
+    }
+
+    public boolean deleteCheck() {
+        if (null == selected) {
+            return false;
+        }
+        if (StringUtils.isEmpty(selected.getMaintenanceWorkOrderNumber())) {
+            return true;
+        }
         return false;
     }
 

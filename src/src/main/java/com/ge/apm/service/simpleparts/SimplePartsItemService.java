@@ -8,6 +8,7 @@ import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,12 +59,16 @@ public class SimplePartsItemService {
         return partsItemRepository.findAll(ids);
     }
 
-    public List<SimplePartsItem> getPartsItemListInInventoryByPartsHouseId(String partsWarehouseId) {
+    public List<SimplePartsItem> getPartsItemListInInventoryByPartsHouseId(String partsWarehouseId, String name) {
         List<SimplePartsInventory> partsInventoryList = partsInventoryService.findByWarehouseId(partsWarehouseId);
         List<SimplePartsItem> list = Lists.newArrayList();
         if(partsInventoryList.size() > 0){
             Set<String> uidSet = partsInventoryList.stream().filter(item -> item.getOnhandQty() > 0).map(item -> item.getPartsItemId()).collect(Collectors.toSet());
-            list = this.findByIds(uidSet);
+            if(StringUtils.isEmpty(name)){
+                list = this.findByIds(uidSet);
+            }else{
+                list = partsItemRepository.findByUidAndName(uidSet, name);
+            }
         }
 
         return list;
