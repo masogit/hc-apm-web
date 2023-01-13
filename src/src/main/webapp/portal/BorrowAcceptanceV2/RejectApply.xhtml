@@ -1,0 +1,31 @@
+<ui:composition
+xmlns="http://www.w3.org/1999/xhtml"
+xmlns:f="http://java.sun.com/jsf/core"
+xmlns:h="http://java.sun.com/jsf/html"
+xmlns:ui="http://java.sun.com/jsf/facelets"
+xmlns:p="http://primefaces.org/ui"
+xmlns:pu="http://primefaces.org/ultima"
+xmlns:svg="http://www.w3.org/2000/svg">
+	<p:dialog id="rejectApplyDialog" widgetVar="rejectApplyDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="拒绝申请">
+		<h:form id="rejectApplyDialogForm" >
+			<h:panelGroup id="display1">
+				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+					<h:panelGroup>
+						<label class="label">备注原因:</label>
+						<p:inputTextarea rows="5" cols="50" value="#{sharedAssetRequestV2Controller.selected.remark}"  maxlength="50" required="true" requiredMessage="备注原因 #{msg.ValidationRequire}"
+										 counter="comentsCounts" counterTemplate="#{msg.remainingCharacters}"
+										 autoResize="true"  style="border-width:1px 1px 1px">
+						</p:inputTextarea>
+						<br/>
+						<h:outputText id="comentsCounts" />
+					</h:panelGroup>
+					<h:panelGroup >
+						<p:commandButton value="拒绝申请" actionListener="#{sharedAssetRequestV2Controller.rejectApply}" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" />
+						<p:commandButton value="#{msg.Return}" oncomplete="PF('rejectApplyDialog').hide()"  icon="ui-icon-arrow-back"/>
+					</h:panelGroup>
+				</p:panelGrid>
+				<br/>
+			</h:panelGroup>
+		</h:form>
+	</p:dialog>
+</ui:composition>

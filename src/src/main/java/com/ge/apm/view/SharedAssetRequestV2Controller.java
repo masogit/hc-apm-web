@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.sharedasset.SharedAssetRequestService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
@@ -23,6 +24,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
@@ -1194,7 +1196,25 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             return;
         }
     }
-    
+    public void rejectApply(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        Map<String, Object> params = new HashMap<>();
+        String id = selected.getId();
+        params.put("id", id);
+        params.put("remark",selected.getRemark());
+        ResponseEntity<LinkedHashMap> result = null;
+        try {
+            result = sharedAssetService.rejectApply(GatewayURL.REJECT_APPLY, params);
+            logger.info("拒绝借用申请：id="+id);
+            String url = "List.xhtml?faces-redirect=true";
+            requestContext.addCallbackParam("url", url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            WebUtil.addErrorMessage("申请已取消或已受理，请返回并刷新！");
+            requestContext.addCallbackParam("url","norespond");
+        }
+
+    }
     public void AcceptR() throws Exception {
        String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
