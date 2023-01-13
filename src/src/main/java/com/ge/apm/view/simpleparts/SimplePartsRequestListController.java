@@ -328,7 +328,7 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
     }
 
     public boolean deleteCheck() {
-        if (null == selected) {
+        if (null == selected || selected.getStatus() == 1) {
             return false;
         }
         if (StringUtils.isEmpty(selected.getMaintenanceWorkOrderNumber())) {
