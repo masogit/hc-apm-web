@@ -134,16 +134,18 @@ public class WorkScheduleController{
         selectOrgInfo = orgInfoDao.findBySearchFilter(searchFilters);
         OrgInfo selectSiteSchedule = userContextService.getSelectSiteSchedule();
         if(selectSiteSchedule == null){
-            Optional<OrgInfo> first = selectOrgInfo.stream().filter(item -> item.getOrgType() == 3).findFirst();
+            Optional<OrgInfo> first = selectOrgInfo.stream().filter(item->item.getOrgType() == 3).findFirst();
+            OrgInfo orgInfo =null;
             if (first.isPresent()) {
-                OrgInfo orgInfo = first.get();
-                userContextService.setSelectSiteSchedule(orgInfo);
-                selectSite=orgInfo;
+                 orgInfo = first.get();
+            }else{
+                orgInfo=selectOrgInfo.get(0);
             }
+            userContextService.setSelectSiteSchedule(orgInfo);
+            selectSite=orgInfo;
         }else{
             selectSite=selectSiteSchedule;
         }
-
     }
     private void loadScheduleData(){
         eventModel = new DefaultScheduleModel();
