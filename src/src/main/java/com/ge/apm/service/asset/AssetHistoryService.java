@@ -18,6 +18,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -255,6 +256,12 @@ public class AssetHistoryService {
         Object newFieldValue = field.get(newAsset);
 
         if (Objects.equals(oldFieldValue, newFieldValue)) {
+            return Optional.empty();
+        }
+        String oldValue = ObjectUtils.toString(oldFieldValue, "");
+        String newValue = ObjectUtils.toString(newFieldValue, "");
+
+        if(org.apache.commons.lang3.StringUtils.isBlank(oldValue) && org.apache.commons.lang3.StringUtils.isBlank(newValue)){
             return Optional.empty();
         }
         if ("purchasePrice".equals(fieldName)) {
