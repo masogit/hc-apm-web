@@ -66,6 +66,23 @@ public class ElasticService extends MicroServiceInvoker {
         }
     }
 
+    public List<AssetHistory> searchAssetHistoryList(HashMap<String, Object> map){
+
+
+        HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map);
+        String gatewayURL = getGatewayURL(GatewayURL.SEARCH_ASSET_HISTORY_LIST);
+//        String gatewayURL = "http://10.189.180.139:8882/assetHistory/searchAssetHistoryList";
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            String dat = JSON.toJSONString(responseMap.get("data"));
+            List<AssetHistory> list = JSON.parseObject(dat, new TypeReference<List<AssetHistory>>() {});
+            return list;
+        } else {
+            return null;
+        }
+    }
+
     @Transactional
     public void insertAssetHistory(AssetHistory assetHistory) throws Exception {
         assetHistoryRepository.save(assetHistory);
@@ -77,4 +94,6 @@ public class ElasticService extends MicroServiceInvoker {
              throw new Exception("es insert assethistory filed");
          }
     }
+
+
 }

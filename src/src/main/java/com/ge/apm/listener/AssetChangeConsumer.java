@@ -20,9 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -59,13 +61,20 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             UserAccount currentUserAccount = JSONObject.parseObject(currentUserAccountString, new TypeReference<UserAccount>() {});
             List<AssetHistory.AssetHistoryInfo> resultList =new ArrayList<>();
             if(newAsset.getId()!=null){
-                AssetHistory assetHistory=assetHistoryRepository.getAssetHistoryByAssetUidOne(newAsset.getUid());
-
-                if(assetHistory==null){
+//                AssetHistory assetHistory=assetHistoryRepository.getAssetHistoryByAssetUidOne(newAsset.getUid());
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("pageNum",0);
+                map.put("pageSize",1);
+                map.put("asset_uid",newAsset.getUid());
+                map.put("sortField","created_date");
+                map.put("sortValue","DESC");
+                List<AssetHistory> list = elasticService.searchAssetHistoryList(map);
+                if(CollectionUtils.isEmpty(list)){
                     LOGGER.info("update asset assetHistory is null assetUid:{}",newAsset.getUid());
                     channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
                     return;
                 }
+                AssetHistory assetHistory = list.get(0);
                 String assetJson = assetHistory.getAssetJson();
                 if(StringUtils.isEmpty(assetJson)){
                     LOGGER.info("update  asset  assetJson is null assetUid:{},historyUid:{}",newAsset.getUid(),assetHistory.getUid());

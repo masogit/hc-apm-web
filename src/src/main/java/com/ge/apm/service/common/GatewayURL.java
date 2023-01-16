@@ -144,8 +144,9 @@ public enum GatewayURL {
     USER_SIGNATURE("/hcapmmasterdataservice/api/apm/masterData/userSignature"),
     GET_CONFIG_BY_KEY_AND_SITE("/hcapmmasterdataservice/api/apm/masterData/configItem/getByKeyAndSite"),
 
-    //es查询设备修改历史记录
+    //es查询设备修改历史记录分页
     SEARCH_ASSET_HISTORY("/assetHistory/searchAssetHistory"),
+    SEARCH_ASSET_HISTORY_LIST("/assetHistory/searchAssetHistoryList"),
     INSERT_ASSET_HISTORY("/assetHistory/insertAssetHistory"),
 
     ;
