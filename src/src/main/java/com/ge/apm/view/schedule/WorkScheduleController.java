@@ -732,10 +732,12 @@ public class WorkScheduleController{
         if(org.springframework.util.CollectionUtils.isEmpty(orgList)){
             return null;
         }
+        List<OrgInfo> collect = orgList.stream().sorted((item, item2) ->item2.getOrgType()-item.getOrgType()).collect(Collectors.toList());
+        OrgInfo orgInfo = collect.get(0);
         TreeNode rootNode = new DefaultTreeNode("org", null, null);
         Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> {
             TreeNode org = new DefaultTreeNode("org", item, null);
-            if(item.getOrgType() != 3){
+            if(item.getOrgType() != orgInfo.getOrgType()){
                 org.setSelectable(false);
             }
             return org;
