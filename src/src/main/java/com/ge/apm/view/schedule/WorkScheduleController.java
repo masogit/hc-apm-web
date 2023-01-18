@@ -134,13 +134,9 @@ public class WorkScheduleController{
         selectOrgInfo = orgInfoDao.findBySearchFilter(searchFilters);
         OrgInfo selectSiteSchedule = userContextService.getSelectSiteSchedule();
         if(selectSiteSchedule == null){
-            Optional<OrgInfo> first = selectOrgInfo.stream().filter(item->item.getOrgType() == 3).findFirst();
             OrgInfo orgInfo =null;
-            if (first.isPresent()) {
-                 orgInfo = first.get();
-            }else{
-                orgInfo=selectOrgInfo.get(0);
-            }
+            Optional<OrgInfo> first = selectOrgInfo.stream().sorted((item, item2) -> item2.getOrgType() - item.getOrgType()).findFirst();
+            orgInfo=first.get();
             userContextService.setSelectSiteSchedule(orgInfo);
             selectSite=orgInfo;
         }else{
