@@ -167,6 +167,7 @@ public class WorkScheduleController{
         DefaultScheduleEvent tempEvent = null;
 
         if(event.getId() == null){
+
             //新增记录
             tempUserSchedule = new UserSchedule();
             tempUserSchedule.setTenantUID(selectSite.getTenantUID());
@@ -186,7 +187,10 @@ public class WorkScheduleController{
             //JSF Schedule model
             tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), this.scheduleDate, this.scheduleDate, true);
             tempEvent.setData(tempUserSchedule);
-
+            if(!userScheduleService.getUserVacationList(tempUserSchedule.getScheduleDate(),tempUserSchedule.getUserUID(),tempUserSchedule.getScheduleDateStage(), UserSchedule.AuditStatus.Approved.name()).isEmpty()){
+                WebUtil.addErrorMessage(WebUtil.getMessage("ConfictingWithTheExistingRecords")+"（和休假冲突）");
+                return;
+            }
         }else{
             //更新记录
             if(event.getData() != null){
