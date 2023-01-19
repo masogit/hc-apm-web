@@ -7,6 +7,7 @@ import com.ge.apm.service.simpleparts.SimplePartsConfigService;
 import com.ge.apm.service.simpleparts.SimplePartsItemService;
 import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
@@ -28,6 +29,8 @@ public class SimplePartsConfigReadController {
     private SimplePartsItemService partsItemService;
     private SimplePartsItemRepository partsItemRepository;
 
+    private String partsWarehouseId;
+
     @PostConstruct
     protected void init() {
         partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
@@ -44,15 +47,26 @@ public class SimplePartsConfigReadController {
         return partsConfigService.isEnableWarehouseSelectionInRequest();
     }
 
-    public List<SimplePartsItem> getPartsItemListInInventory(String partsWarehouseId) {
-
-        return partsItemService.getPartsItemListInInventoryByPartsHouseId(partsWarehouseId);
+    public List<SimplePartsItem> getPartsItemListInInventory(String query) {
+        return partsItemService.getPartsItemListInInventoryByPartsHouseId(this.partsWarehouseId, query);
     }
 
-    public List<SimplePartsItem> getAllPartsItemList() {
+    public List<SimplePartsItem> getAllPartsItemList(String query) {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        List<SimplePartsItem> partsItemList = partsItemRepository.findByTenantUid(userAccount.getTenantUID());
+        List<SimplePartsItem> partsItemList = null;
+        if(StringUtils.isEmpty(query)){
+            partsItemList = partsItemRepository.findByTenantUid(userAccount.getTenantUID());
+        }else{
+            partsItemList = partsItemRepository.findByTenantUidAndName(userAccount.getTenantUID(), query);
+        }
         return partsItemList;
     }
 
+    public String getPartsWarehouseId() {
+        return partsWarehouseId;
+    }
+
+    public void setPartsWarehouseId(String partsWarehouseId) {
+        this.partsWarehouseId = partsWarehouseId;
+    }
 }

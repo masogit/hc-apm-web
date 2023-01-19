@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="jmEditDlg" widgetVar="jmEditDialog" width="1000" height="650" modal="true" resizable="true" draggable="true" appendTo="@this" header="设备绩效记录" closable="false">
+        <p:dialog id="jmEditDlg" widgetVar="jmEditDialog" width="1000" height="650" modal="true" resizable="true" draggable="true" appendTo="@this" header="报表编辑" closable="false">
 
             <h:form id="jmEditForm">
                 <h:panelGroup id="display">
@@ -29,7 +29,7 @@
                             <p:inputText id="reportEditUrl" value="#{jmReportController.selected.reportEditUrl}"  />
                         </h:panelGroup>
                         <p:commandButton id="btnSite" style="max-width:160px;" value="#{jmReportController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right" rendered="#{!empty jmReportController.selected.id}"/>
-                        <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
+                        <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form" rendered="#{!empty jmReportController.selected.id}">
                             <p:selectOneListbox scrollHeight="500" style="border: none;" value="#{jmReportController.tenantId}">
                                 <p:ajax process="@this" event="click" oncomplete="PF('varPanelSite').hide();"/>
                                 <f:selectItems value="#{tenantInfoController.itemList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>

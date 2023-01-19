@@ -45,4 +45,5 @@ public interface SimplePartsRequestLineItemRepository extends GenericRepositoryU
     @Query(value = "select * from simple_parts_request_line_item where request_code = ?1", nativeQuery = true)
     List<SimplePartsRequestLineItem> findByRequestCode(String requestCode);
 
+    void deleteByPartsRequestId(String requestId);
 }
