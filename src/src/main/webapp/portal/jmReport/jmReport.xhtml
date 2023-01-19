@@ -37,20 +37,24 @@
 								</p:column>
 								<p:column  headerText="预览/设计" >
 									<h:panelGroup>
-										<a id="viewReportButton" title="预览"  href="#{item.reportViewUrl}" target="_blank">
+										<p:commandLink id="viewReportButton" title="预览"   action="#{jmReportController.getViewUrl(item.id)}" >
 											<p:graphicImage name="icons/find.png" style="width: 30px; height: 30px;"/>
-										</a>
+										</p:commandLink>
 									</h:panelGroup>
 									<h:panelGroup rendered="#{userContextService.authContains('SuperAdmin')}">
-										<a id="editReportButton" title="设计"  href="#{item.reportEditUrl}" target="_blank">
+										<p:commandLink id="editReportButton" title="设计"   action="#{jmReportController.getCheckUrl(item.id)}" >
 											<p:graphicImage name="icons/pencil.png" style="width: 30px; height: 30px;"/>
-										</a>
+										</p:commandLink>
 									</h:panelGroup>
 								</p:column>
 								<f:facet name="{Toolbar}">
 									<p:commandButton id="addButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{jmReportController.prepareCreate}" rendered="#{userContextService.authContains('SuperAdmin')}" oncomplete="PF('jmEditDialog').show()"/>
 
 									<p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btnEdit" actionListener="#{jmReportController.prepareEdit}" update="@(.updateTrCls) :jmEditDlg" disabled="#{empty jmReportController.selected.id}" rendered="#{userContextService.authContains('SuperAdmin')}" oncomplete="PF('jmEditDialog').show()"/>
+
+<!--									<p:commandButton id="viewButton" title="报表预览"  icon="ui-icon-search"  action="#{jmReportController.getViewUrl(item.id)}" disabled="#{empty jmReportController.selected.id}" />-->
+
+<!--									<p:commandButton id="checkButton" title="报表编辑"  icon="ui-icon-check"  action="#{jmReportController.getCheckUrl(item.id)}" disabled="#{empty jmReportController.selected.id}" />-->
 
 									<p:commandButton id="roleButton"  title="分配访问角色"  icon="ui-icon-people" class="btnEdit" actionListener="#{jmReportController.prepareEdit}" update="@(.updateTrCls) :JmRoleEditDlg" disabled="#{empty jmReportController.selected.id}" rendered="#{userContextService.authContains('ITAdmin')}" oncomplete="PF('JmRoleEditDialog').show()"/>
 
@@ -66,6 +70,8 @@
 				</h:form>
 				<ui:include src="jmReportEdit.xhtml"/>
 				<ui:include src="jmReportRole.xhtml"/>
+<!--				<ui:include src="jmReportView.xhtml"/>-->
+<!--				<ui:include src="jmReportCheck.xhtml"/>-->
 			</div>
 		</div>
 	</ui:define>
