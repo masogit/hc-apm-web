@@ -206,7 +206,7 @@
                         <h:panelGroup rendered="#{zkbPartOrderEditController.radiationQuotaTypeFlag}">
                             <label class="label">放射名额扣除类型*</label>
                             <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.radiationQuotaType}" disabled="#{zkbPartOrderEditController.spareArtificialFlag}" required="true" requiredMessage="放射名额扣除类型 #{msg.ValidationRequire}">
-                                <p:ajax event="change" update="partsHighTypeGroup"/>
+                                <p:ajax event="change" update="partsHighTypeGroup zkbDetailDatalist"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="联合名额" itemValue="SpareArtificial"/>
                                 <f:selectItem itemLabel="高值备件名额" itemValue="PartsHigh"/>
@@ -515,7 +515,7 @@
                             <h:outputText value="#{item.remark}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbPartOrderEditController.prepareItemCreate}" update=":growl :zkbPartOrderEditDlg" oncomplete="PF('zkbPartOrderEditDlg').show()" />
+                            <p:commandButton immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbPartOrderEditController.prepareItemCreate}" update=":growl :zkbPartOrderEditDlg" oncomplete="PF('zkbPartOrderEditDlg').show()" disabled="#{zkbPartOrderEditController.itemCreateDisabled}" />
                             <p:commandButton immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbPartOrderEditController.prepareItemEdit}" update=":growl :zkbPartOrderEditDlg"  oncomplete="PF('zkbPartOrderEditDlg').show()"  disabled="#{zkbPartOrderEditController.itemDisabled}"/>
                             <p:commandButton immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbPartOrderEditController.deleteItem}" update=":growl :zkbPartOrderEditForm:zkbDetailDatalist  :zkbPartOrderEditForm:qty :zkbPartOrderEditForm:remainQty" disabled="#{zkbPartOrderEditController.itemDisabled}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>

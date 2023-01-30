@@ -601,6 +601,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public boolean isItemCreateDisabled(){
+        if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
+            if (assetInfo.getAssetGroup().equals(1)) {
+                if(StrUtil.isEmpty(selected.getRadiationQuotaType())){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public void deleteItem(){
         this.selected.getZkbPartOrderItems().remove(this.zkbPartOrderItem);
         this.zkbPartOrderItem = null;
@@ -629,6 +641,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         }else{
                             RequestContext.getCurrentInstance().addCallbackParam("validationFailed",false);
                         }
+                    }else{
+                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed",false);
                     }
                 }else if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
                     List<ZkbHighPartInfo> zkbHighPartInfos = zkbHighPartInfoRepository.findBulbTube(zkbPartOrderItem.getPartNo());
@@ -924,7 +938,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog += "附件不能为空！";
             }
         }else{
@@ -1005,22 +1019,31 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }
-            /*if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
-                if(assetInfo.getAssetGroup().equals(1) && ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
+                if(assetInfo.getAssetGroup().equals(1)){
                     String el = "";
-                    for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
-                        ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(i.getPartNo());
-                        if(z != null ){
-                            if(ZkbHighPartInfo.PartTypeEnum.highPart.toString().equals(z.getPartType())){
-                                el += "备件号："+i.getPartNo()+"属于高值备件，不可订购！";
-                            }else if(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())){
+                    if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                        for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+                            ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(i.getPartNo());
+                            if(z != null ){
+                                if(ZkbHighPartInfo.PartTypeEnum.highPart.toString().equals(z.getPartType())){
+                                    el += "备件号："+i.getPartNo()+"属于高值备件，不可订购！";
+                                }else if(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())){
+                                    el += "备件号："+i.getPartNo()+"属于球管，不可订购！";
+                                }
+                            }
+                        }
+                    }else if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
+                        for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+                            List<ZkbHighPartInfo> zkbHighPartInfos = zkbHighPartInfoRepository.findBulbTube(i.getPartNo());
+                            if(zkbHighPartInfos != null && zkbHighPartInfos.size() > 0){
                                 el += "备件号："+i.getPartNo()+"属于球管，不可订购！";
                             }
                         }
                     }
                     reLog += el;
                 }
-            }*/
+            }
         } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             String probeType = "";
             if(StringUtils.isEmpty(zkbContract.getQuotaDeductType())){
