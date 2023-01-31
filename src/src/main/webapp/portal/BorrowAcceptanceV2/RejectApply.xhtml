@@ -6,7 +6,7 @@ xmlns:ui="http://java.sun.com/jsf/facelets"
 xmlns:p="http://primefaces.org/ui"
 xmlns:pu="http://primefaces.org/ultima"
 xmlns:svg="http://www.w3.org/2000/svg">
-	<p:dialog id="rejectApplyDialog" widgetVar="rejectApplyDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="拒绝申请">
+	<p:dialog id="rejectApplyDialog" widgetVar="rejectApplyDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetRequestV2Controller.dialogTitle==1?'拒绝申请':'搁置受理'}">
 		<h:form id="rejectApplyDialogForm" >
 			<h:panelGroup id="display1">
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -20,7 +20,8 @@ xmlns:svg="http://www.w3.org/2000/svg">
 						<h:outputText id="comentsCounts" />
 					</h:panelGroup>
 					<h:panelGroup >
-						<p:commandButton value="拒绝申请" actionListener="#{sharedAssetRequestV2Controller.rejectApply}" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" />
+						<p:commandButton value="拒绝申请" actionListener="#{sharedAssetRequestV2Controller.rejectApply}" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" rendered="#{sharedAssetRequestV2Controller.dialogTitle==1}"/>
+						<p:commandButton value="搁置受理" actionListener="#{sharedAssetRequestV2Controller.Shelve}" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" rendered="#{sharedAssetRequestV2Controller.dialogTitle==2}" />
 						<p:commandButton value="#{msg.Return}" oncomplete="PF('rejectApplyDialog').hide()"  icon="ui-icon-arrow-back"/>
 					</h:panelGroup>
 				</p:panelGrid>
