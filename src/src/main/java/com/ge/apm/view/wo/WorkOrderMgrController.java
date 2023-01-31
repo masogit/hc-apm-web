@@ -1170,8 +1170,10 @@ public void test1(){
         List<SearchFilter> filters = new ArrayList<>();
 
         List<Integer> assetIds = serviceRequestApiService.getVisableMvsAssetSystemId(UserContextService.getAccessToken());
-        if (!CollectionUtils.isEmpty(assetIds)) {
-            filters.add(new SearchFilter("assetId",SearchFilter.Operator.IN,assetIds));
+        if (CollectionUtils.isEmpty(assetIds)) {
+            assetIds = new ArrayList<>();
+            assetIds.add(0);
+            filters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, assetIds));
         }
         if (!CollectionUtils.isEmpty(clinicalDeptOrgUidSetMVS)) {
             filters.add(new SearchFilter("serviceRequest.fromDeptUID",SearchFilter.Operator.IN, clinicalDeptOrgUidSetMVS));
@@ -1180,7 +1182,7 @@ public void test1(){
             filters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
         }
         for (SearchFilter searchFilter :searchFilters) {
-            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
+            if ("siteUID,status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
@@ -3711,7 +3713,7 @@ public void test1(){
             if (!CollectionUtils.isEmpty(bySearchFilterMVS)) {
                 orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
             }
-            if (!CollectionUtils.isEmpty(orgList)) {
+            if (!CollectionUtils.isEmpty(orgListMVS)) {
                 orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
             }
         }
