@@ -94,4 +94,10 @@ public class SimplePartsItemService {
         return null;
     }
 
+    public List<SimplePartsItem> findAllByName(String name) {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        List<SimplePartsItem> partsItems = partsItemRepository.findByTenantUidAndName(userAccount.getTenantUID(), name);
+        return partsItems;
+    }
+
 }

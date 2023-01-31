@@ -2,7 +2,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
     <ui:define name="head">
         <h:outputStylesheet name="css/inspection.css"/>
@@ -135,8 +135,8 @@
                 <h:panelGroup id="display">
                     <br/>
                     <p:commandButton id="confirmBtn" validateClient="true" disabled="#{sharedAssetRequestV2Controller.validateAllExpectedQty()}" actionListener="#{sharedAssetRequestV2Controller.Accept}" update="IouEditForm" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="确认受理" icon="ui-icon-check" />
-                    <p:commandButton id="refuseBtn" validateClient="true"   update="IouEditForm" oncomplete="PF('rejectApplyDialog').show()" value="拒绝申请" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.Shelve}" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
+                    <p:commandButton id="refuseBtn" validateClient="true" action="#{sharedAssetRequestV2Controller.editDialogTitle(1)}"  update="rejectApplyDialog" oncomplete="PF('rejectApplyDialog').show()" value="拒绝申请" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
+                    <p:commandButton validateClient="true" action="#{sharedAssetRequestV2Controller.editDialogTitle(2)}" update="rejectApplyDialog" oncomplete="PF('rejectApplyDialog').show()" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1}"/>
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
                     <p:commandButton value="#{msg.transfer}" actionListener="#{sharedAssetRequestV2Controller.prepareTransferRequest()}" oncomplete="PF('transferOrderDialog').show()" rendered="true"/>
                     <script>
@@ -191,10 +191,10 @@
                         </h:panelGroup>
                     </h:form>
                 </p:dialog>
-                
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
                 <ui:include src="RejectApply.xhtml"/>
          </div>
+
         </div> 
     </ui:define>  
 </ui:composition>
