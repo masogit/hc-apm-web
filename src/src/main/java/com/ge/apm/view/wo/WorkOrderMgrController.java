@@ -1174,6 +1174,8 @@ public void test1(){
             assetIds = new ArrayList<>();
             assetIds.add(0);
             filters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, assetIds));
+        } else {
+            filters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, assetIds));
         }
         if (!CollectionUtils.isEmpty(clinicalDeptOrgUidSetMVS)) {
             filters.add(new SearchFilter("serviceRequest.fromDeptUID",SearchFilter.Operator.IN, clinicalDeptOrgUidSetMVS));
@@ -1182,7 +1184,7 @@ public void test1(){
             filters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
         }
         for (SearchFilter searchFilter :searchFilters) {
-            if ("siteUID,status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
+            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
