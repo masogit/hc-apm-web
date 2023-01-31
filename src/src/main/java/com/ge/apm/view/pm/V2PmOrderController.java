@@ -785,6 +785,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<SimplePartsItem> partsItemList = partsItemService.findAll();
         return partsItemList;
     }
+
+    public List<SimplePartsItem> autosparePartNameForPm(String name) {
+        List<SimplePartsItem> all = partsInventoryService.findAllByName(name);
+        return all;
+    }
+    public List<SimplePartsItem> initSparePartsMasterForPm(String name) {
+        List<SimplePartsItem> partsItemList = partsItemService.findAllByName(name);
+        return partsItemList;
+    }
+
     public void onSparePartsMasterValueChange(SelectEvent event) {
         SimplePartsItem partsItem = (SimplePartsItem) event.getObject();
         if (partsItem == null) return;
