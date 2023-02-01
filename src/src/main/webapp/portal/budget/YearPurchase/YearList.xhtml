@@ -1,0 +1,130 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.YearPurchase}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <p:dataTable style="margin-top: 20px;"  id="datalist" value="#{yearPurchaseInfoController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}" selection="#{yearPurchaseInfoController.selected}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                 rows="5" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="5,20,100,200">
+                        <p:ajax event="filter" listener="#{yearPurchaseInfoController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                        <p:column width="36"  id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{yearPurchaseInfoController.selectedMap[item.uid]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{yearPurchaseInfoController.onSelectAllOfPage}" update="@(.selectCheckBox) :searchForm:datalist" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="操作">
+                            <p:link target="_new" title="#{msg.Edit}" outcome="#{yearPurchaseInfoController.getEditPage(item.uid)}" >
+                                <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                            </p:link>
+                            <p:commandLink id="deleteButton" title="#{msg.Delete}"  actionListener="#{yearPurchaseInfoController.delete(item)}" update="datalist">
+                                <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandLink>
+                        </p:column>
+                        <p:column  headerText="#{msg.PurchaseYear}" >
+                            <h:outputText value="#{item.purchaseYear}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.clinicalDeptName}" >
+                            <h:outputText value="#{item.applicationDept.name}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" >
+                            <h:outputText value="#{item.assetName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.FunctionType}" >
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.quantity}" >
+                            <h:outputText value="#{item.quantity}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.BudgetAmount}" >
+                            <h:outputText value="#{item.budgetAmount}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ApplicationStatus}">
+                            <h:outputText value="#{fieldMsg.fieldValue('budgetApplicationStatus', item.applicationStatus)}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('YearCreate.xhtml?actionName=Create')}"  />
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{yearPurchaseInfoController.exportExcel}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                <p:fileDownload value="#{yearPurchaseInfoController.zipFile}" />
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                    <p:remoteCommand name="rc" update=":searchForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
+                </h:form>
+            </div>
+        </div>
+        <script>
+
+            function afterLoadRender(){
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            }
+
+            $(function () {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            });
+
+            //<![CDATA[
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+                var isActive = "#{userContextService.isActive()}";
+                if (isActive == '1') {
+                    PF('ActiveDlg').show();
+                }
+            }
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>

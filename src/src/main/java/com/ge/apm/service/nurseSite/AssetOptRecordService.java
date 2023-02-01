@@ -1,14 +1,19 @@
 package com.ge.apm.service.nurseSite;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.toolkit.CollectionUtils;
+import com.ge.apm.service.nurseSite.export.AssetOptRecordExport;
+import com.ge.apm.service.nurseSite.export.AssetOptRecordExportUtil;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +29,8 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ibm.icu.util.Calendar;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 
 
 @Service
@@ -172,6 +179,128 @@ public class AssetOptRecordService {
 			}
 		}
 	}
-	
-	
+	public List<AssetOptRecord> getAssetOptRecordList(String assetUid){
+		if(StringUtils.isEmpty(assetUid)) return null;
+		List<AssetOptRecord> assetOptRecordListLimit5 = assetOptRecordRepository.getAssetOptRecordListLimit5(assetUid);
+		assetOptRecordListLimit5.forEach(item->{
+			if(item.getEndDate() != null){
+				item.setCostTime(generateCostTime(item.getStartDate(),item.getEndDate()));
+			}
+			UserAccount createBy=null ;
+			if((createBy=item.getCreateBy()) != null){
+				item.setCreateByName(createBy.getName());
+			}else{
+				String createByUid = item.getCreateByUid();
+				if(StringUtils.isNotEmpty(createByUid)){
+					createBy= userAccountRepository.getByUid(createByUid);
+					item.setCreateByName(createBy.getName());
+				}
+			}
+			UserAccount modifyBy=null ;
+			if((modifyBy=item.getModifyBy()) != null){
+				item.setModifyByName(modifyBy.getName());
+			}else{
+				String modifyByUid = item.getModifyByUid();
+				if(StringUtils.isNotEmpty(modifyByUid)){
+					modifyBy= userAccountRepository.getByUid(modifyByUid);
+					item.setModifyByName(modifyBy.getName());
+				}
+			}
+
+		});
+		return assetOptRecordListLimit5;
+	}
+	public static String[] basicInfo={"院区","科室","设备名称","设备编号","序列号","型号"};
+	public StreamedContent exportAllWoByAssetInfoId(AssetInfo assetInfo, Date startDate, Date endDate){
+		InputStream inputStream =null;
+		try {
+			List<AssetOptRecord> bySearchFilter = assetOptRecordRepository.getAseetOptRecordListByDate(assetInfo.getUid(),startDate,endDate);
+			List<AssetOptRecordExport> collect =null;
+			if(CollectionUtils.isNotEmpty(bySearchFilter)){
+					collect = bySearchFilter.stream().map(item -> {
+					AssetOptRecordExport export = new AssetOptRecordExport();
+					BeanUtils.copyProperties(item, export);
+						String createByUid = export.getCreateByUid();
+						if(StringUtils.isNotEmpty(createByUid)){
+						UserAccount byUid = userAccountRepository.getByUid(createByUid);
+						if(byUid != null){
+							export.setCreateByUid(byUid.getName());
+						}
+					}
+					String modifyByUid = export.getModifyByUid();
+					if(StringUtils.isNotEmpty(modifyByUid) && item.getEndDate() != null){
+						UserAccount byUid = userAccountRepository.getByUid(modifyByUid);
+						if(byUid != null){
+							export.setModifyByUid(byUid.getName());
+						}
+					}else{
+						export.setModifyByUid("");
+					}
+					if(item.getStartDate() != null && item.getEndDate()!= null){
+						export.setCostTime(generateCostTime(item.getStartDate(),item.getEndDate()));
+					}else{
+						export.setCostTime("");
+					}
+					return export;
+				}).collect(Collectors.toList());
+			}
+			List<Map<String, String>> maps = setAssetBasicInfo(assetInfo);
+			inputStream = AssetOptRecordExportUtil.export(maps,collect);
+			return new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "AssetOptRecordData.xlsx");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(inputStream != null){
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return null;
+	}
+	private List<Map<String,String>> setAssetBasicInfo(AssetInfo assetInfo){
+		List<Map<String,String>> result=new ArrayList<>();
+		for (int i = 0; i < basicInfo.length; i++) {
+			Map<String,String> map=new HashMap<>();
+			map.put("key",basicInfo[i]);
+			switch (basicInfo[i]){
+				case "院区":
+					OrgInfo siteOrg = assetInfo.getSiteOrg();
+					if(siteOrg != null){
+						map.put("value",siteOrg.getName());
+					}else{
+						OrgInfo byUid = orgInfoRepository.findByUid(assetInfo.getSiteUID());
+						if(byUid != null){
+							map.put("value",byUid.getName());
+						}else{
+							map.put("value","");
+						}
+					}
+					break;
+				case "科室":
+					map.put("value",assetInfo.getClinicalDeptName());
+					break;
+				case "设备名称":
+					map.put("value",assetInfo.getName());
+					break;
+				case "设备编号":
+					map.put("value",assetInfo.getDepartNum());
+					break;
+				case "序列号":
+					map.put("value",assetInfo.getSerialNum());
+					break;
+				case "型号":
+					map.put("value",assetInfo.getFunctionType());
+					break;
+				default:
+					map.put("value","");
+					break;
+			}
+			result.add(map);
+		}
+		return result;
+	}
 }

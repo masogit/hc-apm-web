@@ -99,14 +99,23 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
                         </p:column>
+                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.siteUidFilterMVS}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{v2PmOrderController.LoadSiteNameListMVS()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
+                </p:column>
                         <!--所属科室-->
                         <p:column headerText="#{msg.clinicalDeptName}"  width="100">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                                <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgName}" appendTo="@(Body)"
-                                                scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderController.autoCompleteDeptName}" size="5">
-                                    <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmMvsListForm:datalist"/>
-                                    <p:ajax listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmMvsListForm:datalist"/>
+                                <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgNameMVS}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderController.autoCompleteDeptNameMVS}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChangeMVS}" process="@this"  update="pmTab:pmMvsListForm:datalist"/>
+                                    <p:ajax listener="#{v2PmOrderController.onClinicalDeptNameFilterChangeMVS}" process="@this"  update="pmTab:pmMvsListForm:datalist"/>
                                 </p:autoComplete>
                             </f:facet>
                             <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
@@ -439,7 +448,8 @@
                     <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%" >
-                            <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+<!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
                             <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -467,7 +477,8 @@
                     <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%" >
-                            <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+<!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
                             <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentById(fileitem.id)}" update="pictureListBatch" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>

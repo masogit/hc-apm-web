@@ -71,6 +71,8 @@ public class V2_WorkOrderService {
     private UserCommonService ucService;
     @Autowired
     private ServiceRequestMsgRepository msgDao;
+    @Autowired
+    private WorkOrderManHoursDetailRepository workOrderManHoursDetailRepository;
 
     public V2_WorkOrder getWorkOrderById(String woId) {
         return woDao.findById(woId);
@@ -246,6 +248,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setDesc(reason);
         formData.setAssetStatus(String.valueOf(status));
+        formData.setRepairType(tmpwo.getRepairType());
         String res = srApi.invokeWorkOrderAction(token, formData, "ackFailed", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Acknowledge")));
@@ -304,6 +307,30 @@ public class V2_WorkOrderService {
         }
         selectedWorkOrder.setCurrentStepId(4);
     }
+    public void confirmSend(V2_WorkOrder selectedWorkOrder) {
+        //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+        //   selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String res = srApi.invokeWorkOrderAction(token, formData, "confirmSend", selectedWorkOrder.getId());
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "送修"));
+        }
+        selectedWorkOrder.setCurrentStepId(4);
+    }
+    public void confirmReturn(V2_WorkOrder selectedWorkOrder) {
+        //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+        //   selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String res = srApi.invokeWorkOrderAction(token, formData, "confirmReturn", selectedWorkOrder.getId());
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "返还"));
+        }
+        selectedWorkOrder.setCurrentStepId(4);
+    }
 
     public void takeWorkOrder(V2_WorkOrder selectedWorkOrder, Date takeTime, String taker) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
@@ -344,6 +371,7 @@ public class V2_WorkOrderService {
         approvedDetails.stream().forEach(item -> item.setCreatedDate(null));
         formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
+        formData.setSignature(selectedWorkOrder.getPartApproveSignature());
 
         String approvalType = "approvalReject";
         if (approvedDetails.stream().anyMatch(item -> item.getApproved())) {
@@ -394,6 +422,11 @@ public class V2_WorkOrderService {
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
         formData.setPatTests(selectedWorkOrder.getPatTests());
+        formData.setEntryType(selectedWorkOrder.getEntryType());
+
+        if(selectedWorkOrder.getEntryType() == 1){
+            formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
+        }
         if (null != confirmedUpTime) {
             formData.setConfirmedUpTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(confirmedUpTime));
         }
@@ -426,7 +459,7 @@ public class V2_WorkOrderService {
         selectedWorkOrder.setCurrentStepName("维修中");
         formData.setDesc(comments);
         formData.setRepairResult(selectedWorkOrder.getRepairResult());
-
+        formData.setRepairType(selectedWorkOrder.getRepairType());
         if(selectedWorkOrder.getStatusCloseTime()!=null) {
             formData.setStatusCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusCloseTime()));
         }
@@ -449,6 +482,10 @@ public class V2_WorkOrderService {
         formData.setExternalExpense(selectedWorkOrder.getExternalExpense());
         formData.setAttachments(attachments);
         formData.setAssigneeId(assignId);
+        formData.setEntryType(selectedWorkOrder.getEntryType());
+        if(selectedWorkOrder.getEntryType() == 1){
+            formData.setWorkHoursList(selectedWorkOrder.getWorkHoursList());
+        }
         String res = srApi.invokeWorkOrderAction(token, formData, "repair", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "完成"));
@@ -612,6 +649,7 @@ public class V2_WorkOrderService {
         formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
         formData.setAssigneeId(approverUid);
+        formData.setSignature(selectedWorkOrder.getPartApproveSignature());
         String approvalType = "approval";
         String res = srApi.invokeWorkOrderAction(token, formData, approvalType, selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
@@ -621,4 +659,15 @@ public class V2_WorkOrderService {
         }
     }
 
-}
+    public List<V2_WorkOrderManHoursDetail> getWorkOrderManHoursDetail(String woId) {
+        return workOrderManHoursDetailRepository.findByWoId(woId);
+    }
+
+    public List<Map<String, String>> getUserSignature() {
+        return srApi.getUserSignature();
+    }
+    public String addUserSignature(String signatureId) {
+        return srApi.addUserSignature(signatureId);
+    }
+
+    }

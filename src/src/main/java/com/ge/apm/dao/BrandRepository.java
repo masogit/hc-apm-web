@@ -11,4 +11,6 @@ public interface BrandRepository extends GenericRepository<Brand> {
 
     @Query(value = "select id from brand where name like ?1",nativeQuery = true)
     public List<Integer> findIdsNameLike(String name);
+    @Query(value = "select * from brand ",nativeQuery = true)
+    public List<Brand> findByBrandList();
 }

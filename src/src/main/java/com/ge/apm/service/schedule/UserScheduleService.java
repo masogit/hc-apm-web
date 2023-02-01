@@ -1,14 +1,14 @@
 package com.ge.apm.service.schedule;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.UserScheduleRepository;
 import com.ge.apm.dao.UserScheduleStageConfigRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserSchedule;
-import com.ge.apm.domain.UserScheduleStageConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +47,8 @@ public class UserScheduleService {
     public final static String SCHEDULE_TYPE_VACATION = "V";
     //排班
     public final static String SCHEDULE_TYPE_WORK = "W";
+    // 调剂排班
+    public final static String SCHEDULE_TYPE_ADJUST = "A";
 
     public final static String SCHEDULE_STAGE_ALL="ALL"; //全天
     public final static String SCHEDULE_STAGE_AM="AM";   //白班
@@ -58,6 +60,19 @@ public class UserScheduleService {
     public final static String BATCH_SUCCESS_LIST="SuccessList";   //批量创建成功LIST
     public final static String BATCH_FAILED_LIST="FailedList";   //批量创建失败LIST
 
+    private final static List<UserScheduleStageConfig> DEFAULT_USER_SCHEDULE_STAGE_CONFIG=new ArrayList<>();
+    static {
+        DEFAULT_USER_SCHEDULE_STAGE_CONFIG.add(initConfig("08:00:00","08:00:00",SCHEDULE_STAGE_ALL));
+        DEFAULT_USER_SCHEDULE_STAGE_CONFIG.add(initConfig("12:00:00","13:30:00",SCHEDULE_STAGE_AM));
+        DEFAULT_USER_SCHEDULE_STAGE_CONFIG.add(initConfig("17:00:00","08:00:00",SCHEDULE_STAGE_PM));
+    }
+    private static UserScheduleStageConfig initConfig(String startTime,String endTime,String scheduleDateStage){
+        UserScheduleStageConfig userScheduleStageConfig = new UserScheduleStageConfig();
+        userScheduleStageConfig.setStartTime(startTime);
+        userScheduleStageConfig.setEndTime(endTime);
+        userScheduleStageConfig.setScheduleDateStage(scheduleDateStage);
+        return userScheduleStageConfig;
+    }
     public void saveWork(List<UserAccount> userAccountList, Date startDate, Date endDate, UserSchedule userSchedule, boolean isBatch){
 
         Instant startDateInstant = startDate.toInstant();
@@ -219,8 +234,105 @@ public class UserScheduleService {
         resultMap.put(BATCH_FAILED_LIST, failedList);
         return resultMap;
     }
+    @Transactional
+    public Map<String, List<UserSchedule>> batchSaveWorkSchedule(List<UserAccount> userAccountList, Date startDate, Date endDate, String[] batchType, OrgInfo selectSite, UserSchedule.Type type, List<Integer> selectedOptions2) {
+        Map<String, List<UserSchedule>> resultMap = new HashedMap();
+        List<UserSchedule> successList = new ArrayList<>();//创建成功排班记录
+        List<UserSchedule> failedList = new ArrayList<>();//没有创建成功排班记录
+        Instant startDateInstant = startDate.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDateInstant, zone);
+        LocalDate startLocalDate = startLocalDateTime.toLocalDate();
 
-    //创建排班记录
+        Instant endDateInstant = endDate.toInstant();
+        LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(endDateInstant, zone);
+        LocalDate endLocalDate = endLocalDateTime.toLocalDate();
+
+        long daysDiff = ChronoUnit.DAYS.between(startLocalDate, endLocalDate) + 1;
+        LocalDate scheduleDate;
+        Instant scheduleDateInstant;
+        for(int i = 0 ; i < daysDiff ; i++) {
+            scheduleDateInstant = startLocalDate.plus(i, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant();
+            scheduleDate = startLocalDate.plus(i, ChronoUnit.DAYS).atStartOfDay().toLocalDate();
+            int dayOfWeek = scheduleDate.get(ChronoField.DAY_OF_WEEK);
+            if(selectedOptions2.contains(dayOfWeek)){
+                // 删除已经有的排班
+                if(!UserSchedule.Type.A.equals(type)){
+                    userScheduleDao.deleteByTypeAndScheduleDateAndSiteUID(type.name(), Date.from(scheduleDateInstant), selectSite.getSiteUID());
+                }
+                for (UserAccount ua : userAccountList) {
+                    String[] types=batchType;
+                    if(UserSchedule.Type.A.equals(type)){
+                        types=changeType(types,scheduleDateInstant,ua);
+                    }
+                    createUserWorkSchedule(scheduleDateInstant,types,successList,failedList,selectSite,ua,type);
+                }
+            }
+        }
+        if(CollectionUtils.isNotEmpty(successList)){
+            userScheduleDao.save(successList);
+        }
+        resultMap.put(BATCH_SUCCESS_LIST, successList);
+        resultMap.put(BATCH_FAILED_LIST, failedList);
+        return resultMap;
+    }
+    private String[] changeType(String[] types,Instant scheduleDateInstant,UserAccount ua){
+        List<UserSchedule> byTypeAndUserUIDAndScheduleDate = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(UserSchedule.Type.A.name(), ua.getUid(), Date.from(scheduleDateInstant));
+        if(CollectionUtils.isNotEmpty(byTypeAndUserUIDAndScheduleDate)){
+            List<String> collect = byTypeAndUserUIDAndScheduleDate.stream().filter(item -> !StringUtils.isEmpty(item.getScheduleDateStage())).map(UserSchedule::getScheduleDateStage).collect(Collectors.toList());
+            List<String> typeList = Arrays.asList(types).stream().filter(item -> !collect.contains(item)).collect(Collectors.toList());
+            return typeList.toArray(new String[typeList.size()]);
+        }
+        return types;
+    }
+    private void createUserWorkSchedule(Instant scheduleDateInstant, String[] batchType, List<UserSchedule> successList, List<UserSchedule> failedList, OrgInfo selectSite, UserAccount ua, UserSchedule.Type type){
+        List<UserSchedule> byTypeAndUserUIDAndScheduleDate = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(type.name(), ua.getUid(), Date.from(scheduleDateInstant));
+        Map<String, UserSchedule> collect = byTypeAndUserUIDAndScheduleDate.stream().collect(Collectors.toMap(item -> item.getScheduleDateStage(), item -> item));
+        for (int j=0;j<batchType.length;j++) {
+            if (SCHEDULE_STAGE_AM.equals(batchType[j])) {
+                if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.AM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
+                    if(!collect.containsKey(SCHEDULE_STAGE_AM)){
+                        successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    }
+                } else {
+                    failedList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.AM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                }
+            } else if (SCHEDULE_STAGE_PM.equals(batchType[j])) {
+                if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.PM.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty() ) {
+                    if(!collect.containsKey(SCHEDULE_STAGE_PM)){
+                        successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    }
+                } else {
+                    failedList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.PM.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                }
+            } else if (SCHEDULE_STAGE_ALL.equals(batchType[j])) {
+                if (this.getUserVacationList(Date.from(scheduleDateInstant), ua.getUid(), UserSchedule.ScheduleDateStage.ALL.name(), UserSchedule.AuditStatus.Approved.name()).isEmpty()) {
+                    if(!collect.containsKey(SCHEDULE_STAGE_ALL)){
+                        successList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                    }
+                } else {
+                    failedList.add(this.createWorkSchedule(selectSite, ua, UserSchedule.ScheduleDateStage.ALL.name(), Date.from(scheduleDateInstant), Boolean.FALSE, type));
+                }
+            }
+        }
+    }
+    private UserSchedule createWorkSchedule(OrgInfo selectSite, UserAccount scheduleUserAccount, String scheduleDateStage, Date scheduleDate, boolean isSave,UserSchedule.Type type) {
+        UserSchedule userSchedule = new UserSchedule();
+        userSchedule.setTenantUID(selectSite.getTenantUID());
+        userSchedule.setInstitutionUID(selectSite.getInstitutionUID());
+        userSchedule.setHospitalUID(selectSite.getHospitalUID());
+        userSchedule.setSiteUID(selectSite.getSiteUID());
+        userSchedule.setType(type.name());
+        userSchedule.setUserUID(scheduleUserAccount.getUid());
+        userSchedule.setScheduleDate(scheduleDate);
+        userSchedule.setUserAccount(scheduleUserAccount);
+        userSchedule.setScheduleDateStage(scheduleDateStage);
+        if (isSave) {
+            userScheduleDao.save(userSchedule);
+        }
+        return userSchedule;
+    }
+        //创建排班记录
     private UserSchedule createWorkSchedule(UserAccount loginUserAccount, UserAccount scheduleUserAccount, String scheduleDateStage, Date scheduleDate, boolean isSave){
         UserSchedule userSchedule = new UserSchedule();
         userSchedule.setTenantUID(loginUserAccount.getTenantUID());
@@ -238,38 +350,48 @@ public class UserScheduleService {
         return userSchedule;
     }
 
-    public void saveScheduleStageConfig(Date startTime_all, Date endTime_all, Date startTime_am, Date endTime_am, Date startTime_pm, Date endTime_pm, UserAccount userAccount){
+    public void saveScheduleStageConfig(Date startTime_all, Date endTime_all, Date startTime_am, Date endTime_am, Date startTime_pm, Date endTime_pm, OrgInfo selectSite, UserSchedule.Type type){
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+        List<SearchFilter> searchFilters=new ArrayList<>();
         for(int i = 0 ; i < 3 ; i++){
             UserScheduleStageConfig ussc = new UserScheduleStageConfig();
-            ussc.setTenantUID(userAccount.getTenantUID());
-            ussc.setInstitutionUID(userAccount.getInstitutionUID());
-            ussc.setHospitalUID(userAccount.getHospitalUID());
-            ussc.setSiteUID(userAccount.getSiteUID());
+            ussc.setTenantUID(selectSite.getTenantUID());
+            ussc.setInstitutionUID(selectSite.getInstitutionUID());
+            ussc.setHospitalUID(selectSite.getHospitalUID());
+            ussc.setSiteUID(selectSite.getSiteUID());
+            ussc.setType(type.name());
             if(i == 0){
                 ussc.setScheduleDateStage(UserScheduleService.SCHEDULE_STAGE_ALL);
-                List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findByScheduleDateStageAndSiteUID(UserScheduleService.SCHEDULE_STAGE_ALL, userAccount.getSiteUID());
+                buildSearchFilter(type,searchFilters,selectSite.getSiteUID(),UserScheduleService.SCHEDULE_STAGE_ALL);
+//                List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findByScheduleDateStageAndSiteUID(UserScheduleService.SCHEDULE_STAGE_ALL, userAccount.getSiteUID());
+                List<UserScheduleStageConfig> usscList= userScheduleStageConfigDao.findBySearchFilter(searchFilters);
                 if(!usscList.isEmpty()){
                     ussc = usscList.get(0);
                 }
+                ussc.setType(type.name());
                 ussc.setStartTime(sdf.format(startTime_all).split(" ")[1]);
                 ussc.setEndTime(sdf.format(endTime_all).split(" ")[1]);
             }else if(i == 1){
                 ussc.setScheduleDateStage(UserScheduleService.SCHEDULE_STAGE_AM);
-                List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findByScheduleDateStageAndSiteUID(UserScheduleService.SCHEDULE_STAGE_AM, userAccount.getSiteUID());
+                buildSearchFilter(type,searchFilters,selectSite.getSiteUID(),UserScheduleService.SCHEDULE_STAGE_AM);
+//                List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findByScheduleDateStageAndSiteUID(UserScheduleService.SCHEDULE_STAGE_AM, userAccount.getSiteUID());
+                List<UserScheduleStageConfig> usscList= userScheduleStageConfigDao.findBySearchFilter(searchFilters);
                 if(!usscList.isEmpty()){
                     ussc = usscList.get(0);
                 }
+                ussc.setType(type.name());
                 ussc.setStartTime(sdf.format(startTime_am).split(" ")[1]);
                 ussc.setEndTime(sdf.format(endTime_am).split(" ")[1]);
             }else if(i == 2){
                 ussc.setScheduleDateStage(UserScheduleService.SCHEDULE_STAGE_PM);
-                List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findByScheduleDateStageAndSiteUID(UserScheduleService.SCHEDULE_STAGE_PM, userAccount.getSiteUID());
+                buildSearchFilter(type,searchFilters,selectSite.getSiteUID(),UserScheduleService.SCHEDULE_STAGE_PM);
+//                List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findByScheduleDateStageAndSiteUID(UserScheduleService.SCHEDULE_STAGE_PM, userAccount.getSiteUID());
+                List<UserScheduleStageConfig> usscList= userScheduleStageConfigDao.findBySearchFilter(searchFilters);
                 if(!usscList.isEmpty()){
                     ussc = usscList.get(0);
                 }
+                ussc.setType(type.name());
                 ussc.setStartTime(sdf.format(startTime_pm).split(" ")[1]);
                 ussc.setEndTime(sdf.format(endTime_pm).split(" ")[1]);
             }
@@ -278,14 +400,33 @@ public class UserScheduleService {
         }
 
     }
-
-    public Map<String,UserScheduleStageConfig> loadScheduleStageConfig(UserAccount ua){
+    private List<SearchFilter> buildSearchFilter(UserSchedule.Type type, List<SearchFilter> searchFilters, String siteUID, String scheduleStage){
+        searchFilters.clear();
+        searchFilters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, siteUID,"1*"));
+        searchFilters.add(new SearchFilter("scheduleDateStage",SearchFilter.Operator.EQ, scheduleStage,"1*"));
+        if(UserSchedule.Type.W == type){
+            searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ,type.name(),"1*2+"));
+            searchFilters.add(new SearchFilter("type", SearchFilter.Operator.IsNull,null,"1*2+"));
+        }else{
+            searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ,type.name(),"1*"));
+        }
+        return searchFilters;
+    }
+    public Map<String,UserScheduleStageConfig> loadScheduleStageConfig(UserAccount ua, UserSchedule.Type type, OrgInfo selectSite){
         Map<String,UserScheduleStageConfig> scheduleStageConfigMap = new HashedMap();
         scheduleStageConfigMap.put(SCHEDULE_STAGE_ALL, null);
         scheduleStageConfigMap.put(SCHEDULE_STAGE_AM, null);
         scheduleStageConfigMap.put(SCHEDULE_STAGE_PM, null);
-
-        List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findBySiteUID(ua.getSiteUID());
+        //List<UserScheduleStageConfig> usscList = userScheduleStageConfigDao.findBySiteUID(ua.getSiteUID());
+        List<SearchFilter> searchFilters=new ArrayList<>();
+        searchFilters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, selectSite.getUid(),"1*"));
+        if(UserSchedule.Type.W == type){
+            searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ,type.name(),"1*2+"));
+            searchFilters.add(new SearchFilter("type", SearchFilter.Operator.IsNull,null,"1*2+"));
+        }else{
+            searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ,type.name(),"1*"));
+        }
+        List<UserScheduleStageConfig> usscList =userScheduleStageConfigDao.findBySearchFilter(searchFilters);
 
         for (UserScheduleStageConfig ussc : usscList) {
             if(SCHEDULE_STAGE_ALL.equals(ussc.getScheduleDateStage())){
@@ -410,6 +551,107 @@ public class UserScheduleService {
         }
 
         return tempUserScheduleList;
+    }
+
+    public void batchDeleteWorkSchedule(List<UserAccount> selectedUserList, Date startBatchDate, Date endBatchDate, OrgInfo selectSite, UserSchedule.Type type,List<String> scheduleDateStage) {
+        List<String> collect = selectedUserList.stream().map(UserAccount::getUid).collect(Collectors.toList());
+        Date date = deleteOneDay(collect, startBatchDate, selectSite, type);
+        if(date.compareTo(endBatchDate) != 1){
+            userScheduleDao.batchDeleteWorkSchedule(collect,date,endBatchDate,type.name(),scheduleDateStage,selectSite.getUid());
+        }
+    }
+    private Date deleteOneDay(List<String> userUidCollect,Date startBatchDate, OrgInfo selectSite,UserSchedule.Type type){
+        LocalDate localDate = startBatchDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        if(LocalDate.now().compareTo(localDate) == 0){
+            LocalDate nowDate = LocalDate.now();
+            LocalDateTime nowDateTime=LocalDateTime.now();
+            List<UserScheduleStageConfig> bySiteUID ;
+            if(UserSchedule.Type.W.equals(type)){
+                bySiteUID=userScheduleStageConfigDao.findBySiteUIDAndTypeW(selectSite.getSiteUID(),type.name());
+            }else{
+                bySiteUID=userScheduleStageConfigDao.findBySiteUIDAndTypeA(selectSite.getSiteUID(),type.name());
+            }
+            if(CollectionUtils.isEmpty(bySiteUID)) bySiteUID=DEFAULT_USER_SCHEDULE_STAGE_CONFIG;
+            List<String> scheduleDateStage = bySiteUID.stream()
+                    .filter(item -> {
+                        if(StringUtils.isBlank(item.getStartTime()) ) return true;
+                        if(StringUtils.isBlank(item.getEndTime()) ) return true;
+                        LocalTime startTime=LocalTime.parse(item.getStartTime());
+                        LocalTime endTime=LocalTime.parse(item.getEndTime());
+                        int startHour = startTime.getHour();
+                        int endHour = endTime.getHour();
+                        LocalDateTime startDateTime = LocalDateTime.of(nowDate, startTime);
+                        LocalDateTime endDateTime = LocalDateTime.of(nowDate, endTime);
+                        if(startHour >= endHour){
+                            endDateTime=endDateTime.plus(1,ChronoUnit.DAYS);
+                        }
+                        return nowDateTime.isBefore(startDateTime) && nowDateTime.isBefore(endDateTime);
+                    })
+                    .map(item -> item.getScheduleDateStage())
+                    .collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(scheduleDateStage)){
+                userScheduleDao.batchDeleteWorkSchedule(userUidCollect,startBatchDate,startBatchDate,type.name(),scheduleDateStage,selectSite.getUid());
+            }
+            LocalDate plus = localDate.plus(1, ChronoUnit.DAYS);
+            return  Date.from(plus.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+
+        }
+        return startBatchDate;
+    }
+
+    public boolean isValidateWorkScheduleAndUser(Date scheduleDate, String scheduleDateStage, UserAccount currentUser, String userUID,UserSchedule.Type type) {
+            if(StringUtils.isBlank(scheduleDateStage) || StringUtils.isBlank(userUID))return true;
+            List<UserSchedule> userSchedule=userScheduleDao.findByTypeAndUserUIDAndScheduleDate(type.name(),userUID,scheduleDate);
+            if(CollectionUtils.isNotEmpty(userSchedule)){
+                return !userSchedule.stream().anyMatch(item -> scheduleDateStage.equals(item.getScheduleDateStage()));
+            }else{
+                return true;
+            }
+    }
+
+    public void existUserWorkList(UserAccount selected,List<String> result,UserSchedule.Type type) {
+        String uid = selected.getUid();
+        String tName = type.name();
+        String siteUID = selected.getSiteUID();
+        LocalDate nowDate = LocalDate.now();
+        LocalDateTime nowDateTime=LocalDateTime.now();
+        Date date = Date.from(nowDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        List<UserSchedule> userScheduleW = userScheduleDao.findByTypeAndUserUIDAndScheduleDate(tName, uid,date);
+        if(CollectionUtils.isNotEmpty(userScheduleW)){
+            List<UserScheduleStageConfig> userScheduleStageConfigW = userScheduleStageConfigDao.findBySiteUIDAndTypeA(siteUID, tName);
+            if(CollectionUtils.isEmpty(userScheduleStageConfigW)) userScheduleStageConfigW=DEFAULT_USER_SCHEDULE_STAGE_CONFIG;
+            List<String> collect = userScheduleStageConfigW.stream().filter(item -> {
+                if (StringUtils.isBlank(item.getStartTime())) return false;
+                if (StringUtils.isBlank(item.getEndTime())) return false;
+                LocalTime startTime = LocalTime.parse(item.getStartTime());
+                LocalTime endTime = LocalTime.parse(item.getEndTime());
+                int startHour = startTime.getHour();
+                int endHour = endTime.getHour();
+                LocalDateTime startDateTime = LocalDateTime.of(nowDate, startTime);
+                LocalDateTime endDateTime = LocalDateTime.of(nowDate, endTime);
+                if (startHour >= endHour) {
+                    endDateTime = endDateTime.plus(1, ChronoUnit.DAYS);
+                }
+                return nowDateTime.isBefore(startDateTime) && nowDateTime.isBefore(endDateTime) || (nowDateTime.isAfter(startDateTime) && nowDateTime.isBefore(endDateTime));
+            }).map(UserScheduleStageConfig::getScheduleDateStage).collect(Collectors.toList());
+            for (UserSchedule userSchedule : userScheduleW) {
+                String scheduleDateStage = userSchedule.getScheduleDateStage();
+                if(collect.contains(scheduleDateStage)){
+                    result.add("该用户有当日排班"+scheduleDateStage+"，不能操作！");
+                    logger.info("该用户正在进行当日排班"+scheduleDateStage+"，不能操作！：{}", JSONObject.toJSONString(userSchedule));
+                    break;
+                 }
+            }
+        }
+        List<SearchFilter> filterFilter=new ArrayList<>();
+        filterFilter.add(new SearchFilter("userUID", SearchFilter.Operator.EQ,uid));
+        filterFilter.add(new SearchFilter("type", SearchFilter.Operator.EQ,tName));
+        filterFilter.add(new SearchFilter("scheduleDate", SearchFilter.Operator.GT,date));
+        List<UserSchedule> bySearchFilter = userScheduleDao.findBySearchFilter(filterFilter);
+        if(CollectionUtils.isNotEmpty(bySearchFilter)){
+            result.add("该用户有未执行的排班，不能操作！");
+            logger.info("该用户正在进行当日排班，不能操作！：{}", JSONObject.toJSONString(bySearchFilter));
+        }
     }
 
 }

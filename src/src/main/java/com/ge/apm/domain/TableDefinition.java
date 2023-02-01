@@ -7,12 +7,7 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
@@ -33,6 +28,9 @@ public class TableDefinition implements Serializable {
     public static final int MEASURE_ORDER_RULE = 2;
     public enum TableDefinitionStatus {
         Draft, Released, Expired
+    }
+    public enum TableTemplateType {
+        Maintain, AssetAchievements
     }
 
     @Id
@@ -93,6 +91,9 @@ public class TableDefinition implements Serializable {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "template_type")
+    private String templateType;
+
     @Column(name = "type")
     private Integer type;//类型 1-保养相关 2-计量相关
 
@@ -107,6 +108,18 @@ public class TableDefinition implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+    /**
+     * 主目录
+     */
+    @Transient
+    private String mainDirectory;
+
+    /**
+     * 子目录
+     */
+    @Transient
+    private String secondDirectory;
 
     public Integer getType() {
         return type;
@@ -252,11 +265,35 @@ public class TableDefinition implements Serializable {
 		this.instrumentKeyValues = instrumentKeyValues;
 	}
 
-	@Override
+    public String getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
+    }
+
+    @Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);
         return hash;
+    }
+
+    public String getMainDirectory() {
+        return mainDirectory;
+    }
+
+    public void setMainDirectory(String mainDirectory) {
+        this.mainDirectory = mainDirectory;
+    }
+
+    public String getSecondDirectory() {
+        return secondDirectory;
+    }
+
+    public void setSecondDirectory(String secondDirectory) {
+        this.secondDirectory = secondDirectory;
     }
 
     @Override

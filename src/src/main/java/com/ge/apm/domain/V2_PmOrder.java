@@ -265,6 +265,9 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Setter
     private String period;
 
+    @Transient
+    private String partApproveSignature;
+
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
         return totalPriceToBigDecimal;
@@ -592,6 +595,7 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     }
 
     public String getQualityChecking() {
+        if(currentStepName!=null && currentStepName.equals("已关单") && qualityChecking == null) qualityChecking = "1"; //已关单的默认是正常
         return qualityChecking;
     }
 
@@ -769,5 +773,13 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setSiteName(String siteName) {
         this.siteName = siteName;
+    }
+
+    public String getPartApproveSignature() {
+        return partApproveSignature;
+    }
+
+    public void setPartApproveSignature(String partApproveSignature) {
+        this.partApproveSignature = partApproveSignature;
     }
 }

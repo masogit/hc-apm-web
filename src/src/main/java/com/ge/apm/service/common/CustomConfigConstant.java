@@ -25,7 +25,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity");
     }
 
     //只读字段
@@ -186,11 +186,15 @@ public class CustomConfigConstant {
         allFields.put("currentId", WebUtil.getMessage("currentId"));
         allFields.put("assetQuality", WebUtil.getMessage("assetQuality"));
         allFields.put("assetDisposalResults", WebUtil.getMessage("assetDisposalResults"));
+        allFields.put("isUseRegistration", WebUtil.getMessage("isUseRegistration"));
+        allFields.put("networkingStatus", WebUtil.getMessage("networkingStatus"));
         allFields.put("systemNum1", WebUtil.getMessage("systemNum1"));
         allFields.put("systemNum2", WebUtil.getMessage("systemNum2"));
         allFields.put("systemNum3", WebUtil.getMessage("systemNum3"));
         allFields.put("systemNum4", WebUtil.getMessage("systemNum4"));
         allFields.put("systemNum5", WebUtil.getMessage("systemNum5"));
+        allFields.put("assetUsedLifecycle", WebUtil.getMessage("assetUsedLifecycle"));
+        allFields.put("assetQuantity", WebUtil.getMessage("assetQuantity"));
         return allFields;
     }
 
@@ -203,7 +207,7 @@ public class CustomConfigConstant {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
                 "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
-                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality");
+                "maitanance", "maitananceTel", "nationalStandardCode","assetQuality","assetUsedLifecycle");
     }
 
     public static List<String> getAssetsDetailpageDetailFields() {
@@ -213,7 +217,7 @@ public class CustomConfigConstant {
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
-                "lastQaDate", "lastMeteringDate", "warranty","createdBy");
+                "lastQaDate", "lastMeteringDate", "warranty","createdBy","assetUsedLifecycle");
     }
 
     public static List<String> getAssetsEditpageBasicFields() {

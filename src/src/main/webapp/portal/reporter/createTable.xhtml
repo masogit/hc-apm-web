@@ -109,7 +109,7 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
-                        <p:tab title="#{msg.ViewExcel}">
+                        <p:tab title="#{msg.ViewExcel}" rendered="#{tableCreateController.isMaintainanceReport()}" >
                             <div class="ui-g-12 card cardTitle">
                                 <p:inputText id="pageTitle3" class="pageTitle" value="#{tableCreateController.table.title}" >
                                     <p:ajax update=":CreateTemplateForm:tabView:pageTitle2 :CreateTemplateForm:tabView:pageTitle1"  listener="#{tableCreateController.onTitleChange}"/>
@@ -118,7 +118,8 @@
                             <h:panelGroup id="importExcel">
                                 <p:commandButton value="#{msg.ImportTemplate}"  process="@this" update="importExcel" oncomplete="PF('uploadDialog').show()" rendered="#{empty tableCreateController.selectedTableDefinition.excelStorageId}" disabled="#{tableCreateController.isReadOnly}"/>
                                 <h:outputText value="#{tableCreateController.uploadedFile.fileName}" />
-                                <p:link href="#{fileDownloadService.getFileUrl(tableCreateController.selectedTableDefinition.excelStorageId)}" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId and empty tableCreateController.uploadedFile}">#{tableCreateController.selectedTableDefinition.name}</p:link>
+                                <p:commandLink value="#{tableCreateController.selectedTableDefinition.name}" ajax="false" actionListener="#{fileDownloadService.downloadFile(tableCreateController.selectedTableDefinition.excelStorageId)}" styleClass="p-mr-2" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId and empty tableCreateController.uploadedFile}"/>
+<!--                                <p:link href="#{fileDownloadService.getFileUrl(tableCreateController.selectedTableDefinition.excelStorageId)}" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId and empty tableCreateController.uploadedFile}">#{tableCreateController.selectedTableDefinition.name}</p:link>-->
                                 <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" process="@this" actionListener="#{tableCreateController.removeExcelTemplate}" update="importExcel :uploadDialogForm preview" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId}" disabled="#{tableCreateController.isReadOnly}"/>
                             </h:panelGroup>
                             <p:fieldset legend="#{msg.preview}" id="preview">
@@ -129,7 +130,7 @@
                                 </p:panel>
                             </p:fieldset>
                         </p:tab>
-                        <p:tab title="#{msg.InstrumentDataImportConfiguration}">
+                        <p:tab title="#{msg.InstrumentDataImportConfiguration}" rendered="#{tableCreateController.isMaintainanceReport()}">
                             <div class="ui-g-12 card">
                             </div>
                             <h:panelGrid columns="6" id="instrumentDataImportConfig">
@@ -187,6 +188,22 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('reportType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>-->
+                        <h:panelGroup>
+                            <label class="label">#{msg.templateType}*</label>
+                            <p:selectOneMenu id="type" value="#{tableCreateController.selectedTableDefinition.templateType}"
+                                             required="true" requiredMessage="#{msg.templateType}#{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <c:forEach var="item" items="#{fieldMsg.getFieldValueList('templateType')}">
+                                    <c:if test="#{(userContextService.versionContains('asset.achievements')) and (item.value eq '设备绩效')}">
+                                        <f:selectItem itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </c:if>
+                                    <c:if test="#{item.value != '设备绩效'}">
+                                        <f:selectItem itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </c:if>
+                                </c:forEach>
+                                <p:ajax event="itemSelect" listener="#{tableCreateController.chengeIsMaintainanceReport}" update="tabView"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
 
                     </p:panelGrid>
                     <h:panelGroup>

@@ -1,11 +1,16 @@
 package com.ge.apm.view.asset;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.pm.RelRuleAssetController;
@@ -55,7 +60,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetCreateService acService;
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
-    private QrCodeService qrCodeService;
     private UaaService uaaService;
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
@@ -63,6 +67,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private TenantOptionConfigRepository tenantOptionConfigRepository;
     private AssetHistoryService assetHistoryService;
     private RelRuleAssetRepository relRuleAssetRepository;
+    private UserRoleRepository userRoleRepository;
+    private CustomRoleRepository customRoleRepository;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -161,7 +167,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         userContextService = WebUtil.getBean(UserContextService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        qrCodeService = WebUtil.getBean(QrCodeService.class);
         acService = WebUtil.getBean(AssetCreateService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
@@ -173,6 +178,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
+        userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
+        customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
@@ -230,6 +237,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters = new ArrayList<SearchFilter>();
         }
         setUserSearchFilters();
+        Integer newLifecyle = null;
+        for(SearchFilter searchFilter : searchFilters) {
+            if("lifecycle".equals(searchFilter.fieldName)) {
+                newLifecyle = Integer.parseInt(searchFilter.value.toString()) * 12;
+            }
+        }
+        if(newLifecyle!=null) {
+            this.updateSearchFilter(new SearchFilter("lifecycle", SearchFilter.Operator.EQ,newLifecyle));
+        }
         selected = null;
             Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
             if (tenantOptionConfigOptional.isPresent() && tenantOptionConfigOptional.get().getOrderByCreateTimeByDefault()) {
@@ -261,8 +277,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
         Page<AssetInfo> res;
         if(createdByBoolean) {
-            List<SearchFilter> searchFiltersList = new ArrayList(searchFilters);
-            searchFiltersList.removeIf(e -> e.fieldName.equals("createdBy"));
+            searchFilters.removeIf(e -> e.fieldName.equals("createdBy"));
             List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
             List<String> loginNamList = new ArrayList<>();
             if(!userAccountList.isEmpty()){
@@ -270,19 +285,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                     loginNamList.add(userAccount.getLoginName());
                 }
             }
-            searchFiltersList.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
-            res = dao.findBySearchFilter(searchFiltersList, pageRequest);
-        }else {
-            res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
         }
+        if (this.hasFilterOnField("assetUsedLifecycle")) {
+            int assetUsedLifecycle = Integer.parseInt(searchFilters.stream().filter(sf -> "assetUsedLifecycle".equals(sf.fieldName)).findFirst().orElse(new SearchFilter("assetUsedLifecycle", SearchFilter.Operator.EQ, 0)).value.toString());
+            DateTime parse = DateUtil.parse(String.valueOf(org.joda.time.LocalDate.now().plusYears(-assetUsedLifecycle)));
+            searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.IsNotNull, null));
+            searchFilters.add(new SearchFilter("lifecycle", SearchFilter.Operator.IsNotNull, null));
+            searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.LTE, new Date(parse.getTime())));
+            this.removeFilterOnField("assetUsedLifecycle");
+        }
+        res = dao.findBySearchFilter(this.searchFilters, pageRequest);
 
         currentPageAssets = res.getContent();
 
         //设置OneQrCodeStatus
-        currentPageAssets.stream().forEach(item -> {
+        currentPageAssets.forEach(item -> {
             if(item.getQrCodeLib()!=null){
                 item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
             }
+            item.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(item.getInstallDate(), item.getLifecycle()));
         });
 
         addMisingClinicalDeptOrg(currentPageAssets);
@@ -983,6 +1005,35 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             return user.getName();
         }
         return null;
+    }
+
+    /**
+     *
+     * @param authKey
+     * @param roleName
+     *        a - create
+     *        d - delete
+     *        m - modify
+     *        s - search
+     *        o - export
+     *        i - import
+     * @return
+     */
+    public boolean hasCustomRole(String authKey, String roleName){
+        List<UserRole> userRoleList = userRoleRepository.findByUserIdAndRoleType(UserContextService.getUserID(), ApmConstant.CUSTOME_ROLE_TYPE);
+        for (UserRole userRole : userRoleList) {
+            String webAuthorities = customRoleRepository.findById(userRole.getRoleId()).getWebAuthorities();
+            if(null != webAuthorities){
+                JSONArray authJSONArr= JSONArray.parseArray(webAuthorities);
+                for (int i = 0; i < authJSONArr.size(); i++) {
+                    JSONObject ob = authJSONArr.getJSONObject(i);
+                    if(authKey.equals(ob.get("k")) && (Boolean) ob.get(roleName)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public OrgInfo getSelectSite() {

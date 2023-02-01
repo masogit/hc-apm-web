@@ -393,6 +393,14 @@
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'networkingStatus')}">
+        <h:panelGroup >
+            <label class="label">#{msg.networkingStatus}</label>
+            <p:selectOneRadio id="networkingStatus"  label="#{msg.networkingStatus}" value="#{assetInfoDetailController.selected.networkingStatus}" disabled="true">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('networkingStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'comments')}">
         <h:panelGroup >
             <label class="label">#{msg.comments}</label>
@@ -564,7 +572,7 @@
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'warrantyMonth')}">
         <h:panelGroup>
             <label class="label">#{msg.warrantyMonth}</label>
-            <p:inputText id="lifecycle" value="#{assetInfoDetailController.selected.warrantyMonth}" readonly="true">
+            <p:inputText id="warrantyMonth" value="#{assetInfoDetailController.selected.warrantyMonth}" readonly="true">
             </p:inputText>
         </h:panelGroup>
     </c:if>
@@ -616,6 +624,15 @@
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'isUseRegistration')}">
+        <h:panelGroup>
+            <label class="label">#{msg.isUseRegistration}</label>
+            <p:selectOneRadio value="#{assetInfoDetailController.selected.isUseRegistration}" disabled="true">
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'isFixed')}">
         <h:panelGroup>
             <label class="label">#{msg.isFixed}</label>
@@ -657,6 +674,18 @@
         <h:panelGroup >
             <label class="label">#{msg.assetQuality}</label>
             <p:inputText id="assetQuality" value="#{fieldMsg.fieldValue('assetQuality', assetInfoDetailController.selected.assetQuality)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetUsedLifecycle')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetUsedLifecycle}</label>
+            <p:inputText id="assetUsedLifecycle" value="#{assetInfoDetailController.selected.assetUsedLifecycle}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetQuantity')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetQuantity}</label>
+            <p:inputText id="assetQuantity" value="#{assetInfoDetailController.selected.assetQuantity}" readonly="true"/>
         </h:panelGroup>
     </c:if>
 </ui:composition>

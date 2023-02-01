@@ -43,7 +43,9 @@ public class UserScheduleStageConfig implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-
+    //计划类型[V：休假，W：维修流程排班,A:调剂排班]
+    @Column(name = "type")
+    private String type;
     public String getId() {
         return id;
     }
@@ -106,5 +108,13 @@ public class UserScheduleStageConfig implements Serializable {
 
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

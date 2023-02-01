@@ -5,16 +5,24 @@
  */
 package com.ge.apm.view;
 
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.AllocateCustomConfigConstant;
+import com.ge.apm.service.sharedasset.SharedAssetReqDetailService;
+import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.component.datatable.DataTable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
@@ -52,12 +60,15 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     SharedAssetTypeRepository sharedAssetTypeRepository = null;
     SharedAssetSwapIndexRepository swapIndexRepository=null;
     private UaaService uuaService;
-
+    private CustomConfigService ccService;
+    @Autowired
+    SharedAssetReqDetailService sharedAssetReqDetailService;
     private Date filterBeginTime;
     private Date filterEndTime;
     private String oneSearchStr;
     private Object clinicalDeptName;
-
+    private List<String> assetAllocateFields;
+    private Boolean whethertoenableunattended;
     public String getOneSearchStr() {
         return oneSearchStr;
     }
@@ -104,8 +115,10 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         sharedAssetTypeRepository = WebUtil.getBean(SharedAssetTypeRepository.class);
+        sharedAssetReqDetailService = WebUtil.getBean(SharedAssetReqDetailService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         swapIndexRepository=WebUtil.getBean(SharedAssetSwapIndexRepository.class);
+        ccService=WebUtil.getBean(CustomConfigService.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
         String actionName = (String)UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -116,7 +129,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-
+        initAssetAllocateFields();
     }
 
 
@@ -143,6 +156,8 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
                     .filter(item -> item.getOrgType() == 4)
                     .map(item -> item.getUid())
                     .collect(Collectors.toList());
+
+            orgUidList.add(getVirtuallyOrgInfoUid(user));
         }
 
         this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -152,7 +167,11 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         this.updateSearchFilter(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
     }
-
+    private String getVirtuallyOrgInfoUid(UserAccount user){
+        char[] chars = user.getSiteUID().toCharArray();
+        chars[0]='$';
+        return String.valueOf(chars);
+    }
     @Override
     public void getFilterMatchModes(DataTable table) {
         super.getFilterMatchModes(table);
@@ -186,44 +205,31 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         List<WorkflowConfig> wfCfigList = wfCfigDao.findByDeptForSharedAsset(orgUid);
         if (wfCfigList != null && wfCfigList.size() > 0) {
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.NE,orgUid));
+            this.updateSearchFilter(new SearchFilter("clinical_dept_uid", SearchFilter.Operator.NE,orgUid));
         }
 
         if (queryIndex == 0){
-            this.removeFilterOnField("chargingEndTime");
-        }
-        if (filterBeginTime != null){
-            searchFilters.add(new SearchFilter("chargingBeginTime", SearchFilter.Operator.GTE,filterBeginTime));
-        }
-        if (filterEndTime != null){
-            searchFilters.add(new SearchFilter("chargingEndTime", SearchFilter.Operator.LTE,filterEndTime));
+            this.removeFilterOnField("charging_begin_time");
         }
 
-        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("assetNumber", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-        }
+
         if (queryIndex == 1){
-            this.updateSearchFilter(new SearchFilter("chargingEndTime", SearchFilter.Operator.IsNull,null));
+            this.updateSearchFilter(new SearchFilter("charging_end_time", SearchFilter.Operator.IsNull,null));
         }
 
-//        searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
-        Page<SharedAssetReqDetail> result=null;
-        if (this.searchFilters == null) {
-            result=dao.findAll(pageRequest);
-        } else {
-            result= dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Wrapper wrapper = sharedAssetReqDetailService.buildDefaultFilters(searchFilters);
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+//            this.updateSearchFilter(new SearchFilter("asset_name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+//            this.updateSearchFilter(new SearchFilter("asset_number", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            wrapper.andNew().like("asset_name",oneSearchStr).or().like("asset_number",oneSearchStr);
         }
-        if(result != null && !CollectionUtils.isEmpty(result.getContent())){
-            for (SharedAssetReqDetail sharedAssetReqDetail : result.getContent()) {
-                String assetInfoId = sharedAssetReqDetail.getAssetInfoId();
-                if(StringUtils.isNotBlank(assetInfoId)){
-                    SharedAssetSwapIndex byAssetUid = swapIndexRepository.findByAssetUid(assetInfoId);
-                    if(byAssetUid != null){
-                        sharedAssetReqDetail.setSwapIndex(byAssetUid.getSwapIndex());
-                    }
-                }
-            }
+        int totalRowCount = sharedAssetReqDetailService.getTotalRowCount(wrapper);
+        List<SharedAssetReqDetail> sharedAssets = sharedAssetReqDetailService.loadSharedAssets(pageRequest, wrapper);
+        Page<SharedAssetReqDetail> result=null;
+        if (sharedAssets== null) {
+            result=new PageImpl(new ArrayList(),pageRequest,totalRowCount);
+        } else {
+            result= new PageImpl(sharedAssets,pageRequest,totalRowCount);
         }
         return result;
     }
@@ -376,12 +382,37 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         return "";
     }
     public boolean  openWhethertoenableunattended(){
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        String siteUID = currentUserAccount.getSiteUID();
-        List<WorkflowConfig> bySiteUID = wfCfigDao.findBySiteUID(siteUID);
-        if(CollectionUtils.isEmpty(bySiteUID)){
-            return false;
+        if(whethertoenableunattended == null){
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            String siteUID = currentUserAccount.getSiteUID();
+            List<WorkflowConfig> bySiteUID = wfCfigDao.findBySiteUID(siteUID);
+            if(CollectionUtils.isEmpty(bySiteUID)){
+                return false;
+            }
+            whethertoenableunattended= bySiteUID.stream().allMatch(item -> item.getWhethertoenableunattended() != null && item.getWhethertoenableunattended());
         }
-       return bySiteUID.stream().allMatch(item -> item.getWhethertoenableunattended() != null && item.getWhethertoenableunattended());
+
+       return whethertoenableunattended;
+    }
+
+    public void  initAssetAllocateFields(){
+        if(!openWhethertoenableunattended())  {
+            assetAllocateFields= AllocateCustomConfigConstant.ASSET_ALLOCATE.getAssetAllocateFields();
+            return ;
+        }else {
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            String siteUID = currentUserAccount.getSiteUID();
+            CustomConfigObject currentCustomConfig = ccService.getCurrentCustomConfig(siteUID);
+            assetAllocateFields = currentCustomConfig.getAssetAllocateFields();
+        }
+
+    }
+
+    public List<String> getAssetAllocateFields() {
+        return assetAllocateFields;
+    }
+
+    public void setAssetAllocateFields(List<String> assetAllocateFields) {
+        this.assetAllocateFields = assetAllocateFields;
     }
 }

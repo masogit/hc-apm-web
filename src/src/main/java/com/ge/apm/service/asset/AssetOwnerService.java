@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -62,7 +63,7 @@ public class AssetOwnerService {
         return assetDao.findBySearchFilter(OrgInfoFilters);
     }
 
-    public Page getAssetListEx(AssetInfo queryAsset) {
+    public Page getAssetListEx(AssetInfo queryAsset,List<String> clinicalDeptUids) {
 
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
         //OrgInfoFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
@@ -76,8 +77,8 @@ public class AssetOwnerService {
         if (null != queryAsset.getTenantUID()) {
             OrgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
         }
-        if (null != queryAsset.getClinicalDeptUID()) {
-            OrgInfoFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptUID()));
+        if (CollectionUtils.isNotEmpty(clinicalDeptUids)) {
+            OrgInfoFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUids));
         }
         if (null != queryAsset.getHospitalUID()) {
             OrgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, queryAsset.getHospitalUID()));

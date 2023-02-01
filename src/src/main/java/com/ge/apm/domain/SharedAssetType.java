@@ -9,10 +9,10 @@ import com.alibaba.fastjson.JSON;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * @author caoyong
@@ -64,6 +64,14 @@ public class SharedAssetType implements Serializable {
     @Column(name = "starting_duration")
     private Double startingDuration;//起步时长
 
+    @Column(name = "gratis_duration")
+    private Double gratisDuration; //免除计费时长（小时）
+    @Column(name = "discount_start_date")
+    private Date discountStartDate;  //折扣开始日期
+    @Column(name = "discount_end_date")
+    private Date discountEndDate;  //折扣开始日期
+    @Column(name = "discount")
+    private Double discount;  // 优惠折扣
     //新增字段（数据权限四个字段）
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -297,5 +305,61 @@ public class SharedAssetType implements Serializable {
 
         return accessoryList;
     }
-//
+
+    public Double getGratisDuration() {
+        return gratisDuration;
+    }
+
+    public void setGratisDuration(Double gratisDuration) {
+        this.gratisDuration = gratisDuration;
+    }
+
+    public Date getDiscountStartDate() {
+        return discountStartDate;
+    }
+
+    public void setDiscountStartDate(Date discountStartDate) {
+        this.discountStartDate = discountStartDate;
+    }
+
+    public Date getDiscountEndDate() {
+        return discountEndDate;
+    }
+
+    public void setDiscountEndDate(Date discountEndDate) {
+        this.discountEndDate = discountEndDate;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+
+    public String  getDiscountPeriod(){
+
+        StringBuilder buffer=new StringBuilder();
+        SimpleDateFormat format = new SimpleDateFormat("HH");
+        Calendar instance = Calendar.getInstance(Locale.CHINA);
+        int startHour=0;
+        int endHour=0;
+        if(discountStartDate !=null){
+            instance.setTime(discountStartDate);
+            startHour = instance.get(Calendar.HOUR_OF_DAY);
+            buffer.append(format.format(discountStartDate)).append("时");
+        }
+        buffer.append("-");
+        if(discountEndDate != null){
+            instance.setTime(discountEndDate);
+            endHour = instance.get(Calendar.HOUR_OF_DAY);
+            if(startHour >= endHour){
+                buffer.append("次日");
+            }
+            buffer.append(format.format(discountEndDate)).append("时");
+        }
+        return buffer.toString();
+    }
 }

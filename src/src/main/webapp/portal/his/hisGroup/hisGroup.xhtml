@@ -1,0 +1,89 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <style>
+            div.ui-panelgrid-cell > label + div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+        </style>
+        <div class="ui-g clearfix">
+
+            <div class="ui-g-12 card">
+                <h:form id="hisGlobalGroupListForm">
+                    <p:dataTable id="datalist" value="#{hisGlobalAssetGroupController.getAllHisAssetGroup()}"
+                                 var="item"
+                                 lazy="true" paginator="true" paginatorPosition="bottom"
+                                 paginatorAlwaysVisible="true"
+                                 selectionMode="single" selection="#{hisGlobalAssetGroupController.selected}"
+                                 rowKey="#{item.uuid}" sortMode="single" sortOrder="descending"
+                                 sortBy="#{item.name}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" listener="#{hisGlobalAssetGroupController.onSelectHisAssetGroup()}" update="createButton editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{hisGlobalAssetGroupController.onFilter}" oncomplete="rc();"/>
+
+                        <p:column headerText="#{msg.name}" sortBy="#{item.name}">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+
+                        <p:column headerText="设备数量">
+                            <h:outputText value="#{hisGlobalAssetGroupController.getAssetCountsByGroupUid(item.uuid)}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabGroup:hisListDialog" actionListener="#{hisGlobalAssetGroupController.prepareCreate}" oncomplete="PF('hisListDialog').show()"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{hisGlobalAssetGroupController.prepareEdit}" update=":tabGroup:hisListDialog @(.modiPartsDlg)" oncomplete="PF('hisListDialog').show()" disabled="#{empty hisGlobalAssetGroupController.selected}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{hisGlobalAssetGroupController.delete}" update="datalist" disabled="#{empty hisGlobalAssetGroupController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="his列表"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+
+            <p:dialog id="hisListDialog" widgetVar="hisListDialog" modal="true" width="1200" class="hisListDialog"
+                      height="600"
+                      resizable="true" draggable="true" appendTo="@this" header="设备分组">
+                <h:form id="HisAssetGroupCreateForm">
+                    <p:fieldset legend="设备分组">
+
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                     rendered="true">
+                            <h:panelGroup>
+                                <label class="label">#{msg.name}</label>
+                                <p:inputText id="hisAssetGroupName" name="hisAssetGroupName" readonly="false"
+                                             style="width: 220px;"
+                                             value="#{hisGlobalAssetGroupController.selected.name}"/>
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+
+                    </p:fieldset>
+
+                    <h:panelGroup >
+                        <p:commandButton
+                                actionListener="#{hisGlobalAssetGroupController.saveHisList()}"
+                                value="#{msg.save}"
+                                update=":tabGroup:hisGlobalGroupListForm:datalist"
+                                icon="ui-icon-check" oncomplete="PF('hisListDialog').hide();"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                         onclick="PF('hisListDialog').hide()"
+                                         update=":tabGroup:hisGlobalGroupListForm:datalist"  oncomplete="PF('hisListDialog').hide();"/>
+                    </h:panelGroup>
+                </h:form>
+            </p:dialog>
+        </div>
+    </ui:composition>
+
+</html>

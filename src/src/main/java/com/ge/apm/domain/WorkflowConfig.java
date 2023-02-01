@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author 212579464
@@ -257,7 +258,7 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "appointment_status_locked_time")
     private Integer appointmentstatuslockedtime ;
     //是否启用无人值守
-    @Column(name = "whether_to_enable_unattended ")
+    @Column(name = "whether_to_enable_unattended")
     private Boolean whethertoenableunattended;
     //是否启用院间借调
     @Column(name = "enable_site_to_site_allocation")
@@ -266,6 +267,10 @@ public class WorkflowConfig implements Serializable {
     @Getter
     @Column(name = "enable_asset_preview")
     private Boolean enableAssetPreview;
+    @Setter
+    @Getter
+    @Column(name = "enable_send_repair")
+    private Boolean enableSendRepair;
     //是否启用小型物联网设备(急救类)服务
     @Column(name = "is_io_tenabled")
     private Boolean isiotenabled;
@@ -381,6 +386,34 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "other_expenses")
     private Boolean otherExpenses ; // 其他费用
+
+    @Column(name = "pat_problems")
+    private Boolean patProblems;    //原因描述
+
+    @Column(name = "pat_actions")
+    private Boolean patActions;     //解决方案
+
+    @Column(name = "pat_tests")
+    private Boolean patTests;       //交付前检测
+
+    @Column(name = "work_order_images_upload")
+    private Boolean workOrderImagesUpload; //维修附件是否上传，当前只对图片限制
+
+    public Boolean getPatProblems() { return patProblems; }
+
+    public void setPatProblems(Boolean patProblems) { this.patProblems = patProblems; }
+
+    public Boolean getPatActions() { return patActions; }
+
+    public void setPatActions(Boolean patActions) { this.patActions = patActions; }
+
+    public Boolean getPatTests() { return patTests; }
+
+    public void setPatTests(Boolean patTests) { this.patTests = patTests; }
+
+    public Boolean getWorkOrderImagesUpload() { return workOrderImagesUpload; }
+
+    public void setWorkOrderImagesUpload(Boolean workOrderImagesUpload) { this.workOrderImagesUpload = workOrderImagesUpload; }
 
     public Boolean getExternalExpenses() {
         return externalExpenses == null ? false : externalExpenses;
@@ -1597,6 +1630,19 @@ public class WorkflowConfig implements Serializable {
         String id;
         String boType;
         String label;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            AttachmentCategory that = (AttachmentCategory) o;
+            return Objects.equals(boType, that.boType);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(boType);
+        }
     }
 
 }

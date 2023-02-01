@@ -85,7 +85,9 @@
 
 
                     <p:commandButton actionListener="#{editReportController.save}" value="#{msg.save}" update=":EditReportForm"  disabled="#{editReportController.report.status eq 'Archived'}"/>
-                    <p:commandButton actionListener="#{editReportController.importElectricSafetyData}" value="#{msg.TesterDataImport}" update=":EditReportForm"  disabled="#{editReportController.hasElectricSafetyData==false}"/>
+                    <c:if test="#{editReportController.maintainanceReport}">
+                        <p:commandButton actionListener="#{editReportController.importElectricSafetyData}" value="#{msg.TesterDataImport}" update=":EditReportForm"  disabled="#{editReportController.hasElectricSafetyData==false}"/>
+                    </c:if>
                     <!--<p:commandButton actionListener="#{editReportController.submit}" value="#{msg.submit}" update=":EditReportForm" disabled="#{editReportController.report.status eq 'Archived'}"/>-->
                 </h:form>
             </div>

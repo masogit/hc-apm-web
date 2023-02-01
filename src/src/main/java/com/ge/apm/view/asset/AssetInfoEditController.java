@@ -1,10 +1,12 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.callback.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
@@ -19,11 +21,14 @@ import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -69,6 +74,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private MvsUtil mvsUtil;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+    private AssetInfoBulkEditCheckService assetInfoBulkEditCheckService;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -111,6 +117,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private List<String> editableFieldsList;
 
     private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
+
 
     @Getter
     @Setter
@@ -163,9 +170,22 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private UserContextService userContextService;
 
+
+    private MqUtils mqUtils;
+
     //设备状态
     @Getter
     List<I18nMessage> assetStatusList = Collections.emptyList();
+
+    @Getter
+    private Boolean unCheckedNursesiteMaintainSite = false;
+    @Getter
+    private Boolean toDeleteNurseMaintainSite = false;
+    private List<AssetInfo> unCheckNurseSiteMaintain = Collections.emptyList();
+
+    public void toDelete () {
+       toDeleteNurseMaintainSite = true;
+    }
 
     // TreeNodeName Filter
     private String treeNodeNameFilter;
@@ -212,6 +232,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         userContextService = WebUtil.getBean(UserContextService.class);
+        mqUtils = WebUtil.getBean(MqUtils.class);
+        assetInfoBulkEditCheckService = WebUtil.getBean(AssetInfoBulkEditCheckService.class);
 
         countyArea = userContextService.isCountyArea();
 
@@ -268,6 +290,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
             changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
             uploadFlag = getAttachList(selected.getUid(), "1").size() ==0;
+            selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
         }
         if(selected ==null){
             try {
@@ -652,6 +675,31 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void todelete() {
+        toDeleteNurseMaintainSite = true;
+    }
+
+    public String checkIfRequireBeforeApplyChange() {
+        if(!unCheckedNursesiteMaintainSite && selected.getUid()!=null) {
+            AssetInfo old = dao.findByUid(selected.getUid());
+            Integer oldClinicalId = old.getClinicalDeptId() == null ? 0 : old.getClinicalDeptId();
+            Integer newClinicalId = selected.getClinicalDeptId() == null ? 0 : selected.getClinicalDeptId();
+            if((!oldClinicalId.equals(newClinicalId)) || !StringUtils.equals(old.getAssetDeptUID(),selected.getAssetDeptUID())) {
+                List<AssetInfo> assets = new ArrayList<>();
+                assets.add(old);
+                unCheckNurseSiteMaintain = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets);
+                if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain)) {
+                    unCheckedNursesiteMaintainSite = true;
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("unCheckedNursesiteMaintainSite", unCheckedNursesiteMaintainSite);
+                    requestContext.addCallbackParam("toDeleteNurseMaintainSite", toDeleteNurseMaintainSite);
+                    return "";
+                }
+            }
+        }
+        return applyChange();
+    }
+
     @Transactional
     public String applyChange() {
 
@@ -730,11 +778,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-        if(isStatusAssetHistory){
-            this.saveAssetHistory();
+        if(org.apache.commons.lang3.StringUtils.isEmpty(selected.getUid()) && selected.getId()==null){
+            String uid = UUID.randomUUID().toString().replace("-", "");
+            selected.setUid(uid);
         }
-
+        selected.setOfflineUpdateDate(new Date());
+        this.saveAssetHistory();
         this.save();
+        if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain) && toDeleteNurseMaintainSite) {
+            assetInfoBulkEditCheckService.deleteNursiteMaintain(unCheckNurseSiteMaintain.get(0));
+        }
 
         if(selected != null && selected.getId() != null && selectedPictures != null){
             acService.createAttachments(selected, selectedPictures);
@@ -1437,9 +1490,31 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
     private void saveAssetHistory() {
+//        AssetInfo oldAsset = dao.findByUid(selected.getUid());
 
-        AssetInfo oldAsset = dao.findByUid(selected.getUid());
-        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
+        MqContext mqContext = new MqContext();
+        mqContext.setTime(new Date());
+        mqContext.setType("asset");
+        mqContext.setRoutingKey("asset.update");
+        mqContext.setExChange("assetChange");
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        JSONObject jsonObject =new JSONObject();
+
+
+        selected.setHospital(null);
+        selected.setQrCodeLib(null);
+        selected.setAssetTags(null);
+        selected.setBrand(null);
+        selected.setTags(null);
+        //gson序列化只与属性(字段)有关，与get开头的方法无关
+        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String str = g.toJson(selected);
+        jsonObject.put("assetInfo",str);
+//        jsonObject.put("assetInfo",selected);
+        jsonObject.put("currentUserAccount",currentUserAccount);
+        mqContext.setJsonObject(jsonObject);
+        mqUtils.sendToMq(mqContext);
+//        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
     }
 
     public int getAssetChangeHistoryCount() {

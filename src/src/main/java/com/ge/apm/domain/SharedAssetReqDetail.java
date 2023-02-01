@@ -14,14 +14,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  *
@@ -202,8 +200,35 @@ public class SharedAssetReqDetail implements Serializable{
 
     @Column(name = "maintain_time")
     private Date maintainTime;
-    //@Formula("(select a.swap_index from shared_asset_swap_index a where a.asset_uid = asset_info_id limit 1)")
+
+    @Column(name = "gratis_duration")
+    private Double gratisDuration; //免除计费时长（小时）
+    @Column(name = "discount_start_date")
+    private Date discountStartDate;  //折扣开始日期
+    @Column(name = "discount_end_date")
+    private Date discountEndDate;  //折扣开始日期
+    @Column(name = "discount")
+    private Double discount;  // 优惠折扣
+    @Column(name = "qr_code")
+    private String qrCode;  // 二维码
+
+    @Transient
     private String swapIndex;
+    @Transient
+    private String discountTime; // 优惠时长
+    @Transient
+    private BigDecimal discountFee; // 优惠费用
+    @Transient
+    private BigDecimal gratisFee;  // 免除费用
+    @Transient
+    private String swapName; // 调剂设备名称
+
+    @Transient
+    private String functionType;//设备型号
+    @Transient
+    private String brandName;//品牌名称
+
+
     public String getId() {
         return id;
     }
@@ -261,16 +286,7 @@ public class SharedAssetReqDetail implements Serializable{
 //    }
 
     public String getState() {
-        String state="";
-        if(leaseRequest != null && leaseRequest.getState() == 3){
-            state="已预约";
-        }else if(chargingBeginTime !=null && chargingEndTime == null){
-            state="使用中";
-        }else if(returnRequest != null && chargingEndTime != null && isCleaned !=null && isCleaned == false){
-            state="已归还（未清洁保养）";
-        }else if(isCleaned != null && isCleaned){
-            state="已完成";
-        }
+
         return state;
     }
 
@@ -973,5 +989,117 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setSwapIndex(String swapIndex) {
         this.swapIndex = swapIndex;
+    }
+
+    public String getDiscountTime() {
+        return discountTime;
+    }
+
+    public void setDiscountTime(String discountTime) {
+        this.discountTime = discountTime;
+    }
+
+    public BigDecimal getDiscountFee() {
+        return discountFee;
+    }
+
+    public void setDiscountFee(BigDecimal discountFee) {
+        this.discountFee = discountFee;
+    }
+
+    public BigDecimal getGratisFee() {
+        return gratisFee;
+    }
+
+    public void setGratisFee(BigDecimal gratisFee) {
+        this.gratisFee = gratisFee;
+    }
+
+    public Double getGratisDuration() {
+        return gratisDuration;
+    }
+
+    public void setGratisDuration(Double gratisDuration) {
+        this.gratisDuration = gratisDuration;
+    }
+
+    public Date getDiscountStartDate() {
+        return discountStartDate;
+    }
+
+    public void setDiscountStartDate(Date discountStartDate) {
+        this.discountStartDate = discountStartDate;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
+
+    public Date getDiscountEndDate() {
+        return discountEndDate;
+    }
+
+    public void setDiscountEndDate(Date discountEndDate) {
+        this.discountEndDate = discountEndDate;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    public String  getDiscountPeriod(){
+
+        StringBuilder buffer=new StringBuilder();
+        SimpleDateFormat format = new SimpleDateFormat("HH");
+        Calendar instance = Calendar.getInstance(Locale.CHINA);
+        int startHour=0;
+        int endHour=0;
+        if(discountStartDate !=null){
+            instance.setTime(discountStartDate);
+            startHour = instance.get(Calendar.HOUR_OF_DAY);
+            buffer.append(format.format(discountStartDate)).append("时");
+        }
+        buffer.append("-");
+        if(discountEndDate != null){
+            instance.setTime(discountEndDate);
+            endHour = instance.get(Calendar.HOUR_OF_DAY);
+            if(startHour >= endHour){
+                buffer.append("次日");
+            }
+            buffer.append(format.format(discountEndDate)).append("时");
+        }
+        return buffer.toString();
+    }
+
+    public String getSwapName() {
+        return swapName;
+    }
+
+    public void setSwapName(String swapName) {
+        this.swapName = swapName;
+    }
+
+    public String getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(String functionType) {
+        this.functionType = functionType;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
     }
 }

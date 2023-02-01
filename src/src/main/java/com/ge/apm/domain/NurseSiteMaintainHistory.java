@@ -83,6 +83,9 @@ public class NurseSiteMaintainHistory{
     @Column(name = "status")
     private Integer status=0;
 
+    @Column(name = "is_finish")
+    private Boolean isFinish = false; //是否完成，以所有检测项都已勾选为准
+
     @Column(name="config_id")
     private String configId;
 
@@ -156,5 +159,9 @@ public class NurseSiteMaintainHistory{
     public String toString() {
         return "NurseSiteMaintainHistory [ id=" + id + " ]";
     }
+
+    public Boolean getIsFinish() { return isFinish; }
+
+    public void setIsFinish(Boolean finish) { isFinish = finish; }
 
 }

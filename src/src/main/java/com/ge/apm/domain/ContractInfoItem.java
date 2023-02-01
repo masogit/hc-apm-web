@@ -107,6 +107,8 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "contract_asset_quantity")
     private Integer contractAssetQuantity;
 
+    private Integer noInstallQuntity;
+
     //制造商
     @Column(name = "manufacturer")
     private String manufacturer;
@@ -443,6 +445,10 @@ public class ContractInfoItem implements Serializable {
     public void setEstimatedPaymentDate(Date estimatedPaymentDate) {
         this.estimatedPaymentDate = estimatedPaymentDate;
     }
+
+    public Integer getNoInstallQuntity() { return noInstallQuntity; }
+
+    public void setNoInstallQuntity(Integer noInstallQuntity) { this.noInstallQuntity = noInstallQuntity; }
 
     @Override
     public int hashCode() {

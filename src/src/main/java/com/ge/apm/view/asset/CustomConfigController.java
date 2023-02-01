@@ -11,10 +11,12 @@ import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.TenantOptionConfigRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
@@ -30,6 +32,7 @@ import javax.faces.bean.ViewScoped;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
@@ -61,9 +64,8 @@ public class CustomConfigController {
     private List<String> addFieldsList;
     private String addFieldsType;
     private Map<String, String> configInfo = new HashMap();
-
     private PinYinComparator pinYinComparator;
-
+    private WorkflowConfigRepository workflowConfigRepository;
     private Map<String,Boolean> importantFieldsCheckedStatus = new HashMap();
 
     @Setter
@@ -77,6 +79,7 @@ public class CustomConfigController {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
         tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
+        workflowConfigRepository = WebUtil.getBean(WorkflowConfigRepository.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
         configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
@@ -213,6 +216,9 @@ public class CustomConfigController {
             case "RemoveWebWorkOrderFieldsList":
                 addFieldsList.addAll(((JSONArray) JSONPath.eval(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).toJavaList(String.class));
                 break;
+            case "assetAllocateFieldsList":
+                addFieldsList=getAllAllocateFields().keySet().stream().filter(item->!customConfigObject.getAssetAllocateFields().contains(item)).collect(Collectors.toList());
+                break;
 
 
         }
@@ -276,7 +282,8 @@ public class CustomConfigController {
 
             case "RemoveWebWorkOrderFieldsList":
                 return "customConfigForm:tabView:WebWorkOrderFieldsList";
-
+            case "assetAllocateFieldsList":
+                return "customConfigForm:tabView:assetAllocatePageTable";
             default:
                 return "";
         }
@@ -424,6 +431,10 @@ public class CustomConfigController {
                         && !customConfigObject.getAssetsImportantFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 customConfigObject.setAssetsImportantFields(addImportantFields);
                 break;
+            case "assetAllocateFieldsList":
+                customConfigObject.getAssetAllocateFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetAllocateFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
 
         }
         cancelAddFields();
@@ -525,7 +536,11 @@ public class CustomConfigController {
             customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
         }
     }
-
+    public void removeAllocateListPageField(String key) {
+        if (customConfigObject.getAssetAllocateFields().contains(key)) {
+            customConfigObject.setAssetAllocateFields(customConfigObject.getAssetAllocateFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
+        }
+    }
     public void prepareEditAssetField(String fieldKey) {
         currentEditField = customConfigObject.getAssetFields().get(fieldKey);
     }
@@ -701,4 +716,17 @@ public class CustomConfigController {
         if(workflowConfig!=null && tenantOptionConfig!=null && workflowConfig.getActiveSupplier()!=null && tenantOptionConfig.getActiveSupplier()!=null && workflowConfig.getActiveSupplier() && tenantOptionConfig.getActiveSupplier()) return true;
         return false;
     }
+
+    public LinkedHashMap<String, String> getAllAllocateFields() {
+        return AllocateCustomConfigConstant.ASSET_ALLOCATE.getAllAllocateFields();
+    }
+    public boolean enabledWhethertoenableunattended(){
+        if(selectSite == null) return false;
+        List<WorkflowConfig> bySiteUID = workflowConfigRepository.findBySiteUID(selectSite.getUid());
+        if(CollectionUtils.isEmpty(bySiteUID)) return false;
+        WorkflowConfig workflowConfig = bySiteUID.get(0);
+        if(workflowConfig == null ) return false;
+        return Boolean.TRUE.equals(workflowConfig.getWhethertoenableunattended());
+    }
+
 }

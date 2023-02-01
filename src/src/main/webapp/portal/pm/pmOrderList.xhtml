@@ -71,9 +71,9 @@
                 </p:column>
                 <p:column headerText="#{msg.hospitalId}">
                     <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
-                    <!--<f:facet name="filter">
-                        <p:inputText id="btnOrg2" class="btnOrg2clss" readonly="true" value="#{empty v2PmOrderController.selectSite? msg.AllHospitals:v2PmOrderController.selectSite.name}"/>
-                    </f:facet>-->
+<!--                    <f:facet name="filter">-->
+<!--                        <p:inputText id="btnOrg2" class="btnOrg2clss" readonly="false" value="#{empty v2PmOrderController.selectSite? msg.AllHospitals:v2PmOrderController.selectSite.name}"/>-->
+<!--                    </f:facet>-->
                 </p:column>
 
                 <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
@@ -105,15 +105,25 @@
                         <h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour',item.ruleLevel)}"/>
                 </p:column>
 
-                        <p:column headerText="#{msg.MaintenanceType}"  sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
-                            <f:facet name="filter" >
-                                <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.repairTypeInt}">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
-                        </p:column>
+                <p:column headerText="#{msg.MaintenanceType}"  sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.repairTypeInt}">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.hospitalId}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" rendered="#{userContextService.isYiMaiYangGuangTenant()}">
+                    <f:facet name="filter" >
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.siteUidFilter}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{v2PmOrderController.LoadSiteNameList()}" var="val" itemLabel="#{val.name}" itemValue="#{val.uid}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
+                </p:column>
                         <!--所属科室-->
                         <p:column headerText="#{msg.clinicalDeptName}"  width="100">
                             <f:facet name="header">
@@ -472,7 +482,8 @@
                     <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%" >
-                            <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+<!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
                             <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -500,7 +511,8 @@
                     <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                     <p:panel  style="text-align:center">
                         <h:panelGrid columns="1" style="width:100%" >
-                            <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+<!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
                             <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentById(fileitem.id)}" update="pictureListBatch" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>

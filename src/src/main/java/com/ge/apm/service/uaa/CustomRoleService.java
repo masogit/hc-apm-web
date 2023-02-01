@@ -136,6 +136,10 @@ public class CustomRoleService {
 				listNew.add(i18n);
 			}else if(key.equals("measure.info")){
 				listNew.add(i18n);
+			}else if(key.equals("knowledge.mgt")){
+				listNew.add(i18n);
+			}else if(key.equals("asset.supplierMgt")){
+				listNew.add(i18n);
 			}
 		}
 		return listNew;

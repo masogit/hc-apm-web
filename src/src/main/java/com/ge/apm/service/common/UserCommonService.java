@@ -235,19 +235,19 @@ public class UserCommonService {
     }
 
     //判断用户是否有操作数据权限
-    public boolean isCanOperate(UserAccount cua, String siteUID) {
+    public boolean isCanOperate(UserAccount cua, String siteUid) {
         boolean flag = false;
 
         if (!UserContextService.isOnlyLocalITAdmin()) {
             return true;
         }
-        OrgInfo tempOrgInfo = orgInfoDao.getByUid(siteUID);
+        OrgInfo tempOrgInfo = orgInfoDao.getByUid(siteUid);
 
         if (cua.getOrgLevel() < tempOrgInfo.getOrgLevel()) {
             flag = true;
         }
 
-        if (cua.getOrgLevel() == tempOrgInfo.getOrgLevel() && cua.getSiteUID().equals(siteUID)) {
+        if (cua.getOrgLevel() == tempOrgInfo.getOrgLevel() && cua.getSiteUID().equals(siteUid)) {
             flag = true;
         }
 

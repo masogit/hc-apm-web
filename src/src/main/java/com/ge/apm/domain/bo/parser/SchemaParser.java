@@ -61,9 +61,12 @@ public class SchemaParser {
                 }
             }
         }
-        return new TableRenderData(
+
+        TableRenderData res =  new TableRenderData(
                 rows,
                 this.description);
+        res.setWidth(5000);
+        return res;
     }
 
     private String wrap(String key) {

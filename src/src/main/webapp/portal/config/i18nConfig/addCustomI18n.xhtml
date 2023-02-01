@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:composition>
+        <p:dialog id="addCustomI18nDlg" widgetVar="addCustomI18nDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.addI18nConfig}" max-height="480" width="400">
+            <h:form id="addCustomI18nCForm">
+
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <c:choose>
+                        <c:when test="#{i18nConfigController.selected.msgKey eq 'transaction' or i18nConfigController.selected.msgKey eq 'assetClass'}">
+                            <h:panelGroup>
+                                <label class="label">#{msg.ConfigItemKey}*</label>
+                                <p:inputNumber id="configItemKeyNum" autocomplete="off" decimalPlaces="0" thousandSeparator="" placeholder="请输入数字" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
+                            </h:panelGroup>
+                        </c:when>
+                        <c:otherwise>
+                            <h:panelGroup>
+                                <label class="label">#{msg.ConfigItemKey}*</label>
+                                <p:inputText id="configItemKeyStr" autocomplete="off" value="#{i18nConfigController.editI18n.msgKey}" required="true" requiredMessage="#{msg.ConfigItemKey}#{msg.ValidationRequire}" disabled="#{i18nConfigController.editFlag}" style="width: 95%;"/>
+                            </h:panelGroup>
+                        </c:otherwise>
+                    </c:choose>
+                    <h:panelGroup>
+                        <label class="label">#{msg.ConfigItemName}-#{msg.Chinese}*</label>
+                        <p:inputText id="chinese" autocomplete="off" value="#{i18nConfigController.editI18n.valueZh}" required="true" requiredMessage="#{msg.ConfigItemName}-#{msg.Chinese}#{msg.ValidationRequire}" style="width: 95%;"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.ConfigItemName}-#{msg.English}</label>
+                        <p:inputText id="english" autocomplete="off" value="#{i18nConfigController.editI18n.valueEn}" style="width: 95%;"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.ConfigItemName}-#{msg.Traditional}</label>
+                        <p:inputText id="traditional" autocomplete="off" value="#{i18nConfigController.editI18n.valueTw}" style="width: 95%;"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <br/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{i18nConfigController.addI18nConfig}" update=":configEditForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'addCustomI18nDialog');" />
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('addCustomI18nDialog').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

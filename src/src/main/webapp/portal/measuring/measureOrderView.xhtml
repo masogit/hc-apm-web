@@ -182,9 +182,10 @@
                         <f:facet name="header">附件上传</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
-                                <p:graphicImage   url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
-                                <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" > 下载文件
-                                </p:link>
+                                <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                <p:commandLink value="下载文件" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" > 下载文件-->
+<!--                                </p:link>-->
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>

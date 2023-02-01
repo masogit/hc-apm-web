@@ -22,6 +22,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import javax.validation.constraints.Size;
+
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -34,6 +36,7 @@ import org.springframework.data.annotation.LastModifiedDate;
  */
 @Entity
 @Table(name = "arrival_list_item")
+@Data
 public class ArrivalListItem implements Serializable {
 
     
@@ -411,6 +414,9 @@ public class ArrivalListItem implements Serializable {
 
     @Column(name = "tenant_uid")
     private String tenantUid;
+
+    @Column(name = "medical_apparatus_classification")
+    private String medicalApparatusClassification; // 医疗器械分类
 
     public void setSiteUid(String siteUid) {
         this.siteUid = siteUid;

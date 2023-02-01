@@ -46,7 +46,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_contractType}*</label>
                             <p:selectOneMenu id="status" value="#{zkbContractEditController.selected.contractType}" required="true" requiredMessage="#{msg.zkbContract_contractType} #{msg.ValidationRequire}">
-                                <p:ajax event="itemSelect" update="quotaDeductType" listener="#{zkbContractEditController.contractTypeSelect}" />
+                                <p:ajax event="itemSelect" update="panelGrid2" listener="#{zkbContractEditController.contractTypeSelect}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
@@ -76,6 +76,8 @@
                                 <f:selectItems value="#{zkbContractEditController.quotaDeductTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+
+
                         <h:panelGroup>
                             <label class="label">2022年起探头高低端名额分类*</label>
                             <p:selectOneMenu  value="#{zkbContractEditController.selected.assetQuotaType}" required="true" requiredMessage="2022年起探头高低端名额分类 #{msg.ValidationRequire}">
@@ -106,7 +108,8 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{empty zkbContractEditController.selected.id}">
                         </h:panelGroup>
-
+                    </p:panelGrid>
+                    <p:panelGrid id="panelGrid2" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Spare')}">
                             <label class="label">#{msg.zkbContract_spareQuota_total}</label>
                             <p:spinner id="spareQuotaTotal" value="#{zkbContractEditController.selected.spareQuotaTotal}" min="0" max="1000"  />
@@ -191,22 +194,6 @@
                                 <label class="label">探头特殊已使用名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaSpecialUse}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <!--<h:panelGroup>
-                                <label class="label">探头高值总名额</label>
-                                <p:spinner value="#{zkbContractEditController.selected.probeQuotaHighTotal}" min="0" max="1000"  />
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">探头高值剩余名额</label>
-                                <p:spinner id="probeQuotaHigh" value="#{zkbContractEditController.selected.probeQuotaHigh}" min="0" max="1000"  />
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">探头高值申请名额</label>
-                                <p:spinner value="#{zkbContractEditController.selected.probeQuotaHighApply}" min="0" max="1000"  />
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">探头高值已使用名额</label>
-                                <p:spinner value="#{zkbContractEditController.selected.probeQuotaHighUse}" min="0" max="1000"  />
-                            </h:panelGroup>-->
                         </c:if>
                         <h:panelGroup rendered="#{zkbContractEditController.qtyRender('Artificial')}">
                             <label class="label">#{msg.zkbContract_geArtificialSupportTimes_total}</label>
@@ -231,16 +218,52 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbContractEditController.qtyRender('SpareArtificial')}">
                             <label class="label">#{msg.zkbContract_spareArtificail}</label>
-                            <p:spinner id="maintenanceQuota" value="#{zkbContractEditController.selected.spareArtificail}" min="0" max="1000"  />
+                            <p:spinner  value="#{zkbContractEditController.selected.spareArtificail}" min="0" max="1000"  />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbContractEditController.qtyRender('SpareArtificial')}">
                             <label class="label">#{msg.zkbContract_spareArtificail_apply}</label>
-                            <p:spinner id="maintenanceQuota_apply" value="#{zkbContractEditController.selected.spareArtificailApply}" min="0" max="1000"  />
+                            <p:spinner  value="#{zkbContractEditController.selected.spareArtificailApply}" min="0" max="1000"  />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbContractEditController.qtyRender('SpareArtificial')}">
                             <label class="label">#{msg.zkbContract_spareArtificail_use}</label>
-                            <p:spinner id="spareArtificailUse" value="#{zkbContractEditController.selected.spareArtificailUse}" min="0" max="1000"  />
+                            <p:spinner value="#{zkbContractEditController.selected.spareArtificailUse}" min="0" max="1000"  />
                         </h:panelGroup>
+
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('PartsHigh')}">
+                            <label class="label">备件高值总额</label>
+                            <p:spinner  value="#{zkbContractEditController.selected.partHighQuotaTotal}" min="0" max="1000"  />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('PartsHigh')}">
+                            <label class="label">备件高值剩余名额</label>
+                            <p:spinner  value="#{zkbContractEditController.selected.partHighQuota}" min="0" max="1000"  />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('PartsHigh')}">
+                            <label class="label">备件高值申请中名额</label>
+                            <p:spinner  value="#{zkbContractEditController.selected.partHighQuotaApply}" min="0" max="1000"  />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('PartsHigh')}">
+                            <label class="label">备件高值已使用名额</label>
+                            <p:spinner value="#{zkbContractEditController.selected.partHighQuotaUse}" min="0" max="1000"  />
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('CssbMaintenance')}">
+                            <label class="label">保养总额</label>
+                            <p:spinner value="#{zkbContractEditController.selected.ccsbMaintenanceQuotaTotal}" min="0" max="1000"  />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('CssbMaintenance')}">
+                            <label class="label">保养剩余名额</label>
+                            <p:spinner  value="#{zkbContractEditController.selected.ccsbMaintenanceQuota}" min="0" max="1000"  />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('CssbMaintenance')}">
+                            <label class="label">保养申请中名额</label>
+                            <p:spinner  value="#{zkbContractEditController.selected.ccsbMaintenanceQuotaApply}" min="0" max="1000"  />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbContractEditController.qtyRender('CssbMaintenance')}">
+                            <label class="label">保养已使用名额</label>
+                            <p:spinner value="#{zkbContractEditController.selected.ccsbMaintenanceQuotaUse}" min="0" max="1000"  />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_ibNumber}</label>
                             <p:spinner id="ibNumber" value="#{zkbContractEditController.selected.ibNumber}" min="0" max="1000" />
@@ -286,7 +309,6 @@
                             </h:panelGroup>
                         </h:panelGroup>
                     </p:panelGrid>
-
 
                     <p:fieldset id="zkbContractCourseFieldset" legend="相关课程" rendered="#{not empty zkbContractEditController.selected.id}">
                         <p:dataTable id="zkbContractCourseDatalist" value="#{zkbContractEditController.contractCourseList}" var="zkbContractCourseItem"

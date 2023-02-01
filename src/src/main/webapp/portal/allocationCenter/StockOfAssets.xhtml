@@ -46,6 +46,7 @@
                         <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(1)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 1}" value="正常可借用"/>
                         <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(2)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 2}" value="正常已借出"/>
                         <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(3)}"  rendered="true" disabled="#{sharedAssetStockController.queryType == 3}" value="故障不可借用" />
+                        <p:commandButton process="@this" update="datalist filterTab" actionListener="#{sharedAssetStockController.setQueryType(4)}"  rendered="#{sharedAssetStockController.isWhethertoenableunattended()}" disabled="#{sharedAssetStockController.queryType == 4}" value="正常不可借用" />
                     </h:panelGrid>
 
                     <p:dataTable id="datalist" value="#{sharedAssetStockController.lazyModel}" var="asset" widgetVar="varDataList"
@@ -66,7 +67,7 @@
 
                         <p:column headerText="借用科室" sortBy="#{asset.lease_org_name}" filterBy="#{asset.asset_dept_uid}" filterMatchMode="EQ">
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200" filter="true" filterMatchMode="contains">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{sharedAssetStockController.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
                                 </p:selectOneMenu>
@@ -87,9 +88,11 @@
                         </p:column>
 
                         <p:column headerText="调剂设备名称" sortBy="#{asset.swap_name}" filterBy="#{asset.swap_name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{asset.sharedAssetType.swapName}"/>
+                            <h:outputText value="#{asset.sharedAssetTypeEntity.swapName}"/>
                         </p:column>
-
+                        <p:column rendered="#{sharedAssetStockController.isWhethertoenableunattended()}" headerText="调剂编号" sortBy="#{asset.shared_asset_swap_index}" filterBy="#{asset.shared_asset_swap_index}" filterMatchMode="LIKE">
+                            <h:outputText value="#{asset.sharedAssetSwapIndex}"/>
+                        </p:column>
                         <p:column headerText="计费开始时间" sortBy="#{asset.charging_begin_time}">
                             <h:outputText value="#{asset.sharedAssetReqDetail.chargingBeginTime}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
@@ -139,7 +142,7 @@
                                              rendered="#{asset.canBorrow}"
                                              update="forceLeaseAssetDialog"
                                              actionListener="#{sharedAssetStockController.prepareForceLeaseAsset(asset)}"
-                                             oncomplete="openForceLeaseDialog(xhr, status, args)"/>
+                                             oncomplete="openForceLeaseDialog(xhr, status, args)" disabled="#{sharedAssetStockController.isWhethertoenableunattended()and asset.sharedStatus==2}"/>
                             <p:commandButton value="归还"
                                              rendered="#{asset.canReturn}"
                                              update="forceReturnAssetDialog"

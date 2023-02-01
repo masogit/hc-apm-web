@@ -118,7 +118,9 @@
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.functionType}"/>
                         </p:column>
-
+                        <p:column headerText="品牌" sortBy="#{item.makerShortName}" filterBy="#{item.makerShortName}" filterMatchMode="LIKE" rendered="#{sharedAssetInfoController.whethertoenableunattended}">
+                            <h:outputText value="#{item.makerShortName}"/>
+                        </p:column>
                         <p:column headerText="#{msg.purchasePrice}" sortBy="#{item.purchasePrice}" filterBy="#{item.purchasePrice}" filterMatchMode="GTE">
                             <h:outputText value="#{item.purchasePrice}"/>
                         </p:column>
@@ -132,14 +134,19 @@
                             </f:facet>
                             <h:outputText value="#{sharedAssetInfoController.getSwapName(item.sharedAssetTypeUid)}"/>
                         </p:column>
-
+                        <p:column headerText="注意事项" exportable="true" rendered="#{sharedAssetInfoController.whethertoenableunattended}">
+                            <h:outputText value="#{item.remark}" title="#{item.remark}" style="white-space: nowrap;text-overline: ellipsis"/>
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoController.exportExcel}" update=":growl"-->
                                              <!--onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">-->
                                 <!--<p:fileDownload value="#{assetInfoController.excelFile}" />-->
                             <!--</p:commandButton>-->
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="批量编辑" update=":BatchAssetEditDlg" oncomplete="PF('BatchAssetEditDialog').show()" disabled="#{!sharedAssetInfoController.editFlag()}" />
-
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false" rendered="#{sharedAssetInfoController.whethertoenableunattended}">
+<!--                                <p:dataExporter type="xls" target="datalist" fileName="Iou_export" preProcessor="#{sharedAssetInfoController.preProcessorExport}" postProcessor="#{sharedAssetInfoController.postProcessorExport}"/>-->
+                                <p:fileDownload value="#{sharedAssetInfoController.exportXls}"/>
+                            </p:commandButton>
                         </f:facet>
 
                     </p:dataTable>
@@ -173,7 +180,19 @@
                                 <label class="label">#{msg.SwappedEquipmentNo}</label>
                                 <p:inputText id="swapIndex" value="#{sharedAssetInfoController.selected.sharedAssetSwapIndex}" />
                             </h:panelGroup>
-
+                            <h:panelGroup rendered="#{sharedAssetInfoController.whethertoenableunattended}">
+                                <label class="label">是否可调剂</label>
+                                <p:selectOneRadio id="isAdjust" value="#{sharedAssetInfoController.selected.sharedStatus}">
+                                    <f:selectItem  itemLabel="是" itemValue="1"/>
+                                    <f:selectItem  itemLabel="否" itemValue="2"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{sharedAssetInfoController.whethertoenableunattended}">
+                                <label class="label">注意事项</label>
+                                <p:inputTextarea value="#{sharedAssetInfoController.selected.remark}" rows="6" cols="33" style="border-width: 1px" autoResize="false"/>
+                            </h:panelGroup>
                             <!--测试代码start-->
                             <!--<h:panelGroup>
                                 <label class="label">测试222</label>
@@ -213,7 +232,13 @@
                                     <f:selectItems value="#{sharedAssetInfoController.allType()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-
+                            <h:panelGroup rendered="#{sharedAssetInfoController.whethertoenableunattended}">
+                                <label class="label">是否可调剂</label>
+                                <p:selectOneRadio id="isAdjustBatch" value="#{sharedAssetInfoController.bathcSharedStatus}">
+                                    <f:selectItem  itemLabel="是" itemValue="1"/>
+                                    <f:selectItem  itemLabel="否" itemValue="2"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
                         </p:panelGrid>
                         <br/>
                         <p:commandButton validateClient="true" actionListener="#{sharedAssetInfoController.batchSave}" value="批量保存"

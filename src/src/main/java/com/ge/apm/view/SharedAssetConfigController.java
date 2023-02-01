@@ -2,6 +2,7 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.SharedAssetConfigRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SharedAssetConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -32,12 +33,13 @@ public class SharedAssetConfigController {
 
     private Date startTime;
     private Date endTime;
-
+    private UserContextService userContextService;
     @PostConstruct
     protected void init() {
 
         dao = WebUtil.getBean(SharedAssetConfigRepository.class);
         userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
 
@@ -98,16 +100,35 @@ public class SharedAssetConfigController {
 
         //userAccountList = userAccountDao.findByTenantUIDAndRoleName(currentUser.getTenantUID(), "SharedAssetMgmt");
         List<UserAccount> userAccountList = userAccountDao.findByTenantUIDAndRoleNames(currentUser.getTenantUID(), Arrays.asList("SharedAssetMgmt","AssetStaff"));
-
+        OrgInfo selectSiteSchedule = userContextService.getSelectSiteSchedule();
         if(!userAccountList.isEmpty()){
             if(currentUser.getOrgLevel() != 0){
                 if(currentUser.getOrgLevel() == 1){
                     userAccountList = userAccountList.stream()
                             .filter(item-> currentUser.getInstitutionUID().equals(item.getInstitutionUID()))
+                            .filter(item-> {
+                                if(selectSiteSchedule == null) return Boolean.TRUE;
+                                String institutionUID = item.getInstitutionUID();
+                                String hospitalUID = item.getHospitalUID();
+                                String siteUID = item.getSiteUID();
+                                if(siteUID.equals(selectSiteSchedule.getUid()) || siteUID.equals(hospitalUID) || siteUID.equals(institutionUID)){
+                                    return Boolean.TRUE;
+                                }
+                                return false;
+                            })
                             .collect(Collectors.toList());
                 }else if(currentUser.getOrgLevel() == 2){
                     userAccountList = userAccountList.stream()
                             .filter(item-> currentUser.getHospitalUID().equals(item.getHospitalUID()))
+                            .filter(item-> {
+                                if(selectSiteSchedule == null) return Boolean.TRUE;
+                                String hospitalUID = item.getHospitalUID();
+                                String siteUID = item.getSiteUID();
+                                if(siteUID.equals(selectSiteSchedule.getUid()) || siteUID.equals(hospitalUID)){
+                                    return Boolean.TRUE;
+                                }
+                                return false;
+                            })
                             .collect(Collectors.toList());
                 }else{
                     userAccountList = userAccountList.stream()

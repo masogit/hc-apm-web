@@ -1,5 +1,7 @@
 package com.ge.apm.service.zkb;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -125,6 +127,15 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("探头特殊剩余名额", "setProbeQuotaSpecial");
             contractRow.setFieldNumValue("探头特殊已使用名额", "setProbeQuotaSpecialUse");
 
+            contractRow.setFieldNumValue("保养总额", "setCcsbMaintenanceQuotaTotal");
+            contractRow.setFieldNumValue("保养剩余名额", "setCcsbMaintenanceQuota");
+            contractRow.setFieldNumValue("保养已使用名额", "setCcsbMaintenanceQuotaUse");
+
+            contractRow.setFieldNumValue("备件高值总额", "setPartHighQuotaTotal");
+            contractRow.setFieldNumValue("备件高值剩余名额", "setPartHighQuota");
+            contractRow.setFieldNumValue("备件高值已使用名额", "setPartHighQuotaUse");
+
+
             /*contractRow.setFieldNumValue("探头高值总额", "setProbeQuotaHighTotal");
             contractRow.setFieldNumValue("探头高值剩余名额", "setProbeQuotaHigh");
             contractRow.setFieldNumValue("探头高值已使用名额", "setProbeQuotaHighUse");*/
@@ -222,6 +233,21 @@ public class ZkbContractImportService {
             zkbContract.setGeArtificialSupportTimes(contractInfoVO.getGeArtificialSupportTimes());
             zkbContract.setGeArtificialSupportTimesUse(contractInfoVO.getGeArtificialSupportTimesUse());
 
+            zkbContract.setCcsbMaintenanceQuotaTotal(contractInfoVO.getGeArtificialSupportTimesTotal());
+            zkbContract.setCcsbMaintenanceQuota(contractInfoVO.getGeArtificialSupportTimes());
+            zkbContract.setCcsbMaintenanceQuotaUse(contractInfoVO.getGeArtificialSupportTimesUse());
+
+            zkbContract.setPartHighQuotaTotal(contractInfoVO.getGeArtificialSupportTimesTotal());
+            zkbContract.setPartHighQuota(contractInfoVO.getGeArtificialSupportTimes());
+            zkbContract.setPartHighQuotaUse(contractInfoVO.getGeArtificialSupportTimesUse());
+
+            zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaTotal() - zkbContract.getSpareQuotaUse() - zkbContract.getSpareQuota());
+            zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaTotal() - zkbContract.getProbeQuotaUse() - zkbContract.getProbeQuota());
+            zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesTotal() - zkbContract.getGeArtificialSupportTimesUse() - zkbContract.getGeArtificialSupportTimes());
+            zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailTotal() - zkbContract.getSpareArtificailUse() - zkbContract.getSpareArtificail());
+            zkbContract.setPartHighQuotaApply(zkbContract.getPartHighQuotaTotal() - zkbContract.getPartHighQuota() - zkbContract.getPartHighQuotaUse());
+            zkbContract.setCcsbMaintenanceQuotaApply(zkbContract.getCcsbMaintenanceQuotaTotal() - zkbContract.getCcsbMaintenanceQuota() - zkbContract.getCcsbMaintenanceQuotaUse());
+
             if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
                 if("是".equals(contractInfoVO.getFiveNineNineFlag())){
                     zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
@@ -296,6 +322,8 @@ public class ZkbContractImportService {
             newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
             newZkbContract.setGeArtificialSupportTimesApply(newZkbContract.getGeArtificialSupportTimesTotal() - newZkbContract.getGeArtificialSupportTimesUse() - newZkbContract.getGeArtificialSupportTimes());
             newZkbContract.setSpareArtificailApply(newZkbContract.getSpareArtificailTotal() - newZkbContract.getSpareArtificailUse() - newZkbContract.getSpareArtificail());
+            newZkbContract.setPartHighQuotaApply(newZkbContract.getPartHighQuotaTotal() - newZkbContract.getPartHighQuota() - newZkbContract.getPartHighQuotaUse());
+            newZkbContract.setCcsbMaintenanceQuotaApply(newZkbContract.getCcsbMaintenanceQuotaTotal() - newZkbContract.getCcsbMaintenanceQuota() - newZkbContract.getCcsbMaintenanceQuotaUse());
             zkbContractRepository.save(newZkbContract);
         }
 
@@ -469,6 +497,27 @@ public class ZkbContractImportService {
             }
         }
 
+        if(ZkbContract.ContractType.CCSB.toString().equals(contractInfoVO.getContractType())){
+            int ccsbMaintenanceQuotaTotal = contractInfoVO.getCcsbMaintenanceQuotaTotal() == null ? 0 : contractInfoVO.getCcsbMaintenanceQuotaTotal();
+            int ccsbMaintenanceQuota = contractInfoVO.getCcsbMaintenanceQuota() == null ? 0 : contractInfoVO.getCcsbMaintenanceQuota();
+            int ccsbMaintenanceQuotaUse = contractInfoVO.getCcsbMaintenanceQuotaUse() == null ? 0 : contractInfoVO.getCcsbMaintenanceQuotaUse();
+            if(ccsbMaintenanceQuotaTotal < (ccsbMaintenanceQuota  + ccsbMaintenanceQuotaUse)){
+                item.put("status", ImportStatus.Failure);
+                ZkbContractRow.addErrMessage(item,  "保养总额小于保养剩余名额、保养已使用名额之和");
+                isValidateData = false;
+            }
+        }
+
+        if(ZkbContract.ContractType.DI.toString().equals(contractInfoVO.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(contractInfoVO.getContractType())){
+            int partHighQuotaTotal = contractInfoVO.getPartHighQuotaTotal() == null ? 0 : contractInfoVO.getPartHighQuotaTotal();
+            int partHighQuota = contractInfoVO.getPartHighQuota() == null ? 0 : contractInfoVO.getPartHighQuota();
+            int partHighQuotaUse = contractInfoVO.getPartHighQuotaUse() == null ? 0 : contractInfoVO.getPartHighQuotaUse();
+            if(partHighQuotaTotal < (partHighQuota + partHighQuotaUse)){
+                item.put("status", ImportStatus.Failure);
+                ZkbContractRow.addErrMessage(item,  "备件高值总额小于备件高值剩余名额、备件高值已使用名额之和");
+                isValidateData = false;
+            }
+        }
 
         for (Map<String, Object> tempContractMap: importContractMapList) {
             ZkbContractVO tempZkbContractVO = (ZkbContractVO)tempContractMap.get("contractInfoVO");
@@ -834,18 +883,36 @@ public class ZkbContractImportService {
                     zkbContractAsset.setTrainReasonFlag("empty");
                 }
                 zkbContractAsset.setSupportMaintainFlag(zkbContractAssetVO.getSupportMaintainFlag());
+                zkbContractAsset.setLastModifiedBy(currentUser.getName());
+                zkbContractAsset.setLastModifiedDate(new Date());
                 zkbContractAssetRepository.save(zkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetEdit","",zkbContractAssetVO.getQrCode(),"导入设备编辑",currentUser,null);
 
+                AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
+                boolean modifyFlag= false;
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
                     Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
-                    AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
                     if(assetInfo != null && repairForm != null){
                         if(!repairForm.equals(assetInfo.getRepairForm())){
                             assetInfo.setRepairForm(repairForm);
-                            assetInfoRepository.save(assetInfo);
+                            modifyFlag = true;
                         }
                     }
+                }
+                ZkbContract zkbContract = zkbContractRepository.findById(zkbContractAsset.getContractId());
+                if(assetInfo.getWarrantyDate() != null){
+                    long betweenDay = DateUtil.between(assetInfo.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
+                    if(betweenDay != 0){
+                        assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                        modifyFlag = true;
+                    }
+                }else {
+                    assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                    modifyFlag = true;
+                }
+
+                if(modifyFlag){
+                    assetInfoRepository.save(assetInfo);
                 }
             }else{
                 ZkbContractAsset newZkbContractAsset = new ZkbContractAsset();
@@ -867,17 +934,38 @@ public class ZkbContractImportService {
                 newZkbContractAsset.setModality(zkbContractAssetVO.getModality());
                 newZkbContractAsset.setResponsiblEngineer(zkbContractAssetVO.getResponsiblEngineer());
                 newZkbContractAsset.setKa(zkbContractAssetVO.getKa());
+                newZkbContractAsset.setCreatedBy(currentUser.getName());
+                newZkbContractAsset.setCreatedDate(new Date());
+                newZkbContractAsset.setLastModifiedBy(currentUser.getName());
+                newZkbContractAsset.setLastModifiedDate(new Date());
                 zkbContractAssetRepository.save(newZkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser,null);
+
+                AssetInfo assetInfo = assetInfoRepository.findByUid(newZkbContractAsset.getAssetId());
+                boolean modifyFlag= false;
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
                     Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
-                    AssetInfo assetInfo = assetInfoRepository.findByUid(newZkbContractAsset.getAssetId());
                     if(assetInfo != null && repairForm != null){
                         if(!repairForm.equals(assetInfo.getRepairForm())){
                             assetInfo.setRepairForm(repairForm);
-                            assetInfoRepository.save(assetInfo);
+                            modifyFlag = true;
                         }
                     }
+                }
+                ZkbContract zkbContract = zkbContractRepository.findById(newZkbContractAsset.getContractId());
+                if(assetInfo.getWarrantyDate() != null){
+                    long betweenDay = DateUtil.between(assetInfo.getWarrantyDate(), zkbContract.getEndDate(), DateUnit.DAY);
+                    if(betweenDay != 0){
+                        assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                        modifyFlag = true;
+                    }
+                }else {
+                    assetInfo.setWarrantyDate(zkbContract.getEndDate());
+                    modifyFlag = true;
+                }
+
+                if(modifyFlag){
+                    assetInfoRepository.save(assetInfo);
                 }
             }
         }else if("Y".equals(zkbContractAssetVO.getFlag())){

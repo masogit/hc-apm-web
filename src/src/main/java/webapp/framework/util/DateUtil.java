@@ -61,8 +61,7 @@ public class DateUtil {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		cal.add(Calendar.MONTH, month);
-		Date  time = cal.getTime();
-		return time;
+		return cal.getTime();
 	}
 
 	/**
@@ -109,5 +108,42 @@ public class DateUtil {
 			e.printStackTrace();
 		}
 		return date;
+	}
+
+	/**
+	 * 获取当月第一天
+	 * @return first day
+	 */
+	public static Date currentMonthFirstDay () {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND,0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
+
+	/**
+	 * 获取下个月最后一天
+	 * @return last day
+	 */
+	public static Date nextMonthLastDay () {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND,0);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.add(Calendar.MONTH, 2);
+		cal.add(Calendar.MILLISECOND, -1);
+		return cal.getTime();
+	}
+
+	public static Date getDateAddOneDay(Date date){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.DATE,1);
+		return calendar.getTime();
 	}
 }

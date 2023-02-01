@@ -122,9 +122,15 @@
                                          value="#{multiLevelApprovalController.approvalOpinion}"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14}">
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 7 and multiLevelApprovalController.businessTypeFlag != 8 and multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14}">
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                    </h:panelGroup>
+                    <!--维修、保养备件审核-->
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 7 or multiLevelApprovalController.businessTypeFlag == 8}">
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(1)}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(2)}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton style="display: none" id="openSignature" actionListener="#{multiLevelApprovalController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
                     </h:panelGroup>
                     <!--不良事件审批-->
                     <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 13}">
@@ -144,6 +150,35 @@
                     </h:panelGroup>
                 </h:form>
 
+            </p:dialog>
+            <p:dialog id="signatureDlg" widgetVar="signatureDlg" header="签名" modal="true">
+                <h:form id="signatureForm">
+                    <h:panelGrid columnClasses="value" columns="1">
+                        <h:panelGroup>
+                            <p:signature id="signatureContent" style="width:400px;height:200px" widgetVar="sigPanel" base64Value="#{multiLevelApprovalController.signatureContent}"
+                                         guideline="false" rendered="#{multiLevelApprovalController.signatureContentStream==null}" />
+                            <p:graphicImage value="#{multiLevelApprovalController.signatureContentStream}" stream="false" rendered="#{multiLevelApprovalController.signatureContentStream!=null}"></p:graphicImage>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                    <p:commandButton value="确认" actionListener="#{multiLevelApprovalController.saveSignatureAndSubmitApprove()}" update="approvalList ItemDetailViewForm" oncomplete="handleApproveSuccess(xhr, status, args);"/>
+                    <p:commandButton immediate="true" process="@this" value="重写" actionListener="#{multiLevelApprovalController.resetSignature()}" update="signatureForm" oncomplete="PF('sigPanel').clear()"/>
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" onclick="PF('signatureDlg').hide()"/>
+                </h:form>
+                <script>
+                    function handleComplete(xhr, status, args) {
+                        if(xhr.status===205){
+                            document.getElementById('approvalDialogForm:openSignature').click();
+                        }else{
+                            PF('MultiLevelApprovalClaimDialog').hide();
+                        }
+                    }
+                    function handleApproveSuccess(xhr, status, args) {
+                        if(xhr.status!==206){
+                            PF('signatureDlg').hide();
+                            PF('MultiLevelApprovalClaimDialog').hide();
+                        }
+                    }
+                </script>
             </p:dialog>
         </div>
     </ui:define>

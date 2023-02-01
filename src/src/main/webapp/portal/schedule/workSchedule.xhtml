@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <!--<ui:define name="head">
@@ -17,10 +18,23 @@
             </div>
 
             <div class="ui-g-12 card">
-                <h:form>
+                <h:form id="IouListForm">
+                    <p:commandButton id="basic" value="#{workScheduleController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:overlayPanel widgetVar="varPanelOrg" for="basic" hideEffect="fade" style="width:350px">
+                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="docs"  class="tree" style="width:98%;border:0;" value="#{workScheduleController.hospitalTree}" var="node" selectionMode="single"
+                                    selection="#{tenantTreeController.selectedTenantOrgNode}" dynamic="true">
+                                <p:ajax process="@this" event="select" listener="#{workScheduleController.onSelectSiteTreeNode}" update="IouListForm workScheduleForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                <p:treeNode type="org">
+                                    <h:outputText value="#{node.name}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
                     <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="#{msg.CreateWorkScheduleInBatch}" title="#{msg.CreateWorkScheduleInBatch}" update=":workScheduleBatchDlg" oncomplete="PF('workScheduleBatchDialog').show()"/>
+                    <p:commandButton id="batchDeleteButton" icon="ui-icon-extlink" value="批量删除" title="批量删除" update=":workScheduleBatchDeleteDlg" oncomplete="PF('workScheduleBatchDeleteDlg').show()"/>
                     <p:commandButton id="scheduleDateStageButton" icon="ui-icon-extlink" value="#{msg.SequenceTimeSettings}" title="#{msg.SequenceTimeSettings}" update=":scheduleDateStageDlg" oncomplete="PF('scheduleDateStageDialog').show()"/>
-                    <p:commandButton id="sharedAssetConfigButton" icon="ui-icon-extlink" value="#{msg.SwapCenterDutySettings}" title="#{msg.SwapCenterDutySettings}" update=":sharedAssetConfigDlg" actionListener="#{sharedAssetConfigController.loadSharedAssetConfig}" oncomplete="PF('sharedAssetConfigDialog').show()" rendered = "#{userContextService.isLocale()}"/>
+<!--                    <p:commandButton id="sharedAssetConfigButton" icon="ui-icon-extlink" value="#{msg.SwapCenterDutySettings}" title="#{msg.SwapCenterDutySettings}" update=":sharedAssetConfigDlg" actionListener="#{sharedAssetConfigController.loadSharedAssetConfig}" oncomplete="PF('sharedAssetConfigDialog').show()" rendered = "#{userContextService.isLocale()}"/>-->
                 </h:form>
                 <h:form id="workScheduleForm">
                     <p:growl widgetVar="messages" id="messages" showDetail="true" />
@@ -49,9 +63,16 @@
                         <h:panelGroup>
                             <label class="label">#{msg.Personnel}*</label>
                             <p:selectOneMenu value="#{workScheduleController.userUID}" style="width:125px" required="true" requiredMessage="#{msg.PersonnelCannotBeEmpty}">
-                                <p:ajax listener="#{workScheduleController.onScheduleValidate}" update="workScheduleForm:addButton"></p:ajax>
+                                <p:ajax listener="#{workScheduleController.onScheduleValidateNew}" update="workScheduleForm:addButton"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{workScheduleController.userList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                <c:choose >
+                                    <c:when test="#{workScheduleController.edited}">
+                                        <f:selectItems value="#{workScheduleController.editUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <f:selectItems value="#{workScheduleController.loadUserList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    </c:otherwise>
+                                </c:choose>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <br/>
@@ -65,7 +86,7 @@
                                 <f:selectItem itemLabel="晚班" itemValue="PM" />
                             </p:selectOneRadio>-->
                             <p:selectOneMenu value="#{workScheduleController.scheduleDateStage}" style="width:125px" required="true" disabled="#{workScheduleController.disableScheduleDateStage}" requiredMessage="#{msg.SequenceCannotBeEmpty}">
-                                <p:ajax listener="#{workScheduleController.onScheduleValidate}" update="workScheduleForm:addButton"></p:ajax>
+                                <p:ajax listener="#{workScheduleController.onScheduleValidateNew}" update="workScheduleForm:addButton"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="#{msg.AllDay}" itemValue="ALL" />
                                 <f:selectItem itemLabel="#{msg.MorningShift}" itemValue="AM" />
@@ -96,6 +117,7 @@
                 <ui:include src="workScheduleBatch.xhtml"/>
                 <ui:include src="workScheduleStageConfig.xhtml"/>
                 <ui:include src="sharedAssetConfig.xhtml"/>
+                <ui:include src="workScheduleBatchDelete.xhtml"/>
             </div>
         </div>
 

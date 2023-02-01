@@ -1,0 +1,204 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <script type="text/javascript">
+            function handleAssetGroupChange(selection) {
+                var ct = document.getElementById('AssetInfoListForm:datalist:assetGroupSeconday_input');
+                if (ct) {
+                    ct.value = '';
+                }
+                PF('varDataList').filter();
+            }
+        </script>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="医疗设备风险评估"/>
+            </div>
+
+            <div class="ui-g-12 card">
+
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="3">
+                        <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
+                            <p:commandButton id="btnOrg" value="#{empty assetRiskAssessmentController.selectSite? msg.AllHospitals:assetRiskAssessmentController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterNodeByName()}" value="#{msg.Search}"/>
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{assetRiskAssessmentController.onSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) :searchForm #{assetRiskAssessmentController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <p:inputText id="searchText" value="#{assetRiskAssessmentController.findByStr}" placeholder="#{msg.name}/#{msg.functionType}/#{msg.assetGroup}" maxlength="100" style="width: 500px">
+                            <p:ajax event="keyup" update=":AssetInfoListForm searchButtons " />
+                        </p:inputText>
+                        <h:panelGroup id='searchButtons'>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm"  rendered="#{empty assetRiskAssessmentController.findByStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm" actionListener="#{assetRiskAssessmentController.setOneSearchStr('')}" rendered="#{not empty assetRiskAssessmentController.findByStr}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:form>
+                <h:form id="AssetInfoListForm">
+                    <p:dataTable id="datalist" value="#{assetRiskAssessmentController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false" selection="#{assetRiskAssessmentController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+<!--                        <p:ajax  event="rowSelect" listener="#{assetRiskAssessmentController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>-->
+                        <p:ajax event="filter" listener="#{assetRiskAssessmentController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                        <p:column width="36"  id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{assetRiskAssessmentController.selectedMap[item.uid]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{assetRiskAssessmentController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="操 作" exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
+                            <p:link target="_new" title="#{msg.Edit}" outcome="#{assetRiskAssessmentController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin') and assetRiskAssessmentController.getIsRiskAssessment(item)}">
+                                <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                            </p:link>
+                            <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetRiskAssessmentController.deleteAsset(item)}" update="datalist">
+                                <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.namePyCode}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.serialNum}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup', item.assetGroup)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="handleAssetGroupChange()"  autoWidth="false" style="max-width: 150px;" height="300" value="#{assetRiskAssessmentController.assetGroup}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <p:ajax listener="#{assetRiskAssessmentController.assetGroupChangeListener}" update="@(.assetGroupChange)" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{assetRiskAssessmentController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetRiskAssessmentController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{assetRiskAssessmentController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  " oncomplete="afterLoadRender()" />
+                                    <p:ajax process="@this" listener="#{assetRiskAssessmentController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  "  oncomplete="afterLoadRender()"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.riskAssessment}" sortBy="#{item.sumRiskScore}" filterBy="#{item.sumRiskScore}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.sumRiskScore}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.maintenancePeriod}" sortBy="#{item.maintenancePeriod}" filterBy="#{item.maintenancePeriod}" filterMatchMode="EQ" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="300">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{assetRiskAssessmentController.maintenancePeriod}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.maintenancePeriod}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.detectionCycle}" sortBy="#{item.detectionCycle}" filterBy="#{item.detectionCycle}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.detectionCycle}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('assetRiskAssessmentCreate.xhtml?actionName=Create')}"  />
+                            <p:commandButton title="#{msg.exportToDoc}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetRiskAssessmentController.exportWord}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                <p:fileDownload value="#{assetRiskAssessmentController.zipFile}" />
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+
+                    <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
+                </h:form>
+            </div>
+        </div>
+
+        <script>
+
+            function afterLoadRender(){
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            }
+
+            $(function () {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            });
+
+            //<![CDATA[
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+                var isActive = "#{userContextService.isActive()}";
+                if (isActive == '1') {
+                    PF('ActiveDlg').show();
+                }
+            }
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>

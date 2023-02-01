@@ -10,17 +10,16 @@
         <h:outputScript name="js/assetUsageAll.js"/>
         <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
-        <!--        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>-->
         <style>
             div.ui-autocomplete.ui-autocomplete-multiple.asset-tags ul.ui-autocomplete-multiple-container{
                 max-width: 200px;
                 max-height: 100px;
-                overflow-y: auto;
+                overflow-y: hidden;
             }
         </style>
     </ui:define>
     <ui:define name="content">
-        <div class="ui-g clearfix">
+        <div class="ui-g clearfix" id="header">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{assetInfoDetailController.terminate? msg.TerminateAssetInfoDetail :msg.AssetInfoDetail}"/>
             </div>
@@ -40,15 +39,12 @@
                             </p:panelGrid>
                         </div>
                         <div class="ui-g-4">
-                            <!--                            <p:galleria value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="attach" panelWidth="300" panelHeight="200" showCaption="false" rendered="#{!empty assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}">-->
-                            <!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;" onclick="javascript:showthis(this);"/>-->
-                            <!--                            </p:galleria>-->
                             <div class="container-fluid" style="height: 400px; overflow: auto;">
                                 <div class="row" id="picDiv">
                                     <c:forEach items="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="attach" >
                                         <div>
-                                            <img data-original="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
-                                                 src="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
+                                            <img data-original="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
+                                                 src="#{fileDownloadService.getImgBase64(attach.objectStorageId)}"
                                                  style="opacity:0; width:1px; height:1px" />
                                         </div>
                                     </c:forEach>
@@ -201,7 +197,6 @@
                     <p:panel  header="#{msg.MetrologyMonitor}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/measuring/measuringResultMain?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/insp/MetrologyOrderCreate?faces-redirect=true&amp;actionName=Create')}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                         </f:facet>
 
                         <p:dataTable var="item" value="#{inspectionServiceController.getInspectionOrderList(assetInfoDetailController.selected.id, 2, 3)}" emptyMessage="#{msg.noRecordFound}">
@@ -276,7 +271,6 @@
                     <p:panel  header="#{msg.ExternalMaintenanceRecord}4566" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;queryTab=pmOrderListRemote&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
                         </f:facet>
                         <p:dataTable var="item" value="#{assetInfoDetailController.getOrderList('5')}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.MaintenanceID}" >
@@ -322,35 +316,75 @@
                             </p:column>
                         </p:dataTable>
                     </p:panel>
+                    <p:panel  header="日常检查记录" >
+                        <f:facet name="actions">
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/maintainMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                            <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl nurseSiteMaintainForm" onclick="PF('nurseSiteMaintainDialog').show()"/>
+                        </f:facet>
+                        <p:dataTable var="item" value="#{maintainController.getMaintainDataList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column styleClass="textCenter"  headerText="计划检查日期" >
+                                <h:outputText value="#{item.scheduleDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="实际检查日期" >
+                                <h:outputText value="#{item.checkDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+<!--                            <p:column headerText="负责人" >
+                                <h:outputText value="#{item.principal}"/>
+                            </p:column>-->
+                            <p:column headerText="检查人" >
+                                <h:outputText value="#{item.checker}"/>
+                            </p:column>
+                            <p:column headerText="工单状态" >
+                                <h:outputText value="#{item.status}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+
+                    <p:panel  header="开关机记录" id="A">
+                        <f:facet name="actions">
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/assetOptRecordList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                            <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl sharedAssetConfigForm" onclick="PF('sharedAssetConfigDialog').show();"/>
+                        </f:facet>
+
+                        <p:dataTable var="item" value="#{assetOptRecordController.getAssetOptRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="开机时间" >
+                                <h:outputText value="#{item.startDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="关机时间" >
+                                <h:outputText value="#{item.endDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm "/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="开机人" >
+                                <h:outputText value="#{item.createByName}" />
+                            </p:column>
+                            <p:column headerText="关机人" >
+                                <h:outputText value="#{empty item.endDate?'':item.modifyByName}" />
+                            </p:column>
+                            <p:column headerText="使用时长">
+                                <h:outputText value="#{item.costTime}">
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
                 </p:panelGrid>
             </h:form>
 
-            <!--            <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceExpo.series}">
-                             Chart 2: Device Exposure
-                            <div class="ui-g-12">
-                                <div class="block">
-                                    <h3 class="block-title">#{msg.deviceExpohd}</h3>
-                                    <p:chart id="exposure_bar" type="line" model="#{assetUsageSingleController.deviceExpo}"
-                                             responsive="true"/>
-                                </div>
-                            </div>
-                        </p:fieldset>
-                        <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceScan.series}">
-                             Chart 1: Device Scan
-                            <div class="ui-g-12">
-                                <div class="block">
-                                    <h3 class="block-title">#{msg.deviceScanhd}</h3>
-                                    <p:chart id="scan_bar" type="line"
-                                             model="#{assetUsageSingleController.deviceScan}" responsive="true"/>
-                                </div>
-                            </div>
-                        </p:fieldset>-->
             <h:form>
-                <p:panel  header="#{msg.RelatedEquipmentUID}" rendered="#{assetInfoDetailController.showParentsTree()}">
+                <p:panel  header="相关设备" rendered="#{assetInfoDetailController.showParentsTree()}">
                     <p:treeTable styleClass="ui-datatable"  value="#{assetInfoDetailController.getParentsRelationTree()}" var="assetItem">
                         <f:facet name="header" />
                         <p:column headerText="#{msg.name}">
                             <h:outputText value="#{assetItem.name}" />
+                        </p:column>
+                        <p:column headerText="#{msg.functionType}">
+                            <h:outputText value="#{assetItem.functionType}" />
                         </p:column>
                         <p:column headerText="#{msg.serialNum}">
                             <h:outputText value="#{assetItem.serialNum}" />
@@ -362,7 +396,6 @@
                             <h:outputText value="#{assetItem.departNum}" />
                         </p:column>
                         <p:column >
-                            <!--<p:commandLink value="#{msg.View}" action="#{assetInfoDetailController.getDetailPageLink(assetItem.uid)}" disabled="#{assetItem.uid eq assetInfoDetailController.selected.uid}"/>-->
                             <p:link  outcome="#{assetInfoDetailController.getDetailPageLink(assetItem.uid)}" disabled="#{assetItem.uid eq assetInfoDetailController.selected.uid}" >#{msg.View}</p:link>
                         </p:column>
 
@@ -374,7 +407,6 @@
                     <f:facet name="actions">
                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}"
                                        disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                        <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Create&amp;assetId='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                     </f:facet>
                     <p:dataTable var="item" value="#{assetInfoDetailController.getContractList()}" emptyMessage="#{msg.noRecordFound}">
                         <p:column headerText="#{msg.name}" >
@@ -402,7 +434,6 @@
                             <h:outputText value="#{assetInfoDetailController.getContractInvoice(item)}"/>
                         </p:column>
                         <p:column   >
-                            <!--<p:commandLink action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.id))}" value="查看" />-->
                             <p:link outcome="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.id))}" disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}">#{msg.View}</p:link>
                         </p:column>
                     </p:dataTable>
@@ -412,23 +443,28 @@
                 <p:tabView>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 1)}">
                         <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 2)}">
                         <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,2)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 3)}">
                         <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,3)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        </p:dataList>
+                    </p:tab>
+                    <p:tab title="#{fieldMsg.fieldValue('attachmentType', 4)}">
+                        <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,4)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                         </p:dataList>
                     </p:tab>
                     <c:forEach items="#{assetInfoDetailController.getAttachmentCategories()}" var="attachmentConfig">
                         <p:tab title="#{attachmentConfig.label}">
                             <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                             </p:dataList>
                         </p:tab>
                     </c:forEach>
@@ -438,7 +474,6 @@
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoDetailController.selected.qrCode}">
-<!--                        <img id="codeImg" src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" />-->
                         <p:panelGrid columns="2" layout="grid" styleClass="showcase-text-align-center">
                             <p:graphicImage id="qrcode" value="#{qrCodeShowController.getImg(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" stream="false" />
                             <p:commandButton id="btn" value="打印" icon="ui-icon-print" style="margin-top: 41px;margin-left: 30px">
@@ -448,7 +483,61 @@
                     </p:tab>
                 </p:tabView>
             </h:form>
-
+            <p:dialog id="sharedAssetConfigDlg" widgetVar="sharedAssetConfigDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)"  header="设备开关机记录-下载">
+                <p:ajax event="open" listener="#{assetDetailExportController.initOpenDialog}" update="sharedAssetConfigForm" onsuccess="window.location.hash='header'"></p:ajax>
+                <p:ajax event="close" listener="#{assetDetailExportController.closeOpenDialog}" update="sharedAssetConfigForm" onsuccess="window.location.hash='returnButton'"></p:ajax>
+                <h:form id="sharedAssetConfigForm">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup   >
+                            <label class="label">开始时间</label>
+                            <p:calendar mode="popup" timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetDetailExportController.startDate}"
+                                        showOn="button" readonlyInput="true" showButtonPanel="true"  navigator="true"   >
+                                <p:ajax event="dateSelect"  listener="#{assetDetailExportController.onScheduleValidate}" update="sharedAssetConfigForm:sharedAssetConfigButton"></p:ajax>
+                            </p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup  >
+                            <label class="label">结束时间</label>
+                            <p:calendar mode="popup"  pattern="yyyy/MM/dd" value="#{assetDetailExportController.endDate}"  showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"  >
+                                <p:ajax event="dateSelect" listener="#{assetDetailExportController.onScheduleValidate}" update="sharedAssetConfigForm:sharedAssetConfigButton"></p:ajax>
+                            </p:calendar>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:inputHidden id="sharedAssetConfigOpen" value="#{assetDetailExportController.open}"></h:inputHidden>
+                    <p:commandButton id="sharedAssetConfigButton" validateClient="true" ajax="false"  disabled="#{assetDetailExportController.download}"
+                                      actionListener="#{assetDetailExportController.exportAllWoByAssetInfoId(assetInfoDetailController.selected)}" value="下载" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" >
+                        <p:fileDownload value="#{assetDetailExportController.exportFile}" />
+                    </p:commandButton>
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('sharedAssetConfigDialog').hide()"/>
+                </h:form>
+            </p:dialog>
+            </div>
+            <p:dialog id="nurseSiteMaintainDialog" widgetVar="nurseSiteMaintainDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="日常检查记录-下载">
+                <p:ajax event="open" listener="#{assetDetailExportController.initOpenDialog}" update="nurseSiteMaintainForm" onsuccess="window.location.hash='#header'"></p:ajax>
+                <p:ajax event="close" listener="#{assetDetailExportController.closeOpenDialog}" update="nurseSiteMaintainForm"  onsuccess="window.location.hash='returnButton'"></p:ajax>
+                <h:form id="nurseSiteMaintainForm">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup   >
+                            <label class="label">开始时间</label>
+                            <p:calendar mode="popup"  timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetDetailExportController.startDate}"
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  >
+                                <p:ajax event="dateSelect" listener="#{assetDetailExportController.onScheduleValidate}" update="nurseSiteMaintainForm:nurseSiteMaintainButton"></p:ajax>
+                            </p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup  >
+                            <label class="label">结束时间</label>
+                            <p:calendar mode="popup" timeZone="GMT+8" value="#{assetDetailExportController.endDate}" pattern="yyyy/MM/dd"  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  >
+                                <p:ajax event="dateSelect" listener="#{assetDetailExportController.onScheduleValidate}" update="nurseSiteMaintainForm:nurseSiteMaintainButton"></p:ajax>
+                            </p:calendar>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:inputHidden   id="nurseSiteMaintainOpen" value="#{assetDetailExportController.open}" />
+                    <p:commandButton id="nurseSiteMaintainButton" validateClient="true" ajax="false"  disabled="#{assetDetailExportController.download}"
+                                     actionListener="#{assetDetailExportController.exportNurseSiteMaintainByAssetInfoId(assetInfoDetailController.selected)}" value="下载" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" >
+                        <p:fileDownload value="#{assetDetailExportController.exportFile}" />
+                    </p:commandButton>
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('nurseSiteMaintainDialog').hide()"/>
+                </h:form>
+            </p:dialog>
             <p:panel id="modifyRecordList"
                      header="#{msg.ModifyRecord}"
                      toggleable="true"
@@ -464,7 +553,6 @@
                 <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
 
             </h:panelGroup>
-        </div>
         <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: available;max-height:available;min-width:800px;min-height:600px;overflow: hidden">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
                 <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span>
@@ -495,7 +583,7 @@
             afterPageLoad = function () {
                 $(".jqplot-table-legend").css("display", "none");
             }
-
+            
             function showthis(pic) {
                 var s = $('#shwoPicDialogImg')[0];
                 s.src = pic.src;
@@ -540,7 +628,21 @@
                     imgsrc.height = imgsrc.height / 1.1;
                 }
             }
+            //<![CDATA[
+            window.onscroll = function () {
+                console.log(document.documentElement.scrollTop);
+                var scrollTop = document.documentElement.scrollTop;
+                /*1.默认的透明度*/
+                var sharedAssetConfigOpen=document.getElementById('sharedAssetConfigForm:sharedAssetConfigOpen').value;
+                var nurseSiteMaintainOpen=document.getElementById('nurseSiteMaintainForm:nurseSiteMaintainOpen').value;
+                if(sharedAssetConfigOpen=='true' || nurseSiteMaintainOpen =='true'){
+                    document.documentElement.scrollTop=0;
+                }else{
+                    document.documentElement.scrollTop=scrollTop;
+                }
 
+            }
+            //]]>
         </script>
         <script>
             new Viewer(document.getElementById('picDiv'), {inline: true});

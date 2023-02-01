@@ -178,6 +178,9 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         if (user.getPassword().equals(tenantInfo.getInitialPassword()) && user.getPwdSalt().equals(tenantInfo.getInitialPasswordSalt())) {
             return true;
         } else {
+            if(user.getLastLoginTime()==null) { // 没有亲自修改改密码
+                return true;
+            }
             return false;
         }
     }

@@ -25,6 +25,24 @@ public class QueryAsset {
     private Double purchasePriceEnd;//采购价格(元)end
 	private boolean generate;
 	private Integer riskGrade;
+ 	private String mainDirectory;
+ 	private String secondDirectory;
+
+	public String getMainDirectory() {
+		return mainDirectory;
+	}
+
+	public void setMainDirectory(String mainDirectory) {
+		this.mainDirectory = mainDirectory;
+	}
+
+	public String getSecondDirectory() {
+		return secondDirectory;
+	}
+
+	public void setSecondDirectory(String secondDirectory) {
+		this.secondDirectory = secondDirectory;
+	}
 
 	public Integer getRiskGrade() { return riskGrade; }
 

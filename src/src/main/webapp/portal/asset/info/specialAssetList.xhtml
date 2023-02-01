@@ -1,0 +1,947 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="preRenderView">
+        <f:metadata>
+            <f:viewParam name="assetStatus" value="#{assetInfoListController.filterAssetStatus}"/>
+            <f:viewParam name="model" value="#{assetInfoListController.filterWarrantyDate}"/>
+            <f:viewParam name="assetId" value="#{assetInfoListController.assetId}"/>
+        </f:metadata>
+        <f:event type="preRenderView" listener="#{assetInfoListController.setAssetStatusFilter()}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <script type="text/javascript">
+            function handleAssetGroupChange(selection) {
+                var ct = document.getElementById('AssetInfoListForm:datalist:assetGroupSeconday_input');
+                if (ct) {
+                    ct.value = '';
+                }
+
+                PF('varDataList').filter();
+            }
+        </script>
+
+        <style>
+            .warrantyExpireSoon {
+            background-color: #fca752!important;
+            color: #000000!important;
+            }
+            .warrantyExpired {
+            background-color: #f04134!important;
+            color: #000000!important;
+            }
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="台账管理"/>
+            </div>
+
+            <div class="ui-g-12 card">
+
+                <h:form id="searchForm">
+                    <h:panelGrid id="filterType" columns="4" style="float: right">
+                        <h:panelGroup style="float: right"  rendered="#{assetInfoListController.showWarrantyAlert}">
+                            <span >#{msg.Legend}：</span>
+                            <span class="warrantyExpireSoon">#{msg.MorWExpireSoon}</span>
+                            <span></span>
+                            <span class="warrantyExpired">#{msg.MorWExpired}</span>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(1)}"  rendered="true" disabled="#{assetInfoListController.queryType == 1}" value="全部" />
+                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(2)}"  rendered="true" disabled="#{assetInfoListController.queryType == 2}" value="主设备"/>
+                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(3)}"  rendered="true" disabled="#{assetInfoListController.queryType == 3}" value="子设备"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <h:panelGrid id="searchPanel" columns="3">
+                        <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
+                            <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":searchForm:treeNodeNameFilter @this" update="searchForm:orgTree" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="#{msg.Search}"/>
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm @(.dataTableFilterByHospital) :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{userContextService.hasAnyRole('MVSAdmin,MVSFE')}">
+.                            <p:commandButton id="btnTenant" value="#{empty assetInfoListController.selectSite? msg.AllTenants:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
+                            <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="tenantTree" class="tree" style="width:98%;border:0;" value="#{tenantTreeController.buildTenantTree(1)}" selection="#{tenantTreeController.selectedTenantOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm" oncomplete="PF('varPanelTenant').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+										<p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+                        <p:inputText id="searchText" value="#{assetInfoListController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}/#{msg.assetTags}" maxlength="100" style="width: 500px">
+                            <p:ajax event="keyup" update=":AssetInfoListForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''} searchButtons " />
+                        </p:inputText>
+
+                        <h:panelGroup id='searchButtons'>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}"  rendered="#{empty assetInfoListController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" actionListener="#{assetInfoListController.setOneSearchStr('')}" rendered="#{not empty assetInfoListController.oneSearchStr}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:form>
+                <h:form id="AssetInfoListForm">
+                    <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false" selection="#{assetInfoListController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowStyleClass="#{item.warrantyAlertStatus}"
+                                 rowKey="#{item.id}" sortMode="single"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax  event="rowSelect" listener="#{assetInfoListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>
+                        <p:ajax event="filter" listener="#{assetInfoListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
+                        <p:column width="36"  id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{assetInfoListController.selectedMap[item.uid]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{assetInfoListController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist batchToRelRule" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="操 作" exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
+                            <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}">
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                                </p:link>
+                                <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+                            <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
+                                <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+<!--                            <h:panelGroup rendered="#{assetInfoListController.filterAssetStatus == -1}">-->
+<!--                            <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteForever" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAssetForever(item)}" update="datalist" >-->
+<!--                                <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>-->
+<!--                                <p:confirm header="#{msg.DeleteConformation}" message="您确定要删除选定的记录么? 操作不可逆，设备记录将会丢失!" icon="ui-icon-warning"/>-->
+<!--                            </p:commandLink>-->
+<!--                            </h:panelGroup>-->
+                        </p:column>
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.namePyCode}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.manufacture}"/>
+                        </p:column>
+                        <p:column  headerText="设备编号" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="handleAssetGroupChange()"  autoWidth="false" style="max-width: 150px;" height="300" value="#{assetInfoListController.assetGroup}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <p:ajax listener="#{assetInfoListController.assetGroupChangeListener}" update="@(.assetGroupChange)" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.vendor}" sortBy="#{item.vendor}" filterBy="#{item.vendor}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.vendor}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:autoComplete dropdown="true" value="#{assetInfoListController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
+                                    <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" oncomplete="afterLoadRender()" />
+                                    <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>
+                                </p:autoComplete>
+                            </f:facet>
+                            <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.locationName}" sortBy="#{item.locationName}" filterBy="#{item.locationName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.locationName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{!assetInfoListController.terminate}">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <!--                                            <c:if test="#{userContextService.hasRole('AssetHead')}">-->
+                                    <!--                                                <f:selectItem itemLabel="待删除" itemValue="-1" noSelectionOption="true" />-->
+                                    <!--                                            </c:if>-->
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.QRCode}" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.createdDate}" sortBy="#{item.createdDate}" filterBy="#{item.createdDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" value="#{assetInfoListController.selectedObject['createdDate']}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                            </h:outputText>
+                        </p:column>
+                        <c:forEach items="#{assetInfoListController.customedColumns}" var="columnItem" >
+                            <c:if test="#{columnItem eq 'vendorTel'}">
+                                <p:column headerText="#{msg.vendorTel}" rendered="false">
+                                    <h:outputText value="#{item.supplier.tel}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'subjectProject'}">
+                                <p:column headerText="#{msg.subjectProject}" sortBy="#{item.subjectProject}" filterBy="#{item.subjectProject}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.subjectProject}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'networkingStatus'}">
+                                <p:column headerText="#{msg.networkingStatus}" sortBy="#{item.networkingStatus}" filterBy="#{item.networkingStatus}" filterMatchMode="EQ" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('networkingStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('networkingStatus',item.networkingStatus)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'isUseRegistration'}">
+                                <p:column headerText="#{msg.isUseRegistration}" sortBy="#{item.isUseRegistration}" filterBy="#{item.isUseRegistration}" filterMatchMode="EQ" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                            <f:converter converterId="javax.faces.Boolean" />
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" />
+                                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{item.isUseRegistration?msg.True2Yes:msg.False2No}"/>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'warrantyDate'}">
+                                <p:column  headerText="#{msg.warrantyDate}" sortBy="#{item.warrantyDate}" filterBy="#{item.warrantyDate}" filterMatchMode="GTE" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterWarrantyDate" widgetVar="varFilterWarrantyDate" value="#{assetInfoListController.warrantyFormatTime}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.warrantyDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+
+                            <c:if test="#{columnItem eq 'financingNum'}">
+                                <p:column headerText="#{msg.financingNum}" exportable="true" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.financingNum}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'rfId'}">
+                                <p:column headerText="#{msg.rfId}" exportable="true" sortBy="#{item.rfId}" filterBy="#{item.rfId}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.rfId}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'modalityType'}">
+                                <p:column headerText="#{msg.modalityType}" exportable="true" sortBy="#{item.modalityType}" filterBy="#{item.modalityType}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.modalityType}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'medicalApparatusClassification'}" >
+                                <p:column headerText="#{msg.medicalApparatusClassification}" rendered="false" exportable="true" sortBy="#{item.medicalApparatusClassification}" filterBy="#{item.medicalApparatusClassification}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.medicalApparatusClassification}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'rfGroup'}">
+                                <p:column headerText="#{msg.rfGroup}" exportable="true" sortBy="#{item.rfGroup}" filterBy="#{item.rfGroup}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.rfGroup}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'aliasName'}">
+                                <p:column  headerText="#{msg.aliasName}" sortBy="#{item.aliasName}" filterBy="#{item.aliasName}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.aliasName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetOwnerName'}" >
+                                <p:column  headerText="#{msg.assetOwnerName}" sortBy="#{item.assetOwnerName}" filterBy="#{item.assetOwnerName}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.assetOwnerName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetOwnerTel'}">
+                                <p:column  headerText="#{msg.assetOwnerTel}" sortBy="#{item.assetOwnerTel}" filterBy="#{item.assetOwnerTel}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.assetOwnerTel}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetOwnerName2'}" >
+                                <p:column  headerText="#{msg.assetOwnerName2}" sortBy="#{item.assetOwnerName2}" filterBy="#{item.assetOwnerName2}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.assetOwnerName2}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetOwnerTel2'}">
+                                <p:column headerText="#{msg.assetOwnerTel2}" sortBy="#{item.assetOwnerTel2}" filterBy="#{item.assetOwnerTel2}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.assetOwnerTel2}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetOwnerName3'}">
+                                <p:column headerText="#{msg.assetOwnerName3}" sortBy="#{item.assetOwnerName3}" filterBy="#{item.assetOwnerName3}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.assetOwnerName3}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetOwnerTel3'}">
+                                <p:column headerText="#{msg.assetOwnerTel3}" sortBy="#{item.assetOwnerTel3}" filterBy="#{item.assetOwnerTel3}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.assetOwnerTel3}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'clinicalOwnerName'}">
+                                <p:column headerText="#{msg.clinicalOwnerName}" sortBy="#{item.clinicalOwnerName}" filterBy="#{item.clinicalOwnerName}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.clinicalOwnerName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'clinicalOwnerTel'}">
+                                <p:column headerText="#{msg.clinicalOwnerTel}" sortBy="#{item.clinicalOwnerTel}" filterBy="#{item.clinicalOwnerTel}" filterMatchMode="LIKE" rendered="false">
+                                    <h:outputText value="#{item.clinicalOwnerTel}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetUsage'}">
+                                <p:column id="assetUsage" headerText="#{msg.assetUsage}" sortBy="#{item.assetUsage}" filterBy="#{item.assetUsage}" filterMatchMode="EQ" rendered="false">
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetUsage')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetValueCategory'}">
+                                <p:column headerText="#{msg.assetValueCategory}" rendered="false">
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetValueCategory', item.assetValueCategory)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'capitalSource'}">
+                                <p:column id="capitalSource" headerText="#{msg.capitalSource}" sortBy="#{item.capitalSource}" filterBy="#{item.capitalSource}" filterMatchMode="EQ" rendered="false">
+                                    <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+
+                            </c:if>
+                            <c:if test="#{columnItem eq 'capitalSource2'}">
+                                <p:column id="capitalSource2" headerText="#{msg.capitalSource2}" sortBy="#{item.capitalSource2}" filterBy="#{item.capitalSource2}" filterMatchMode="EQ" rendered="false">
+                                    <h:outputText value="#{fieldMsg.fieldValue('capitalSource2', item.capitalSource2)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource2')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'measureGrade'}">
+                                <p:column headerText="#{msg.measureGrade}" sortBy="#{item.measureGrade}" filterBy="#{item.measureGrade}" filterMatchMode="EQ" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'riskGrade'}">
+                                <p:column headerText="#{msg.riskGrade}" sortBy="#{item.riskGrade}" filterBy="#{item.riskGrade}" filterMatchMode="EQ" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{userContextService.useNewRiskGrade() ? fieldMsg.getFieldValueList('riskGradeNew') : fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{userContextService.useNewRiskGrade() ? fieldMsg.fieldValue('riskGradeNew', item.riskGrade) : fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'emergencyEquipment'}">
+                                <p:column id="emergencyEquipment" headerText="#{msg.emergencyEquipment}" sortBy="#{item.emergencyEquipment}" rendered="false" filterBy="#{item.emergencyEquipment}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'importEquipment'}">
+                                <p:column id="importEquipment" headerText="#{msg.importEquipment}" sortBy="#{item.importEquipment}" filterBy="#{item.importEquipment}" rendered="false" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('importEquipment', item.importEquipment)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'measuringItemCategory'}">
+                                <p:column headerText="#{msg.measuringItemCategory}" sortBy="#{item.measuringItemCategory}" filterBy="#{item.measuringItemCategory}" filterMatchMode="EQ" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'accountingCategory'}">
+                                <p:column headerText="#{msg.accountingCategory}" rendered="false">
+                                    <h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'siteUID'}">
+                                <p:column headerText="#{msg.hospitalId}" filterBy="#{item.hospitalId}" filterMatchMode="EQ" rendered="false">
+                                    <h:outputText value="#{assetInfoListController.getSiteOrgName(item.siteUID)}"/>
+                                    <f:facet name="filter">
+                                        <p:inputText id="btnOrg2" readonly="true" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" widgetVar="varPanelOrg2"/>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'parentAssetId'}">
+                                <p:column headerText="#{msg.parentAsset}" rendered="false" >
+                                    <h:outputText value="#{assetInfoListController.getParentAssetNameByAssetId(item.id)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemId'}">
+                                <p:column  headerText="#{msg.systemId}" sortBy="#{item.systemId}" rendered="false" filterBy="#{item.systemId}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemId}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'functionGroup'}">
+                                <p:column headerText="#{msg.functionGroup}"  rendered="false">
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.functionGroup)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetCode68'}">
+                                <p:column headerText="#{msg.assetCode68}"  rendered="false" >
+                                    <h:outputText value="#{fieldMsg.fieldValue(item.functionGroup,item.assetCode68)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'functionGrade'}">
+                                <p:column headerText="#{msg.functionGrade}" rendered="false" >
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetFunctionGrade',item.functionGrade)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'proprietaryClass'}">
+                                <p:column headerText="#{msg.proprietaryClass}" rendered="false" sortBy="#{item.proprietaryClass}" filterBy="#{item.proprietaryClass}" filterMatchMode="EQ" >
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('proprietaryClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('proprietaryClass',item.proprietaryClass)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'maitanance'}">
+                                <p:column headerText="#{msg.maitanance}" rendered="false" >
+                                    <h:outputText value="#{item.maitanance}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'maitananceTel'}">
+                                <p:column headerText="#{msg.maitananceTel}" rendered="false" >
+                                    <h:outputText value="#{item.maitananceTel}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'barcode'}">
+                                <p:column headerText="#{msg.barcode}" rendered="false" sortBy="#{item.barcode}" filterBy="#{item.barcode}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.barcode}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'modalityId'}">
+                                <p:column headerText="#{msg.modalityId}" rendered="false" sortBy="#{item.modalityId}" filterBy="#{item.modalityId}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.modalityId}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'locationCode'}" >
+                                <p:column headerText="#{msg.locationCode}" rendered="false" sortBy="#{item.locationCode}" filterBy="#{item.locationCode}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.locationCode}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'registrationNo'}">
+                                <p:column headerText="#{msg.registrationNo}" rendered="false" sortBy="#{item.registrationNo}" filterBy="#{item.registrationNo}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.registrationNo}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemNum1'}">
+                                <p:column headerText="#{msg.systemNum1}" rendered="false" sortBy="#{item.systemNum1}" filterBy="#{item.systemNum1}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum1}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemNum2'}">
+                                <p:column headerText="#{msg.systemNum2}" rendered="false" sortBy="#{item.systemNum2}" filterBy="#{item.systemNum2}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum2}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemNum3'}">
+                                <p:column headerText="#{msg.systemNum3}" rendered="false" sortBy="#{item.systemNum3}" filterBy="#{item.systemNum3}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum3}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemNum4'}">
+                                <p:column headerText="#{msg.systemNum4}"  rendered="false" sortBy="#{item.systemNum4}" filterBy="#{item.systemNum4}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum4}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'systemNum5'}">
+                                <p:column headerText="#{msg.systemNum5}" rendered="false" sortBy="#{item.systemNum5}" filterBy="#{item.systemNum5}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.systemNum5}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'deviceStatus'}">
+                                <p:column id="deviceStatus" headerText="#{msg.deviceStatus}" sortBy="#{item.deviceStatus}" filterBy="#{item.deviceStatus}" filterMatchMode="EQ" rendered="false">
+                                    <h:outputText value="#{fieldMsg.fieldValue('deviceStatus', item.deviceStatus)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'manufactDate'}">
+                                <p:column headerText="#{msg.manufactDate}" sortBy="#{item.manufactDate}" filterBy="#{item.manufactDate}" filterMatchMode="GTE" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterManufactDate" widgetVar="varFilterManufactDate" value="#{assetInfoListController.manufactDateFormatTime}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.manufactDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'purchaseDate'}">
+                                <p:column headerText="#{msg.purchaseDate}" sortBy="#{item.purchaseDate}" rendered="false">
+                                    <h:outputText value="#{item.purchaseDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'acceptDate'}">
+                                <p:column headerText="#{msg.acceptDate}" sortBy="#{item.acceptDate}" rendered="false">
+                                    <h:outputText value="#{item.acceptDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'arriveDate'}">
+                                <p:column headerText="#{msg.arriveDate}" sortBy="#{item.arriveDate}" filterBy="#{item.arriveDate}" filterMatchMode="GTE" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterArriveDate" widgetVar="varFilterArriveDate" value="#{assetInfoListController.arriveDateFormatTime}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.arriveDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'installDate'}">
+                                <p:column headerText="#{msg.installDate}" sortBy="#{item.installDate}" filterBy="#{item.installDate}" filterMatchMode="GTE" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterInstallDate" widgetVar="varFilterInstallDate" value="#{assetInfoListController.installDateFormatTime}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.installDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'terminateDate'}">
+                                <p:column headerText="#{msg.terminateDate}" sortBy="#{item.terminateDate}" rendered="false">
+                                    <h:outputText value="#{item.terminateDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'factoryWarrantyDate'}">
+                                <p:column headerText="#{msg.factoryWarrantyDate}" sortBy="#{item.factoryWarrantyDate}" filterBy="#{item.factoryWarrantyDate}" filterMatchMode="GTE" rendered="false">
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterFactoryWarrantyDate" widgetVar="varFilterFactoryWarrantyDate" value="#{assetInfoListController.factoryWarrantyDateFormatTime}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.factoryWarrantyDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'purchasePrice'}">
+                                <p:column headerText="#{msg.purchasePrice}" sortBy="#{item.purchasePrice}" filterBy="#{item.purchasePrice}" filterMatchMode="GTE" rendered="false">
+                                    <h:outputText value="#{item.purchasePrice}">
+                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                    </h:outputText>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'salvageValue'}">
+                                <p:column headerText="#{msg.salvageValue}"  rendered="false">
+                                    <h:outputText value="#{item.salvageValue}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'lifecycle'}">
+                                <p:column headerText="#{msg.lifecycle}" sortBy="#{item.lifecycle}" filterBy="#{item.lifecycle}" filterMatchMode="EQ" rendered="false">
+                                    <h:outputText value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'warrantyMonth'}">
+                                <p:column headerText="#{msg.warrantyMonth}" rendered="false">
+                                    <h:outputText value="#{item.warrantyMonth}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'depreciationMethod'}">
+                                <p:column headerText="#{msg.depreciationMethod}" rendered="false" >
+                                    <h:outputText value="#{fieldMsg.fieldValue('depreciationMethodList',item.depreciationMethod)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'makerShortName'}">
+                                <p:column headerText="#{msg.makerShortName}" rendered="false" sortBy="#{item.makerShortName}" filterBy="#{item.makerShortName}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.makerShortName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'deviceName'}">
+                                <p:column headerText="#{msg.deviceName}"  rendered="false">
+                                    <h:outputText value="#{item.deviceName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'repairForm'}">
+                                <p:column id="repairForm" headerText="#{msg.repairForm}"  rendered="false" sortBy="#{item.repairForm}" filterBy="#{item.repairForm}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('repairForm', item.repairForm)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'comments'}">
+                                <p:column headerText="#{msg.comments}"  sortBy="#{item.comments}" rendered="false" filterBy="#{item.comments}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.comments}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'isPm'}">
+                                <p:column headerText="#{msg.isAssetPMed}"   rendered="false">
+                                    <h:outputText value="#{item.isPm?msg.True2Yes:msg.False2No}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'isFixed'}">
+                                <p:column headerText="#{msg.isFixed}" rendered="false" sortBy="#{item.isFixed}" filterBy="#{item.isFixed}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                            <f:converter converterId="javax.faces.Boolean" />
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" />
+                                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{item.isFixed?msg.True2Yes:msg.False2No}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'isChecked'}">
+                                <p:column headerText="#{msg.isAssetChecked}" rendered="false" sortBy="#{item.isChecked}" filterBy="#{item.isChecked}" filterMatchMode="EQ" >
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                            <f:converter converterId="javax.faces.Boolean" />
+                                            <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{item.isChecked?msg.True2Yes:msg.False2No}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'pmOwnerName'}">
+                                <p:column headerText="#{msg.pmOwnerName}" rendered="false" sortBy="#{item.pmOwnerName}" filterBy="#{item.pmOwnerName}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.pmOwnerName}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'pmOwnerTel'}">
+                                <p:column headerText="#{msg.pmOwnerTel}" rendered="false" sortBy="#{item.pmOwnerTel}" filterBy="#{item.pmOwnerTel}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.pmOwnerTel}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetTags'}">
+                                <p:column headerText="#{msg.assetTags}" rendered="false" filterBy="#{item.assetTags.tag}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.assetTagsView}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'createdBy'}">
+                                <p:column headerText="#{msg.createdBy}" rendered="false" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{assetInfoListController.selectCreatedBy(item.createdBy)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetQuality' and assetInfoListController.countyArea}">
+                                <p:column id="assetQuality" rendered="false" headerText="#{msg.assetQuality}" sortBy="#{item.assetQuality}" filterBy="#{item.assetQuality}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetQuality', item.assetQuality)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetQuality')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetUsedLifecycle'}">
+                                <p:column headerText="#{msg.assetUsedLifecycle}" rendered="false" filterBy="#{item.assetUsedLifecycle}" filterMatchMode="LTE">
+                                    <h:outputText value="#{item.assetUsedLifecycle}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetQuantity'}">
+                                <p:column headerText="#{msg.assetQuantity}" rendered="false" exportable="true" sortBy="#{item.assetQuantity}" filterBy="#{item.assetQuantity}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.assetQuantity}"/>
+                                </p:column>
+                            </c:if>
+                        </c:forEach>
+
+                        <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ"  rendered="false">
+                            <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('usageStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="batchToRelRule" oncomplete="PF('relRuleAssetDialog').show()" actionListener="#{assetInfoListController.setSelectedAssetsUids()}" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="#{msg.SetRulesInBatch}" disabled="#{not assetInfoListController.isChecked()}"/>
+                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportExcel}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                                <p:fileDownload value="#{assetInfoListController.excelFile}" />
+                            </p:commandButton>
+                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
+
+                            <ui:fragment rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin') and userContextService.hasScrappedAuthority()}">
+                                <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchToBeTerminated}" actionListener="#{assetInfoListController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
+                                    <p:confirm header="#{msg.ConfirmationOfBatchToBeTerminated}" message="#{msg.AreYouSureToConfirmTheRecordOfSelectedItemsToBeTerminated}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </ui:fragment>
+
+                        </f:facet>
+                    </p:dataTable>
+
+                    <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
+                </h:form>
+            </div>
+        </div>
+
+        <p:overlayPanel id="idPanelFilterWarrantyDate" widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false"  rendered="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterWarrantyDate', 'varWarrantyDateFrom', 'varWarrantyDateTo'); PF('panelFilterWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel widgetVar="panelFilterCreatedDate" for=":AssetInfoListForm:datalist:filterCreatedDate" dismissable="false"  rendered="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterCreatedDate', 'varCreatedDateFrom', 'varCreatedDateTo'); PF('panelFilterCreatedDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterCreatedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idPanelFilterManufactDate" widgetVar="panelFilterManufactDate" for=":AssetInfoListForm:datalist:filterManufactDate" dismissable="false"  rendered="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterManufactDate', 'varManufactDateFrom', 'varManufactDateTo'); PF('panelFilterManufactDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterManufactDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idPanelFilterInstallDate" widgetVar="panelFilterInstallDate" for=":AssetInfoListForm:datalist:filterInstallDate" dismissable="false"  rendered="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterInstallDate', 'varInstallDateFrom', 'varInstallDateTo'); PF('panelFilterInstallDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterInstallDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idPanelFilterArriveDate" widgetVar="panelFilterArriveDate" for=":AssetInfoListForm:datalist:filterArriveDate" dismissable="false"  rendered="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArriveDate', 'varArriveDateFrom', 'varArriveDateTo'); PF('panelFilterArriveDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterArriveDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idPanelFilterFactoryWarrantyDate" widgetVar="panelFilterFactoryWarrantyDate" for=":AssetInfoListForm:datalist:filterFactoryWarrantyDate" dismissable="false"  rendered="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterFactoryWarrantyDate', 'varFactoryWarrantyDateFrom', 'varFactoryWarrantyDateTo'); PF('panelFilterFactoryWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterFactoryWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+<!--        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;" rendered="#{assetInfoListController.isShowColumn('clinicalDeptName')}">
+            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoListController.selectSite==null? '':assetInfoListController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
+                    <p:ajax process="@this" event="select"  listener="#{assetInfoListController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist :idVarPanelDeptOrg :idPanelFilterWarrantyDate" oncomplete="PF('varPanelDeptOrg').hide();"/>
+                    <p:ajax process="@this" event="expand"/>
+                    <p:ajax process="@this" event="collapse"/>
+                    <p:treeNode type="org">
+                        <h:outputText value="#{node.name}"/>
+                    </p:treeNode>
+                </p:tree>
+            </p:scrollPanel>
+        </p:overlayPanel>-->
+        <ui:include src="RelRuleAsset.xhtml"/>
+        <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ExportQRCode}">
+            <h:form id="exportQrCodeForm" >
+                <h:panelGroup id="display" >
+                    <label class="label">#{msg.SelectExportTemplate}</label>
+                    <p:selectOneMenu  value="#{assetInfoListController.exportQrCodeTemplateId}">
+                        <p:ajax update="preview" />
+                        <f:selectItem itemLabel="#{msg.TemplateUsedbyDefault}" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItems value="#{assetInfoListController.getQrCodeTemplates()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                    </p:selectOneMenu>
+                    <h:panelGrid columns="1" style="width:100%" id="preview">
+                        <h:panelGroup rendered="#{not empty assetInfoListController.exportQrCodeTemplateId}">
+                            <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoListController.exportQrCodeTemplateId,'')}" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:panelGroup>
+                <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoListController.exportQrCode}" update=":growl" 
+                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
+                    <p:fileDownload value="#{assetInfoListController.zipFile}" />
+                </p:commandButton>
+                <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
+            </h:form>
+        </p:dialog>
+
+        <c:if test="#{assetInfoListController.customedColumns.contains('siteUID')}">
+            <h:form id="dataTableFilterByHospital">
+            <p:overlayPanel widgetVar="varPanelOrg2" hideEffect="fade" dynamic="false" modal="false" class="dataTableFilterByHospital">
+                    <p:inputText id="treeNodeNameFilter2" value="#{orgTreeController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process="dataTableFilterByHospital:treeNodeNameFilter2 @this" update="dataTableFilterByHospital:orgTree2" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
+                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                    <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode2}" update=":AssetInfoListForm:datalist :searchForm :dataTableFilterByHospital" oncomplete="PF('varPanelOrg2').hide(); afterLoadRender()"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                    <p:treeNode type="hidden" rendered="false"/>
+                            </p:tree>
+                    </p:scrollPanel>
+            </p:overlayPanel>
+        </h:form>
+        </c:if>        
+
+        <script>
+
+            function afterLoadRender(){
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            }
+
+            $(function () {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            });
+
+            //<![CDATA[
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+                var isActive = "#{userContextService.isActive()}";
+                if (isActive == '1') {
+                    PF('ActiveDlg').show();
+                }
+            }
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+            function changeDiaLog() {
+                PF('relRuleAssetDialog').hide();
+                PF('redirectDialog').show();
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+//]]>
+        </script>
+    </ui:define>
+</ui:composition>

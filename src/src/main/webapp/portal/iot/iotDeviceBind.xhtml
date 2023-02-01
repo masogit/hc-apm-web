@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.IotDeviceBind}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="iotDeviceBindListForm">
+                    <p:dataTable id="datalist" class="datalist" value="#{iotDeviceBindController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{iotDeviceBindController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="filter" listener="#{iotDeviceBindController.onFilter}" />
+                        <p:ajax event="rowSelect" update="editButton"/>
+
+                        <p:column headerText="显示名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="aet" filterBy="#{item.pk.aet}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.pk.aet}"/>
+                        </p:column>
+                        <p:column headerText="stationName" filterBy="#{item.stationName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.stationName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Site}" filterBy="#{item.orgInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.orgInfo.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.assetType}" filterBy="#{item.pk.deviceType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.pk.deviceType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.deviceNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.departNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.QRCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.qrCode}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                                title="#{msg.Edit}" disabled="#{empty iotDeviceBindController.selected}"
+                                             actionListener="#{iotDeviceBindController.setIotAssetUid()}"
+                                update=":iotDeviceBindEditDlg" oncomplete="PF('iotDeviceBindEditDialog').show()"/>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="iotDeviceBindEdit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -4,19 +4,22 @@ import com.ge.apm.dao.BudgetApplicationRepository;
 import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.domain.AdverseEvents;
-import com.ge.apm.domain.MultiLevelApproval;
-import com.ge.apm.domain.V2_PmOrder;
-import com.ge.apm.domain.V2_WorkOrder;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -24,8 +27,13 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @ManagedBean
 @ViewScoped
@@ -38,6 +46,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private V2_PmOrderRepository v2_PmOrderRepository;
     private V2_WorkOrderService woService;
     private BudgetApplicationRepository budgetDao;
+    private WorkflowService workflowService;
+    private BlobFileService blobService;
 
     @Setter
     @Getter
@@ -60,6 +70,19 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     @Getter
     private Object secondaryApprovalData;
 
+    // 签名相关
+    @Getter
+    @Setter
+    private String signatureContent;
+    @Getter
+    private StreamedContent signatureContentStream;
+    @Getter
+    private String signatureId;
+    @Getter
+    private boolean newSignature = true;
+    private boolean isAgree = true;
+    private boolean needSignature = false;
+
     @Override
     protected GenericRepositoryUUID<MultiLevelApproval> getDAO() {
         return multiLevelApprovalRepository;
@@ -73,6 +96,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
         budgetDao = WebUtil.getBean(BudgetApplicationRepository.class);
+        workflowService = WebUtil.getBean(WorkflowService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -134,8 +159,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
             return;
         }
+        if(this.needSignature){
+            multiLevelApproval.setAuditSignature(this.signatureId);
+        }
         multiLevelApprovalService.getMultiLevelApprovalPersonByAgree(multiLevelApproval,approvalOpinion);
         selected = null;
+        this.needSignature = false;
+        this.resetSignature();
     }
 
     /**
@@ -149,8 +179,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
             return;
          }
+        if(this.needSignature){
+            multiLevelApproval.setAuditSignature(this.signatureId);
+        }
         multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
         selected = null;
+        this.needSignature = false;
+        this.resetSignature();
     }
 
     /**
@@ -206,5 +241,109 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         businessTypeFlag = selected.getBusinessType();
 
         getApprovalContentByCurrentApproval(selected);
+    }
+
+    public void preApproveCheck(Integer agree) throws Exception {
+        MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
+
+        String siteUid = null;
+
+        if(this.businessTypeFlag == 7){
+            V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
+            siteUid = v2WorkOrder.getSiteUID();
+        }else if(this.businessTypeFlag == 8){
+            V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
+            siteUid = v2PmOrder.getSiteUID();
+        }
+
+        if(StringUtils.isNotEmpty(siteUid)){
+            WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(siteUid);
+            if(workflowConfig != null && Boolean.TRUE.equals(workflowConfig.getPartsNeedSign())){
+                if(agree == 1){
+                    this.isAgree = true;
+                }else if(agree == 2){
+                    this.isAgree = false;
+                }
+                this.needSignature = true;
+                // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
+                ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+                HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+                response.setStatus(205);
+                return;
+            }
+        }
+
+        if(agree == 1){
+            this.isAgree = true;
+            this.getMultiLevelApprovalPersonByAgree();
+        }else if(agree == 2){
+            this.isAgree = false;
+            this.getMultiLevelApprovalPersionAndSubmitByDisagree();
+        }
+
+    }
+
+    public void getSignature() {
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+
+        List<Map<String, String>> signatureList = woService.getUserSignature();
+
+        if (!CollectionUtils.isEmpty(signatureList)) {
+            String lastSignatureId = signatureList.get(signatureList.size() - 1).get("signatureUid");
+            this.signatureContentStream = blobService.getBlobObjectByStorageId(lastSignatureId);
+            this.signatureId = lastSignatureId;
+            this.newSignature = false;
+        }else{
+            this.newSignature = true;
+        }
+    }
+
+    public void saveSignatureAndSubmitApprove() throws Exception {
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+        if(StringUtils.isEmpty(this.signatureId) && (this.newSignature && StringUtils.isEmpty(this.signatureContent))){
+            WebUtil.addErrorMessage("签名不可为空！");
+            response.setStatus(206);
+            return;
+        }
+
+        if(this.newSignature && StringUtils.isNotEmpty(signatureContent)){
+            try {
+                String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
+                BASE64Decoder decoder = new BASE64Decoder();
+                byte[] decode = decoder.decodeBuffer(base64);
+
+                V2_BlobObject blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
+                if (null != blobObject) {
+                    this.signatureId = blobObject.getObjectStorageId();
+                    woService.addUserSignature(this.signatureId);
+                }else{
+                    WebUtil.addErrorMessage("签名保存失败！");
+                    response.setStatus(206);
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e.getMessage());
+                WebUtil.addErrorMessage("签名保存失败！");
+                response.setStatus(206);
+                return;
+            }
+        }
+
+        if(this.isAgree){
+            this.getMultiLevelApprovalPersonByAgree();
+        }else{
+            this.getMultiLevelApprovalPersionAndSubmitByDisagree();
+        }
+    }
+
+    public void resetSignature() {
+        this.signatureId = null;
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+        this.newSignature = true;
     }
 }

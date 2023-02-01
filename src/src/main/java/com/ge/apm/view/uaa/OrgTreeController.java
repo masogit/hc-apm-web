@@ -17,6 +17,7 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -199,6 +200,19 @@ public class OrgTreeController {
 
     public void filterNode(){
         tenantOrgTreePage = createTenantOrgTree46();
+    }
+
+    public void filterNodeByName(){
+        if(judgeTheUser()){
+            logger.info("===============================================TrgTreeController.getTenantOrgTree 优化逻辑");
+            tenantOrgTreePage = createTenantOrgTree46();
+        }else{
+            logger.info("===============================================TrgTreeController.getTenantOrgTree 原始逻辑");
+            tenantOrgTreePage = createTenantOrgTree();
+        }
+        if (!StringUtils.isEmpty(treeNodeNameFilter)) {
+            uaaService.filterTreeNode(tenantOrgTreePage, treeNodeNameFilter, 3, 3);
+        }
     }
     //判断租户是否是46号租户 是返回true 否返回false
     public boolean judgeTheUser(){

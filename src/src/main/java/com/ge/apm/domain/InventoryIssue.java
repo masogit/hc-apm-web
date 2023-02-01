@@ -1,15 +1,22 @@
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -63,6 +70,11 @@ public class InventoryIssue implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Column(name = "last_modified_by", length = 50)
+    private String lastModifiedBy;
+
+    @Column(name = "last_modified_date")
+    private Date lastModifiedDate ;
 
     @ManyToMany(targetEntity = InventoryCheckList.class, cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name = "inventory_issue_detail",
@@ -182,5 +194,12 @@ public class InventoryIssue implements Serializable {
 	public void setInventoryCheckListItems(String inventoryCheckListItems) {
 		this.inventoryCheckListItems = inventoryCheckListItems;
 	}
-    
+
+    public String getLastModifiedBy() { return lastModifiedBy; }
+
+    public void setLastModifiedBy(String lastModifiedBy) { this.lastModifiedBy = lastModifiedBy; }
+
+    public Date getLastModifiedDate() { return lastModifiedDate; }
+
+    public void setLastModifiedDate(Date lastModifiedDate) { this.lastModifiedDate = lastModifiedDate; }
 }

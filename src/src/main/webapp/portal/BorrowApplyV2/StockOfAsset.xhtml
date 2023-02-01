@@ -64,7 +64,7 @@
                             <h:outputText value="#{item.departNum}"/>
                         </p:column>
                         <p:column headerText="调剂设备名称">
-                            <h:outputText value="#{item.sharedAssetType.swapName}"/>
+                            <h:outputText value="#{item.sharedAssetTypeEntity.swapName}"/>
                         </p:column>
 
                         <p:column headerText="计费开始时间">
@@ -80,11 +80,11 @@
                         </p:column>
                         
                         <p:column headerText="单价">
-                            <h:outputText value="#{item.sharedAssetType.unitPrice}"/>
+                            <h:outputText value="#{item.sharedAssetTypeEntity.unitPrice}"/>
                         </p:column>
                         
                         <p:column headerText="计价方式">
-                            <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.sharedAssetType.chargingType)=='' ? '' : fieldMsg.fieldValue('chargingType',item.sharedAssetType.chargingType)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.sharedAssetTypeEntity.chargingType)=='' ? '' : fieldMsg.fieldValue('chargingType',item.sharedAssetTypeEntity.chargingType)}"/>
                         </p:column>
                         
                         <p:column headerText="使用时长">

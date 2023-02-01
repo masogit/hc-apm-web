@@ -1,12 +1,13 @@
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.MeasuringCertificateDetailRepository;
-import com.ge.apm.dao.MeasuringTypeConfigRepository;
-import com.ge.apm.dao.TenantInfoRepository;
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.MeasuringCertificateDetailMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.commons.lang.StringUtils;
+import com.google.common.collect.Lists;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -21,10 +22,14 @@ import org.springframework.stereotype.Component;
 import webapp.framework.util.DateUtil;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Created by 212605082 on 2017/11/7.
@@ -40,7 +45,6 @@ public class MeasuringService {
     private final String HEADER_ASSET_SN = "设备序列号SN";
     private final String HEADER_ASSET_NO = "资产编号";
     private final String HEADER_APPLIANCE_NO = "器具编号";
-    //private final String HEADER_PAYED = "付款否";
     private final String HEADER_VERIFICATION_CONCLUSION = "检定结论";
     private final String HEADER_VERIFICATION_DATE = "检定日期";
     private final String HEADER_EXPIRE_DATE = "有效期至";
@@ -50,7 +54,6 @@ public class MeasuringService {
     private final String HEADER_CATEGORY = "种别";
     private final String HEADER_CLINICAL_DEPT = "送检单位";
     private final String HEADER_REMARK = "备注";
-    //private final String HEADER_OVERDUE = "过期否";
     private final String HEADER_FILE_NO = "存档记录";
     private final String HEADER_QR_CODE = "二维码";
 
@@ -63,57 +66,61 @@ public class MeasuringService {
 
     @Autowired
     private TenantInfoRepository tenantInfoDao;
+    @Autowired
+    private BlobFileService blobFileService;
+    @Autowired
+    private MeasuringCertificateDetailMapper certificateDetailMapper;
+    @Autowired
+    private BlobObjectRepository blobDao;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
         AssetInfo tempAssetInfo = null;
-        String errorInfo = "";
+        StringBuilder errorInfo = new StringBuilder();
         List<AssetInfo> tempAssetInfoList = null;
 
-        if(null != measuringCertificateDetail.getAssetSN()){
+        if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getAssetSN())){
             tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo += "[设备序列号SN不能匹配到资产设备]";
+                errorInfo.append("[设备序列号SN不能匹配到资产设备]");
             }else{
                 if(tempAssetInfoList.size() == 1){
                     flag = true;
                 }else{
-                    errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                    errorInfo.append("[设备序列号SN匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
                 }
             }
         }
 
-        if(null != measuringCertificateDetail.getFinanceNo() && !flag){
+        if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getFinanceNo()) && !flag){
             tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo += "[资产编号不能匹配到设备]";
+                errorInfo.append("[资产编号不能匹配到设备]");
             }else{
                 if(tempAssetInfoList.size() == 1){
                     flag = true;
                 }else{
-                    errorInfo += "[资产编号匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                    errorInfo.append("[资产编号匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
                 }
             }
         }
 
         // YHAAO-13151 如果资产编号和设备序列号都不能匹配到资产设备，使用二维码匹配
-        if(null != measuringCertificateDetail.getQrCode() && !flag){
+        if(ObjectUtil.isNotEmpty(measuringCertificateDetail.getQrCode()) && !flag){
             tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo += "[二维码不能匹配到设备]";
+                errorInfo.append("[二维码不能匹配到设备]");
             }else{
                 if(tempAssetInfoList.size() == 1){
                     flag = true;
                 }else{
-                    errorInfo += "[二维码匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                    errorInfo.append("[二维码匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
                 }
             }
         }
 
-        if(flag){
-            if(tempAssetInfoList.size() == 1){
-                tempAssetInfo = tempAssetInfoList.get(0);
-            }
+        if(flag && tempAssetInfoList.size() == 1){
+            tempAssetInfo = tempAssetInfoList.get(0);
         }
 
         if(tempAssetInfo != null){
@@ -152,7 +159,7 @@ public class MeasuringService {
 
             Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
             Date checkDate = needUpdateAssetMcd.getCheckDate();
-            if(UserContextService.hasCurrentTenantName("")){
+            if(Boolean.TRUE.equals(UserContextService.hasCurrentTenantName(""))){
                 if(checkDate != null && nextMeteringDate == null && tempAssetInfo.getMeasuringItemCategory() != null){
                     MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndSiteUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getSiteUID());
                     Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
@@ -180,7 +187,7 @@ public class MeasuringService {
         }
 
         if(!flag){
-            measuringCertificateDetail.setErrorInfo(errorInfo);
+            measuringCertificateDetail.setErrorInfo(errorInfo.toString());
             return measuringCertificateDetail;
         }else{
             return null;
@@ -191,7 +198,7 @@ public class MeasuringService {
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo_For_ShaoYiFu(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
         AssetInfo tempAssetInfo = null;
-        String errorInfo = "";
+        StringBuilder errorInfo = new StringBuilder();
         List<AssetInfo> tempAssetInfoList = null;
 
         if(null != measuringCertificateDetail.getFinanceNo() && !"".equals(measuringCertificateDetail.getFinanceNo())){
@@ -202,24 +209,24 @@ public class MeasuringService {
                 //开始匹配sn号
                 tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
                 if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                    errorInfo += "[资产编号不能匹配到设备]";
+                    errorInfo.append("[资产编号不能匹配到设备]");
                 }else if(tempAssetInfoList.size() == 1){
                     flag = true;
                 }else{
-                    errorInfo += "[资产编号匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                    errorInfo.append("[资产编号匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
                 }
             }
         }
         if(!flag && (null != measuringCertificateDetail.getAssetSN() && !"".equals(measuringCertificateDetail.getAssetSN()))){
             tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo += "[设备序列号SN不能匹配到资产设备]";
+                errorInfo.append("[设备序列号SN不能匹配到资产设备]");
             }else{
                 if(tempAssetInfoList.size() == 1){
-                    errorInfo = "";
+                    errorInfo = new StringBuilder();
                     flag = true;
                 }else{
-                    errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                    errorInfo.append("[设备序列号SN匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
                 }
             }
         }
@@ -227,20 +234,20 @@ public class MeasuringService {
         if(!flag && (null != measuringCertificateDetail.getQrCode() && !"".equals(measuringCertificateDetail.getQrCode()))){
             tempAssetInfoList = this.getAssetInfoByQrCode(measuringCertificateDetail.getQrCode(), measuringCertificateDetail.getSiteUID());
             if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-                errorInfo += "[二维码不能匹配到资产设备]";
+                errorInfo.append("[二维码不能匹配到资产设备]");
             }else{
                 if(tempAssetInfoList.size() == 1){
-                    errorInfo = "";
+                    errorInfo = new StringBuilder();
                     flag = true;
                 }else{
-                    errorInfo += "[二维码匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                    errorInfo.append("[二维码匹配到(").append(tempAssetInfoList.size()).append(")个资产设备]");
                 }
             }
         }
         else if ((null == measuringCertificateDetail.getFinanceNo() || "".equals(measuringCertificateDetail.getFinanceNo()))
                 && (null == measuringCertificateDetail.getAssetSN() || "".equals(measuringCertificateDetail.getAssetSN()))
                 && null == measuringCertificateDetail.getQrCode() || "".equals(measuringCertificateDetail.getQrCode())){
-            errorInfo += "[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]";
+            errorInfo.append("[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]");
         }
 
         if(flag){
@@ -285,7 +292,7 @@ public class MeasuringService {
 
             Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
             Date checkDate = needUpdateAssetMcd.getCheckDate();
-            if(UserContextService.hasCurrentTenantName("")){
+            if(Boolean.TRUE.equals(UserContextService.hasCurrentTenantName(""))){
                 if(checkDate != null && nextMeteringDate == null && tempAssetInfo.getMeasuringItemCategory() != null){
                     MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndSiteUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getSiteUID());
                     Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
@@ -313,7 +320,7 @@ public class MeasuringService {
         }
 
         if(!flag){
-            measuringCertificateDetail.setErrorInfo(errorInfo);
+            measuringCertificateDetail.setErrorInfo(errorInfo.toString());
             return measuringCertificateDetail;
         }else{
             return null;
@@ -326,7 +333,6 @@ public class MeasuringService {
 
         if(!StringHelper.isNullOrEmptyString(financingNum)){
             //getByFinancingNumAndSiteUID 方法暂时废弃 使用getByFinancingNumAndSiteUID_ForDbTable
-//            tempAssetInfoList = assetInfoDao.getByFinancingNumAndSiteUID(financingNum, siteUID);
             tempAssetInfoList = assetInfoDao.getByFinancingNumAndSiteUID_ForDbTable(financingNum, siteUID);
         }
 
@@ -338,7 +344,6 @@ public class MeasuringService {
 
         if(!StringHelper.isNullOrEmptyString(serialNum)){
             //excel 报表导出需要忽略大小写 所以使用jpa原生sql 加了ILIKE关键字( getBySerialNumAndSiteUID 方法是原本的业务，目前改为 getBySerialNumAndSiteUID_ForDbTable 业务)
-//            tempAssetInfoList = assetInfoDao.getBySerialNumAndSiteUID(serialNum, siteUID);
             tempAssetInfoList = assetInfoDao.getBySerialNumAndSiteUID_ForDbTable(serialNum, siteUID);
         }
 
@@ -356,13 +361,50 @@ public class MeasuringService {
         return tempAssetInfoList;
     }
 
+    public List<MeasuringCertificateDetail> handleZip(UploadedFile file, UserAccount user) throws IOException {
+        Wrapper<MeasuringCertificateDetail> wrapper = new EntityWrapper<>();
+        wrapper.setSqlSelect("id, certificate_no certificateNo");
+        wrapper.eq("tenant_uid", user.getTenantUID());
+        List<MeasuringCertificateDetail> measuringCertificateDetails = certificateDetailMapper.selectList(wrapper);
+        Map<String, List<MeasuringCertificateDetail>> certificateDetailMap = measuringCertificateDetails.stream().filter(detail -> ObjectUtil.isNotEmpty(detail.getCertificateNo())).collect(Collectors.groupingBy(MeasuringCertificateDetail::getCertificateNo));
+
+        List<MeasuringCertificateDetail> noFoundList = Lists.newArrayList();
+        // 获取压缩文件中的每个子文件
+        ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"));
+        ZipEntry entry;
+        while ((entry = zipInputStream.getNextEntry()) != null) {
+            String fileName = entry.getName();
+            String certificateNo = Lists.newArrayList(fileName.split("\\.")).get(0);
+            MeasuringCertificateDetail noFoundDetail = new MeasuringCertificateDetail();
+            List<MeasuringCertificateDetail> certificateDetails = certificateDetailMap.get(certificateNo);
+            String errInfo = "";
+            if (ObjectUtil.isEmpty(certificateDetails)) {
+                errInfo = "证书编号匹配不到计量证书";
+            } else if (certificateDetails.size() > 1) {
+                errInfo = "证书编号匹配到" + certificateDetails.size() + "个计量证书";
+            } else {
+                MeasuringCertificateDetail certificateDetail = certificateDetails.get(0);
+                V2_BlobObject blobObject = blobFileService.uploadFile(zipInputStream, entry.getName());
+                blobObject.setBoType(V2_BlobObject.BO_SUB_TYPE_AssetInfo_Measuring);
+                blobObject.setBoUuid(certificateDetail.getId());
+                blobDao.save(blobObject);
+            }
+
+            if (errInfo.length() > 0) {
+                noFoundDetail.setCertificateNo(certificateNo);
+                noFoundDetail.setErrorInfo(errInfo);
+                noFoundList.add(noFoundDetail);
+            }
+        }
+        return noFoundList;
+    }
+
     public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         sdf.setLenient(false);
         List<MeasuringCertificateDetail> tempMCDList = new ArrayList<>();
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
-        //for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             HSSFSheet sheet = workbook.getSheetAt(0);
             if (sheet == null) {
                 return null;
@@ -372,7 +414,8 @@ public class MeasuringService {
                 return null;
             }
             for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
-                String errorInfo = "";
+                StringBuilder errorInfo = new StringBuilder();
+//                String errorInfo = "";
 
                 HSSFRow row = sheet.getRow(j);
 
@@ -410,7 +453,7 @@ public class MeasuringService {
                     try {
                         detail.setCheckDate(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue()));
                     }catch (Exception ex){
-                        errorInfo += "[检定日期格式不对]";
+                        errorInfo.append("[检定日期格式不对]");
                     }
 
                     detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
@@ -419,7 +462,7 @@ public class MeasuringService {
                     try {
                         detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
                     }catch (Exception ex){
-                        errorInfo += "[有效期至格式不对]";
+                        errorInfo.append("[有效期至格式不对]");
                     }
 
                     detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
@@ -433,7 +476,6 @@ public class MeasuringService {
                 if(row.getCell(header.get("REMARK_CELL")) != null){
                     detail.setComments(CellType.NUMERIC.equals(row.getCell(header.get("REMARK_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("REMARK_CELL")).getNumericCellValue()) : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
                 }
-                //detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
                 if(row.getCell(header.get("CLINICAL_DEPT_CELL")) != null){
                     detail.setDepartment(CellType.NUMERIC.equals(row.getCell(header.get("CLINICAL_DEPT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CLINICAL_DEPT_CELL")).getNumericCellValue()) : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
                 }
@@ -449,7 +491,6 @@ public class MeasuringService {
                 if(row.getCell(header.get("CATEGORY_CELL")) != null){
                     detail.setType(CellType.NUMERIC.equals(row.getCell(header.get("CATEGORY_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CATEGORY_CELL")).getNumericCellValue()) : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
                 }
-                //detail.setPay(row.getCell(header.get("PAYED_CELL")) == null ? null : row.getCell(header.get("PAYED_CELL")).getBooleanCellValue());
                 if(row.getCell(header.get("FILE_NO_CELL")) != null) {
                     detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
                 }
@@ -457,7 +498,7 @@ public class MeasuringService {
                     detail.setQrCode(CellType.NUMERIC.equals(row.getCell(header.get("QR_CODE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("QR_CODE_CELL")).getNumericCellValue()) : row.getCell(header.get("QR_CODE_CELL")).getStringCellValue());
                 }
                 detail.setStatusDisplay(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue());
-                Integer status = 3;
+                int status = 3;
                 if (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) != null) {
                     switch (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue()) {
                         case "A级合格":
@@ -481,28 +522,27 @@ public class MeasuringService {
                 detail.setExcelIdex(j + 1);
 
                 if(detail.getCheckDate() != null && detail.getCheckDate().after(sdf.parse("99999/12/31"))){
-                    errorInfo += "[检定日期不能超过99999/12/31]";
+                    errorInfo.append("[检定日期不能超过99999/12/31]");
                 }
 
                 if(detail.getValidDateTo() != null && detail.getValidDateTo().after(sdf.parse("99999/12/31"))){
-                    errorInfo += "[有效期至不能超过99999/12/31]";
+                    errorInfo.append("[有效期至不能超过99999/12/31]");
                 }
 
                 //检定日期不能为空，设备序列号和资产编号 二维码 不能全为空
-                if (row == null || !errorInfo.equals("") || row.getCell(header.get("VERIFICATION_DATE_CELL")) == null ||
-                        (row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null && row.getCell(header.get("QR_CODE_CELL")) == null)) {
-                    if(row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null && row.getCell(header.get("QR_CODE_CELL")) == null){
-                        errorInfo += "[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]";
-                    }
-                    if(row.getCell(header.get("VERIFICATION_DATE_CELL")) == null){
-                        errorInfo += "[检定日期不能为空]";
-                    }
-                    detail.setErrorInfo(errorInfo);
+                if (ObjectUtil.isEmpty(row.getCell(header.get("VERIFICATION_DATE_CELL")))) {
+                    errorInfo.append("[检定日期不能为空]");
+                }
+                if (ObjectUtil.isAllEmpty(row.getCell(header.get("ASSET_SN_CELL")), row.getCell(header.get("ASSET_NO_CELL")), row.getCell(header.get("QR_CODE_CELL")))) {
+                    errorInfo.append("[(设备序列号SN)、(资产编号)和(二维码)不能同时为空]");
+                }
+                if (errorInfo.length() > 0) {
+                    detail.setErrorInfo(errorInfo.toString());
                     tempMCDList.add(detail);
                     continue;
                 }
                 //如果是邵逸夫医院
-                if(isShaoYiFu()){
+                if(Boolean.TRUE.equals(isShaoYiFu())){
                     if(operateMeasuringAndAssetInfo_For_ShaoYiFu(detail) != null){
                         tempMCDList.add(detail);
                     }
@@ -513,10 +553,8 @@ public class MeasuringService {
                     }
                 }
             }
-        //}
         return tempMCDList;
     }
-
 
     //判断是否是邵逸夫医院
     public Boolean isShaoYiFu(){
@@ -525,10 +563,6 @@ public class MeasuringService {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
-    }
-
-    private HSSFSheet handleSheet(HSSFSheet sheet) {
-        return sheet;
     }
 
     private Map<String, Integer> findHeader(HSSFSheet sheet) {
@@ -545,7 +579,6 @@ public class MeasuringService {
             boolean hasAssetSN = false;
             boolean hasAssetNo = false;
             boolean hasApplianceNo = false;
-            //boolean hasPayed = false;
             boolean hasVerificationConclusion = false;
             boolean hasVerificationDate = false;
             boolean hasExpireDate = false;
@@ -555,7 +588,6 @@ public class MeasuringService {
             boolean hasCategory = false;
             boolean hasClinicalDept = false;
             boolean hasRemark = false;
-            //boolean hasOverdue = false;
             boolean hasFileNo = false;
             boolean hasQrCode = false;
 
@@ -572,7 +604,6 @@ public class MeasuringService {
                     hasAssetSN = HEADER_ASSET_SN.equals(cell.getStringCellValue()) ? true : hasAssetSN;
                     hasAssetNo = HEADER_ASSET_NO.equals(cell.getStringCellValue()) ? true : hasAssetNo;
                     hasApplianceNo = HEADER_APPLIANCE_NO.equals(cell.getStringCellValue()) ? true : hasApplianceNo;
-                    //hasPayed = HEADER_PAYED.equals(cell.getStringCellValue()) ? true : hasPayed;
                     hasVerificationConclusion = HEADER_VERIFICATION_CONCLUSION.equals(cell.getStringCellValue()) ? true : hasVerificationConclusion;
                     hasVerificationDate = HEADER_VERIFICATION_DATE.equals(cell.getStringCellValue()) ? true : hasVerificationDate;
                     hasExpireDate = HEADER_EXPIRE_DATE.equals(cell.getStringCellValue()) ? true : hasExpireDate;
@@ -582,7 +613,6 @@ public class MeasuringService {
                     hasCategory = HEADER_CATEGORY.equals(cell.getStringCellValue()) ? true : hasCategory;
                     hasClinicalDept = HEADER_CLINICAL_DEPT.equals(cell.getStringCellValue()) ? true : hasClinicalDept;
                     hasRemark = HEADER_REMARK.equals(cell.getStringCellValue()) ? true : hasRemark;
-                    //hasOverdue = HEADER_OVERDUE.equals(cell.getStringCellValue()) ? true : hasOverdue;
                     hasFileNo = HEADER_FILE_NO.equals(cell.getStringCellValue()) ? true : hasFileNo;
                     hasQrCode = HEADER_QR_CODE.equals(cell.getStringCellValue()) ? true : hasQrCode;
                     switch (cell.getStringCellValue()) {
@@ -614,10 +644,6 @@ public class MeasuringService {
                             hasApplianceNo = true;
                             header.put("APPLIANCE_NO_CELL", j);
                             break;
-                        /*case HEADER_PAYED:
-                            hasPayed = true;
-                            header.put("PAYED_CELL", j);
-                            break;*/
                         case HEADER_VERIFICATION_CONCLUSION:
                             hasVerificationConclusion = true;
                             header.put("VERIFICATION_CONCLUSION_CELL", j);
@@ -654,10 +680,6 @@ public class MeasuringService {
                             hasRemark = true;
                             header.put("REMARK_CELL", j);
                             break;
-                        /*case HEADER_OVERDUE:
-                            hasOverdue = true;
-                            header.put("OVERDUE_CELL", j);
-                            break;*/
                         case HEADER_FILE_NO:
                             hasFileNo = true;
                             header.put("FILE_NO_CELL", j);
@@ -671,7 +693,6 @@ public class MeasuringService {
                     }
                 } catch (Exception e) {
                     LOGGER.debug(e.getMessage());
-                    continue;
                 }
             }
             if (hasCertificationNo && hasApplianceName && hasManufacture && hasModel && hasAssetSN && hasAssetNo
@@ -681,8 +702,6 @@ public class MeasuringService {
                 break;
             }
         }
-
-
         return header;
     }
 
