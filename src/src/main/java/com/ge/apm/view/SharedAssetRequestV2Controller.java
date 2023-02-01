@@ -1202,7 +1202,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         Map<String, Object> params = new HashMap<>();
         String id = selected.getId();
         params.put("id", id);
-        params.put("remark",selected.getRemark());
+        params.put("rejectShelveRemark",selected.getRejectShelveRemark());
         ResponseEntity<LinkedHashMap> result = null;
         try {
             result = sharedAssetService.rejectApply(GatewayURL.REJECT_APPLY, params);
@@ -1254,7 +1254,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        if(sta == 1){//借用待受理状态
            //dao.updateState(uid, state);
            realSAR.setState(state);
-           realSAR.setRemark(selected.getRemark());
+           realSAR.setRejectShelveRemark(selected.getRejectShelveRemark());
             dao.save(realSAR);
            //调用微服务
            try {

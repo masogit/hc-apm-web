@@ -137,7 +137,8 @@ public class SharedAssetRequest implements Serializable{
 
     @Column(name = "effort")//工时
     private Double effort;
-
+    @Column(name = "reject_shelve_remark",columnDefinition = "text")
+    private String rejectShelveRemark; // 拒绝申请/搁置申请备注
     public String getId() {
         return id;
     }
@@ -524,4 +525,11 @@ public class SharedAssetRequest implements Serializable{
         this.effort = effort;
     }
 
+    public String getRejectShelveRemark() {
+        return rejectShelveRemark;
+    }
+
+    public void setRejectShelveRemark(String rejectShelveRemark) {
+        this.rejectShelveRemark = rejectShelveRemark;
+    }
 }
