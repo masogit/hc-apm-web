@@ -3,19 +3,13 @@ package com.ge.apm.service.sharedasset;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.model.SelectItem;
 
 import com.ge.apm.domain.*;
+import com.ge.apm.service.sharedasset.valuation.ValuationFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.TreeNode;
@@ -91,6 +85,7 @@ public class SharedAssetStockService {
         switch (queryType) {
             case 1 :
                 ew.andNew().eq("asset_status", 1).or().eq("asset_status", 3);
+                ew.andNew().eq("shared_status",1).or().isNull("shared_status");
                 ew.andNew().in("asset_dept_uid", allocationCenterUids);
                 break;
             case 2:
@@ -100,6 +95,9 @@ public class SharedAssetStockService {
                 ew.andNew().ne("asset_status", 1).andNew().ne("asset_status", 3);
                 ew.andNew().in("asset_dept_uid", allocationCenterUids);
                 break;
+            case 4:
+                ew.andNew().in("asset_status", Arrays.asList(1,3)).andNew().eq("shared_status",2);
+                ew.andNew().in("asset_dept_uid", allocationCenterUids);
             default:
         }
     }
@@ -144,10 +142,18 @@ public class SharedAssetStockService {
         if (rootNode != null) {
             traverse(rootNode, dropdownList, allocationCenterUids);
         }
+        if(isWhethertoenableunattended()){
+            getVirtuallyOrgInfo(siteUID,dropdownList);
+        }
 
         return dropdownList;
     }
-
+    private void getVirtuallyOrgInfo(String siteUID,List<SelectItem> dropdownList){
+         if(StringUtils.isEmpty(siteUID)) return ;
+        char[] chars = siteUID.toCharArray();
+        chars[0]='$';
+        dropdownList.add(new SelectItem(String.valueOf(chars), "调剂无人值守", "", false));
+    }
     public SharedAssetRequest findRequestById(String requestId) {
         if(logger.isDebugEnabled()) {
             logger.debug("Request id: {}", requestId);
@@ -263,7 +269,7 @@ public class SharedAssetStockService {
                 AssetInfo realTimeAssetInfo = getRealTimeAssetInfo(asset.getUid());
                 
                 voucherInfo.put("设备型号", realTimeAssetInfo.getFunctionType());
-                voucherInfo.put("设备分类", asset.getSharedAssetType() == null ? null : asset.getSharedAssetType().getSwapName());
+                voucherInfo.put("设备分类", asset.getSharedAssetTypeEntity() == null ? null : asset.getSharedAssetTypeEntity().getSwapName());
                 voucherInfo.put("租金", AllocationCenterUtils.getPdfUnitPrice(sharedAssetReqDetail));
                 voucherInfo.put("状态", AllocationCenterUtils.getPdfStatus(realTimeAssetInfo));
                 voucherInfo.put("借用时间", AllocationCenterUtils.getPdfDatetime(sharedAssetReqDetail.getChargingBeginTime()));
@@ -344,6 +350,16 @@ public class SharedAssetStockService {
         for(AssetInfo asset : assets) {
             if(allocationCenterUids.contains(asset.getAssetDeptUID())) {
                 asset.getAssetDeptOrg().setName("");
+            }else{
+                char[] chars = asset.getSiteUID().toCharArray();
+                chars[0]='$';
+                String s = String.valueOf(chars);
+                if(s.equals(asset.getAssetDeptUID())){
+                    OrgInfo orgInfo = new OrgInfo();
+                    orgInfo.setName("调剂无人值守");
+                    orgInfo.setUid(s);
+                    asset.setAssetDeptOrg(orgInfo);
+                }
             }
         }
     }
@@ -353,16 +369,18 @@ public class SharedAssetStockService {
             SharedAssetReqDetail reqDetail = asset.getSharedAssetReqDetail();
             if(reqDetail != null) {
                 if(StringUtils.isBlank(reqDetail.getChargingType())) {
-                    logger.info("charging_type is missed in request, so set charging_type from share_asset_type: " + asset.getUid() + ":" + asset.getSharedAssetType().getChargingType());
-                    reqDetail.setChargingType(asset.getSharedAssetType().getChargingType());
+                    logger.info("charging_type is missed in request, so set charging_type from share_asset_type: " + asset.getUid() + ":" + asset.getSharedAssetTypeEntity().getChargingType());
+                    reqDetail.setChargingType(asset.getSharedAssetTypeEntity().getChargingType());
                 }
-                asset.setSharedAssetReqDetail(this.calcRentTimeAndFeeByReqDetail(asset, reqDetail));
+                SharedAssetReqDetail sharedAssetReqDetail = this.calcRentTimeAndFeeByReqDetail(asset, reqDetail);
+                ValuationFactory.valuation(null,sharedAssetReqDetail);
+                asset.setSharedAssetReqDetail(sharedAssetReqDetail);
             }
         }
     }
 
     private SharedAssetReqDetail calcRentTimeAndFeeByReqDetail(AssetInfo asset, SharedAssetReqDetail reqDetail) {
-        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(asset.getSharedAssetType(), reqDetail);
+        Tuple3<Long, String, BigDecimal> billingDetail = AllocationCenterUtils.getBillingDetail(asset.getSharedAssetTypeEntity(), reqDetail);
         reqDetail.setRentalTime(billingDetail._2);
         reqDetail.setTotalAmount(billingDetail._3);
         if(StringUtils.isNotEmpty(reqDetail.getReturnId())) {
@@ -440,5 +458,20 @@ public class SharedAssetStockService {
             orgInfList.addAll(orgUidList);
         }
         return orgInfList;
+    }
+    public boolean  isWhethertoenableunattended(){
+        UserContextService bean = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = bean.getSelectSite();
+        String siteUid="";
+        if(selectSite != null){
+            siteUid=selectSite.getUid();
+        }else{
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            siteUid=user.getSiteUID();
+        }
+        List<WorkflowConfig> bySiteUID = wfCfigDao.findBySiteUID(siteUid);
+        if(CollectionUtils.isEmpty(bySiteUID)) return false;
+        Boolean whethertoenableunattended = bySiteUID.get(0).getWhethertoenableunattended();
+        return whethertoenableunattended==null?false:whethertoenableunattended;
     }
 }

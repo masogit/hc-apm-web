@@ -29,9 +29,11 @@ public class ZkbPartOrder implements Serializable {
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,
+        Requested,TechnicalAccept,TechnicalReject,ProductAccept,ProductReject,
         ManageAccept,ManageReject,UnOrdered,UnOrderedReject,
-        Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject,CommercialAccept,CommercialReject,FourHundredCancel
+        Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,
+        DirectorReject,CommercialAccept,CommercialReject,FourHundredCancel,
+        CloseReject
     }
 
     /**
@@ -45,6 +47,14 @@ public class ZkbPartOrder implements Serializable {
 
     public enum ProbeQuotaTypeEnum{
         Any,Special,Normal,High
+    }
+
+    public enum CcsbQuotaTypeEnum{
+        Repair, Maintain
+    }
+
+    public enum RadiationQuotaTypeEnum{
+        SpareArtificial,PartsHigh
     }
 
     @Id
@@ -172,6 +182,20 @@ public class ZkbPartOrder implements Serializable {
     private String manageAuditer;
     @Column(name = "manage_auditer_uid")
     private String manageAuditerUid;
+
+    /**
+     * 产品经理审批备注
+     */
+    @Column(name = "product_remark")
+    private String productRemark;
+
+    @Column(name = "product_audit_date")
+    private Date productAuditDate;
+
+    @Column(name = "product_auditer")
+    private String productAuditer;
+    @Column(name = "product_auditer_uid")
+    private String productAuditerUid;
 
     /**
      * 销售总监审批备注
@@ -596,6 +620,70 @@ public class ZkbPartOrder implements Serializable {
     @Transient
     private String regionalManagerPhone;//区域经理电话
 
+    @Column(name = "ccsb_apply_type")
+    private String ccsbApplyType;// apply maintain
+
+    @Column(name = "radiation_quota_type")
+    private String radiationQuotaType;
+
+    @Column(name = "parts_high_type")
+    private String partsHighType;
+
+    public String getPartsHighType() {
+        return partsHighType;
+    }
+
+    public void setPartsHighType(String partsHighType) {
+        this.partsHighType = partsHighType;
+    }
+
+    public String getRadiationQuotaType() {
+        return radiationQuotaType;
+    }
+
+    public void setRadiationQuotaType(String radiationQuotaType) {
+        this.radiationQuotaType = radiationQuotaType;
+    }
+
+    public String getProductRemark() {
+        return productRemark;
+    }
+
+    public void setProductRemark(String productRemark) {
+        this.productRemark = productRemark;
+    }
+
+    public Date getProductAuditDate() {
+        return productAuditDate;
+    }
+
+    public void setProductAuditDate(Date productAuditDate) {
+        this.productAuditDate = productAuditDate;
+    }
+
+    public String getProductAuditer() {
+        return productAuditer;
+    }
+
+    public void setProductAuditer(String productAuditer) {
+        this.productAuditer = productAuditer;
+    }
+
+    public String getProductAuditerUid() {
+        return productAuditerUid;
+    }
+
+    public void setProductAuditerUid(String productAuditerUid) {
+        this.productAuditerUid = productAuditerUid;
+    }
+
+    public String getCcsbApplyType() {
+        return ccsbApplyType;
+    }
+
+    public void setCcsbApplyType(String ccsbApplyType) {
+        this.ccsbApplyType = ccsbApplyType;
+    }
 
     public String getRegionalManagerName() {
         return regionalManagerName;

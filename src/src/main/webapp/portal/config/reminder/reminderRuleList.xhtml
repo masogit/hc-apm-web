@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:p="http://primefaces.org/ui"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="#{msg.ReminderConfiguration}"/>
+			</div>
+			<div class="ui-g-12 card">
+				<h:form id="reminderRuleListForm">
+					<p:dataTable id="datalist" value="#{reminderRuleController.lazyModel}" var="item" widgetVar="varDataList"
+								 selectionMode="single" selection="#{reminderRuleController.selected}"
+								 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+								 sortMode="single" sortBy="#{item.id}" sortOrder="descending"
+								 paginatorTemplate="{CurrentPageReport}  {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {JumpToPageDropdown} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+								 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+								 emptyMessage="#{msg.noRecordFound}" rows="20"
+								 rowsPerPageTemplate="20,50,100,500">
+
+						<p:ajax event="rowSelect" update="editButton deleteButton ruleSettingButton"/>
+						<p:ajax event="filter" listener="#{reminderRuleController.onFilter}"/>
+						<p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.name}"/>
+						</p:column>
+						<p:column headerText="#{msg.Description2}" sortBy="#{item.description}" filterBy="#{item.description}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.description}"/>
+						</p:column>
+						<p:column headerText="#{msg.reminderRule}" sortBy="#{item.type}" filterBy="#{item.type}" filterMatchMode="EQ">
+							<h:outputText value="#{fieldMsg.fieldValue('reminderRule', item.type)}"/>
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()">
+									<f:selectItem itemLabel="#{msg.All}" itemValue=""/>
+									<f:selectItems value="#{fieldMsg.getFieldValueList('reminderRule')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
+						<p:column headerText="#{msg.reminderType}" sortBy="#{item.reminderType}" filterBy="#{item.reminderType}" filterMatchMode="EQ">
+							<h:outputText value="#{fieldMsg.fieldValue('reminderType', item.reminderType)}"/>
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()">
+									<f:selectItem itemLabel="#{msg.All}" itemValue=""/>
+									<f:selectItems value="#{fieldMsg.getFieldValueList('reminderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
+						<p:column headerText="#{msg.isEnabled}" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="EQ">
+							<h:outputText value="#{item.state eq 1 ? msg.True2Yes : msg.False2No}"/>
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()">
+									<f:selectItem itemLabel="#{msg.All}" itemValue=""/>
+									<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>
+									<f:selectItem itemLabel="#{msg.False2No}" itemValue="0"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
+						<p:column headerText="#{msg.Actions}" exportable="false" width="120" id="operatorColumn1">
+							<h:panelGroup>
+								<p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}" actionListener="#{reminderRuleController.setToUsing(item.id,true)}" update="datalist"  rendered="#{item.state eq 0}"/>
+								<p:commandButton icon="ui-icon-close" style="zoom:0.7" title="#{msg.Disabled}" actionListener="#{reminderRuleController.setToUsing(item.id,false)}" update="datalist"  rendered="#{item.state eq 1}"/>
+								<p:commandButton icon="ui-icon-search" style="zoom:0.7" title="#{msg.View}" actionListener="#{reminderRuleController.onRuleEvent(item.id)}" update="datalist" oncomplete="openEventListWindow(xhr, status, args)"/>
+<!--								<p:link target="_detail" title="#{msg.View}" outcome="#{reminderRuleController.getEventPage(item.id)}">-->
+<!--									<p:graphicImage name="icons/eye.png" style="zoom:0.7"/>-->
+<!--								</p:link>-->
+							</h:panelGroup>
+						</p:column>
+						<f:facet name="{Toolbar}">
+							<p:commandButton id="createButton" actionListener="#{reminderRuleController.prepareCreate}" icon="ui-icon-plus" title="#{msg.Create}" update=":reminderRuleEditDlg" oncomplete="PF('reminderRuleEditDialog').show()"/>
+							<p:commandButton id="editButton" actionListener="#{reminderRuleController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":reminderRuleEditDlg" oncomplete="PF('reminderRuleEditDialog').show()" disabled="#{empty reminderRuleController.selected}"/>
+							<p:commandButton id="deleteButton" actionListener="#{reminderRuleController.delete}" icon="ui-icon-close" title="#{msg.Delete}" update="datalist" disabled="#{empty reminderRuleController.selected}">
+								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+							</p:commandButton>
+							<p:commandButton id="ruleSettingButton" actionListener="#{reminderRuleController.prepareEdit}" icon="ui-icon-settings" title="#{msg.ReminderConfiguration}" update=":reminderRuleSettingDlg" oncomplete="PF('reminderRuleSettingDialog').show()" disabled="#{empty reminderRuleController.selected}"/>
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</div>
+		</div>
+		<ui:include src="reminderRuleEdit.xhtml"/>
+		<ui:include src="reminderRuleSetting.xhtml"/>
+		<script>
+			function openEventListWindow(xhr, status, args) {
+				window.open(args.url, '_blank');
+			}
+		</script>
+	</ui:define>
+</ui:composition>

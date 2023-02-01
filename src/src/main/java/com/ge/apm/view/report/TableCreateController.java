@@ -3,10 +3,7 @@ package com.ge.apm.view.report;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.domain.ElectricSafetyData;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableOption;
@@ -17,8 +14,12 @@ import com.ge.apm.service.report.TieFacesService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ReportTemplateDocument;
 import com.ge.apm.service.utils.StringComparator;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -66,6 +67,7 @@ public class TableCreateController extends TieWebSheetBean {
     private TableDefinition selectedTableDefinition;
 
     private Map<String, Object> tableValue;
+    private ZkbFileDirectoryService zkbFileDirectoryService;
 
     private Boolean isStringEditable = false;
 
@@ -90,12 +92,19 @@ public class TableCreateController extends TieWebSheetBean {
     private String operateType;
     // cache for exported file.
     private StreamedContent exportedFile;
+    private List<ZkbFileDirectory> subZkbFileDirectoryList=null;
+
+    @Getter@Setter
+    private boolean isMaintainanceReport = true;
+
+
 
     @Override
     public void initialLoad() {
         tableValue = new HashMap<String, Object>();
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
         templateService = WebUtil.getBean(TableDefinitionService.class);
+        zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
@@ -124,7 +133,6 @@ public class TableCreateController extends TieWebSheetBean {
                     WebUtil.addErrorMessage(WebUtil.getMessage("FailedToLoadExcelTemplate"));
                 }
             }
-
             if (StringUtils.isNotEmpty(selectedTableDefinition.getInstrumentKeyValues())) {
                 List<String> targetList = new ArrayList<String>();
                 listInstrumentMppingLabels.setTarget(targetList);
@@ -138,6 +146,11 @@ public class TableCreateController extends TieWebSheetBean {
                         }
                     }
                 }
+            }
+            if (TableDefinition.TableTemplateType.AssetAchievements.name().equals(selectedTableDefinition.getTemplateType())) {
+                isMaintainanceReport = false;
+            } else {
+                isMaintainanceReport = true;
             }
         }
 
@@ -607,6 +620,14 @@ public class TableCreateController extends TieWebSheetBean {
     }
 
     public void testSubmit() {
+    }
+
+    public void chengeIsMaintainanceReport() {
+        if (TableDefinition.TableTemplateType.AssetAchievements.name().equals(selectedTableDefinition.getTemplateType())) {
+            isMaintainanceReport = false;
+        } else {
+            isMaintainanceReport = true;
+        }
     }
 
     public void onSiteChange() {

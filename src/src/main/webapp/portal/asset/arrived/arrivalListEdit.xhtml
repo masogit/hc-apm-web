@@ -4,7 +4,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-                template="/WEB-INF/template.xhtml">
+                template="/WEB-INF/template.xhtml"
+                xmlns:apm="http://www.ge.com/tags/apm">
 
     <ui:define name="content">
         <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
@@ -62,10 +63,6 @@
                                             <label class="label">#{msg.arrivalDate}*</label>
                                             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                         </h:panelGroup>
-                                        <!--                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">-->
-                                        <!--                                        <label class="label">#{msg.arrivalDate}</label>-->
-                                        <!--                                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />-->
-                                        <!--                                    </h:panelGroup>-->
                                         <h:panelGroup>
                                             <label class="label">#{msg.arrivalListFunctionType}</label>
                                             <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
@@ -86,7 +83,9 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.quantity}*</label>
-                                        <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{assetArrivedListEditController.selected.quantity}"  readonly="#{assetArrivedListEditController.selected.status ne '1'}" required="true" requiredMessage="#{msg.quantity} #{msg.ValidationRequire}"/>
+                                        <p:inputNumber  maxValue="999" valueChangeListener="#{assetArrivedListEditController.onQuantityChange}" decimalPlaces="0" value="#{assetArrivedListEditController.selected.quantity}"  readonly="#{assetArrivedListEditController.selected.status ne '1'}" required="true" requiredMessage="#{msg.quantity} #{msg.ValidationRequire}">
+                                            <p:ajax update="@this" listener="#{assetArrivedListEditController.onQuantityChange}"  />
+                                        </p:inputNumber>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                         <label class="label">#{msg.arrivalListOrigin}</label>
@@ -163,14 +162,6 @@
                                             <label class="label">使用日期</label>
                                             <p:calendar value="#{assetArrivedListEditController.selected.usingDate}" timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                         </h:panelGroup>
-                                        <!--                                    <h:panelGroup >-->
-                                        <!--                                        <label class="label">使用人</label>-->
-                                        <!--                                        <p:inputText value="#{assetArrivedListEditController.selected.usingPerson}" />-->
-                                        <!--                                    </h:panelGroup>-->
-                                        <!--                                    <h:panelGroup >-->
-                                        <!--                                        <label class="label">使用人电话</label>-->
-                                        <!--                                        <p:inputText value="#{assetArrivedListEditController.selected.usingPersonTel}" />-->
-                                        <!--                                    </h:panelGroup>-->
                                         <h:panelGroup >
                                             <label class="label">联系人</label>
                                             <p:inputText value="#{assetArrivedListEditController.selected.contactPerson}" />
@@ -187,10 +178,6 @@
                                             <label class="label">维修联系人电话</label>
                                             <p:inputText value="#{assetArrivedListEditController.selected.repairerTel}" />
                                         </h:panelGroup>
-                                        <!--                                        <h:panelGroup>-->
-                                        <!--                                            <label class="label">培训资料</label>-->
-                                        <!--                                            <p:inputText value="#{assetArrivedListEditController.selected.trainingInfo}" />-->
-                                        <!--                                        </h:panelGroup>-->
                                     </c:if>
                                 </p:panelGrid>
                                 <h:panelGroup rendered="#{assetArrivedListEditController.selected.status eq 2 and assetArrivedListEditController.getInstalledCount() eq 0}">
@@ -222,27 +209,33 @@
                                     </c:if>
 
 
-                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['functionGroup']}">
+                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['medicalApparatusClassification']}" >
                                         <h:panelGroup >
-                                            <label class="label">#{msg.functionGroup}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['functionGroup'].arrivalRequired? '*':''}</span></label>
-                                            <p:selectOneMenu id="functionGroup" value="#{assetArrivedListEditController.easyInstallItem.functionGroup}" required="#{assetArrivedListEditController.customConfig.assetFields['functionGroup'].arrivalRequired}"
-                                                             requiredMessage="#{msg.functionGroup} #{msg.ValidationRequire}"  autoWidth="false" style="width: 100%">
-                                                <p:ajax  listener="#{assetArrivedListEditController.onFunctionGroupChange()}" update="@(.assetCode68)" />
-                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                            </p:selectOneMenu>
+                                            <label class="label">#{msg.medicalApparatusClassification}</label>
+                                            <apm:selectMedicalInstrumentsClassification/>
                                         </h:panelGroup>
                                     </c:if>
-                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['assetCode68']}">
-                                        <h:panelGroup >
-                                            <label class="label">#{msg.assetCode68}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['assetCode68'].arrivalRequired? '*':''}</span></label>
-                                            <p:selectOneMenu id="assetCode68" value="#{assetArrivedListEditController.easyInstallItem.assetCode68}" required="#{assetArrivedListEditController.customConfig.assetFields['assetCode68'].arrivalRequired}"
-                                                             requiredMessage="#{msg.assetCode68} #{msg.ValidationRequire}" autoWidth="false" style="width: 100%" class="assetCode68">
-                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                <f:selectItems value="#{assetArrivedListEditController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                            </p:selectOneMenu>
-                                        </h:panelGroup>
-                                    </c:if>
+<!--                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['functionGroup']}">-->
+<!--                                        <h:panelGroup >-->
+<!--                                            <label class="label">#{msg.functionGroup}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['functionGroup'].arrivalRequired? '*':''}</span></label>-->
+<!--                                            <p:selectOneMenu id="functionGroup" value="#{assetArrivedListEditController.easyInstallItem.functionGroup}" required="#{assetArrivedListEditController.customConfig.assetFields['functionGroup'].arrivalRequired}"-->
+<!--                                                             requiredMessage="#{msg.functionGroup} #{msg.ValidationRequire}"  autoWidth="false" style="width: 100%">-->
+<!--                                                <p:ajax  listener="#{assetArrivedListEditController.onFunctionGroupChange()}" update="@(.assetCode68)" />-->
+<!--                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
+<!--                                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+<!--                                            </p:selectOneMenu>-->
+<!--                                        </h:panelGroup>-->
+<!--                                    </c:if>-->
+<!--                                    <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['assetCode68']}">-->
+<!--                                        <h:panelGroup >-->
+<!--                                            <label class="label">#{msg.assetCode68}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['assetCode68'].arrivalRequired? '*':''}</span></label>-->
+<!--                                            <p:selectOneMenu id="assetCode68" value="#{assetArrivedListEditController.easyInstallItem.assetCode68}" required="#{assetArrivedListEditController.customConfig.assetFields['assetCode68'].arrivalRequired}"-->
+<!--                                                             requiredMessage="#{msg.assetCode68} #{msg.ValidationRequire}" autoWidth="false" style="width: 100%" class="assetCode68">-->
+<!--                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
+<!--                                                <f:selectItems value="#{assetArrivedListEditController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+<!--                                            </p:selectOneMenu>-->
+<!--                                        </h:panelGroup>-->
+<!--                                    </c:if>-->
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['registrationNo']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.registrationNo}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['registrationNo'].arrivalRequired? '*':''}</span></label>
@@ -301,7 +294,6 @@
                                             <label class="label">#{msg.capitalSource}<span style="color:red">#{(assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['capitalSource'].arrivalRequired)? '*':''}</span></label>
                                             <p:selectOneMenu id="capitalSource" value="#{assetArrivedListEditController.easyInstallItem.capitalSource}" required="#{assetArrivedListEditController.needInstorageCheck or assetArrivedListEditController.customConfig.assetFields['capitalSource'].arrivalRequired}" requiredMessage="#{msg.capitalSource}#{msg.ValidationRequire}">
                                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                <!--<f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource').subList(0, 5)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                                                 <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                             </p:selectOneMenu>
                                         </h:panelGroup>
@@ -422,10 +414,10 @@
                                         <h:panelGroup >
                                             <p:dataList id="pictureList" value="#{assetArrivedListEditController.getAttachList('asset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                    <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -438,10 +430,10 @@
                                         <h:panelGroup >
                                             <p:dataList id="contractList" value="#{assetArrivedListEditController.getAttachList('asset2')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                    <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -454,10 +446,10 @@
                                         <h:panelGroup >
                                             <p:dataList id="manualList" value="#{assetArrivedListEditController.getAttachList('asset3')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
-                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                    <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -477,10 +469,10 @@
                                                         <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
                                                     </c:otherwise>
                                                 </c:choose>
-                                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
-                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                    <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -494,10 +486,10 @@
                                             <h:panelGroup >
                                                 <p:dataList id="#{attachmentConfig.boType.concat('List')}" value="#{assetArrivedListEditController.getAttachList(attachmentConfig.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                     <f:facet name="header">#{attachmentConfig.label}</f:facet>
-                                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                     <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
-                                                        <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                             src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                        <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
                                                     </h:panelGroup>
                                                     <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -519,10 +511,10 @@
                                 <h:panelGroup >
                                     <p:dataList id="accessoryFinishedList" value="#{assetArrivedListEditController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                         <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
-                                        <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                         <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
-                                            <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
-                                                 src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                            <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                 src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                         </h:panelGroup>
                                         <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryFinishedList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -595,7 +587,6 @@
                     </p:fieldset>
                 </h:form>
                 <ui:include src="ItemDetailView.xhtml"/>
-                <!--<ui:include src="easyInstallDlg.xhtml"/>-->
             </div>
         </div>
 
@@ -615,6 +606,7 @@
                         <h:panelGroup>
                             <label class="label">订购项*</label>
                             <p:selectOneMenu id="contractItem" value="#{assetArrivedListEditController.selectedContractItemId}" required="true" requiredMessage="订购项 #{msg.ValidationRequire}">
+                                <p:ajax listener="#{assetArrivedListEditController.onContractItemChange()}" update="contractItem" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{assetArrivedListEditController.contractItemList}" var="item" itemLabel="#{item.contractAssetName}/#{item.contractAssetQuantity}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>

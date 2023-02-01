@@ -36,7 +36,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <div style="white-space:pre">#{msg.Description}   1. <a href="APM_ContractItem_Service_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>        2. #{msg.fileNeedData}        3. #{msg.upFileImport}</div>
+                            <div style="white-space:pre">#{msg.Description}   1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('CONTRACT_ITEM')}" styleClass="p-mr-2"/>        2. #{msg.fileNeedData}        3. #{msg.upFileImport}</div>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>

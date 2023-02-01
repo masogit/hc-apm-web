@@ -15,6 +15,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
@@ -107,7 +108,9 @@ public class MaintainController implements ServerEventInterface{
 		setDefaultParentOrgInfo();
 		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_MAINTAIN);
 	}
-
+	public List<NurseSiteMaintainExport> getMaintainDataList(String assetUid){
+		return nurseSiteMaintainService.getMaintainDataList(assetUid);
+	}
 	private List<NurseSiteMaintain> searchMaintainData(Date start, Date end) {
 		List<NurseSiteMaintain> listData = null;
 		Calendar ca = Calendar.getInstance();

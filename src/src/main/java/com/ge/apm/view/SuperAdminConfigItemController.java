@@ -42,6 +42,8 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
     private Boolean superAdminEdit = true;
 
     private Map<Integer, String> categoryMap;
+    private List<String> multiSelected;
+    private static final String VALUE ="value";
 
     @Override
     protected void init() {
@@ -63,6 +65,8 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
         categoryMap.put(9,"知识文档");
         categoryMap.put(10,"绩效分析");
         categoryMap.put(11,"质控评审");
+        categoryMap.put(12,"盘点工单");
+        categoryMap.put(13,"系统配置");
     }
 
     @Override
@@ -87,7 +91,6 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
                 // 使用上级配置
                 ConfigItemValue value;
                 if(null != configItem.getUserParentConfig() && configItem.getUserParentConfig()){
-                    value = null;
                     value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getSiteUID());
                     if(value == null){
                         value = configItemValueRepository.findFirstByKeyAndSiteUid(configItem.getKey(), selectSite.getHospitalUID());
@@ -107,7 +110,8 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
                 }else{
                     configItem.setShowValue(configItem.getDefaultValue());
                 }
-                if(7 == configItem.getValueType() && StringUtils.isNotEmpty(configItem.getValidation())){
+                if((7 == configItem.getValueType() || 8 == configItem.getValueType())
+                        && StringUtils.isNotEmpty(configItem.getValidation())){
                     String validation = configItem.getValidation();
                     List<Map<String, String>> mapList = JSON.parseObject(validation, new TypeReference<List<Map<String,String>>>(){});
                     configItem.setEnumList(mapList);
@@ -129,6 +133,22 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
                 this.selectSite = orgInfoRepository.getByUid(user.getSiteUID());
             }
         }
+    }
+
+    @Override
+    public void prepareEdit() {
+        if(8 == this.selected.getValueType()){
+            this.multiSelected = new ArrayList<>();
+            String showValue = this.selected.getShowValue();
+            if(StringUtils.isNotEmpty(showValue)){
+                List<Map<String, String>> valueList = JSON.parseObject(showValue, List.class);
+
+                for (Map<String, String> valueMap : valueList) {
+                    multiSelected.add(valueMap.get(VALUE));
+                }
+            }
+        }
+        super.prepareEdit();
     }
 
     public void saveConfig(){
@@ -157,9 +177,23 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
                     WebUtil.addErrorMessage("配置项保存异常，请联系系统管理员！");
                     return;
                 }
+            }else if(8 == this.selected.getValueType()){
+                if(CollectionUtils.isNotEmpty(this.multiSelected)){
+                    List<Map<String, String>> maps = new ArrayList<>();
+                    List<Map<String, String>> enumList = this.selected.getEnumList();
+                    for (String selectedVal : multiSelected) {
+                        for (Map<String, String> stringMap : enumList) {
+                            if(stringMap.containsValue(selectedVal)){
+                                maps.add(stringMap);
+                            }
+                        }
+                    }
+                    configItemValue.setValue(JSON.toJSONString(maps));
+                }
             }else{
                 configItemValue.setValue(this.selected.getShowValue());
             }
+
             configItemValueRepository.save(configItemValue);
         }
     }
@@ -167,7 +201,7 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
     public String formatDate(String value) throws ParseException {
         String formatValue = "";
 
-        SimpleDateFormat sdf = new SimpleDateFormat();
+        SimpleDateFormat sdf;
 
         switch (this.selected.getValueType()){
             case 4:
@@ -189,18 +223,37 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
         return formatValue;
     }
 
-    public String transferEnum(String value, List<Map<String, String>> list){
-        String str = "";
-        if(CollectionUtils.isNotEmpty(list) && StringUtils.isNotEmpty(value)){
-            for (Map<String, String> map : list) {
-                if(value.equals(map.get("value"))){
-                    str = map.get("key");
-                    break;
+    public String transferEnum(int valueType, String value, List<Map<String, String>> list){
+        switch (valueType){
+            case 7:
+                if(CollectionUtils.isNotEmpty(list) && StringUtils.isNotEmpty(value)){
+                    for (Map<String, String> map : list) {
+                        if(value.equals(map.get(VALUE))){
+                            return map.get("key");
+                        }
+                    }
                 }
-            }
-        }
+                break;
+            case 8:
+                StringBuilder str = new StringBuilder();
+                if(CollectionUtils.isNotEmpty(list) && StringUtils.isNotEmpty(value)){
+                    List<Map<String, String>> valueList = JSON.parseObject(value, List.class);
 
-        return str;
+                    for (Map<String, String> valueMap : valueList) {
+                        for (Map<String, String> map : list) {
+                            if(valueMap.get(VALUE).equals(map.get(VALUE))){
+                                str.append(map.get("key")).append(",");
+                            }
+                        }
+                    }
+                    if(str.length() > 0){
+                        return str.substring(0,str.length() - 1);
+                    }
+                }
+                break;
+            default:
+        }
+        return "";
     }
 
     public OrgInfo getSelectSite() {
@@ -217,5 +270,13 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
 
     public void setCategoryMap(Map<Integer, String> categoryMap) {
         this.categoryMap = categoryMap;
+    }
+
+    public List<String> getMultiSelected() {
+        return multiSelected;
+    }
+
+    public void setMultiSelected(List<String> multiSelected) {
+        this.multiSelected = multiSelected;
     }
 }

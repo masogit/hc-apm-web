@@ -267,6 +267,46 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         return response.getBody();
     }
 
+    public List<Map<String, String>> getUserSignature() {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<>(header);
+        String url = getGatewayURL(GatewayURL.USER_SIGNATURE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            List<Map<String, String>> responseBody = (List<Map<String, String>>) response.getBody().get("data");
+            return responseBody;
+        } else {
+            return null;
+        }
+    }
+
+    public String addUserSignature(String signatureId) {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<>(signatureId, header);
+        String url = getGatewayURL(GatewayURL.USER_SIGNATURE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (String) responseMap.get("message");
+        } else {
+            return null;
+        }
+    }
+
+    public LinkedHashMap<String, Object> getConfigByKeyAndSite(String key, String siteUid) {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<>(header);
+        String url = getGatewayURL(GatewayURL.GET_CONFIG_BY_KEY_AND_SITE);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url + "?key=" + key + "&siteUid=" + siteUid,
+                HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap.get("data");
+        } else {
+            return new LinkedHashMap<>();
+        }
+    }
+
 }
 
 class ServiceRequestForm {
@@ -485,8 +525,11 @@ class WorkOrderActionForm {
     Integer repairType;
     String repairResult;
     Double externalExpense;
+    String signature;
 
     List<V2_BlobObject> attachments;
+    Integer entryType;
+    List<V2_WorkOrderManHoursDetail> workHoursList;
 
     public String getRepairResult() {
         return repairResult;
@@ -710,6 +753,30 @@ class WorkOrderActionForm {
 
     public void setSubStatus(Integer subStatus) {
         this.subStatus = subStatus;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public Integer getEntryType() {
+        return entryType;
+    }
+
+    public void setEntryType(Integer entryType) {
+        this.entryType = entryType;
+    }
+
+    public List<V2_WorkOrderManHoursDetail> getWorkHoursList() {
+        return workHoursList;
+    }
+
+    public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
+        this.workHoursList = workHoursList;
     }
 }
 

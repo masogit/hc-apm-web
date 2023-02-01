@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:composition>
+
+        <p:dialog id="tenantEditDlg" widgetVar="tenantEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="关联租户">
+            <h:form id="tenantEditForm">
+                <h:panelGroup id="display2"  >
+                    <div   class="ui-tabs " style="height: 362px;overflow: auto;width: 550px;"  >
+                              <p:panelGrid  style="width: 100%;" columns="2" rendered="#{zkbSalesPersonInfoController.selected != null}">
+                                <p:outputLabel value="姓名"/>
+                                <p:outputLabel value="#{zkbSalesPersonInfoController.selected.name}"/>
+                                <p:outputLabel value="关联租户" for="tenant" />
+                                <p:selectManyCheckbox style="width: 100%;" id="tenant" value="#{zkbSalesPersonInfoController.tenantInfoUids}"   layout="pageDirection"  >
+                                    <p:ajax update=":tenantEditForm:tenant"/>
+                                    <f:selectItems value="#{zkbSalesPersonInfoController.tenantInfoList}" var="tenantInfo" itemLabel="#{tenantInfo.name}" itemValue="#{tenantInfo.uid}"   />
+                                 </p:selectManyCheckbox>
+                            </p:panelGrid>
+                    </div>
+                     <br/>
+                    <p:commandButton validateClient="true" actionListener="#{zkbSalesPersonInfoController.saveSalesTenantAssociate}" value="#{msg.Save}" update=":salesPersonInfoListForm:datalist, :growl"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'tenantEditDialog');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" onclick="PF('tenantEditDialog').hide()"/>
+
+
+
+
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

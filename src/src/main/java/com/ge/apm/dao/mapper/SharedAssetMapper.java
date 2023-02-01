@@ -53,9 +53,9 @@ public interface SharedAssetMapper extends BaseMapper<AssetInfo> {
         @Result(column = "financing_num", property = "financingNum"),
         @Result(column = "qr_code", property = "qrCode"),
         @Result(column = "asset_dept_uid", property = "assetDeptUID"),
-        @Result(column = "swap_name", property = "sharedAssetType.swapName"),
-        @Result(column = "unit_price", property = "sharedAssetType.unitPrice"),
-        @Result(column = "charging_type", property = "sharedAssetType.chargingType")
+        @Result(column = "swap_name", property = "sharedAssetTypeEntity.swapName"),
+        @Result(column = "unit_price", property = "sharedAssetTypeEntity.unitPrice"),
+        @Result(column = "charging_type", property = "sharedAssetTypeEntity.chargingType")
     })
     List<AssetInfo> findSharedAsset(@Param("ew") Wrapper<AssetInfo> wrapper);
 

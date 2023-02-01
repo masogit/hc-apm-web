@@ -6,7 +6,6 @@
 package com.ge.apm.view.asset;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +18,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -40,8 +40,9 @@ import com.google.common.base.Strings;
 import javaslang.Tuple2;
 import lombok.Getter;
 import lombok.Setter;
-import webapp.framework.dao.SearchFilter;
+import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 /**
  *
@@ -49,17 +50,14 @@ import webapp.framework.web.WebUtil;
  */
 @ManagedBean
 @ViewScoped
-public class AssetInstallationController {
+public class AssetInstallationController extends GenericCRUDUUIDController<ArrivalList> {
 
     @Getter
     @Setter
     private ArrivalListItem arrivalListItem;
     private ArrivalListItemRepository itemDao;
     private WorkflowConfigRepository workflowDao;
-    private UserAccountRepository userAccountDao;
     private ArrivalListRepository arrivalListDao;
-    private RelRuleAssetRepository relRuleAssetDao;
-    private AssetInfoRepository assetInfoRepository;
     private TableDefinitionRepository tableDefinitionRepository;
     private AssetInstallationService aiService;
     private AssetInfoRepository assetDao;
@@ -68,6 +66,7 @@ public class AssetInstallationController {
     private AssetInfoMgrService assetMgrService;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
     private CustomConfigService ccService;
+    private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
 
     private List<V2_BlobObject> attachList;
     @Getter
@@ -109,10 +108,7 @@ public class AssetInstallationController {
     private UserAccount useOwner;
     private AutoCompleteService autoCompleteService;
     @Getter @Setter
-    private Map<String, Object> selectedObjectMap = new HashMap();
-    @Getter
-    private TreeNode orgTree;
-//    private String currentQrCode;
+    private Map<String, Object> selectedObjectMap = new HashMap<>();
 
     private ConfigService configService;
 
@@ -149,6 +145,12 @@ public class AssetInstallationController {
 
     private ArrivalList arrivalList;
 
+    @Override
+    protected GenericRepositoryUUID<ArrivalList> getDAO() {
+        return arrivalListDao;
+    }
+
+    @Override
     @PostConstruct
     protected void init() {
         aiService = WebUtil.getBean(AssetInstallationService.class);
@@ -162,22 +164,21 @@ public class AssetInstallationController {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         workflowDao = WebUtil.getBean(WorkflowConfigRepository.class);
-        userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         arrivalListDao = WebUtil.getBean(ArrivalListRepository.class);
-        relRuleAssetDao = WebUtil.getBean(RelRuleAssetRepository.class);
-        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         tableDefinitionRepository = WebUtil.getBean(TableDefinitionRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         assetInstallationReportService = WebUtil.getBean(AssetInstallationReportService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
+        medicalInstrumentsClassificationCompCtrl.registerController(this);
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
-//        String itemId = WebUtil.getRequestParameter("itemId");
         arrivalListItem = itemDao.findById(itemId);
-        arrivalListItem.setIsPm(arrivalListItem.getIsPm() == null ? true : arrivalListItem.getIsPm());
-        arrivalListItem.setIsChecked(arrivalListItem.getIsChecked() == null ? true : arrivalListItem.getIsChecked());
+        medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, arrivalListItem.getMedicalApparatusClassification());
+        arrivalListItem.setIsPm(arrivalListItem.getIsPm() == null || arrivalListItem.getIsPm());
+        arrivalListItem.setIsChecked(arrivalListItem.getIsChecked() == null || arrivalListItem.getIsChecked());
         oldQrCode = arrivalListItem.getQrCode();
 
         if (null == arrivalListItem.getInstallDate()) {
@@ -265,7 +266,7 @@ public class AssetInstallationController {
     public String rejectInstall() {
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
-            if (aiService.submitInstallItem(arrivalListItem.getId(), false, null)) {
+            if (Boolean.TRUE.equals(aiService.submitInstallItem(arrivalListItem.getId(), false, null))) {
                 WebUtil.addSuccessMessage("提交成功");
                 return returnAction();
             } else {
@@ -294,7 +295,7 @@ public class AssetInstallationController {
 
     public String finishInstall() {
         arrivalListDao.save(arrivalList);//由于更新了院区，所以要重新保存一下，供定时任务获取
-        Boolean isValidate = true;
+        boolean isValidate = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
             if (null == gbCode) {
@@ -310,21 +311,11 @@ public class AssetInstallationController {
             RequestContext.getCurrentInstance().addCallbackParam("ClinicalDeptName", true);
             isValidate = false;
         }
-//        if (null == arrivalListItem.getIsGeneratePmOrder()) {
-//            WebUtil.addErrorMessage("同时生成保养工单" + WebUtil.getMessage("ValidationRequire"));
-//            RequestContext.getCurrentInstance().addCallbackParam("IsGeneratePmOrder", true);
-//            isValidate = false;
-//        }
         if (arrivalListItem.getWorkHours() == null) {
             WebUtil.addErrorMessage("安装工时" + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("workHours", true);
             isValidate = false;
         }
-//        if (Strings.isNullOrEmpty(arrivalListItem.getSerialNum()) && customConfig.assetFields.get("serialNum").isArrivalRequired()) {
-//            WebUtil.addErrorMessage(WebUtil.getMessage("serialNum") + WebUtil.getMessage("ValidationRequire"));
-//            RequestContext.getCurrentInstance().addCallbackParam("serialNum", true);
-//            isValidate = false;
-//        }
         if (arrivalListItem.getArrivalList().getProcessType().equals(ArrivalList.ProcessType.Normal.toString())) {
             if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
                 WebUtil.addErrorMessage("商务验收未通过");
@@ -353,14 +344,14 @@ public class AssetInstallationController {
         }
 
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
+            if (Boolean.FALSE.equals(isAvailableQrcode(arrivalListItem.getQrCode()))) {
                 arrivalListItem.setQrCode(null);
                 isValidate = false;
             }
         }
 
         Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
-        if (!isvalidDeptNum._1) {
+        if (Boolean.FALSE.equals(isvalidDeptNum._1)) {
             isValidate = false;
             WebUtil.addErrorMessage(isvalidDeptNum._2);
         }
@@ -387,7 +378,7 @@ public class AssetInstallationController {
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
             arrivalListItem = itemDao.findById(arrivalListItem.getId());
-            if (aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() == null ? false : arrivalListItem.getIsGeneratePmOrder())) {
+            if (Boolean.TRUE.equals(aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() != null && arrivalListItem.getIsGeneratePmOrder()))) {
                 WebUtil.addSuccessMessage("提交成功");
             } else {
                 WebUtil.addErrorMessage("提交失败");
@@ -411,19 +402,19 @@ public class AssetInstallationController {
             String orderNumber = arrivalList1.getName();
             List<WorkflowConfig> workflowConfigItems = workflowDao.findBySiteUID(siteId);
             WorkflowConfig workflowConfigItem =null;
-            if(workflowConfigItems.size()>0){
+            if(!workflowConfigItems.isEmpty()){
                 workflowConfigItem = workflowConfigItems.get(0);
             }else{
                 workflowConfigItems = workflowDao.findByHospitalUID(hospitalId);
-                if(workflowConfigItems.size()>0){
+                if(!workflowConfigItems.isEmpty()){
                     workflowConfigItem = workflowConfigItems.get(0);
                 }else{
                     workflowConfigItems = workflowDao.findByInstitutionUID(institutionId);
-                    if(workflowConfigItems.size()>0){
+                    if(!workflowConfigItems.isEmpty()){
                         workflowConfigItem = workflowConfigItems.get(0);
                     }else{
                         workflowConfigItems = workflowDao.findByTenantUID(tenantId);
-                        if(workflowConfigItems.size()>0){
+                        if(!workflowConfigItems.isEmpty()){
 
                             workflowConfigItem = workflowConfigItems.get(0);
                         }
@@ -433,13 +424,13 @@ public class AssetInstallationController {
             if(workflowConfigItem != null){
                 //获取到workflow中是否售后服务
                 Boolean anBool = workflowConfigItem.getAiNeedMaintenance();
-                if(anBool != null && anBool  == true){
+                if(Boolean.TRUE.equals(anBool)){
                     ArrivalList arrivalListToStatus = arrivalListDao.findByName(orderNumber);
                     if(arrivalListToStatus.getStatus()!=3){
                         return returnAction();
                     }
                     List<TableDefinition> tableDefinitions = tableDefinitionRepository.getBySiteUID(siteId);
-                    if(tableDefinitions.size()>0){
+                    if(!tableDefinitions.isEmpty()){
                         //需要判断设备分类是否相同而跳转到I产规则管理
                         //获取到安装设备的分类编号
                         Integer assetGroupNum1 = arrivalList1.getAssetGroup();
@@ -449,9 +440,8 @@ public class AssetInstallationController {
                             Integer assetGroupId = tableDefinition.getAssetGroup();
                             if(assetGroupNum1.equals(assetGroupId)){
                                 //获取到assetinfo表中设备想对应的uid值
-                                List<String> assetIds = itemDao.getAssetUid(arrivalListId);
                                 //通过assetinfo中的uid值，获取到id值保存到集合
-                                RelRuleAssetController.assetInfoUids=assetIds;
+                                RelRuleAssetController.assetInfoUids= itemDao.getAssetUid(arrivalListId);
                                 return "/portal/asset/arrived/ItemEdit2?faces-redirect=true";
                             }
                         }
@@ -489,7 +479,7 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage(String.format("没有找到合同编号[%s]以及所属科室的到货单记录 .", contractNum));
             return null;
         }
-        String errorMessage = "";
+        StringBuilder errorMessage = new StringBuilder();
         for(ArrivalListItem arrivalListItem : itemList){
             String message = "";
             if (null != gbCodeName) {
@@ -525,25 +515,17 @@ public class AssetInstallationController {
                     message = message + "、" + WebUtil.getMessage(qrCodeStatus);
                 }
             }
-            //if(arrivalListItem.getBusinessAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
-            arrivalListItem.setBusinessAckStatus(arrivalListItem.ACK_STATUS_PASS);
+            arrivalListItem.setBusinessAckStatus(ArrivalListItem.ACK_STATUS_PASS);
             arrivalListItem.setBusinessAckDate(new Date());
-            //}
-//            if(arrivalListItem.getTechnicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
-            arrivalListItem.setTechnicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
+            arrivalListItem.setTechnicalAckStatus(ArrivalListItem.ACK_STATUS_PASS);
             arrivalListItem.setTechnicalAckDate(new Date());
-//            }
-//            if(arrivalListItem.getClinicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
-            arrivalListItem.setClinicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
+            arrivalListItem.setClinicalAckStatus(ArrivalListItem.ACK_STATUS_PASS);
             arrivalListItem.setClinicalAckDate(new Date());
-//            }
-//            if(arrivalListItem.getFixassetAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
-            arrivalListItem.setFixassetAckStatus(arrivalListItem.ACK_STATUS_PASS);
+            arrivalListItem.setFixassetAckStatus(ArrivalListItem.ACK_STATUS_PASS);
             arrivalListItem.setFixassetAckDate(new Date());
-//            }
 
             Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
-            if (!isvalidDeptNum._1) {
+            if (Boolean.FALSE.equals(isvalidDeptNum._1)) {
                 message = message + "、" + isvalidDeptNum._2;
             }
 
@@ -552,11 +534,11 @@ public class AssetInstallationController {
                 String financingNumName = WebUtil.getMessage("financingNum");
                 String financingNum = arrivalListItem.getFinancingNum()==null?"不可为空！":arrivalListItem.getFinancingNum();
                 message = message.replaceFirst("、","");
-                if(errorMessage.contains("到货单名称/编号："+name)){
-                    errorMessage =  errorMessage + "、"+ financingNumName +"："+ financingNum +"---->" + message;
+                if(errorMessage.toString().contains("到货单名称/编号："+name)){
+                    errorMessage.append("、").append(financingNumName).append("：").append(financingNum).append("---->").append(message);
                 }else{
                     message = "到货单名称/编号：" + name +","+ financingNumName +"："+ financingNum +"---->" + message;
-                    errorMessage = errorMessage + message ;
+                    errorMessage.append(message);
                 }
             }
 
@@ -580,8 +562,8 @@ public class AssetInstallationController {
             }
         }
 
-        if(StringUtils.isNotBlank(errorMessage)){
-            WebUtil.addErrorMessage(errorMessage);
+        if(StringUtils.isNotBlank(errorMessage.toString())){
+            WebUtil.addErrorMessage(errorMessage.toString());
             return "";
         }
 
@@ -589,27 +571,27 @@ public class AssetInstallationController {
         return returnAction();
     }
     public void finishInstallHandle(List<ArrivalListItem> itemList) {
-        String message = "";
+        StringBuilder message = new StringBuilder();
         for(ArrivalListItem arrivalListItem : itemList){
             if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
                 arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
                 aiService.saveOrUpdateItem(arrivalListItem);
                 arrivalListItem = itemDao.findById(arrivalListItem.getId());
-                if (!aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() == null ? false : arrivalListItem.getIsGeneratePmOrder())) {
+                if (Boolean.FALSE.equals(aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() != null && arrivalListItem.getIsGeneratePmOrder()))) {
                     String name = arrivalListItem.getArrivalList().getName();
-                    if(message.contains("到货单名称/编号："+name)){
-                        message =  message +"、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->当前记录提交失败";
+                    if(message.toString().contains("到货单名称/编号："+name)){
+                        message.append("、").append(WebUtil.getMessage("financingNum")).append("：").append(arrivalListItem.getFinancingNum()).append("---->当前记录提交失败");
                     }else{
-                        message = message + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->当前记录提交失败";
+                        message.append("到货单名称/编号：").append(name).append(",").append(WebUtil.getMessage("financingNum")).append("：").append(arrivalListItem.getFinancingNum()).append("---->当前记录提交失败");
                     }
                 }
 
             }
         }
-        if(StringUtils.isEmpty(message)){
+        if(StringUtils.isEmpty(message.toString())){
             WebUtil.addSuccessMessage("入库安装成功");
         }else{
-            WebUtil.addErrorMessage(message);
+            WebUtil.addErrorMessage(message.toString());
         }
     }
     public void removeAttachmentById(String blobId) {
@@ -641,19 +623,17 @@ public class AssetInstallationController {
     }
 
     private boolean saveItem() {
-        Boolean valid = true;
+        boolean valid = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
             if (null == gbCode) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
                 return false;
             }
-            if (null != gbCodeName) {
-                arrivalListItem.setNationalStandardCode(gbCodeName.split("/")[0]);
-            }
+            arrivalListItem.setNationalStandardCode(gbCodeName.split("/")[0]);
         }
 
-        if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
+        if (Boolean.FALSE.equals(isAvailableQrcode(arrivalListItem.getQrCode()))) {
             valid = false;
             arrivalListItem.setQrCode(null);
         }
@@ -679,9 +659,6 @@ public class AssetInstallationController {
             attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalListItem);
             blobObject.setBoUuid(arrivalListItem.getId());
-//            if(activeSupplier()){//已激活的供应商：使用合同号作为BoUuid
-//                blobObject.setBoUuid(arrivalListItem.getArrivalList().getContractNum());
-//            }
             blobObject.setBoSubType(typeName);
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
@@ -716,7 +693,7 @@ public class AssetInstallationController {
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             parentAssetList = assetMgrService.getParentsAssetsList(null, arrivalListItem.getClinicalDeptUID(), arrivalListItem.getArrivalList().getSiteUID());
         } else {
-            parentAssetList = Collections.EMPTY_LIST;
+            parentAssetList = Collections.emptyList();
         }
         return parentAssetList;
     }
@@ -802,7 +779,6 @@ public class AssetInstallationController {
     }
 
     public void onAssetOwnerNameChange() {
-//        owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
         arrivalListItem.setAssetOwnerUID(owner1 == null ? null : owner1.getUid());
         if (owner1 == null) {
             return;
@@ -845,7 +821,6 @@ public class AssetInstallationController {
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
             String availableQrcode = qrCodeService.getAvailableQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
             if (Strings.isNullOrEmpty(availableQrcode)) {
-//                WebUtil.addErrorMessage("二维码不正确");
                 arrivalListItem.setQrCode("");
             } else {
                 oldQrCode = arrivalListItem.getQrCode();
@@ -877,7 +852,6 @@ public class AssetInstallationController {
                             break;
                         case "qrCode":
                             num = arrivalListItem.getQrCode();
-//                            arrivalListItem.setQrCode(num);
                             break;
                         default:
                     }
@@ -920,32 +894,36 @@ public class AssetInstallationController {
                 } else {
                     arrivalListItem.setTechnicalAckDate(null);
                 }
+                break;
             case "clinical":
                 if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getClinicalAckStatus())) {
                     arrivalListItem.setClinicalAckDate(new Date());
                 } else {
                     arrivalListItem.setClinicalAckDate(null);
                 }
+                break;
             case "business":
                 if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getBusinessAckStatus())) {
                     arrivalListItem.setBusinessAckDate(new Date());
                 } else {
                     arrivalListItem.setBusinessAckDate(null);
                 }
+                break;
             case "fixasset":
                 if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getFixassetAckStatus())) {
                     arrivalListItem.setFixassetAckDate(new Date());
                 } else {
                     arrivalListItem.setFixassetAckDate(null);
                 }
+                break;
+            default:
+                break;
         }
     }
 
     public List<String> autoCompleteDept(String query) {
-        List<String> res = deptInfoList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).collect(Collectors.toList());
-        res.sort(new PinYinComparator());
-        return res;
+        return deptInfoList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).sorted(new PinYinComparator()).collect(Collectors.toList());
     }
 
     public void onClinicalDeptChange(SelectEvent event) {
@@ -996,16 +974,11 @@ public class AssetInstallationController {
     }
 
     public void exportReport(String reportType) {
-        //List<ArrivalListItem> tempList = new ArrayList();
-        //tempList.add(this.selected);
         try {
             Map<String, Object> data = assetInstallationReportService.createReportData(arrivalListItem);
-            //List<Map<String, Object>> data = assetInstallationReportService.createReportDataList(tempList);
             byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
-
             if (templateBytes != null) {
                 exportFile = assetInstallationReportService.exportDocx(data, templateBytes, reportType);
-                //exportFile = assetInstallationReportService.exportZip(data, templateBytes, reportType);
             }
         } catch (IOException e) {
             Logger.getLogger(AssetInstallationController.class.getName()).log(Level.SEVERE, null, e);
@@ -1024,7 +997,6 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage("所属科室不能为空");
             return;
         }
-//        saveItem();
         List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
         if(itemList == null || itemList.isEmpty()){
             WebUtil.addErrorMessage("没有需要导出的验收报告");
@@ -1055,69 +1027,6 @@ public class AssetInstallationController {
         this.exportFile = exportFile;
     }
 
-    //    public ArrivalListItem getArrivalListItem() {
-//        return arrivalListItem;
-//    }
-//
-//    public void setArrivalListItem(ArrivalListItem arrivalListItem) {
-//        this.arrivalListItem = arrivalListItem;
-//    }
-//    public List<I18nMessage> getCode68List() {
-//        return code68List;
-//    }
-//
-//    public void setCode68List(List<I18nMessage> code68List) {
-//        this.code68List = code68List;
-//    }
-//    public String getGbCodeName() {
-//        return gbCodeName;
-//    }
-//
-//    public void setGbCodeName(String gbCodeName) {
-//        this.gbCodeName = gbCodeName;
-//    }
-//    public GbCode getSelectedGb() {
-//        return selectedGb;
-//    }
-//
-//    public void setSelectedGb(GbCode selectedGb) {
-//        this.selectedGb = selectedGb;
-//    }
-//    public TreeNode getSelectedNode() {
-//        return selectedNode;
-//    }
-//
-//    public void setSelectedNode(TreeNode selectedNode) {
-//        this.selectedNode = selectedNode;
-//    }
-//    public TreeNode getSelectedGbNode() {
-//        return selectedGbNode;
-//    }
-//
-//    public void setSelectedGbNode(TreeNode selectedGbNode) {
-//        this.selectedGbNode = selectedGbNode;
-//    }
-//    public TreeNode getGbTree() {
-//        return gbTree;
-//    }
-//
-//    public void setGbTree(TreeNode gbTree) {
-//        this.gbTree = gbTree;
-//    }
-//    public String getExportQrCodeTemplateId() {
-//        return exportQrCodeTemplateId;
-//    }
-//
-//    public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
-//        this.exportQrCodeTemplateId = exportQrCodeTemplateId;
-//    }
-//    public String getDeptName() {
-//        return deptName;
-//    }
-//
-//    public void setDeptName(String deptName) {
-//        this.deptName = deptName;
-//    }
     public boolean isNeedInstorageCheck() {
         return needInstorageCheck;
     }
@@ -1126,51 +1035,14 @@ public class AssetInstallationController {
         this.needInstorageCheck = needInstorageCheck;
     }
 
-//    public UserAccount getOwner1() {
-//        return owner1;
-//    }
-//
-//    public void setOwner1(UserAccount owner1) {
-//        this.owner1 = owner1;
-//    }
-//    public UserAccount getOwner2() {
-//        return owner2;
-//    }
-//
-//    public void setOwner2(UserAccount owner2) {
-//        this.owner2 = owner2;
-//    }
-//    public UserAccount getOwner3() {
-//        return owner3;
-//    }
-//
-//    public void setOwner3(UserAccount owner3) {
-//        this.owner3 = owner3;
-//    }
-//    public UserAccount getUseOwner() {
-//        return useOwner;
-//    }
-//
-//    public void setUseOwner(UserAccount useOwner) {
-//        this.useOwner = useOwner;
-//    }
-//
-//	public AssetInfo getParentAssetInfo() {
-//		return parentAssetInfo;
-//	}
-//
-//	public void setParentAssetInfo(AssetInfo parentAssetInfo) {
-//		this.parentAssetInfo = parentAssetInfo;
-//	}
-
     public boolean activeSupplier(){
         return supplierService.activeSupplier();
     }
 
     public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
         String[] fileSuffixNames = fileSuffixName.toUpperCase().split("\\|");
-        for(int i=0;i<fileSuffixNames.length;i++){
-            if(fileName.toUpperCase().endsWith(fileSuffixNames[i])){
+        for (String suffixName : fileSuffixNames) {
+            if (fileName.toUpperCase().endsWith(suffixName)) {
                 return true;
             }
         }

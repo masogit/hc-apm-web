@@ -11,6 +11,8 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminConsoleService extends MicroServiceInvoker {
@@ -92,6 +96,10 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	
 	@Autowired
 	BlobObjectRepository blobObjectRepository;
+
+	@Autowired
+	private AssetHistoryRepository assetHistoryRepository;
+
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -573,6 +581,69 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			 List<V2_PmOrder> pmOrders = (List<V2_PmOrder>) response.getBody();
 			logger.info("批量创建保养失败记录：{}",pmOrders);
 		} else {
+		}
+	}
+
+
+	public void batchUpdateAssetHistoryEvent() {
+		try {
+			logger.info("batchUpdateAssetHistoryEvent start .......");
+			long startTimeUpdate = System.currentTimeMillis();
+
+			assetHistoryRepository.batchUpdateAssetHistoryEvent();
+			long endTimeUpdate = System.currentTimeMillis();
+
+			logger.info("batchUpdateAssetHistoryEvent end .......耗时:{}ms",endTimeUpdate-startTimeUpdate);
+			logger.info("batchInsertAssetHistoryEvent start .......");
+			int pageNum=0;
+			int pageSize=3000;
+			Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+			long startTime = System.currentTimeMillis();
+			List<AssetHistory> assetHistorys =new ArrayList<>(2000);
+			while (true){
+				List<AssetInfo> assetInfos=assetInfoRepository.queryAssetHistoryNotExistsInsert();
+				if(CollectionUtils.isEmpty(assetInfos)){
+					break;
+				}
+				for(AssetInfo assetInfo:assetInfos){
+					if(assetInfo.getHospital()!=null){
+						assetInfo.setAssetDeptName(assetInfo.getHospital().getName());
+					}
+					AssetHistory assetHistory = new AssetHistory();
+					assetHistory.setAssetUid(assetInfo.getUid());
+					assetHistory.setAssetName(assetInfo.getName());
+					assetHistory.setFinancingNum(assetInfo.getFinancingNum());
+					assetHistory.setJsonData("[]");
+					assetHistory.setCreatedDate(new Date());
+					assetHistory.setCreatedBy(assetInfo.getCreatedBy()!=null?assetInfo.getCreatedBy():"admin");
+					assetHistory.setSiteUID(assetInfo.getSiteUID());
+					assetHistory.setHospitalUID(assetInfo.getHospitalUID());
+					assetHistory.setTenantUID(assetInfo.getTenantUID());
+					assetHistory.setInstitutionUID(assetInfo.getInstitutionUID());
+					assetHistory.setClinicalDeptUid(assetInfo.getClinicalDeptUID());
+
+					assetInfo.setHospital(null);
+					assetInfo.setQrCodeLib(null);
+					assetInfo.setAssetTags(null);
+					assetInfo.setBrand(null);
+					assetInfo.setTags(null);
+					String assetJson = g.toJson(assetInfo);
+					assetHistory.setAssetJson(assetJson);
+
+					assetHistorys.add(assetHistory);
+				}
+				if(!CollectionUtils.isEmpty(assetHistorys)){
+					assetHistoryRepository.save(assetHistorys);
+				}
+				assetHistorys.clear();
+				pageNum=pageNum+pageSize;
+				Thread.sleep(10000);
+			}
+			long endTime = System.currentTimeMillis();
+			logger.info("batchInsertAssetHistoryEvent end 添加设备到历史数据运行时间：{} ms",endTime-startTime);
+
+		}catch (Exception e){
+			logger.info("batchUpdateAssetHistoryEvent error e:",e);
 		}
 	}
 }

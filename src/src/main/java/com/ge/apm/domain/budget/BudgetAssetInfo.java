@@ -103,6 +103,15 @@ public class BudgetAssetInfo implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate;
 
+    @Column(name = "imported_or_not", length = 4)
+    private String importedOrNot ;//是否进口
+
+    @Column(name = "special_or_not", length = 4)
+    private String specialOrNot;
+
+    @Column(name = "requirement", length = 500)
+    private String requirement;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -277,5 +286,29 @@ public class BudgetAssetInfo implements Serializable {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getImportedOrNot() {
+        return importedOrNot;
+    }
+
+    public void setImportedOrNot(String importedOrNot) {
+        this.importedOrNot = importedOrNot;
+    }
+
+    public String getSpecialOrNot() {
+        return specialOrNot;
+    }
+
+    public void setSpecialOrNot(String specialOrNot) {
+        this.specialOrNot = specialOrNot;
+    }
+
+    public String getRequirement() {
+        return requirement;
+    }
+
+    public void setRequirement(String requirement) {
+        this.requirement = requirement;
     }
 }

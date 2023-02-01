@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONPath;
@@ -34,6 +29,7 @@ import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -61,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -70,11 +67,11 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -124,9 +121,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //选定的院区
     private OrgInfo selectSite;
     private List<OrgInfo> clinicalDeptList;
+    private List<OrgInfo> clinicalDeptListMVS;
     private OrgInfoTreeService orgInfoTreeService;
     @Setter @Getter
     private Set<String> clinicalDeptOrgUidSet;
+    @Setter @Getter
+    private Set<String> clinicalDeptOrgUidSetMVS;
     @Setter @Getter
     List<PmOrderRuleCheckList> pmOrderRuleCheckList;
     private ServiceRequestApiService serviceRequestApiService;
@@ -148,6 +148,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     Boolean switchTmp= false;
     @Getter @Setter
     private String fileterOrgName;
+    @Getter @Setter
+    private String fileterOrgNameMVS;
     @Getter @Setter
     private String filterRule;
     @Getter @Setter
@@ -247,6 +249,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //备注
     @Getter @Setter
     private String remarks;
+    // 签名相关
+    private String signatureContent;
+    private StreamedContent signatureContentStream;
+    private String signatureId;
+    private boolean newSignature = true;
+
+    @Getter @Setter
+    private String siteUidFilter;
+    @Getter @Setter
+    private String siteUidFilterMVS;
+    @Getter @Setter
+    private List<OrgInfo> orgListMVS;
+    @Getter @Setter
+    List<V2_PmOrder> bySearchFilterMVS = null;
+    @Getter @Setter
+    List<V2_PmOrder> bySearchFilterInternal = null;
+    @Getter @Setter
+    private List<OrgInfo> orgList;
+
+
+    private WorkflowService workflowService;
 
     public String getActualCompletionTimeFormat() {
         return actualCompletionTimeFormat;
@@ -581,7 +604,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
-        System.out.println();
         List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
         if(CollectionUtils.isEmpty(pmRuleByPmNum)){
             return new PmOrderRule();
@@ -1593,6 +1615,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmReportService = WebUtil.getBean(PmReportService.class);
         multiLevelApprovalService= WebUtil.getBean(MultiLevelApprovalService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
+        workflowService = WebUtil.getBean(WorkflowService.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1838,8 +1861,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if("MVS保养".equals(tabTitle)){
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 result  = dao.findBySearchFilter(filters, pageRequest);
+                bySearchFilterMVS = result.getContent();
+                loadMVSClinicalDeptList();
             }else{
                 result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
+                bySearchFilterInternal = result.getContent();
             }
 //            Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
@@ -1877,8 +1903,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if("MVS保养".equals(tabTitle)){
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 result  = dao.findBySearchFilter(filters, pageRequest);
+                bySearchFilterMVS = result.getContent();
+                loadMVSClinicalDeptList();
             }else{
                 result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
+                bySearchFilterInternal = result.getContent();
             }
 //            Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
            // result.getContent().forEach(item->pmIdList.add(item.getId()));
@@ -1986,8 +2015,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if("MVS保养".equals(tabTitle)){
             List<SearchFilter> filters = buildMvsSearchFilter();
             result = dao.findBySearchFilter(filters, pageRequest);
+            bySearchFilterMVS = result.getContent();
+            loadMVSClinicalDeptList();
         }else{
             result = dao.findBySearchFilter(this.filterArrayList, pageRequest);
+            bySearchFilterInternal = result.getContent();
         }
         currentPagePmOrders = result.getContent();
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
@@ -2013,10 +2045,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<SearchFilter> filters = new ArrayList<>();
 
         List<String> orderIds = getVisableMvsAssetSystemId();
-        filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+        if (!CollectionUtils.isEmpty(orderIds)) {
+            filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+        }
 
         for (SearchFilter searchFilter : filterArrayList) {
-            if ("currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
+            if ("clinicalDeptId,siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
@@ -2151,15 +2185,94 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return !selectedMap.entrySet().stream().anyMatch(item -> item.getValue());
     }
 
+    public void getSignature() {
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+
+        List<Map<String, String>> signatureList = woService.getUserSignature();
+
+        if (!org.springframework.util.CollectionUtils.isEmpty(signatureList)) {
+            String lastSignatureId = signatureList.get(signatureList.size() - 1).get("signatureUid");
+            this.signatureContentStream = blobService.getBlobObjectByStorageId(lastSignatureId);
+            this.signatureId = lastSignatureId;
+            this.newSignature = false;
+        }else{
+            this.newSignature = true;
+        }
+    }
+
+    public void resetSignature() {
+        this.signatureId = null;
+        this.signatureContent = null;
+        this.signatureContentStream = null;
+        this.newSignature = true;
+    }
+
+    public void preApprovePMOrder(){
+        // 审核不通过，必须填写备注
+        if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
+                (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ApprovalFallureReasonRequired"));
+            RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
+            return;
+        }
+
+        // 备件审核是否需要签名
+        WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(this.selectedPmOrder.getSiteUID());
+
+        if(workflowConfig != null && workflowConfig.getPartsNeedSign() != null && workflowConfig.getPartsNeedSign()){
+            // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
+            ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+            HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+            response.setStatus(205);
+            return;
+        }
+        approvePMorder();
+    }
+
+    public void saveSignatureAndSubmitApprove(){
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+
+        if(StringUtils.isEmpty(this.signatureId) && (this.newSignature && StringUtils.isEmpty(this.signatureContent))){
+            WebUtil.addErrorMessage("签名不可为空！");
+            response.setStatus(206);
+            return;
+        }
+
+        if(this.newSignature){
+            if (StringUtils.isNotEmpty(signatureContent)) {
+
+                try {
+                    String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    byte[] decode = decoder.decodeBuffer(base64);
+
+                    V2_BlobObject blobObject = blobService.uploadFile(new ByteArrayInputStream(decode), "signature.png");
+                    if (null != blobObject) {
+                        this.signatureId = blobObject.getObjectStorageId();
+                        woService.addUserSignature(this.signatureId);
+                    }else{
+                        WebUtil.addErrorMessage("签名保存失败！");
+                        response.setStatus(206);
+                        return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error(e.getMessage());
+                    WebUtil.addErrorMessage("签名保存失败！");
+                    response.setStatus(206);
+                    return;
+                }
+            }
+        }
+        approvePMorder();
+    }
+
     public void approvePMorder() {
         List<V2_WorkOrder_Detail> approvedDetailsNew = new ArrayList<>();
        if (selectedPmOrder != null) {
-            if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
-                    (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("ApprovalFallureReasonRequired"));
-                RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
-                return;
-            }
+           selectedPmOrder.setPartApproveSignature(this.signatureId);
            for (int i = 0; i < approvedDetails.size(); i++) {
                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
                if (selectedMap.get(v2_workOrder_detail.getId())) {
@@ -2204,6 +2317,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
          pmOrderService.approvePMorder(selectedPmOrder, approvedDetails, this.comments);
             this.comments = null;
             approvedDetails = null;
+            resetSignature();
         }
     }
 
@@ -2293,18 +2407,30 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters = new ArrayList();
         }
         filterArrayList.clear();
-        filterArrayList.addAll(searchFilters);
-
-            //先获取 filterOrgName-手术科的 uid
-          //  List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-           // List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
-
+        searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
+        if ("MVS保养".equals(tabTitle)){
+            if (StringUtils.isNotEmpty(siteUidFilterMVS)) {
+                searchFilters.add((new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilterMVS, "1*")));
+            }
+            if (clinicalDeptOrgUidSetMVS != null && !clinicalDeptOrgUidSetMVS.isEmpty()) {
+                filterArrayList.add((new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSetMVS), "1*")));
+            }
+        } else {
+            if (StringUtils.isNotEmpty(siteUidFilter)) {
+                searchFilters.add((new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUidFilter, "1*")));
+            }
             if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
                 filterArrayList.add((new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*")));
 //                this.updateSearchFilter(new SearchFilter("clinicalDeptId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
             } else {
 //                searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
+        }
+        filterArrayList.addAll(searchFilters);
+
+            //先获取 filterOrgName-手术科的 uid
+          //  List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+           // List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
 
         if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -2332,6 +2458,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedPmOrder = null;assetName = null;endTime = null;
         ruleLevel = null;dptName = null;picList = null;
         planTimeForBatch = null;comments = null;
+        resetSignature();
     }
 
     public void prepareActTakeGrap(String woid, String head) {
@@ -2471,6 +2598,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
+    public List<String> autoCompleteDeptNameMVS(String query) {
+        if (clinicalDeptListMVS == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.clinicalDeptListMVS.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             fileterOrgName = (String) ((SelectEvent) event).getObject();
@@ -2487,6 +2624,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
         } else {
             clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+    }
+
+    public void onClinicalDeptNameFilterChangeMVS(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            fileterOrgNameMVS = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(fileterOrgNameMVS) && !clinicalDeptListMVS.stream().anyMatch(item -> fileterOrgNameMVS.equals(item.getName()))) {
+            fileterOrgNameMVS = null;
+        }
+
+        if (fileterOrgNameMVS != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptListMVS.stream().filter(item -> item.getName().equals(fileterOrgNameMVS)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptListMVS);
+            clinicalDeptOrgUidSetMVS = matchedList.stream().map(OrgInfo::getUid).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSetMVS = Collections.emptySet();
         }
     }
 
@@ -2739,7 +2895,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public List<String> autoCompleteSupplier(String query) {
-        supplierList = aimService.getSuplierListBySiteUid(selectedPmOrder.getTenantUID());
+        supplierList = aimService.getSuplierListBySiteUid(userContextService.getLoginUser().getTenantUID());
         List<Supplier> suList = autoCompleteService.autoCompleteVendor(query, supplierList);
         List<String> sList = new ArrayList<String>();
         suList.forEach(item -> sList.add(item.getName()));
@@ -2781,6 +2937,42 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             pmOrderService.invokeAcceptance(selectedPmOrder, remarks, pass);
         }else { //批量
             pmOrderService.invokeAcceptanceInBatch(selectedMap, remarks, pass);
+        }
+    }
+
+    public List<OrgInfo> LoadSiteNameList() {
+        if (org.springframework.util.CollectionUtils.isEmpty(orgList)) {
+            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterInternal)) {
+                orgList = bySearchFilterInternal.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+            }
+            if (!org.springframework.util.CollectionUtils.isEmpty(orgList)) {
+                orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            }
+        }
+        return orgList;
+    }
+
+    public List<OrgInfo> LoadSiteNameListMVS() {
+        if (org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
+            if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                orgListMVS = bySearchFilterMVS.stream().map(item -> item.getSiteUID()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+            }
+            if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
+                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            }
+        }
+        return orgListMVS;
+    }
+
+    private void loadMVSClinicalDeptList() {
+        try {
+            if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
+                if (!org.springframework.util.CollectionUtils.isEmpty(bySearchFilterMVS)) {
+                    clinicalDeptListMVS = bySearchFilterMVS.stream().map(item -> item.getClinicalDeptId()).collect(Collectors.toSet()).stream().map(val -> orgDao.getByUid(val)).collect(Collectors.toList());
+                }
+            }
+        } catch (Exception e) {
+            logger.info("暂无MVS列表");
         }
     }
 
@@ -3268,5 +3460,29 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
         return null;
+    }
+
+    public String getSignatureContent() {
+        return signatureContent;
+    }
+
+    public void setSignatureContent(String signatureContent) {
+        this.signatureContent = signatureContent;
+    }
+
+    public StreamedContent getSignatureContentStream() {
+        return signatureContentStream;
+    }
+
+    public void setSignatureContentStream(StreamedContent signatureContentStream) {
+        this.signatureContentStream = signatureContentStream;
+    }
+
+    public String getSignatureId() {
+        return signatureId;
+    }
+
+    public void setSignatureId(String signatureId) {
+        this.signatureId = signatureId;
     }
 }

@@ -21,7 +21,6 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
                     <h:panelGroup id="artificialTypeGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
                         <label class="label">机型*</label>
                         <p:selectOneMenu id="artificialType" value="#{zkbPartOrderEditController.artificialType}" required="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}">
@@ -31,7 +30,7 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
 
-                    <h:panelGroup id="maintainFlagGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
+                    <h:panelGroup id="maintainFlagGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and !(zkbPartOrderEditController.selectedContract.contractType eq 'CCSB')}">
                         <label class="label">保养申请*</label>
                         <p:selectOneMenu id="maintainFlag" value="#{zkbPartOrderEditController.maintainFlag}" required="true" requiredMessage="保养申请 #{msg.ValidationRequire}">
                             <p:ajax event="change" update="zkbPartOrderEditForm zkbHeadEditForm" listener="#{zkbPartOrderEditController.orderTypeChange}"  />
@@ -73,7 +72,7 @@
                                  lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
                                  paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
 
-                        <p:ajax event="rowSelect"  listener="#{zkbPartOrderEditController.workFlowSelected}" update="zkbwkEditForm zkbPartOrderEditForm zkbContractDatalist "/>
+                        <p:ajax event="rowSelect"  listener="#{zkbPartOrderEditController.workFlowSelected}" update="zkbHeadEditForm zkbwkEditForm zkbPartOrderEditForm zkbContractDatalist "/>
 
                         <p:column headerText="设备名称">
                             <h:outputText value="#{item.name}"/>
@@ -111,27 +110,54 @@
                     <p:column headerText="#{msg.zkbContract_ibNumber}">
                         <h:outputText value="#{item.ibNumber}"/>
                     </p:column>
-                    <p:column headerText="#{msg.zkbContract_spareQuota}">
-                        <h:outputText value="#{item.spareQuota}"/>
-                    </p:column>
-                    <p:column headerText="探头任意剩余名额" >
-                        <h:outputText value="#{item.probeQuota}"/>
-                    </p:column>
-                    <p:column headerText="探头普通剩余名额" >
-                        <h:outputText value="#{item.probeQuotaNormal}"/>
-                    </p:column>
-                    <p:column headerText="探头特殊剩余名额" >
-                        <h:outputText value="#{item.probeQuotaSpecial}"/>
-                    </p:column>
+                    <c:choose>
+                        <c:when test="#{zkbPartOrderEditController.orderType eq 'Parts'}">
+                            <p:column headerText="#{msg.zkbContract_spareQuota}">
+                                <h:outputText value="#{item.spareQuota}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.zkbContract_spareArtificail}">
+                                <h:outputText value="#{item.spareArtificail}"/>
+                            </p:column>
+                            <p:column headerText="高值备件剩余名额">
+                                <h:outputText value="#{item.partHighQuota}"/>
+                            </p:column>
+                        </c:when>
+                        <c:when test="#{zkbPartOrderEditController.orderType eq 'Probe'}">
+                            <p:column headerText="探头任意剩余名额" >
+                                <h:outputText value="#{item.probeQuota}"/>
+                            </p:column>
+                            <p:column headerText="探头普通剩余名额" >
+                                <h:outputText value="#{item.probeQuotaNormal}"/>
+                            </p:column>
+                            <p:column headerText="探头特殊剩余名额" >
+                                <h:outputText value="#{item.probeQuotaSpecial}"/>
+                            </p:column>
+                        </c:when>
+                        <c:when test="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
+                            <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
+                                <h:outputText value="#{item.geArtificialSupportTimes}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.zkbContract_spareArtificail}">
+                                <h:outputText value="#{item.spareArtificail}"/>
+                            </p:column>
+                            <p:column headerText="保养剩余名额">
+                                <h:outputText value="#{item.ccsbMaintenanceQuota}"/>
+                            </p:column>
+                        </c:when>
+                        <c:when test="#{zkbPartOrderEditController.orderType eq 'Tool'}">
+                            <p:column headerText="#{msg.zkbContract_spareQuota}">
+                                <h:outputText value="#{item.spareQuota}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.zkbContract_spareArtificail}">
+                                <h:outputText value="#{item.spareArtificail}"/>
+                            </p:column>
+                        </c:when>
+                    </c:choose>
+
                     <!--<p:column headerText="探头高值剩余名额" >
                         <h:outputText value="#{item.probeQuotaHigh}"/>
                     </p:column>-->
-                    <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
-                        <h:outputText value="#{item.geArtificialSupportTimes}"/>
-                    </p:column>
-                    <p:column headerText="#{msg.zkbContract_spareArtificail}">
-                        <h:outputText value="#{item.spareArtificail}"/>
-                    </p:column>
+
                     <p:column headerText="#{msg.zkbContract_startDate}">
                         <h:outputText value="#{item.startDate}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -167,7 +193,7 @@
 
                        <!-- <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">-->
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts'}">
-                            <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 1}">
+                            <h:panelGroup rendered="#{zkbPartOrderEditController.assetInfo.assetGroup eq 1}">
                                 <label class="label">设备类型（DI）*</label>
                                 <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderEditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -177,7 +203,26 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup id="ArtificialGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.maintainFlag != 't'}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.radiationQuotaTypeFlag}">
+                            <label class="label">放射名额扣除类型*</label>
+                            <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.radiationQuotaType}" disabled="#{zkbPartOrderEditController.spareArtificialFlag}" required="true" requiredMessage="放射名额扣除类型 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="partsHighTypeGroup"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="联合名额" itemValue="SpareArtificial"/>
+                                <f:selectItem itemLabel="高值备件名额" itemValue="PartsHigh"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup id="partsHighTypeGroup" >
+                            <h:panelGroup  rendered="#{zkbPartOrderEditController.selected.radiationQuotaType eq 'PartsHigh'}">
+                                <label class="label">备件类型*</label>
+                                <p:selectOneMenu value="#{zkbPartOrderEditController.selected.partsHighType}" required="true" requiredMessage="备件类型 #{msg.ValidationRequire}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartsHighTypeGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                        <h:panelGroup id="ArtificialGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.maintainFlag != 't' and zkbPartOrderEditController.selectedContract.contractType != 'CCSB'}">
                             <c:if test="#{zkbPartOrderEditController.artificialType eq '1'}">
                                 <label class="label" >是否需要SSA Key*</label>
                             </c:if>
@@ -228,6 +273,16 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.selectedContract.contractType eq 'CCSB'}">
+                            <label class="label">CCSB扣除名额类型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.ccsbApplyType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="remainQty" listener="#{zkbPartOrderEditController.ccsbApplyTypeSelect}"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCCsbQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType != null and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'Old'}">
                             <label class="label">是否高值探头*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.highCatFlag}" required="true" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
@@ -362,7 +417,8 @@
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">故障图片上传</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                 <p:commandButton actionListener="#{zkbPartOrderEditController.removeFile(fileitem,'ZkbPartOrder')}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
@@ -378,7 +434,8 @@
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'New' and zkbPartOrderEditController.selected.tenantNewCatFlag eq 't'}">
                             <p:dataList  id="uploadProveList" value="#{zkbPartOrderEditController.v2_probe_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">院方合同证明</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                                 <p:commandButton actionListener="#{zkbPartOrderEditController.removeFile(fileitem,'ZkbPartOrderProve')}" update="uploadProveList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>

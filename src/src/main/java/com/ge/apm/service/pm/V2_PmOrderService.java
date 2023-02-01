@@ -549,6 +549,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         formData.setDesc(comments);
         formData.setDetails(accessList);
+        formData.setSignature(selectedPmOrder.getPartApproveSignature());
         String res = srApi.invokePmOrderAction(token,formData,"审批",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));

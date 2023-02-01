@@ -65,6 +65,7 @@ public class UserContextService implements Serializable {
     private String selectedSiteUid;
     //选定的院区
     private OrgInfo selectSite;
+    private OrgInfo selectSiteSchedule;
     private List<OrgInfo> child = new ArrayList<>();
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
@@ -251,6 +252,14 @@ public class UserContextService implements Serializable {
         }
         WorkflowConfig workflowConfig = bySiteUID.get(0);
         return workflowConfig.getEnableAssetPreview() != null && workflowConfig.getEnableAssetPreview();
+    }
+    public boolean enableSendRepair() {
+        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
+        if (bySiteUID == null || bySiteUID.isEmpty()) {
+            return false;
+        }
+        WorkflowConfig workflowConfig = bySiteUID.get(0);
+        return workflowConfig.getEnableSendRepair() != null && workflowConfig.getEnableSendRepair();
     }
 
     public boolean byOpWorker(){
@@ -1116,6 +1125,14 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    public static boolean isYiMaiYangGuangTenantForServer() {
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
+        if (tenantOptionConfigOptional.isPresent()) {
+            return tenantOptionConfigOptional.get().getSynchronizeWorkOrder()!=null? tenantOptionConfigOptional.get().getSynchronizeWorkOrder():false;
+        }
+        return false;
+    }
+
     public static boolean isSuperAdminWithPartnerAccount(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.isPartnerAccount();
@@ -1210,11 +1227,7 @@ public class UserContextService implements Serializable {
     public boolean isLocale(){
         Locale locale = LocaleHolder.getLocale();
         //System.out.println("locale  is "+locale);
-        if(locale.getLanguage().equalsIgnoreCase("zh")){
-            return true;
-        } else {
-            return false;
-        }
+        return "zh".equalsIgnoreCase(locale.getLanguage());
     }
 
     public String timeFormat(){
@@ -1612,5 +1625,13 @@ public class UserContextService implements Serializable {
             }
         }
         return selectItems;
+    }
+
+    public OrgInfo getSelectSiteSchedule() {
+        return selectSiteSchedule;
+    }
+
+    public void setSelectSiteSchedule(OrgInfo selectSiteSchedule) {
+        this.selectSiteSchedule = selectSiteSchedule;
     }
 }

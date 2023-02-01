@@ -10,6 +10,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ge.apm.dao.UserAccountRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -39,6 +40,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	private InventoryIssueRepository dao;
 	private InventoryOrderRepository inventoryOrderRepository;
     private InventoryOrderService inventoryOrderService;
+    private UserAccountRepository userAccountRepository;
     private UaaService uaaService;
 	private InventoryOrderService service;
 	private static final String ORG_NAME = "orgName";
@@ -53,6 +55,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
@@ -87,6 +90,24 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
         searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         searchFilters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
         searchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
+       	boolean hasLastModifiedBy = false; String lastModifiedByFilter = null;
+       	for (SearchFilter searchFilter :searchFilters) {
+       		if ("lastModifiedBy".equals(searchFilter.fieldName)) {
+       			hasLastModifiedBy = true;
+				lastModifiedByFilter = (String)searchFilter.value;
+       		}
+		}
+       	if(hasLastModifiedBy) {
+			searchFilters.removeIf(e -> e.fieldName.equals("lastModifiedBy"));
+			List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(user.getTenantUID(), lastModifiedByFilter);
+			List<String> loginNamList = new ArrayList<>();
+			if(!userAccountList.isEmpty()){
+				for (UserAccount userAccount:userAccountList) {
+					loginNamList.add(userAccount.getLoginName());
+				}
+			}
+			searchFilters.add(new SearchFilter("lastModifiedBy", SearchFilter.Operator.IN, loginNamList,"1*"));
+		}
         //全院视图
         if(null == orderId){
             List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);

@@ -162,6 +162,11 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("repairForm")), "setRepairForm", repairFormList, map, StringUtils.isEmpty(asset.getUid()) ? 1 : null); //新增资产默认内修
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("functionType")), "setFunctionType", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("serialNum")), "setSerialNum", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum1")), "setSystemNum1", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum2")), "setSystemNum2", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum3")), "setSystemNum3", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum4")), "setSystemNum4", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemNum5")), "setSystemNum5", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemId")), "setSystemId", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("BarCode")), "setBarcode", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("NationalCode")), "setNationalStandardCode", true);
@@ -209,6 +214,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("assetValueCategory")), "setAssetValueCategory", assetValueCategoryList, map, null);
 
+                assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("isUseRegistration")), "setIsUseRegistration", true);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("networkingStatus")), "setNetworkingStatus", networkingStatusList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("deviceStatus")), "setDeviceStatus", deviceStatusList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("capitalSource2")), "setCapitalSource2", capitalSource2List, map, null);
                 assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("isWarrantyNotice")), "setWarranty", true);
@@ -221,6 +228,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("ProprietaryClass")), "setProprietaryClass", proprietaryClassList, map, null);
 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetQuality")), "setAssetQuality", assetQualityList, map, null);
+                assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("assetQuantity")), "setAssetQuantity");
 
                 if (crossSite) {
                     SiteOrgWithDeptOrg siteOrgWithDeptOrg = supportingService.findSiteOrgInAssetExcelRow(rowMap, orgNamesUriCache);

@@ -115,13 +115,17 @@
                             <p:commandButton icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetArrivedItemsController.selected.qrCode}" class="popupIconButton"/>
                         </h:panelGroup>
 
-                        <h:panelGroup >
-                            <label class="label">#{msg.medicalInstrumentClassification}</label>
-                            <p:inputText  value="#{fieldMsg.fieldValue('assetFunctionType', assetArrivedItemsController.selected.functionGroup)}" readonly="true"/>
-                        </h:panelGroup>
-                        <h:panelGroup >
-                            <label class="label">#{msg.medicalInstrumentSubclassification}</label>
-                            <p:inputText  value="#{fieldMsg.fieldValue(assetArrivedItemsController.selected.functionGroup, assetArrivedItemsController.selected.assetCode68)}" readonly="true"/>
+<!--                        <h:panelGroup >-->
+<!--                            <label class="label">#{msg.medicalInstrumentClassification}</label>-->
+<!--                            <p:inputText  value="#{fieldMsg.fieldValue('assetFunctionType', assetArrivedItemsController.selected.functionGroup)}" readonly="true"/>-->
+<!--                        </h:panelGroup>-->
+<!--                        <h:panelGroup >-->
+<!--                            <label class="label">#{msg.medicalInstrumentSubclassification}</label>-->
+<!--                            <p:inputText  value="#{fieldMsg.fieldValue(assetArrivedItemsController.selected.functionGroup, assetArrivedItemsController.selected.assetCode68)}" readonly="true"/>-->
+<!--                        </h:panelGroup>-->
+                        <h:panelGroup>
+                            <label class="label">#{msg.medicalApparatusClassification}</label>
+                            <p:inputText  value="#{medicalInstrumentsClassificationCompCtrl.selectedAuthGroupName}" readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.locationCode}</label>
@@ -151,13 +155,6 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </p:inputText>
                         </h:panelGroup>
-                        <!--                        <h:panelGroup>
-                                                    <label class="label">#{msg.arriveDate}</label>
-                                                    <p:inputText  value="#{assetArrivedItemsController.selected.arriveDate}" readonly="true">
-                                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                                                    </p:inputText>
-                                                </h:panelGroup>-->
-
                         <h:panelGroup>
                             <label class="label">#{msg.installDate}</label>
                             <p:inputText  value="#{assetArrivedItemsController.selected.installDate}" readonly="true">
@@ -266,7 +263,8 @@
                             </h:panelGroup>
                             <p:dataList id="pictureList1" value="#{assetArrivedItemsController.getAckPicList('business')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">相关附件</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                             </p:dataList>
                         </h:panelGroup>
 
@@ -283,7 +281,8 @@
                             </h:panelGroup>
                             <p:dataList id="pictureList2" value="#{assetArrivedItemsController.getAckPicList('clinical')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">相关附件</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                             </p:dataList>
                         </h:panelGroup>
 
@@ -300,7 +299,8 @@
                             </h:panelGroup>
                             <p:dataList id="pictureList3" value="#{assetArrivedItemsController.getAckPicList('technical')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">相关附件</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                             </p:dataList>
                         </h:panelGroup>
 
@@ -318,7 +318,8 @@
                             </h:panelGroup>
                             <p:dataList id="pictureList4" value="#{assetArrivedItemsController.getAckPicList('fixasset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">相关附件</f:facet>
-                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+<!--                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>-->
                             </p:dataList>
                         </h:panelGroup>
                     </p:panelGrid>

@@ -5,10 +5,7 @@
  */
 package com.ge.apm.view;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SharedAssetReqDetailRepository;
-import com.ge.apm.dao.SharedAssetTypeRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.BlobFileService;
@@ -18,6 +15,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -412,5 +410,40 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
 
     public void setFilterUnitPriceTo(Double filterUnitPriceTo) {
         this.filterUnitPriceTo = filterUnitPriceTo;
+    }
+
+    public boolean  isWhetherToEnableUnattendedAndType(){
+        WorkflowConfig workflowConfig = getWorkflowConfig();
+        if(workflowConfig == null){
+            return false;
+        }
+        String chargingType = selected.getChargingType();
+        if(workflowConfig.getWhethertoenableunattended() &&  !("1".equals(chargingType) || "3".equals(chargingType))){
+            return true;
+        }
+
+        return false;
+    }
+    public boolean isWhetherToEnableUnattended(){
+        WorkflowConfig workflowConfig = getWorkflowConfig();
+        if(workflowConfig == null){
+            return false;
+        }
+       return Boolean.TRUE.equals(workflowConfig.getWhethertoenableunattended());
+    }
+    private WorkflowConfig  getWorkflowConfig(){
+        WorkflowConfig workflowConfig=null;
+        WorkflowConfigRepository workflowConfigRepository = WebUtil.getBean(WorkflowConfigRepository.class);
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        OrgInfo selectSite = userContextService.getSelectSite();
+        List<WorkflowConfig> bySiteUID=null;
+        if(selectSite != null){
+            bySiteUID = workflowConfigRepository.findBySiteUID(selectSite.getUid());
+        }else{
+            UserAccount loginUser = userContextService.getLoginUser();
+            bySiteUID = workflowConfigRepository.findBySiteUID(loginUser.getSiteUID());
+        }
+            workflowConfig=CollectionUtils.isNotEmpty(bySiteUID)?bySiteUID.get(0):null;
+        return workflowConfig;
     }
 }

@@ -45,6 +45,7 @@ public class WorkOrderExportService {
     private static final String I18N_REPAIR_TYPE = "repairType";
     private static final String I18N_CURRENT_STEP_ = "woSteps";
     private static final String I18N_REPAIR_RESULT = "repairResult";
+    private static final String I18N_HOUR_TYPE = "hoursEntryType";
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final Logger log = LoggerFactory.getLogger(WorkOrderExportService.class);
@@ -220,6 +221,13 @@ public class WorkOrderExportService {
                     isReturn = false;
                 }
             }
+            if(filterMap.get("hospitalName") != null && filterMap.get("hospitalName").length() > 0) {   //所属院区
+                if(workOrderExportPojo.getSrNum()!=null) {
+                    isReturn = workOrderExportPojo.getHospitalName().contains(filterMap.get("hospitalName").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
             return isReturn;
         }).collect(Collectors.toList());
 
@@ -236,6 +244,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("EquipmentName_xlsx"), workOrderExportPojo.getAssetName());
             workOrderMap.put(WebUtil.getMessage("Site"), workOrderExportPojo.getHospitalName());
             workOrderMap.put(WebUtil.getMessage("Department"), workOrderExportPojo.getAssetClinicalDeptName());
+            workOrderMap.put(WebUtil.getMessage("Site"), workOrderExportPojo.getHospitalName());
             workOrderMap.put(WebUtil.getMessage("manufacture"), workOrderExportPojo.getAssetManufacture());
             workOrderMap.put(WebUtil.getMessage("brand"), workOrderExportPojo.getAssetMakerShortName());
             workOrderMap.put(WebUtil.getMessage("MaintenanceSubStatus"), getSubStatus(workOrderExportPojo.getSubStatus()));
@@ -320,6 +329,9 @@ public class WorkOrderExportService {
 
             workOrderMap.put("siebleNumber", workOrderExportPojo.getSiebleNumber());
             workOrderMap.put("callCenterNumber", workOrderExportPojo.getCallCenterNumber());
+
+            workOrderMap.put(WebUtil.getMessage("entryType"), FieldValueMessageController.fieldValue(I18N_HOUR_TYPE, workOrderExportPojo.getEntryType() == null ? "0" : workOrderExportPojo.getEntryType().toString()));
+            workOrderMap.put(WebUtil.getMessage("workHourDetail"), workOrderExportPojo.getWorkHourDetail());
 
             String attributesStr = "";
             if(!StringUtils.isEmpty(workOrderExportPojo.getAttributes())){

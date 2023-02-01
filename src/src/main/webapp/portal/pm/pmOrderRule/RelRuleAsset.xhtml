@@ -11,7 +11,11 @@
        <div class="ui-g-12 card cardTitle">
            <p:outputLabel class="pageTitle" value="#{msg.RelRuleAsset}"/>
        </div>
-
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
        <div class="ui-g-12 card">
     
         <h:form id="BatchCreateForm" class="bcls">
@@ -19,13 +23,14 @@
                 <p:tab > -->
                    <p:panelGrid id="queryCondition" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                        <h:panelGroup>
-                           <label class="label">#{msg.hospitalId}</label>
+                           <label class="label">#{userContextService.isYiMaiYangGuangTenant()?'所属机构':msg.hospitalId}</label>
                            <p:inputText id="selectedUserOrgName" value="#{relRuleAssetController.getOrgFullName(relRuleAssetController.selectedUserOrg)}" readonly="true" required="false" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
                            <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                            <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{relRuleAssetController.orgTree}" selection="#{relRuleAssetController.selectedNode}" var="node" selectionMode="single">
+                                   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{relRuleAssetController.orgTree}" selection="#{relRuleAssetController.selectedNode}" var="node" selectionMode="#{userContextService.isYiMaiYangGuangTenant()?'checkbox':'single'}">
                                        <p:ajax process="@this" event="select" update="BatchCreateForm" listener="#{relRuleAssetController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                       <p:ajax process="@this" event="unselect" update="BatchCreateForm" listener="#{relRuleAssetController.onUnSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
                                        <p:ajax process="@this" event="expand"/>
                                        <p:ajax process="@this" event="collapse"/>
                                        <p:treeNode type="org">
@@ -146,6 +151,30 @@
                            </p:inputNumber>
                        </h:panelGroup>
 
+                       <c:if test="#{userContextService.zkbAccount}" >
+                           <h:panelGroup>
+                               <label class="label">Modality</label>
+                               <p:selectOneMenu id="fileMainDirectory" value="#{relRuleAssetController.queryAsset.mainDirectory}"   >
+                                   <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList fileSecondDirectory"/>
+                                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                   <c:forEach items="#{relRuleAssetController.findMainDirectory()}" var="v">
+                                       <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                   </c:forEach>
+                               </p:selectOneMenu>
+                           </h:panelGroup>
+                           <h:panelGroup>
+                               <label class="label">Product</label>
+                               <p:selectOneMenu id="fileSecondDirectory" value="#{relRuleAssetController.queryAsset.secondDirectory}"  >
+                                   <p:ajax process="@this" event="itemSelect" listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList"/>
+                                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                   <c:forEach items="#{relRuleAssetController.subZkbFileDirectoryList}" var="v">
+                                       <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                   </c:forEach>
+                               </p:selectOneMenu>
+                           </h:panelGroup>
+                       </c:if>
+
+
                        <h:panelGroup id="queryLevel" rendered="#{relRuleAssetController.queryAsset.ruleStatus != null}">
                            <label class="label">#{msg.RuleGrade}</label>
                            <p:selectOneMenu value="#{relRuleAssetController.queryAsset.queryLevel}">
@@ -230,7 +259,7 @@
                     <br/> <br/>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{relRuleAssetController.saveRel()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" />
-                        <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
+                        <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back"  immediate="true" onclick="javascript:goBack();"/>
                     </h:panelGroup>
                     <!--<p:panelGrid id ="buttonGrid" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
                         <!---->

@@ -10,6 +10,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * @author 503310146
+ */
 @Entity
 @Table(name = "export_record")
 @Data
@@ -20,6 +23,9 @@ public class ExportRecord implements Serializable {
     private static final long serialVersionUID = 4344213478040355610L;
 
     public enum Status {
+        /**
+         * 状态颜色
+         */
         NEW("#8c8c8c"), AUDIT("#1890ff"), RUN("#2f54eb"), FINISHED("#52c41a"), REFUSE("#fa8c16"), FAIL("#f5222d");
 
         private final String value;
@@ -39,6 +45,9 @@ public class ExportRecord implements Serializable {
     }
 
     public enum AuditStatus {
+        /**
+         * 审核状态
+         */
         PASS, REFUSE
     }
 

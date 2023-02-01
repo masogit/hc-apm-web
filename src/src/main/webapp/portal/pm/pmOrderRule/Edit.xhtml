@@ -19,7 +19,7 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
                         <h:panelGroup>
-                            <label class="label">#{msg.hospitalId}*</label>
+                            <label class="label">#{userContextService.isYiMaiYangGuangTenant()?'所属机构':msg.hospitalId}</label>
                             <p:inputText id="selectedUserOrgName" value="#{pmOrderRuleController.getOrgFullName(pmOrderRuleController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
                             <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                             <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
@@ -146,7 +146,8 @@
                            </p:commandButton><br/>-->
                            <h:panelGroup id="importReportTemplate">
                                <p:commandButton value="#{msg.ImportTemplate}" process="@this" update="importReportTemplate" oncomplete="PF('uploadEditDialog').show()" rendered="#{empty pmOrderRuleController.selected.reportStorageId}"/>
-                               <p:link href="#{fileDownloadService.getFileUrl(pmOrderRuleController.selected.reportStorageId)}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}">#{pmOrderRuleController.selected.reportTemplateName}</p:link>
+                               <p:commandLink value="#{pmOrderRuleController.selected.reportTemplateName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(pmOrderRuleController.selected.reportStorageId)}" styleClass="p-mr-2" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
+<!--                               <p:link href="#{fileDownloadService.getFileUrl(pmOrderRuleController.selected.reportStorageId)}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}">#{pmOrderRuleController.selected.reportTemplateName}</p:link>-->
                                <p:commandButton icon="ui-icon-close" style="zoom:0.8;" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":PmOrderRuleEditForm:importReportTemplate :uploadEditDialogForm :growl" process="@this" actionListener="#{pmOrderRuleController.removeReportTemplate}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
                            </h:panelGroup>
                        </h:panelGroup>

@@ -17,7 +17,6 @@
        <div class="ui-g-12 card cardTitle">
            <p:outputLabel class="pageTitle" value="#{msg.GenerateMaintenanceWorkordersInBatch}"/>
        </div>
-
        <div class="ui-g-12 card">
     
         <h:form id="GeneratePmOrderForm">
@@ -50,13 +49,14 @@
 					   </h:panelGroup>
 
 					   <h:panelGroup>
-						   <label class="label">#{msg.hospitalId}*</label>
+						   <label class="label">#{userContextService.isYiMaiYangGuangTenant()?'所属机构':msg.hospitalId}</label>
 						   <p:inputText id="selectedUserOrgName" value="#{generatePmOrdersController.getOrgFullName(generatePmOrdersController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
 						   <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
 						   <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
 							   <p:scrollPanel style="height:300px;border: 0" mode="native">
-								   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{generatePmOrdersController.orgTree}" selection="#{generatePmOrdersController.selectedNode}" var="node" selectionMode="single">
+								   <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{generatePmOrdersController.orgTree}" selection="#{generatePmOrdersController.selectedNode}" var="node" selectionMode="#{userContextService.isYiMaiYangGuangTenant()?'checkbox':'single'}">
 									   <p:ajax process="@this" event="select" update="GeneratePmOrderForm" listener="#{generatePmOrdersController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+									   <p:ajax process="@this" event="unselect" update="GeneratePmOrderForm" listener="#{generatePmOrdersController.onUnSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
 									   <p:ajax process="@this" event="expand"/>
 									   <p:ajax process="@this" event="collapse"/>
 									   <p:treeNode type="org">
@@ -248,7 +248,7 @@
 					<p:commandButton id ="hidden" value="hello" style="display:none"/>
 					<h:panelGroup>
 						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="#{msg.Generate}" icon="ui-icon-check" update=":growl" />
-						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
+						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="javascript:goBack();" immediate="true" />
 					</h:panelGroup>
                     <p:panelGrid id ="PmOrderRule" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     </p:panelGrid>
@@ -269,6 +269,10 @@
 				} else {
 					$(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
 				}
+			}
+
+			function goBack() {
+				window.history.back();
 			}
 		</script>
     </ui:define>

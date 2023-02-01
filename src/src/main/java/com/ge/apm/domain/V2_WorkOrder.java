@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "v2_work_order")
+@TableName("v2_work_order")
 /*@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable(true)*/
 public class V2_WorkOrder implements Serializable, ApprovableTarget {
@@ -306,6 +308,21 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     /**县域 开单类型： 1主动开单、2被动开单**/
     @Column(name="order_type")
     private String orderType;
+
+    /**
+     * 填写工时选择方式 0 输入填写 , 1 多个工时段填写
+     */
+    @Column(name="entry_type")
+    private Integer entryType;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<V2_WorkOrderManHoursDetail> workHoursList;
+
+    @Transient
+    private String partApproveSignature;
 
     public Integer getIsCoreMemberApproval() {
         return isCoreMemberApproval;
@@ -952,5 +969,29 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setOrderType(String orderType) {
         this.orderType = orderType;
+    }
+
+    public String getPartApproveSignature() {
+        return partApproveSignature;
+    }
+
+    public void setPartApproveSignature(String partApproveSignature) {
+        this.partApproveSignature = partApproveSignature;
+    }
+
+    public Integer getEntryType() {
+        return entryType;
+    }
+
+    public void setEntryType(Integer entryType) {
+        this.entryType = entryType;
+    }
+
+    public List<V2_WorkOrderManHoursDetail> getWorkHoursList() {
+        return workHoursList;
+    }
+
+    public void setWorkHoursList(List<V2_WorkOrderManHoursDetail> workHoursList) {
+        this.workHoursList = workHoursList;
     }
 }

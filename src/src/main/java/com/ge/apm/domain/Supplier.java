@@ -184,6 +184,9 @@ public class Supplier implements Serializable, ChineseName {
     //供应商状态
     private String status = "Enable";
 
+    @Transient
+    private String taxpayerIdentityNumber;
+
     @PrePersist
     public void initializeUid() {
         if (uid == null) {
@@ -521,6 +524,14 @@ public class Supplier implements Serializable, ChineseName {
 
     public void setRegistrationCertificateExpireDate(Date registrationCertificateExpireDate) {
         this.registrationCertificateExpireDate = registrationCertificateExpireDate;
+    }
+
+    public String getTaxpayerIdentityNumber() {
+        return taxpayerIdentityNumber;
+    }
+
+    public void setTaxpayerIdentityNumber(String taxpayerIdentityNumber) {
+        this.taxpayerIdentityNumber = taxpayerIdentityNumber;
     }
 
     @Override

@@ -119,7 +119,8 @@
                         </p:commandLink><br/>
                         <h:panelGroup id="importReportTemplate">
                             <p:commandButton value="导入模版" process="@this" update="importReportTemplate" oncomplete="PF('uploadSaveAsDialog').show()" rendered="#{empty measureOrderRuleController.selected.reportStorageId}"/>
-                            <p:link href="#{fileDownloadService.getFileUrl(measureOrderRuleController.selected.reportStorageId)}" rendered="#{not empty measureOrderRuleController.selected.reportStorageId}">#{measureOrderRuleController.selected.reportTemplateName}</p:link>
+                            <p:commandLink value="#{measureOrderRuleController.selected.reportTemplateName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(measureOrderRuleController.selected.reportStorageId)}" styleClass="p-mr-2" rendered="#{not empty measureOrderRuleController.selected.reportStorageId}"/>
+<!--                            <p:link href="#{fileDownloadService.getFileUrl(measureOrderRuleController.selected.reportStorageId)}" rendered="#{not empty measureOrderRuleController.selected.reportStorageId}">#{measureOrderRuleController.selected.reportTemplateName}</p:link>-->
                             <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":MeasureOrderRuleSaveAsForm:importReportTemplate :uploadSaveAsDialogForm :growl" process="@this" actionListener="#{measureOrderRuleController.removeReportTemplate}" rendered="#{not empty measureOrderRuleController.selected.reportStorageId}"/>
                         </h:panelGroup>
                     </h:panelGroup>

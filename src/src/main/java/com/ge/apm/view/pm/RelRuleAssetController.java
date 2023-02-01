@@ -1,12 +1,5 @@
 package com.ge.apm.view.pm;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.SupplierService;
@@ -15,7 +8,10 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.OrgInfoComparator;
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
@@ -25,6 +21,7 @@ import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -33,11 +30,16 @@ import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.view.sysutil.UserContextService;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAsset> {
@@ -66,6 +68,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private UserCommonService userCommonService;
     private PmOrderRule pmOrderRule;
     public static List<String> assetInfoUids = null;
+    private List<ZkbFileDirectory> subZkbFileDirectoryList=null;
     @Getter @Setter
     private PmOrderRule pmOrderRuleTwoLevel;
     @Getter @Setter
@@ -75,14 +78,19 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private SupplierService supplierService;
     private ConfigService configService;
     private TenantInfo selectedTenant;
-    private OrgInfo selectedUserOrg;
+    private ZkbFileDirectoryService zkbFileDirectoryService;
+    private List<OrgInfo> selectedUserOrg;
     private OrgInfo selectedOrg;
     private TreeNode orgTree;
-    private TreeNode selectedNode;
+    private TreeNode[] selectedNode;
     private TenantInfoRepository tenantInfoRepository;
+    private TableDefinitionRepository tableDao;
+    private ZkbDirectoryTableDefineRepository zkbDirectoryRepository;
     private UaaService uaaService;
     private OrgInfoTreeService orgInfoTreeService;
     private OrgInfo clinicalOrgInfo;
+    private boolean isYmyg = false;
+    private OrgInfo userOrgInfo;
 
     @Override
     protected void init() {
@@ -91,7 +99,10 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         user = UserContextService.getCurrentUserAccount();
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        tableDao = WebUtil.getBean(TableDefinitionRepository.class);
+        zkbDirectoryRepository = WebUtil.getBean(ZkbDirectoryTableDefineRepository.class);
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         brandRepository = WebUtil.getBean(BrandRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
@@ -107,15 +118,38 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
-        selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
+        selectedUserOrg = new ArrayList<>();
+        userOrgInfo = orgInfoRepository.getByUid(user.getSiteUID());
+        selectedUserOrg.add(userOrgInfo);
+        isYmyg = UserContextService.isYiMaiYangGuangTenantForServer();
         //initTree(user.getTenantUID());
         initOrgTree();
+        if (isYmyg) {
+            getAssetList();
+        }
     }
 
     public boolean getPmRule(){
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
+    }
+    /**
+     * 根据主目录值获取子目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> getSubZkbFileDirectoryList() {
+        if(StringUtils.isBlank(this.queryAsset.getMainDirectory())){
+            return null;
+        }
+        List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
+                ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
+                this.queryAsset.getMainDirectory());
+        if(CollectionUtils.isEmpty(mainZkbFileDirectory)){
+            return null;
+        }
+        subZkbFileDirectoryList=this.zkbFileDirectoryService.findByZkbFileDirectory(mainZkbFileDirectory.get(0));
+        return subZkbFileDirectoryList;
     }
 
     public void initOrgTree() {
@@ -165,8 +199,50 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
-        selectedUserOrg = (OrgInfo) node.getData();
+        if (!isYmyg) {
+            selectedUserOrg.clear();
+            //selectedUserOrg.add(userOrgInfo);
+        }  else {
+            setTreeNodes(node, true);
+        }
+        selectedUserOrg.add((OrgInfo) node.getData());
         addFilter();
+    }
+
+    public void onUnSelectOrgForUser(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        selectedUserOrg.remove((OrgInfo)node.getData());
+        addFilter();
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        if (root == null) {
+            return;
+        }
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            if (isSelected && !ObjectUtils.isEmpty(item)) {
+                selectedUserOrg.add((OrgInfo)item.getData());
+            } else {
+                selectedUserOrg.remove((OrgInfo)item.getData());
+            }
+            setTreeNodes(item, isSelected);
+        }
+    }
+
+    private void updateParentNode(TreeNode parentNode) {
+        if (parentNode == null) {
+            return;
+        }
+        boolean result = false;
+        for (TreeNode item : parentNode.getChildren()) {
+            result = item.isSelected();
+            if (result) {
+                break;
+            }
+        }
+        parentNode.setSelected(result);
     }
 
     public void initAssets() {
@@ -187,16 +263,23 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         return orgInfo.getName();
     }
 
-    public String getOrgFullName(OrgInfo org) {
-        if(null == org || org.getId() == -1) {
-            return null;
+    public String getOrgFullName(List<OrgInfo> org) {
+        StringBuilder sb = new StringBuilder();
+        if (CollectionUtils.isNotEmpty(org)) {
+            org.forEach(val -> sb.append(val.getName() + ","));
+            String name = sb.toString();
+            return name.substring(0, name.length()-1);
         }
-        String name = org.getName();
-/*        while (org.getParentOrg() != null) {
-            org = org.getParentOrg();
-            name = org.getName() + "/" + name;
-        }*/
-        return name;
+        return null;
+//        if(null == org || org.getId() == -1) {
+//            return null;
+//        }
+//        String name = org.getName();
+///*        while (org.getParentOrg() != null) {
+//            org = org.getParentOrg();
+//            name = org.getName() + "/" + name;
+//        }*/
+//        return name;
     }
     @Override
     public void onFilter(FilterEvent event) {
@@ -246,6 +329,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
 		}
+        if (StringUtils.isNotEmpty(queryAsset.getMainDirectory())) {
+            assetFilters.add(new SearchFilter("mainDirectory", SearchFilter.Operator.EQ, queryAsset.getMainDirectory()));
+        }
+        if (StringUtils.isNotEmpty(queryAsset.getSecondDirectory())) {
+            assetFilters.add(new SearchFilter("secondDirectory", SearchFilter.Operator.EQ, queryAsset.getSecondDirectory()));
+        }
 /*        if (null != queryAsset.getManufactureId()) {
             assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
         }*/
@@ -276,7 +365,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
             assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
         }
-        if (!assetFilters.isEmpty()) {
+        if (!assetFilters.isEmpty() || isYmyg) {
             if (queryAsset.getRuleStatus() != null) {
                 uids = new ArrayList<>();
                 if (queryAsset.getRuleStatus() == 1) {// 已配置
@@ -301,7 +390,13 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         }
         return new ArrayList<>();
     }
-
+    /**
+     * 获取所有主目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> findMainDirectory() {
+        return zkbFileDirectoryService.findMainDirectory(null);
+    }
 
     public List<String> getAssetUids(String tenantUid,String pmOrderRuleLevel){
         List<String> uids = null;
@@ -317,8 +412,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     public List<SearchFilter> getAssetFilter() {
         List<SearchFilter> filter = new ArrayList<>();
-        if(selectedUserOrg != null){
-            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID()));
+        if(CollectionUtils.isNotEmpty(selectedUserOrg)){
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedUserOrg.stream().map(OrgInfo::getSiteUID).collect(Collectors.toList())));
         }else{
             filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
             //filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
@@ -413,43 +508,73 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     @Transactional
     public void saveRel() {
-        if (targetAssets.isEmpty()) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
-        } else {
-            List<RelRuleAsset> rels = new ArrayList<>(targetAssets.size());
-            targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
-            for (AssetInfo ai : targetAssets) {
-                RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
-                if (rel == null) {
-                    rel = new RelRuleAsset();
-                    rel.setAssetUID(ai.getUid());
-                    rel.setCreatedDate(new Date());
-                    rel.setTenantUID(ai.getTenantUID());
-                    rel.setInstitutionUID(ai.getInstitutionUID());
-                    rel.setHospitalUID(ai.getHospitalUID());
-                    rel.setSiteUID(ai.getSiteUID());
+        try {
+            if (targetAssets.isEmpty()) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
+            } else {
+                //只有智康保的走这段逻辑
+                UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+                boolean zkbAccountBoolean = userContextService.isZkbAccount();
+                Set<String> directorySets = new HashSet<String>();
+                if (zkbAccountBoolean){
+                    PmOrderRule pmOrderRule = this.pmOrderRuleRepository.findByUid(this.getPmOrderRule().getUid());
+                    TableDefinition tableDefinition = tableDao.findById(pmOrderRule.getPerformanceReport());
+                    List<SearchFilter> filter = new ArrayList<>();
+                    filter.add(new SearchFilter("name", SearchFilter.Operator.EQ, tableDefinition.getName()));
+                    filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "0"));
+                    List<ZkbDirectoryTableDefine> zkbDirectoryTableDefineList = zkbDirectoryRepository.findBySearchFilter(filter);
+                    zkbDirectoryTableDefineList.stream().forEach(zkbDirectory -> {
+                        if(StringUtils.isNotBlank(zkbDirectory.getMainDirectory())&&StringUtils.isNotBlank(zkbDirectory.getSecondDirectory())){
+                            directorySets.add(zkbDirectory.getMainDirectory()+zkbDirectory.getSecondDirectory());
+                        }
+                    });
                 }
-                if (level != null) {
-                    if (level == 1) {
-                        rel.setRuleUIDInspection(pmOrderRule.getUid());
-                        rel.setRuleUID1(pmOrderRule.getUid());
-                    } else if (level == 2) {
-                        rel.setRuleUID2(pmOrderRule.getUid());
-                    } else if (level == 3) {
-                        rel.setRuleUID(pmOrderRule.getUid());
-                    }else if (level == 4) {
-                        rel.setRuleUID4(pmOrderRule.getUid());
+                List<RelRuleAsset> rels = new ArrayList<>(targetAssets.size());
+                targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
+                for (AssetInfo ai : targetAssets) {
+                    //只有智康保的走这段逻辑
+                    if(zkbAccountBoolean){
+                        if(!directorySets.contains(ai.getMainDirectory()+ai.getSecondDirectory())){
+                            WebUtil.addErrorMessage(WebUtil.getMessage("设备"+ai.getName()+"不适用当前规则，请检查设备[modality，product]是否匹配"));
+                            return;
+                        };
                     }
-                    rels.add(rel);
-                }
-            }
-            relRuleAssetRepository.save(rels);
-            this.level = null;
-            this.ruleUid = null;
-            this.pmOrderRule = null;
-            WebUtil.addSuccessMessage(WebUtil.getMessage("ConfigurationSuccess"));
-        }
 
+                    RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
+                    if (rel == null) {
+                        rel = new RelRuleAsset();
+                        rel.setAssetUID(ai.getUid());
+                        rel.setCreatedDate(new Date());
+                        rel.setTenantUID(ai.getTenantUID());
+                        rel.setInstitutionUID(ai.getInstitutionUID());
+                        rel.setHospitalUID(ai.getHospitalUID());
+                        rel.setSiteUID(ai.getSiteUID());
+                    }
+                    if (level != null) {
+                        if (level == 1) {
+                            rel.setRuleUIDInspection(pmOrderRule.getUid());
+                            rel.setRuleUID1(pmOrderRule.getUid());
+                        } else if (level == 2) {
+                            rel.setRuleUID2(pmOrderRule.getUid());
+                        } else if (level == 3) {
+                            rel.setRuleUID(pmOrderRule.getUid());
+                        }else if (level == 4) {
+                            rel.setRuleUID4(pmOrderRule.getUid());
+                        }
+                        rels.add(rel);
+                    }
+                }
+                relRuleAssetRepository.save(rels);
+                this.level = null;
+                this.ruleUid = null;
+                this.pmOrderRule = null;
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ConfigurationSuccess"));
+            }
+        } catch (Exception e) {
+            WebUtil.addSuccessMessage(WebUtil.getMessage("FAILED"));
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        }
     }
 
     public List<PmOrderRule> getPmOrderRuleList() {
@@ -544,8 +669,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         //UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> filter = new ArrayList<>();
         filter.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4,"1*"));
-        if(selectedUserOrg != null){
-            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID(),"1*"));
+        if(CollectionUtils.isNotEmpty(selectedUserOrg)){
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedUserOrg.stream().map(OrgInfo::getSiteUID).collect(Collectors.toList()),"1*"));
         }else{
             filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*"));
         }
@@ -566,19 +691,19 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         this.clinicalOrgInfo = clinicalOrgInfo;
     }
 
-    public TreeNode getSelectedNode() {
+    public TreeNode[] getSelectedNode() {
         return selectedNode;
     }
 
-    public void setSelectedNode(TreeNode selectedNode) {
+    public void setSelectedNode(TreeNode[] selectedNode) {
         this.selectedNode = selectedNode;
     }
 
-    public OrgInfo getSelectedUserOrg() {
+    public List<OrgInfo> getSelectedUserOrg() {
         return selectedUserOrg;
     }
 
-    public void setSelectedUserOrg(OrgInfo selectedUserOrg) {
+    public void setSelectedUserOrg(List<OrgInfo> selectedUserOrg) {
         this.selectedUserOrg = selectedUserOrg;
     }
 

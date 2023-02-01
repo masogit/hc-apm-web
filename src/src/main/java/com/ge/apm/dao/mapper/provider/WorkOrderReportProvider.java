@@ -313,7 +313,9 @@ public class WorkOrderReportProvider {
             "aft.fault_name as caseTypeName, " +
             "ai.status as assetStatus," +
             "wo.signature as signature,wo.ack_signature as ackSignature,wo.maintenance_value as maintenanceValue,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes ," +
-            "wo.sieble_number as siebleNumber,wo.call_center_number as callCenterNumber " +
+            "wo.sieble_number as siebleNumber,wo.call_center_number as callCenterNumber, " +
+            "(select string_agg(concat('开始时间:',woh.start_time,'结束时间:', woh.end_time, '工时:', cast(woh.hours as decimal(10,2)),'备注:', woh.remark, ';'),'') from v2_work_order_man_hours_detail woh where woh.wo_id=wo.id GROUP BY woh.wo_id) as workHourDetail, " +
+            "wo.entry_type as entryType " +
             "from v2_work_order wo " +
             "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
             "INNER JOIN asset_info ai ON ai.id = wo.asset_id " +
@@ -604,7 +606,7 @@ public class WorkOrderReportProvider {
 
         sb.append("select wod.id as id,ai.clinical_dept_name as assetClinicalDeptName, ai.name as assetName,ai.depart_num as assetDepartNum,wod.supplier as supplierName,wod.parts as partsName,wod.parts_quantity as partsQuantity, " +
                 "wod.closed_price as closedPrice,wod.invoice_num as invoiceNum,wod.invoice_time as invoiceTime,wo.approver_name as approverName,wod.contract_num as contractNum,wod.comment as comment,wod.closed as statementStatus " +
-                "from v2_work_order_detail wod, v2_work_order wo, v2_service_request sr, asset_info ai where wod.wo_id = wo.id and wo.sr_id = sr.id and wo.asset_id = ai.id and (wod.approved = true or wod.approved is null) ");
+                "from v2_work_order_detail wod, v2_work_order wo, v2_service_request sr, asset_info ai where wod.wo_id = wo.id and wo.sr_id = sr.id and wo.asset_id = ai.id and wod.approved = true ");
 
         String filter = buildFilter_WorkOrderDetail(searchFilterList);
         sb.append(filter);

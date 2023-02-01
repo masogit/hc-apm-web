@@ -41,7 +41,7 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
             "(select hospital_id from user_account where id=#{requestorId}))")
     public List<Integer> fetchDispaterUser(@Param("requestorId") Integer requestorId, @Param("sysRole") Integer sysRole);
 
-    @Select("select id from user_account where wechat_id =#{wechatId}")
+    @Select("select id, name, wechat_id from user_account where wechat_id =#{wechatId}")
     public UserAccount getUserByWechatId(String wechatId);
 
     @Select("select id from user_account where login_name =#{loginName}")
@@ -59,7 +59,7 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
     @Options(useGeneratedKeys = true)
     public Integer saveUserAccount(UserAccount user);
 
-    @Update("update user_account set site_id=#{siteId},hospital_id=#{hospitalId},tenant_uid=#{tenantUID},institution_uid=#{institutionUID},hospital_uid=#{hospitalUID},site_uid=#{siteUID},telephone=#{telephone},org_id=#{orgInfoId},login_name=#{loginName},name=#{name},org_uid=#{orgInfoUID},email=#{email},is_active=#{isActive},is_locked=#{isLocked},last_modified_by=#{lastModifiedBy},last_modified_date=#{lastModifiedDate},password_error_count=#{passwordErrorCount},active_time=#{activeTime},name_py_code=#{namePyCode}, position=#{position} where uid=#{uid}")
+    @Update("update user_account set site_id=#{siteId},hospital_id=#{hospitalId},tenant_uid=#{tenantUID},institution_uid=#{institutionUID},hospital_uid=#{hospitalUID},site_uid=#{siteUID},telephone=#{telephone},org_id=#{orgInfoId},login_name=#{loginName},name=#{name},org_uid=#{orgInfoUID},email=#{email},is_active=#{isActive},is_locked=#{isLocked},is_disable=#{isDisable},last_modified_by=#{lastModifiedBy},last_modified_date=#{lastModifiedDate},password_error_count=#{passwordErrorCount},active_time=#{activeTime},name_py_code=#{namePyCode}, position=#{position} where uid=#{uid}")
     public void updateUserAccount(UserAccount user);
 
     @Insert("insert into user_role(user_id,role_id,role_type) values (#{userId},#{roleId},#{roleType})")
@@ -95,7 +95,8 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
     @Select("select distinct login_name from user_account where site_id = #{siteId}")
     public List<String> getLoginNameBySiteId(Integer siteId);
 
-    @Select("select distinct login_name from user_account where tenant_uid = #{siteUid} or institution_uid = #{siteUid} or hospital_uid = #{siteUid} or site_uid = #{siteUid}")
-    public List<String> getLoginNameBySiteUid(String siteUid);
+    @Select("select id, name, login_name from user_account where is_deleted is not true and is_disable is not true and(" +
+            "tenant_uid = #{siteUid} or institution_uid = #{siteUid} or hospital_uid = #{siteUid} or site_uid = #{siteUid})")
+    public List<UserAccount> getBySiteUid(String siteUid);
 
 }

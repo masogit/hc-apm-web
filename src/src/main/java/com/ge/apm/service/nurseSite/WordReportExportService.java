@@ -49,11 +49,13 @@ public class WordReportExportService {
         for (NurseSiteMaintain maintain : listMaintain) {
             String name;
             Integer sequence = maintain.getSequence();
+            String year = DateFormatUtils.format(maintain.getScheduleDate(), "yyyy");
             if (sequence==0){
                  name = maintain.getName();
             }else {
                  name = maintain.getName()+"-"+sequence;
             }
+            name = name  + " " + year;
             if(listMap.containsKey(name)){
                 listMap.get(name).add(maintain);
                 listMap.put(name,listMap.get(name));
@@ -155,7 +157,7 @@ public class WordReportExportService {
                 outStream.close();
                 byte[] bytes = outStream.toByteArray();
                 reports.add(bytes);
-                reportMap.put(m.getKey(),reports);
+                reportMap.put(m.getKey(), reports);
             }
             reportMapMap.put(name,reportMap);
         }
@@ -174,7 +176,7 @@ public class WordReportExportService {
         List<byte[]> reports= null;
         Map<String,List<NurseSiteMaintainHistory>>listMap = new LinkedHashMap<>();
         for (NurseSiteMaintainHistory maintain : listMaintain) {
-            String name = maintain.getName();
+            String name = maintain.getName() + " " + DateFormatUtils.format(maintain.getScheduleDate(), "yyyy");
             if(listMap.containsKey(name)){
                 listMap.get(name).add(maintain);
                 listMap.put(name,listMap.get(name));
@@ -292,7 +294,8 @@ public class WordReportExportService {
         NurseSiteMaintainItemHistory nurseSiteMaintainItem = nurseSiteMaintainItemList.get(i);
         AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
         String assetInfoName = assetInfo.getName();
-        tableOneRowOne.getCell(0).setText(assetInfoName +"("+assetInfo.getDepartNum()+")");
+        tableOneRowOne.getCell(0).setText(assetInfoName +"("+assetInfo.getDepartNum()+")"
+                + "-"+ DateFormatUtils.format(dataMap.get(1), "yyyy-MM"));
         tableOneRowTwo.getCell(0).setText("日期");
         List<NurseSiteMaintainDataHistory> listData = nurseSiteMaintainItem.getListData();
         int num = listData.size();
@@ -307,7 +310,7 @@ public class WordReportExportService {
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
-            String dateStr = DateFormatUtils.format(date, "MM-dd");
+            String dateStr = DateFormatUtils.format(date, "yyyy-MM-dd");
             tableOneRow.getCell(0).setText(dateStr);//时间
             Map<String, List<String>> stringListMap = stringMap.get(date);
             List<String> stringList = stringListMap.get(assetInfoName);
@@ -369,7 +372,8 @@ public class WordReportExportService {
         NurseSiteMaintainItem nurseSiteMaintainItem = nurseSiteMaintainItemList.get(i);
         AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
         String assetInfoName = assetInfo.getName();
-        tableOneRowOne.getCell(0).setText(assetInfoName +"("+assetInfo.getDepartNum()+")");
+        tableOneRowOne.getCell(0).setText(assetInfoName +"("+assetInfo.getDepartNum()+")"
+                + "-"+ DateFormatUtils.format(dataMap.get(1), "yyyy-MM"));
         tableOneRowTwo.getCell(0).setText("日期");
         List<NurseSiteMaintainData> listData = nurseSiteMaintainItem.getListData();
         int num = listData.size();
@@ -384,7 +388,7 @@ public class WordReportExportService {
         for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
-            String dateStr = DateFormatUtils.format(date, "MM-dd");
+            String dateStr = DateFormatUtils.format(date, "yyyy-MM-dd");
             tableOneRow.getCell(0).setText(dateStr);//时间
             Map<String, List<String>> stringListMap = stringMap.get(date);
             List<String> stringList = stringListMap.get(assetInfoName);
@@ -451,6 +455,22 @@ public class WordReportExportService {
                     }
                 }
             }
+            zos.closeEntry();
+            zos.close();
+            return out.toByteArray();
+        }
+    }
+
+    public byte[] docxZip(Map<String, byte[]> maps) throws IOException {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream(); ZipOutputStream zos = new ZipOutputStream(out)) {
+            maps.forEach((key, val) -> {
+                try {
+                    zos.putNextEntry(new ZipEntry(key));
+                    IOUtils.write(val, zos);
+                } catch (IOException e) {
+                    return;
+                }
+            });
             zos.closeEntry();
             zos.close();
             return out.toByteArray();

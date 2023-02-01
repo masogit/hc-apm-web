@@ -637,8 +637,6 @@
         <h:panelGroup >
             <label class="label">#{msg.status}<span style="color:red">*</span></label>
             <p:selectOneRadio id="status" value="#{assetInfoEditController.selected.status}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('status')}" >
-                <!--<p:ajax process="@this" listener="#{assetInfoEditController.initLifecycleStatus}"/>-->
-                <!--<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                 <f:selectItems value="#{assetInfoEditController.assetStatusList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{!item.editable}"/>
             </p:selectOneRadio>
         </h:panelGroup>
@@ -649,6 +647,25 @@
             <p:selectOneRadio id="deviceStatus" value="#{assetInfoEditController.selected.deviceStatus}" required="#{assetInfoEditController.customConfig.assetFields['deviceStatus'].required}" requiredMessage="#{msg.deviceStatus} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('deviceStatus')}" >
                 <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'networkingStatus')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.networkingStatus}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['networkingStatus'].required? '*':''}</span></label>
+            <p:selectOneRadio id="networkingStatus" value="#{assetInfoEditController.selected.networkingStatus}" required="#{assetInfoEditController.customConfig.assetFields['networkingStatus'].required}" requiredMessage="#{msg.networkingStatus} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('networkingStatus')}" >
+                <f:selectItems value="#{fieldMsg.getFieldValueList('networkingStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'isUseRegistration')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.isUseRegistration}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['isUseRegistration'].required? '*':''}</span></label>
+            <p:selectOneRadio value="#{assetInfoEditController.selected.isUseRegistration}" required="#{assetInfoEditController.customConfig.assetFields['isUseRegistration'].required}"
+                              requiredMessage="#{msg.isUseRegistration} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('isUseRegistration')}" >
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
@@ -949,6 +966,21 @@
             <p:selectOneMenu id="assetQuality" value="#{assetInfoEditController.selected.assetQuality}" requiredMessage="#{msg.assetQuality} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetQuality')}">
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetQuality')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetUsedLifecycle')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetUsedLifecycle}</label>
+            <p:inputText id="assetUsedLifecycle" value="#{assetInfoEditController.selected.assetUsedLifecycle}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetQuantity')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetQuantity}</label>
+            <p:inputNumber minValue="0" decimalPlaces="0" id="assetQuantity"
+                required="#{assetInfoEditController.customConfig.assetFields['assetQuantity'].required}"
+                requiredMessage="#{msg.assetQuantity} #{msg.ValidationRequire}"
+                value="#{assetInfoEditController.selected.assetQuantity}" readonly="#{!assetInfoEditController.needEdit('assetQuantity')}"/>
         </h:panelGroup>
     </c:if>
 </ui:composition>

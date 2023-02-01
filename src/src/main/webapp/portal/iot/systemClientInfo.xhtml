@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.SystemClientInfo}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="iotDeviceBindListForm">
+                    <p:dataTable id="datalist" class="datalist" value="#{systemClientController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{systemClientController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.uid}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="filter" listener="#{systemClientController.onFilter}" />
+                        <p:ajax event="rowSelect" update="editButton deleteButton"/>
+
+                        <p:column headerText="#{msg.ClientName}" filterBy="#{item.clientName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.clientName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.ClientType}" filterBy="#{item.clientType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.clientType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.BindOrgInfo}" filterBy="#{item.orgInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.orgInfo.name}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
+                                title="#{msg.Create}" actionListener="#{systemClientController.prepareCreate}"
+                                update=":systemClientInfoEditDlg" oncomplete="PF('systemClientInfoEditDialog').show()" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                                title="#{msg.Edit}" disabled="#{empty systemClientController.selected}"
+                                actionListener="#{systemClientController.setDefaultVal}"
+                                update=":systemClientInfoEditDlg" oncomplete="PF('systemClientInfoEditDialog').show()"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                title="#{msg.Delete}" disabled="#{empty systemClientController.selected}"
+                                actionListener="#{systemClientController.delete}" update="@(.datalist)">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="systemClientInfoEdit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

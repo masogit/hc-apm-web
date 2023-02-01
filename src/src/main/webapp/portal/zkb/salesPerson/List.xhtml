@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="销售人员信息管理"/>
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="salesPersonInfoListForm">
+                    <p:dataTable id="datalist" value="#{zkbSalesPersonInfoController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+                                 selection="#{zkbSalesPersonInfoController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
+                                 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="rowSelect" update="editButton deleteButton importButton exportButton" />
+                        <p:ajax event="filter" listener="#{zkbSalesPersonInfoController.onFilter}" />
+                        <p:column headerText="姓名" exportable="true" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"  />
+                        </p:column>
+                        <p:column headerText="电话" exportable="true" sortBy="#{item.phone}" filterBy="#{item.phone}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.phone}" />
+                        </p:column>
+                        <p:column headerText="邮箱" exportable="true"  sortBy="#{item.email}" filterBy="#{item.email}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.email}" />
+                        </p:column>
+                        <p:column headerText="订单类型" exportable="true" >
+                            <h:outputText value="#{item.orderType}" />
+                        </p:column>
+                        <p:column headerText="关联租户" exportable="true" filterBy="#{item.zkbSalesTenantAssociateList.tenantUid}" filterMatchMode="EQ" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu value="#{zkbSalesPersonInfoController.tenantInfoUid}" onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
+                                    <f:selectItems value="#{zkbSalesPersonInfoController.tenantInfoList}" var="tenantInfo" itemLabel="#{tenantInfo.name}" itemValue="#{tenantInfo.uid}"/>
+                                 </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{zkbSalesPersonInfoController.getAssociateTenant(item.id)}" />
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}"   process="@this" actionListener="#{zkbSalesPersonInfoController.prepareCreate}"
+                                             update=":salesPersonInfoEditDlg" oncomplete="PF('salesPersonInfoEditDialog').show()" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbSalesPersonInfoController.prepareEdit}"
+                                             update=":salesPersonInfoEditDlg" oncomplete="PF('salesPersonInfoEditDialog').show()"
+                                             disabled="#{empty zkbSalesPersonInfoController.selected}" />
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbSalesPersonInfoController.delete}"
+                                             update="datalist" disabled="#{empty zkbSalesPersonInfoController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbSalesPersonInfoController.exportSalesTenantAssociate}" icon="ui-icon-arrowstop-1-s"  disabled="#{empty zkbSalesPersonInfoController.selected}" >
+                                <p:fileDownload value="#{zkbSalesPersonInfoController.exportFile}"/>
+                            </p:commandButton>
+                            <p:commandButton id="importButton" ajax="false" title="导入" action="#{zkbSalesPersonInfoController.importAction}" icon="ui-icon-arrowstop-1-n"  disabled="#{empty zkbSalesPersonInfoController.selected}" >
+                            </p:commandButton>
+                            <!--<p:commandButton id="tenantButton" icon="ui-icon-person-add" title="关联租户"  actionListener="#{zkbSalesPersonInfoController.prepareAssociateTenant}"
+                                             update=":tenantEditDlg" oncomplete="PF('tenantEditDialog').show()" disabled="#{empty zkbSalesPersonInfoController.selected}" />-->
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Edit.xhtml"/>
+                <ui:include src="Tenant.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

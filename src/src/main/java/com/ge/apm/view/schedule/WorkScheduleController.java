@@ -1,16 +1,20 @@
 package com.ge.apm.view.schedule;
 
+import cn.hutool.core.date.Week;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserSchedule;
-import com.ge.apm.domain.UserScheduleStageConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.schedule.UserScheduleService;
+import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.view.SharedAssetConfigController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.SetUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.*;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -21,8 +25,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.ValueChangeEvent;
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2018/5/8.
@@ -55,18 +62,27 @@ public class WorkScheduleController{
 
     private Date startBatchDate;
     private Date endBatchDate;
+    private Date deleteStartBatchDate;
+    private Date deleteEndBatchDate;
     private List<UserAccount> selectedUserList;
+    private List<UserAccount> deleteSelectedUserList;
     private String batchType;
-
+    private String[] selectedOptions2;
+    private String[] shiftType;
     private Date startTime_all;
     private Date endTime_all;
     private Date startTime_am;
     private Date endTime_am;
     private Date startTime_pm;
     private Date endTime_pm;
-
+    private UserSchedule.Type type;
     private String resultInfo;
-
+    private OrgInfo selectSite;
+    private List<OrgInfo> selectOrgInfo;
+    private UserContextService userContextService;
+    private Boolean isEdited=Boolean.FALSE;
+    private List<UserAccount> editUserList;
+    private SharedAssetConfigController sharedAssetConfigController;
     @PostConstruct
     protected void init() {
 
@@ -76,11 +92,19 @@ public class WorkScheduleController{
         userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         userScheduleStageConfigDao = WebUtil.getBean(UserScheduleStageConfigRepository.class);
         userScheduleService = WebUtil.getBean(UserScheduleService.class);
-
-        currentUser = UserContextService.getCurrentUserAccount();
+        userContextService = WebUtil.getBean(UserContextService.class);
+        sharedAssetConfigController = WebUtil.getBean(SharedAssetConfigController.class);
+        currentUser = userContextService.getLoginUser();
 
         event = new DefaultScheduleEvent();
-
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String encodeStr = request.getRequestURI();
+        if("/geapm/portal/schedule/SwapCenterDuty/workSchedule.xhtml".equals(encodeStr)){
+            type=UserSchedule.Type.A;
+        }else{
+            type=UserSchedule.Type.W;
+        }
+        this.initSite();
         this.loadScheduleData();
         this.loadScheduleConfig();
         this.userList = loadUserList();
@@ -89,19 +113,16 @@ public class WorkScheduleController{
         this.isDisableSave = false;
         this.isDisableScheduleDateStage = false;
         this.isDisableScheduleDate = false;
-
+        shiftType=new String[]{"AM","PM","ALL"};
         this.resultInfo = "";
 
+
     }
-
-    private void loadScheduleData(){
-        eventModel = new DefaultScheduleModel();
-
+    private void initSite(){
         List<SearchFilter> searchFilters = new ArrayList<>();
-
-        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, UserSchedule.Type.W.name()));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
-        /*if(currentUser.getOrgLevel() == 0){
+        SearchFilter orgLevel = new SearchFilter("orgType", SearchFilter.Operator.NE, 4);
+        searchFilters.add(orgLevel);
+        if(currentUser.getOrgLevel() == 0){
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
         }else if(currentUser.getOrgLevel() == 1){
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
@@ -109,7 +130,29 @@ public class WorkScheduleController{
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
         }else{
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
-        }*/
+        }
+        selectOrgInfo = orgInfoDao.findBySearchFilter(searchFilters);
+        OrgInfo selectSiteSchedule = userContextService.getSelectSiteSchedule();
+        if(selectSiteSchedule == null){
+            Optional<OrgInfo> first = selectOrgInfo.stream().filter(item -> item.getOrgType() == 3).findFirst();
+            if (first.isPresent()) {
+                OrgInfo orgInfo = first.get();
+                userContextService.setSelectSiteSchedule(orgInfo);
+                selectSite=orgInfo;
+            }
+        }else{
+            selectSite=selectSiteSchedule;
+        }
+
+    }
+    private void loadScheduleData(){
+        eventModel = new DefaultScheduleModel();
+
+        List<SearchFilter> searchFilters = new ArrayList<>();
+
+        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, type.name()));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid()));
+
         List<UserSchedule> tempUserScheduleList = dao.findBySearchFilter(searchFilters);
 
         for (UserSchedule us : tempUserScheduleList) {
@@ -128,11 +171,11 @@ public class WorkScheduleController{
         if(event.getId() == null){
             //新增记录
             tempUserSchedule = new UserSchedule();
-            tempUserSchedule.setTenantUID(currentUser.getTenantUID());
-            tempUserSchedule.setInstitutionUID(currentUser.getInstitutionUID());
-            tempUserSchedule.setHospitalUID(currentUser.getHospitalUID());
-            tempUserSchedule.setSiteUID(currentUser.getSiteUID());
-            tempUserSchedule.setType("W");
+            tempUserSchedule.setTenantUID(selectSite.getTenantUID());
+            tempUserSchedule.setInstitutionUID(selectSite.getInstitutionUID());
+            tempUserSchedule.setHospitalUID(selectSite.getHospitalUID());
+            tempUserSchedule.setSiteUID(selectSite.getSiteUID());
+            tempUserSchedule.setType(type.name());
             tempUserSchedule.setScheduleDateStage(this.scheduleDateStage);
             tempUserSchedule.setUserUID(this.userUID);
             tempUserSchedule.setScheduleDate(this.scheduleDate);
@@ -167,7 +210,7 @@ public class WorkScheduleController{
         }
 
         if(tempUserSchedule != null){
-            if(userScheduleService.isValidateWorkSchedule(tempUserSchedule.getScheduleDate(), tempUserSchedule.getScheduleDateStage(), currentUser)){
+            if(userScheduleService.isValidateWorkScheduleAndUser(tempUserSchedule.getScheduleDate(), tempUserSchedule.getScheduleDateStage(), currentUser,userUID,type)){
                 if(tempUserSchedule.getId() == null){
                     eventModel.addEvent(tempEvent);
                 }else{
@@ -208,24 +251,49 @@ public class WorkScheduleController{
     }
 
     public List<UserAccount> loadUserList(){
-
+        OrgInfo selectSiteSchedule = userContextService.getSelectSiteSchedule();
         List<UserAccount> userAccountList = new ArrayList<>();
         if(currentUser.getOrgLevel() == 0){
             userAccountList = userAccountDao.findByTenantUIDAndStaffRole(currentUser.getTenantUID());
         }else if(currentUser.getOrgLevel() == 1){
             userAccountList = userAccountDao.findByInstitutionUIDAndStaffRole(currentUser.getInstitutionUID());
+            userAccountList = userAccountList.stream()
+                    .filter(item-> currentUser.getInstitutionUID().equals(item.getInstitutionUID()))
+                    .filter(item-> {
+                        if(selectSiteSchedule == null) return Boolean.TRUE;
+                        String institutionUID = item.getInstitutionUID();
+                        String hospitalUID = item.getHospitalUID();
+                        String siteUID = item.getSiteUID();
+                        if(siteUID.equals(selectSiteSchedule.getUid()) || siteUID.equals(hospitalUID) || siteUID.equals(institutionUID)){
+                            return Boolean.TRUE;
+                        }
+                        return false;
+                    })
+                    .collect(Collectors.toList());
         }else if(currentUser.getOrgLevel() == 2){
             userAccountList = userAccountDao.findByHospitalUIDAndStaffRole(currentUser.getHospitalUID());
+            userAccountList = userAccountList.stream()
+                    .filter(item-> currentUser.getHospitalUID().equals(item.getHospitalUID()))
+                    .filter(item-> {
+                        if(selectSiteSchedule == null) return Boolean.TRUE;
+                        String hospitalUID = item.getHospitalUID();
+                        String siteUID = item.getSiteUID();
+                        if(siteUID.equals(selectSiteSchedule.getUid()) || siteUID.equals(hospitalUID)){
+                            return Boolean.TRUE;
+                        }
+                        return false;
+                    })
+                    .collect(Collectors.toList());
         }else if(currentUser.getOrgLevel() == 3){
             userAccountList = userAccountDao.findBySiteUIDAndStaffRole(currentUser.getSiteUID());
         }
-
+        userAccountList=userAccountList.stream().filter(item-> item.getIsDeleted() == null?Boolean.TRUE:!item.getIsDeleted()).collect(Collectors.toList());
         return userAccountList;
     }
 
     public void onEventSelect(SelectEvent selectEvent) {
         event = (ScheduleEvent) selectEvent.getObject();
-
+        this.setEdited(Boolean.TRUE);
         this.userScheduleID = ((UserSchedule)event.getData()).getId();
         this.scheduleDate = ((UserSchedule)event.getData()).getScheduleDate();
         this.scheduleDateStage = ((UserSchedule)event.getData()).getScheduleDateStage();
@@ -240,13 +308,24 @@ public class WorkScheduleController{
             this.isDisableDelete = false;
             this.isDisableSave = false;
         }
+        List<UserAccount> userAccounts =new ArrayList<>();
+        if(UserSchedule.Type.A == type){
+            userAccounts=sharedAssetConfigController.loadUserList();
+        }else{
+            userAccounts=this.loadUserList();
+        }
+        boolean b = userAccounts.stream().anyMatch(item -> item.getUid().equals(this.userUID));
+        if(!b){
+            userAccounts.add(userAccountDao.getUsers(this.userUID));
+        }
+        this.setEditUserList(userAccounts);
     }
 
     public void onDateSelect(SelectEvent selectEvent) {
         DefaultScheduleEvent tempEvent = new DefaultScheduleEvent("", (Date) selectEvent.getObject(), (Date) selectEvent.getObject(), true);
         tempEvent.setData(null);
         event = tempEvent;
-
+        this.setEdited(Boolean.FALSE);
         this.userScheduleID = null;
         this.scheduleDate = (Date) selectEvent.getObject();
         this.scheduleDateStage = null;
@@ -269,13 +348,19 @@ public class WorkScheduleController{
             this.isDisableSave = false;
         }
     }
-
-    private void loadScheduleConfig(){
+    public void onScheduleValidateNew(){
+        if(userScheduleService.isBeforeTagetDate(this.scheduleDate, new Date()) || !userScheduleService.isValidateWorkScheduleAndUser(this.scheduleDate, this.scheduleDateStage, currentUser,this.userUID,type)){
+            this.isDisableSave = true;
+        }else {
+            this.isDisableSave = false;
+        }
+    }
+    public void loadScheduleConfig(){
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentDateStr = sdf.format(new Date());
 
-        Map<String, UserScheduleStageConfig> usscMap = userScheduleService.loadScheduleStageConfig(currentUser);
+        Map<String, UserScheduleStageConfig> usscMap = userScheduleService.loadScheduleStageConfig(currentUser,type,selectSite);
 
         UserScheduleStageConfig ussc_all = usscMap.get(UserScheduleService.SCHEDULE_STAGE_ALL);
         UserScheduleStageConfig ussc_am = usscMap.get(UserScheduleService.SCHEDULE_STAGE_AM);
@@ -322,10 +407,10 @@ public class WorkScheduleController{
 
     public void batchSaveWorkSchedule(){
         RequestContext requestContext = RequestContext.getCurrentInstance();
-        if(this.isValideDate()){
+        if(this.isValideDate(startBatchDate,endBatchDate)){
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-            Map<String, List<UserSchedule>> resultMap = userScheduleService.batchSaveWorkSchedule(selectedUserList, startBatchDate, endBatchDate, batchType, currentUser);
+            List<Integer> collect = Arrays.asList(selectedOptions2).stream().map(item -> Integer.valueOf(item)).collect(Collectors.toList());
+            Map<String, List<UserSchedule>> resultMap = userScheduleService.batchSaveWorkSchedule(selectedUserList, startBatchDate, endBatchDate, shiftType, selectSite, type,collect);
 
             List<UserSchedule> successList = resultMap.get(UserScheduleService.BATCH_SUCCESS_LIST);//没有创建成功排班记录
             List<UserSchedule> failedList = resultMap.get(UserScheduleService.BATCH_FAILED_LIST);//没有创建成功排班记录
@@ -345,18 +430,26 @@ public class WorkScheduleController{
         }
 
     }
-
+    public void batchDeleteWorkSchedule(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        if(this.isValideDate(deleteStartBatchDate,deleteEndBatchDate)){
+            userScheduleService.batchDeleteWorkSchedule(deleteSelectedUserList,deleteStartBatchDate, deleteEndBatchDate,selectSite, type,Arrays.asList(shiftType));
+            requestContext.addCallbackParam("flag", "Success");
+        }else {
+            requestContext.addCallbackParam("flag", "Failed");
+        }
+    }
     public String resultConfig(){
         return "workSchedule?faces-redirect=true";
     }
 
     public void saveStageConfig(){
 
-        userScheduleService.saveScheduleStageConfig(startTime_all,endTime_all,startTime_am,endTime_am,startTime_pm,endTime_pm,currentUser);
+        userScheduleService.saveScheduleStageConfig(startTime_all,endTime_all,startTime_am,endTime_am,startTime_pm,endTime_pm,selectSite,type);
 
     }
 
-    public boolean isValideDate(){
+    public boolean isValideDate(Date startBatchDate,Date endBatchDate){
         Calendar calender = Calendar.getInstance();
         calender.setTime(new Date());
         calender.add(Calendar.DAY_OF_MONTH, -1);
@@ -371,6 +464,14 @@ public class WorkScheduleController{
         }
 
         return true;
+    }
+
+    public String[] getShiftType() {
+        return shiftType;
+    }
+
+    public void setShiftType(String[] shiftType) {
+        this.shiftType = shiftType;
     }
 
     private void addMessage(FacesMessage message) {
@@ -543,5 +644,141 @@ public class WorkScheduleController{
 
     public void setResultInfo(String resultInfo) {
         this.resultInfo = resultInfo;
+    }
+
+    public String[] getSelectedOptions2() {
+        return selectedOptions2;
+    }
+
+    public void setSelectedOptions2(String[] selectedOptions2) {
+        this.selectedOptions2 = selectedOptions2;
+    }
+
+
+
+    private final String[] all=new String[]{"0","1","2","3","4","5","6","7"};
+    private String selectedStr;
+    private boolean add=Boolean.TRUE;
+    public void valueChangeListener(ValueChangeEvent event){
+        String[] newValue =(String[]) event.getNewValue();
+        String[] oldValue =(String[]) event.getOldValue();
+       if(oldValue == null){
+            selectedStr=newValue[0];
+            add=Boolean.TRUE;
+        }else {
+            int newlength = newValue.length;
+            int oldlength = oldValue.length;
+            add=newlength > oldlength;
+            if(newlength == 7 && add){
+                selectedStr="0";
+            }else{
+                Set<String> set=new HashSet<String>(Arrays.asList(add?newValue:oldValue));
+                for (String i: add?oldValue:newValue){
+                    if(set.contains(i)){
+                        set.remove(i);
+                    }else{
+                        set.add(i);
+                    }
+                }
+                selectedStr=new ArrayList<>(set).get(0);
+            }
+         }
+    }
+    public void selectedOptions2Changed() {
+           if(add){
+               if("0".equals(selectedStr)){
+                   selectedOptions2=all;
+               }else{
+                   List<String> collect = Arrays.asList(selectedOptions2).stream().filter(item -> !"0".equals(item)).collect(Collectors.toList());
+                   selectedOptions2=collect.toArray(new String[collect.size()]);
+               }
+           }else{
+               if("0".equals(selectedStr)){
+                   selectedOptions2=null;
+               }else{
+                   List<String> collect = Arrays.asList(selectedOptions2).stream().filter(item -> !"0".equals(item)).collect(Collectors.toList());
+                   selectedOptions2=collect.toArray(new String[collect.size()]);
+               }
+           }
+    }
+
+    public Date getDeleteStartBatchDate() {
+        return deleteStartBatchDate;
+    }
+
+    public void setDeleteStartBatchDate(Date deleteStartBatchDate) {
+        this.deleteStartBatchDate = deleteStartBatchDate;
+    }
+
+    public Date getDeleteEndBatchDate() {
+        return deleteEndBatchDate;
+    }
+
+    public void setDeleteEndBatchDate(Date deleteEndBatchDate) {
+        this.deleteEndBatchDate = deleteEndBatchDate;
+    }
+
+    public List<UserAccount> getDeleteSelectedUserList() {
+        return deleteSelectedUserList;
+    }
+
+    public void setDeleteSelectedUserList(List<UserAccount> deleteSelectedUserList) {
+        this.deleteSelectedUserList = deleteSelectedUserList;
+    }
+    public TreeNode getHospitalTree(){
+        List<OrgInfo> orgList = selectOrgInfo;
+        if(org.springframework.util.CollectionUtils.isEmpty(orgList)){
+            return null;
+        }
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> {
+            TreeNode org = new DefaultTreeNode("org", item, null);
+            if(item.getOrgType() != 3){
+                org.setSelectable(false);
+            }
+            return org;
+        }));
+        for (OrgInfo org : orgList) {
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+//        expandedByOrgType(rootNode, 2);
+        return rootNode;
+    }
+    public OrgInfo getSelectSite() {
+        return selectSite;
+    }
+
+    public void setSelectSite(OrgInfo selectSite) {
+        this.selectSite = selectSite;
+    }
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        if(event == null ) return;
+        OrgInfo orgInfo = (OrgInfo) event.getTreeNode().getData();
+        userContextService.setSelectSiteSchedule(orgInfo);
+        selectSite=userContextService.getSelectSiteSchedule();
+        this.loadScheduleData();
+        this.loadScheduleConfig();
+    }
+
+    public Boolean getEdited() {
+        return isEdited;
+    }
+
+    public void setEdited(Boolean edited) {
+        isEdited = edited;
+    }
+
+    public List<UserAccount> getEditUserList() {
+        return editUserList;
+    }
+
+    public void setEditUserList(List<UserAccount> editUserList) {
+        this.editUserList = editUserList;
     }
 }

@@ -1,0 +1,74 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:his="http://www.ge.com/tags/his">
+
+    <ui:composition>
+        <div class="ui-g">
+
+
+            <div class="ui-g-12 card">
+
+                <h:form id="HisOrgInfoListForm">
+                    <div style="border: 0px solid;margin: 10px 10px 15px 0px">
+                        <his:selectOrg update=":tabGroup:hisListForm:datalist :tabGroup:HisOrgInfoListForm"></his:selectOrg>
+                    </div>
+                </h:form>
+
+                <h:form id="hisListForm">
+                    <p:dataTable id="datalist" value="#{hisAssetGroupListController.lazyModel}"
+                                 var="item"
+                                 lazy="true" paginator="true" paginatorPosition="bottom"
+                                 paginatorAlwaysVisible="true"
+                                 selectionMode="single" selection="#{hisAssetGroupListController.selected}"
+                                 rowKey="#{item.uuid}" sortMode="single" sortOrder="descending"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" listener="#{hisAssetGroupListController.onSelectAssetGroupAssetMatch}" update="createButton editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{hisAssetGroupListController.onFilter}" oncomplete="rc();"/>
+
+                        <p:column headerText="所属业务单元" sortBy="#{item.orgInfoUid}">
+                            <h:outputText value="#{hisAssetGroupListController.getOrgNameByUid(item.orgInfoUid)}"/>
+                        </p:column>
+
+                        <p:column headerText="设备分组名称" sortBy="#{item.assetGroupName}">
+                            <h:outputText value="#{item.assetGroupName}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}">
+                            <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+
+                        <p:column headerText="设备数量" >
+                            <h:outputText value="#{hisAssetGroupListController.getAssetCountsByGroupUidAndDeptUid(item.assetGroupUid,item.clinicalDeptUid)}"/>
+                        </p:column>
+
+                        <p:column headerText="是否子设备" sortBy="#{item.isSubEquipment}">
+                            <h:outputText value="#{item.isSubEquipment eq false ? '否': '是'}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabGroup:hisTagEditForm" actionListener="#{hisAssetGroupListController.prepareCreate}" oncomplete="PF('hisTagEditDialog').show()"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{hisAssetGroupListController.prepareEdit}" update=":tabGroup:hisTagEditForm" oncomplete="PF('hisTagEditDialog').show()" disabled="#{empty hisAssetGroupListController.selected}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{hisAssetGroupListController.delete}" update="datalist" disabled="#{empty hisAssetGroupListController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="his列表"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+
+                <ui:include src="AssetGroupEdit.xhtml"/>
+            </div>
+        </div>
+
+    </ui:composition>
+
+</html>

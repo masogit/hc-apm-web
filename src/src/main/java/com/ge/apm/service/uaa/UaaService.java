@@ -1,6 +1,9 @@
 package com.ge.apm.service.uaa;
 
+import cn.hutool.core.collection.ListUtil;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.PermissionGroupMapper;
+import com.ge.apm.dao.mapper.PermissionGroupUserMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -55,6 +58,13 @@ public class UaaService {
 
     @Autowired
     private UserRoleRepository userRoleRepository;
+
+    @Autowired
+    private PermissionGroupMapper permissionGroupMapper;
+    @Autowired
+    private PermissionGroupUserMapper permissionGroupUserMapper;
+    @Autowired
+    private PermissionGroupUserRepository permissionGroupUserRepository;
 
 
 
@@ -267,7 +277,6 @@ public class UaaService {
     
     @Transactional
     public void setUserRoles(UserAccount userAccount, List<String> newRoleNames){
-        UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
@@ -295,7 +304,6 @@ public class UaaService {
                 CustomRole customRole = customRoleRepository.findByTenantUIDAndName(userAccount.getTenantUID(),newRoleName);
                 if(customRole == null){
                     logger.warn("Assign role to user: Role not found, roleName="+newRoleName);
-                    continue;
                 }else{
                     UserRole userRole = new UserRole();
                     userRole.setUserId(userAccount.getId());
@@ -312,6 +320,19 @@ public class UaaService {
                 userRoleDao.save(userRole);
             }
         }
+    }
+
+    @Transactional
+    public void setUserPermissionGroup(UserAccount userAccount, List<String> permissionGroupUidList){
+        permissionGroupUserRepository.deleteByUserUid(userAccount.getUid());
+        List<PermissionGroupUser> saveList = ListUtil.toList();
+        for (String permissionGroupUid : permissionGroupUidList) {
+            PermissionGroupUser permissionGroupUser = new PermissionGroupUser();
+            permissionGroupUser.setPermissionGroupUid(permissionGroupUid);
+            permissionGroupUser.setUserUid(userAccount.getUid());
+            saveList.add(permissionGroupUser);
+        }
+        permissionGroupUserRepository.save(saveList);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -501,6 +522,10 @@ public class UaaService {
     //origin user accessible org list
     public List<OrgInfo> getOrgListByUser(String userUid){
         return orgInfoDao.getByUser(userUid);
+    }
+
+    public List<OrgInfo> getOrgListByPermissionGroup(List<String> permissionGroupUidList){
+        return orgInfoDao.getOrgListByPermissionGroup(permissionGroupUidList);
     }
 
     public boolean isIbSiteAdmin(UserAccount userAccount) {
@@ -1109,6 +1134,10 @@ public class UaaService {
         return rootNode;
     }
 
+    public List<String> getOrgInfoUidsByparentUid(String uid) {
+        return orgInfoDao.getOrgInfoUidsByparentUid(uid);
+    }
+
     public TreeNode buildOrgTreeByParentIdWithSelectedChildren(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList) {
 
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
@@ -1580,5 +1609,13 @@ public class UaaService {
             zkbFePartOrderUserConfig.setTenantUid(userAccount.getTenantUID());
             zkbFePartOrderUserConfigRepository.save(zkbFePartOrderUserConfig);
         }
+    }
+
+    public List<PermissionGroup> getPermissionGroups(String tenantUid) {
+        return permissionGroupMapper.getBySiteUid(tenantUid);
+    }
+
+    public List<String> getPermissionGroupsByUserUid(String uid) {
+        return permissionGroupUserMapper.getPermissionGroupsByUserUid(uid);
     }
 }

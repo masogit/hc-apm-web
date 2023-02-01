@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="AssetRepairQuickTemplateEditDlg" widgetVar="AssetRepairQuickTemplateEditDialog" width="650" height="220" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetRepairQuickTemplateController.CRUDActionName} 维修快捷模板">
+            <h:form id="AssetRepairQuickTemplateEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetRepairQuickTemplateController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">模板类型*</label>
+                            <p:selectOneMenu id="templateType" value="#{assetRepairQuickTemplateController.selected.templateType}"
+                                             required="true" requiredMessage="模板类型 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetRepairQuickTemplateType')}" var="item" itemLabel="#{item.value}"
+                                               itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">设备分类*</label>
+                            <p:selectOneMenu id="assetGroup" value="#{assetRepairQuickTemplateController.selected.assetGroup}"
+                                             required="true" requiredMessage="设备分类 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}"
+                                               itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="templateTitle" value="#{assetRepairQuickTemplateController.selected.templateTitle}" />
+                            <label>模板主题</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputTextarea id="templateContent" value="#{assetRepairQuickTemplateController.selected.templateContent}"  maxlength="1024" />
+                            <label>模板内容</label>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{assetRepairQuickTemplateController.save}" value="#{msg.Save}" update="display,:AssetRepairQuickTemplateEditDlg, :AssetRepairQuickTemplateListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetRepairQuickTemplateEditDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('AssetRepairQuickTemplateEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

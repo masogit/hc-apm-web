@@ -7,7 +7,9 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -36,7 +38,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private OrgInfo selectedOrg;
 
-    //    private QrCodeLibRepository qrcodeDao;
     private List<ArrivalListItem> arrivalItemList;
 
     private AssetInstallationService aiService;
@@ -52,7 +53,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private ArrivalListItem easyInstallItem;
 
-    //    private OrgInfoService orgService;
     private CustomConfigService ccService;
 
     private List<I18nMessage> code68List;
@@ -68,6 +68,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
     private SupplierController supplierController;
+    private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+    private ServiceRequestApiService serviceRequestApiService;
 
     UserAccount currentUser;
 
@@ -75,7 +77,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private BlobFileService blobService;
 
-    //    private String supplierName;
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
     List<Supplier> manueList;
@@ -86,7 +87,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private String selectedContractItemId;
     private String selectedContractId;
     private List<ContractInfo> contractList;
-    private List<ContractInfoItem> contractItemList = new ArrayList();
+    private List<ContractInfoItem> contractItemList = new ArrayList<>();
 
     private SupplierService supplierService;
     private List<UserAccount> supplierUserList;
@@ -119,9 +120,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         contractService = WebUtil.getBean(ContractInfoService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-//        orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-//        qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
@@ -131,13 +130,16 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
-        attachList = new ArrayList();
+        attachList = new ArrayList<>();
         currentUser=UserContextService.getCurrentUserAccount();
         configService = WebUtil.getBean(ConfigService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
+        medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
+        medicalInstrumentsClassificationCompCtrl.registerController(this);
 
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
@@ -166,7 +168,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
                 this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
-//                supplierName = supplier == null ? null : supplier.getName();
             }
             if (selected.getManufactureId() != null) {
                 manufacture = aiService.getSupplierById(Integer.parseInt(selected.getManufactureId()));
@@ -181,14 +182,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }else{
                 attachList = aiService.getPicList(selected.getId());
             }
-//            if (ArrivalList.ProcessType.Easy.toString().equals(selected.getProcessType())) {
-//                initEasyInstallItem();
-//                this.changeFunctionGroup();
-//
-//            }
             if(null == selected.getBoxInstallationDate()) {
                 selected.setBoxInstallationDate(selected.getArrivalDate());
             }
+            medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, easyInstallItem.getMedicalApparatusClassification());
             prepareEdit();
         }
 
@@ -270,6 +267,15 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         } else {
             WebUtil.addErrorMessage("到货清单提交失败");
         };
+
+        // YHAAO-16616 到货清单提交后，展开的信息要根据上次记录带入
+        LinkedHashMap<String, Object> configMap = serviceRequestApiService.getConfigByKeyAndSite("arrivalListAutoFill", selected.getSiteUID());
+        LinkedHashMap<String, Object> customerConfig = (LinkedHashMap<String, Object>) configMap.get("customerConfig");
+
+        if(null != customerConfig && "true".equals(customerConfig.get("actualValue"))){
+            autoFillInfo();
+        }
+
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
         selected = dao.findById(selected.getId());
@@ -390,13 +396,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void saveEasyItem() {
         easyInstallItem.setNationalStandardCode(nationalStandardCode == null ? "" : nationalStandardCode.split("/")[0]);
         List<ArrivalListItem> saveList = getNewInstallAssetList();
-//        if (easyInstallItem.getWarrantyYear() != null) {
-//            Integer monthLong = Double.valueOf(easyInstallItem.getWarrantyYear() * 12).intValue();
-//            Calendar calender = Calendar.getInstance();
-//            calender.setTime(new Date());
-//            calender.add(Calendar.MONTH, monthLong);
-//            easyInstallItem.setFactoryWarrantyDate(calender.getTime());
-//        }
         saveList.forEach(item -> {
             item.setNationalStandardCode(easyInstallItem.getNationalStandardCode());
             item.setFunctionGroup(easyInstallItem.getFunctionGroup());
@@ -421,12 +420,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setIsPm(easyInstallItem.getIsPm());
             item.setIsChecked(easyInstallItem.getIsChecked());
             item.setWarrantyYear(easyInstallItem.getWarrantyYear());
+            item.setMedicalApparatusClassification(easyInstallItem.getMedicalApparatusClassification());
             if(item.getFixassetAckStatus() == null){
                 item.setFixassetAckStatus(ArrivalListItem.ACK_STATUS_NONE);
             }
         });
         itemDao.save(saveList);
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
+        initEasyInstallItem();
         WebUtil.addSuccessMessage("已保存");
     }
 
@@ -443,7 +444,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
         aiService.reAssignWorkOrder(item);
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
-//        cancel();
     }
 
     public void takeWorkOrderBatch(String itemId) {
@@ -478,7 +478,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             WebUtil.addErrorMessage(errorMessage);
         }
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
-//        cancel();
     }
 
     public void onSelectGbTreeNode(NodeSelectEvent event) {
@@ -702,11 +701,31 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void onContractChange() {
         if (!Strings.isNullOrEmpty(selectedContractId)) {
             contractItemList = contractService.getContractItems(selectedContractId).stream()
-                    .filter(item -> ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
+                    .filter(item -> {
+                                if(item.getContractAssetQuantity()!=null) {
+                                    Integer installedSum = dao.sumQuantityByContractItemId(item.getId());
+                                    if(installedSum == null) installedSum = 0;
+                                    item.setNoInstallQuntity(item.getContractAssetQuantity()-installedSum > 0 ? item.getContractAssetQuantity()-installedSum : 0);
+                                } else {
+                                    item.setNoInstallQuntity(0);
+                                }
+                                return ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType()) && item.getNoInstallQuntity() > 0;
+                      }
+                      ).collect(Collectors.toList());
             //TODO 去除到货数量等于订购数量的条目
         } else {
             contractItemList = new ArrayList();
             selectedContractItemId = null;
+        }
+    }
+
+    public void onQuantityChange() {
+        if(StringUtils.isNotEmpty(selectedContractItemId)) {
+            ContractInfoItem selectedContractItem = contractItemList.stream().filter(item -> item.getId().equals(selectedContractItemId)).findAny().orElse(null);
+            if(selected.getQuantity() > selectedContractItem.getNoInstallQuntity()) {
+                WebUtil.addErrorMessage("填写数量超过合同中待安装数量" + selectedContractItem.getNoInstallQuntity() + ",请考虑重新填写");
+                return;
+            }
         }
     }
 
@@ -722,7 +741,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 this.selected.setContractPrice(0d);
             }
 //        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
-            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+            this.selected.setQuantity(selectedContractItem.getNoInstallQuntity());
             this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
             this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
             this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
@@ -737,7 +756,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                     this.manufacture=manufacture;
                 }
             }
-            this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
             this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
             this.selected.setOrigin(selectedContractItem.getProductionPlace());
             String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
@@ -1121,5 +1139,52 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setCopyFrom(String copyFrom) {
         this.copyFrom = copyFrom;
+    }
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
+            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
+            easyInstallItem.setMedicalApparatusClassification(selectedAuthGroup.getClassificationCode());
+        }
+    }
+
+    private void autoFillInfo(){
+
+        if(org.apache.commons.lang.StringUtils.isEmpty(this.selected.getAssetName())
+                || org.apache.commons.lang.StringUtils.isEmpty(this.selected.getFunctionType())){
+            return;
+        }
+
+        ArrivalListItem lastItem = itemDao.getLastItemByNameAndModel(this.selected.getAssetName(),
+                this.selected.getFunctionType(), this.selected.getTenantUID(), this.selected.getId());
+
+        if(lastItem != null){
+            List<ArrivalListItem> list = itemDao.findByArrivalListId(selected.getId());
+            for (ArrivalListItem item : list) {
+                item.setNationalStandardCode(lastItem.getNationalStandardCode());
+                item.setMedicalApparatusClassification(lastItem.getMedicalApparatusClassification());
+                item.setRegistrationNo(lastItem.getRegistrationNo());
+                item.setMaitananceId(lastItem.getMaitananceId());
+                item.setMaitanance(lastItem.getMaitanance());
+                item.setWarrantyYear(lastItem.getWarrantyYear());
+                item.setWarrantyDate(lastItem.getWarrantyDate());
+                item.setAssetUsage(lastItem.getAssetUsage());
+                item.setCapitalSource(lastItem.getCapitalSource());
+                item.setMeasureGrade(lastItem.getMeasureGrade());
+                item.setRiskGrade(lastItem.getRiskGrade());
+                item.setEmergencyEquipment(lastItem.getEmergencyEquipment());
+                item.setImportEquipment(lastItem.getImportEquipment());
+                item.setMeasuringItemCategory(lastItem.getMeasuringItemCategory());
+                item.setAccountingCategory(lastItem.getAccountingCategory());
+                item.setSalvageValue(lastItem.getSalvageValue());
+                item.setLifecycleInYear(lastItem.getLifecycleInYear());
+                item.setDepreciationMethod(lastItem.getDepreciationMethod());
+                item.setIsPm(lastItem.getIsPm());
+                item.setIsChecked(lastItem.getIsChecked());
+                itemDao.save(item);
+            }
+            medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, lastItem.getMedicalApparatusClassification());
+        }
     }
 }

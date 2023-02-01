@@ -43,11 +43,6 @@ public class SharedAssetRequestService {
             voucherNum = String.format("%06d", Integer.parseInt(voucherNum) + 1);
         }
         asdDao.save(selected.getSardList());
-        //调用微服务
-        try {
-            sharedAssetService.pushWxMsg(selected.getId());
-        } catch (Exception e) {
-            logger.warn("SharedAssetRequestService[]pushWxMsg[]error", e);
-        }
+
     }
 }

@@ -1,3 +1,4 @@
+
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
@@ -135,7 +136,7 @@
                         </p:column>
                         <p:column headerText="操 作" exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
                             <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
-                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}">
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin') or assetInfoListController.hasCustomRole('assetInfoAuth','m')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
                                 <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
@@ -285,6 +286,31 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'networkingStatus'}">
+                                <p:column headerText="#{msg.networkingStatus}" sortBy="#{item.networkingStatus}" filterBy="#{item.networkingStatus}" filterMatchMode="EQ" >
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('networkingStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('networkingStatus',item.networkingStatus)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'isUseRegistration'}">
+                                <p:column headerText="#{msg.isUseRegistration}" sortBy="#{item.isUseRegistration}" filterBy="#{item.isUseRegistration}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                            <f:converter converterId="javax.faces.Boolean" />
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" />
+                                            <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                            <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{item.isUseRegistration?msg.True2Yes:msg.False2No}"/>
+                                </p:column>
+                            </c:if>
+
                             <c:if test="#{columnItem eq 'warrantyDate'}">
                                 <p:column  headerText="#{msg.warrantyDate}" sortBy="#{item.warrantyDate}" filterBy="#{item.warrantyDate}" filterMatchMode="GTE">
                                     <f:facet name="filter">
@@ -668,7 +694,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'lifecycle'}">
-                                <p:column headerText="#{msg.lifecycle}">
+                                <p:column headerText="#{msg.lifecycle}" sortBy="#{item.lifecycle}" filterBy="#{item.lifecycle}" filterMatchMode="EQ">
                                     <h:outputText value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
                                 </p:column>
                             </c:if>
@@ -770,6 +796,16 @@
                                     </f:facet>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'assetUsedLifecycle'}">
+                                <p:column headerText="#{msg.assetUsedLifecycle}" filterBy="#{item.assetUsedLifecycle}" filterMatchMode="LTE">
+                                    <h:outputText value="#{item.assetUsedLifecycle}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetQuantity'}">
+                                <p:column headerText="#{msg.assetQuantity}" exportable="true" sortBy="#{item.assetQuantity}" filterBy="#{item.assetQuantity}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.assetQuantity}"/>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
@@ -784,7 +820,7 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="batchToRelRule" oncomplete="PF('relRuleAssetDialog').show()" actionListener="#{assetInfoListController.setSelectedAssetsUids()}" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="#{msg.SetRulesInBatch}" disabled="#{not assetInfoListController.isChecked()}"/>
                             <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}"/>
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and (userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin') or assetInfoListController.hasCustomRole('assetInfoAuth','a'))}"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportExcel}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
                                 <p:fileDownload value="#{assetInfoListController.excelFile}" />

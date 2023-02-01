@@ -13,6 +13,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.SupplierRepository;
@@ -145,8 +146,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
         selected.setLastModifiedDate(new Date());
         selected.setLastModifiedBy(currentUser.getLoginName());
-
         supplierService.saveSupplier(selected);
+        onAfterNewObject(selected, true);
     }
 
     @Override
@@ -155,8 +156,10 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         if(isOK){
             if (attachements != null){
                 for (V2_BlobObject blobObject: attachements) {
-                    blobObject.setBoUuid(object.getUid());
-                    blobService.saveBlobObject(blobObject);
+                    if (StringUtils.isEmpty(blobObject.getBoUuid())) {
+                        blobObject.setBoUuid(object.getUid());
+                        blobService.saveBlobObject(blobObject);
+                    }
                 }
             }
         }

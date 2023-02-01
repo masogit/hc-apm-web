@@ -129,6 +129,19 @@ public class ZkbKeyBehaviorIndexProvider {
         }
         return sb.toString();
     }
+    /**
+     * 添加租户UID条件
+     * @param tenantUID 租户UID
+     * @return
+     */
+    public String buildFilter_batchUpdateOfCCSB(String tenantUID){
+        StringBuilder sb = new StringBuilder();
+        if(StringUtils.isNotBlank(tenantUID))
+        {
+            sb.append(" and zkbi.tenant_uid = '"+tenantUID+"'");
+        }
+        return sb.toString();
+    }
 
     /**
      * 组装批量生效sql语句
@@ -147,6 +160,26 @@ public class ZkbKeyBehaviorIndexProvider {
         StringBuilder sb = new StringBuilder();
         sb.append("select * from zkb_key_behavior_index where '"+kpiDate+"' = TO_CHAR(kbi_date, '"+dateFormat+"') ");
         sb.append(buildFilter_batchUpdate(tenantUID));
+        return sb.toString();
+    }
+
+    /**
+     * 组装批量生效sql语句
+     * @param param
+     * @return
+     */
+    public String findByDateAndTenantUIDOfCCSB(Map<String,Object> param)
+    {
+        String kpiDate = param.get("kpiDate").toString();//kpi时间
+        String dateFormat = param.get("dateFormat").toString();//日期格式
+        String tenantUID = "";
+        if(param.get("tenantUID")!=null)
+        {
+            tenantUID=param.get("tenantUID").toString();
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("select zkbi.*,recalculatetable.recalculate from zkb_key_behavior_index zkbi left join (select t.tenant_uid,true as recalculate from zkb_contract t where t.contract_type='CCSB' group by t.tenant_uid having count(t.contract_no)>0) recalculatetable on recalculatetable.tenant_uid =zkbi.tenant_uid  where '"+kpiDate+"' = TO_CHAR(zkbi.kbi_date, '"+dateFormat+"') ");
+        sb.append(buildFilter_batchUpdateOfCCSB(tenantUID));
         return sb.toString();
     }
 }
