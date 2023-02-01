@@ -22,7 +22,7 @@ xmlns:svg="http://www.w3.org/2000/svg">
 					<h:panelGroup >
 						<p:commandButton value="拒绝申请" actionListener="#{sharedAssetRequestV2Controller.rejectApply}" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" rendered="#{sharedAssetRequestV2Controller.dialogTitle==1}"/>
 						<p:commandButton value="搁置受理" actionListener="#{sharedAssetRequestV2Controller.Shelve}" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" rendered="#{sharedAssetRequestV2Controller.dialogTitle==2}" />
-						<p:commandButton value="#{msg.Return}" oncomplete="PF('rejectApplyDialog').hide()"  icon="ui-icon-arrow-back"/>
+						<p:commandButton immediate="true" value="#{msg.Return}" onclick="PF('rejectApplyDialog').hide()"  icon="ui-icon-arrow-back"/>
 					</h:panelGroup>
 				</p:panelGrid>
 				<br/>
