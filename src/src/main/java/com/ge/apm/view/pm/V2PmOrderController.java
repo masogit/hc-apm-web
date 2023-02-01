@@ -2045,8 +2045,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<SearchFilter> filters = new ArrayList<>();
 
         List<String> orderIds = getVisableMvsAssetSystemId();
-        if (!CollectionUtils.isEmpty(orderIds)) {
-            filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+        if (org.springframework.util.CollectionUtils.isEmpty(orderIds)) {
+            orderIds = new ArrayList<>();
+            orderIds.add("0");
+            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
+        } else {
+            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
         }
 
         for (SearchFilter searchFilter : filterArrayList) {
