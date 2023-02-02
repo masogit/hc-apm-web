@@ -105,7 +105,7 @@ public class ZkbHighPartController extends GenericCRUDUUIDController<ZkbHighPart
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameNotExist"));
             return;
         }
-
+        selected.setPartNo(selected.getPartNo().trim());
         if(!checkSave()){
             return;
         }
