@@ -887,6 +887,8 @@ public void test1(){
             removeFilterOnField("assetInfo.assetOwnerId2");
             removeFilterOnField("assetInfo.assetOwnerId3");
             removeFilterOnField("assetInfo.uid");
+            removeFilterOnField("assetInfo.clinicalDeptUID");
+            removeFilterOnField("approverId");
             Integer fillterStepId;
             if (queryIndex == 1) {//已报修 可取消
                 if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
