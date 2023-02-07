@@ -17,4 +17,7 @@ public interface ZkbIntegralRecordRepository extends GenericRepositoryUUID<ZkbIn
     ZkbIntegralRecord findFirstByRecord(String zkbIntegralId,List<String> recordType,String kpiMonth);
 
     List<ZkbIntegralRecord> findByZkbIntegralIdAndRecordTypeNotOrderByCreatedDateDesc(String zkbIntegralId,String recordType);
+
+    List<ZkbIntegralRecord> findByZkbIntegralIdOrderByCreatedDateDesc(String zkbIntegralId);
+
 }

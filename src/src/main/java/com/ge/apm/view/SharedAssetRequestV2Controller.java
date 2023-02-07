@@ -82,6 +82,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private String filterApplyTime = null;
     private UserAccount selectedAssignee;
     private UserContextService userContextService;
+    private Integer dialogTitle;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -1201,7 +1202,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         Map<String, Object> params = new HashMap<>();
         String id = selected.getId();
         params.put("id", id);
-        params.put("remark",selected.getRemark());
+        params.put("rejectShelveRemark",selected.getRejectShelveRemark());
         ResponseEntity<LinkedHashMap> result = null;
         try {
             result = sharedAssetService.rejectApply(GatewayURL.REJECT_APPLY, params);
@@ -1251,8 +1252,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int state = 5;//5为借用搁置状态
         RequestContext requestContext = RequestContext.getCurrentInstance();
        if(sta == 1){//借用待受理状态
-           dao.updateState(uid, state);
-
+           //dao.updateState(uid, state);
+           realSAR.setState(state);
+           realSAR.setRejectShelveRemark(selected.getRejectShelveRemark());
+            dao.save(realSAR);
            //调用微服务
            try {
                sharedAssetService.pushWxMsg(selected.getId());
@@ -1979,6 +1982,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         searchFilters.clear();
         bean.onSelectSiteTreeNode(event);
 
+    }
+    public void editDialogTitle(Integer dialog){
+        this.dialogTitle=dialog;
+    }
+    public Integer getDialogTitle() {
+        return dialogTitle;
+    }
+
+    public void setDialogTitle(Integer dialogTitle) {
+        this.dialogTitle = dialogTitle;
     }
 }
     

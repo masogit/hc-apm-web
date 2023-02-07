@@ -530,6 +530,15 @@ class WorkOrderActionForm {
     List<V2_BlobObject> attachments;
     Integer entryType;
     List<V2_WorkOrderManHoursDetail> workHoursList;
+    Boolean generatePartsRequest;
+
+    public Boolean getGeneratePartsRequest() {
+        return generatePartsRequest;
+    }
+
+    public void setGeneratePartsRequest(Boolean generatePartsRequest) {
+        this.generatePartsRequest = generatePartsRequest;
+    }
 
     public String getRepairResult() {
         return repairResult;

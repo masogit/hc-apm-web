@@ -122,7 +122,7 @@
                                             value="#{v2PmOrderController.partsItem}"
                                             readonly="false"
                                             forceSelection="true"
-                                            completeMethod="#{v2PmOrderController.autosparePartName()}"
+                                            completeMethod="#{v2PmOrderController.autosparePartNameForPm}"
                                             var="item" itemLabel="#{item.name}"
                                             itemValue="#{item}"
                                             converter="simplePartsItemConverter" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
@@ -141,7 +141,7 @@
                             <p:autoComplete id="parts" dropdown="true"
                                             value="#{v2PmOrderController.partsItem}"
                                             readonly="false" forceSelection="true"
-                                            completeMethod="#{v2PmOrderController.initSparePartsMaster()}"
+                                            completeMethod="#{v2PmOrderController.initSparePartsMasterForPm}"
                                             var="item" itemLabel="#{item.name}"
                                             itemValue="#{item}"
                                             converter="simplePartsItemConverter" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
