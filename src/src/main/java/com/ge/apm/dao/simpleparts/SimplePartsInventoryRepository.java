@@ -108,4 +108,7 @@ public interface SimplePartsInventoryRepository extends GenericRepositoryUUID<Si
     @Query(value = "select * from simple_parts_inventory where parts_warehouse_id in ?1 ", nativeQuery = true)
     public List<SimplePartsInventory> findByPartsWarehouseIds(Set<String> uids);
 
+    @Query(value = "select * from simple_parts_inventory where parts_warehouse_id in ?1 and name like concat('%',?2,'%')", nativeQuery = true)
+    public List<SimplePartsInventory> findByPartsWarehouseIdsAndName(Set<String> uids, String name);
+
 }
