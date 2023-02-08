@@ -28,13 +28,16 @@
                             <label class ="label">设计地址 </label>
                             <p:inputText id="reportEditUrl" value="#{jmReportController.selected.reportEditUrl}"  />
                         </h:panelGroup>
-                        <p:commandButton id="btnSite" style="max-width:160px;" value="#{jmReportController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right" rendered="#{!empty jmReportController.selected.id}"/>
-                        <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form" rendered="#{!empty jmReportController.selected.id}">
-                            <p:selectOneListbox scrollHeight="500" style="border: none;" value="#{jmReportController.tenantId}">
-                                <p:ajax process="@this" event="click" oncomplete="PF('varPanelSite').hide();"/>
-                                <f:selectItems value="#{tenantInfoController.itemList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                            </p:selectOneListbox>
-                        </p:overlayPanel>
+                        <h:panelGroup id = "tanentName">
+                            <label class ="label">分配租户 </label>
+                            <p:commandButton id="btnSite" style="max-width:160px;" value="#{jmReportController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right" rendered="#{!empty jmReportController.selected.id}"/>
+                            <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form" rendered="#{!empty jmReportController.selected.id}">
+                                <p:selectOneListbox scrollHeight="500" style="border: none;" value="#{jmReportController.tenantId}">
+                                    <p:ajax process="@this" event="click" listener="#{jmReportController.tenantChange()}" update=":jmEditForm:tanentName" oncomplete="PF('varPanelSite').hide();"/>
+                                    <f:selectItems value="#{tenantInfoController.itemList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                </p:selectOneListbox>
+                            </p:overlayPanel>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <p:commandButton validateClient="true" actionListener="#{jmReportController.save()}" value="#{msg.Save}"
                     update="display,:jmEditForm, :jmReportForm:datalist, :growl, :jmEditForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'jmEditDialog');"/>
