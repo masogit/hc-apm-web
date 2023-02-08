@@ -8,18 +8,16 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.primefaces.event.ItemSelectEvent;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -92,13 +90,15 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         }
         setFilter();
         Page<JmReport> pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<JmReport> reportIds = new ArrayList(pageResult.getContent());
         if (!userContextService.hasAnyRole("SuperAdmin,ITAdmin")) {
             pageResult.getContent().forEach(val -> {
                 if (!userContextService.hasAnyRole(val.getAssignRole())) {
-                    pageResult.getContent().remove(val);
+                    reportIds.remove(val);
                 }
             });
         }
+        pageResult =  new PageImpl<>(reportIds, pageRequest, reportIds.size());
         return pageResult;
     }
 
