@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.ItemSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
@@ -17,6 +19,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,7 +44,7 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
     @Getter @Setter
     private OrgInfo currentOrg;
     @Getter @Setter
-    private int tenantId;
+    private Integer tenantId;
     @Setter
     private List<String> assignedRoles;
     @Setter
@@ -57,7 +60,7 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         siteDao =  WebUtil.getBean(TenantInfoRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         currentOrg = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-        selectedTenant = siteDao.findByUid(loginUser.getTenantUID());
+        //selectedTenant = siteDao.findByUid(loginUser.getTenantUID());
         this.filterBySite = false;
         this.filterByHospital = false;
         initRole();
@@ -113,6 +116,9 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
     @Override
     public void prepareEdit() {
         super.prepareEdit();
+        if (StringUtils.isNotEmpty(selected.getAssignTenant())) {
+            selectedTenant = siteDao.findByUid(selected.getAssignTenant());
+        }
     }
 
     public void save() {
@@ -120,13 +126,19 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
             selected.setTenantUID(loginUser.getTenantUID());
         }
         if (crudActionName.equals("Edit")) {
-            if (tenantId != 0 && tenantId != selectedTenant.getId()) {
+            if (tenantId != null) {
                 TenantInfo tenantInfo = siteDao.findById(tenantId);
                 selected.setAssignTenantName(tenantInfo.getName());
                 selected.setAssignTenant(tenantInfo.getUid());
             }
         }
         dao.save(selected);
+    }
+
+    public void tenantChange() {
+        if (tenantId != null && tenantId != selectedTenant.getId()) {
+            selectedTenant = siteDao.findById(tenantId);
+        }
     }
 
     public void assignRole(ValueChangeEvent e) {
@@ -162,6 +174,7 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
 
     public void cancel() {
         selected = null;
+
     }
 
     public void delete() {
