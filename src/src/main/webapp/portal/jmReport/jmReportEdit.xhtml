@@ -28,9 +28,9 @@
                             <label class ="label">设计地址 </label>
                             <p:inputText id="reportEditUrl" value="#{jmReportController.selected.reportEditUrl}"  />
                         </h:panelGroup>
-                        <h:panelGroup id = "tanentName">
+                        <h:panelGroup id = "tanentName" rendered="#{!empty jmReportController.selected.id}">
                             <label class ="label">分配租户 </label>
-                            <p:commandButton id="btnSite" style="max-width:160px;" value="#{jmReportController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right" rendered="#{!empty jmReportController.selected.id}"/>
+                            <p:commandButton id="btnSite" style="max-width:160px;" value="#{jmReportController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
                             <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form" rendered="#{!empty jmReportController.selected.id}">
                                 <p:selectOneListbox scrollHeight="500" style="border: none;" value="#{jmReportController.tenantId}">
                                     <p:ajax process="@this" event="click" listener="#{jmReportController.tenantChange()}" update=":jmEditForm:tanentName" oncomplete="PF('varPanelSite').hide();"/>
