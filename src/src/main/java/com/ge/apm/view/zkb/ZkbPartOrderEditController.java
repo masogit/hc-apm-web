@@ -1,5 +1,6 @@
 package com.ge.apm.view.zkb;
 
+import cn.hutool.core.util.StrUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
@@ -8,6 +9,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -583,10 +585,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     public void prepareItemCreate(){
         this.actionItemName = "Create";
         this.zkbPartOrderItem = new ZkbPartOrderItem();
+        this.itemSaveTips = "";
     }
 
     public void prepareItemEdit(){
         this.actionItemName = "Edit";
+        this.itemSaveTips = "";
     }
 
     public boolean isItemDisabled(){
@@ -597,6 +601,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public boolean isItemCreateDisabled(){
+        if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
+            if (assetInfo.getAssetGroup().equals(1)) {
+                if(StrUtil.isEmpty(selected.getRadiationQuotaType())){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public void deleteItem(){
         this.selected.getZkbPartOrderItems().remove(this.zkbPartOrderItem);
         this.zkbPartOrderItem = null;
@@ -605,7 +621,43 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         calcRemainQty();
     }
 
+    private String itemSaveTips = "";
     public void saveItem(){
+        zkbPartOrderItem.setPartNo(zkbPartOrderItem.getPartNo().trim());
+        if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
+            if (assetInfo.getAssetGroup().equals(1)) {
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed",true);
+                if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                    ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(zkbPartOrderItem.getPartNo());
+                    if(z != null ){
+                        String el="";
+                        if(ZkbHighPartInfo.PartTypeEnum.highPart.toString().equals(z.getPartType())){
+                            el += zkbPartOrderItem.getPartNo()+"属于高值备件，不可订购！";
+                        }else if(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())){
+                            el += zkbPartOrderItem.getPartNo()+"属于球管，不可订购！";
+                        }
+                        if(StrUtil.isNotEmpty(el)){
+                            itemSaveTips = el;
+                            return;
+                        }else{
+                            RequestContext.getCurrentInstance().addCallbackParam("validationFailed",false);
+                        }
+                    }else{
+                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed",false);
+                    }
+                }else if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
+                    List<ZkbHighPartInfo> zkbHighPartInfos = zkbHighPartInfoRepository.findBulbTube(zkbPartOrderItem.getPartNo());
+                    if(zkbHighPartInfos != null && zkbHighPartInfos.size() > 0){
+                        itemSaveTips = zkbPartOrderItem.getPartNo()+"属于球管，不可订购！";
+                        return;
+                    }else {
+                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed",false);
+                    }
+                }
+
+            }
+        }
+
         if("Create".equals(this.actionItemName)){
             if(this.selected == null){
                 this.selected = new ZkbPartOrder();
@@ -625,6 +677,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             this.zkbPartOrderItem.setPartQty(zkbPartOrderItem.getPrePartQty());
         }
         this.zkbPartOrderItem = null;
+        this.itemSaveTips = "";
         this.selected.setQty(calcOrderQty());
         calcRemainQty();
         saveTips = "备件申请信息已添加，提交申请后流程才会进入审批阶段，请在添加完需要审批的备件信息后提交申请，以免影响您的申请进度，感谢您的配合！";
@@ -968,14 +1021,23 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
             if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())){
-                if(assetInfo.getAssetGroup().equals(1) && ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                if(assetInfo.getAssetGroup().equals(1)){
                     String el = "";
-                    for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
-                        ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(i.getPartNo());
-                        if(z != null ){
-                            if(ZkbHighPartInfo.PartTypeEnum.highPart.toString().equals(z.getPartType())){
-                                el += "备件号："+i.getPartNo()+"属于高值备件，不可订购！";
-                            }else if(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())){
+                    if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
+                        for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+                            ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(i.getPartNo());
+                            if(z != null ){
+                                if(ZkbHighPartInfo.PartTypeEnum.highPart.toString().equals(z.getPartType())){
+                                    el += "备件号："+i.getPartNo()+"属于高值备件，不可订购！";
+                                }else if(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())){
+                                    el += "备件号："+i.getPartNo()+"属于球管，不可订购！";
+                                }
+                            }
+                        }
+                    }else if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
+                        for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+                            List<ZkbHighPartInfo> zkbHighPartInfos = zkbHighPartInfoRepository.findBulbTube(i.getPartNo());
+                            if(zkbHighPartInfos != null && zkbHighPartInfos.size() > 0){
                                 el += "备件号："+i.getPartNo()+"属于球管，不可订购！";
                             }
                         }
@@ -1624,6 +1686,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setSpareArtificialFlag(boolean spareArtificialFlag) {
         this.spareArtificialFlag = spareArtificialFlag;
+    }
+
+    public String getItemSaveTips() {
+        return itemSaveTips;
+    }
+
+    public void setItemSaveTips(String itemSaveTips) {
+        this.itemSaveTips = itemSaveTips;
     }
 
     @Override

@@ -785,6 +785,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<SimplePartsItem> partsItemList = partsItemService.findAll();
         return partsItemList;
     }
+
+    public List<SimplePartsItem> autosparePartNameForPm(String name) {
+        List<SimplePartsItem> all = partsInventoryService.findAllByName(name);
+        return all;
+    }
+    public List<SimplePartsItem> initSparePartsMasterForPm(String name) {
+        List<SimplePartsItem> partsItemList = partsItemService.findAllByName(name);
+        return partsItemList;
+    }
+
     public void onSparePartsMasterValueChange(SelectEvent event) {
         SimplePartsItem partsItem = (SimplePartsItem) event.getObject();
         if (partsItem == null) return;
@@ -2074,6 +2084,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         String token = UserContextService.getAccessToken();
 //        String to = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ5bXlnQWRtaW4iLCJhdXRoIjoieW15Z0FkbWluIiwidWlkIjoiYmI5MDQ5NDYxMWIxNDllYzk0MWMzZTUyMTUwZDQ0YjQiLCJ1c2VySWQiOjE4Mjg4LCJleHAiOjE2MzgzNDYzOTB9.S6s0ow5Ab9RUO5Efo9XG-lAQmQxbxrf6aDsuUsnApStJ3iCdE7bjJHLs6hKJAQK-QYY4i9w8VmTlps7WZk0-iA";
         List<Integer> orgUidList = pmOrderService.getMvsAssectUids(token);
+        if (CollectionUtils.isEmpty(orgUidList)) {
+            orgUidList.add(0);
+        }
         return assetInfoMapper.getMvsPmOrders(orgUidList,tenantUid);
     }
 

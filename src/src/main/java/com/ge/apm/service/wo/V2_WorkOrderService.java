@@ -372,6 +372,8 @@ public class V2_WorkOrderService {
         formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
         formData.setSignature(selectedWorkOrder.getPartApproveSignature());
+        // 标记用于微服务端避免重复生成备件申领申购单
+        formData.setGeneratePartsRequest(false);
 
         String approvalType = "approvalReject";
         if (approvedDetails.stream().anyMatch(item -> item.getApproved())) {
