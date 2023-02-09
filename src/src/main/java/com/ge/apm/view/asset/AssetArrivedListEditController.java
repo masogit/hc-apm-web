@@ -618,6 +618,16 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
     }
 
+    public Boolean isReadOnly() {
+        Boolean result = false;
+        if(selected!=null) {
+            if(getInstalledCount() > 0 && selected.getContractItemId()!=null) { //至少有一个安装项目已经开始安装，并且绑定了合同的，不能编辑该字段
+                result = true;
+            }
+        }
+        return result;
+    }
+
     public void saveArrivalList() {
         this.save();
 

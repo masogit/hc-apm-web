@@ -136,7 +136,7 @@
                                         value="#{workOrderMgrController.partsItem}"
                                         readonly="false"
                                         forceSelection="true"
-                                        completeMethod="#{workOrderMgrController.autosparePartName()}"
+                                        completeMethod="#{workOrderMgrController.autosparePartName}"
                                         var="item" itemLabel="#{item.name}"
                                         itemValue="#{item}"
                                         converter="simplePartsItemConverter">
@@ -155,7 +155,7 @@
                         <p:autoComplete id="parts" dropdown="true"
                                         value="#{workOrderMgrController.partsItem}"
                                         readonly="false" forceSelection="true"
-                                        completeMethod="#{workOrderMgrController.initSparePartsMaster()}"
+                                        completeMethod="#{workOrderMgrController.initSparePartsMaster}"
                                         var="item" itemLabel="#{item.name}"
                                         itemValue="#{item}"
                                         converter="simplePartsItemConverter">

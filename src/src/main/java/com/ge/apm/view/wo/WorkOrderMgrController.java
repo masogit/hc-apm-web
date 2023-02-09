@@ -450,17 +450,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             itemDetail.setPartsDescription(partsItem.getPartsDescription());
         }
     }
-    public List<SimplePartsItem> autosparePartName() {
+    public List<SimplePartsItem> autosparePartName(String name) {
         List<SimplePartsItem> all = null;
         if(userContextService.isCountyArea()){
-            all = initSparePartsMaster();
+            all = initSparePartsMaster(name);
         }else{
-            all = partsInventoryService.findAll();
+            all = partsInventoryService.findAllByName(name);
         }
         return all;
     }
-    public List<SimplePartsItem> initSparePartsMaster() {
-        List<SimplePartsItem> partsItemList = partsItemService.findAll();
+    public List<SimplePartsItem> initSparePartsMaster(String name) {
+        List<SimplePartsItem> partsItemList = partsItemService.findAllByName(name);
         return partsItemList;
     }
     public boolean isEnableIntegrationWithWorkOrder() {
@@ -887,6 +887,9 @@ public void test1(){
             removeFilterOnField("assetInfo.assetOwnerId2");
             removeFilterOnField("assetInfo.assetOwnerId3");
             removeFilterOnField("assetInfo.uid");
+            removeFilterOnField("assetInfo.clinicalDeptUID");
+            removeFilterOnField("approverId");
+            removeFilterOnField("serviceRequest.status");
             Integer fillterStepId;
             if (queryIndex == 1) {//已报修 可取消
                 if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
