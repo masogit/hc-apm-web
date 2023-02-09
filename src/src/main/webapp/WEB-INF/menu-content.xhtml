@@ -83,7 +83,7 @@
                 <p:menuitem id="mirage_SiteToSiteAllocation_stats"   value="科室借调情况" outcome="/portal/secondment/departmentSecondment.xhtml"  rendered="#{userContextService.hasAnyRole('AssetStaff,ClinicalStaff,NursingStaff,DeptHead') and userContextService.enableSiteToSiteAllocation()}"   />
             </p:submenu>
 
-            <p:submenu label="报表管理" icon="fa fa-folder-open-o"  rendered="true">
+            <p:submenu label="报表管理" icon="fa fa-folder-open-o"  rendered="#{userContextService.versionContains('jmReport')}">
                 <p:menuitem  value="报表中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="true"   />
             </p:submenu>
 

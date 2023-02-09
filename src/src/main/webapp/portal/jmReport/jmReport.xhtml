@@ -48,7 +48,7 @@
 									</h:panelGroup>
 								</p:column>
 								<f:facet name="{Toolbar}">
-									<p:commandButton id="addButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{jmReportController.prepareCreate}" rendered="#{userContextService.authContains('SuperAdmin')}" oncomplete="PF('jmEditDialog').show()"/>
+									<p:commandButton id="addButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{jmReportController.prepareCreate}" rendered="#{userContextService.authContains('SuperAdmin')}" update="@(.updateTrCls) :jmEditDlg" oncomplete="PF('jmEditDialog').show()"/>
 
 									<p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btnEdit" actionListener="#{jmReportController.prepareEdit}" update="@(.updateTrCls) :jmEditDlg" disabled="#{empty jmReportController.selected.id}" rendered="#{userContextService.authContains('SuperAdmin')}" oncomplete="PF('jmEditDialog').show()"/>
 
