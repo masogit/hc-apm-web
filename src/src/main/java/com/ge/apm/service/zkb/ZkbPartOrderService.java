@@ -1604,6 +1604,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         return true;
                     }
                 }
+            }else {
+                Integer total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+                double l = total * 0.7;
+                Integer molecule = ( zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
+                if(molecule > l){
+                    return true;
+                }
             }
         }else if("PCB MVS".equals(zkbContract.getContractType())){
             Integer total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
