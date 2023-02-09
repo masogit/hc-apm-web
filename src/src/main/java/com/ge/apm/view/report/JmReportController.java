@@ -58,10 +58,12 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         siteDao =  WebUtil.getBean(TenantInfoRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         currentOrg = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-        //selectedTenant = siteDao.findByUid(loginUser.getTenantUID());
+
         this.filterBySite = false;
         this.filterByHospital = false;
+
         initRole();
+
         String reportId = WebUtil.getRequestParameter("reportId");
         if (StringUtils.isNotEmpty(reportId)) {
             selected = dao.findById(reportId);
@@ -80,7 +82,6 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
     private void setFilter() {
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID(), "1*2+"));
         searchFilters.add(new SearchFilter("assignTenant", SearchFilter.Operator.EQ, loginUser.getTenantUID(), "1*2+"));
-
     }
 
     @Override
@@ -118,6 +119,8 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         super.prepareEdit();
         if (StringUtils.isNotEmpty(selected.getAssignTenant())) {
             selectedTenant = siteDao.findByUid(selected.getAssignTenant());
+        } else {
+            selectedTenant = siteDao.findByUid(selected.getTenantUID());
         }
     }
 
