@@ -669,7 +669,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
@@ -817,7 +819,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }

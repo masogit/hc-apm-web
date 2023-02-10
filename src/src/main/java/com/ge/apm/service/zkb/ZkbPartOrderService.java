@@ -812,6 +812,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                             zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
                         }else if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
                             zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                        }else{
+                            zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
                         }
                     }
                 }else{
