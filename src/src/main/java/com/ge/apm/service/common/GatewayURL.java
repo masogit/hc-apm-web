@@ -144,8 +144,13 @@ public enum GatewayURL {
     REMOVE_USER_FROM_REDIS("/hcapmgateway/api/apm/security/userAccounts/removeUser/{loginName}"),
     USER_SIGNATURE("/hcapmmasterdataservice/api/apm/masterData/userSignature"),
     GET_CONFIG_BY_KEY_AND_SITE("/hcapmmasterdataservice/api/apm/masterData/configItem/getByKeyAndSite"),
-    ;
 
+    //es查询设备修改历史记录分页
+    SEARCH_ASSET_HISTORY("/hcapmelasticservice/assetHistory/searchAssetHistory"),
+    SEARCH_ASSET_HISTORY_LIST("/hcapmelasticservice/assetHistory/searchAssetHistoryList"),
+    INSERT_ASSET_HISTORY("/hcapmelasticservice/assetHistory/insertAssetHistory"),
+
+    ;
     private final String url;
 
     GatewayURL(String url) {
