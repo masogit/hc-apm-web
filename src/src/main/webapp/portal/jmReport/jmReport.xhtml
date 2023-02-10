@@ -27,8 +27,8 @@
 										 rows="20" emptyMessage="#{msg.noRecordFound}"
 										 rowsPerPageTemplate="20,50,100,500">
 
-								<p:ajax event="rowSelect" update="addButton editButton deleteButton roleButton"/>
-								<p:ajax event="filter" listener="#{jmReportController.onFilter}" update="addButton editButton deleteButton roleButton"/>
+								<p:ajax event="rowSelect" listener="#{jmReportController.onSelect}" update="addButton editButton deleteButton tenantButton"/>
+								<p:ajax event="filter" listener="#{jmReportController.onFilter}" update="addButton editButton deleteButton tenantButton"/>
 								<p:column headerText="报表名称">
 									<h:outputText value="#{item.name}"/>
 								</p:column>
@@ -56,9 +56,11 @@
 
 <!--									<p:commandButton id="checkButton" title="报表编辑"  icon="ui-icon-check"  action="#{jmReportController.getCheckUrl(item.id)}" disabled="#{empty jmReportController.selected.id}" />-->
 
-									<p:commandButton id="roleButton"  title="分配访问角色"  icon="ui-icon-people" class="btnEdit" actionListener="#{jmReportController.prepareEdit}" update="@(.updateTrCls) :JmRoleEditDlg" disabled="#{empty jmReportController.selected.id}" rendered="#{userContextService.authContains('ITAdmin')}" oncomplete="PF('JmRoleEditDialog').show()"/>
+									<p:commandButton id="tenantButton"  title="分配访问租户" icon="ui-icon-person" class="btnEdit" actionListener="#{jmReportController.prepareEdit}" update="@(.updateTrCls) :JmAssignTenantEditDlg" disabled="#{empty jmReportController.selected.id}" rendered="#{userContextService.authContains('SuperAdmin')}" oncomplete="PF('JmAssignTenantEditDialog').show()"/>
 
-									<p:commandButton id="deleteButton" disabled="#{empty jmReportController.selected.id}" title="#{msg.Delete}" process="@this" actionListener="#{jmReportController.delete}" update=":jmReportForm:datalist, :growl"  icon="ui-icon-close" class="delBtn" >
+<!--									<p:commandButton id="roleButton"  title="分配访问角色"  icon="ui-icon-people" class="btnEdit" actionListener="#{jmReportController.prepareEdit}" update="@(.updateTrCls) :JmRoleEditDlg" disabled="#{empty jmReportController.selected.id}" rendered="#{userContextService.authContains('ITAdmin')}" oncomplete="PF('JmRoleEditDialog').show()"/>-->
+
+									<p:commandButton id="deleteButton" disabled="#{empty jmReportController.selected.id}" title="#{msg.Delete}" process="@this" actionListener="#{jmReportController.delete}" update=":jmReportForm:datalist, :growl"  icon="ui-icon-close" class="delBtn" rendered="#{userContextService.authContains('SuperAdmin')}">
 										<p:confirm header="#{msg.DeleteConformation}"
 												   message="确定删除该报表？"
 												   icon="ui-icon-warning"/>
@@ -70,6 +72,7 @@
 				</h:form>
 				<ui:include src="jmReportEdit.xhtml"/>
 				<ui:include src="jmReportRole.xhtml"/>
+				<ui:include src="jmReportAssignTenant.xhtml"/>
 <!--				<ui:include src="jmReportView.xhtml"/>-->
 <!--				<ui:include src="jmReportCheck.xhtml"/>-->
 			</div>

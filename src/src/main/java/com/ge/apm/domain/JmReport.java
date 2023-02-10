@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -82,8 +83,31 @@ public class JmReport implements Serializable {
     @Column(name = "assign_tenant_name")
     private String assignTenantName;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "jm_report_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private List<JmReportAssignTenant> jmReportAssignTenants;
+
     @Column(name = "assign_role")
     private String assignRole;
+
+    @Column(name = "visible_range")//可见范围 -1所有租户可见  0超管可见
+    private String visibleRange;
+
+    public String getVisibleRange() {
+        return visibleRange;
+    }
+
+    public void setVisibleRange(String visibleRange) {
+        this.visibleRange = visibleRange;
+    }
+
+    public List<JmReportAssignTenant> getJmReportAssignTenants() {
+        return jmReportAssignTenants;
+    }
+
+    public void setJmReportAssignTenants(List<JmReportAssignTenant> jmReportAssignTenants) {
+        this.jmReportAssignTenants = jmReportAssignTenants;
+    }
 
     public String getAssignRole() {
         return assignRole;
