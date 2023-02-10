@@ -65,7 +65,7 @@
                                      rowsPerPageTemplate="5,20,50,100,500">
                             <p:ajax event="rowSelect"
                                     listener="#{simplePartsRequestListController.onRowSelect}"
-                                    update="editButton sparePartsDetailsForm"/>
+                                    update="editButton sparePartsDetailsForm deleteButton"/>
                             <p:column headerText="申领人">
                                 <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
@@ -112,6 +112,12 @@
                                                  actionListener="#{simplePartsRequestListController.editPartsRequest()}"
                                                  oncomplete="PF('EditPartsRequestFormDialog').show()"
                                                  update="SparePartsDetailEditForm SparePartsEditForm"/>
+                                <p:commandButton id="deleteButton" class="btn btn-sm btn-gray" icon="ui-icon-delete"
+                                                 disabled="#{not simplePartsRequestListController.deleteCheck()}"
+                                                 actionListener="#{simplePartsRequestListController.deletePartsRequset()}"
+                                                 update="sparePartsClaimForm sparePartsDetailsForm :growl">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning" />
+                                </p:commandButton>
                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
                                                  class="btn btn-sm btn-gray"
                                                  ajax="false">
@@ -301,8 +307,9 @@
                                     <label class="label">备件名称 <span style="color: red;"> *</span></label>
                                     <p:autoComplete id="sparePartName" dropdown="true" inputStyle="width: 160px"
                                                     readonly="false" forceSelection="true"
+                                                    onfocus="#{simplePartsConfigReadController.setPartsWarehouseId(simplePartsRequestEditController.selected.partsWarehouseId)}"
                                                     value="#{simplePartsRequestEditController.newLineItem.partsItem}"
-                                                    completeMethod="#{simplePartsConfigReadController.getPartsItemListInInventory(simplePartsRequestEditController.selected.partsWarehouseId)}"
+                                                    completeMethod="#{simplePartsConfigReadController.getPartsItemListInInventory}"
                                                     var="item" itemLabel="#{item.name}" required="true" requiredMessage="备件选择 #{msg.ValidationRequire}"
                                                     itemValue="#{item}"
                                                     converter="simplePartsItemConverter">

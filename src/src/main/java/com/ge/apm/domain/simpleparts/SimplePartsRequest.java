@@ -166,6 +166,18 @@ public class SimplePartsRequest implements ApprovableTarget, Serializable {
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;
 
+    /**
+     * 工单id 维修or保养的id
+     */
+    @Column(name = "order_id")
+    private String orderId;
+
+    /**
+     * 工单类型 0-维修 1-保养
+     */
+    @Column(name = "order_type")
+    private Integer orderType;
+
     @Override
     public int hashCode() {
         int hash = 0;
