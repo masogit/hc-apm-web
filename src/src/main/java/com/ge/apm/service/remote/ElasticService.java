@@ -2,13 +2,12 @@ package com.ge.apm.service.remote;
 
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.domain.AssetHistory;
+import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
-import com.ge.apm.web.TransactionForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ElasticService extends MicroServiceInvoker {
@@ -45,7 +41,6 @@ public class ElasticService extends MicroServiceInvoker {
         map.put("pageSize",pageSize);
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SEARCH_ASSET_HISTORY);
-//        String gatewayURL = "http://10.189.180.139:8882/assetHistory/searchAssetHistory";
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
@@ -71,7 +66,6 @@ public class ElasticService extends MicroServiceInvoker {
 
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map);
         String gatewayURL = getGatewayURL(GatewayURL.SEARCH_ASSET_HISTORY_LIST);
-//        String gatewayURL = "http://10.189.180.139:8882/assetHistory/searchAssetHistoryList";
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
@@ -83,17 +77,12 @@ public class ElasticService extends MicroServiceInvoker {
         }
     }
 
-    @Transactional
-    public void insertAssetHistory(AssetHistory assetHistory) throws Exception {
-        assetHistoryRepository.save(assetHistory);
+
+    public Boolean insertAssetHistory(AssetHistory assetHistory) throws Exception {
         HttpEntity<AssetHistory> requestEntity = new HttpEntity<AssetHistory>(assetHistory);
         String gatewayURL = getGatewayURL(GatewayURL.INSERT_ASSET_HISTORY);
-//        String gatewayURL = "http://10.189.180.139:8882/assetHistory/insertAssetHistory";
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-         if(!isOkay(response)){
-             throw new Exception("es insert assethistory filed");
-         }
+        return isOkay(response);
     }
-
 
 }
