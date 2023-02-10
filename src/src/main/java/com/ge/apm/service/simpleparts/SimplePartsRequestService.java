@@ -560,4 +560,10 @@ public class SimplePartsRequestService {
             return fileName;
         }
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deletePartsRequest(String id){
+        partsRequestLineItemRepository.deleteByPartsRequestId(id);
+        partsRequestRepository.delete(id);
+    }
 }

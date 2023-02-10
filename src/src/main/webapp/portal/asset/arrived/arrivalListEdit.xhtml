@@ -92,21 +92,21 @@
                                         <p:inputText value="#{assetArrivedListEditController.selected.origin}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.arrivalListInvoiceNum}</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.invoiceNum}" readonly="#{not userContextService.activeSupplier() and assetArrivedListEditController.getInstalledCount() gt 0}"/>
-                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新发票号" action="#{assetArrivedListEditController.updateInvoiceNum()}" update="@parent" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.selected.status > 1}" style="margin-left: 5px;"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
                                         <label class="label">发票日期</label>
                                         <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.invoiceDate}" maxdate="#{appContextService.curentDate}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
                                     <h:panelGroup>
+                                        <label class="label">#{msg.arrivalListInvoiceNum}</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.invoiceNum}" readonly="#{not userContextService.activeSupplier() and assetArrivedListEditController.isReadOnly()}"/>
+                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新发票号" action="#{assetArrivedListEditController.updateInvoiceNum()}" update="@parent" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.selected.status > 1}" style="margin-left: 5px;"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
                                         <label class="label">#{msg.arrivalListContractNum}</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.contractNum}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                        <p:inputText value="#{assetArrivedListEditController.selected.contractNum}" readonly="#{assetArrivedListEditController.isReadOnly()}" />
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListContractPrice}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
-                                        <p:inputNumber  maxValue="99999999"  decimalPlaces="2" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.arrivalListContractPrice}#{msg.ValidationRequire}"/>
+                                        <p:inputNumber  maxValue="99999999"  decimalPlaces="2" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.isReadOnly()}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.arrivalListContractPrice}#{msg.ValidationRequire}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListAgent}</label>
@@ -180,7 +180,7 @@
                                         </h:panelGroup>
                                     </c:if>
                                 </p:panelGrid>
-                                <h:panelGroup rendered="#{assetArrivedListEditController.selected.status eq 2 and assetArrivedListEditController.getInstalledCount() eq 0}">
+                                <h:panelGroup rendered="#{assetArrivedListEditController.selected.status ne 1}">
                                     <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveArrivalList()}" process="arrivalListHeader"  update=":growl"/>
                                 </h:panelGroup>
 

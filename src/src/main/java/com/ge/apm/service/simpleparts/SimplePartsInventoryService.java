@@ -163,4 +163,38 @@ public class SimplePartsInventoryService {
         }
     }
 
+    /**
+     * @return java.util.List<com.ge.apm.domain.simpleparts.PartsInventory>
+     * @throws
+     * @params []
+     * @author csh
+     * @createTime 2020/6/8 14:53
+     * @description 查找所有的备件库存信息
+     */
+    public List<SimplePartsItem> findAllByName(String name) {
+        List<SimplePartsItem> list = Lists.newArrayList();
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        List<SimplePartsWareHouseOrg> simplePartsWareHouseOrgList = simplePartsWarehouseOrgRepository.findAllByOrgUid(currentUserAccount.getSiteUID());
+        if(simplePartsWareHouseOrgList.size() == 0){
+            logger.info("根据当前操作用户,未查询到关联的仓库组织. SiteUID : " +currentUserAccount.getOrgInfoUID());
+            return list;
+        }
+
+        Set<String> partsWarehouseIds = simplePartsWareHouseOrgList.stream().map(p->p.getPartsWarehouseId()).collect(Collectors.toSet());
+        List<SimplePartsWarehouse>  simplePartsWarehouseList = simplePartsWarehouseRepository.getByIds(currentUserAccount.getTenantUID(),partsWarehouseIds);
+
+        if(simplePartsWarehouseList.size() == 0){
+            logger.info("根据当前操作用户,未查询到关联的仓库. SiteUID : " +currentUserAccount.getOrgInfoUID());
+            return list;
+        }
+        Set<String> partsWarehouseIds2 = simplePartsWarehouseList.stream().map(p->p.getId()).collect(Collectors.toSet());
+
+        List<SimplePartsInventory> all = partsInventoryRepository.findByPartsWarehouseIdsAndName(partsWarehouseIds2, name);
+        if(all.size() > 0){
+            Set<String> uidSet = all.stream().filter(item -> item.getPartsItemId() !=null).map(item -> item.getPartsItemId()).collect(Collectors.toSet());
+            list = this.findByIds(uidSet);
+        }
+        return list;
+    }
+
 }

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.sharedasset.SharedAssetRequestService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
@@ -23,6 +24,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
@@ -80,6 +82,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private String filterApplyTime = null;
     private UserAccount selectedAssignee;
     private UserContextService userContextService;
+    private Integer dialogTitle;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -1194,7 +1197,25 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             return;
         }
     }
-    
+    public void rejectApply(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        Map<String, Object> params = new HashMap<>();
+        String id = selected.getId();
+        params.put("id", id);
+        params.put("rejectShelveRemark",selected.getRejectShelveRemark());
+        ResponseEntity<LinkedHashMap> result = null;
+        try {
+            result = sharedAssetService.rejectApply(GatewayURL.REJECT_APPLY, params);
+            logger.info("拒绝借用申请：id="+id);
+            String url = "List.xhtml?faces-redirect=true";
+            requestContext.addCallbackParam("url", url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            WebUtil.addErrorMessage("申请已取消或已受理，请返回并刷新！");
+            requestContext.addCallbackParam("url","norespond");
+        }
+
+    }
     public void AcceptR() throws Exception {
        String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
@@ -1231,8 +1252,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int state = 5;//5为借用搁置状态
         RequestContext requestContext = RequestContext.getCurrentInstance();
        if(sta == 1){//借用待受理状态
-           dao.updateState(uid, state);
-
+           //dao.updateState(uid, state);
+           realSAR.setState(state);
+           realSAR.setRejectShelveRemark(selected.getRejectShelveRemark());
+            dao.save(realSAR);
            //调用微服务
            try {
                sharedAssetService.pushWxMsg(selected.getId());
@@ -1959,6 +1982,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         searchFilters.clear();
         bean.onSelectSiteTreeNode(event);
 
+    }
+    public void editDialogTitle(Integer dialog){
+        this.dialogTitle=dialog;
+    }
+    public Integer getDialogTitle() {
+        return dialogTitle;
+    }
+
+    public void setDialogTitle(Integer dialogTitle) {
+        this.dialogTitle = dialogTitle;
     }
 }
     

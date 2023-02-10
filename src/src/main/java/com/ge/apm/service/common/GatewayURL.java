@@ -104,6 +104,7 @@ public enum GatewayURL {
     LEASE_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/rent/shortcut"),
     RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut"),
     GET_VOUCHER_NUM("/hcapmworkflowservice/api/apm/allocation/voucherNum"),
+    REJECT_APPLY("/hcapmworkflowservice/api/apm/allocation/rent/rejectApply"),
 
     BATCH_FILE_UPLOAD("/hcapmreportservice/api/apm/batchFile/upload"),
 

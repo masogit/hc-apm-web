@@ -27,4 +27,10 @@ public interface SimplePartsItemRepository extends GenericRepositoryUUID<SimpleP
     void updatePartsItemPartsCategoryByIds(Set<String> partsItemIds,String categoryName,String categoryCode);
 
     List<SimplePartsItem> findByName(String name);
+
+    @Query(value = "select * from simple_parts_item where tenant_uid = ?1 and name like concat('%',?2,'%')", nativeQuery = true)
+    List<SimplePartsItem> findByTenantUidAndName(String tenantUID, String name);
+
+    @Query(value = "select * from simple_parts_item where id in ?1 and name like concat('%',?2,'%')", nativeQuery = true)
+    List<SimplePartsItem> findByUidAndName(Set<String> uids, String name);
 }
