@@ -94,7 +94,7 @@ public class AssetHistoryService {
 //        List<AssetHistory> resultList = assetHistoryRepository.findByUidOrderByCreatedDateDescAtMostFive(assetUid);
         List<SearchFilter> searchFilters =new ArrayList<> ();
         searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ,assetUid));
-        Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, null, 0, 5);
+        Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), 0, 5);
         List<AssetHistory> resultList = assetHistoryPage.getContent();
         CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         resultList = resultList.stream().filter(assetHistory -> {
