@@ -427,13 +427,14 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         String format = "yyyy-MM-dd";
         String dateStr = DateUtil.getFormatStrByDate(this.selected.getReportDate(), format);
         Date reportDate = DateUtil.getDateByFormatStr(dateStr, format);
-        if (reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0){
+        //GE FE合同到期后400下单前增加Commercial角色进行审批  且不是599合同
+        if ((reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0)&&!"Y".equals(zkbContract.getFiveNineNineFlag())){
             workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString();
         }
         String result = this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 workFlowStep, date, null, GatewayURL.FE_PART_ORDER_SEND_EMAIL);
         //注意：流程为WaitingCommercial审批时需要发微信、短信、邮件通知
-        if(workFlowStep.equals(ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString())){
+        if(workFlowStep.equals(ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString())&&!"Y".equals(zkbContract.getFiveNineNineFlag())){
             this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
             this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
         }
