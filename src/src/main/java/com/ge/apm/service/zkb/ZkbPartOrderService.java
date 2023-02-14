@@ -795,7 +795,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     if(ZkbContract.ContractType.DI.toString().equals(c.getContractType()) ||
                             ZkbContract.ContractType.PCB.toString().equals(c.getContractType()) ||
                             "PCB MVS".equals(c.getContractType())){
-                        isNewPartChange = true;
+                        AssetInfo a = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                        if(a != null && a.getAssetGroup() != null && a.getAssetGroup().equals(1)){
+                            isNewPartChange = true;
+                        }
                     }
                 }
                 if(isNewPartChange){
