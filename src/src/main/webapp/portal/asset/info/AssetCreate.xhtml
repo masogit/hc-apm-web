@@ -116,7 +116,7 @@
             <div class="ui-g-12 card">
 
                 <p:tabView id="tab">
-                    <p:tab title="#{msg.Create2}">
+                    <p:tab title="#{assetInfoEditController.CRUDActionName}">
                         <h:form id="AssetInfoEditForm">
                             <c:if test="#{assetInfoEditController.CRUDActionName.equals('新增') or assetInfoEditController.CRUDActionName.equals('')}">
                                 <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
