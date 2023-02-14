@@ -8,27 +8,27 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
-
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
 public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDController<InventoryOrderDetail> implements Serializable, ServerEventInterface {
+
+    private PageUtil<InventoryOrderDetail> pageUtil = new PageUtil();
 
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
@@ -268,15 +268,10 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                     inventoryOrderDetails.add(inventoryOrderDetail);
                 }
             }
-            int size = inventoryOrderDetails.size();
-            inventoryOrderDetails= this.pageNum(inventoryOrderDetails, pageRequest);
-            Page<InventoryOrderDetail>  inventoryOrderDetailPage = new PageImpl<InventoryOrderDetail>(inventoryOrderDetails, pageRequest, size);
+            Page<InventoryOrderDetail>  inventoryOrderDetailPage = pageUtil.pageNum(inventoryOrderDetails, pageRequest);
             return inventoryOrderDetailPage;
         }
-        int size = inventoryOrderDetailList.size();
-        inventoryOrderDetailList= this.pageNum(inventoryOrderDetailList, pageRequest);
-        Page<InventoryOrderDetail>  inventoryOrderDetailPage = new PageImpl<InventoryOrderDetail>(inventoryOrderDetailList, pageRequest, size);
-        //after
+        Page<InventoryOrderDetail>  inventoryOrderDetailPage = pageUtil.pageNum(inventoryOrderDetailList, pageRequest);
 		return inventoryOrderDetailPage;
 	}
     public String  getUserName(String loginName){
@@ -288,20 +283,6 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             return userAccount.getName();
         }
         return null;
-    }
-	private List<InventoryOrderDetail> pageNum(List<InventoryOrderDetail> inventoryOrderDetailList,PageRequest pageRequest){
-        int pageNumber = pageRequest.getPageNumber();
-        int pageSize = pageRequest.getPageSize() - 1;
-        int numStart = pageNumber * pageSize;
-        numStart = numStart + pageNumber;
-        int numEnd = numStart + pageSize + 1;
-        int size = inventoryOrderDetailList.size();
-        if(size > numEnd){
-            inventoryOrderDetailList = inventoryOrderDetailList.subList(numStart ,numEnd);
-        }else {
-            inventoryOrderDetailList = inventoryOrderDetailList.subList(numStart ,size);
-        }
-        return inventoryOrderDetailList;
     }
 
 	private void addSearchFiltersListNew(List<SearchFilter> searchFilters,List<SearchFilter> searchFiltersListNew){

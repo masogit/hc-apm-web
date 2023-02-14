@@ -11,8 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class JmReportController extends GenericCRUDUUIDController<JmReport> {
+
+    private PageUtil<JmReport> pageUtil = new PageUtil();
 
     private JmReportRepository dao;
     private TenantInfoRepository siteDao;
@@ -48,7 +50,6 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
     private List<String> assignedTenants;
     @Setter
     private List<SysRoleVO> roleListVO;
-
 
     @Override
     protected void init() {
@@ -81,7 +82,12 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         roleListVO = uaaService.getSysRoleVO(loginUser.getTenantUID());
     }
 
-    private void setFilter() {
+    private List<JmReport> setFilter(List<JmReport> reports) {
+        if (CollectionUtils.isNotEmpty(this.searchFilters)) {
+            String name = (String) searchFilters.get(0).value;
+            return reports.stream().filter(val -> val.getName().contains(name)).collect(Collectors.toList());
+        }
+        return reports;
     }
 
     @Override
@@ -89,35 +95,29 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        setFilter();
         List<JmReport> reports = dao.findByTenantUid(loginUser.getTenantUID());
         List<JmReport> reportIds = new ArrayList();
         if (!userContextService.hasAnyRole("SuperAdmin,ITAdmin")) {
             reports.forEach(val -> {
-                JmReportAssignTenant assignTenant = val.getJmReportAssignTenants().stream().filter(tenants -> tenants.getAssignTenant().equals(loginUser.getTenantUID()) && tenants.getJmReportId().equals(val.getId())).collect(Collectors.toList()).get(0);
-                if (!userContextService.hasAnyRole(assignTenant.getAssignRole())) {
-                    reportIds.add(val);
+                List<JmReportAssignTenant> list = val.getJmReportAssignTenants().stream().filter(tenants -> tenants.getAssignTenant()
+                        .equals(loginUser.getTenantUID()) && tenants.getJmReportId().equals(val.getId())).collect(Collectors.toList());
+                if (CollectionUtils.isNotEmpty(list)) {
+                    JmReportAssignTenant tenant = list.get(0);
+                    if (!userContextService.hasAnyRole(tenant.getAssignRole())) {
+                        reportIds.add(val);
+                    }
+                } else {
+                    if (!userContextService.hasAnyRole("ITAdmin")) {
+                        reportIds.add(val);
+                    }
                 }
+
             });
         }
         reports.removeAll(reportIds);
-        int size = reports.size();
-        return new PageImpl<>(pageNum(reports, pageRequest), pageRequest, size);
-    }
-
-    private List<JmReport> pageNum(List<JmReport> jmReportList, PageRequest pageRequest) {
-        int pageNumber = pageRequest.getPageNumber();
-        int pageSize = pageRequest.getPageSize() - 1;
-        int numStart = pageNumber * pageSize;
-        numStart = numStart + pageNumber;
-        int numEnd = numStart + pageSize + 1;
-        int size = jmReportList.size();
-        if(size > numEnd){
-            jmReportList = jmReportList.subList(numStart ,numEnd);
-        }else {
-            jmReportList = jmReportList.subList(numStart ,size);
-        }
-        return jmReportList;
+        reports = setFilter(reports);
+        Page<JmReport> pages = pageUtil.pageNum(reports, pageRequest);
+        return pages;
     }
 
     @Override
@@ -159,22 +159,13 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         dao.save(selected);
     }
 
-    public void tenantChange() {
-        if (tenantId != null && tenantId != selectedTenant.getId()) {
-            selectedTenant = siteDao.findById(tenantId);
-        }
-    }
-
     public void assignTenant(ValueChangeEvent e) {
-        List<String> newValues = (List<String>) e.getNewValue();
-        List<String> oldValues = (List<String>) e.getOldValue();
-        List<String> newlyCheckedRoles = (List<String>) CollectionUtils.subtract(newValues, oldValues);
-        assignedTenants.clear();
-        newlyCheckedRoles.forEach(val -> assignedTenants.add(val));
+        assignList(assignedTenants, e);
     }
 
     public List<String> getAssignedTenants() {
         if (CollectionUtils.isEmpty(assignedTenants)) {
+            assignedTenants = new ArrayList<>();
             if (selected != null && selected.getJmReportAssignTenants() != null) {
                 selected.getJmReportAssignTenants().forEach(val -> assignedTenants.add(val.getAssignTenant()));
             }
@@ -198,11 +189,15 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
     }
 
     public void assignRole(ValueChangeEvent e) {
+        assignList(assignedRoles, e);
+    }
+
+    public void assignList(List<String> list, ValueChangeEvent e) {
         List<String> newValues = (List<String>) e.getNewValue();
         List<String> oldValues = (List<String>) e.getOldValue();
         List<String> newlyCheckedRoles = (List<String>) CollectionUtils.subtract(newValues, oldValues);
-        assignedRoles.clear();
-        newlyCheckedRoles.forEach(val -> assignedRoles.add(val));
+        list.clear();
+        newlyCheckedRoles.forEach(val -> list.add(val));
     }
 
     public void saveAssignRole() {
@@ -216,8 +211,16 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
 
     public List<String> getAssignedRoles() {
         if (CollectionUtils.isEmpty(assignedRoles)) {
+            assignedRoles = new ArrayList<>();
             if (selected != null) {
                 JmReportAssignTenant assignTenant = assignTenantDao.findByJmReportIdAndTenantUid(selected.getId(), loginUser.getTenantUID());
+                if (assignTenant == null) {
+                    assignTenant = new JmReportAssignTenant();
+                    assignTenant.setJmReportId(selected.getId());
+                    assignTenant.setAssignTenant(loginUser.getTenantUID());
+                    assignTenant.setAssignRole("ITAdmin");
+                    assignTenantDao.save(assignTenant);
+                }
                 assignedRoles = Arrays.stream(assignTenant.getAssignRole().split(",")).collect(Collectors.toList());
             }
         }
@@ -238,32 +241,29 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         dao.delete(selected);
     }
 
-    public String getViewUrl(String reportId) {
-        if (StringUtils.isNotEmpty(reportId)) {
-            return "/portal/jmReport/jmReportView.xhtml?faces-redirect=true&amp;reportId=" +  reportId ;
-        }
-        return "";
+    public void getViewUrl(JmReport jmReport) {
+        this.selected = jmReport;
     }
 
-    public String getCheckUrl(String reportId) {
-        if (StringUtils.isNotEmpty(reportId)) {
-            return "/portal/jmReport/jmReportCheck.xhtml?faces-redirect=true&amp;reportId=" +  reportId ;
+    public String openNewWindowView(String reportId) {
+        if (StringUtils.isEmpty(reportId)) {
+            return "";
         }
-        return "";
+        return "/portal/jmReport/jmReportView.xhtml?faces-redirect=true&amp;reportId=" +  reportId ;
     }
 
-    public String view() {
-        if (selected != null) {
-            return  selected.getReportViewUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+    public String view(int type) {
+        if (selected == null) {
+            return "";
         }
-        return "";
-    }
-
-    public String check() {
-        if (selected != null) {
-            return  selected.getReportEditUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+        switch (type) {
+            case 1:
+                return selected.getReportViewUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+            case 2:
+                return selected.getReportEditUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+            default:
+                return "";
         }
-        return "";
     }
 
 }
