@@ -17,7 +17,7 @@
                         <p:outputLabel class="pageTitle" value="报表预览"/>
                     </div>
                     <p:panelGrid columns="1" layout="grid">
-                        <iframe src="#{jmReportController.view()}" style="width: 1650px;height: 800px"> </iframe>
+                        <iframe src="#{jmReportController.view(1)}" style="width: 1650px;height: 800px"> </iframe>
                     </p:panelGrid>
                     <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back"  immediate="true" onclick="javascript:goBack();"/>
                 </div>
