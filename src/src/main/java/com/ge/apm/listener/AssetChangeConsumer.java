@@ -1,5 +1,6 @@
 package com.ge.apm.listener;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
@@ -53,7 +54,6 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 
         try {
             LOGGER.info("mq 监听的消息 message :{}",mqContext);
-
             JSONObject jsonObject = mqContext.getJsonObject();
             String assetInfoString = (String) jsonObject.get("assetInfo");
             Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -77,6 +77,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                     return;
                 }
                 AssetHistory assetHistory = list.get(0);
+                LOGGER.info("mq 查询出history最近记录 assetuid:{},  assetHistory:{}",newAsset.getUid(), JSON.toJSONString(assetHistory));
+
                 String assetJson = assetHistory.getAssetJson();
                 if(StringUtils.isEmpty(assetJson)){
                     LOGGER.info("update  asset  assetJson is null assetUid:{},historyUid:{}",newAsset.getUid(),assetHistory.getUid());
