@@ -74,4 +74,15 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
 
     @Query(value = "select * from tenant_info where tenant_config like '%\"audit\"%' order by name", nativeQuery = true)
     public List<TenantInfo> getAllByTenantConfig();
+
+
+    /**
+     * 查询当前时间有效的合同的租户
+     * @param
+     * @param
+     * @return
+     */
+    @Query(value = "SELECT ti.* from zkb_contract zkbc inner join tenant_info ti on zkbc.tenant_uid = ti.uid where ti.type='3' and NOT ((end_date < ?1) OR (start_date > ?2)) and zkbc.contract_amount='oneMillionMore' and zkbc.start_date<=to_date(?1,'yyyy-MM-dd')  and zkbc.end_date>=to_date(?1,'yyyy-MM-dd');", nativeQuery = true)
+    List<TenantInfo> findTenantInfoListByContractDate(Date firstDay,Date lastDay);
+
 }

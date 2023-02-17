@@ -20,6 +20,7 @@ import webapp.framework.dao.SearchFilter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -46,6 +47,10 @@ public class ZkbIntegralService {
 
     @Autowired
     private TenantInfoRepository tenantInfoDao;
+
+    @Autowired
+    private ZkbKeyBehaviorIndexService zkbKeyBehaviorIndexService;
+
 
     public List<TenantInfo> getSourceTenantInfoList(){
         List<SearchFilter> searchFilters = new ArrayList<>();
@@ -82,8 +87,14 @@ public class ZkbIntegralService {
         if(StringUtils.isEmpty(kpiMonth)){
             kpiMonth = simpleDateFormat.format(new Date());
         }
+
+        List<TenantInfo> tenantInfoList = tenantInfoDao.findTenantInfoListByContractDate(zkbKeyBehaviorIndexService.getFirstDay(new Date(kpiMonth)),zkbKeyBehaviorIndexService.getLastDay(new Date(kpiMonth)));
+        Set<String> uiDset= tenantInfoList.stream().map(TenantInfo::getUid).collect(Collectors.toSet());
         if(zkbIntegral != null){
             cof = calcCoefficient(zkbIntegral);
+            if (uiDset.contains(tenantUID)){
+                cof = 2;
+            }
             score = cof * score;
             List<String> recordTypes = new ArrayList<>();
             recordTypes.add(ZkbIntegralRecord.RecordType.KpiAdd.toString());
@@ -111,7 +122,11 @@ public class ZkbIntegralService {
             zkbIntegral.setIntegralTotal(initialScore);
             zkbIntegral.setTenantUID(tenantUID);
             zkbIntegral.setCoefficient(initCoefficient);
-            score = initCoefficient * score;
+            if (uiDset.contains(tenantUID)){
+                score = 2 * score;
+            }else{
+                score = initCoefficient * score;
+            }
             if (ZkbIntegralRecord.RecordType.KpiDelete.toString().equals(recordType)){
                 zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() - score);
             }else{
@@ -129,6 +144,9 @@ public class ZkbIntegralService {
         zkbIntegralRecord.setZkbIntegralId(zkbIntegral.getId());
         zkbIntegralRecord.setCreatedBy(userAccount.getName());
         zkbIntegralRecord.setCreatedDate(new Date());
+        if (uiDset.contains(tenantUID)){
+            zkbIntegralRecord.setRemark("合同金额超过一百万，积分系数为2");
+        }
         zkbIntegralRecordRepository.save(zkbIntegralRecord);
         return "";
     }
