@@ -82,7 +82,7 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
      * @param
      * @return
      */
-    @Query(value = "SELECT ti.* from zkb_contract zkbc inner join tenant_info ti on zkbc.tenant_uid = ti.uid where ti.type='3' and NOT ((end_date < ?1) OR (start_date > ?2)) and zkbc.contract_amount='oneMillionMore' and zkbc.start_date<=to_date(?1,'yyyy-MM-dd')  and zkbc.end_date>=to_date(?1,'yyyy-MM-dd');", nativeQuery = true)
+    @Query(value = "SELECT ti.* from zkb_contract zkbc inner join tenant_info ti on zkbc.tenant_uid = ti.uid where ti.type='3' and NOT ((end_date < ?1) OR (start_date > ?2)) and zkbc.contract_amount='oneMillionMore' ", nativeQuery = true)
     List<TenantInfo> findTenantInfoListByContractDate(Date firstDay,Date lastDay);
 
 }
