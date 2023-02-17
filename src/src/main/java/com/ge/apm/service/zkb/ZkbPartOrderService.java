@@ -1022,6 +1022,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }else{
             if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.DirectorAccept.toString().equals(zkbPartOrder.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString().equals(zkbPartOrder.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.CommercialAccept.toString().equals(zkbPartOrder.getStatus())){
                 zkbPartOrder.setOrderedDate(new Date());
                 zkbPartOrder.setOrderedAuditerUid(userAccount.getUid());
