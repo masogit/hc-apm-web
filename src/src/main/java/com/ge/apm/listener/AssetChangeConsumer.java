@@ -67,7 +67,7 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("pageNum",0);
                 map.put("pageSize",1);
-                map.put("asset_uid",newAsset.getUid());
+                map.put("assetUid",newAsset.getUid());
                 map.put("sortField","created_date");
                 map.put("sortValue","DESC");
                 List<AssetHistory> list = elasticService.searchAssetHistoryList(map);
@@ -88,6 +88,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                 AssetInfo assetInfo = g.fromJson(assetJson, AssetInfo.class);
                 UserAccountThreadLocal.setUserAccount(currentUserAccount);
                 resultList = assetHistoryService.getAssetsHistoryModifiedFields(assetInfo, newAsset);
+                LOGGER.info("mq 数据比对 assetuid:{},  assetHistory:{}",newAsset.getUid(), JSON.toJSONString(resultList));
+
                 UserAccountThreadLocal.remove();
             }
 
