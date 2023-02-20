@@ -8,7 +8,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,10 +96,9 @@ public class ZkbIntegralService {
             if(zkbIntegral != null){
                 cof = calcCoefficient(zkbIntegral);
                 if (uiDset.contains(tenantUID)){
-                    score = 2 * score;
-                }else{
-                    score = cof * score;
+                    cof = 2;
                 }
+                score = cof * score;
                 List<String> recordTypes = new ArrayList<>();
                 recordTypes.add(ZkbIntegralRecord.RecordType.KpiAdd.toString());
                 recordTypes.add(ZkbIntegralRecord.RecordType.KpiModify.toString());
@@ -150,6 +148,7 @@ public class ZkbIntegralService {
             zkbIntegralRecord.setCreatedDate(new Date());
             if (uiDset.contains(tenantUID)){
                 zkbIntegralRecord.setRemark("合同金额超过一百万，积分系数为2");
+                zkbIntegralRecord.setCurrentCoefficient(2);
             }
             zkbIntegralRecordRepository.save(zkbIntegralRecord);
             return "SUCCESS";
