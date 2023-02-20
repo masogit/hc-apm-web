@@ -97,9 +97,10 @@ public class ZkbIntegralService {
             if(zkbIntegral != null){
                 cof = calcCoefficient(zkbIntegral);
                 if (uiDset.contains(tenantUID)){
-                    cof = 2;
+                    score = 2 * score;
+                }else{
+                    score = cof * score;
                 }
-                score = cof * score;
                 List<String> recordTypes = new ArrayList<>();
                 recordTypes.add(ZkbIntegralRecord.RecordType.KpiAdd.toString());
                 recordTypes.add(ZkbIntegralRecord.RecordType.KpiModify.toString());
