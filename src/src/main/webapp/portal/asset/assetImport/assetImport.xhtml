@@ -244,6 +244,8 @@
                 var toDeleteCheckedNurseSite = args.toDeleteCheckedNurseSite
                 if(unCheckedNurseSite==true && toDeleteCheckedNurseSite == false) {
                     PF('toDeleteCheckedNurseSite').show()
+                } else {
+                    PF('toCreateRuleDialog').show()
                 }
                 PF('statusDialogForImport').hide()
             }
@@ -251,7 +253,11 @@
             //]]>
         </script>
 
-
+        <p:dialog widgetVar="toCreateRuleDialog" modal="true" class="toCreateRuleDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:fieldset legend="请分别绑定保养规则、临床助手规则和日常使用登记规则！">
+                <p:commandButton immediate="true" value="确定" icon="ui-icon-check" oncomplete="PF('toCreateRuleDialog').hide()"  update=":growl"/>
+            </p:fieldset>
+        </p:dialog>
         <p:dialog widgetVar="statusDialogForImport" modal="true" class="ajaxStatusDialog" draggable="false" closable="false" resizable="false" showHeader="false">
             <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"></i>
         </p:dialog>

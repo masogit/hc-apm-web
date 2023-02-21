@@ -132,6 +132,11 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
         return pageResult;
     }
 
+	public List<NurseSiteMaintainConfigJN> getConfigList() {
+		Page<NurseSiteMaintainConfigJN> result = loadData(new PageRequest(0,1000));
+		return result.getContent();
+	}
+
 	public void onSelectSiteTreeNode(NodeSelectEvent event) {
 		if(searchFilters!=null) searchFilters.clear();
 
@@ -514,11 +519,11 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 			return true;
 		}
 	}
-	
-//	public void onSelectedCheckItemChange(){
-//		checkSaveDisable();
-//	}
-	
+
+    public void onSelectedCheckItemChange() {
+
+	}
+
 	public void onAssetsTransfer(TransferEvent event) {
 		List<AssetInfo> collection=(List<AssetInfo>) event.getItems();
 		if(collection!=null && collection.size()>0){
