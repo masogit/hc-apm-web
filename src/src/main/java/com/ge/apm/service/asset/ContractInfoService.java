@@ -8,9 +8,11 @@ package com.ge.apm.service.asset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.ge.apm.dao.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +46,8 @@ public class ContractInfoService {
     @Autowired
     private ArrivalListRepository arrivalDao;
     @Autowired
+    private ArrivalListItemRepository arrivalListItemDao;
+    @Autowired
     private BlobFileService blobService;
     @Autowired
     private V2_WorkOrderDetailRepository partsDao;
@@ -55,6 +59,8 @@ public class ContractInfoService {
     private UserAccountService userAccountService;
     @Autowired
     private AssetInfoRepository assetInfoDao;
+    @Autowired
+    private AssetInfoMgrService assetInfoMgrService;
 
     public List<ContractInfoItem> getContractItems(String id) {
         return contractItemDao.findByContractId(id);
@@ -113,20 +119,51 @@ public class ContractInfoService {
         if (null == contract) {
             return false;
         }
+        List<V2_BlobObject> blobList = blobService.findBlobObjectsByBoUid(contract.getId());
         List<ContractInfoItem> contractItems = getContractItems(contract.getId());
+        if (CollectionUtils.isEmpty(contractItems)) {
+            blobList.stream().forEach(item -> blobService.deleteBlobFile(item));
+            contractDao.delete(contract);
+            return true;
+        }
         List<ArrivalList> arrivalList = arrivalDao.findByContractItemIdIn(contractItems.stream().map(ContractInfoItem::getId).collect(Collectors.toList()));
         if (arrivalList != null && !arrivalList.isEmpty()) {
             return false;
         }
-        List<V2_BlobObject> blobList = blobService.findBlobObjectsByBoUid(contract.getId());
         blobList.stream().forEach(item -> blobService.deleteBlobFile(item));
-
         contractItemDao.delete(contractItems);
         contractDao.delete(contract);
-
         return true;
     }
 
+    /**
+     * 无限制合同删除
+     **/
+    @Transactional
+    public boolean deleteContractUnlimited(ContractInfo contract) {
+        if (null != contract) {
+            List<ContractInfoItem> contractItems = getContractItems(contract.getId());
+            List<ArrivalList> arrivalList = Optional.ofNullable(arrivalDao.findByContractItemIdIn(contractItems.stream().map(ContractInfoItem::getId).collect(Collectors.toList()))).orElse(new ArrayList<>());
+            contractItems.forEach(contractInfoItem -> {
+                try {
+                    if (null != contractInfoItem.getAssetInfo()) {
+                        assetInfoMgrService.deleteAssetForever(contractInfoItem.getAssetInfo());
+                    } else {
+                        contractItemDao.delete(contractInfoItem);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            arrivalList.forEach(list -> {
+                List<ArrivalListItem> arrivalListItems = arrivalListItemDao.findByArrivalListId(list.getId());
+                arrivalListItemDao.delete(arrivalListItems);
+                arrivalDao.delete(list);
+            });
+            return true;
+        }
+        return false;
+    }
 //    public List<V2_WorkOrder_Detail> getPartsInfo(String contractNum, String tenantUid) {
 //
 //        return partsDao.findByContractNum(contractNum, tenantUid);
