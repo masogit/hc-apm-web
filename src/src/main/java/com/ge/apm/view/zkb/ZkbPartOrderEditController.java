@@ -602,10 +602,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public boolean isItemCreateDisabled(){
-        if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
-            if (assetInfo.getAssetGroup().equals(1)) {
-                if(StrUtil.isEmpty(selected.getRadiationQuotaType())){
-                    return true;
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
+                if (assetInfo.getAssetGroup().equals(1)) {
+                    if(StrUtil.isEmpty(selected.getRadiationQuotaType())){
+                        return true;
+                    }
                 }
             }
         }
