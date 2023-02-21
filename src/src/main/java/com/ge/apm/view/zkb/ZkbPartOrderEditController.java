@@ -626,7 +626,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String itemSaveTips = "";
     public void saveItem(){
         zkbPartOrderItem.setPartNo(zkbPartOrderItem.getPartNo().trim());
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())) {
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)) {
             if (ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
                 if (assetInfo.getAssetGroup().equals(1)) {
                     RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
