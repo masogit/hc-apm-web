@@ -151,6 +151,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         return pageResult;
     }
 
+    public List<NurseSiteMaintainConfig> getConfigList() {
+		Page<NurseSiteMaintainConfig> result = loadData(new PageRequest(0,1000));
+		return result.getContent();
+	}
+
 	public void onSelectSiteTreeNode(NodeSelectEvent event) {
 		if(searchFilters!=null) searchFilters.clear();
 
