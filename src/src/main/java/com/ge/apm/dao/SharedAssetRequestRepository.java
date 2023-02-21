@@ -50,4 +50,23 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
 
     @Query(value = "select o from SharedAssetRequest o where o.state in :states")
     public List<SharedAssetRequest> findListByState(@Param("states") List<Integer> states);
+
+    @Query(value = "select  sum(num) from \n" +
+                        "(select  \n" +
+                        "case when sar.state=1  then sart.apply_qty \n" +
+                        "    when sar.state=2  then sart.actual_qty \n" +
+                        "    else sart.actual_qty end num \n" +
+                        " from  shared_asset_request  sar \n" +
+                        "left join shared_asset_req_type sart on sart.shared_id=sar.id \n" +
+                        "left join  shared_asset_req_detail  sard on sard.borrow_id=sar.id and sard.return_id is null \n" +
+                        "where sar.site_uid=?1 and sart.shared_asset_type=?2 and sar.state in (1,2,6)) t ",nativeQuery = true)
+    Integer getBorrowingCount(String siteUid, String sharedAssetTypeId);
+
+    @Query(value = "select  \n" +
+            "sum(rent_qty) \n" +
+            "from  shared_asset_request  sar \n" +
+            "left join shared_asset_req_type sart on sart.shared_id=sar.id \n" +
+            "left join  shared_asset_req_detail  sard on sard.return_id=sar.id \n" +
+            "where sar.site_uid=?1 and sart.shared_asset_type=?2 and sar.state in (7,8,9)",nativeQuery = true)
+    Integer getReturningCount(String siteUid, String sharedAssetTypeId);
 }
