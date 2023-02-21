@@ -298,9 +298,9 @@ public class ZkbContractImportService {
             }
             if(StringUtils.isNotEmpty(newZkbContract.getContractAmount())){
                 if("100W/年以下".equals(newZkbContract.getContractAmount())){
-                    zkbContract.setContractAmount(ZkbContract.ContractAmount.oneMillionLess.toString());
+                    newZkbContract.setContractAmount(ZkbContract.ContractAmount.oneMillionLess.toString());
                 }else if("100W/年以上".equals(contractInfoVO.getContractAmount())){
-                    zkbContract.setContractAmount(ZkbContract.ContractAmount.oneMillionMore.toString());
+                    newZkbContract.setContractAmount(ZkbContract.ContractAmount.oneMillionMore.toString());
                 }
             }
             if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
