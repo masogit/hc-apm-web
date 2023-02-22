@@ -17,6 +17,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.mapper.DefaultMapper;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
@@ -167,15 +168,22 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
                 if (status != null) {
                     if (status == 1) {
                         arrivalList.setCannotDeleted(false);
-                    } else if (status == 2) {
+                    } else {
                         List<ArrivalListItem> items = aiService.getListItem(arrivalList.getId());
                         if (items != null) {
                             arrivalList.setCannotDeleted(true);
-                            boolean installed = false;
+                            boolean installed = true;
                             for (ArrivalListItem item : items) {
-                                if (item.getInstallStatus() != null && (!item.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW))) {
+                                if (ArrivalListItem.INSTALL_STATUS_NEW.equals(item.getInstallStatus())) {
                                     installed = true;
                                     break;
+                                }
+                                if (StringUtils.isNotEmpty(item.getAssetUID())) {
+                                    //验证设备是否报废
+                                    if (aiService.assetIsInvalid(item.getAssetUID())) {
+                                        installed = false;
+                                        break;
+                                    }
                                 }
                             }
                             if (installed) {
@@ -191,8 +199,6 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
                                 arrivalList.setCannotDeleted(true);
                             }
                         }
-                    } else {
-                        arrivalList.setCannotDeleted(true);
                     }
                 }
             }

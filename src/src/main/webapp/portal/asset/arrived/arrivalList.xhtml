@@ -23,8 +23,8 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:ajax event="rowSelect" update="createButton deleteButton deleteButtonUnLimit viewButton exportPdfButton saveAsButton exportDocButton" />
-                        <p:ajax event="filter" listener="#{assetArrivedListController.onFilter}" update="createButton deleteButton deleteButtonUnLimit" />
+                        <p:ajax event="rowSelect" update="createButton deleteButton  viewButton exportPdfButton saveAsButton exportDocButton" />
+                        <p:ajax event="filter" listener="#{assetArrivedListController.onFilter}" update="createButton deleteButton " />
                         <p:column headerText="到货单名称/编号" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
@@ -99,9 +99,9 @@
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetArrivedListController.delete}" update=":AssetArrivalListForm:datalist, :growl"  disabled="#{empty assetArrivedListController.selected or assetArrivedListController.selected.cannotDeleted}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
-                            <p:commandButton id="deleteButtonUnLimit" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetArrivedListController.deleteUnLimited}" update=":AssetArrivalListForm:datalist, :growl"  disabled="#{empty assetArrivedListController.selected}" rendered="#{userContextService.hasRole('AssetHead')}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
-                            </p:commandButton>
+<!--                            <p:commandButton id="deleteButtonUnLimit" icon="ui-icon-close" class="btn btn-sm btn-gray" title="删除(含已安装报废设备)" actionListener="#{assetArrivedListController.deleteUnLimited}" update=":AssetArrivalListForm:datalist, :growl"  disabled="#{empty assetArrivedListController.selected}" rendered="#{userContextService.hasRole('AssetHead')}">-->
+<!--                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>-->
+<!--                            </p:commandButton>-->
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                             </p:commandButton>
