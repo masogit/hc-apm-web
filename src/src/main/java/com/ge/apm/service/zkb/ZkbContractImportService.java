@@ -105,6 +105,7 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("区域","setRegion");
             contractRow.setFieldStringValue("代理商","setAgentName");
             contractRow.setFieldStringValue("合同类型", "setContractType");
+            contractRow.setFieldStringValue("合同金额", "setContractAmount");
             contractRow.setFieldDateValue("合同开始日期", "setStartDate");
             contractRow.setFieldDateValue("合同结束日期", "setEndDate");
             contractRow.setFieldStringValue("名额扣除类型", "setQuotaDeductType");
@@ -217,6 +218,13 @@ public class ZkbContractImportService {
                     zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
                 }
             }
+            if(StringUtils.isNotEmpty(contractInfoVO.getContractAmount())){
+                if("100W/年以下".equals(contractInfoVO.getContractAmount())){
+                    zkbContract.setContractAmount(ZkbContract.ContractAmount.oneMillionLess.toString());
+                }else if("100W/年以上".equals(contractInfoVO.getContractAmount())){
+                    zkbContract.setContractAmount(ZkbContract.ContractAmount.oneMillionMore.toString());
+                }
+            }
             zkbContract.setSpareQuotaTotal(contractInfoVO.getSpareQuotaTotal());
             zkbContract.setSpareQuota(contractInfoVO.getSpareQuota());
             zkbContract.setSpareQuotaUse(contractInfoVO.getSpareQuotaUse());
@@ -286,6 +294,13 @@ public class ZkbContractImportService {
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
                 }else if("N/A".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+                }
+            }
+            if(StringUtils.isNotEmpty(newZkbContract.getContractAmount())){
+                if("100W/年以下".equals(newZkbContract.getContractAmount())){
+                    newZkbContract.setContractAmount(ZkbContract.ContractAmount.oneMillionLess.toString());
+                }else if("100W/年以上".equals(contractInfoVO.getContractAmount())){
+                    newZkbContract.setContractAmount(ZkbContract.ContractAmount.oneMillionMore.toString());
                 }
             }
             if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
@@ -364,6 +379,18 @@ public class ZkbContractImportService {
         if(contractInfoVO.getContractType() == null){
             item.put("status", ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractTypeIsEmpty"));
+            isValidateData = false;
+        }else{
+            /*if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){
+                item.put("status", ImportStatus.Failure);
+                ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTypeIsNotRange"));
+                isValidateData = false;
+            }*/
+        }
+        //合同金额
+        if(contractInfoVO.getContractAmount() == null){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item, WebUtil.getMessage("错误：合同金额为空"));
             isValidateData = false;
         }else{
             /*if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){

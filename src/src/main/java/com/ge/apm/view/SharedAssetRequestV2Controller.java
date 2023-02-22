@@ -83,6 +83,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private UserAccount selectedAssignee;
     private UserContextService userContextService;
     private Integer dialogTitle;
+    private Integer stock=0;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -166,10 +167,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void prepareCreateSart(){
         crudActionName = "Create";
         selectedSart = new SharedAssetReqType();
+        this.setStock(0);
     }
     
     public void prepareEditSart(){
         crudActionName = "Edit";
+        this.queryStock();
     }
     
     public void deleteSart(){
@@ -1043,7 +1046,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void submmit0() {
-        if (selected.getSartList().size() == 0) {
+        List<SharedAssetReqType> sartList = selected.getSartList();
+        if (sartList==null || sartList.size() == 0) {
                 String url = "norespond" ;
                 RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("url", url);
@@ -1051,6 +1055,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                WebUtil.addWarnMessage("请先添加申请明细，再进行提交！");
                return;
        } else {
+            for (SharedAssetReqType sharedAssetReqType : sartList) {
+                Integer stock = this.selectStock(sharedAssetReqType.getSharedAssetTypeId());
+                int applyQty = sharedAssetReqType.getApplyQty();
+                if(applyQty > stock){
+                    String message = "wrong" ;
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("message", message);
+                    WebUtil.addWarnMessage("调剂设备："+sharedAssetReqType.getSwapName()+",库存不足，当前库存数量："+stock);
+                    return;
+                }
+            }
             String name = orgInfoDao.getByUid(selected.getClinicalDeptUid()).getName();
             selected.setClinicalDeptName(name);
             selected.setApplyTime(new Date());
@@ -1509,7 +1524,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void saveSart(){
-        if (selectedSart.getApplyQty() == 0){
+
+        int applyQty = selectedSart.getApplyQty();
+        if (applyQty == 0){
             String message = "wrong" ;
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("message", message);
@@ -1517,12 +1534,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             WebUtil.addWarnMessage("申请数必须大于0！");
             return;
         }
-
+        String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
+        Integer stock = this.selectStock(selectedSart.getSharedAssetTypeId());
+        if(applyQty > stock){
+            String message = "wrong" ;
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("message", message);
+            WebUtil.addWarnMessage("调剂设备："+swapName+",库存不足，当前库存数量："+stock);
+            return;
+        }
         List<SharedAssetReqType> sartList = selected.getSartList();
         if(this.isLogPatientInfoEnabled()) {
             if("Create".equals(super.crudActionName)) {
                 selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
-                String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
                 selectedSart.setSwapName(swapName);
                 selectedSart.setSharedId(selected.getId());
                 sartList.add(selectedSart);
@@ -1554,7 +1578,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             }
         } else {
             selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
-            String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
             selectedSart.setSwapName(swapName);
             selectedSart.setSharedId(selected.getId());
             Iterator<SharedAssetReqType> iterator = sartList.iterator();
@@ -1992,6 +2015,43 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     public void setDialogTitle(Integer dialogTitle) {
         this.dialogTitle = dialogTitle;
+    }
+    public void queryStock(){
+        String sharedAssetTypeId = this.getSelectedSart().getSharedAssetTypeId();
+        this.setStock(selectStock(sharedAssetTypeId));
+    }
+    private Integer selectStock(String sharedAssetTypeId){
+        if(StringUtils.isBlank(sharedAssetTypeId)) return 0;
+        String siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
+        Integer count=getCount(siteUID,sharedAssetTypeId); // 总数
+        if(count == null || count <= 0) return 0;
+        Integer borrowing=getBorrowingCount(siteUID,sharedAssetTypeId); // 借调中和使用中
+        Integer returning=getReturningCount(siteUID,sharedAssetTypeId); // 归还中
+        Integer stock = count - borrowing - returning;
+        return stock < 0 ? 0:stock;
+    }
+    private Integer getReturningCount(String siteUid,String sharedAssetTypeId) {
+        logger.info("getReturningCount: param,siteUid:"+siteUid+", sharedAssetTypeId:"+ sharedAssetTypeId);
+        Integer returningCount=dao.getReturningCount(siteUid,sharedAssetTypeId);
+        return returningCount==null?0:returningCount;
+    }
+
+    private Integer getBorrowingCount(String siteUid,String sharedAssetTypeId) {
+        logger.info("getBorrowingCount,param,siteUid:"+siteUid+", sharedAssetTypeId:"+ sharedAssetTypeId);
+        Integer borrowingCount=dao.getBorrowingCount(siteUid,sharedAssetTypeId);
+        return borrowingCount==null?0:borrowingCount;
+    }
+
+    private Integer getCount(String siteUid,String sharedAssetTypeId) {
+        return asiDao.findSharedAssetTypeIdCount(siteUid,sharedAssetTypeId);
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 }
     

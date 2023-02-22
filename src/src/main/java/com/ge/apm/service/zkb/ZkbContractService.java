@@ -89,6 +89,9 @@ public class ZkbContractService {
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_agentName"), zkbContract.getAgentName());
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractNo"), zkbContract.getContractNo());
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractType"), zkbContract.getContractType());
+            if(StringUtils.isNotEmpty(zkbContract.getContractAmount())){
+                zkbContractDataMap.put("合同金额", WebUtil.getFieldValueMessage("zkbcontractAmount", zkbContract.getContractAmount()));
+            }
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_startDate"), DateFormatUtils.format(zkbContract.getStartDate(),"yyyy-MM-dd"));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_endDate"), DateFormatUtils.format(zkbContract.getEndDate(),"yyyy-MM-dd"));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());

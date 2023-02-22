@@ -11,7 +11,6 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.primefaces.event.FileUploadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -791,7 +790,39 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setTechAuditer(userAccount.getName());
             if(nextFlag){
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
-                zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                boolean isNewPartChange = false;
+                if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+                    if(ZkbContract.ContractType.DI.toString().equals(c.getContractType()) ||
+                            ZkbContract.ContractType.PCB.toString().equals(c.getContractType()) ||
+                            "PCB MVS".equals(c.getContractType())){
+                        AssetInfo a = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                        if(a != null && a.getAssetGroup() != null && a.getAssetGroup().equals(1)){
+                            isNewPartChange = true;
+                        }
+                    }
+                }
+                if(isNewPartChange){
+                    if(checkPartSeventyPercent(c,zkbPartOrder)){
+                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                    }else{
+                        boolean r = checkApplyNumValid(zkbPartOrder,c);
+                        if(!r){
+                            zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
+                        }else{
+                            zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                        }
+                        if(CopyByInvok.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
+                            zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+                        }else if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
+                            zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                        }else{
+                            zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                        }
+                    }
+                }else{
+                    zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
+                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                }
             }else{
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
@@ -991,6 +1022,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }else{
             if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.DirectorAccept.toString().equals(zkbPartOrder.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString().equals(zkbPartOrder.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.CommercialAccept.toString().equals(zkbPartOrder.getStatus())){
                 zkbPartOrder.setOrderedDate(new Date());
                 zkbPartOrder.setOrderedAuditerUid(userAccount.getUid());
@@ -1554,6 +1586,51 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
     }
+
+    public boolean checkPartSeventyPercent(ZkbContract zkbContract,ZkbPartOrder zkbPartOrder){
+        ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),zkbPartOrder.getAssetId());
+        if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag()) && "highMachine".equals(zkbContractAsset.getAssetType())){
+            return false;
+        }
+        if(ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+            AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+            if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup().equals(1)){
+                if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(zkbPartOrder.getRadiationQuotaType())){
+                    Integer total = zkbContract.getPartHighQuotaTotal() == null ? 0 : zkbContract.getPartHighQuotaTotal();
+                    double l = total * 0.7;
+                    Integer molecule = ( zkbContract.getPartHighQuotaApply() == null ? 0 : zkbContract.getPartHighQuotaApply()) + (zkbContract.getPartHighQuotaUse() == null ? 0 : zkbContract.getPartHighQuotaUse());
+                    if(molecule > l){
+                        return true;
+                    }
+                }else if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(zkbPartOrder.getRadiationQuotaType())){
+                    Integer total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+                    double l = total * 0.7;
+                    Integer molecule = ( zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
+                    if(molecule > l){
+                        return true;
+                    }
+                }
+            }else {
+                Integer total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+                double l = total * 0.7;
+                Integer molecule = ( zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
+                if(molecule > l){
+                    return true;
+                }
+            }
+        }else if("PCB MVS".equals(zkbContract.getContractType())){
+            Integer total = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+            double l = total * 0.7;
+            Integer molecule = ( zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + (zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse());
+            if(molecule > l){
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+
 
     public void subApplyQty(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty,UserAccount userAccount,boolean acceptFlag){
         String opType = ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderDeduct.toString();

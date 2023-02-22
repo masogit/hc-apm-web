@@ -557,8 +557,20 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             } else if(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString().equals(selected.getStatus())){
                 showTech= true;
                 if(canEditFlag){
-                    showManage = true;
-                    showBtn = "0";
+                    if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+                        showManage = true;
+                        showBtn = "0";
+                    } else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(selected.getCurrentStep())){
+                        showDirector = true;
+                        showBtn = "0";
+                    }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
+                        showOrder = true;
+                        showBtn = "1";
+                    }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
+                        showCommercial = true;
+                        showBtn = "0";
+                    }
+
                 }
             } else if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(selected.getStatus())){
                 showTech= true;
@@ -600,7 +612,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 showDirector = true;
                 if(canEditFlag){
                     if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
@@ -621,7 +635,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 showDirector = true;
             } else if(ZkbPartOrder.PartOrderStatus.CommercialAccept.toString().equals(selected.getStatus())){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
@@ -630,7 +646,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
@@ -651,7 +669,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
@@ -699,11 +719,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
-                if(StringUtils.isNotEmpty(selected.getCommercialAuditerUid())){
+                if(StrUtil.isNotEmpty(selected.getCommercialAuditerUid())){
                     showCommercial = true;
                 }
                 showOrder = true;
@@ -721,7 +743,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
@@ -739,7 +763,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
@@ -767,7 +793,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
@@ -791,7 +819,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         showTech= true;
                     }
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getManageAuditer())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }

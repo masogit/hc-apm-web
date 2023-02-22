@@ -1,5 +1,6 @@
 package com.ge.apm.listener;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
@@ -53,7 +54,6 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 
         try {
             LOGGER.info("mq 监听的消息 message :{}",mqContext);
-
             JSONObject jsonObject = mqContext.getJsonObject();
             String assetInfoString = (String) jsonObject.get("assetInfo");
             Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -67,7 +67,7 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("pageNum",0);
                 map.put("pageSize",1);
-                map.put("asset_uid",newAsset.getUid());
+                map.put("assetUid",newAsset.getUid());
                 map.put("sortField","created_date");
                 map.put("sortValue","DESC");
                 List<AssetHistory> list = elasticService.searchAssetHistoryList(map);
@@ -77,6 +77,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                     return;
                 }
                 AssetHistory assetHistory = list.get(0);
+                LOGGER.info("mq 查询出history最近记录 assetuid:{},  assetHistory:{}",newAsset.getUid(), JSON.toJSONString(assetHistory));
+
                 String assetJson = assetHistory.getAssetJson();
                 if(StringUtils.isEmpty(assetJson)){
                     LOGGER.info("update  asset  assetJson is null assetUid:{},historyUid:{}",newAsset.getUid(),assetHistory.getUid());
@@ -86,6 +88,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                 AssetInfo assetInfo = g.fromJson(assetJson, AssetInfo.class);
                 UserAccountThreadLocal.setUserAccount(currentUserAccount);
                 resultList = assetHistoryService.getAssetsHistoryModifiedFields(assetInfo, newAsset);
+                LOGGER.info("mq 数据比对 assetuid:{},  assetHistory:{}",newAsset.getUid(), JSON.toJSONString(resultList));
+
                 UserAccountThreadLocal.remove();
             }
 
@@ -112,6 +116,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 
     private void saveAssetHistory(AssetHistory assetHistory) {
         AssetHistory assetHistoryResult = assetHistoryRepository.save(assetHistory);
+        LOGGER.info("asset update success save es send mq assetuid:{}",assetHistory.getAssetUid());
+
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");

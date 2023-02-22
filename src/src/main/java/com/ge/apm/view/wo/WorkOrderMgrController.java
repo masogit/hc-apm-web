@@ -776,17 +776,17 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
      * select
         *
     from
-        v2_work_order v2_workord0_ 
+        v2_work_order v2_workord0_
     left outer join
-        v2_service_request v2_service1_ 
-            on v2_workord0_.sr_id=v2_service1_.id cross 
+        v2_service_request v2_service1_
+            on v2_workord0_.sr_id=v2_service1_.id cross
     join
-        v2_service_request v2_service2_ cross 
+        v2_service_request v2_service2_ cross
     join
-        asset_info assetinfo4_ 
+        asset_info assetinfo4_
     where
-        v2_workord0_.sr_id=v2_service2_.id 
-        and v2_workord0_.asset_id=assetinfo4_.id         
+        v2_workord0_.sr_id=v2_service2_.id
+        and v2_workord0_.asset_id=assetinfo4_.id
         and v2_workord0_.status=1                           //1*
         and (
             v2_workord0_.current_step_id in (
@@ -811,52 +811,52 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 ?
             )                                                 //1*2+
             or v2_workord0_.current_person_id=2342            //1*2+
-        ) 
+        )
         and (
             (
                 v2_workord0_.dispatch_mode in (
                     2 , 3
                 )
-            ) 
+            )
             and (
-                v2_workord0_.current_person_id<>348 
-                or v2_workord0_.current_person_id=348 
+                v2_workord0_.current_person_id<>348
+                or v2_workord0_.current_person_id=348
                 and v2_workord0_.current_step_id=2
-            ) 
+            )
             and (
                 v2_workord0_.asset_id in (
                     0
-                ) 
+                )
                 or (
                     v2_workord0_.asset_id in (
                         0
                     )
-                ) 
+                )
                 and (
-                    assetinfo1_.asset_owner_id=348 
-                    or assetinfo1_.asset_owner_id2=348 
-                    or assetinfo1_.asset_owner_id3=348 
+                    assetinfo1_.asset_owner_id=348
+                    or assetinfo1_.asset_owner_id2=348
+                    or assetinfo1_.asset_owner_id3=348
                     or (
                         assetinfo1_.asset_owner_id2 is null
-                    ) 
+                    )
                     and (
                         assetinfo1_.asset_owner_id3 is null
-                    ) 
+                    )
                     or (
                         assetinfo1_.asset_owner_id is null
-                    ) 
+                    )
                     and (
                         assetinfo1_.asset_owner_id3 is null
-                    ) 
+                    )
                     or (
                         assetinfo1_.asset_owner_id is null
-                    ) 
+                    )
                     and (
                         assetinfo1_.asset_owner_id2 is null
                     )
                 )
-            ) 
-            or v2_workord0_.current_person_id=348 
+            )
+            or v2_workord0_.current_person_id=348
             and v2_workord0_.current_step_id=3
         )
 
@@ -1482,7 +1482,7 @@ public void test1(){
         equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
         takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
     }
-    
+
     public void saveEditedWorkOrder(){
         //故障类型必填校验
         if (requireCaseType() && null == selectedWorkOrder.getCaseType()) {
@@ -2302,7 +2302,7 @@ public void test1(){
             }
             if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
                 statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
-            }   
+            }
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
