@@ -116,6 +116,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 
     private void saveAssetHistory(AssetHistory assetHistory) {
         AssetHistory assetHistoryResult = assetHistoryRepository.save(assetHistory);
+        LOGGER.info("asset update success save es send mq assetuid:{}",assetHistory.getAssetUid());
+
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
