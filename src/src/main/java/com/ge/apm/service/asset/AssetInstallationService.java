@@ -94,6 +94,16 @@ public class AssetInstallationService {
         return itemDao.findByArrivalListId(arrivalListId);
     }
 
+    public boolean assetIsInvalid(String assetUid) {
+        AssetInfo assetInfo = assetDao.findByUid(assetUid);
+        if (assetInfo != null) {
+            if (assetInfo.getStatus().equals(4)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void deleteListItem(String arrivalListId, String siteUid) {
         List<ArrivalListItem> listItem = getListItem(arrivalListId);
         if (listItem != null) {
