@@ -195,9 +195,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
                                     arrivalList.setCannotDeleted(true);
                                 }
                             }
-                            if (arrivalList.getContractItemId() != null) {
-                                arrivalList.setCannotDeleted(true);
-                            }
+//                            if (arrivalList.getContractItemId() != null) {
+//                                arrivalList.setCannotDeleted(true);
+//                            }
                         }
                     }
                 }
