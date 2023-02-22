@@ -644,6 +644,31 @@ public class QrCodeService {
         return true;
     }
 
+    public List<AssetInfo> deleteQrcodeAndAsset(String qrCode, String siteUid) {
+        List<AssetInfo> invalidAsset = new ArrayList<>();
+        List<AssetInfo> validAsset = new ArrayList<>();
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
+        if (null == qrCodeLib) {
+            return new ArrayList<>();
+        }
+        List<AssetInfo> assetList = assetDao.findByQrCodeAndSiteUID(qrCode, siteUid);
+        if (null != assetList && !assetList.isEmpty()) {
+            assetList.forEach(val -> {
+                if (val.getStatus() == 4 && !val.getIsValid()) {
+                    invalidAsset.add(val);
+                } else {
+                    validAsset.add(val);
+                }
+            });
+            if (assetList.size() != invalidAsset.size()) {
+               return validAsset;
+            }
+            assetDao.delete(invalidAsset);
+        }
+        qrCodeLibDao.delete(qrCodeLib);
+        return new ArrayList<>();
+    }
+
     public boolean isQrcodeAvailableInStatus(String qrCode, String siteUid, int status) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
         if (null == qrCodeLib) {

@@ -602,10 +602,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public boolean isItemCreateDisabled(){
-        if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
-            if (assetInfo.getAssetGroup().equals(1)) {
-                if(StrUtil.isEmpty(selected.getRadiationQuotaType())){
-                    return true;
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
+                if (assetInfo.getAssetGroup().equals(1)) {
+                    if(StrUtil.isEmpty(selected.getRadiationQuotaType())){
+                        return true;
+                    }
                 }
             }
         }
@@ -624,40 +626,41 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String itemSaveTips = "";
     public void saveItem(){
         zkbPartOrderItem.setPartNo(zkbPartOrderItem.getPartNo().trim());
-        if(ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
-            if (assetInfo.getAssetGroup().equals(1)) {
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed",true);
-                if(ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())){
-                    ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(zkbPartOrderItem.getPartNo());
-                    if(z != null ){
-                        String el="";
-                        if(ZkbHighPartInfo.PartTypeEnum.highPart.toString().equals(z.getPartType())){
-                            el += zkbPartOrderItem.getPartNo()+"属于高值备件，不可订购！";
-                        }else if(ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())){
-                            el += zkbPartOrderItem.getPartNo()+"属于球管，不可订购！";
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)) {
+            if (ZkbContract.ContractType.DI.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selectedContract.getContractType())) {
+                if (assetInfo.getAssetGroup().equals(1)) {
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                    if (ZkbPartOrder.RadiationQuotaTypeEnum.SpareArtificial.toString().equals(selected.getRadiationQuotaType())) {
+                        ZkbHighPartInfo z = zkbHighPartInfoRepository.findFirstByPartNo(zkbPartOrderItem.getPartNo());
+                        if (z != null) {
+                            String el = "";
+                            if (ZkbHighPartInfo.PartTypeEnum.highPart.toString().equals(z.getPartType())) {
+                                el += zkbPartOrderItem.getPartNo() + "属于高值备件，不可订购！";
+                            } else if (ZkbHighPartInfo.PartTypeEnum.bulbTube.toString().equals(z.getPartType())) {
+                                el += zkbPartOrderItem.getPartNo() + "属于球管，不可订购！";
+                            }
+                            if (StrUtil.isNotEmpty(el)) {
+                                itemSaveTips = el;
+                                return;
+                            } else {
+                                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+                            }
+                        } else {
+                            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
                         }
-                        if(StrUtil.isNotEmpty(el)){
-                            itemSaveTips = el;
+                    } else if (ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())) {
+                        List<ZkbHighPartInfo> zkbHighPartInfos = zkbHighPartInfoRepository.findBulbTube(zkbPartOrderItem.getPartNo());
+                        if (zkbHighPartInfos != null && zkbHighPartInfos.size() > 0) {
+                            itemSaveTips = zkbPartOrderItem.getPartNo() + "属于球管，不可订购！";
                             return;
-                        }else{
-                            RequestContext.getCurrentInstance().addCallbackParam("validationFailed",false);
+                        } else {
+                            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
                         }
-                    }else{
-                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed",false);
                     }
-                }else if(ZkbPartOrder.RadiationQuotaTypeEnum.PartsHigh.toString().equals(selected.getRadiationQuotaType())){
-                    List<ZkbHighPartInfo> zkbHighPartInfos = zkbHighPartInfoRepository.findBulbTube(zkbPartOrderItem.getPartNo());
-                    if(zkbHighPartInfos != null && zkbHighPartInfos.size() > 0){
-                        itemSaveTips = zkbPartOrderItem.getPartNo()+"属于球管，不可订购！";
-                        return;
-                    }else {
-                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed",false);
-                    }
-                }
 
+                }
             }
         }
-
         if("Create".equals(this.actionItemName)){
             if(this.selected == null){
                 this.selected = new ZkbPartOrder();

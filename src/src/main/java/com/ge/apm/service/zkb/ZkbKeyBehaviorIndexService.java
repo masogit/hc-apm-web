@@ -211,7 +211,7 @@ public class ZkbKeyBehaviorIndexService {
             return this.tenantInfoDao.findByType(3);
         return this.tenantInfoDao.findByTypeAndNameNotLike(3,"ZKB%");
     }
-    private Date getFirstDay(final Date date){
+    public Date getFirstDay(final Date date){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);

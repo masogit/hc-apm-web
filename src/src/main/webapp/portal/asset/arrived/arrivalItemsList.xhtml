@@ -98,6 +98,15 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
                         </p:column>
+                        <p:column headerText="#{msg.ArrivalProcessType}" sortBy="#{item.arrivalList.processType}" filterBy="#{item.arrivalList.processType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListProcessType',item.arrivalList.processType)}"/>
+                        </p:column>
                         <p:column headerText="操作" exportable="false">
                             
                             <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.activeSupplier()}"  update=":AssetArrivalItemListForm:datalist" >接单
