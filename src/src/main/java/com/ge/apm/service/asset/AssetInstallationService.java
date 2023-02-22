@@ -96,8 +96,14 @@ public class AssetInstallationService {
 
     public boolean assetIsInvalid(String assetUid) {
         AssetInfo assetInfo = assetDao.findByUid(assetUid);
+        if (assetInfo == null) {
+            return true;
+        }
         if (assetInfo != null) {
             if (assetInfo.getStatus().equals(4)) {
+                return true;
+            }
+            if (assetInfo.getIsDeleted()) {
                 return true;
             }
         }
