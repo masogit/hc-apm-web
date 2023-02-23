@@ -33,6 +33,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -84,6 +85,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private UserContextService userContextService;
     private Integer dialogTitle;
     private Integer stock=0;
+    private boolean isReturn=false;
     @Getter
     @Setter
     private WorkflowConfig currentWorkflowConfig;
@@ -1055,15 +1057,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                WebUtil.addWarnMessage("请先添加申请明细，再进行提交！");
                return;
        } else {
-            for (SharedAssetReqType sharedAssetReqType : sartList) {
-                Integer stock = this.selectStock(sharedAssetReqType.getSharedAssetTypeId());
-                int applyQty = sharedAssetReqType.getApplyQty();
-                if(applyQty > stock){
-                    String message = "wrong" ;
-                    RequestContext requestContext = RequestContext.getCurrentInstance();
-                    requestContext.addCallbackParam("message", message);
-                    WebUtil.addWarnMessage("调剂设备："+sharedAssetReqType.getSwapName()+",库存不足，当前库存数量："+stock);
-                    return;
+            if(!isReturn){
+                for (SharedAssetReqType sharedAssetReqType : sartList) {
+                    Integer stock = this.selectStock(sharedAssetReqType.getSharedAssetTypeId());
+                    int applyQty = sharedAssetReqType.getApplyQty();
+                    if(applyQty > stock){
+                        String message = "wrong" ;
+                        RequestContext requestContext = RequestContext.getCurrentInstance();
+                        requestContext.addCallbackParam("message", message);
+                        WebUtil.addWarnMessage("调剂设备："+sharedAssetReqType.getSwapName()+",库存不足，当前库存数量："+stock);
+                        return;
+                    }
                 }
             }
             String name = orgInfoDao.getByUid(selected.getClinicalDeptUid()).getName();
@@ -1823,8 +1827,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public String workOrderRouter() {
     	String retrunUrl = "";
     	RequestContext requestContext = RequestContext.getCurrentInstance();
-
-      Boolean enableAllocateOperation = Boolean.TRUE;
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        String uri=((HttpServletRequest) ctx.getRequest()).getRequestURI();
+        if(uri.contains("BorrowApplyV2")){
+            isReturn=false;  // 创建借用申请
+        }else{
+            isReturn=true;  // 创建归还申请
+        }
+        Boolean enableAllocateOperation = Boolean.TRUE;
       Boolean willShowNotification = Boolean.FALSE;
     	if(StringUtils.isNotBlank(workflowConfigJson)) {
           JSONObject scObject = JSON.parseObject(workflowConfigJson);

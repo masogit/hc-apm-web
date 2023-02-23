@@ -162,42 +162,32 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     private void setCanDeleted(Page<ArrivalList> result) {
-        if (result != null) {
-            for (ArrivalList arrivalList : result) {
-                Integer status = arrivalList.getStatus();
-                if (status != null) {
-                    if (status == 1) {
-                        arrivalList.setCannotDeleted(false);
-                    } else {
-                        List<ArrivalListItem> items = aiService.getListItem(arrivalList.getId());
-                        if (items != null) {
+        for (ArrivalList arrivalList : result) {
+            if (arrivalList.getStatus() == 1) {
+                arrivalList.setCannotDeleted(false);
+            } else {
+                List<ArrivalListItem> items = aiService.getListItem(arrivalList.getId());
+                if (items != null) {
+                    arrivalList.setCannotDeleted(true);
+                    boolean canNotDelete = false;
+                    for (ArrivalListItem item : items) {
+                        if (ArrivalListItem.INSTALL_STATUS_NEW.equals(item.getInstallStatus())) {
+                            canNotDelete = true;
+                            break;
+                        }
+                        if (StringUtils.isNotEmpty(item.getAssetUID())) {
+                            //验证设备是否无效
+                            if (!aiService.assetIsInvalid(item.getAssetUID())) {
+                                canNotDelete = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!canNotDelete) {
+                        if (UserContextService.checkRole("AssetHead")) {
+                            arrivalList.setCannotDeleted(false);
+                        } else {
                             arrivalList.setCannotDeleted(true);
-                            boolean installed = true;
-                            for (ArrivalListItem item : items) {
-                                if (ArrivalListItem.INSTALL_STATUS_NEW.equals(item.getInstallStatus())) {
-                                    installed = true;
-                                    break;
-                                }
-                                if (StringUtils.isNotEmpty(item.getAssetUID())) {
-                                    //验证设备是否报废
-                                    if (aiService.assetIsInvalid(item.getAssetUID())) {
-                                        installed = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (installed) {
-                                arrivalList.setCannotDeleted(true);
-                            } else {
-                                if (UserContextService.checkRole("AssetHead")) {
-                                    arrivalList.setCannotDeleted(false);
-                                } else {
-                                    arrivalList.setCannotDeleted(true);
-                                }
-                            }
-                            if (arrivalList.getContractItemId() != null) {
-                                arrivalList.setCannotDeleted(true);
-                            }
                         }
                     }
                 }
