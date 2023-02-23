@@ -452,6 +452,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	}
 
 	public void generatePmOrders() {
+		if (level == null) {
+			WebUtil.addErrorMessage("请选择保养等级再生成保养工单！");
+			return;
+		}
 		if (CollectionUtils.isEmpty(assetInfoList)) {
 			WebUtil.addErrorMessage(WebUtil.getMessage("AssetsIsBlank"));
 			return;
