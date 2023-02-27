@@ -59,7 +59,7 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
                         " from  shared_asset_request  sar \n" +
                         "left join shared_asset_req_type sart on sart.shared_id=sar.id \n" +
                         "left join  shared_asset_req_detail  sard on sard.borrow_id=sar.id and sard.return_id is null \n" +
-                        "where sar.site_uid=?1 and sart.shared_asset_type=?2 and sar.state in (1,2,6)) t ",nativeQuery = true)
+                        "where sar.site_uid=?1 and sart.shared_asset_type=?2 and sar.state in (1,2,6) and sard.id != null) t ",nativeQuery = true)
     Integer getBorrowingCount(String siteUid, String sharedAssetTypeId);
 
     @Query(value = "select  \n" +
@@ -67,6 +67,6 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
             "from  shared_asset_request  sar \n" +
             "left join shared_asset_req_type sart on sart.shared_id=sar.id \n" +
             "left join  shared_asset_req_detail  sard on sard.return_id=sar.id \n" +
-            "where sar.site_uid=?1 and sart.shared_asset_type=?2 and sar.state in (7,8,9)",nativeQuery = true)
+            "where sar.site_uid=?1 and sart.shared_asset_type=?2 and sar.state in (7,8,9) and sard.id != null ",nativeQuery = true)
     Integer getReturningCount(String siteUid, String sharedAssetTypeId);
 }
