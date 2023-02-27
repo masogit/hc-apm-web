@@ -380,7 +380,7 @@
                                         </p:column>
                                     </p:selectManyMenu>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="true">
+                                <h:panelGroup rendered="#{userContextService.accessContainsOfJiangNing()}">
                                     <label class="label">使用登记规则(请先选择设备所属科室)</label>
                                     <p:selectManyMenu id="addMaintainConfigJN" value="#{assetInfoEditController.listSelectedNurseSiteMaintainConfigJN}" var="t" converter="nurseSiteMaintainConfigJNConverter" required="false"
                                                       filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
