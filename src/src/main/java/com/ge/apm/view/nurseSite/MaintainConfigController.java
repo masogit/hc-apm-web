@@ -151,9 +151,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         return pageResult;
     }
 
-    public List<NurseSiteMaintainConfig> getConfigList() {
+    public List<NurseSiteMaintainConfig> getConfigList(String clinicalDeptUid) {
+    	if(clinicalDeptUid==null) return new ArrayList<>();
 		Page<NurseSiteMaintainConfig> result = loadData(new PageRequest(0,1000));
-		return result.getContent();
+		return result.getContent().stream().filter(
+				nurseSiteMaintainConfig -> nurseSiteMaintainConfig.getClinicalDeptUID().equals(clinicalDeptUid)
+		).collect(Collectors.toList());
 	}
 
 	public void onSelectSiteTreeNode(NodeSelectEvent event) {
