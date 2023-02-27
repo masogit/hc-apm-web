@@ -149,6 +149,10 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         lastPageSort = pageRequest.getSort(); //export excel use
+        if (lastPageSort.getOrderFor("terminateDate")!=null) { // default sort desc
+            lastPageSort = new Sort(new Sort.Order(Sort.Direction.DESC,"terminateDate"));
+            pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),lastPageSort);
+        }
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
