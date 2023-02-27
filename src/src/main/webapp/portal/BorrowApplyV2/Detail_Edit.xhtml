@@ -18,7 +18,7 @@
                             <p:selectOneMenu id="sharedAssetTypeId" value="#{sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId}" required="true" requiredMessage="调剂设备 #{msg.ValidationRequire}">                     
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{sharedAssetTypeController.getSwapNameList()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>
-                                <p:ajax event="change" listener="#{sharedAssetRequestV2Controller.queryStock()}" update="stock" />
+                                <p:ajax event="change" listener="#{sharedAssetRequestV2Controller.queryStock()}" update="stock save" />
                             </p:selectOneMenu>                        
                         </h:panelGroup>
                         
@@ -50,7 +50,7 @@
                         
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSart}" value="#{msg.Save}"
+                    <p:commandButton id="save" validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSart}" value="#{msg.Save}" disabled="#{sharedAssetRequestV2Controller.stock lt 1}"
                                      update=" :SharedAssetRequestBorrowEditForm:datalistDetail" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow2(xhr, status, args)" />
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SharedAssetReqTypeEditDialog').hide()"/>
