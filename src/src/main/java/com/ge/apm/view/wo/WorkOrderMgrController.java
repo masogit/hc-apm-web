@@ -951,8 +951,9 @@ public void test1(){
             } else if (queryIndex == 5) { //待验收
                 /*工程师和主任， 如果两个角色同时存在，则优先以主任角色.*/
                 if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
+                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1)), "1*3+"));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
+                    searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*3+"));
                 } else {
                     searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
