@@ -2035,28 +2035,47 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         this.setStock(selectStock(sharedAssetTypeId));
     }
     private Integer selectStock(String sharedAssetTypeId){
+        Integer stock =0;
         if(StringUtils.isBlank(sharedAssetTypeId)) return 0;
         String siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
-        Integer count=getCount(siteUID,sharedAssetTypeId); // 总数
-        if(count == null || count <= 0) return 0;
-        Integer borrowing=getBorrowingCount(siteUID,sharedAssetTypeId); // 借调中和使用中
-        Integer returning=getReturningCount(siteUID,sharedAssetTypeId); // 归还中
-        Integer stock = count - borrowing - returning;
-        return stock < 0 ? 0:stock;
+        List<AssetInfo> count = getCount(siteUID, sharedAssetTypeId);// 总数
+        if(CollectionUtils.isEmpty(count)) return stock;
+        Integer returningCount = getReturningCount(count);
+        return count.size()-returningCount;
     }
-    private Integer getReturningCount(String siteUid,String sharedAssetTypeId) {
-        logger.info("getReturningCount: param,siteUid:"+siteUid+", sharedAssetTypeId:"+ sharedAssetTypeId);
-        Integer returningCount=dao.getReturningCount(siteUid,sharedAssetTypeId);
-        return returningCount==null?0:returningCount;
+    private Integer getReturningCount( List<AssetInfo> collect) {
+        // 过滤借出的
+        List<AssetInfo> collect1 = collect.stream().filter(item -> {
+            SharedAssetReqDetail byAssetInfoSharedAssetReqDetail = asdDao.findByAssetInfoSharedAssetReqDetail(item.getUid());
+            String returnId = byAssetInfoSharedAssetReqDetail.getReturnId();
+            if (StringUtils.isNotBlank(returnId)) {
+                List<SharedAssetRequest> returnRequestList = dao.findByDept(returnId);
+                if(CollectionUtils.isEmpty(returnRequestList)) return false;
+                SharedAssetRequest returnRequest = returnRequestList.get(0);
+                int returnState = returnRequest.getState();
+                if(returnState ==7 || returnState == 8){
+                    return true;
+                }
+            }else{
+                String borrowId = byAssetInfoSharedAssetReqDetail.getBorrowId();
+                List<SharedAssetRequest> borrowRequestList = dao.findByDept(borrowId);
+                if(CollectionUtils.isEmpty(borrowRequestList)) return false;
+                SharedAssetRequest borrowRequest = borrowRequestList.get(0);
+                if(borrowRequest == null){
+                    return false;
+                }
+                int borrowState = borrowRequest.getState();
+                if(borrowState == 3 || borrowState ==6){
+                    return true;
+                }
+            }
+            return false;
+        }).collect(Collectors.toList());
+        return collect1.size();
     }
 
-    private Integer getBorrowingCount(String siteUid,String sharedAssetTypeId) {
-        logger.info("getBorrowingCount,param,siteUid:"+siteUid+", sharedAssetTypeId:"+ sharedAssetTypeId);
-        Integer borrowingCount=dao.getBorrowingCount(siteUid,sharedAssetTypeId);
-        return borrowingCount==null?0:borrowingCount;
-    }
 
-    private Integer getCount(String siteUid,String sharedAssetTypeId) {
+    private List<AssetInfo> getCount(String siteUid,String sharedAssetTypeId) {
         return asiDao.findSharedAssetTypeIdCount(siteUid,sharedAssetTypeId);
     }
 

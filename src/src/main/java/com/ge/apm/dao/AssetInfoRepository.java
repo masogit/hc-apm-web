@@ -331,6 +331,6 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value="select count(1) from asset_info where asset_class = ?1 and tenant_uid = ?2", nativeQuery = true)
     int countByAssetClassAndTenant(Integer category, String tenantUid);
 
-    @Query(value="select count(1) from asset_info where site_uid = ?1 and shared_asset_type = ?2", nativeQuery = true)
-    Integer findSharedAssetTypeIdCount(String siteUid, String sharedAssetTypeId);
+    @Query(value="select * from asset_info where site_uid = ?1 and shared_asset_type = ?2 and is_valid=true and is_deleted=false ", nativeQuery = true)
+    List<AssetInfo> findSharedAssetTypeIdCount(String siteUid, String sharedAssetTypeId);
 }
