@@ -23,12 +23,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 public class AssetChangeConsumer implements ChannelAwareMessageListener {
@@ -87,6 +85,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                 }
                 AssetInfo assetInfo = g.fromJson(assetJson, AssetInfo.class);
                 UserAccountThreadLocal.setUserAccount(currentUserAccount);
+                Locale locale = LocaleContextHolder.getLocale();
+                LOGGER.info("asset update label locale.getLanguage:{},local:{}",locale.getLanguage(),locale);
                 resultList = assetHistoryService.getAssetsHistoryModifiedFields(assetInfo, newAsset);
                 LOGGER.info("mq 数据比对 assetuid:{},  assetHistory:{}",newAsset.getUid(), JSON.toJSONString(resultList));
 

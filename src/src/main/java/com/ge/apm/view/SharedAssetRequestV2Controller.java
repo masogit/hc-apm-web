@@ -169,11 +169,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void prepareCreateSart(){
         crudActionName = "Create";
         selectedSart = new SharedAssetReqType();
+        setReturn(RequestContext.getCurrentInstance());
         this.setStock(0);
     }
     
     public void prepareEditSart(){
         crudActionName = "Edit";
+        setReturn(RequestContext.getCurrentInstance());
         this.queryStock();
     }
     
@@ -1540,7 +1542,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
         String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
         Integer stock = this.selectStock(selectedSart.getSharedAssetTypeId());
-        if(applyQty > stock){
+        if(!isReturn && applyQty > stock){
             String message = "wrong" ;
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("message", message);
@@ -1823,10 +1825,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void setQueryIndex(Integer queryIndex) {
         this.queryIndex = queryIndex;
     }
-    
-    public String workOrderRouter() {
-    	String retrunUrl = "";
-    	RequestContext requestContext = RequestContext.getCurrentInstance();
+    private void setReturn(RequestContext requestContext){
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         String uri=((HttpServletRequest) ctx.getRequest()).getRequestURI();
         if(uri.contains("BorrowApplyV2")){
@@ -1834,6 +1833,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }else{
             isReturn=true;  // 创建归还申请
         }
+    }
+    public String workOrderRouter() {
+    	String retrunUrl = "";
+    	RequestContext requestContext = RequestContext.getCurrentInstance();
+        setReturn(requestContext);
         Boolean enableAllocateOperation = Boolean.TRUE;
       Boolean willShowNotification = Boolean.FALSE;
     	if(StringUtils.isNotBlank(workflowConfigJson)) {
@@ -2062,6 +2066,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public boolean showAndDisabled(){
+        Boolean enableStockShow = this.currentWorkflowConfig.getEnableStockShow();
+        if(Boolean.FALSE.equals(enableStockShow)){
+            return enableStockShow;
+        }
+        return this.getStock() < 1;
     }
 }
     

@@ -117,6 +117,10 @@ public class AssetInstallationService {
                 if (StringUtils.isNotEmpty(item.getQrCode())) {
                     deleteQrCode(item.getQrCode(), siteUid);
                 }
+                ContractInfoItem contractItem = contractItemDao.getByArrivalItemId(item.getId());
+                if (null != contractItem) {
+                    contractItemDao.delete(contractItem);
+                }
             }
             itemDao.delete(listItem);
         }
