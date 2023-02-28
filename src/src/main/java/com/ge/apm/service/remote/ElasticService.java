@@ -57,7 +57,10 @@ public class ElasticService extends MicroServiceInvoker {
             Page<AssetHistory> jsonPage = new PageImpl<>(assetHistories, pageRequest, totalElements);
             return jsonPage;
         } else {
-            return null;
+            logger.info("searchAssetHistory Failed ");
+            PageRequest  pageRequest=  new PageRequest(pageNum, pageSize, null);
+            Page<AssetHistory> jsonPage = new PageImpl<>(new ArrayList<>(), pageRequest, 0);
+            return jsonPage;
         }
     }
 
