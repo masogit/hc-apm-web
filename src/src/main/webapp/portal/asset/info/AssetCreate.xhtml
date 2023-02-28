@@ -352,7 +352,7 @@
                         <h:form id="createRule">
                             <p:panelGrid id ="PmOrderRule" columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
-                                    <label class="label">#{'二级'.concat(msg.PmOrderRule)}*</label>
+                                    <label class="label">#{'二级'.concat(msg.PmOrderRule)}</label>
                                     <p:autoComplete id="SelectedPmOrderRuleTwoLevel" value="#{assetInfoEditController.pmOrderRuleTwoLevel}" dropdown="true" scrollHeight="300"
                                                     forceSelection="true" completeMethod="#{relRuleAssetController.geLevelTwoRuleList}"
                                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="pmOrderRuleConverter">
@@ -361,7 +361,7 @@
                                     </p:autoComplete>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">#{'三级'.concat(msg.PmOrderRule)}*</label>
+                                    <label class="label">#{'三级'.concat(msg.PmOrderRule)}</label>
                                     <p:autoComplete id="SelectedPmOrderRuleThreeLevel" value="#{assetInfoEditController.pmOrderRuleThreeLevel}" dropdown="true" scrollHeight="300"
                                                     forceSelection="true" completeMethod="#{relRuleAssetController.getLevelThreeRuleList}"
                                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="pmOrderRuleConverter">
@@ -370,22 +370,22 @@
                                     </p:autoComplete>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">日常检查规则</label>
+                                    <label class="label">日常检查规则(请先选择设备所属科室)</label>
                                     <p:selectManyMenu id="addMaintainConfig" value="#{assetInfoEditController.listSelectedNurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="false"
                                                       filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
                                         <p:ajax process="@this" listener="#{maintainConfigController.onSelectedCheckItemChange}" update=""></p:ajax>
-                                        <f:selectItems value="#{maintainConfigController.getConfigList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                                        <f:selectItems value="#{maintainConfigController.getConfigList(assetInfoEditController.selected.clinicalDeptUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
                                         <p:column style="float: left;text-align:left;">
                                             <h:outputText value="#{t.name}" />
                                         </p:column>
                                     </p:selectManyMenu>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{userContextService.accessContainsOfJiangNing()}">
-                                    <label class="label">使用登记规则</label>
+                                    <label class="label">使用登记规则(请先选择设备所属科室)</label>
                                     <p:selectManyMenu id="addMaintainConfigJN" value="#{assetInfoEditController.listSelectedNurseSiteMaintainConfigJN}" var="t" converter="nurseSiteMaintainConfigJNConverter" required="false"
                                                       filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
                                         <p:ajax process="@this" listener="#{maintainConfigJNController.onSelectedCheckItemChange}" update=""></p:ajax>
-                                        <f:selectItems value="#{maintainConfigJNController.getConfigList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                                        <f:selectItems value="#{maintainConfigJNController.getConfigList(assetInfoEditController.selected.clinicalDeptUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
                                         <p:column style="float: left;text-align:left;">
                                             <h:outputText value="#{t.name}" />
                                         </p:column>

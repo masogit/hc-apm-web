@@ -34,6 +34,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -132,9 +133,12 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
         return pageResult;
     }
 
-	public List<NurseSiteMaintainConfigJN> getConfigList() {
+	public List<NurseSiteMaintainConfigJN> getConfigList(String clinicalDeptUid) {
+    	if(clinicalDeptUid==null) return new ArrayList<>();
 		Page<NurseSiteMaintainConfigJN> result = loadData(new PageRequest(0,1000));
-		return result.getContent();
+		return result.getContent().stream().filter(
+				nurseSiteMaintainConfigJN -> nurseSiteMaintainConfigJN.getClinicalDeptUID().equals(clinicalDeptUid)
+		).collect(Collectors.toList());
 	}
 
 	public void onSelectSiteTreeNode(NodeSelectEvent event) {

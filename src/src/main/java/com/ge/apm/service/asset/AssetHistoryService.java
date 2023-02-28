@@ -21,12 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.service.DbResourcesUtil;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -277,6 +279,8 @@ public class AssetHistoryService {
         assetHistoryInfo.setColumnName(fieldName);
         assetHistoryInfo.setOldColumnValue(objToString(fieldName, oldFieldValue));
         assetHistoryInfo.setNewColumnValue(objToString(fieldName, newFieldValue));
+        Locale locale = LocaleContextHolder.getLocale();
+        log.info("asset update label locale.getLanguage:{},local:{}",locale.getLanguage(),locale);
         assetHistoryInfo.setLabel(WebUtil.getMessage(fieldName));
 
         return Optional.of(assetHistoryInfo);

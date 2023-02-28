@@ -839,7 +839,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private void creteRule() {
-        if(pmOrderRuleThreeLevel!=null && pmOrderRuleTwoLevel!=null) {
+        if(pmOrderRuleThreeLevel!=null || pmOrderRuleTwoLevel!=null) {
             RelRuleAsset rel = new RelRuleAsset();
             rel.setAssetUID(selected.getUid());
             rel.setCreatedDate(new Date());
