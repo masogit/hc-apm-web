@@ -1059,7 +1059,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                WebUtil.addWarnMessage("请先添加申请明细，再进行提交！");
                return;
        } else {
-            if(!isReturn){
+            if(!isReturn && Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())){
                 for (SharedAssetReqType sharedAssetReqType : sartList) {
                     Integer stock = this.selectStock(sharedAssetReqType.getSharedAssetTypeId());
                     int applyQty = sharedAssetReqType.getApplyQty();
@@ -1541,14 +1541,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             return;
         }
         String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
-        Integer stock = this.selectStock(selectedSart.getSharedAssetTypeId());
-        if(!isReturn && applyQty > stock){
-            String message = "wrong" ;
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("message", message);
-            WebUtil.addWarnMessage("调剂设备："+swapName+",库存不足，当前库存数量："+stock);
-            return;
+        if(!isReturn && Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())) {
+            Integer stock = this.selectStock(selectedSart.getSharedAssetTypeId());
+            if(applyQty > stock){
+                String message = "wrong" ;
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("message", message);
+                WebUtil.addWarnMessage("调剂设备："+swapName+",库存不足，当前库存数量："+stock);
+                return;
+            }
         }
+
         List<SharedAssetReqType> sartList = selected.getSartList();
         if(this.isLogPatientInfoEnabled()) {
             if("Create".equals(super.crudActionName)) {
@@ -2032,7 +2035,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     public void queryStock(){
         String sharedAssetTypeId = this.getSelectedSart().getSharedAssetTypeId();
-        this.setStock(selectStock(sharedAssetTypeId));
+        if(Boolean.TRUE.equals(this.currentWorkflowConfig.getEnableStockShow())){
+            this.setStock(selectStock(sharedAssetTypeId));
+        }else{
+            this.setStock(0);
+        }
     }
     private Integer selectStock(String sharedAssetTypeId){
         Integer stock =0;
