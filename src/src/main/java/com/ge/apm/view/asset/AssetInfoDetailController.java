@@ -24,6 +24,7 @@ import javaslang.Tuple2;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -86,6 +87,9 @@ public class AssetInfoDetailController {
 
     private UserContextService userContextService;
 
+    private ArrivalListItemRepository arrivalListItemRepository;
+
+
     @PostConstruct
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -117,6 +121,8 @@ public class AssetInfoDetailController {
 
         userContextService = WebUtil.getBean(UserContextService.class);
         countyArea = userContextService.isCountyArea();
+        arrivalListItemRepository = WebUtil.getBean(ArrivalListItemRepository.class);
+
 
         if(selected!=null) {
             if (selected.getSupplierId() != null) {
@@ -360,6 +366,18 @@ public class AssetInfoDetailController {
 
     public boolean needShow(String itemKey, String fieldKey) {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
+    }
+
+    public boolean Show(String assetUid) {
+        ArrivalListItem arrivalListItemByAssetUid = arrivalListItemRepository.getArrivalListItemByAssetUid(assetUid);
+        if(arrivalListItemByAssetUid!=null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public void onTabChange(TabChangeEvent event) {
+
     }
 
     public List<ContractInfo> getContractList(){
