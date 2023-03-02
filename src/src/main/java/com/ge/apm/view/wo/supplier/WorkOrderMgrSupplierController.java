@@ -34,6 +34,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.event.data.FilterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -2090,6 +2091,39 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
 
     public void setSubStatus(Integer subStatus) {
         this.subStatus = subStatus;
+    }
+
+    public void onFilterWo(FilterEvent event) {
+        onFilterCustom(event, this::filters);
+    }
+
+    public boolean filters(String fieldName, String filterVal) {
+        if ("serviceRequest.requestTime".equals(fieldName)) {
+            processTimeFiled(filterVal, fieldName);
+            return true;
+        }
+        if ("id".equals(fieldName)) {
+            List<String> ownerNames = woService.findOwerNames(filterVal);
+            List<V2_WorkOrder_Step> steps = woService.findWorkSteps(filterVal);
+            if (org.apache.commons.collections.CollectionUtils.isEmpty(ownerNames) || org.apache.commons.collections.CollectionUtils.isEmpty(steps)) {
+                return true;
+            }
+            StringBuffer ownerNamesSb = new StringBuffer();
+            ownerNames.forEach(var -> ownerNamesSb.append(var).append(","));
+            String ownerNamesStr = ownerNamesSb.toString();
+            Map<String, List<V2_WorkOrder_Step>> map = steps.stream().filter(step -> ownerNamesStr.contains(step.getOwnerName())).collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
+            List<V2_WorkOrder_Step> stepList = map.values().stream().map(group -> group.stream()
+                    .max(Comparator.comparing(V2_WorkOrder_Step::getStartTime))
+                    .orElse(null))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            removeFilterOnField("id");
+            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(stepList)) {
+                searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepList.stream().map(V2_WorkOrder_Step::getWoId).collect(Collectors.toList())));
+            }
+            return true;
+        }
+        return false;
     }
 }
 
