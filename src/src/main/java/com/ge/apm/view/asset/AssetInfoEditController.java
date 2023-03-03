@@ -33,6 +33,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -1613,6 +1614,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 //        jsonObject.put("assetInfo",selected);
         jsonObject.put("currentUserAccount",currentUserAccount);
         mqContext.setJsonObject(jsonObject);
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
         mqUtils.sendToMq(mqContext);
 //        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
     }

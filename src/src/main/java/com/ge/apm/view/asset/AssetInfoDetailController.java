@@ -368,7 +368,7 @@ public class AssetInfoDetailController {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
     }
 
-    public boolean Show(String assetUid) {
+    public boolean show(String assetUid) {
         ArrivalListItem arrivalListItemByAssetUid = arrivalListItemRepository.getArrivalListItemByAssetUid(assetUid);
         if(arrivalListItemByAssetUid!=null){
             return true;
