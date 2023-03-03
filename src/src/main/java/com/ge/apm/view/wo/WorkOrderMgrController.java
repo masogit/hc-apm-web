@@ -1026,7 +1026,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             LOGGER.error("load data occur exception,{}", e.getMessage());
             throw e;
         }
-        needTwoSubStatusBatch(pageResult.getContent());
+        if (!userContextService.hasCurrentTenantName("")) {
+            needTwoSubStatusBatch(pageResult.getContent());
+        }
         return pageResult;
     }
     private List<V2_WorkOrder> pageNum(List<V2_WorkOrder> v2_workOrderList,PageRequest pageRequest){
