@@ -149,6 +149,8 @@ public enum GatewayURL {
     SEARCH_ASSET_HISTORY("/hcapmelasticservice/assetHistory/searchAssetHistory"),
     SEARCH_ASSET_HISTORY_LIST("/hcapmelasticservice/assetHistory/searchAssetHistoryList"),
     INSERT_ASSET_HISTORY("/hcapmelasticservice/assetHistory/insertAssetHistory"),
+    // jimureport
+    JI_MU_REPORT("/apmReport/jmreport/view"),
 
     ;
     private final String url;
