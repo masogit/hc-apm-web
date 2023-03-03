@@ -85,6 +85,7 @@
 
             <p:submenu label="报表管理" icon="fa fa-folder-open-o"  rendered="#{userContextService.versionContains('jmReport')}">
                 <p:menuitem  value="报表中心" outcome="/portal/jmReport/jmReportList.xhtml"  rendered="true"   />
+                <p:menuitem value="#{msg.keyAssetDataInput}" outcome="/portal/keyAssetReport/dataInputList.xhtml" rendered="true"/>
             </p:submenu>
 
             <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('install')}">
