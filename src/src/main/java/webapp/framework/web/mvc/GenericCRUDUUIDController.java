@@ -1,21 +1,17 @@
 package webapp.framework.web.mvc;
 
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.dao.V2_WorkOrderStepRepository;
-import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
 import webapp.framework.web.WebUtil;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.data.FilterEvent;
@@ -24,15 +20,13 @@ import org.primefaces.model.LazyDataModel;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil.PersistAction;
 
 public abstract class GenericCRUDUUIDController<E> implements Serializable, ServerEventInterface {
-    private V2_WorkOrderStepRepository workOrderStepDao;
-    private V2_WorkOrderService workOrderService;
+
     private static final long serialVersionUID = 1L;
 
     protected boolean filterBySite = false;
@@ -54,7 +48,6 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable, Serv
                 return true;
             }
         }
-
         return false;
     }
     
@@ -170,169 +163,50 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable, Serv
     }
     
     public void onFilter(FilterEvent event){
-        if(searchFilters==null) searchFilters = new ArrayList<SearchFilter>();
-        searchFilters.clear();
+        onFilterCustom(event, this::dateTimeField);
+    }
 
-        if(getFiltersFromDynaColumns()) return;
-        
+    /**
+     * 自定义过滤器
+     * BiFunction返回是否continue
+     * */
+    public void onFilterCustom(FilterEvent event, BiFunction<String, String, Boolean> function) {
+        if (searchFilters == null) searchFilters = new ArrayList<>();
+        searchFilters.clear();
+        if (getFiltersFromDynaColumns()) return;
         getFilterMatchModes((DataTable)event.getComponent());
-        for(Map.Entry<String, Object> filter: event.getFilters().entrySet()){
+        for (Map.Entry<String, Object> filter: event.getFilters().entrySet()) {
             String fieldName = filter.getKey();
             Object filterValue = filter.getValue();
-            if(filterValue==null) continue;
-
-            if (isDateTimeField(fieldName)) {
-                // support lte & gte for datetime field
-                String[] values = filterValue.toString().split("~");
-                if (values.length > 0) {
-                    filterValue = TimeUtil.fromString(values[0]);
-
-                    if (filterValue != null) {
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime) filterValue).toDate()));
-                    }
-                }
-
-                if (values.length > 1) {
-                    filterValue = TimeUtil.fromString(values[1]);
-                    if (filterValue != null) {
-                        //结束时间是一天的最后一秒  YHAAO-4035
-                        Date toDate = TimeUtils.getDateFromStr(TimeUtils.getStrDate(((DateTime) filterValue).toDate(), "yyyyMMdd").concat("235959"), "yyyyMMddHHmmss");
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, toDate));
-                    }
-                }
+            if (filterValue == null) continue;
+            String filterVal = filterValue.toString();
+            if (StringUtils.isEmpty(filterVal)) continue;
+            if (function.apply(fieldName, filterVal)) {
                 continue;
             }
-
             String matchMode = filterMatchModes.get(fieldName);
             addFilter(fieldName, matchMode, filterValue);
         }
-        
         setSiteFilter();
         setHospitalFilter();
     }
-    public void onFilterByAssetHistory(FilterEvent event){
-        if(searchFilters==null) searchFilters = new ArrayList<SearchFilter>();
-        searchFilters.clear();
 
-        if(getFiltersFromDynaColumns()) return;
-
-        getFilterMatchModes((DataTable)event.getComponent());
-        for(Map.Entry<String, Object> filter: event.getFilters().entrySet()){
-            String fieldName = filter.getKey();
-            Object filterValue = filter.getValue();
-            if(filterValue==null) continue;
-
-            if (isDateTimeField(fieldName)||"createdDate".equals(fieldName)) {
-                // support lte & gte for datetime field
-                String[] values = filterValue.toString().split("~");
-                if (values.length > 0) {
-                    filterValue = TimeUtil.fromString(values[0]);
-
-                    if (filterValue != null) {
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime) filterValue).toDate()));
-                    }
-                }
-
-                if (values.length > 1) {
-                    filterValue = TimeUtil.fromString(values[1]);
-                    if (filterValue != null) {
-                        //结束时间是一天的最后一秒  YHAAO-4035
-                        Date toDate = TimeUtils.getDateFromStr(TimeUtils.getStrDate(((DateTime) filterValue).toDate(), "yyyyMMdd").concat("235959"), "yyyyMMddHHmmss");
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, toDate));
-                    }
-                }
-                continue;
-            }
-
-            String matchMode = filterMatchModes.get(fieldName);
-            addFilter(fieldName, matchMode, filterValue);
+    protected boolean dateTimeField(String fieldName, String filterVal) {
+        if (isDateTimeField(fieldName)) {
+            processTimeFiled(filterVal, fieldName);
+            return true;
         }
-
-        setSiteFilter();
-        setHospitalFilter();
+        return false;
     }
-    public void onFilterWo(FilterEvent event){
-        if(searchFilters==null) searchFilters = new ArrayList<SearchFilter>();
-        searchFilters.clear();
 
-        if(getFiltersFromDynaColumns()) return;
-
-        getFilterMatchModes((DataTable)event.getComponent());
-        for(Map.Entry<String, Object> filter: event.getFilters().entrySet()){
-            String fieldName = filter.getKey();
-            Object filterValue = filter.getValue();
-            if(filterValue==null) continue;
-            String str ="serviceRequest.requestTime";
-            if (fieldName.equals(str)) {
-                // support lte & gte for datetime field
-                String[] values = filterValue.toString().split("~");
-                if (values.length > 0) {
-                    filterValue = TimeUtil.fromString(values[0]);
-
-                    if (filterValue != null) {
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime) filterValue).toDate()));
-                    }
-                }
-
-                if (values.length > 1) {
-                    filterValue = TimeUtil.fromString(values[1]);
-                    if (filterValue != null) {
-                        //结束时间是一天的最后一秒  YHAAO-4035
-                        Date toDate = TimeUtils.getDateFromStr(TimeUtils.getStrDate(((DateTime) filterValue).toDate(), "yyyyMMdd").concat("235959"), "yyyyMMddHHmmss");
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, toDate));
-                    }
-                }
-                continue;
-            }
-            String strId ="id";
-            if(fieldName.equals(strId)){
-                if(filterValue != null){
-
-                    String filterName = filterValue.toString();
-//                    List<String> stepIds = workOrderStepDao.findWorkIds(filterName);
-                    List<String> OwerNames = workOrderService.findOwerNames(filterName);
-                    StringBuffer OwerNameStrBu = new StringBuffer();
-                    for(String s : OwerNames){
-                        OwerNameStrBu.append(s).append(",");
-                    }
-                    String OwerNameStr = OwerNameStrBu.toString();
-                    List<V2_WorkOrder_Step> steps = workOrderService.findWorkSteps(filterName);
-                    List<String> stepIds = new ArrayList<>();
-                    for(V2_WorkOrder_Step s : steps){
-//                        String workAfterId = s.getWoId();
-                        String workAfterId = "";
-                        Date lastDate = s.getStartTime();
-                        if(OwerNameStr.contains(s.getOwnerName())){
-                            workAfterId = s.getWoId();
-                        }
-                        for(V2_WorkOrder_Step s2 : steps){
-                            if(s.getWoId().equals(s2.getWoId())){
-                                if(lastDate.before(s2.getStartTime())){
-                                    lastDate=s2.getStartTime();
-                                    if(OwerNameStr.contains(s2.getOwnerName())){
-                                        workAfterId = s2.getWoId();
-                                    }else{
-                                        workAfterId="";
-                                    }
-                                }
-                            }
-                        }
-                        if(!workAfterId.equals("")){
-                            stepIds.add(workAfterId);
-                        }
-                    }
-                    removeFilterOnField("id");
-                    System.out.println(stepIds);
-                    searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepIds));
-                }
-                continue;
-            }
-            String matchMode = filterMatchModes.get(fieldName);
-            addFilter(fieldName, matchMode, filterValue);
+    protected void processTimeFiled(String filterVal, String fieldName) {
+        String[] values = filterVal.split("~");
+        if (values.length > 0) {
+            Optional.ofNullable(TimeUtil.fromString(values[0])).ifPresent(var -> searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, var.toDate())));
         }
-
-        setSiteFilter();
-        setHospitalFilter();
+        if (values.length > 1) {
+            Optional.ofNullable(TimeUtil.fromString(values[1])).ifPresent(var -> searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, TimeUtils.getDateFromStr(TimeUtils.getStrDate(var.toDate(), "yyyyMMdd").concat("235959"), "yyyyMMddHHmmss"))));
+        }
     }
 
     protected Page<E> doLoadData(PageRequest pageRequest){
@@ -360,14 +234,7 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable, Serv
     protected LazyDataModel gamePlanLazyModel;
     protected E selected;
 
-    protected void init(){
-        try{
-            workOrderStepDao = WebUtil.getBean(V2_WorkOrderStepRepository.class);
-            workOrderService = WebUtil.getBean(V2_WorkOrderService.class);
-        } catch (Exception e) {
-            throw e;
-        }
-    };
+    protected void init(){}
     
     protected void onPrepareDataTableModel(){}
 

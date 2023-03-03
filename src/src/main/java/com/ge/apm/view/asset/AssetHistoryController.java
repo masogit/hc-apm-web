@@ -14,6 +14,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.data.FilterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -133,4 +134,15 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         return pageRequest;
     }
 
+    public void onFilterByAssetHistory(FilterEvent event) {
+        onFilterCustom(event, this::filters);
+    }
+
+    private boolean filters(String fieldName, String filterVal) {
+        if ("createdDate".equals(fieldName)) {
+            processTimeFiled(filterVal ,fieldName);
+            return true;
+        }
+        return false;
+    }
 }
