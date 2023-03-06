@@ -1,5 +1,6 @@
 package com.ge.apm.view.zkb;
 
+import cn.hutool.core.util.StrUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -62,6 +63,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private String isVacation;
     private boolean canDelete= false;
     private boolean operateDelete = false;
+    private String notGeAsset;
 
     @Override
     protected void init() {
@@ -72,6 +74,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         queryStatus =WebUtil.getRequestParameter("queryStatus");
+        notGeAsset = WebUtil.getRequestParameter("notGeAsset");
         selectionTenantInfo =WebUtil.getRequestParameter("tenantUID");
         if(StringUtils.isEmpty(queryStatus)){
             queryStatus = "";
@@ -87,9 +90,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
                 if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
+                    ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
+                    ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
+                    ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
+                    ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
+                    ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
                 ){
                     showStatusBtn =false;
                 }
@@ -144,6 +151,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         List<SearchFilter> searchFilters = csearchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
+        }
+
+        if(StrUtil.isEmpty(notGeAsset)){
+            searchFilters.add(new SearchFilter("notGeAsset", SearchFilter.Operator.IsNull, ""));
+        }else{
+            searchFilters.add(new SearchFilter("notGeAsset", SearchFilter.Operator.EQ, "t"));
         }
 
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
@@ -203,7 +216,22 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1*2+3*"));
                         }
                     }
-
+                }else if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    if("US".equals(zkbPartOrderUserConfig.getAssetType())){
+                        if(StringUtils.isEmpty(queryStatus)){
+                            searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getId()));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString()));
+                        }else if("all".equals(queryStatus)){
+                            searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getId()));
+                        }
+                    }else {
+                        if(StringUtils.isEmpty(queryStatus)){
+                            searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType()));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString()));
+                        }else if("all".equals(queryStatus)){
+                            searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1*2+3*"));
+                        }
+                    }
                 }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if(StringUtils.isEmpty(queryStatus)){
                         searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion()));
@@ -217,6 +245,18 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion(), "1+2*"));
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), "1+2*"));
                             searchFilters.add(new SearchFilter("manageAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                        }
+                    }
+                }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
+                    if(StringUtils.isEmpty(queryStatus)){
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString()));
+                    }else if("all".equals(queryStatus)){
+                        if(searchFilters.size() > 0) {
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString(),"1*2+"));
+                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
+                        }else {
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), "1+"));
+                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
                         }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
@@ -384,7 +424,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public String queryListByStatus(String status){
         queryStatus = status;
-        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
+        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus +"&notGeAsset="+(StrUtil.isEmpty(notGeAsset) ? "" : notGeAsset);
     }
 
     public void doubleClick(SelectEvent event){
@@ -605,5 +645,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setOperateDelete(boolean operateDelete) {
         this.operateDelete = operateDelete;
+    }
+
+    public String getNotGeAsset() {
+        return notGeAsset;
+    }
+
+    public void setNotGeAsset(String notGeAsset) {
+        this.notGeAsset = notGeAsset;
     }
 }

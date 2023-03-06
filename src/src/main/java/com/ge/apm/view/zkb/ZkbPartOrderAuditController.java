@@ -3,6 +3,7 @@ package com.ge.apm.view.zkb;
 import cn.hutool.core.util.StrUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -20,6 +21,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -42,8 +44,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<V2_BlobObject> v2_blobObjectList;
     private List<V2_BlobObject> v2_probe_blobObjectList;
     private boolean showTech=false;
+    private boolean showTse=false;
     private boolean showProduct = false;
     private boolean showManage=false;
+    private boolean showOssc=false;
     private boolean showDirector = false;
     private boolean showCommercial = false;
     private boolean showUnOrder = false;
@@ -57,6 +61,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean isUnOrder = false;
     private boolean whetherDeductEdit = false;
     private boolean showBtnFourHundredCancel = false;
+    private String notGeAsset;
 
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
@@ -70,6 +75,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<HashMap<String, Object>> v2_listHashMap;
     private TenantInfo tenantInfo;
     private TenantInfoRepository tenantInfoRepository;
+    private BlobFileService blobService;
 
     private List<HashMap<String, String>> partNoList = new ArrayList<>();
     private List<HashMap<String, String>> orderNoList = new ArrayList<>();
@@ -96,6 +102,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String str = "";
     private String modifySsaKey;
 
+    private List<V2_BlobObject> goodReturnBlobObjectList = new ArrayList<>();
+
     @Override
     protected void init() {
         super.init();
@@ -109,7 +117,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         zkbContractAssetRepository = WebUtil.getBean(ZkbContractAssetRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
-
+        blobService = WebUtil.getBean(BlobFileService.class);
         str = WebUtil.getRequestParameter("str");
         System.out.println(str);
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -123,6 +131,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             Optional.ofNullable(selected.getTenantUID()).ifPresent(t -> tenantInfo = tenantInfoRepository.findByuid(selected.getTenantUID()));
             Optional.ofNullable(this.selected.getOrderType()).ifPresent(t -> orderType = this.selected.getOrderType());
             Optional.ofNullable(this.selected.getArtificialType()).ifPresent(t -> artificialType = this.selected.getArtificialType());
+
+            if(StrUtil.isEmpty(selected.getNotGeAsset())){
+                notGeAsset = CopyByInvok.F;
+            }else{
+                notGeAsset = CopyByInvok.T;
+            }
 
             zkbContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
             if(zkbContract == null){
@@ -544,13 +558,25 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             //endregion
         }else{
             if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && canEditFlag){
-                if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
-                    showManage = true;
+                if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
+                    if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
+                        showOssc = true;
+                    }else{
+                        if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
+                            showOssc = true;
+                        }else{
+                            showTse =true;
+                        }
+                    }
                 }else{
-                    if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
+                    if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                         showManage = true;
                     }else{
-                        showTech =true;
+                        if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
+                            showManage = true;
+                        }else{
+                            showTech =true;
+                        }
                     }
                 }
                 showBtn = "0";
@@ -574,6 +600,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
             } else if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(selected.getStatus())){
                 showTech= true;
+            } else if(ZkbPartOrder.PartOrderStatus.TseAccept.toString().equals(selected.getStatus())){
+                showTech= true;
+                if(canEditFlag){
+                    showOssc = true;
+                    showBtn = "0";
+                }
+            } else if(ZkbPartOrder.PartOrderStatus.TseReject.toString().equals(selected.getStatus())){
+                showTse= true;
             } else if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(selected.getStatus())){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
@@ -605,6 +639,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 showManage = true;
+            } else if(ZkbPartOrder.PartOrderStatus.OsscAccept.toString().equals(selected.getStatus())){
+                showTse= true;
+                showOssc = true;
+                if(canEditFlag){
+                    showOrder = true;
+                    showBtn = "1";
+                }
+            } else if(ZkbPartOrder.PartOrderStatus.OsscReject.toString().equals(selected.getStatus())){
+                showTse= true;
+                showOssc = true;
             } else if(ZkbPartOrder.PartOrderStatus.DirectorAccept.toString().equals(selected.getStatus())){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
@@ -886,6 +930,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return false;
     }
 
+    public String techFieldsetName(){
+        if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
+            return "Tse审批";
+        }else{
+            return "技术支持审批";
+        }
+    }
+
     public Boolean isCanModifyUnOrder(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus()) || ZkbPartOrder.PartOrderStatus.UnOrdered.toString().equals(selected.getStatus())){
@@ -1131,9 +1183,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         flag = false;
                         errorLog += "配件名称不能为空,";
                     }
-                    if(StringUtils.isEmpty(zkbPartOrderItem.getPrice())){
-                        flag = false;
-                        errorLog += "价格不能为空,";
+                    if(StrUtil.isEmpty(selected.getNotGeAsset())){
+                        if(StringUtils.isEmpty(zkbPartOrderItem.getPrice())){
+                            flag = false;
+                            errorLog += "价格不能为空,";
+                        }
                     }
                     if(StringUtils.isEmpty(zkbPartOrderItem.getOrderNo())){
                         flag = false;
@@ -1360,6 +1414,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderReturn.setPartQualityIssue(null);
         }
         if("Create".equals(actionReturnName) || "Edit".equals(actionReturnName)){
+            if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
+                if("goodReturn".equals(zkbPartOrderReturn.getReturnType())){
+                    if(goodReturnBlobObjectList == null || goodReturnBlobObjectList.size() == 0){
+                        WebUtil.addErrorMessage("请上传图片","");
+                        return;
+                    }
+                }
+            }
             boolean flag = true;
             Integer total = 0;
             for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
@@ -1396,7 +1458,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }
             zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString());
             zkbPartOrderReturn.setDataStatus(null);
-            zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
+            zkbPartOrderReturn = zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
+
+            for(V2_BlobObject v : goodReturnBlobObjectList){
+                if(StrUtil.isEmpty(v.getBoUuid())){
+                    v.setBoUuid(zkbPartOrderReturn.getId());
+                    blobService.saveBlobObject(v);
+                }
+            }
 
             saveTips = "备件归还信息已添加，提交申请后流程才会进入Admin确认阶段，请在添加完需要已归还的备件信息后提交申请，以免影响您后续的进度，感谢您的配合！";
         }else if("ModifyCreate".equals(actionReturnName)){
@@ -1660,6 +1729,24 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.probeCloseReject(selected, currentUser);
         WebUtil.addErrorMessage("操作成功！","操作成功w2");
         return "List?faces-redirect=true&queryStatus="+queryStatus;
+    }
+
+    public void handleReturnFileUpload(FileUploadEvent event){
+        V2_BlobObject v2_blobObject = blobService.uploadFile(event);
+        if (null != v2_blobObject) {
+            v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
+            v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_RETURN);
+            v2_blobObject.setBoUuid(null);
+            goodReturnBlobObjectList.add(v2_blobObject);
+            WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void removeReturnFile(V2_BlobObject v2_blobObject){
+        goodReturnBlobObjectList = goodReturnBlobObjectList.stream().filter(item -> !item.getId().equals(v2_blobObject.getId())).collect(Collectors.toList());
+        blobService.deleteBlobFile(v2_blobObject);
     }
 
     //region get、set
@@ -2066,6 +2153,38 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowProduct(boolean showProduct) {
         this.showProduct = showProduct;
+    }
+
+    public boolean isShowTse() {
+        return showTse;
+    }
+
+    public void setShowTse(boolean showTse) {
+        this.showTse = showTse;
+    }
+
+    public boolean isShowOssc() {
+        return showOssc;
+    }
+
+    public void setShowOssc(boolean showOssc) {
+        this.showOssc = showOssc;
+    }
+
+    public String getNotGeAsset() {
+        return notGeAsset;
+    }
+
+    public void setNotGeAsset(String notGeAsset) {
+        this.notGeAsset = notGeAsset;
+    }
+
+    public List<V2_BlobObject> getGoodReturnBlobObjectList() {
+        return goodReturnBlobObjectList;
+    }
+
+    public void setGoodReturnBlobObjectList(List<V2_BlobObject> goodReturnBlobObjectList) {
+        this.goodReturnBlobObjectList = goodReturnBlobObjectList;
     }
 
     @Override

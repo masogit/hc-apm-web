@@ -33,7 +33,7 @@ public class ZkbPartOrder implements Serializable {
         ManageAccept,ManageReject,UnOrdered,UnOrderedReject,
         Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,
         DirectorReject,CommercialAccept,CommercialReject,FourHundredCancel,
-        CloseReject
+        CloseReject,TseAccept,TseReject,OsscAccept,OsscReject
     }
 
     /**
@@ -182,6 +182,37 @@ public class ZkbPartOrder implements Serializable {
     private String manageAuditer;
     @Column(name = "manage_auditer_uid")
     private String manageAuditerUid;
+    /**
+     * Tse审批备注
+     */
+    @Column(name = "tse_remark")
+    private String tseRemark;
+
+    @Column(name = "tse_audit_date")
+    private Date tseAuditDate;
+
+    @Column(name = "tse_auditer")
+    private String tseAuditer;
+
+    @Column(name = "tse_auditer_uid")
+    private String tseAuditerUid;
+
+    /**
+     * ossc审批备注
+     */
+
+    @Column(name = "ossc_part_no")
+    private String osscPartNo;
+    @Column(name = "ossc_remark")
+    private String osscRemark;
+
+    @Column(name = "ossc_audit_date")
+    private Date osscAuditDate;
+
+    @Column(name = "ossc_auditer")
+    private String osscAuditer;
+    @Column(name = "ossc_auditer_uid")
+    private String osscAuditerUid;
 
     /**
      * 产品经理审批备注
@@ -628,6 +659,20 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "parts_high_type")
     private String partsHighType;
+
+    /**
+     * 是否非ge设备 t是非ge设备，空是ge设备
+     */
+    @Column(name = "not_ge_asset")
+    private String notGeAsset;
+
+    public String getNotGeAsset() {
+        return notGeAsset;
+    }
+
+    public void setNotGeAsset(String notGeAsset) {
+        this.notGeAsset = notGeAsset;
+    }
 
     public String getPartsHighType() {
         return partsHighType;
@@ -1659,6 +1704,78 @@ public class ZkbPartOrder implements Serializable {
 
     public void setCommercialAuditerUid(String commercialAuditerUid) {
         this.commercialAuditerUid = commercialAuditerUid;
+    }
+
+    public String getTseRemark() {
+        return tseRemark;
+    }
+
+    public void setTseRemark(String tseRemark) {
+        this.tseRemark = tseRemark;
+    }
+
+    public Date getTseAuditDate() {
+        return tseAuditDate;
+    }
+
+    public void setTseAuditDate(Date tseAuditDate) {
+        this.tseAuditDate = tseAuditDate;
+    }
+
+    public String getTseAuditer() {
+        return tseAuditer;
+    }
+
+    public void setTseAuditer(String tseAuditer) {
+        this.tseAuditer = tseAuditer;
+    }
+
+    public String getTseAuditerUid() {
+        return tseAuditerUid;
+    }
+
+    public void setTseAuditerUid(String tseAuditerUid) {
+        this.tseAuditerUid = tseAuditerUid;
+    }
+
+    public String getOsscRemark() {
+        return osscRemark;
+    }
+
+    public void setOsscRemark(String osscRemark) {
+        this.osscRemark = osscRemark;
+    }
+
+    public Date getOsscAuditDate() {
+        return osscAuditDate;
+    }
+
+    public void setOsscAuditDate(Date osscAuditDate) {
+        this.osscAuditDate = osscAuditDate;
+    }
+
+    public String getOsscAuditer() {
+        return osscAuditer;
+    }
+
+    public void setOsscAuditer(String osscAuditer) {
+        this.osscAuditer = osscAuditer;
+    }
+
+    public String getOsscAuditerUid() {
+        return osscAuditerUid;
+    }
+
+    public void setOsscAuditerUid(String osscAuditerUid) {
+        this.osscAuditerUid = osscAuditerUid;
+    }
+
+    public String getOsscPartNo() {
+        return osscPartNo;
+    }
+
+    public void setOsscPartNo(String osscPartNo) {
+        this.osscPartNo = osscPartNo;
     }
 
     @Override
