@@ -27,7 +27,7 @@
                 <h:panelGroup>
                     <label class="label">归还类型*</label>
                     <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnType}" required="true" requiredMessage="归还类型不能为空" >
-                        <p:ajax event="change" update="returnTypeGrid" />
+                        <p:ajax event="change" update="returnTypeGrid goodReturnAttachment" />
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <!--<f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                         <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -72,6 +72,19 @@
                     <p:inputText id="remark" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.remark}"  />
                 </h:panelGroup>
             </p:panelGrid>
+            <h:panelGroup id="goodReturnAttachment">
+                <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'goodReturn'}">
+                    <p:dataList id="uploadReturnList" value="#{zkbPartOrderAuditController.goodReturnBlobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                        <f:facet name="header">图片</f:facet>
+                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                        <p:commandButton actionListener="#{zkbPartOrderAuditController.removeReturnFile(fileitem)}" update="uploadReturnList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                        </p:commandButton>
+                    </p:dataList>
+                    <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{zkbPartOrderAuditController.handleReturnFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                  multiple="true"  sizeLimit="31000000"  update="uploadReturnList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}"/>
+                </h:panelGroup>
+            </h:panelGroup>
             <br/>
             <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbPartOrderAuditController.saveReturn}" update="#{zkbPartOrderAuditController.actionReturnName eq 'Create'  or zkbPartOrderAuditController.actionReturnName eq 'Edit' ? ':growl :zkbPartOrderEditForm:zkbReturnDatalist :zkbPartOrderEditForm:saveTips' : ':growl :zkbPartOrderReturnModifyForm'}"
                  icon="ui-icon-check" oncomplete="PF('zkbPartOrderReturnEditDlg').hide()" />

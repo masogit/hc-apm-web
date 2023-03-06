@@ -114,6 +114,17 @@ public class ZkbPartOrderReturn implements Serializable {
     @Column(name = "closed_auditer_uid")
     private String closedAuditerUid;
 
+    @Column(name = "seven_returned_flag")
+    private String sevenReturnedFlag;
+
+    public String getSevenReturnedFlag() {
+        return sevenReturnedFlag;
+    }
+
+    public void setSevenReturnedFlag(String sevenReturnedFlag) {
+        this.sevenReturnedFlag = sevenReturnedFlag;
+    }
+
     public String getClosedRemark() {
         return closedRemark;
     }

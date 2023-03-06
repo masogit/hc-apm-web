@@ -12,7 +12,16 @@
         </div>
         <div  class="ui-g-12 card">
             <h:form id="zkbHeadEditForm">
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">GE设备或非GE设备*</label>
+                        <p:selectOneMenu id="notGeAsset" value="#{zkbPartOrderEditController.notGeAsset}" required="true" requiredMessage="GE设备或非GE设备 #{msg.ValidationRequire}">
+                            <p:ajax event="change" update="zkbwkEditForm zkbPartOrderEditForm"  />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItem itemLabel="GE设备" itemValue="f"/>
+                            <f:selectItem itemLabel="非GE设备" itemValue="t"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">订单类型*</label>
                         <p:selectOneMenu id="orderType" value="#{zkbPartOrderEditController.orderType}" disabled="#{zkbPartOrderEditController.selected.scoreFlag != null and zkbPartOrderEditController.selected.scoreFlag eq 't'}">
@@ -48,6 +57,13 @@
                             <f:selectItem itemLabel="否" itemValue="f"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+                   <!-- <h:panelGroup>
+                        <br/>
+                        <p:selectBooleanCheckbox itemLabel="非GE" value="#{zkbPartOrderEditController.notGeAssetFlag}"  >
+                            <p:ajax event="change" update="zkbPartOrderEditForm" />
+                        </p:selectBooleanCheckbox>
+                    </h:panelGroup>-->
+
                 </p:panelGrid>
             </h:form>
         </div>
@@ -57,7 +73,7 @@
                 <p:messages id="messages" showDetail="true" closable="false" autoUpdate="true"></p:messages>
                 <p:fieldset id="zkbWorkFlowFieldset" legend="工单信息" >
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup>
+                        <h:panelGroup >
                             <label class="label">设备sysID</label>
                             <p:inputText id="qrCode" value="#{zkbPartOrderEditController.queryWorkFlow.assetInfo.systemId}" maxlength="100" required="false"/>
                         </h:panelGroup>
@@ -82,6 +98,12 @@
                         </p:column>
                         <p:column headerText="报修单号">
                             <h:outputText value="#{item.srNum}"/>
+                        </p:column>
+                        <p:column headerText="二维码">
+                            <h:outputText value="#{item.oneQrCode}"/>
+                        </p:column>
+                        <p:column headerText="品牌">
+                            <h:outputText value="#{item.makerShortName}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
                         </f:facet>
@@ -412,6 +434,10 @@
                             <label class="label">Sr#*</label>
                             <p:inputText value="#{zkbPartOrderEditController.selected.srNo}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}" />
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.notGeAsset eq 't' and zkbPartOrderEditController.orderType eq 'Parts'}">
+                            <label class="label">品牌*</label>
+                            <p:inputText id="makerShortName" value="#{zkbPartOrderEditController.assetInfo.makerShortName}"  disabled="true"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid  rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                         <h:panelGroup>
@@ -445,7 +471,7 @@
                         </h:panelGroup>
                     </h:panelGroup>
                 </p:fieldset>
-                <p:fieldset id="regionalManagerFieldset" legend="区域经理信息" rendered="#{zkbPartOrderEditController.showPartOrder and zkbPartOrderEditController.showRegionalManager}" >
+                <p:fieldset id="regionalManagerFieldset" legend="区域经理信息" rendered="#{zkbPartOrderEditController.showPartOrder and zkbPartOrderEditController.showRegionalManager and !(zkbPartOrderEditController.notGeAsset eq 't')}" >
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">姓名</label>
