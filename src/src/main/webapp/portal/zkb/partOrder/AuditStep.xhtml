@@ -15,9 +15,8 @@
                 <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">GE设备或非GE设备*</label>
-                        <p:selectOneMenu id="notGeAsset" value="#{zkbPartOrderAuditController.notGeAsset}" disabled="true">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItem itemLabel="GE设备" itemValue="f"/>
+                        <p:selectOneMenu id="notGeAsset" value="#{zkbPartOrderAuditController.selected.notGeAsset}" disabled="true">
+                            <f:selectItem itemLabel="GE设备" />
                             <f:selectItem itemLabel="非GE设备" itemValue="t"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
@@ -864,7 +863,7 @@
                         <p:column headerText="Order#*">
                             <p:inputText value="#{item.orderNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
-                        <p:column headerText="价格*" rendered="#{!userContextService.zkbUser and !(zkbPartOrderAuditController.notGeAsset eq 't')}">
+                        <p:column headerText="价格*" rendered="#{!userContextService.zkbUser and !(zkbPartOrderAuditController.selected.notGeAsset eq 't')}">
                             <p:inputText value="#{item.price}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                             <!--<p:inputNumber value="#{item.price}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" > </p:inputNumber>-->
                         </p:column>
@@ -1054,11 +1053,17 @@
                                 </f:facet>
                             </p:cellEditor>
                         </p:column>
-                        <p:column headerText="是否7天未归还" exportable="false" width="160" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin and zkbPartOrderAuditController.notGeAsset eq 't'}" >
+                        <p:column headerText="是否7天未归还" exportable="false" width="160" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin and zkbPartOrderAuditController.selected.notGeAsset eq 't'}" >
                             <p:cellEditor>
-                                <f:facet name="output"><h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnDataStatus',it.dataStatus)}" /></f:facet>
+                                <f:facet name="output">
+                                    <p:selectOneMenu value="#{it.sevenReturnedFlag}" style="width:100%" disabled="true">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItem itemLabel="是" itemValue="t"/>
+                                        <f:selectItem itemLabel="否" itemValue="f"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
                                 <f:facet name="input">
-                                    <p:selectOneMenu value="#{it.dataStatus}" style="width:100%">
+                                    <p:selectOneMenu value="#{it.sevenReturnedFlag}" style="width:100%">
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItem itemLabel="是" itemValue="t"/>
                                         <f:selectItem itemLabel="否" itemValue="f"/>
