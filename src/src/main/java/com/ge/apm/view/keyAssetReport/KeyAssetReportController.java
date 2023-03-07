@@ -18,6 +18,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -40,6 +41,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     private KeyAssetReportRepository dao;
     private OrgInfoRepository orgDao;
     private AssetInfoRepository assetDao;
+    private UserOrgInfoRepository userOrgInfoRepository;
+    private OrgInfoRepository orgInfoRepository;
 
     private KeyAssetReportService service;
 
@@ -94,6 +97,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         service = WebUtil.getBean(KeyAssetReportService.class);
         microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
+        userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 
         org = orgDao.findById(UserContextService.getCurrentUserAccount().getOrgInfoId());
 
@@ -143,10 +148,37 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if(CollectionUtils.isEmpty(this.searchFilters)){
             this.searchFilters = new ArrayList<>();
         }
+        Set<Integer> idList = findOrgUidListByUserUid(UserContextService.getCurrentUserAccount().getUid());
+        if(CollectionUtils.isNotEmpty(idList)){
+            searchFilters.add(new SearchFilter("deptId", SearchFilter.Operator.IN, idList));
+        }else{
+            return new PageImpl<>(new ArrayList<>(), pageRequest, 0);
+        }
+
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         PageRequest page = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         List<SearchFilter> searchFilters = this.searchFilters;
         return dao.findBySearchFilter(searchFilters, page);
+    }
+
+    private Set<Integer> findOrgUidListByUserUid(String userUid) {
+        Set<String> listResult = new HashSet<String>();
+        List<UserOrgInfo> listUserOrgInfo = userOrgInfoRepository.findOrgUidListByUserUid(userUid);
+        if (listUserOrgInfo != null && listUserOrgInfo.size() > 0) {
+            for (int i = 0; i < listUserOrgInfo.size(); ++i) {
+                listResult.add(listUserOrgInfo.get(i).getOrgUid());
+            }
+        }
+        if (CollectionUtils.isNotEmpty(listResult)) {
+            Set<String> tempResult=orgInfoRepository.findClinicalDeptOrgUidListByOrgUid(listResult);
+            if(tempResult!=null){
+                listResult.addAll(tempResult);
+            }
+        }
+        if(CollectionUtils.isNotEmpty(listResult)){
+            return orgInfoRepository.findIdListByUid(listResult);
+        }
+        return new HashSet<>();
     }
 
     public void saveKeyAssetReport(){
