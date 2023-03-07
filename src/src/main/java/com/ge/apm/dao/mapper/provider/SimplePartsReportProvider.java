@@ -1,6 +1,6 @@
 package com.ge.apm.dao.mapper.provider;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
