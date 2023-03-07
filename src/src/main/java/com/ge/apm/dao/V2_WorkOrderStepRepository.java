@@ -23,6 +23,9 @@ public interface V2_WorkOrderStepRepository extends GenericRepositoryUUID<V2_Wor
     @Query("select s from V2_WorkOrder_Step s where s.woId=?1 and s.stepId=?2")
     public List<V2_WorkOrder_Step> findRepaireName(String woId,Integer stepId);
 
+    @Query("select s from V2_WorkOrder_Step s where s.woId=?1 and s.stepId=?2 order by s.startTime DESC")
+    public List<V2_WorkOrder_Step> findMaxStartTimeWorkOrderStepByWoIdAndStepId(String woId, Integer stepId);
+
     @Query("select s from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%') and s.stepId = 4")
 //    @Query("select s.woId from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%')")
     public List<V2_WorkOrder_Step> findWorkIds(String owerName);
@@ -32,6 +35,9 @@ public interface V2_WorkOrderStepRepository extends GenericRepositoryUUID<V2_Wor
 
     @Query("select s from V2_WorkOrder_Step s where s.stepId = 4 and s.ownerName like concat('%',?1,'%')")
     List<V2_WorkOrder_Step> findWorkSteps(String ownerName);
+
+    @Query("select s from V2_WorkOrder_Step s where s.stepId = ?1 and s.tenantUID = ?2")
+    List<V2_WorkOrder_Step> findWorkStepsByStepIdAndTenantUid(Integer stepId, String tenantUid);
 
     @Query("select s from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%')")
     public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName);

@@ -1246,6 +1246,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     }
 
+    public String getRepairNameRefract(String woId, Integer step){
+        List<V2_WorkOrder_Step> v2WorkOrderStep = woService.getMaxStartTimeWorkOrderStepByWoIdAndStepId(woId, step);
+        return CollectionUtils.isEmpty(v2WorkOrderStep)?"":v2WorkOrderStep.get(0).getOwnerName();
+    }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         return woService.getWorkOrderDetails(woId);
@@ -3652,7 +3656,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void needTwoSubStatusBatch(List<V2_WorkOrder> workOrders){
-        workOrders.forEach(workOrder -> workOrder.setRepairName(isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPersonName(workOrder.getId(), 10):getRepairPersonName(workOrder.getId(), 4)));
+        workOrders.forEach(workOrder -> workOrder.setRepairName(isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairNameRefract(workOrder.getId(), 10):getRepairNameRefract(workOrder.getId(), 4)));
     }
 
     public Boolean isConfigNeedTwoSubBySiteUid(String siteUid) {
@@ -3685,19 +3689,15 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             return true;
         }
         if ("id".equals(fieldName)) {
-            List<String> ownerNames = woService.findOwerNames(filterVal);
-            List<V2_WorkOrder_Step> steps = woService.findWorkSteps(filterVal);
-            if (CollectionUtils.isEmpty(ownerNames) || CollectionUtils.isEmpty(steps)) {
+            List<V2_WorkOrder_Step> steps = woService.getWorkStepsByStepId(4, tenantInfo.getUid());
+            if (CollectionUtils.isEmpty(steps)) {
                 return true;
             }
-            StringBuffer ownerNamesSb = new StringBuffer();
-            ownerNames.forEach(var -> ownerNamesSb.append(var).append(","));
-            String ownerNamesStr = ownerNamesSb.toString();
-            Map<String, List<V2_WorkOrder_Step>> map = steps.stream().filter(step -> ownerNamesStr.contains(step.getOwnerName())).collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
+            Map<String, List<V2_WorkOrder_Step>> map = steps.stream().collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
             List<V2_WorkOrder_Step> stepList = map.values().stream().map(group -> group.stream()
                     .max(Comparator.comparing(V2_WorkOrder_Step::getStartTime))
                     .orElse(null))
-                    .filter(Objects::nonNull)
+                    .filter(val -> val!=null&&val.getOwnerName().contains(filterVal))
                     .collect(Collectors.toList());
             removeFilterOnField("id");
             if (!CollectionUtils.isEmpty(stepList)) {

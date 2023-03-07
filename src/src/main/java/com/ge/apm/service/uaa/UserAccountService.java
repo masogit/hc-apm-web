@@ -1,6 +1,6 @@
 package com.ge.apm.service.uaa;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.ge.apm.dao.*;
