@@ -2103,15 +2103,11 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
             return true;
         }
         if ("id".equals(fieldName)) {
-            List<String> ownerNames = woService.findOwerNames(filterVal);
-            List<V2_WorkOrder_Step> steps = woService.findWorkSteps(filterVal);
-            if (org.apache.commons.collections.CollectionUtils.isEmpty(ownerNames) || org.apache.commons.collections.CollectionUtils.isEmpty(steps)) {
+            List<V2_WorkOrder_Step> steps = woService.getWorkStepsByStepId(4, loginUser.getTenantUID());
+            if (CollectionUtils.isEmpty(steps)) {
                 return true;
             }
-            StringBuffer ownerNamesSb = new StringBuffer();
-            ownerNames.forEach(var -> ownerNamesSb.append(var).append(","));
-            String ownerNamesStr = ownerNamesSb.toString();
-            Map<String, List<V2_WorkOrder_Step>> map = steps.stream().filter(step -> ownerNamesStr.contains(step.getOwnerName())).collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
+            Map<String, List<V2_WorkOrder_Step>> map = steps.stream().collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
             List<V2_WorkOrder_Step> stepList = map.values().stream().map(group -> group.stream()
                     .max(Comparator.comparing(V2_WorkOrder_Step::getStartTime))
                     .orElse(null))

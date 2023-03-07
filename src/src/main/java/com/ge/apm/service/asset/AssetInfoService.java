@@ -5,7 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
