@@ -1,6 +1,6 @@
 package com.ge.apm.view.measuring;
 
-import cn.hutool.core.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;

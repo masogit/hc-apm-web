@@ -1,6 +1,6 @@
 package com.ge.apm.service;
 
-import cn.hutool.core.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.ge.apm.dao.BlobObjectRepository;
