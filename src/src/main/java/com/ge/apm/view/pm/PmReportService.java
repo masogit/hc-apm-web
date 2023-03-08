@@ -343,8 +343,8 @@ public class PmReportService {
         empty = false;
         List pictureStorageIds = blobObjectRepository.findByBoUuid(pmOrder.getId()).stream().map(blob -> {
             if (".jpg,.jpeg,.png".contains(blob.getObjectName().substring(blob.getObjectName().lastIndexOf(".")+1).toLowerCase())) return blob.getObjectStorageId();return null; }).collect(Collectors.toList());
-        for(int i=0;i<5;i++) {
-            if(i>=pictureStorageIds.size()) empty = true; //实际图片少于5个
+        for(int i=0;i<30;i++) {
+            if(i>=pictureStorageIds.size()) empty = true; //实际图片少于30个
             byte[] pictureBytes = null;
             if(empty) {
                 pictureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
@@ -392,6 +392,206 @@ public class PmReportService {
                             content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER4.toString(), "工单图片");
                         }
                         content.put(MaintenanceTemplate.Component.PM_PICTURE4.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 5:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER5.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER5.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE5.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 6:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER6.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER6.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE6.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 7:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER7.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER7.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE7.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 8:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER8.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER8.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE8.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 9:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER9.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER9.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE9.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 10:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER10.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER10.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE10.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 11:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER11.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER11.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE11.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 12:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER12.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER12.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE12.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 13:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER13.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER13.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE13.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 14:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER14.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER14.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE14.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 15:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER15.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER15.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE15.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 16:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER16.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER16.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE16.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 17:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER17.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER17.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE17.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 18:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER18.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER18.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE18.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 19:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER19.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER19.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE19.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 20:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER20.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER20.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE20.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 21:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER21.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER21.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE21.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 22:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER22.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER22.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE22.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 23:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER23.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER23.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE23.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 24:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER24.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER24.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE24.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 25:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER25.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER25.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE25.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 26:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER26.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER26.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE26.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 27:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER27.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER27.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE27.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 28:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER28.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER28.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE28.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                        break;
+                    case 29:
+                        if(empty) {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER29.toString(), EMPTY_SIGNATURE_HOLDER);
+                        } else {
+                            content.put(MaintenanceTemplate.Component.PM_PICTURE_HOLDER29.toString(), "工单图片");
+                        }
+                        content.put(MaintenanceTemplate.Component.PM_PICTURE29.toString(), new PictureRenderData(100, 80, "signature.png", pictureBytes));
                         break;
                     default:
                         break;
