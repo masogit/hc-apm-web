@@ -423,13 +423,17 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     }
 
     public String queryListByStatus(String status){
-        queryStatus = status;
-        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus +"&notGeAsset="+(StrUtil.isEmpty(notGeAsset) ? "" : notGeAsset);
+        if(StrUtil.isNotEmpty(status) && "notGeAsset".equals(status)){
+            return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus +"&notGeAsset="+(StrUtil.isEmpty(notGeAsset) ? "" : notGeAsset);
+        }else{
+            queryStatus = status;
+            return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus +"&notGeAsset="+(StrUtil.isEmpty(notGeAsset) ? "" : notGeAsset);
+        }
     }
 
     public void doubleClick(SelectEvent event){
         selected = (ZkbPartOrder) event.getObject();
-        String str = "action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus;
+        String str = "action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus +"&notGeAsset="+(StrUtil.isEmpty(notGeAsset) ? "" : notGeAsset);
         String url = "AuditStep.xhtml?str="+UrlParamUtil.encodeUrlQueryString(str);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
@@ -503,10 +507,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
 
     public String createAction() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo)+"&queryStatus="+queryStatus);
+        return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo)+"&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(notGeAsset) ? "" : notGeAsset));
     }
     public String editAction() {
-        return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
+        return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(notGeAsset) ? "" : notGeAsset));
     }
     private StreamedContent exportFile;
 
