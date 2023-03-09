@@ -28,4 +28,13 @@ public class MqUtils {
         }
 
     }
+
+
+
+
+    public   void sendToMq(String routingKey,String exChange,Object object){
+        rabbitTemplate.convertAndSend(exChange,routingKey,object);
+    }
+
+
 }
