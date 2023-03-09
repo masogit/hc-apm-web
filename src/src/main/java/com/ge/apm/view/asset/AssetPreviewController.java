@@ -157,7 +157,7 @@ public class AssetPreviewController extends GenericCRUDController<AssetInfo> {
     public void exportExcel() throws IOException {
         assetInfoListController.setSelectedMap(initSelectMap(assetInfoList));
         assetInfoListController.setIsOrderByForParentAndChildren(true);
-        assetInfoListController.exportExcel();
+        assetInfoListController.exportExcel(false);
     }
 
     public void onSelectAsset() throws IOException {
