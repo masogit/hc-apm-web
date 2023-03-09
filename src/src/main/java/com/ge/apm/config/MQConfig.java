@@ -23,6 +23,13 @@ public class MQConfig {
 
 
 
+    public static final String PHYSICAL_DATA_DELETE_KEY = "physical.data.delete";
+    public static final String PHYSICAL_DATA_DEL_CHANGE = "physicalDataDelChange";
+    public static final String PHYSICAL_DATA_DEL_QUEUE = "physicalDataDelQueue";
+    public static final String MESSAGE_TYPE = "physical.data.delete";
+
+
+
 
 
 }

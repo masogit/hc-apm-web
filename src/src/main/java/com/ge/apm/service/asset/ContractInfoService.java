@@ -6,11 +6,18 @@
 package com.ge.apm.service.asset;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.callback.DataDelVO;
+import com.ge.apm.callback.MqContext;
+import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.*;
+import com.ge.apm.mq.MqUtils;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +62,9 @@ public class ContractInfoService {
     private UserAccountService userAccountService;
     @Autowired
     private AssetInfoRepository assetInfoDao;
+
+    @Autowired
+    private MqUtils mqUtils;
 
     public List<ContractInfoItem> getContractItems(String id) {
         return contractItemDao.findByContractId(id);
@@ -123,11 +133,34 @@ public class ContractInfoService {
 
         contractItemDao.delete(contractItems);
         contractDao.delete(contract);
-
+        sendMq(contract,"contract_info");
+        sendMq(contractItems,"contract_info_item");
         return true;
     }
 
-//    public List<V2_WorkOrder_Detail> getPartsInfo(String contractNum, String tenantUid) {
+    private void sendMq(Object object,String objectType) {
+        MqContext mqContex=new MqContext();
+        mqContex.setTime(new Date());
+        mqContex.setExChange(MQConfig.PHYSICAL_DATA_DEL_CHANGE);
+        mqContex.setRoutingKey("physical.data.delete");
+        mqContex.setType("physicalDataDelete");
+        DataDelVO dataDelVO = new DataDelVO();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("jsonData",dataDelVO);
+        mqContex.setJsonObject(jsonObject);
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        dataDelVO.setOperator(userAccount.getLoginName());
+        dataDelVO.setDate(new Date());
+        dataDelVO.setObjectType(objectType);
+        dataDelVO.setObjectValue(JSONObject.toJSONString(object));
+        dataDelVO.setHospitalUID(userAccount.getHospitalUID());
+        dataDelVO.setInstitutionUID(userAccount.getInstitutionUID());
+        dataDelVO.setSiteUID(userAccount.getSiteUID());
+        dataDelVO.setTenantUID(userAccount.getTenantUID());
+        mqUtils.sendToMq(mqContex);
+    }
+
+    //    public List<V2_WorkOrder_Detail> getPartsInfo(String contractNum, String tenantUid) {
 //
 //        return partsDao.findByContractNum(contractNum, tenantUid);
 //    }
@@ -200,6 +233,8 @@ public class ContractInfoService {
         }
 
         contractItemDao.delete(item);
+        sendMq(item,"contract_info_item");
+
     }
 
 }
