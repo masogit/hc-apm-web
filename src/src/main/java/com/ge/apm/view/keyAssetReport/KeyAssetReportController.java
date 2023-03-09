@@ -88,8 +88,6 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     @Getter @Setter
     private String filterFillTime = null;
 
-    private MicroServiceUtil microServiceUtil;
-
     private String previewUrl;
 
     @Override
@@ -98,7 +96,6 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         service = WebUtil.getBean(KeyAssetReportService.class);
-        microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
         userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 
@@ -287,6 +284,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetGroup = "";
         functionType = "";
         departNum = "";
+        assetName = this.selected.getAssetName();
     }
 
     public void findAssetList(){
