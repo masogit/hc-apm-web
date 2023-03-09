@@ -76,10 +76,11 @@ public class WorkOrderPublishRenderService {
     }
 
     private String getFileName(Map<String, Object> map, int index) {
+        String siteName = (String) map.get("院区");
         String deviceName = (String) map.get(WebUtil.getMessage("EquipmentName_xlsx"));
         deviceName = StringUtils.replace(deviceName, "\\", "-");
         deviceName = StringUtils.replace(deviceName, "/", "-");
-        return "WO" + index + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx")) + ".docx";
+        return siteName + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx")) + ".docx";
     }
 
     private String encoding(String fileName) {

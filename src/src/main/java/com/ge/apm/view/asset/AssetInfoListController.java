@@ -598,12 +598,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             e.printStackTrace();
         }
     }
-    public void exportExcel() throws IOException {
+    public void exportExcel(boolean crossSite) throws IOException {
 
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-
+        if (crossSite) {
+            insertCrossSiteColumns(exportFields);
+        }
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
-//        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
         List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
@@ -611,11 +612,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<AssetInfo> assetList = getExportList();
 
-//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
         logger.info("start to export asset list to excel");
 
-        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(crossSite);
         template.exportAsset(assetList, sites, orgList, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
@@ -623,6 +622,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
 
         logger.info("export file: AssetInfo_export.xlsx successful.");
+    }
+
+    private void insertCrossSiteColumns(List<String> exportFields) {
+        // 增加医院列
+        String hospitalColumn = WebUtil.getMessage("hospitalId");
+        int siteIndex = exportFields.indexOf(hospitalColumn);
+        exportFields.add(siteIndex, WebUtil.getMessage("Hospital"));
+
+        // 增加集团列
+        exportFields.add(exportFields.size(), WebUtil.getMessage("Institution"));
     }
 
     public void batchProcessToBeTerminated() {

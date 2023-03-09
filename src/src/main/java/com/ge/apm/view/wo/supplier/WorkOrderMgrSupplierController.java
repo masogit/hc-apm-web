@@ -2111,7 +2111,7 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
             List<V2_WorkOrder_Step> stepList = map.values().stream().map(group -> group.stream()
                     .max(Comparator.comparing(V2_WorkOrder_Step::getStartTime))
                     .orElse(null))
-                    .filter(Objects::nonNull)
+                    .filter(val -> val!=null&&val.getOwnerName().contains(filterVal))
                     .collect(Collectors.toList());
             removeFilterOnField("id");
             if (org.apache.commons.collections.CollectionUtils.isNotEmpty(stepList)) {
