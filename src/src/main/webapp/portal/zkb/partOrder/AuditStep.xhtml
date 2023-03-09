@@ -537,15 +537,15 @@
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.showTse}">
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
-                            <label class="label">Tsc审批人</label>
+                            <label class="label">TSE审批人</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.tseAuditer}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
-                            <label class="label">Tsc审批时间*</label>
+                            <label class="label">TSE审批时间*</label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.tseAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">Tsc审批备注</label>
+                            <label class="label">TSE审批备注</label>
                             <p:inputTextarea value="#{zkbPartOrderAuditController.selected.tseRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
                             </p:inputTextarea>
                         </h:panelGroup>
@@ -1081,8 +1081,14 @@
                             <!-- <p:inputText value="#{it.closedRemark}"  rendered="#{zkbPartOrderAuditController.choseAdmin and it.dataStatus eq 'Pending'}"/>
                              <h:outputText value="#{it.closedRemark}" rendered="#{!(zkbPartOrderAuditController.choseAdmin and it.dataStatus eq 'Pending')}" />-->
                         </p:column>
-                        <p:column headerText="操作" style="width:80px" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin}">
+                      <!--  <p:column headerText="编辑" style="width:80px" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin}">
                             <p:rowEditor editTitle="审批" rendered="#{it.dataStatus eq 'Pending'}" />
+                        </p:column>-->
+                        <p:column headerText="操作" style="width:80px" >
+                            <!--<p:rowEditor editTitle="审批" rendered="#{it.dataStatus eq 'Pending'}" />-->
+                            <p:commandLink title="查看" update="zkbPartOrderReturnEditDlg" action="#{zkbPartOrderAuditController.prepareReturnAudit(it)}" oncomplete="PF('zkbPartOrderReturnEditDlg').show()" >
+                                <p:graphicImage name="icons/edit.png" style="width: 20px; height: 20px;"/>
+                            </p:commandLink>
                         </p:column>
                         <f:facet name="{Toolbar}" >
                             <p:commandButton immediate="false" process="@this" id="createReturnButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbPartOrderAuditController.prepareReturnCreate}" update=":growl :zkbPartOrderReturnEditDlg" oncomplete="PF('zkbPartOrderReturnEditDlg').show()" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag and !zkbPartOrderAuditController.choseAdmin}" />

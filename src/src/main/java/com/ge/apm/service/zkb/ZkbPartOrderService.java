@@ -191,7 +191,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     m.put("assetId", v.getAssetInfo().getUid());
                     m.put("hospitalName", v.getAssetInfo().getClinicalDeptName());
                     m.put("makerShortName", v.getAssetInfo().getMakerShortName());
-                    m.put("oneQrCode", v.getAssetInfo().getOneQrCode());
+                    m.put("oneQrCode", v.getAssetInfo().getQrCode());
                 });
                 v2_listHashMap.add(m);
             }
