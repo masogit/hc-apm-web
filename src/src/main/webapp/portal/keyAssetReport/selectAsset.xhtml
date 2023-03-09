@@ -22,8 +22,9 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.EquipmentName}</label>
-                        <p:inputText value="#{keyAssetReportController.assetName}" autocomplete="off" />
+                        <label class="label">#{msg.EquipmentName}*</label>
+                        <p:inputText value="#{keyAssetReportController.assetName}" autocomplete="off" required="true"
+                                     requiredMessage="#{msg.EquipmentName} #{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.EquipmentModel}</label>
@@ -34,7 +35,7 @@
                         <p:inputText id="departNumInput" value="#{keyAssetReportController.departNum}" autocomplete="off" />
                     </h:panelGroup>
                     <p:commandButton validateClient="true" value="查询"
-                                     update="selectForm:allAssetList"
+                                     update=":growl selectForm:allAssetList"
                                      actionListener="#{keyAssetReportController.findAssetList}" />
                 </p:panelGrid>
                 <p:fieldset legend="待选设备">

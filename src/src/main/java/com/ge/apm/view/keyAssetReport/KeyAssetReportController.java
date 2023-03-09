@@ -28,7 +28,9 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -86,8 +88,6 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     @Getter @Setter
     private String filterFillTime = null;
 
-    private MicroServiceUtil microServiceUtil;
-
     private String previewUrl;
 
     @Override
@@ -96,7 +96,6 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         service = WebUtil.getBean(KeyAssetReportService.class);
-        microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
         userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 
@@ -107,8 +106,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(account.getOrgInfoUID(), account.getUid(), 4);
         orgTree = initOrgTree(treeNode);
 
-        previewUrl = microServiceUtil.getGatewayURL(GatewayURL.JI_MU_REPORT).replace("8090","8085");
-        previewUrl += "/788203969584615424?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
+                "/792634098989666304?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
     }
 
     @Override
@@ -284,6 +284,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetGroup = "";
         functionType = "";
         departNum = "";
+        assetName = this.selected.getAssetName();
     }
 
     public void findAssetList(){
