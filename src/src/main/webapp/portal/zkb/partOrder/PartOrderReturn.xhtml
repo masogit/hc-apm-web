@@ -81,7 +81,7 @@
                 </h:panelGroup>
 
                 <h:panelGroup rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit'}">
-                    <label class="label">是否7天未归还</label>
+                    <label class="label">好还是否超过七天</label>
                     <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.sevenReturnedFlag}" style="text-align: left" disabled="#{zkbPartOrderAuditController.returnFormFlag eq 'readOnly'}" >
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItem itemLabel="是" itemValue="t"/>
