@@ -1451,7 +1451,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderReturn.setPartQualityIssue(null);
         }
         if("Create".equals(actionReturnName) || "Edit".equals(actionReturnName)){
-           /* if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
+            if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
                 if("goodReturn".equals(zkbPartOrderReturn.getReturnType())){
                     if(goodReturnBlobObjectList == null || goodReturnBlobObjectList.size() == 0){
                         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -1460,7 +1460,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);*/
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
             boolean flag = true;
             Integer total = 0;
             for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
