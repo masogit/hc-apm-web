@@ -110,7 +110,7 @@
             <br/>
             <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbPartOrderAuditController.saveReturn}" rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Edit' or zkbPartOrderAuditController.actionReturnName eq 'Create'}"
                  update="#{zkbPartOrderAuditController.actionReturnName eq 'Create' or zkbPartOrderAuditController.actionReturnName eq 'Edit' ? ':growl :zkbPartOrderEditForm:zkbReturnDatalist :zkbPartOrderEditForm:saveTips' : ':growl :zkbPartOrderReturnModifyForm'}"
-                 icon="ui-icon-check" oncomplete="PF('zkbPartOrderReturnEditDlg').hide()" />
+                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'zkbPartOrderReturnEditDlg');" />
             <p:commandButton validateClient="true" value="提交" action="#{zkbPartOrderAuditController.returnAudit()}" update=":growl :zkbPartOrderEditForm:zkbReturnDatalist :zkbPartOrderEditForm:saveTips" rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit'}"
                              icon="ui-icon-check"  oncomplete="handleSubmit(args, 'zkbPartOrderReturnEditDlg');"/>
 

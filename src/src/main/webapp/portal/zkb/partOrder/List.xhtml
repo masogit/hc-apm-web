@@ -25,8 +25,8 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:selectOneMenu id="notGeAsset"  value="#{zkbPartOrderController.notGeAsset}" >
-                                <p:ajax event="change" update="buttonSet datalist" />
+                            <p:selectOneMenu id="notGeAsset" value="#{zkbPartOrderController.notGeAsset}" >
+                                <p:ajax event="change" update="buttonSet datalist" listener="#{zkbPartOrderController.notGeAssetChange()}" oncomplete="openViewWindow(xhr, status, args)" />
                                 <f:selectItem itemLabel="GE" />
                                 <f:selectItem itemLabel="非GE" itemValue="t"/>
                             </p:selectOneMenu>

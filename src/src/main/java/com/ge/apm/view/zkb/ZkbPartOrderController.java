@@ -14,7 +14,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -30,7 +29,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -420,6 +418,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         }else{
             return "名额申请";
         }
+    }
+
+    public void notGeAssetChange(){
+        String url = "List.xhtml?notGeAsset=" + (StrUtil.isEmpty(notGeAsset) ? "" : notGeAsset);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public String queryListByStatus(String status){

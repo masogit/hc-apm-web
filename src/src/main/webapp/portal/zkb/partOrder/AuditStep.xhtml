@@ -1084,7 +1084,7 @@
                       <!--  <p:column headerText="编辑" style="width:80px" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin}">
                             <p:rowEditor editTitle="审批" rendered="#{it.dataStatus eq 'Pending'}" />
                         </p:column>-->
-                        <p:column headerText="操作" style="width:80px" >
+                        <p:column headerText="操作" style="width:80px" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin}">
                             <!--<p:rowEditor editTitle="审批" rendered="#{it.dataStatus eq 'Pending'}" />-->
                             <p:commandLink title="查看" update="zkbPartOrderReturnEditDlg" action="#{zkbPartOrderAuditController.prepareReturnAudit(it)}" oncomplete="PF('zkbPartOrderReturnEditDlg').show()" >
                                 <p:graphicImage name="icons/edit.png" style="width: 20px; height: 20px;"/>
