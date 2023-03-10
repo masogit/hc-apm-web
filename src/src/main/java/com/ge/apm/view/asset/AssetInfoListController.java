@@ -598,12 +598,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             e.printStackTrace();
         }
     }
-    public void exportExcel(boolean crossSite) throws IOException {
 
-        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        if (crossSite) {
-            insertCrossSiteColumns(exportFields);
-        }
+    public void export(List<String> exportFields) throws IOException {
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
         List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
@@ -614,7 +610,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         logger.info("start to export asset list to excel");
 
-        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(crossSite);
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
         template.exportAsset(assetList, sites, orgList, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
@@ -622,6 +618,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
 
         logger.info("export file: AssetInfo_export.xlsx successful.");
+    }
+
+    public void exportExcel() throws IOException {
+        export(ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles()));
+    }
+
+    public void exportAssetExcel() throws IOException {
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        insertCrossSiteColumns(exportFields);
+        export(exportFields);
     }
 
     private void insertCrossSiteColumns(List<String> exportFields) {
