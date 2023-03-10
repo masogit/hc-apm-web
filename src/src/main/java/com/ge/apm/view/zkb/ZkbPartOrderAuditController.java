@@ -121,7 +121,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         currentUser = UserContextService.getCurrentUserAccount();
         blobService = WebUtil.getBean(BlobFileService.class);
         str = WebUtil.getRequestParameter("str");
-        System.out.println(str);
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
@@ -1024,6 +1023,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String acceptNext(){
+        if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(selected.getCurrentStep())){
+            if(StrUtil.isEmpty(selected.getOsscPartNo())){
+                WebUtil.addErrorMessage("备件号不能为空！");
+                return "";
+            }
+        }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+            if(haveTrainCourseFlag){
+                WebUtil.addErrorMessage("是否上过培训课不能为空！");
+                return "";
+            }
+        }
         zkbPartOrderService.auditNext(this.selected,true,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendMessage(zkbPartOrder,UserContextService.getAccessToken());
@@ -1457,10 +1467,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                         WebUtil.addErrorMessage("请上传图片","");
                         return;
+                    }else{
+                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
                     }
                 }
             }
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
             boolean flag = true;
             Integer total = 0;
             for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
@@ -1485,10 +1496,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 flag = false;
             }
             if(!flag){
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage("归还数量不能大于配件数量","");
-                zkbPartOrderReturn = null;
-                zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId(),isChoseAdmin);
+                //zkbPartOrderReturn = null;
+                //zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId(),isChoseAdmin);
                 return;
+            }else{
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
             }
             if(StringUtils.isEmpty(zkbPartOrderReturn.getId())){
                 zkbPartOrderReturn.setCreatedDate(new Date());
@@ -1673,15 +1687,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
 
     public void returnAudit(){
-        if("goodReturn".equals(zkbPartOrderReturn.getReturnType())){
+        if("goodReturn".equals(zkbPartOrderReturn.getReturnType()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
             if(StrUtil.isEmpty(zkbPartOrderReturn.getSevenReturnedFlag()) && ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(zkbPartOrderReturn.getDataStatus())){
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage("是否7天未归还不能为空！");
                 return;
+            }else{
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
             }
         }
-        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
-
 
         zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString());
         for(ZkbPartOrderReturn r : zkbPartOrderReturnList){

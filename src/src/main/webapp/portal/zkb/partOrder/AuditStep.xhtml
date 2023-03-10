@@ -83,6 +83,12 @@
                     <p:column headerText="报修单号">
                         <h:outputText value="#{item.srNum}"/>
                     </p:column>
+                    <p:column headerText="二维码">
+                        <h:outputText value="#{item.oneQrCode}"/>
+                    </p:column>
+                    <p:column headerText="品牌">
+                        <h:outputText value="#{item.makerShortName}"/>
+                    </p:column>
                     <f:facet name="{Toolbar}">
                     </f:facet>
                 </p:dataTable>
@@ -386,6 +392,10 @@
                             <label class="label">Sr#*</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}"  disabled="true"/>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.notGeAsset eq 't' and zkbPartOrderAuditController.selected.orderType eq 'Parts'}">
+                            <label class="label">品牌*</label>
+                            <p:inputText id="makerShortName" value="#{zkbPartOrderAuditController.selected.getAssetInfo().makerShortName}"  disabled="true"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid rendered="#{!(zkbPartOrderAuditController.orderType eq 'Artificial')}">
                         <h:panelGroup>
@@ -581,7 +591,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.haveTrainCourseFlag}">
                             <label class="label">是否上过培训课*</label>
-                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.haveTrainCourseFlag}" required="true" requiredMessage="是否上过培训课 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.haveTrainCourseFlag}"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>
                                 <f:selectItem itemLabel="否" itemValue="f"/>
@@ -605,7 +615,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">备件号*</label>
-                            <p:inputText value="#{zkbPartOrderAuditController.selected.osscPartNo}" required="true" requiredMessage="备件号 #{msg.ValidationRequire}"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscPending')}" />
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.osscPartNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscPending')}" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscPending')}">
                             <label class="label">OSSC确认人</label>
