@@ -1053,7 +1053,7 @@
                                 </f:facet>
                             </p:cellEditor>
                         </p:column>
-                        <p:column headerText="是否7天未归还" exportable="false" width="160" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin and zkbPartOrderAuditController.selected.notGeAsset eq 't'}" >
+                        <p:column headerText="好还是否超过七天" exportable="false" width="160" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin and zkbPartOrderAuditController.selected.notGeAsset eq 't'}" >
                             <p:cellEditor>
                                 <f:facet name="output">
                                     <p:selectOneMenu value="#{it.sevenReturnedFlag}" style="width:100%" disabled="true">

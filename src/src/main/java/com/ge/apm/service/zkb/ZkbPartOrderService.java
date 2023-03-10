@@ -2680,7 +2680,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
                 if(ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
                     if(StrUtil.isNotEmpty(zkbPartOrder.getNotGeAsset()) && CopyByInvok.T.equals(zkbPartOrder.getNotGeAsset()) && "goodReturn".equals(r.getReturnType())){
-                        v += (r.getQty() - 1);
+                        if(CopyByInvok.T.equals(r.getSevenReturnedFlag())){
+                            v += (r.getQty() - 1);
+                        }
                     }else{
                         v += r.getQty();
                     }
