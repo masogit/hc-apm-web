@@ -94,7 +94,7 @@ public class CompareImportService {
             Collections.sort(itemList, Comparator.comparing(ArrivalListItem::getLastModifiedDate).reversed());
         }
 //        return (itemList != null && itemList.size() == 1) ? itemList.get(0) : null;
-        return (itemList != null) ? itemList.get(0) : null;
+        return (itemList != null && itemList.size()>0) ? itemList.get(0) : null;
     }
     
     public ArrivalListItem updateArrivalListItem(ArrivalListItem item) {
