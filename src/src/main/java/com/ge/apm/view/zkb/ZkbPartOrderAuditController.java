@@ -1674,7 +1674,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void returnAudit(){
         if("goodReturn".equals(zkbPartOrderReturn.getReturnType())){
-            if(StrUtil.isEmpty(zkbPartOrderReturn.getSevenReturnedFlag())){
+            if(StrUtil.isEmpty(zkbPartOrderReturn.getSevenReturnedFlag()) && ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(zkbPartOrderReturn.getDataStatus())){
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage("是否7天未归还不能为空！");
                 return;
