@@ -14,11 +14,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -93,7 +90,11 @@ public class CompareImportService {
 //        }
 
         List<ArrivalListItem> itemList = arrivalListItemDao.findBySearchFilter(itemFilters);
-        return (itemList != null && itemList.size() == 1) ? itemList.get(0) : null;
+        if(itemList!=null && itemList.size()>1){
+            Collections.sort(itemList, Comparator.comparing(ArrivalListItem::getLastModifiedDate).reversed());
+        }
+//        return (itemList != null && itemList.size() == 1) ? itemList.get(0) : null;
+        return (itemList != null) ? itemList.get(0) : null;
     }
     
     public ArrivalListItem updateArrivalListItem(ArrivalListItem item) {
