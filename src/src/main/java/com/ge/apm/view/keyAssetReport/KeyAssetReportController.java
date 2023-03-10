@@ -108,7 +108,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
-                "/792634098989666304?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+                "/793725327773011968?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
     }
 
     @Override
