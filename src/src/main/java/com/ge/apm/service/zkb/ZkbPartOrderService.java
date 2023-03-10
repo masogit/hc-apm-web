@@ -2411,8 +2411,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
         if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
+           ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
             ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrder.getCurrentStep()) ||    ZkbPartOrder.PartOrderStatus.ProductReject.toString().equals(zkbPartOrder.getStatus()) ||
             ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
+            ZkbPartOrder.PartOrderStatus.TseReject.toString().equals(zkbPartOrder.getStatus()) || ZkbPartOrder.PartOrderStatus.OsscReject.toString().equals(zkbPartOrder.getStatus()) ||
             ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(zkbPartOrder.getStatus()) || ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus())) {
             HashMap<String, Object> emailWrapperMap = null;
             try {
@@ -2453,6 +2455,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         statusList.add(ZkbPartOrder.PartOrderStatus.CommercialAccept.toString());
         statusList.add(ZkbPartOrder.PartOrderStatus.CommercialReject.toString());
         statusList.add(ZkbPartOrder.PartOrderStatus.FourHundredCancel.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.TseAccept.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.TseReject.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.OsscAccept.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.OsscReject.toString());
         if (statusList.contains(zkbPartOrder.getStatus())) {
             try {
                 String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
