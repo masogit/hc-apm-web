@@ -1225,6 +1225,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         return "List?faces-redirect=true";
     }
 
+
+
     public void orderTypeChange(){
         v2_listHashMap = new ArrayList<>();
         contractList = new ArrayList<>();
@@ -1234,6 +1236,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selected.setRequestDate(new Date());
         selected.setRequestUser(currentUser.getName());
         selected.setRequestPhone(currentUser.getTelephone());
+        queryWorkFlow = new V2_WorkOrder();
+        queryWorkFlow.setAssetInfo(new AssetInfo());
+        queryWorkFlow.setServiceRequest(new V2_ServiceRequest());
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             selected.setScoreFlag(CopyByInvok.F);
             if(StringUtils.isEmpty(maintainFlag)){

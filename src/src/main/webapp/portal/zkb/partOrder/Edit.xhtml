@@ -16,7 +16,7 @@
                     <h:panelGroup>
                         <label class="label">GE设备或非GE设备*</label>
                         <p:selectOneMenu id="notGeAsset" value="#{zkbPartOrderEditController.notGeAsset}" required="true" requiredMessage="GE设备或非GE设备 #{msg.ValidationRequire}">
-                            <p:ajax event="change" update="zkbwkEditForm zkbPartOrderEditForm"  />
+                            <p:ajax event="change" update="zkbPartOrderEditForm zkbHeadEditForm zkbwkEditForm zkbContractDatalist"  listener="#{zkbPartOrderEditController.orderTypeChange()}"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="GE设备" itemValue="f"/>
                             <f:selectItem itemLabel="非GE设备" itemValue="t"/>
