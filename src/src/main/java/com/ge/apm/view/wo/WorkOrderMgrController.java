@@ -3689,20 +3689,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             return true;
         }
         if ("id".equals(fieldName)) {
+            List<String> stepIds = new ArrayList<>();
             List<V2_WorkOrder_Step> steps = woService.getWorkStepsByStepId(4, tenantInfo.getUid());
-            if (CollectionUtils.isEmpty(steps)) {
-                return true;
+            if (!CollectionUtils.isEmpty(steps)) {
+                Map<String, List<V2_WorkOrder_Step>> map = steps.stream().collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
+                List<V2_WorkOrder_Step> stepList = map.values().stream().map(group -> group.stream()
+                        .max(Comparator.comparing(V2_WorkOrder_Step::getStartTime))
+                        .orElse(null))
+                        .filter(val -> val!=null&&val.getOwnerName().contains(filterVal))
+                        .collect(Collectors.toList());
+                removeFilterOnField("id");
+                stepIds = stepList.stream().map(V2_WorkOrder_Step::getWoId).collect(Collectors.toList());
             }
-            Map<String, List<V2_WorkOrder_Step>> map = steps.stream().collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
-            List<V2_WorkOrder_Step> stepList = map.values().stream().map(group -> group.stream()
-                    .max(Comparator.comparing(V2_WorkOrder_Step::getStartTime))
-                    .orElse(null))
-                    .filter(val -> val!=null&&val.getOwnerName().contains(filterVal))
-                    .collect(Collectors.toList());
-            removeFilterOnField("id");
-            if (!CollectionUtils.isEmpty(stepList)) {
-                searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepList.stream().map(V2_WorkOrder_Step::getWoId).collect(Collectors.toList())));
-            }
+            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepIds));
             return true;
         }
         return false;
