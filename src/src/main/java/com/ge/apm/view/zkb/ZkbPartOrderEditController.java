@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -21,8 +20,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -77,6 +76,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private I18nMessageRepository i18nMessageRepository;
     private ZkbHighPartInfoRepository zkbHighPartInfoRepository;
     private String notGeAsset;
+    String encodeStr;
 
     @Override
     protected void init() {
@@ -93,10 +93,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         zkbHighPartInfoRepository = WebUtil.getBean(ZkbHighPartInfoRepository.class);
         zkbContractAssetService = WebUtil.getBean(ZkbContractAssetService.class);
         currentUser = UserContextService.getCurrentUserAccount();
-        String encodeStr = WebUtil.getRequestParameter("str");
+        encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         selectionTenantInfo = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectionTenantInfo");
         queryStatus = UrlEncryptController.getValueFromMap(encodeStr, "queryStatus") == null ? "" : (String) UrlEncryptController.getValueFromMap(encodeStr, "queryStatus");
+        notGeAsset = WebUtil.getRequestParameter("ng");
         queryWorkFlow = new V2_WorkOrder();
         queryWorkFlow.setAssetInfo(new AssetInfo());
         queryWorkFlow.setServiceRequest(new V2_ServiceRequest());
@@ -1225,9 +1226,20 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         return "List?faces-redirect=true";
     }
 
+    public void notGeAssetChange(ValueChangeEvent event){
+       /* if(StrUtil.isEmpty(notGeAsset)){
+            return;
+        }*/
+        String v = event.getNewValue() == null ? "" : (String)event.getNewValue();
+        String url = "Edit.xhtml?str="+ encodeStr+"&ng="+v;
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
 
-
-    public void orderTypeChange(){
+    public void orderTypeChange(String ty){
+        if("notGeAsset".equals(ty)){
+            orderType = null;
+        }
         v2_listHashMap = new ArrayList<>();
         contractList = new ArrayList<>();
         assetInfo  = new AssetInfo();

@@ -2684,6 +2684,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     if(StrUtil.isNotEmpty(zkbPartOrder.getNotGeAsset()) && CopyByInvok.T.equals(zkbPartOrder.getNotGeAsset()) && "goodReturn".equals(r.getReturnType())){
                         if(CopyByInvok.T.equals(r.getSevenReturnedFlag())){
                             v += (r.getQty() - 1);
+                        }else{
+                            v += r.getQty();
                         }
                     }else{
                         v += r.getQty();
