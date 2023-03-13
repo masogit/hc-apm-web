@@ -460,6 +460,12 @@
                             <label class="label">非人工派工时,是否开启自动接单?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.whenAutoEnabledIsAutoAccept}"/>
                         </h:panelGroup >
+                        <h:panelGroup rendered="true">
+                            <label class = "label">是否启用质控绑定多个规则?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmFourthRuleLevelForAsset}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 
