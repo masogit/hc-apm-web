@@ -1387,6 +1387,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void prepareReturnEdit(){
         this.actionReturnName = "Edit";
+        goodReturnBlobObjectList = zkbPartOrderService.getBlobObjectRepository().findByBoUuid(zkbPartOrderReturn.getId());
         initPartList();
     }
 
@@ -1407,6 +1408,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
 
         this.zkbPartOrderReturn = r;
+        goodReturnBlobObjectList = zkbPartOrderService.getBlobObjectRepository().findByBoUuid(zkbPartOrderReturn.getId());
         initPartList();
     }
 
@@ -1420,6 +1422,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void prepareReturnModifyEdit(){
         this.actionReturnName = "ModifyEdit";
+        goodReturnBlobObjectList = zkbPartOrderService.getBlobObjectRepository().findByBoUuid(zkbPartOrderReturn.getId());
         initPartList();
     }
 
