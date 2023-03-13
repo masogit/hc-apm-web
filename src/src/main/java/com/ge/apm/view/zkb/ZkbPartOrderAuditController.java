@@ -1295,18 +1295,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         } else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && isChoseAdmin){
             if(ZkbPartOrder.PartOrderStatus.PartReturned.toString().equals(selected.getStatus()) || ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus())){
                 List<ZkbPartOrderReturn> auditReturnList = new ArrayList<>();
-
-              /*  String er = "";
                 for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
                     if(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString().equals(r.getModifyFlag())){
                         auditReturnList.add(r);
-                        if("goodReturn".equals(r.getReturnType()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
-                            if(StrUtil.isEmpty(r.getSevenReturnedFlag()) && ){
-                                er += "配件号："+r.getPartNo()+"好还必须填写是否7天内归还！";
-                            }
-                        }
                     }
-                }*/
+                }
                 if(auditReturnList.size() == 0){
                     WebUtil.addErrorMessage("请填写审批数据","");
                     return "";

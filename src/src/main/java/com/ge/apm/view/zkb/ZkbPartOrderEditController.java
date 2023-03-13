@@ -1227,9 +1227,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void notGeAssetChange(ValueChangeEvent event){
-       /* if(StrUtil.isEmpty(notGeAsset)){
-            return;
-        }*/
         String v = event.getNewValue() == null ? "" : (String)event.getNewValue();
         String url = "Edit.xhtml?str="+ encodeStr+"&ng="+v;
         RequestContext requestContext = RequestContext.getCurrentInstance();
