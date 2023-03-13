@@ -140,6 +140,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "pm_rule_level_four")
     private Boolean pmRuleLevelFour ; // 是否启用四级规则
 
+    @Column(name = "pm_fourth_rule_level_for_asset")
+    private Boolean pmFourthRuleLevelForAsset ; // 是否启用质控绑定多个规则
+
     @Column(name = "wo_direct_reception")
     private Boolean woDirectReception ; // 设备直接验收(接收)
 
@@ -499,6 +502,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setPmRuleLevelFour(Boolean pmRuleLevelFour) {
         this.pmRuleLevelFour = pmRuleLevelFour;
+    }
+
+    public Boolean getPmFourthRuleLevelForAsset() {
+        return pmFourthRuleLevelForAsset == null? false:pmFourthRuleLevelForAsset;
+    }
+
+    public void setPmFourthRuleLevelForAsset(Boolean pmFourthRuleLevelForAsset) {
+        this.pmFourthRuleLevelForAsset = pmFourthRuleLevelForAsset;
     }
 
     public Integer getClinicalDeptHeadWeight() {

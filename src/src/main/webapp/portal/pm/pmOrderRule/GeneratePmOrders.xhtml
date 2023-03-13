@@ -247,7 +247,7 @@
                     <br/> <br/>
 					<p:commandButton id ="hidden" value="hello" style="display:none"/>
 					<h:panelGroup>
-						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="#{msg.Generate}" icon="ui-icon-check" update=":growl" />
+						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="#{msg.Generate}" icon="ui-icon-check" update=":growl pmCreateDialogBatch" oncomplete="handleSubmit(args, 'pmCreateDialogBatch');" />
 						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="javascript:goBack();" immediate="true" />
 					</h:panelGroup>
                     <p:panelGrid id ="PmOrderRule" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -256,6 +256,51 @@
         </h:form>
         </div>
       </div>
+
+
+		<p:dialog class ="pmCreateDialogBatch" id="pmCreateDialogBatch" widgetVar="pmCreateDialogBatch" modal="true" width="500"  resizable="false" draggable="true" appendTo="@this" header="#{msg.BatchCreate}">
+			<p:dataTable id="datalist" value="#{generatePmOrdersController.notOnlyOneModels}" var="item" widgetVar="varDataListgl"
+						 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+						 rowKey="#{uniqueUid}"
+						 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+						 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+						 rows="20" emptyMessage="#{msg.noRecordFound}"
+						 rowsPerPageTemplate="20,50,100,500">
+<!--				<p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />-->
+				<p:column width="36"  id="checkBoxRulesColumn">
+					<p:selectBooleanCheckbox value="#{generatePmOrdersController.selectedRuleMap[item.uniqueUid]}"  class="checkBoxRulesColumn">
+						<p:ajax process="@this" update="@this" />
+					</p:selectBooleanCheckbox>
+					<f:facet name="header"  >
+						<p:selectBooleanCheckbox id="selectRulesCheckBoxHeader" class="selectRulesCheckBoxHeader">
+							<p:ajax listener="#{generatePmOrdersController.onSelectRuleAllOfPage}" update="@(.checkBoxRulesColumn) :GeneratePmOrderForm:dataScroller" />
+						</p:selectBooleanCheckbox>
+					</f:facet>
+				</p:column>
+				<p:column headerText="#{msg.assetName}">
+					<h:outputText value="#{item.assetName}"/>
+				</p:column>
+				<p:column headerText="#{msg.pmRuleName}">
+					<h:outputText value="#{item.pmRuleName}"/>
+				</p:column>
+				<p:column headerText="#{msg.level}">
+					<h:outputText value="#{item.level}"/>
+				</p:column>
+				<p:column headerText="#{msg.period}">
+					<h:outputText value="#{item.period}"/>
+				</p:column>
+				<p:column headerText="#{msg.planTime}">
+					<h:outputText value="#{item.planTime}"/>
+				</p:column>
+				<p:column headerText="#{msg.pmType}">
+					<h:outputText value="#{item.pmType}"/>
+				</p:column>
+
+			</p:dataTable>
+			<p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.generatePmOrdersForMuliPMRule4()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" />
+			<p:commandButton id="close" value="#{msg.Return}" icon="ui-icon-arrow-back"  immediate="true" />
+		</p:dialog>
+
 		<script type="text/javascript">
 			function updateSelectAllCheckBox() {
 				var checkboxlist = $(".selectCheckBox");

@@ -180,6 +180,9 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     @Column(name="inst_id")
     private String instId;
+
+    @Column(name="rule_uid")
+    private String ruleUid;
     //    @Column(name = "feedback_rating")
 //    private Integer feedbackRating;
 //
@@ -781,5 +784,13 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setPartApproveSignature(String partApproveSignature) {
         this.partApproveSignature = partApproveSignature;
+    }
+
+    public String getRuleUid() {
+        return ruleUid;
+    }
+
+    public void setRuleUid(String ruleUid) {
+        this.ruleUid = ruleUid;
     }
 }
