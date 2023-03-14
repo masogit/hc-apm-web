@@ -137,16 +137,18 @@
                             <h:outputText value="#{v2PmOrderController.getRulePm(item).period}"/>
                         </p:column>
 
-                <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}">
+<!--                <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">-->
                     <h:outputText value="#{item.creatorName}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.Owner}" sortBy="#{item.ownerName}" filterBy="#{item.ownerName}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.Owner}" sortBy="#{item.ownerName}">
+<!--                <p:column headerText="#{msg.Owner}" sortBy="#{item.ownerName}" filterBy="#{item.ownerName}" filterMatchMode="LIKE">-->
                     <h:outputText value="#{item.ownerName}"/>
                 </p:column>
 
-
-                <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
+                <p:column headerText="保养编号" sortBy="#{item.pmNum}" >
+<!--                <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">-->
                     <h:outputText value="#{item.pmNum}"/>
                 </p:column>
                 <p:column headerText="#{msg.CurrentProcessingStep}"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
@@ -162,7 +164,8 @@
                 <p:column headerText="#{msg.intExtType}" rendered="#{!userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                 </p:column>
-                <p:column headerText="#{msg.PlannedCompletionTime}"  sortBy="#{item.planTime}" filterBy="#{item.planTime}" filterMatchMode="GTE" >
+                <p:column headerText="#{msg.PlannedCompletionTime}"  sortBy="#{item.planTime}" >
+<!--                <p:column headerText="#{msg.PlannedCompletionTime}"  sortBy="#{item.planTime}" filterBy="#{item.planTime}" filterMatchMode="GTE" >-->
                     <f:facet name="filter">
                         <p:inputText id="filterPlannedCompletionTime" widgetVar="varFilterPlannedCompletionTime" value="#{v2PmOrderController.plannedCompletionTimeFormat}"/>
                     </f:facet>
@@ -171,7 +174,8 @@
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE" rendered="#{v2PmOrderController.queryIndex==7 or userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">
+                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" rendered="#{v2PmOrderController.queryIndex==7 or userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">
+<!--                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE" rendered="#{v2PmOrderController.queryIndex==7 or userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">-->
                     <f:facet name="filter">
                         <p:inputText id="filterActualCompletionTime" widgetVar="varFilterActualCompletionTime" value="#{v2PmOrderController.actualCompletionTimeFormat}"/>
                     </f:facet>
