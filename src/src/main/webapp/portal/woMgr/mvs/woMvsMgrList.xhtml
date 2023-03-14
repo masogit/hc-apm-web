@@ -43,13 +43,14 @@
                 <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update = "woTab:woMvsMgrDetailForm" />
                 <p:ajax event="filter" listener="#{workOrderMgrController.onFilterWo}" update="datalist"/>
 
-                <p:column width="70" styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.serviceRequest.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
-                    <f:facet name="filter">
-                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                        </p:selectOneMenu>
-                    </f:facet>
+<!--                <p:column width="70" styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.serviceRequest.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">-->
+                <p:column width="70" styleClass="textCenter"  headerText="#{msg.casePriority}" >
+                    <!--                    <f:facet name="filter">-->
+<!--                        <p:selectOneMenu onchange="PF('varDataList').filter()" >-->
+<!--                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
+<!--                            <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+<!--                        </p:selectOneMenu>-->
+<!--                    </f:facet>-->
                     <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
                 </p:column>
 
@@ -103,7 +104,8 @@
 <!--                    <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>-->
                 </p:column>
 
-                <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" >
+<!--                <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">-->
                     <h:outputText value="#{item.serviceRequest.srNum}"/>
                 </p:column>
 
@@ -116,10 +118,12 @@
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" filterBy="#{item.serviceRequest.requestorName}" filterMatchMode="LIKE" rendered="#{userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" rendered="#{userContextService.hasCurrentTenantName('')}">
+<!--                <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" filterBy="#{item.serviceRequest.requestorName}" filterMatchMode="LIKE" rendered="#{userContextService.hasCurrentTenantName('')}">-->
                     <h:outputText value="#{item.serviceRequest.requestorName}"/>
                 </p:column>
-                <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="GTE" rendered="#{userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" rendered="#{userContextService.hasCurrentTenantName('')}">
+<!--                <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="GTE" rendered="#{userContextService.hasCurrentTenantName('')}">-->
                     <f:facet name="filter">
                         <p:inputText id="filterPlannedCompletionTime" widgetVar="varFilterRequestTime" value="#{workOrderMgrController.plannedCompletionTimeFormat}"/>
                     </f:facet>
@@ -128,11 +132,8 @@
 <!--                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}"/>-->
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{msg.Assignee}" filterBy="#{item.id}" filterMatchMode="LIKE"  rendered="#{workOrderMgrController.queryIndex==8 and userContextService.hasCurrentTenantName('')}">
-                    <!--6 表示 step_name 是待关单-->
-                    <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,6)}"/>
-                </p:column>
-                <p:column headerText="#{msg.Assignee}"  rendered="#{workOrderMgrController.queryIndex==8 and !userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.Assignee}" rendered="#{workOrderMgrController.queryIndex==8 and userContextService.hasCurrentTenantName('')}">
+<!--                <p:column headerText="#{msg.Assignee}" filterBy="#{item.id}" filterMatchMode="LIKE"  rendered="#{workOrderMgrController.queryIndex==8 and userContextService.hasCurrentTenantName('')}">-->
                     <!--6 表示 step_name 是待关单-->
                     <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,6)}"/>
                 </p:column>
@@ -203,7 +204,8 @@
                 <!--                        <p:column headerText="#{msg.currentPersonName}">
                                         <h:outputText value="#{item.currentPersonName}"/>
                                     </p:column>-->
-                <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" >
+<!--                <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">-->
                     <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
                 </p:column>
 
