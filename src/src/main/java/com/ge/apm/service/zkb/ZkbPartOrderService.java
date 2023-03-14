@@ -2755,12 +2755,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Transactional(rollbackFor = Exception.class)
     public List<ZkbPartOrder> usVacationHandle(ZkbPartOrderUserConfig zkbPartOrderUserConfig,String isVacation){
+        if(StrUtil.isEmpty(zkbPartOrderUserConfig.getUsBackUpId())){
+            return null;
+        }
         ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(zkbPartOrderUserConfig.getUsBackUpId());
         List<ZkbPartOrder> zkbPartOrderList = new ArrayList<>();
         if("t".equals(isVacation)){
             List<SearchFilter> searchFilters = new ArrayList<>();
             searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getId()));
-            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
+            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getConfigType()));
             zkbPartOrderList = zkbPartOrderRepository.findBySearchFilter(searchFilters);
             for(ZkbPartOrder p : zkbPartOrderList){
                 p.setOnlineEngineer(backUp.getId());
@@ -2772,7 +2775,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             List<SearchFilter> searchFilters = new ArrayList<>();
             searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getUsBackUpId()));
             searchFilters.add(new SearchFilter("modifyFlag", SearchFilter.Operator.EQ, "t"));
-            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
+            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getConfigType()));
             zkbPartOrderList = zkbPartOrderRepository.findBySearchFilter(searchFilters);
             for(ZkbPartOrder p : zkbPartOrderList){
                 p.setOnlineEngineer(zkbPartOrderUserConfig.getId());
