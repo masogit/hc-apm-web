@@ -1376,6 +1376,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         this.zkbPartOrderReturn = new ZkbPartOrderReturn();
         zkbPartOrderReturn.setReturnDate(new Date());
         zkbPartOrderReturn.setPartOrderId(selected.getId());
+        goodReturnBlobObjectList = new ArrayList<>();
         initPartList();
     }
 
@@ -1413,6 +1414,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturn = new ZkbPartOrderReturn();
         zkbPartOrderReturn.setReturnDate(new Date());
         zkbPartOrderReturn.setPartOrderId(selected.getId());
+        goodReturnBlobObjectList = new ArrayList<>();
         initPartList();
     }
 
@@ -1425,6 +1427,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void deleteReturnModify(){
         zkbPartOrderReturnModifyList.remove(zkbPartOrderReturn);
+        goodReturnBlobObjectList = new ArrayList<>();
         zkbPartOrderReturn = null;
     }
 
