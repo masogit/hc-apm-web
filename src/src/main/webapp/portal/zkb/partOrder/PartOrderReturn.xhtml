@@ -109,7 +109,7 @@
             </h:panelGroup>
             <br/>
             <div style="width: 100%; text-align: center">
-                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbPartOrderAuditController.saveReturn}" rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Edit' or zkbPartOrderAuditController.actionReturnName eq 'Create'}"
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbPartOrderAuditController.saveReturn}" rendered="#{!(zkbPartOrderAuditController.actionReturnName eq 'Audit')}"
                                  update="#{zkbPartOrderAuditController.actionReturnName eq 'Create' or zkbPartOrderAuditController.actionReturnName eq 'Edit' ? ':growl :zkbPartOrderEditForm:zkbReturnDatalist :zkbPartOrderEditForm:saveTips' : ':growl :zkbPartOrderReturnModifyForm'}"
                                  icon="ui-icon-check" oncomplete="handleSubmit(args, 'zkbPartOrderReturnEditDlg');" style="text-align: center"/>
                 <p:commandButton validateClient="true" value="提交" action="#{zkbPartOrderAuditController.returnAudit()}" update=":growl :zkbPartOrderEditForm:zkbReturnDatalist :zkbPartOrderEditForm:saveTips" rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit' and !(zkbPartOrderAuditController.returnFormFlag eq 'readOnly')}"
