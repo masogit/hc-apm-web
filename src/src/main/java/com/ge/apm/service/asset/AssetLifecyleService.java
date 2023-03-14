@@ -54,4 +54,9 @@ public class AssetLifecyleService {
 
         assetLifecycleRepository.save(assetLifecycle);
     }
+
+    public AssetLifecycle selectByAssetUidAndStatusOne(String assetUid, int status) {
+        AssetLifecycle assetLifecycle= assetLifecycleRepository.selectByAssetUidAndStatusOne(assetUid,status);
+        return assetLifecycle;
+    }
 }

@@ -565,6 +565,9 @@
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
+                <p:column headerText="报废操作人">
+                    <h:outputText value="#{assetInfoTerminatedListController.getTerminateBy(item.uid,-2)}"/>
+                </p:column>
                 <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoTerminatedListController.needShowAssetApproval}">
                     <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
                     <f:facet name="filter">

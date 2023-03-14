@@ -588,6 +588,21 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         }
     }
 
+    public String getTerminateBy(String assetUid,int status){
+        AssetLifecycle assetLifecycle=assetLifecyleService.selectByAssetUidAndStatusOne(assetUid,status);
+        if(assetLifecycle!=null){
+            return assetLifecycle.getModifyBy();
+        }
+        return null;
+    }
+    public Date  getTerminateDate(String assetUid,int status){
+        AssetLifecycle assetLifecycle=assetLifecyleService.selectByAssetUidAndStatusOne(assetUid,status);
+        if(assetLifecycle!=null){
+            return assetLifecycle.getModifyTime();
+        }
+        return null;
+    }
+
     public OrgInfo getSelectSite() {
         return selectSite;
     }
