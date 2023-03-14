@@ -1372,6 +1372,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void prepareReturnCreate(){
         this.actionReturnName = "Create";
+        this.returnFormFlag = "edit";
         this.zkbPartOrderReturn = new ZkbPartOrderReturn();
         zkbPartOrderReturn.setReturnDate(new Date());
         zkbPartOrderReturn.setPartOrderId(selected.getId());
@@ -1380,6 +1381,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void prepareReturnEdit(){
         this.actionReturnName = "Edit";
+        this.returnFormFlag = "edit";
         goodReturnBlobObjectList = zkbPartOrderService.getBlobObjectRepository().findByBoUuid(zkbPartOrderReturn.getId());
         initPartList();
     }
@@ -1407,6 +1409,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void prepareReturnModifyCreate(){
         this.actionReturnName = "ModifyCreate";
+        this.returnFormFlag = "edit";
         zkbPartOrderReturn = new ZkbPartOrderReturn();
         zkbPartOrderReturn.setReturnDate(new Date());
         zkbPartOrderReturn.setPartOrderId(selected.getId());
@@ -1415,6 +1418,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void prepareReturnModifyEdit(){
         this.actionReturnName = "ModifyEdit";
+        this.returnFormFlag = "edit";
         goodReturnBlobObjectList = zkbPartOrderService.getBlobObjectRepository().findByBoUuid(zkbPartOrderReturn.getId());
         initPartList();
     }

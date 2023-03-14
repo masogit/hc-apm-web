@@ -27,7 +27,7 @@
                 <h:panelGroup>
                     <label class="label">归还类型*</label>
                     <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnType}" required="true" requiredMessage="归还类型不能为空"  disabled="#{!(zkbPartOrderAuditController.returnFormFlag eq 'edit')}">
-                        <p:ajax event="change" update="returnTypeGrid goodReturnAttachment" />
+                        <p:ajax event="change" update="returnTypeGrid goodReturnAttachment sevenReturnedFlagGroup" />
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <!--<f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                         <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -79,15 +79,17 @@
                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnDataStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
-
-                <h:panelGroup rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit' and zkbPartOrderAuditController.selected.notGeAsset eq 't'}">
-                    <label class="label">好还是否超过七天</label>
-                    <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.sevenReturnedFlag}" style="text-align: left" disabled="#{zkbPartOrderAuditController.returnFormFlag eq 'readOnly'}" >
-                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItem itemLabel="是" itemValue="t"/>
-                        <f:selectItem itemLabel="否" itemValue="f"/>
-                    </p:selectOneMenu>
+                <h:panelGroup id="sevenReturnedFlagGroup">
+                    <h:panelGroup rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit' and zkbPartOrderAuditController.selected.notGeAsset eq 't' and zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'goodReturn'}">
+                        <label class="label">好还是否超过七天</label>
+                        <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.sevenReturnedFlag}" style="text-align: left" disabled="#{zkbPartOrderAuditController.returnFormFlag eq 'readOnly'}" >
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItem itemLabel="是" itemValue="t"/>
+                            <f:selectItem itemLabel="否" itemValue="f"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                 </h:panelGroup>
+
 
                 <h:panelGroup rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit'}">
                     <label class="label">审批备注</label>
@@ -99,7 +101,7 @@
                     <p:dataList id="uploadReturnList" value="#{zkbPartOrderAuditController.goodReturnBlobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                         <f:facet name="header">图片</f:facet>
                         <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                        <p:commandButton actionListener="#{zkbPartOrderAuditController.removeReturnFile(fileitem)}" update="uploadReturnList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                        <p:commandButton actionListener="#{zkbPartOrderAuditController.removeReturnFile(fileitem)}" update="uploadReturnList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{!(zkbPartOrderAuditController.returnFormFlag eq 'readOnly')}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
                     </p:dataList>
