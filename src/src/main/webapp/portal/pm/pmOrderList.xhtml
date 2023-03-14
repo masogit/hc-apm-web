@@ -413,7 +413,7 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup id="pmRuleUid"  rendered="#{v2PmOrderController.getPmRuleList()}" >
-                        <label class="label">#{msg.pmRuleUid}*</label>
+                        <label class="label">保养规则*</label>
                         <p:selectOneMenu  value="#{v2PmOrderController.pmRuleUid}" required="true" requiredMessage="#{msg.pmRuleUid}#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{v2PmOrderController.getPmOrderRulesByAsset()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>

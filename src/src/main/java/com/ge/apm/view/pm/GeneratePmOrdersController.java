@@ -70,6 +70,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private Integer pmType;
 	@Getter @Setter
 	private PmOrderRule pmOrderRule;
+	@Getter @Setter
+	private Boolean isAllRuleSelected = true;
 	//复选的设备
 	@Getter @Setter
 	private Map<String, Boolean> selectedMap;
@@ -77,6 +79,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private Map<String, Boolean> selectedRuleMap;
 	private SupplierService supplierService;
 
+	private GeneratePmOrders4Controller generatePmOrders4Controller;
     private TenantInfo selectedTenant;
     private List<OrgInfo> selectedUserOrg;
     private OrgInfo selectedOrg;
@@ -96,7 +99,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private List<AssetRuleModel> notOnlyOneModels = new ArrayList<>();//存在多个绑定规则的列表（需用户选择是否批量创建）
 	private List<AssetRuleModel> selectedNotOnlyOneModels = new ArrayList<>();//弹出框存在多个质控规则中选定的记录
 	private List<AssetRuleModel> batchCreateModels = new ArrayList<>();//最终批量创建列表
-
 
     @Override
 	protected void init() {
@@ -128,6 +130,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		isYmyg = UserContextService.isYiMaiYangGuangTenantForServer();
         //initTree(user.getTenantUID());
 		initOrgTree();
+		generatePmOrders4Controller = WebUtil.getBean(GeneratePmOrders4Controller.class);
 	}
 
     public boolean getPmRule(){
@@ -246,10 +249,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		}
 	}
 	public void onSelectRuleAllOfPage() {
-		boolean isSelectedAll = !notOnlyOneModels.stream().anyMatch(item -> !selectedMap.containsKey(item.getUniqueUid()) || !selectedMap.get(item.getUniqueUid()));
-		for (AssetRuleModel item : notOnlyOneModels) {
-			selectedRuleMap.put(item.getUniqueUid(), !isSelectedAll);
-		}
+//		isAllRuleSelected = !isAllRuleSelected;
+			notOnlyOneModels.stream().forEach(e -> {
+				selectedRuleMap.put(e.getUniqueUid(), selectedRuleMap.get("header"));
+			});
 	}
 
 	public void setRuleId() {}
@@ -468,6 +471,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	public void generatePmOrdersForMuliPMRule4() {
 		List<AssetRuleModel> models = new ArrayList<>();
+		selectedNotOnlyOneModels = notOnlyOneModels.stream().filter(e->selectedRuleMap.get(e.getUniqueUid())).collect(Collectors.toList());
 		batchCreateModels.addAll(selectedNotOnlyOneModels);
 		batchCreateModels.addAll(onlyOneModels);
 		models = batchCreateModels;
@@ -516,7 +520,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		String[] split = StringUtils.split(ruleUID, "|");
 		List<String> ruleUids = Arrays.asList(split);
 		List<PmOrderRule> orderRules = pmOrderRuleRepository.findByUidIn(ruleUids);
-		Map<String, String> ruleNameMap = orderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, PmOrderRule::getName));
+		Map<String, PmOrderRule> ruleNameMap = orderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, v->v,(o1,o2)->o2));
 		if(!StringUtils.isEmpty(ruleUID)&&ruleUID.contains("|")){
 				ruleUids.stream().forEach(item->{
 					AssetRuleModel model = new AssetRuleModel();
@@ -525,8 +529,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 					model.setLevel(level);
 					model.setPlanTime(planTime);
 					model.setPmRuleUid(item);
+					model.setPeriod(ruleNameMap.get(item).getPeriod());
 					model.setAssetName(e.getAssetName());
-					model.setPmRuleName(ruleNameMap.get(item));
+					model.setPmRuleName(ruleNameMap.get(item).getName());
+					model.setUniqueUid(e.getAssetUID()+item);
 					notOnlyOneModels.add(model);
 					});
 				}else{
@@ -536,7 +542,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 					model.setLevel(level);
 					model.setPlanTime(planTime);
 					model.setPmRuleUid(ruleUID);
-					model.setPmRuleName(ruleNameMap.get(ruleUID));
+					model.setPmRuleName(ruleNameMap.get(ruleUID).getName());
 					onlyOneModels.add(model);
 			}
 	}
@@ -559,14 +565,22 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				//继续原来流程 批量页面不弹框
 				generatePmOrders1();
 
-				requestContext.addCallbackParam("validationFailed", false);
+//				requestContext.addCallbackParam("validationFailed", false);
 			}else {
-				requestContext.addCallbackParam("validationFailed", true);
+				notOnlyOneModels.stream().forEach(e->{
+					selectedRuleMap.put(e.getUniqueUid(),true);
+				});
+				isAllRuleSelected = true;
+//				selectedRuleMap.put("header",false);
+//				generatePmOrders4Controller.setSelectedRuleMap(selectedRuleMap);
+//				generatePmOrders4Controller.setNotOnlyOneModels(notOnlyOneModels);
+//				generatePmOrders4Controller.setOnlyOneModels(onlyOneModels);
+//				requestContext.addCallbackParam("validationFailed", true);
 			}
 		}else{
 			//继续原来流程 批量页面不弹框
 			generatePmOrders1();
-			requestContext.addCallbackParam("validationFailed", false);
+//			requestContext.addCallbackParam("validationFailed", false);
 		}
 	}
 	public void generatePmOrders1() {
@@ -682,6 +696,20 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			LOGGER.error("工单生成失败，msg is {}",e.getMessage());
 		}
 
+	}
+
+	public void updateCheckBox(){
+//		selectedRuleMap.put(uniqueUid,!selectedRuleMap.get(uniqueUid));
+//		selectedRuleMap.remove("header");
+		isAllRuleSelected = selectedRuleMap.values().stream().allMatch(e -> e.equals(true));
+//		selectedRuleMap.put("header",b);
+	}
+
+	public void cancel(){
+		onlyOneModels.clear();
+		notOnlyOneModels.clear();
+		batchCreateModels.clear();
+		selectedNotOnlyOneModels.clear();
 	}
 
 /*	public void removeItem(String uid){
