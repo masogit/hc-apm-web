@@ -997,7 +997,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
             //查询Mvs工单
             if("MVS工单".equals(tabTitle)){
-
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 pageResult = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = pageResult.getContent();
@@ -1076,7 +1075,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             filters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
         }
         for (SearchFilter searchFilter :searchFilters) {
-            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
+            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating,assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType".contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
