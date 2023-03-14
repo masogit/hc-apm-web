@@ -96,9 +96,9 @@
                     <p:inputText  value="#{zkbPartOrderAuditController.zkbPartOrderReturn.remark}" disabled="#{zkbPartOrderAuditController.returnFormFlag eq 'readOnly'}"  />
                 </h:panelGroup>
             </p:panelGrid>
-            <h:panelGroup id="goodReturnAttachment">
+            <h:panelGroup id="goodReturnAttachment" rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit' or zkbPartOrderAuditController.actionReturnName eq 'Create' or zkbPartOrderAuditController.actionReturnName eq 'Edit'}">
                 <h:panelGroup rendered="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'goodReturn' and zkbPartOrderAuditController.selected.notGeAsset eq 't'}">
-                    <p:dataList id="uploadReturnList" value="#{zkbPartOrderAuditController.goodReturnBlobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                    <p:dataList id="uploadReturnList" value="#{zkbPartOrderAuditController.goodReturnBlobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" >
                         <f:facet name="header">图片</f:facet>
                         <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                         <p:commandButton actionListener="#{zkbPartOrderAuditController.removeReturnFile(fileitem)}" update="uploadReturnList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{!(zkbPartOrderAuditController.returnFormFlag eq 'readOnly')}">
