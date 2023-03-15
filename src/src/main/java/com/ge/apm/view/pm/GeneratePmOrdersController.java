@@ -91,6 +91,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
     private OrgInfo clinicalOrgInfo;
     private List<AssetInfo> assetInfoList = new ArrayList<>();
     private Integer total = 0;
+    private Integer assetRuleModelTotal = 0;
 
 	private boolean isYmyg = false;
 	private OrgInfo userOrgInfo;
@@ -247,11 +248,13 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		for (AssetInfo item : assetInfoList) {
 			selectedMap.put(item.getUid(), !isSelectedAll);
 		}
+        prepareAssetRuleList();
 	}
 	public void onSelectRuleAllOfPage() {
-//		isAllRuleSelected = !isAllRuleSelected;
+		isAllRuleSelected = !isAllRuleSelected;
+//        selectedRuleMap.put("header",!selectedRuleMap.get("header"));
 			notOnlyOneModels.stream().forEach(e -> {
-				selectedRuleMap.put(e.getUniqueUid(), selectedRuleMap.get("header"));
+				selectedRuleMap.put(e.getUniqueUid(), isAllRuleSelected);
 			});
 	}
 
@@ -399,6 +402,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		}
 		filterAssetInfoList();
 		total = assetInfoList.size();
+		prepareAssetRuleList();
 	}
 	private void filterAssetInfoList(){
 		TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
@@ -547,40 +551,48 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			}
 	}
 
+	public void prepareAssetRuleList(){
+        clearModels();//清除缓存
+        if(prepareGenPmOrders()){
+            Set selectedAssetUid = selectedMap.keySet();
+            List<AssetInfo> targetAssets = assetInfoList.stream().filter(assetInfo -> selectedAssetUid.contains(assetInfo.getUid()) && selectedMap.get(assetInfo.getUid())).distinct().collect(Collectors.toList());
+            Map<String, AssetInfo> assetInfoMap = targetAssets.stream().collect(Collectors.toMap(AssetInfo::getUid, v -> v, (v1, v2) -> v2));
+            if(CollectionUtils.isNotEmpty(assetInfoMap.entrySet())){
+
+                List<RelRuleAsset> ruleAssets = relRuleAssetRepository.findByAssetUids1(targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet()));
+                if(CollectionUtils.isNotEmpty(ruleAssets)) {
+                    ruleAssets.stream().forEach(
+                            e -> {
+                                e.setAssetName(assetInfoMap.get(e.getAssetUID()).getName());
+                                prepareAssetRuleModelList(e, level);
+                            }
+                    );
+                }else {
+                    clearModels();
+                }
+            }else {
+                clearModels();
+            }
+            if(!CollectionUtils.isEmpty(notOnlyOneModels)){
+
+                notOnlyOneModels.stream().forEach(e->{
+                    selectedRuleMap.put(e.getUniqueUid(),true);
+                });
+                isAllRuleSelected = true;
+//                selectedRuleMap.put("header",true);
+            }else {
+//                selectedRuleMap.put("header",false);
+                isAllRuleSelected = false;
+            }
+        }
+        assetRuleModelTotal = notOnlyOneModels.size();
+    }
 
 	public void generatePmOrders() {
-		RequestContext requestContext = RequestContext.getCurrentInstance();
 		if(prepareGenPmOrders()){
-			Set selectedAssetUid = selectedMap.keySet();
-			List<AssetInfo> targetAssets = assetInfoList.stream().filter(assetInfo -> selectedAssetUid.contains(assetInfo.getUid()) && selectedMap.get(assetInfo.getUid())).distinct().collect(Collectors.toList());
-			Map<String, AssetInfo> assetInfoMap = targetAssets.stream().collect(Collectors.toMap(AssetInfo::getUid, v -> v, (v1, v2) -> v2));
-			List<RelRuleAsset> ruleAssets = relRuleAssetRepository.findByAssetUids1(targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet()));
-			ruleAssets.stream().forEach(
-					e->{
-						e.setAssetName(assetInfoMap.get(e.getAssetUID()).getName());
-						prepareAssetRuleModelList(e,level);
-					}
-			);
-			if(CollectionUtils.isEmpty(notOnlyOneModels)){
-				//继续原来流程 批量页面不弹框
-				generatePmOrders1();
-
-//				requestContext.addCallbackParam("validationFailed", false);
-			}else {
-				notOnlyOneModels.stream().forEach(e->{
-					selectedRuleMap.put(e.getUniqueUid(),true);
-				});
-				isAllRuleSelected = true;
-//				selectedRuleMap.put("header",false);
-//				generatePmOrders4Controller.setSelectedRuleMap(selectedRuleMap);
-//				generatePmOrders4Controller.setNotOnlyOneModels(notOnlyOneModels);
-//				generatePmOrders4Controller.setOnlyOneModels(onlyOneModels);
-//				requestContext.addCallbackParam("validationFailed", true);
-			}
+            generatePmOrdersForMuliPMRule4();
 		}else{
-			//继续原来流程 批量页面不弹框
 			generatePmOrders1();
-//			requestContext.addCallbackParam("validationFailed", false);
 		}
 	}
 	public void generatePmOrders1() {
@@ -701,16 +713,37 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void updateCheckBox(){
 //		selectedRuleMap.put(uniqueUid,!selectedRuleMap.get(uniqueUid));
 //		selectedRuleMap.remove("header");
-		isAllRuleSelected = selectedRuleMap.values().stream().allMatch(e -> e.equals(true));
+//		boolean b = selectedRuleMap.values().stream().allMatch(e -> e.equals(true));
 //		selectedRuleMap.put("header",b);
-	}
+        isAllRuleSelected = selectedRuleMap.values().stream().allMatch(e -> e.equals(true));
+    }
 
-	public void cancel(){
+
+	public void clearModels(){
 		onlyOneModels.clear();
 		notOnlyOneModels.clear();
 		batchCreateModels.clear();
 		selectedNotOnlyOneModels.clear();
 	}
+
+	public void updatePMPlanTime(){
+	    notOnlyOneModels.stream().forEach(e->{
+	        e.setPlanTime(planTime);
+        });
+	    onlyOneModels.stream().forEach(e->{
+	        e.setPlanTime(planTime);
+        });
+
+    }
+	public void updatePMType(){
+	    notOnlyOneModels.stream().forEach(e->{
+	        e.setPmType(pmType);
+        });
+	    onlyOneModels.stream().forEach(e->{
+            e.setPmType(pmType);
+        });
+
+    }
 
 /*	public void removeItem(String uid){
 		assetInfoList = assetInfoList.stream().filter( assetInfo -> !assetInfo.getUid().equals(uid)).collect(Collectors.toList());
@@ -895,4 +928,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void setBatchCreateModels(List<AssetRuleModel> batchCreateModels) {
 		this.batchCreateModels = batchCreateModels;
 	}
+
+    public Integer getAssetRuleModelTotal() {
+        return assetRuleModelTotal;
+    }
+
+    public void setAssetRuleModelTotal(Integer assetRuleModelTotal) {
+        this.assetRuleModelTotal = assetRuleModelTotal;
+    }
 }
