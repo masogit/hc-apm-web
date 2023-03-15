@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="pkOutDlg" widgetVar="pkOutDialog" width="1000" height="650" modal="true" resizable="true" draggable="true" appendTo="@this" header="备件出库" closable="false">
+        <h:form id="pkOutForm">
+            <h:panelGroup id="display">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup >
+                        <label class ="label">备件名称 </label>
+                        <p:outputLabel id="name" value="#{sparePartController.selected.name}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">规格型号 </label>
+                        <p:outputLabel id="model" value="#{sparePartController.selected.model}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">序列号 </label>
+                        <p:outputLabel id="serialNumber" value="#{sparePartController.selected.serialNumber}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">厂家 </label>
+                        <p:outputLabel id="manufacturer" value="#{sparePartController.selected.manufacturer}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">供应商 </label>
+                        <p:outputLabel id="supplier" value="#{sparePartController.selected.supplier}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">单位 </label>
+                        <p:outputLabel id="unit" value="#{sparePartController.selected.unit}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">数量 </label>
+                        <p:outputLabel id="quantity" value="#{sparePartController.selected.quantity}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">单价 </label>
+                        <p:outputLabel id="unitPrice" value="#{sparePartController.selected.unitPrice}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">总价 </label>
+                        <p:outputLabel id="totalPrice" value="#{sparePartController.selected.totalPrice}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">仓库 </label>
+                        <p:outputLabel id="partsWarehouseName" value="#{sparePartController.selected.partsWarehouse.name}"  />
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup >
+                        <label class ="label">出库数量 </label>
+                        <p:inputText id="outQuantity" value="#{sparePartController.outQuantity}"  />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">领取科室 </label>
+                        <p:autoComplete dropdown="true" value="#{sparePartController.filterClinicalDeptOrg}"
+                                        scrollHeight="300"  forceSelection="true"  completeMethod="#{sparePartController.autoCompleteDeptName}"
+                                        var="t" itemLabel="#{t}" itemValue="#{t}" class="siteFilterChange">
+                        </p:autoComplete>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:commandButton validateClient="true" actionListener="#{sparePartController.save()}" value="#{msg.Save}" update="display,:pkInForm, :sparePartForm:datalist, :growl, :pkInForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pkInDialog');"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{sparePartController.cancel()}" icon="ui-icon-cancel" update=":sparePartForm:datalist" onclick="PF('pkInDialog').hide()" />
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>
