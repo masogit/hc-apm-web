@@ -177,20 +177,18 @@
 				</p:dataTable>
 			</p:fieldset>
 
-			<p:fieldset id="dataTable1" legend="以下资产存在多个同等级保养规则,下拉可查看更多。总计: #{generatePmOrdersController.assetRuleModelTotal}">
+			<p:fieldset id="dataTable1" legend="以下资产存在多个同等级保养规则,下拉可查看更多。总计: #{generatePmOrdersController.assetRuleModelTotal} 条">
 				<p:dataTable id="datalist" value="#{generatePmOrdersController.notOnlyOneModels}" var="item" widgetVar="varDataListgl" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}"
 							 >
-					<p:ajax event="rowSelect" update="@this"/>
 					<p:column width="36"  id="checkBoxRulesColumn">
-						<p:selectBooleanCheckbox value="#{generatePmOrdersController.selectedRuleMap[item.uniqueUid]}"  class="checkBoxRulesBox">
-							<p:ajax process="@this" listener="#{generatePmOrdersController.updateCheckBox()}" update="@this @(.selectRulesCheckBoxHeader)" />
-						</p:selectBooleanCheckbox>
 						<f:facet name="header"  >
-							<p:selectBooleanCheckbox id="selectRulesCheckBoxHeader" class="selectRulesCheckBoxHeader" value="#{generatePmOrdersController.isAllRuleSelected}" >
-								<p:ajax listener="#{generatePmOrdersController.onSelectRuleAllOfPage()}" process="@this" update="@this @(.checkBoxRulesBox) " />
-								<p:ajax event="change" update="@this"/>
+							<p:selectBooleanCheckbox class="selectRulesCheckBoxHeader" value="#{generatePmOrdersController.isAllRuleSelected}" >
+								<p:ajax listener="#{generatePmOrdersController.onSelectRuleAllOfPage()}"  update="@this datalist " />
 							</p:selectBooleanCheckbox>
 						</f:facet>
+						<p:selectBooleanCheckbox value="#{generatePmOrdersController.selectedRuleMap[item.uniqueUid]}"  class="checkBoxRulesBox">
+							<p:ajax  listener="#{generatePmOrdersController.updateCheckBox()}" update="@this @(.selectRulesCheckBoxHeader)" />
+						</p:selectBooleanCheckbox>
 					</p:column>
 					<p:column headerText="#{msg.assetName}">
 						<h:outputText value="#{item.assetName}"/>
