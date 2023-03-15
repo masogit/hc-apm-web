@@ -832,6 +832,34 @@ public class AssetInfo implements ChineseName,Serializable {
     @TableField(exist = false)
     private String sharedAssetSwapIndexId;
 
+
+
+
+    //待报废操作人
+    @Transient
+    @TableField(exist = false)
+    private String terminateOperation;
+    @Transient
+    @TableField(exist = false)
+    private Date terminateOperationDate;
+
+
+    public String getTerminateOperation() {
+        return terminateOperation;
+    }
+
+    public void setTerminateOperation(String terminateOperation) {
+        this.terminateOperation = terminateOperation;
+    }
+
+    public Date getTerminateOperationDate() {
+        return terminateOperationDate;
+    }
+
+    public void setTerminateOperationDate(Date terminateOperationDate) {
+        this.terminateOperationDate = terminateOperationDate;
+    }
+
     public Integer getAssetDisposalResults() {
         return assetDisposalResults;
     }
