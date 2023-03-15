@@ -35,7 +35,7 @@
                 <p:menuitem id="um093" value="#{msg.AssetAchievementsRecord}" outcome="/portal/asset/assetAchievements/assetAchievementsList.xhtml" rendered="#{userContextService.accessContains('asset.achievements')}"/>
                 <p:menuitem id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.versionContains('asset.supplierEvaluation')}"/>
                 <p:menuitem value="#{msg.keyAssetDataInput}" outcome="/portal/keyAssetReport/dataInputList.xhtml" rendered="#{userContextService.versionContains('asset.keyAssetDataInput')}"/>
-                <p:menuitem id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.accessContains('asset.importMvsDataFile')}"/>
+                <p:menuitem id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.versionContains('asset.importMvsDataFile') and userContextService.hasAnyRole('ITAdmin')}"/>
             </p:submenu>
             <p:submenu id="um011" label="特种设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.versionContains('specialAsset')}">
                 <p:menuitem id="um0111" value="台账管理" outcome="/portal/asset/info/specialAssetList" rendered="#{userContextService.versionContains('specialAsset.asset')}"/>
