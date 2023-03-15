@@ -80,7 +80,7 @@ public class WorkOrderPublishRenderService {
         String deviceName = (String) map.get(WebUtil.getMessage("EquipmentName_xlsx"));
         deviceName = StringUtils.replace(deviceName, "\\", "-");
         deviceName = StringUtils.replace(deviceName, "/", "-");
-        return siteName + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx")) + ".docx";
+        return siteName + index + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx")) + ".docx";
     }
 
     private String encoding(String fileName) {
