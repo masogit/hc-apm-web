@@ -696,6 +696,20 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_quantity")
     private Integer assetQuantity; //设备数量 YHAAO-16852
 
+    @Getter@Setter
+    @Column(name = "product_family")
+    private String productFamily; //系列
+    @Getter@Setter
+    @Column(name = "product_segment")
+    private Integer productSegment;//高端/中端/低端
+    @Getter@Setter
+    @Column(name = "mvs_contract_start_date")
+    private Date mvsContractStartDate;//续签合同start date
+    @Getter@Setter
+    @Column(name = "mvs_contract_end_date")
+    private Date mvsContractEndDate;//续签合同end date
+
+
     @Transient
     @TableField(exist = false)
     private int lineNum;
