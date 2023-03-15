@@ -251,12 +251,17 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         prepareAssetRuleList();
 	}
 	public void onSelectRuleAllOfPage() {
-		isAllRuleSelected = !isAllRuleSelected;
 //        selectedRuleMap.put("header",!selectedRuleMap.get("header"));
+        boolean b = notOnlyOneModels.stream().anyMatch(e -> !selectedRuleMap.get(e.getUniqueUid()));
 			notOnlyOneModels.stream().forEach(e -> {
-				selectedRuleMap.put(e.getUniqueUid(), isAllRuleSelected);
-			});
-	}
+                selectedRuleMap.put(e.getUniqueUid(), b);
+            });
+			if(b){
+			    isAllRuleSelected = true;
+            }else {
+			    isAllRuleSelected = false;
+            }
+    }
 
 	public void setRuleId() {}
 
@@ -510,7 +515,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		}
 	}
 
-	public void prepareAssetRuleModelList(RelRuleAsset e,Integer level){
+	public void prepareAssetRuleModelList(RelRuleAsset e,Integer level,Map<String, V2_PmOrder> pmOrderMap){
 		String ruleUID = null;
 			if(level == 1){
 				 ruleUID = e.getRuleUID1();
@@ -527,17 +532,19 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		Map<String, PmOrderRule> ruleNameMap = orderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, v->v,(o1,o2)->o2));
 		if(!StringUtils.isEmpty(ruleUID)&&ruleUID.contains("|")){
 				ruleUids.stream().forEach(item->{
-					AssetRuleModel model = new AssetRuleModel();
-					model.setPmType(pmType);
-					model.setUid(e.getAssetUID());
-					model.setLevel(level);
-					model.setPlanTime(planTime);
-					model.setPmRuleUid(item);
-					model.setPeriod(ruleNameMap.get(item).getPeriod());
-					model.setAssetName(e.getAssetName());
-					model.setPmRuleName(ruleNameMap.get(item).getName());
-					model.setUniqueUid(e.getAssetUID()+item);
-					notOnlyOneModels.add(model);
+				    if(pmOrderMap.get(e.getAssetUID()+level+item) == null) {
+                        AssetRuleModel model = new AssetRuleModel();
+                        model.setPmType(pmType);
+                        model.setUid(e.getAssetUID());
+                        model.setLevel(level);
+                        model.setPlanTime(planTime);
+                        model.setPmRuleUid(item);
+                        model.setPeriod(ruleNameMap.get(item).getPeriod());
+                        model.setAssetName(e.getAssetName());
+                        model.setPmRuleName(ruleNameMap.get(item).getName());
+                        model.setUniqueUid(e.getAssetUID() + item);
+                        notOnlyOneModels.add(model);
+                    }
 					});
 				}else{
 					AssetRuleModel model = new AssetRuleModel();
@@ -560,11 +567,14 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
             if(CollectionUtils.isNotEmpty(assetInfoMap.entrySet())){
 
                 List<RelRuleAsset> ruleAssets = relRuleAssetRepository.findByAssetUids1(targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet()));
+                List<String> assetUids = ruleAssets.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
+                List<V2_PmOrder> pmOrders = pmOrderRepository.findByAssets(assetUids);
+                Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(e -> e.getAssetUid() + e.getRuleLevel() + e.getRuleUid(), v -> v, (v1, v2) -> v2));
                 if(CollectionUtils.isNotEmpty(ruleAssets)) {
                     ruleAssets.stream().forEach(
                             e -> {
                                 e.setAssetName(assetInfoMap.get(e.getAssetUID()).getName());
-                                prepareAssetRuleModelList(e, level);
+                                prepareAssetRuleModelList(e, level,pmOrderMap);
                             }
                     );
                 }else {
@@ -711,10 +721,6 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	}
 
 	public void updateCheckBox(){
-//		selectedRuleMap.put(uniqueUid,!selectedRuleMap.get(uniqueUid));
-//		selectedRuleMap.remove("header");
-//		boolean b = selectedRuleMap.values().stream().allMatch(e -> e.equals(true));
-//		selectedRuleMap.put("header",b);
         isAllRuleSelected = selectedRuleMap.values().stream().allMatch(e -> e.equals(true));
     }
 
