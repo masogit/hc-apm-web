@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
+
 @Data
 @Entity
 @Builder
@@ -18,27 +20,38 @@ public class SparePart implements Serializable {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
-    private Long id;
-    @Column(nullable = false)
+    private String id;
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(nullable = false)
+    @Column(name = "model")
     private String model;
-    @Column(nullable = false, unique = true)
+    @Column(name = "serial_number", nullable = false, unique = true)
     private String serialNumber;
-    @Column(nullable = false)
+    @Column(name = "manufacturer")
     private String manufacturer;
-    @Column(nullable = false)
+    @Column(name = "supplier")
     private String supplier;
-    @Column(nullable = false)
+    @Column(name = "unit")
     private String unit;
-    @Column(nullable = false)
-    private int quantity;
-    @Column(nullable = false)
-    private double unitPrice;
-    @Column(nullable = false)
-    private double totalPrice;
-    @Column(nullable = false)
-    private String warehouse;
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+    @Column(name = "unit_price")
+    private Double unitPrice;
+    @Column(name = "total_price")
+    private Double totalPrice;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "parts_warehouse_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private SimplePartsWarehouse partsWarehouse;
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUID;
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUID;
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUID;
+    @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;
 
     @Override
     public int hashCode() {
