@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -270,7 +271,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
         Set<String> uids = currentPageAssets.stream().filter(item -> item.getUid() != null).map(item -> item.getUid()).collect(Collectors.toSet());
-        List<AssetLifecycle> lifecycles= assetLifecyleService.selectByUidsAndStatus(uids,4);
+        List<AssetLifecycle> lifecycles= assetLifecyleService.selectByUidsAndStatus(uids, AssetConstant.ASSET_STATUS_TO_TERMINATED);
 //        List<AssetLifecycle> lifecycles= assetLifecyleService.selectByAssetUidsAndStatusGroupAssetUid(uids,4);
         Map<String, List<AssetLifecycle>> collect = lifecycles.stream().collect(Collectors.groupingBy(AssetLifecycle::getAssetUid));
         currentPageAssets.forEach(item -> {
