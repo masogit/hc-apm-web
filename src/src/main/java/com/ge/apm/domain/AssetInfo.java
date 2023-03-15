@@ -166,7 +166,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
 
-    @Column(name = "asset_class") // 1 医疗设备  2 家具
+    @Column(name = "asset_class") // 1 医疗设备  2 后勤资产 3 信息类设备
     private Integer assetClass;//资产分类
 
     @Column(name = "asset_group_secondary")
