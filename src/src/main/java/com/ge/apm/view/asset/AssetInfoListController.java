@@ -110,6 +110,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String installDateFormatTime = null;
     private String arriveDateFormatTime = null;
     private String factoryWarrantyDateFormatTime = null;
+    @Getter @Setter
+    private String mvsContractStartDate = null;
+    @Getter @Setter
+    private String mvsContractEndDate = null;
 
     private Boolean needShowAssetApproval;
 
