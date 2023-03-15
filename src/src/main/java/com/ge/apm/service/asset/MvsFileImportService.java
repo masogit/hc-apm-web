@@ -61,7 +61,7 @@ public class MvsFileImportService {
     private final String NONE = "-";
 
     public List<MvsContractDateInfo> handleContractExcel(UploadedFile file) throws IOException, ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<MvsContractDateInfo> importDataList = new ArrayList<>();
         Workbook workbook = null;
         if (file.getFileName().toLowerCase().endsWith(".xls")) {
@@ -109,7 +109,13 @@ public class MvsFileImportService {
                 dateInfo.setStatus(ExcelParser.getCellStringValue(row, header.get("Status")));
                 dateInfo.setStartDate(ExcelParser.getCellDateValue(row, header.get("StartDate"), sdf));
                 dateInfo.setEndDate(ExcelParser.getCellDateValue(row, header.get("EndDate"), sdf));
-                dateInfo.setOCStatus(ExcelParser.getCellStringValue(row, header.get("OC Status")));
+
+                String ocStatus = ExcelParser.getCellStringValue(row, header.get("OC Status"));
+                if(StringUtils.isEmpty(ocStatus)){
+                    dateInfo.setOCStatus(NONE);
+                }else{
+                    dateInfo.setOCStatus(ocStatus);
+                }
                 dateInfo.setOCSubmitDate(ExcelParser.getCellDateValue(row, header.get("OC sumbit date"), sdf));
                 dateInfo.setOrderChangeDate(ExcelParser.getCellDateValue(row, header.get("OrderChangeDate-批准时间"), sdf));
                 dateInfo.setOCSvcStartDate(ExcelParser.getCellDateValue(row, header.get("OCSvcstratdate"), sdf));
@@ -173,11 +179,11 @@ public class MvsFileImportService {
                 assetInfo.setWarrantyDate(dateInfoList.get(0).getOCSvcEndDate());
             }else if (null == assetInfo.getFactoryWarrantyDate() && null == assetInfo.getWarrantyDate()){
                 if(inOrderChange){
-                    dateInfoList = mvsContractRepository.findByStatusNoAndContract(IN_ORDER_CHANGE ,contractNo);
+                    dateInfoList = mvsContractRepository.findByStatusAndContractNo(IN_ORDER_CHANGE ,contractNo);
                     assetInfo.setFactoryWarrantyDate(dateInfoList.get(0).getStartDate());
                     assetInfo.setWarrantyDate(dateInfoList.get(0).getEndDate());
                 }else if(none){
-                    dateInfoList = mvsContractRepository.findByStatusNoAndContract(NONE ,contractNo);
+                    dateInfoList = mvsContractRepository.findByStatusAndContractNo(NONE ,contractNo);
                     assetInfo.setFactoryWarrantyDate(dateInfoList.get(0).getStartDate());
                     assetInfo.setWarrantyDate(dateInfoList.get(0).getEndDate());
                 }
