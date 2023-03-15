@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -170,7 +171,17 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
-
+        Set<String> uids = currentPageAssets.stream().filter(item -> item.getUid() != null).map(item -> item.getUid()).collect(Collectors.toSet());
+        List<AssetLifecycle> lifecycles= assetLifecyleService.selectByUidsAndStatus(uids,-2);
+        Map<String, List<AssetLifecycle>> collect = lifecycles.stream().collect(Collectors.groupingBy(AssetLifecycle::getAssetUid));
+        currentPageAssets.forEach(item -> {
+            List<AssetLifecycle> assetLifecycles = collect.get(item.getUid());
+            if(!CollectionUtils.isEmpty(assetLifecycles)){
+                List<AssetLifecycle> assetLifecycleSortDesc = assetLifecycles.stream().sorted(Comparator.comparing(AssetLifecycle::getModifyTime).reversed()).collect(Collectors.toList());
+                item.setTerminateOperation(assetLifecycleSortDesc.get(0).getModifyBy());
+                item.setTerminateOperationDate(assetLifecycleSortDesc.get(0).getModifyTime());
+            }
+        });
         if (orgUids.isEmpty()) {
             return;
         }
