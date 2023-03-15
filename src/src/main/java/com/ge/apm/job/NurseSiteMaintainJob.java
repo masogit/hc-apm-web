@@ -3,6 +3,7 @@ package com.ge.apm.job;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateTime;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import javaslang.Tuple2;
 import org.apache.commons.collections.CollectionUtils;
@@ -143,8 +144,10 @@ public class NurseSiteMaintainJob {
 
     public void doJobDailyUpdate() {
         Date currentDate = DateUtil.now();
-        Date startDate = DateUtil.beginOfDay(currentDate);
-        Date endDate = DateUtil.endOfDay(currentDate);
+        DateTime startTime = DateUtil.beginOfDay(currentDate);
+        DateTime endTime = DateUtil.endOfDay(currentDate);
+        Date startDate = new Date(startTime.getTime());
+        Date endDate = new Date(endTime.getTime());
 
         //0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
         List<Integer> listStatus = ListUtil.newArrayList(2, 3, 4, 5);
