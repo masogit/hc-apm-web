@@ -145,7 +145,7 @@ public class NurseSiteMaintainJob {
     public void doJobDailyUpdate() {
         Date currentDate = DateUtil.now();
         DateTime startTime = DateUtil.beginOfDay(currentDate);
-        DateTime endTime = DateUtil.endOfDay(currentDate);
+        DateTime endTime = DateUtil.offsetDay(startTime, 1);
         Date startDate = new Date(startTime.getTime());
         Date endDate = new Date(endTime.getTime());
 
