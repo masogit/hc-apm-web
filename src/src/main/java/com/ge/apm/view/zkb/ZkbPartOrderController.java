@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -127,6 +128,16 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(c.getConfigType())){
                         canDelete = true;
                         break;
+                    }
+                }
+            }
+            Map<String, String> mm =  FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+            if(!mm.containsKey("notGeAsset")){
+                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
+                    if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(c.getConfigType()) ||
+                            ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(c.getConfigType())
+                    ){
+                        notGeAsset = CopyByInvok.T;
                     }
                 }
             }

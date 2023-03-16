@@ -247,6 +247,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }
         if((queryWorkFlow.getAssetInfo() == null || StringUtils.isEmpty(queryWorkFlow.getAssetInfo().getSystemId())) &&
+            (queryWorkFlow.getAssetInfo() == null || StringUtils.isEmpty(queryWorkFlow.getAssetInfo().getDepartNum())) &&
            (queryWorkFlow.getServiceRequest() == null || StringUtils.isEmpty(queryWorkFlow.getServiceRequest().getSrNum()))) {
             WebUtil.addErrorMessage("查询有误，请输入条件","");
             return;

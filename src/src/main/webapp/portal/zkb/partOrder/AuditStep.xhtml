@@ -555,7 +555,7 @@
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.tseAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">TSE审批备注</label>
+                            <label class="label">备注</label>
                             <p:inputTextarea value="#{zkbPartOrderAuditController.selected.tseRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
                             </p:inputTextarea>
                         </h:panelGroup>
@@ -626,7 +626,7 @@
                             <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.osscAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">OSSC确认备注</label>
+                            <label class="label">备注</label>
                             <p:inputTextarea value="#{zkbPartOrderAuditController.selected.osscRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscPending')}">
                             </p:inputTextarea>
                         </h:panelGroup>
@@ -1063,7 +1063,7 @@
                                 </f:facet>
                             </p:cellEditor>
                         </p:column>
-                        <p:column headerText="好还是否超过七天" exportable="false" width="160" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin and zkbPartOrderAuditController.selected.notGeAsset eq 't'}" >
+                        <p:column headerText="好还时间是否超过七天" exportable="false" width="160" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.choseAdmin and zkbPartOrderAuditController.selected.notGeAsset eq 't'}" >
                             <p:cellEditor>
                                 <f:facet name="output">
                                     <p:selectOneMenu value="#{it.sevenReturnedFlag}" style="width:100%" disabled="true">
