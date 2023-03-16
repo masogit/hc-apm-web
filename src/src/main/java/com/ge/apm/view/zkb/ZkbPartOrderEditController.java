@@ -76,6 +76,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private I18nMessageRepository i18nMessageRepository;
     private ZkbHighPartInfoRepository zkbHighPartInfoRepository;
     private String notGeAsset;
+    private String listNg;
     String encodeStr;
 
     @Override
@@ -97,6 +98,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         selectionTenantInfo = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectionTenantInfo");
         queryStatus = UrlEncryptController.getValueFromMap(encodeStr, "queryStatus") == null ? "" : (String) UrlEncryptController.getValueFromMap(encodeStr, "queryStatus");
+        listNg = UrlEncryptController.getValueFromMap(encodeStr, "notGeAsset") == null ? "" : (String) UrlEncryptController.getValueFromMap(encodeStr, "notGeAsset");
         notGeAsset = WebUtil.getRequestParameter("ng");
         queryWorkFlow = new V2_WorkOrder();
         queryWorkFlow.setAssetInfo(new AssetInfo());
@@ -1224,7 +1226,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
             zkbPartOrderService.sendEmail(selected, CopyByInvok.EMAIL_URL_TYPE_LASTDAY,UserContextService.getAccessToken());
         }
-        return "List?faces-redirect=true";
+        return "List?faces-redirect=true&queryStatus="+queryStatus +"&notGeAsset="+(StrUtil.isEmpty(listNg) ? "" : listNg);
     }
 
     public void notGeAssetChange(ValueChangeEvent event){
@@ -1486,7 +1488,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String backList(){
-        return "List?faces-redirect=true&queryStatus="+queryStatus;
+        return "List?faces-redirect=true&queryStatus="+queryStatus +"&notGeAsset="+(StrUtil.isEmpty(listNg) ? "" : listNg);
     }
 
     public String getActionName() {
