@@ -25,7 +25,7 @@ public class SparePart implements Serializable {
     private String name;
     @Column(name = "model")
     private String model;
-    @Column(name = "serial_number", nullable = false, unique = true)
+    @Column(name = "serial_number")
     private String serialNumber;
     @Column(name = "manufacturer")
     private String manufacturer;
@@ -39,6 +39,8 @@ public class SparePart implements Serializable {
     private Double unitPrice;
     @Column(name = "total_price")
     private Double totalPrice;
+    @Column(name = "parts_warehouse_id")
+    private String partsWarehouseId;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parts_warehouse_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SimplePartsWarehouse partsWarehouse;

@@ -12,8 +12,8 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup >
-                            <label class ="label">备件名称 </label>
-                            <p:inputText id="name" value="#{sparePartController.selected.name}"  />
+                            <label class ="label">备件名称* </label>
+                            <p:inputText id="name" value="#{sparePartController.selected.name}" required="true" requiredMessage="备件名称必填"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">规格型号 </label>
@@ -21,7 +21,7 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">序列号 </label>
-                            <p:inputText id="serialNumber" value="#{sparePartController.selected.serialNumber}"  />
+                            <p:inputText id="serialNumber" value="#{sparePartController.selected.serialNumber}" />
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">厂家 </label>
@@ -36,20 +36,25 @@
                             <p:inputText id="unit" value="#{sparePartController.selected.unit}"  />
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">数量 </label>
-                            <p:inputText id="quantity" value="#{sparePartController.selected.quantity}"  />
+                            <label class ="label">数量* </label>
+                            <p:inputText id="quantity" value="#{sparePartController.selected.quantity}"  required="true" requiredMessage="数量必填">
+                                <f:validateLongRange minimum="1" />
+                            </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">单价 </label>
-                            <p:inputText id="unitPrice" value="#{sparePartController.selected.unitPrice}"  />
+                            <label class ="label">单价* </label>
+                            <p:inputText id="unitPrice" value="#{sparePartController.selected.unitPrice}" required="true" requiredMessage="单价必填">
+                                <f:validateDoubleRange minimum="0.01" />
+                            </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">总价 </label>
-                            <p:inputText id="totalPrice" value="#{sparePartController.selected.totalPrice}"  />
+                            <label class ="label">总价* </label>
+                            <p:inputText id="totalPrice" value="#{sparePartController.selected.totalPrice}"  readonly="true" required="true" requiredMessage="总价必须计算"/>
+                            <p:commandButton value="计算" actionListener="#{sparePartController.totalPrice}" update="totalPrice"/>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">仓库 </label>
-                            <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" >
+                            <label class ="label">仓库* </label>
+                            <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" required="true" requiredMessage="仓库必填">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{sparePartController.warehouses}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>

@@ -55,8 +55,8 @@
 								<p:column headerText="仓库" filterBy="#{item.partsWarehouse.name}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.partsWarehouse.name}" />
 								</p:column>
-								<p:column  headerText="出库" >
-									
+								<p:column  headerText="操作" >
+									<p:commandButton id="outButton" value="出库" actionListener="#{sparePartController.prepareEdit}" update="@(.updateTrCls) :pkEditDlg" disabled="#{empty sparePartController.selected.id}" oncomplete="PF('pkEditDialog').show()"/>
 								</p:column>
 								<f:facet name="{Toolbar}">
 									<p:commandButton id="addButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{sparePartController.prepareCreate}"  update="@(.updateTrCls) :pkInDlg" oncomplete="PF('pkInDialog').show()"/>
