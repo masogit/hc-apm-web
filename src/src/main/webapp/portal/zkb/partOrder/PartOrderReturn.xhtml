@@ -81,7 +81,7 @@
                 </h:panelGroup>
                 <h:panelGroup id="sevenReturnedFlagGroup">
                     <h:panelGroup rendered="#{zkbPartOrderAuditController.actionReturnName eq 'Audit' and zkbPartOrderAuditController.selected.notGeAsset eq 't' and zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'goodReturn'}">
-                        <label class="label">好还是否超过七天</label>
+                        <label class="label">好还时间是否超过七天</label>
                         <p:selectOneMenu value="#{zkbPartOrderAuditController.zkbPartOrderReturn.sevenReturnedFlag}" style="text-align: left" disabled="#{zkbPartOrderAuditController.returnFormFlag eq 'readOnly'}" >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="是" itemValue="t"/>
@@ -107,6 +107,7 @@
                     </p:dataList>
                     <p:fileUpload allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{zkbPartOrderAuditController.handleReturnFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                   multiple="true"  sizeLimit="31000000"  update="uploadReturnList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}" rendered="#{zkbPartOrderAuditController.returnFormFlag eq 'edit'}"/>
+                    <label style="color: red">请提供好还的备件照片和寄件时的外包装照片</label>
                 </h:panelGroup>
             </h:panelGroup>
             <br/>

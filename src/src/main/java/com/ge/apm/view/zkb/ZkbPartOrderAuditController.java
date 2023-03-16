@@ -1470,9 +1470,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if("goodReturn".equals(zkbPartOrderReturn.getReturnType())){
                     if(goodReturnBlobObjectList == null || goodReturnBlobObjectList.size() == 0){
                         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                        WebUtil.addErrorMessage("请上传图片","");
+                        WebUtil.addErrorMessage("请提供好还的备件照片和寄件时的外包装照片","");
                         return;
-                    }else{
+                    }else if(goodReturnBlobObjectList.size() < 2){
+                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                        WebUtil.addErrorMessage("上传图片数量不能低于2张","");
+                        return;
+                    }else {
                         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
                     }
                 }

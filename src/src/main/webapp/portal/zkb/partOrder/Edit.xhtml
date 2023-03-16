@@ -86,6 +86,10 @@
                             <label class="label">设备sysID</label>
                             <p:inputText id="qrCode" value="#{zkbPartOrderEditController.queryWorkFlow.assetInfo.systemId}" maxlength="100" required="false"/>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.notGeAsset eq 't'}">
+                            <label class="label">设备编号（院方）</label>
+                            <p:inputText value="#{zkbPartOrderEditController.queryWorkFlow.assetInfo.departNum}" maxlength="100" required="false"/>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">报修单号</label>
                             <p:inputText id="assetName" value="#{zkbPartOrderEditController.queryWorkFlow.serviceRequest.srNum}" maxlength="100" required="false"/>
@@ -395,7 +399,12 @@
                             <p:inputText id="qty" value="#{zkbPartOrderEditController.selected.qty}" required="true"  requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">剩余数量</label>
+                            <c:if test="#{zkbPartOrderEditController.notGeAsset eq 't'}">
+                                <label class="label">剩余名额</label>
+                            </c:if>
+                            <c:if test="#{!(zkbPartOrderEditController.notGeAsset eq 't')}">
+                                <label class="label">剩余数量</label>
+                            </c:if>
                             <p:inputText id="remainQty" value="#{zkbPartOrderEditController.selected.remainQty}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
