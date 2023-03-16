@@ -17,5 +17,5 @@ public interface MvsContractDateInfoRepository extends GenericRepositoryUUID<Mvs
     List<MvsContractDateInfo> findNewestByStatusNoAndContract(String status, String contractNo);
 
     @Query(value = "select * from mvs_contract_date_info t1 where oc_status = ?1 and t1.contract_no = ?2", nativeQuery = true)
-    List<MvsContractDateInfo> findByStatusNoAndContract(String status, String contractNo);
+    List<MvsContractDateInfo> findByStatusAndContractNo(String status, String contractNo);
 }

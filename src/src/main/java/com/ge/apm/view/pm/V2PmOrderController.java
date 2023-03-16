@@ -2065,7 +2065,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
         for (SearchFilter searchFilter : filterArrayList) {
             if (("clinicalDeptId,siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
-                    ",assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType,pmType,ruleLevel").contains(searchFilter.fieldName)) {
+                    ",assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType,pmType,ruleLevel,pmNum,planTime").contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
