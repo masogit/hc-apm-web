@@ -195,6 +195,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     m.put("hospitalName", v.getAssetInfo().getClinicalDeptName());
                     m.put("makerShortName", v.getAssetInfo().getMakerShortName());
                     m.put("oneQrCode", v.getAssetInfo().getQrCode());
+                    m.put("departNum", v.getAssetInfo().getDepartNum());
                 });
                 v2_listHashMap.add(m);
             }
@@ -753,6 +754,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     m.put("hospitalName", v.getAssetInfo().getClinicalDeptName());
                     m.put("oneQrCode",v.getAssetInfo().getQrCode());
                     m.put("makerShortName", v.getAssetInfo().getMakerShortName());
+                    m.put("departNum", v.getAssetInfo().getDepartNum());
                 });
                 map.put("v2", m);
             }
