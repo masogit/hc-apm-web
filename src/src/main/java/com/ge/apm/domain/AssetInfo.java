@@ -166,7 +166,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
 
-    @Column(name = "asset_class") // 1 医疗设备  2 家具
+    @Column(name = "asset_class") // 1 医疗设备  2 后勤资产 3 信息类设备
     private Integer assetClass;//资产分类
 
     @Column(name = "asset_group_secondary")
@@ -231,7 +231,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "last_pm_date")
     @Temporal(TemporalType.DATE)
-    private Date lastPmDate;//上次保养日期
+    private Date lastPmDate;//3级保养 上次保养日期
 
     @Column(name = "last_metering_date")
     @Temporal(TemporalType.DATE)
@@ -239,7 +239,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "last_qa_date")
     @Temporal(TemporalType.DATE)
-    private Date lastQaDate;//上次巡检日期
+    private Date lastQaDate;//2级保养 上次保养日期
+
+    @Column(name = "last_pm_date_one")
+    @Temporal(TemporalType.DATE)
+    private Date lastPmDateOne;//1级保养 上次保养日期
+    @Column(name = "last_pm_date_four")
+    @Temporal(TemporalType.DATE)
+    private Date lastPmDateFour;//4级保养 上次保养日期
 
     @Column(name = "last_stocktake_date")
     @Temporal(TemporalType.DATE)
@@ -2699,4 +2706,12 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setRemark(String remark) {
         this.remark = remark;
     }
+
+    public Date getLastPmDateOne() { return lastPmDateOne; }
+
+    public void setLastPmDateOne(Date lastPmDateOne) { this.lastPmDateOne = lastPmDateOne; }
+
+    public Date getLastPmDateFour() { return lastPmDateFour; }
+
+    public void setLastPmDateFour(Date lastPmDateFour) { this.lastPmDateFour = lastPmDateFour; }
 }
