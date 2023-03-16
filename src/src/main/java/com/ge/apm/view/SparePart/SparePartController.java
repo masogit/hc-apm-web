@@ -14,6 +14,7 @@ import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
@@ -21,10 +22,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -126,16 +124,43 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     }
 
     public void save() {
+        selected.setPartsWarehouseId(partsWarehouseId);
+        saveSparePartAndRecord(1);
+    }
+
+    public void outSave() {
+        selected.setQuantity(selected.getQuantity() - this.outQuantity);
+        selected.setTotalPrice(selected.getTotalPrice() - (this.outQuantity * selected.getUnitPrice()));
+        saveSparePartAndRecord(2);
+    }
+
+    @Transactional
+    public void saveSparePartAndRecord(Integer recordType) {
         selected.setTenantUID(loginUser.getTenantUID());
         dao.save(selected);
-        StockRecord stockRecord = StockRecord.builder()
-                .recordType(1)
-                .sparePart(selected)
-                .recordDate(new Date())
-                .warehouseOprPersonUid(partsWarehouseId)
-                .quantity(selected.getQuantity())
-                .build();
+        stockRecordRepository.save(buildStockRecord(recordType));
+    }
 
+    private StockRecord buildStockRecord(Integer recordType) {
+        return setOutStockRecord(StockRecord.builder()
+                .recordType(recordType)
+                .sparePartId(selected.getId())
+                .recordDate(new Date())
+                .warehouseOprPerson(loginUser.getName())
+                .warehouseOprPersonUid(loginUser.getUid())
+                .quantity(selected.getQuantity())
+                .tenantUID(loginUser.getTenantUID())
+                .build());
+    }
+
+    private StockRecord setOutStockRecord(StockRecord record) {
+        if (record.getRecordType() == 2) {
+            OrgInfo orgInfo = clinicalDeptList.stream().filter(var -> var.getName().equals(filterClinicalDeptOrg)).findFirst().orElse(new OrgInfo());
+            record.setReceivingDepartment(orgInfo.getUid());
+            record.setReceivingDepartmentUid(orgInfo.getName());
+            record.setQuantity(outQuantity);
+        }
+        return record;
     }
 
     public void cancel() {
@@ -144,6 +169,10 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
 
     public void delete() {
         dao.delete(selected);
+    }
+
+    public void totalPrice() {
+        selected.setTotalPrice(Optional.ofNullable(selected.getUnitPrice()).orElse(0.0) * Optional.ofNullable(selected.getQuantity()).orElse(0));
     }
 
     public List<String> autoCompleteDeptName(String query) {

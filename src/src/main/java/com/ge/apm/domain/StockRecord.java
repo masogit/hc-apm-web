@@ -21,6 +21,8 @@ public class StockRecord implements Serializable {
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String id;
+    @Column(name = "spare_part_id")
+    private String sparePartId;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "spare_part_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SparePart sparePart;
@@ -31,9 +33,9 @@ public class StockRecord implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "record_date")
     private Date recordDate;
-    @Column(name = "warehouse_in_person")
+    @Column(name = "warehouse_opr_person")
     private String warehouseOprPerson;
-    @Column(name = "warehouse_in_person_uid", columnDefinition = "CHAR(32)")
+    @Column(name = "warehouse_opr_person_uid", columnDefinition = "CHAR(32)")
     private String warehouseOprPersonUid;
     @Column(name = "receiving_department")
     private String receivingDepartment;

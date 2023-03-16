@@ -1,14 +1,13 @@
 package com.ge.apm.view.SparePart;
 
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SparePartRepository;
 import com.ge.apm.dao.StockRecordRepository;
-import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -17,10 +16,9 @@ import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.util.PageUtil;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
@@ -33,13 +31,8 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class SparePartStockRecordController extends GenericCRUDUUIDController<StockRecord> {
 
-    private PageUtil<StockRecord> pageUtil = new PageUtil();
-
-    private TenantInfoRepository siteDao;
     private OrgInfoRepository orgDao;
     private UaaService uaaService;
-    private UserContextService userContextService;
-    private SparePartRepository sparePartRepository;
     private StockRecordRepository stockRecordRepository;
     private SimplePartsWarehouseRepository warehouseRepository;
     private StockRecordRepository dao;
@@ -71,11 +64,8 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
 
     @Override
     protected void init() {
-        userContextService = WebUtil.getBean(UserContextService.class);
-        sparePartRepository = WebUtil.getBean(SparePartRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        siteDao =  WebUtil.getBean(TenantInfoRepository.class);
         stockRecordRepository =  WebUtil.getBean(StockRecordRepository.class);
         warehouseRepository = WebUtil.getBean(SimplePartsWarehouseRepository.class);
         dao = WebUtil.getBean(StockRecordRepository.class);
@@ -100,7 +90,13 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     }
 
     private void setFilter() {
-
+        this.searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
+        this.searchFilters.add(new SearchFilter("recordType", SearchFilter.Operator.EQ, this.filterRecordType));
+        if (this.startTime != null) {
+            this.searchFilters.add(new SearchFilter("recordDate", SearchFilter.Operator.GTE, this.startTime));
+            this.searchFilters.add(new SearchFilter("recordDate", SearchFilter.Operator.LTE
+                    , TimeUtils.getDateFromStr(TimeUtils.getStrDate(this.endTime, "yyyyMMdd").concat("235959"), "yyyyMMddHHmmss")));
+        }
     }
 
     @Override
@@ -108,8 +104,11 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-
-        return null;
+        removeFilterOnField("recordType");
+        removeFilterOnField("tenantUID");
+        removeFilterOnField("recordDate");
+        setFilter();
+        return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     @Override
