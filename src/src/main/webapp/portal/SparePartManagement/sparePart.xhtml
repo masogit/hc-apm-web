@@ -23,21 +23,21 @@
 										 rows="20" emptyMessage="#{msg.noRecordFound}"
 										 rowsPerPageTemplate="20,50,100,500">
 
-								<p:ajax event="rowSelect" listener="#{sparePartController.onSelect}" update="addButton editButton deleteButton tenantButton"/>
-								<p:ajax event="filter" listener="#{sparePartController.onFilter}" update="addButton editButton deleteButton tenantButton"/>
+								<p:ajax event="rowSelect" listener="#{sparePartController.onSelect}" update="addButton editButton deleteButton "/>
+								<p:ajax event="filter" listener="#{sparePartController.onFilter}" update="addButton editButton deleteButton "/>
 								<p:column headerText="备件名称" filterBy="#{item.name}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.name}"/>
 								</p:column>
-								<p:column headerText="规格型号">
+								<p:column headerText="规格型号" filterBy="#{item.model}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.model}" />
 								</p:column>
-								<p:column headerText="序列号">
+								<p:column headerText="序列号" filterBy="#{item.serialNumber}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.serialNumber}" />
 								</p:column>
-								<p:column headerText="厂家">
+								<p:column headerText="厂家" filterBy="#{item.manufacturer}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.manufacturer}" />
 								</p:column>
-								<p:column headerText="供应商">
+								<p:column headerText="供应商" filterBy="#{item.supplier}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.supplier}" />
 								</p:column>
 								<p:column headerText="单位">
@@ -52,7 +52,7 @@
 								<p:column headerText="总价">
 									<h:outputText value="#{item.totalPrice}" />
 								</p:column>
-								<p:column headerText="仓库">
+								<p:column headerText="仓库" filterBy="#{item.partsWarehouse.name}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.partsWarehouse.name}" />
 								</p:column>
 								<p:column  headerText="出库" >
