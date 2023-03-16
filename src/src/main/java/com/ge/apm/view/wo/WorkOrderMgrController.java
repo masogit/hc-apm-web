@@ -1075,7 +1075,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             filters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
         }
         for (SearchFilter searchFilter :searchFilters) {
-            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating,assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType".contains(searchFilter.fieldName)) {
+            if (("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating,assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType" +
+                    ",serviceRequest.srNum,serviceRequest.casePriority").contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
