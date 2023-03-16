@@ -1626,6 +1626,31 @@ public class UserContextService implements Serializable {
         }
         return selectItems;
     }
+    // 当前用户只有指定角色的情况
+    public boolean onlyHasRole(String roles){
+        UserAccount user = getLoginUser();
+        List<String> userRoles = user.getRoleNames();
+        String[] roleList = roles.split(",");
+
+        if(roleList.length < userRoles.size()){
+            return false;
+        }
+
+        int count = 0;
+        for (String role : roleList) {
+            role = role.trim();
+            boolean roleAllowed = userRoles.contains(role);
+            if (roleAllowed) {
+                count++;
+            }
+        }
+        // 指定的角色比拥有的角色多，则判断用户的所有角色是否都在指定角色列表中
+        if((roleList.length == userRoles.size() && count == roleList.length) ||
+                (roleList.length > userRoles.size() && count == userRoles.size())){
+            return true;
+        }
+        return false;
+    }
 
     public OrgInfo getSelectSiteSchedule() {
         return selectSiteSchedule;
