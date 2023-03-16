@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class SparePartStockRecordController extends GenericCRUDUUIDController<StockRecord> {
 
-    private PageUtil<JmReport> pageUtil = new PageUtil();
+    private PageUtil<StockRecord> pageUtil = new PageUtil();
 
     private TenantInfoRepository siteDao;
     private OrgInfoRepository orgDao;

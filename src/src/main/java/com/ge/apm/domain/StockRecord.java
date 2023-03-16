@@ -25,7 +25,7 @@ public class StockRecord implements Serializable {
     @JoinColumn(name = "spare_part_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SparePart sparePart;
     @Column(name = "record_type")
-    private Integer recordType;
+    private Integer recordType;//1 入库，2 出库
     @Column(name = "quantity")
     private Integer quantity;
     @Temporal(TemporalType.TIMESTAMP)

@@ -14,6 +14,7 @@ import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -22,6 +23,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +31,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class SparePartController extends GenericCRUDUUIDController<SparePart> {
 
-    private PageUtil<JmReport> pageUtil = new PageUtil();
+    private PageUtil<SparePart> pageUtil = new PageUtil();
 
     private TenantInfoRepository siteDao;
     private OrgInfoRepository orgDao;
@@ -57,6 +59,9 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     private String filterClinicalDeptOrg;
     @Getter@Setter
     private List<OrgInfo> clinicalDeptList;
+    @Getter@Setter
+    private Integer outQuantity;
+
 
     @Override
     protected void init() {
@@ -88,7 +93,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     }
 
     private void setFilter() {
-
+        this.searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
     }
 
     @Override
@@ -96,8 +101,8 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-
-        return null;
+        setFilter();
+        return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     @Override
@@ -121,7 +126,16 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     }
 
     public void save() {
+        selected.setTenantUID(loginUser.getTenantUID());
         dao.save(selected);
+        StockRecord stockRecord = StockRecord.builder()
+                .recordType(1)
+                .sparePart(selected)
+                .recordDate(new Date())
+                .warehouseOprPersonUid(partsWarehouseId)
+                .quantity(selected.getQuantity())
+                .build();
+
     }
 
     public void cancel() {
