@@ -15,7 +15,7 @@ public interface ZkbIbCrossUserRepository extends GenericRepositoryUUID<ZkbIbCro
 
     @Transactional
     @Modifying
-    @Query("delete from ZkbIbCrossUser")
+    @Query(value = "delete from zkb_ib_cross_user", nativeQuery = true)
     void deleteAllBatch();
 
 

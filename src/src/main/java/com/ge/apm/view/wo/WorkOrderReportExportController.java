@@ -1,6 +1,6 @@
 package com.ge.apm.view.wo;
 
-import cn.hutool.core.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.I18nMessage;

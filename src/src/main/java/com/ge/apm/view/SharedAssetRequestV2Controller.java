@@ -2095,11 +2095,15 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
 
     public boolean showAndDisabled(){
-        Boolean enableStockShow = this.currentWorkflowConfig.getEnableStockShow();
-        if(Boolean.FALSE.equals(enableStockShow)){
-            return enableStockShow;
+        if(this.currentWorkflowConfig == null){
+            return Boolean.FALSE;
         }
-        return this.getStock() < 1;
+        Boolean enableStockShow = this.currentWorkflowConfig.getEnableStockShow();
+        if(Boolean.TRUE.equals(enableStockShow)){
+            return this.getStock() < 1;
+        }else{
+            return Boolean.FALSE;
+        }
     }
 }
     

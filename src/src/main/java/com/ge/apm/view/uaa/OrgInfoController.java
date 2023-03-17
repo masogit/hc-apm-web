@@ -545,7 +545,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         List<SearchFilter> checkFilters = new ArrayList<>();
 
         //检查是否有用户属于这个组织
-        checkFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
+        checkFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1*"));
+        checkFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*2+"));
+        checkFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.IsNull, null, "1*2+"));
 
         List<UserAccount> userList = userDao.findBySearchFilter(checkFilters);
         if (userList != null && !userList.isEmpty()) {

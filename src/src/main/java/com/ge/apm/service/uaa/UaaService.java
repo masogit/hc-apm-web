@@ -1,6 +1,6 @@
 package com.ge.apm.service.uaa;
 
-import cn.hutool.core.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.PermissionGroupMapper;
 import com.ge.apm.dao.mapper.PermissionGroupUserMapper;

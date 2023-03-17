@@ -25,7 +25,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime","assetQuality","isUseRegistration","networkingStatus","systemNum1","systemNum2","systemNum3","systemNum4","systemNum5","assetQuantity","productFamily","productSegment","mvsContractStartDate","mvsContractEndDate");
     }
 
     //只读字段
@@ -195,6 +195,10 @@ public class CustomConfigConstant {
         allFields.put("systemNum5", WebUtil.getMessage("systemNum5"));
         allFields.put("assetUsedLifecycle", WebUtil.getMessage("assetUsedLifecycle"));
         allFields.put("assetQuantity", WebUtil.getMessage("assetQuantity"));
+        allFields.put("productFamily", WebUtil.getMessage("productFamily"));
+        allFields.put("productSegment", WebUtil.getMessage("productSegment"));
+        allFields.put("mvsContractStartDate", WebUtil.getMessage("mvsContractStartDate"));
+        allFields.put("mvsContractEndDate", WebUtil.getMessage("mvsContractEndDate"));
         return allFields;
     }
 

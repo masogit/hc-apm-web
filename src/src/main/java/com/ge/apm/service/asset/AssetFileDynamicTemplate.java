@@ -16,6 +16,7 @@ import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Name;
@@ -413,6 +414,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     public void writeAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<String> exportFields) {
+        boolean flag = this.crossSite;
+        if (!flag && exportFields.containsAll(ListUtil.newArrayList("医院", "集团"))) {
+            flag = true;
+        }
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
 
@@ -434,7 +439,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         for (AssetInfo assetInfo: assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, supplierDao,userDao,authGroupDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite,assetMap,parentAssets, supliers);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(flag,assetMap,parentAssets, supliers);
 
             writer.writeRowData(startRow, rowMap);
 

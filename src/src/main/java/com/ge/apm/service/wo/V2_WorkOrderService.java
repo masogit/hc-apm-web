@@ -105,8 +105,13 @@ public class V2_WorkOrderService {
     public List<V2_WorkOrder_Step> getWorkOrderDetailResponsor(String woId, Integer step){
        return  stepDao.findResponsor(woId,step);
     }
+
     public List<V2_WorkOrder_Step> getWorkOrderRepaireName(String woId, Integer step){
         return  stepDao.findRepaireName(woId,step);
+    }
+
+    public List<V2_WorkOrder_Step> getMaxStartTimeWorkOrderStepByWoIdAndStepId(String woId, Integer step) {
+        return stepDao.findMaxStartTimeWorkOrderStepByWoIdAndStepId(woId, step);
     }
 
     public List<V2_WorkOrder_Step> getWorkIds(String owerName){
@@ -119,6 +124,10 @@ public class V2_WorkOrderService {
 
     public List<V2_WorkOrder_Step> findWorkSteps(String owerName){
         return  stepDao.findWorkSteps(owerName);
+    }
+
+    public List<V2_WorkOrder_Step> getWorkStepsByStepId(Integer stepId, String tenantUid){
+        return  stepDao.findWorkStepsByStepIdAndTenantUid(stepId, tenantUid);
     }
 
     public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName){
