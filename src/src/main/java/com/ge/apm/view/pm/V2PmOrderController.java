@@ -609,14 +609,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
-        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
-        if(CollectionUtils.isEmpty(pmRuleByPmNum)){
+        PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
+        if(orderRule == null){
             return new PmOrderRule();
+        }else {
+            return orderRule;
         }
-        else{
-            PmOrderRule pmOrderRule = pmRuleByPmNum.get(0);
-            return pmOrderRule;
-        }
+//            return new PmOrderRule();
+//        }
+//        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
+//        if(CollectionUtils.isEmpty(pmRuleByPmNum)){
+//            return new PmOrderRule();
+//        }
+//        else{
+//            PmOrderRule pmOrderRule = pmRuleByPmNum.get(0);
+//            return pmOrderRule;
+//        }
     }
     public void preBatchCancel(){
         cancelReason=null;

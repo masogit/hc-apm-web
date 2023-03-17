@@ -547,14 +547,16 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
                     }
 					});
 				}else{
-					AssetRuleModel model = new AssetRuleModel();
-					model.setPmType(pmType);
-					model.setUid(e.getAssetUID());
-					model.setLevel(level);
-					model.setPlanTime(planTime);
-					model.setPmRuleUid(ruleUID);
-					model.setPmRuleName(ruleNameMap.get(ruleUID).getName());
-					onlyOneModels.add(model);
+			if(pmOrderMap.get(e.getAssetUID()+level+ruleUID) == null) {
+				AssetRuleModel model = new AssetRuleModel();
+				model.setPmType(pmType);
+				model.setUid(e.getAssetUID());
+				model.setLevel(level);
+				model.setPlanTime(planTime);
+				model.setPmRuleUid(ruleUID);
+				model.setPmRuleName(ruleNameMap.get(ruleUID).getName());
+				onlyOneModels.add(model);
+				}
 			}
 	}
 
@@ -569,7 +571,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
                 List<RelRuleAsset> ruleAssets = relRuleAssetRepository.findByAssetUids1(targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet()));
                 List<String> assetUids = ruleAssets.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
                 List<V2_PmOrder> pmOrders = pmOrderRepository.findByAssets(assetUids);
-                Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(e -> e.getAssetUid() + e.getRuleLevel() + e.getRuleUid(), v -> v, (v1, v2) -> v2));
+                Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(e -> e.getAssetUid() + e.getRuleLevel() + e.getPmRuleUid(), v -> v, (v1, v2) -> v2));
                 if(CollectionUtils.isNotEmpty(ruleAssets)) {
                     ruleAssets.stream().forEach(
                             e -> {

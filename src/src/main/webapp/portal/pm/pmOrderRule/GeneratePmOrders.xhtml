@@ -141,7 +141,7 @@
 				   </p:panelGrid>
 				</p:fieldset>
 				<h:panelGroup id = "AssetsPickList"/>
-			<p:fieldset id="dataTable" legend="#{msg.totalAsset}#{generatePmOrdersController.assetRuleModelTotal}#{msg.SeeMoreAsset}">
+			<p:fieldset id="dataTable" legend="#{msg.totalAsset}#{generatePmOrdersController.total}#{msg.SeeMoreAsset}">
 				<p:dataTable id="dataScroller" var="item" value="#{generatePmOrdersController.assetInfoList}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}">
 					<p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 					<p:column width="36"  id="checkBoxColumn">
@@ -177,7 +177,7 @@
 				</p:dataTable>
 			</p:fieldset>
 
-			<p:fieldset id="dataTable1" legend="以下资产存在多个同等级保养规则,下拉可查看更多。总计: #{generatePmOrdersController.assetRuleModelTotal} 条">
+			<p:fieldset id="dataTable1" legend="以下资产存在多个同等级保养规则,下拉可查看更多。总计: #{generatePmOrdersController.assetRuleModelTotal} 条" >
 				<p:dataTable id="datalist" value="#{generatePmOrdersController.notOnlyOneModels}" var="item" widgetVar="varDataListgl" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}"
 							 >
 					<p:column width="36"  id="checkBoxRulesColumn">
@@ -273,8 +273,7 @@
                                 <label class="label">#{msg.EstimatedCompletionTime}</label>
                                 <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generatePmOrdersController.planTime}"
 											showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
-									<p:ajax process="@this" listener="#{generatePmOrdersController.updatePMPlanTime()}" update="@this GeneratePmOrderForm:dataTable1"></p:ajax>
-<!--									<p:ajax event="select" process="@this" listener="#{generatePmOrdersController.updatePMPlanTime()}" update="@this GeneratePmOrderForm:dataTable1"></p:ajax>-->
+									<p:ajax event="close" process="@this" listener="#{generatePmOrdersController.updatePMPlanTime()}" update="@this GeneratePmOrderForm:dataTable1"></p:ajax>
 								</p:calendar>
                             </h:panelGroup>
                             <h:panelGroup>
