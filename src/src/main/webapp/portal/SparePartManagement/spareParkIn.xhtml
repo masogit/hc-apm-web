@@ -39,23 +39,23 @@
                             <label class ="label">数量* </label>
                             <p:inputText id="quantity" value="#{sparePartController.selected.quantity}"  required="true" requiredMessage="数量必填">
                                 <f:validateLongRange minimum="1" />
+                                <p:ajax event="change" update=":pkInForm:totalPrice" />
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">单价* </label>
-                            <p:inputText id="unitPrice" value="#{sparePartController.selected.unitPrice}" required="true" requiredMessage="单价必填">
+                            <label class ="label">单价 </label>
+                            <p:inputText id="unitPrice" value="#{sparePartController.selected.unitPrice}" >
                                 <f:validateDoubleRange minimum="0.01" />
+                                <p:ajax event="change" update=":pkInForm:totalPrice"/>
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">总价* </label>
-                            <p:inputText id="totalPrice" value="#{sparePartController.selected.totalPrice}"  readonly="true" required="true" requiredMessage="总价必须计算"/>
-                            <p:commandButton value="计算" actionListener="#{sparePartController.totalPrice}" update="totalPrice"/>
+                            <label class ="label">总价 </label>
+                            <p:inputText id="totalPrice" value="#{sparePartController.totalPrice()}" rendered="#{not empty sparePartController.selected}" readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">仓库* </label>
                             <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" required="true" requiredMessage="仓库必填">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{sparePartController.warehouses}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>

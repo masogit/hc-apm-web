@@ -37,19 +37,19 @@
                     </h:panelGroup>
                     <h:panelGroup >
                         <label class ="label">数量* </label>
-                        <p:inputText id="quantity" value="#{sparePartController.selected.quantity}" required="true" requiredMessage="数量必填"/>
+                        <p:outputLabel id="quantity" value="#{sparePartController.selected.quantity}"/>
                     </h:panelGroup>
                     <h:panelGroup >
                         <label class ="label">单价* </label>
-                        <p:inputText id="unitPrice" value="#{sparePartController.selected.unitPrice}" required="true" requiredMessage="单价必填"/>
+                        <p:outputLabel id="unitPrice" value="#{sparePartController.selected.unitPrice}"/>
                     </h:panelGroup>
                     <h:panelGroup >
                         <label class ="label">总价* </label>
-                        <p:inputText id="totalPrice" value="#{sparePartController.selected.totalPrice}" required="true" requiredMessage="总价必填"/>
+                        <p:outputLabel id="totalPrice" value="#{sparePartController.totalPrice(sparePartController.selected.unitPrice, sparePartController.selected.quantity)}" rendered="#{not empty sparePartController.selected}"/>
                     </h:panelGroup>
                     <h:panelGroup >
                         <label class ="label">仓库* </label>
-                        <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" required="true" requiredMessage="仓库必填">
+                        <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" disabled="true">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{sparePartController.warehouses}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                         </p:selectOneMenu>

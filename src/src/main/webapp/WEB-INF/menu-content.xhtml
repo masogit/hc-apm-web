@@ -67,8 +67,8 @@
             </p:submenu>
             <!-- 备件管理 end  -->
 
-            <p:submenu id="um0101" label="简易备件管理" icon="fa fa-check-square-o" rendered="#{userContextService.versionContains('sparePartsManagement')}">
-                <p:menuitem value="备件信息" outcome="/portal/SparePartManagement/sparePart.xhtml"/>
+            <p:submenu id="um0101" label="备件管理" icon="fa fa-check-square-o" rendered="#{userContextService.versionContains('sparePartsManagement')}">
+                <p:menuitem value="备件出入库" outcome="/portal/SparePartManagement/sparePart.xhtml"/>
                 <p:menuitem value="备件出入库记录" outcome="/portal/SparePartManagement/spareParkStockRecord.xhtml"/>
                 <p:menuitem value="备件仓库" outcome="/portal/parts/PartsWarehouse.xhtml"/>
             </p:submenu>
