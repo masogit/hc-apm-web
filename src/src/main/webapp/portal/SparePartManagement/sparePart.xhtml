@@ -56,7 +56,7 @@
 									<h:outputText value="#{item.partsWarehouse.name}" />
 								</p:column>
 								<p:column  headerText="操作" >
-									<p:commandButton id="outButton" value="出库" actionListener="#{sparePartController.prepareEdit}" update="@(.updateTrCls) :pkEditDlg" disabled="#{empty sparePartController.selected.id}" oncomplete="PF('pkEditDialog').show()"/>
+									<p:commandButton id="outButton" value="出库" actionListener="#{sparePartController.outStock(item)}" update="@(.updateTrCls) :pkOutDlg :pkOutForm:outQuantity" oncomplete="PF('pkOutDialog').show()"/>
 								</p:column>
 								<f:facet name="{Toolbar}">
 									<p:commandButton id="addButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{sparePartController.prepareCreate}"  update="@(.updateTrCls) :pkInDlg" oncomplete="PF('pkInDialog').show()"/>

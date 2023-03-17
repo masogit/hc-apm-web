@@ -55,7 +55,7 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
                 </p:panelGrid>
-                <p:commandButton validateClient="true" actionListener="#{sparePartController.save()}" value="#{msg.Save}" update="display,:pkEditForm, :sparePartForm:datalist, :growl, :pkEditForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pkEditDialog');"/>
+                <p:commandButton validateClient="true" actionListener="#{sparePartController.saveEdit()}" value="#{msg.Save}" update="display,:pkEditForm, :sparePartForm:datalist, :growl, :pkEditForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pkEditDialog');"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{sparePartController.cancel()}" icon="ui-icon-cancel" update=":sparePartForm:datalist" onclick="PF('pkEditDialog').hide()" />
             </h:panelGroup>
         </h:form>

@@ -6,23 +6,20 @@ import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.data.FilterEvent;
-import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +27,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class SparePartStockRecordController extends GenericCRUDUUIDController<StockRecord> {
+    private PageUtil<SparePart> pageUtil = new PageUtil();
 
     private OrgInfoRepository orgDao;
     private UaaService uaaService;
@@ -38,15 +36,9 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     private StockRecordRepository dao;
 
     @Getter @Setter
-    private TenantInfo selectedTenant;
-    @Getter @Setter
-    private TreeNode orgTree;
-    @Getter @Setter
     private UserAccount loginUser;
     @Getter @Setter
     private OrgInfo currentOrg;
-    @Getter @Setter
-    private Integer tenantId;
     @Getter @Setter
     private List<SimplePartsWarehouse> warehouses = new ArrayList<>();
     @Getter @Setter
@@ -144,15 +136,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     }
 
     public List<String> autoCompleteDeptName(String query) {
-        if (clinicalDeptList == null) {
-            return Collections.emptyList();
-        }
-        List<OrgInfo> res = this.clinicalDeptList.stream()
-                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
-                .collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+        return pageUtil.autoComplete(query, this.clinicalDeptList);
     }
 
     private void loadClinicalDeptList() {
