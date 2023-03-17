@@ -1,11 +1,16 @@
 package webapp.framework.util;
 
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.google.common.base.Strings;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PageUtil<T> {
     //将list转化为分页集合
@@ -27,5 +32,17 @@ public class PageUtil<T> {
             }
         }
         return new PageImpl<>(list, pageRequest, countSize);
+    }
+
+    public List<String> autoComplete(String query, List<OrgInfo> clinicalDeptList) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 }
