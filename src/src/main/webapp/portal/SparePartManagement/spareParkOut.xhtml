@@ -45,7 +45,7 @@
                     </h:panelGroup>
                     <h:panelGroup >
                         <label class ="label">总价 </label>
-                        <p:outputLabel id="totalPrice" value="#{sparePartController.selected.totalPrice}"  />
+                        <p:outputLabel id="totalPrice" value="#{sparePartController.totalPrice(sparePartController.selected.unitPrice, sparePartController.selected.quantity)}" rendered="#{not empty sparePartController.selected}"/>
                     </h:panelGroup>
                     <h:panelGroup >
                         <label class ="label">仓库 </label>
@@ -63,6 +63,10 @@
                                         scrollHeight="300"  forceSelection="true"  completeMethod="#{sparePartController.autoCompleteDeptName}"
                                         var="t" itemLabel="#{t}" itemValue="#{t}" class="siteFilterChange" required="true" requiredMessage="领取科室必填">
                         </p:autoComplete>
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">说明 </label>
+                        <p:inputText id="remark" value="#{sparePartController.remark}"  />
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:commandButton validateClient="true" actionListener="#{sparePartController.outSave()}" value="#{msg.Save}" update="display,:pkOutForm, :sparePartForm:datalist, :growl, :pkOutForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pkOutDialog');"/>

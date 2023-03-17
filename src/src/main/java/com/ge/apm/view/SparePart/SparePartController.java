@@ -1,9 +1,9 @@
 package com.ge.apm.view.SparePart;
 
 import com.ge.apm.dao.*;
-import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
+import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     private UaaService uaaService;
     private SparePartRepository dao;
     private StockRecordRepository stockRecordRepository;
-    private SimplePartsWarehouseRepository warehouseRepository;
+    private SimplePartsWarehouseService warehouseService;
 
     @Getter @Setter
     private UserAccount loginUser;
@@ -41,12 +41,14 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     private List<SimplePartsWarehouse> warehouses = new ArrayList<>();
     @Getter @Setter
     private String partsWarehouseId;
-    @Getter@Setter
+    @Getter @Setter
     private String filterClinicalDeptOrg;
-    @Getter@Setter
+    @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
-    @Getter@Setter
+    @Getter @Setter
     private Integer outQuantity;
+    @Getter @Setter
+    private String remark;
 
     @Override
     protected void init() {
@@ -54,7 +56,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         stockRecordRepository =  WebUtil.getBean(StockRecordRepository.class);
-        warehouseRepository = WebUtil.getBean(SimplePartsWarehouseRepository.class);
+        warehouseService = WebUtil.getBean(SimplePartsWarehouseService.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
         currentOrg = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -62,7 +64,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         this.filterBySite = false;
         this.filterByHospital = false;
 
-        initWarehouses(loginUser.getTenantUID());
+        initWarehouses();
         loadClinicalDeptList();
     }
 
@@ -71,12 +73,13 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         return dao;
     }
 
-    private void initWarehouses(String tenantUid) {
-        warehouses = warehouseRepository.findAllWarehouseList(tenantUid);
+    private void initWarehouses() {
+        warehouses = warehouseService.findAllBySiteUidAndUserId(loginUser.getSiteUID());
     }
 
     private void setFilter() {
         this.searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
+        this.searchFilters.add(new SearchFilter("quantity", SearchFilter.Operator.GT, 0));
     }
 
     @Override
@@ -122,6 +125,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         selected = sparePart;
         outQuantity = null;
         filterClinicalDeptOrg = null;
+        remark = null;
     }
 
     public void outSave() {
@@ -130,7 +134,6 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
             return;
         }
         selected.setQuantity(selected.getQuantity() - this.outQuantity);
-        selected.setTotalPrice(selected.getTotalPrice() - (this.outQuantity * selected.getUnitPrice()));
         saveSparePartAndRecord(2);
     }
 
@@ -159,6 +162,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
             record.setReceivingDepartment(orgInfo.getName());
             record.setReceivingDepartmentUid(orgInfo.getUid());
             record.setQuantity(outQuantity);
+            record.setRemark(remark);
         }
         return record;
     }
@@ -166,14 +170,20 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     public void cancel() {
         selected = null;
         partsWarehouseId = null;
+        remark = null;
+        partsWarehouseId = null;
     }
 
     public void delete() {
         dao.delete(selected);
     }
 
-    public void totalPrice() {
-        selected.setTotalPrice(Optional.ofNullable(selected.getUnitPrice()).orElse(0.0) * Optional.ofNullable(selected.getQuantity()).orElse(0));
+    public double totalPrice() {
+        return pageUtil.formatDouble2(Optional.ofNullable(selected.getUnitPrice()).orElse(0.0) * Optional.ofNullable(selected.getQuantity()).orElse(0));
+    }
+
+    public double totalPrice(double price, Integer qty) {
+        return pageUtil.formatDouble2(price * qty);
     }
 
     public List<String> autoCompleteDeptName(String query) {
