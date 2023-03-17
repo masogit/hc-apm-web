@@ -823,7 +823,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'mvsContractStartDate'}">
-                                <p:column headerText="#{msg.mvsContractStartDate}" exportable="true" sortBy="#{item.mvsContractStartDate}" filterBy="#{item.mvsContractStartDate}" filterMatchMode="EQ">
+                                <p:column headerText="#{msg.MVSContractStartDate}" exportable="true" sortBy="#{item.mvsContractStartDate}" filterBy="#{item.mvsContractStartDate}" filterMatchMode="EQ">
                                     <h:outputText value="#{item.mvsContractStartDate}">
                                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
@@ -833,7 +833,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'mvsContractEndDate'}">
-                                <p:column headerText="#{msg.mvsContractEndDate}" exportable="true" sortBy="#{item.mvsContractEndDate}" filterBy="#{item.mvsContractEndDate}" filterMatchMode="EQ">
+                                <p:column headerText="#{msg.MVSContractEndDate}" exportable="true" sortBy="#{item.mvsContractEndDate}" filterBy="#{item.mvsContractEndDate}" filterMatchMode="EQ">
                                     <h:outputText value="#{item.mvsContractEndDate}">
                                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
