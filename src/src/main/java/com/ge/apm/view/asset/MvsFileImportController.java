@@ -92,17 +92,23 @@ public class MvsFileImportController {
     }
 
     public void importContractData(){
-        List<MvsContractDateInfo> list = new ArrayList<>();
-        for (MvsContractDateInfo dateInfo : allContractList) {
-            if(dateInfo.isPass()){
-                list.add(dateInfo);
+        try {
+            List<MvsContractDateInfo> list = new ArrayList<>();
+            for (MvsContractDateInfo dateInfo : allContractList) {
+                if(dateInfo.isPass()){
+                    list.add(dateInfo);
+                }
             }
+            service.saveContractInfo(list);
+            this.file = null;
+            this.allContractList = new ArrayList<>();
+            this.errorContractList = new ArrayList<>();
+            WebUtil.addSuccessMessage("合同时间信息表导入成功！");
+        }catch (Exception e){
+            logger.error("合同时间信息表导入失败：", e);
+            WebUtil.addSuccessMessage("合同时间信息表导入失败，请联系系统管理员！");
         }
-        service.saveContractInfo(list);
-        this.file = null;
-        this.allContractList = new ArrayList<>();
-        this.errorContractList = new ArrayList<>();
-        WebUtil.addSuccessMessage("导入成功！");
+
     }
 
     public void uploadSiteDataFile(FileUploadEvent event) {
@@ -129,16 +135,22 @@ public class MvsFileImportController {
         return allOrgList;
     }
     public void importOrgData(){
-        List<MvsOrgInfo> list = new ArrayList<>();
-        for (MvsOrgInfo orgInfo : allOrgList) {
-            if(orgInfo.isPass()){
-                list.add(orgInfo);
+        try {
+            List<MvsOrgInfo> list = new ArrayList<>();
+            for (MvsOrgInfo orgInfo : allOrgList) {
+                if(orgInfo.isPass()){
+                    list.add(orgInfo);
+                }
             }
+            service.saveOrgInfo(list);
+            this.file = null;
+            this.allOrgList = new ArrayList<>();
+            this.errorOrgList = new ArrayList<>();
+            WebUtil.addSuccessMessage("院区信息表导入成功！");
+        }catch (Exception e){
+            logger.error("院区信息表导入失败：", e);
+            WebUtil.addSuccessMessage("院区信息表导入失败，请联系系统管理员！");
         }
-        service.saveOrgInfo(list);
-        this.file = null;
-        this.allOrgList = new ArrayList<>();
-        this.errorOrgList = new ArrayList<>();
-        WebUtil.addSuccessMessage("导入成功！");
+
     }
 }
