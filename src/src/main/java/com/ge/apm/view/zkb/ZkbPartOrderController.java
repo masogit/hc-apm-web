@@ -261,7 +261,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(StringUtils.isEmpty(queryStatus)){
+                    /*if(StringUtils.isEmpty(queryStatus)){
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString()));
                     }else if("all".equals(queryStatus)){
                         if(searchFilters.size() > 0) {
@@ -270,6 +270,25 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }else {
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), "1+"));
                             searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                        }
+                    }*/
+                    if (StringUtils.isEmpty(queryStatus)) {
+                        if(searchFilters.size() > 0){
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString(),"1*2+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString(),"1*2+"));
+                        }else{
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscPending.toString(),"1+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString(),"1+"));
+                        }
+                    }else if("all".equals(queryStatus)){
+                        if(searchFilters.size() > 0) {
+                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                            searchFilters.add(new SearchFilter("returnAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1*2+"));
+                        }else {
+                            searchFilters.add(new SearchFilter("osscAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                            searchFilters.add(new SearchFilter("returnAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1+"));
                         }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
@@ -403,8 +422,6 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             searchFilters.add(new SearchFilter("commercialAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
                             searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1+"));
-
-
                         }
                     }
                 }

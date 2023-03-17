@@ -521,6 +521,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             this.selected.setQty(0);
             if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 this.selected.setCatNum(1);
+                if(CopyByInvok.T.equals(notGeAsset)){
+                    this.selected.setQty(1);
+                }
             }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
                 if(assetInfo == null || StringUtils.isEmpty(assetInfo.getUid()) || selectedContract == null){
                     this.selected.setArtificialType(CopyByInvok.NORMAL_THREE);
@@ -886,9 +889,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             if(this.selected.getOnlineEngine() != null){
                 if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
-                    ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
-                    this.selected.setOnlineEngine(backUp);
-                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                    if(StrUtil.isNotEmpty(this.selected.getOnlineEngine().getUsBackUpId())){
+                        ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
+                        this.selected.setOnlineEngine(backUp);
+                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                    }else{
+                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                    }
                 }else{
                     this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
                 }
@@ -1109,9 +1116,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
                     ZkbContractCat zkbContractCat = zkbPartOrderService.getZkbContractCatRepository().findById(this.selected.getContractCatId());
-                    if(zkbContractCat != null && CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){
-                        probeType = ZkbContractCatQuotaHistory.ProbeTypeStatus.Normal.toString();
+                    if(zkbContractCat != null && CopyByInvok.FOUR_TO_ONE.equals(zkbContractCat.getSnNo())){                        probeType = ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString();
                         Integer contractCount = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
+                        probeType = ZkbContractCatQuotaHistory.ProbeTypeStatus.Normal.toString();
                         if(contractCount - selected.getQty() < 0){
                             reLog += "合同探头普通剩余名额不足，请检查！";
                         }
