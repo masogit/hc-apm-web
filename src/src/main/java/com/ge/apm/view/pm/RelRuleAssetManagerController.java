@@ -37,6 +37,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -440,11 +441,15 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	}
 
 	public String getRuleName(String ruleUID) {
-		PmOrderRule rule = ruleMap.get(ruleUID);//pmOrderRuleRepository.findByUid(ruleUID);
-		if (rule != null) {
-			return rule.getName();
-		}
-		return null;
+        String[] split = StringUtils.split(ruleUID, '|');
+        List<String> ruleUids = Arrays.asList(split);
+
+        List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findByUidIn(ruleUids);
+         String ruleName = "";
+        if(CollectionUtils.isNotEmpty(pmOrderRules)){
+             ruleName = pmOrderRules.stream().map(PmOrderRule::getName).collect(Collectors.joining("|"));
+        }
+        return ruleName;
 	}
     public boolean getPmRule(){
         UserAccount userAccount = UserContextService.getCurrentUserAccount();

@@ -478,10 +478,19 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
                         rra.setRuleUIDInspection(null);
                         updateList.add(rra);
                     }
-                }else if(StringUtils.isNotEmpty(rra.getRuleUID4()) && rra.getRuleUID4().equals(uid)){
+                }else if(StringUtils.isNotEmpty(rra.getRuleUID4()) && rra.getRuleUID4().contains(uid)){
                     if(StringUtils.isEmpty(rra.getRuleUID())
                             && StringUtils.isEmpty(rra.getRuleUID2()) && StringUtils.isEmpty(rra.getRuleUIDInspection())){
-                        deleteList.add(rra);
+                        String[] split = StringUtils.split(uid, "|");
+                        List<String> ruldUid4s = Arrays.asList(split);
+                        if(ruldUid4s.size() == 1) {
+                            deleteList.add(rra);
+                        }else {
+                            ruldUid4s.remove(uid);
+                            String ruleUidsStr = StringUtils.join(ruldUid4s, "|");
+                            rra.setRuleUID4(ruleUidsStr);
+                            updateList.add(rra);
+                        }
                     }else{
                         rra.setRuleUID4(null);
                         updateList.add(rra);
