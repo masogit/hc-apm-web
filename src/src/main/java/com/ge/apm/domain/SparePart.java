@@ -33,14 +33,14 @@ public class SparePart implements Serializable {
     private String supplier;
     @Column(name = "unit")
     private String unit;
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "quantity")
     private Integer quantity;
     @Column(name = "unit_price")
     private Double unitPrice;
-    @Column(name = "total_price")
-    private Double totalPrice;
     @Column(name = "parts_warehouse_id")
     private String partsWarehouseId;
+    @Column(name = "status")
+    private String status;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parts_warehouse_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SimplePartsWarehouse partsWarehouse;

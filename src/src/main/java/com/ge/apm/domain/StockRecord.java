@@ -41,6 +41,8 @@ public class StockRecord implements Serializable {
     private String receivingDepartment;
     @Column(name = "receiving_department_uid", columnDefinition = "CHAR(32)")
     private String receivingDepartmentUid;
+    @Column(name = "remark")
+    private String remark;
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
     @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
