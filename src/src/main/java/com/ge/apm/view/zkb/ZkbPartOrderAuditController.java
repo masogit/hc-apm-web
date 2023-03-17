@@ -55,6 +55,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean showReturn=false;
     private boolean showRejectOrder = false;
     private boolean showClosed=false;
+    private boolean showOsscReturn=false;
     private boolean canEditFlag=false;
     private boolean isChoseAdmin = false;
     private boolean isOrder = false;
@@ -419,6 +420,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }else{
                     zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndOrderTypeNull(selected.getCurrentStep());
                 }
+            }else if(ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString().equals(selected.getCurrentStep())){
+                zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
             }else {
                 zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(selected.getCurrentStep());
             }
@@ -635,7 +638,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showTse= true;
                 showOssc = true;
                 if(canEditFlag){
-                    showOrder = true;
+                    if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
+                        showUnOrder = true;
+                        showBtn = "1";
+                    }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
+                        showOrder = true;
+                        showBtn = "1";
+                    }
                     showBtn = "1";
                 }
             } else if(ZkbPartOrder.PartOrderStatus.OsscReject.toString().equals(selected.getStatus())){
@@ -714,11 +723,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showCommercial = true;
                 showBtn = "";
             } else if(ZkbPartOrder.PartOrderStatus.UnOrdered.toString().equals(selected.getStatus())) {
-                if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
-                    if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
-                    }else {
-                        showTech= true;
-                    }
+                if(StrUtil.isNotEmpty(selected.getTechAuditerUid())){
+                    showTech = true;
+                }
+                if(StrUtil.isNotEmpty(selected.getTseAuditerUid())){
+                    showTse = true;
+                }
+                if(StrUtil.isNotEmpty(selected.getOsscAuditerUid())){
+                    showOssc = true;
+                }
+                if(StrUtil.isNotEmpty(selected.getManageAuditerUid())){
+                    showManage = true;
                 }
                 showManage = true;
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
@@ -733,13 +748,18 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showBtn = "1";
                 }
             }else if(ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString().equals(selected.getStatus())) {
-                if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
-                    if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
-                    }else {
-                        showTech= true;
-                    }
+                if(StrUtil.isNotEmpty(selected.getTechAuditerUid())){
+                    showTech = true;
                 }
-                showManage = true;
+                if(StrUtil.isNotEmpty(selected.getTseAuditerUid())){
+                    showTse = true;
+                }
+                if(StrUtil.isNotEmpty(selected.getOsscAuditerUid())){
+                    showOssc = true;
+                }
+                if(StrUtil.isNotEmpty(selected.getManageAuditerUid())){
+                    showManage = true;
+                }
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
@@ -772,7 +792,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showUnOrder = true;
                 }
                 if(canEditFlag){
-                    showReturn = true;
+                    if(StrUtil.isEmpty(selected.getNotGeAsset())){
+                        showReturn = true;
+                    }else{
+                        showOsscReturn = true;
+                    }
                     showBtn = "1";
                 }
             } else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
@@ -860,6 +884,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showClosed = true;
                     showBtn = "1";
                 }
+            } else if(ZkbPartOrder.PartOrderStatus.OsscReturned.toString().equals(selected.getStatus())){
+                showTse = true;
+                showOssc = true;
+                if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                    showUnOrder = true;
+                }
+                showOrder = true;
+                if(canEditFlag){
+                    showOsscReturn = true;
+                    showBtn = "1";
+                }
             } else if(ZkbPartOrder.PartOrderStatus.Closed.toString().equals(selected.getStatus())){
                 if(StrUtil.isNotEmpty(selected.getTechAuditerUid())){
                     showTech = true;
@@ -884,7 +919,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showUnOrder = true;
                 }
                 showOrder = true;
-                showReturn = true;
+                if(StrUtil.isEmpty(selected.getNotGeAsset())){
+                    showReturn = true;
+                }else {
+                    if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                        showOsscReturn = true;
+                    }else if (ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                        showReturn = true;
+                    }
+                }
                 showClosed = true;
                 showBtn = "";
             }
@@ -1024,10 +1067,29 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String acceptNext(){
         if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(selected.getCurrentStep())){
-            if(StrUtil.isEmpty(selected.getOsscPartNo())){
-                WebUtil.addErrorMessage("备件号不能为空！");
-                return "";
+            if(ZkbPartOrder.OrderType.Parts.equals(selected.getOrderType())){
+                if(StrUtil.isEmpty(selected.getOsscPartNo())){
+                    WebUtil.addErrorMessage("备件号不能为空！");
+                    return "";
+                }
+            }else if(ZkbPartOrder.OrderType.Probe.equals(selected.getOrderType())){
+                if(StrUtil.isEmpty(selected.getOsscCatNo())){
+                    WebUtil.addErrorMessage("探头号不能为空！");
+                    return "";
+                }
+                if(StrUtil.isEmpty(selected.getRepairFlag())){
+                    WebUtil.addErrorMessage("是否能维修不能为空！");
+                    return "";
+                }else {
+                    if(CopyByInvok.T.equals(selected.getRepairFlag())){
+                        if(StrUtil.isEmpty(selected.getOsscPartNo())){
+                            WebUtil.addErrorMessage("备件号不能为空！");
+                            return "";
+                        }
+                    }
+                }
             }
+
         }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
             if(haveTrainCourseFlag){
                 if(StrUtil.isNotEmpty(selected.getHaveTrainCourseFlag())){
@@ -1036,7 +1098,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }
-        zkbPartOrderService.auditNext(this.selected,true,currentUser);
+        boolean f = true;
+        if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(selected.getCurrentStep()) && ZkbPartOrder.OrderType.Probe.equals(selected.getOrderType())){
+            if(CopyByInvok.F.equals(selected.getRepairFlag())){
+                f = false;
+            }
+        }
+        zkbPartOrderService.auditNext(this.selected,f,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendMessage(zkbPartOrder,UserContextService.getAccessToken());
         zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
@@ -1074,7 +1142,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(StrUtil.isEmpty(selected.getOrderNo())){
                     errorLog.append("Order#不能为空，\r\n");
                 }
-                if(StrUtil.isEmpty(selected.getPrice())){
+                if(StrUtil.isEmpty(selected.getNotGeAsset()) && StrUtil.isEmpty(selected.getPrice())){
                     errorLog.append("价格不能为空，\r\n");
                 }
                 if(selected.getZkbPartOrderCat() != null && !ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType()) && StrUtil.isEmpty(selected.getNewCatFlag())){
@@ -1763,7 +1831,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 flag = false;
                 errorLog += "配件名称不能为空,";
             }
-            if(StringUtils.isEmpty(zkbPartOrderItem.getPrice())){
+            if(StrUtil.isEmpty(selected.getNotGeAsset()) && StringUtils.isEmpty(zkbPartOrderItem.getPrice())){
                 flag = false;
                 errorLog += "价格不能为空,";
             }
@@ -2287,5 +2355,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowBtnFourHundredCancel(boolean showBtnFourHundredCancel) {
         this.showBtnFourHundredCancel = showBtnFourHundredCancel;
+    }
+
+    public boolean isShowOsscReturn() {
+        return showOsscReturn;
+    }
+
+    public void setShowOsscReturn(boolean showOsscReturn) {
+        this.showOsscReturn = showOsscReturn;
     }
 }
