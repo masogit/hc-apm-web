@@ -51,17 +51,17 @@
                         <label class ="label">仓库 </label>
                         <p:outputLabel id="partsWarehouseName" value="#{sparePartController.selected.partsWarehouse.name}"  />
                     </h:panelGroup>
-                </p:panelGrid>
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup >
-                        <label class ="label">出库数量 </label>
-                        <p:inputText id="outQuantity" value="#{sparePartController.outQuantity}"  />
+                        <label class ="label">出库数量* </label>
+                        <p:inputText id="outQuantity" value="#{sparePartController.outQuantity}" required="true" requiredMessage="出库数量必填">
+                            <f:validateLongRange minimum="1"/>
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">领取科室 </label>
+                        <label class="label">领取科室* </label>
                         <p:autoComplete dropdown="true" value="#{sparePartController.filterClinicalDeptOrg}"
                                         scrollHeight="300"  forceSelection="true"  completeMethod="#{sparePartController.autoCompleteDeptName}"
-                                        var="t" itemLabel="#{t}" itemValue="#{t}" class="siteFilterChange">
+                                        var="t" itemLabel="#{t}" itemValue="#{t}" class="siteFilterChange" required="true" requiredMessage="领取科室必填">
                         </p:autoComplete>
                     </h:panelGroup>
                 </p:panelGrid>

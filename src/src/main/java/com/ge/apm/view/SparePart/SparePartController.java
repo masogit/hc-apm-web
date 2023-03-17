@@ -5,13 +5,10 @@ import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.data.FilterEvent;
-import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,27 +25,18 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class SparePartController extends GenericCRUDUUIDController<SparePart> {
-
     private PageUtil<SparePart> pageUtil = new PageUtil();
 
-    private TenantInfoRepository siteDao;
     private OrgInfoRepository orgDao;
     private UaaService uaaService;
-    private UserContextService userContextService;
     private SparePartRepository dao;
     private StockRecordRepository stockRecordRepository;
     private SimplePartsWarehouseRepository warehouseRepository;
 
     @Getter @Setter
-    private TenantInfo selectedTenant;
-    @Getter @Setter
-    private TreeNode orgTree;
-    @Getter @Setter
     private UserAccount loginUser;
     @Getter @Setter
     private OrgInfo currentOrg;
-    @Getter @Setter
-    private Integer tenantId;
     @Getter @Setter
     private List<SimplePartsWarehouse> warehouses = new ArrayList<>();
     @Getter @Setter
@@ -60,14 +48,11 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     @Getter@Setter
     private Integer outQuantity;
 
-
     @Override
     protected void init() {
-        userContextService = WebUtil.getBean(UserContextService.class);
         dao = WebUtil.getBean(SparePartRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        siteDao =  WebUtil.getBean(TenantInfoRepository.class);
         stockRecordRepository =  WebUtil.getBean(StockRecordRepository.class);
         warehouseRepository = WebUtil.getBean(SimplePartsWarehouseRepository.class);
 
@@ -121,6 +106,11 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     @Override
     public void prepareEdit() {
         super.prepareEdit();
+        partsWarehouseId = selected.getPartsWarehouseId();
+    }
+
+    public void saveEdit() {
+        dao.save(selected);
     }
 
     public void save() {
@@ -128,7 +118,17 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         saveSparePartAndRecord(1);
     }
 
+    public void outStock(SparePart sparePart) {
+        selected = sparePart;
+        outQuantity = null;
+        filterClinicalDeptOrg = null;
+    }
+
     public void outSave() {
+        if (outQuantity > selected.getQuantity()) {
+            WebUtil.addErrorMessage("出库数量不得大于备件数量");
+            return;
+        }
         selected.setQuantity(selected.getQuantity() - this.outQuantity);
         selected.setTotalPrice(selected.getTotalPrice() - (this.outQuantity * selected.getUnitPrice()));
         saveSparePartAndRecord(2);
@@ -156,8 +156,8 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     private StockRecord setOutStockRecord(StockRecord record) {
         if (record.getRecordType() == 2) {
             OrgInfo orgInfo = clinicalDeptList.stream().filter(var -> var.getName().equals(filterClinicalDeptOrg)).findFirst().orElse(new OrgInfo());
-            record.setReceivingDepartment(orgInfo.getUid());
-            record.setReceivingDepartmentUid(orgInfo.getName());
+            record.setReceivingDepartment(orgInfo.getName());
+            record.setReceivingDepartmentUid(orgInfo.getUid());
             record.setQuantity(outQuantity);
         }
         return record;
@@ -165,6 +165,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
 
     public void cancel() {
         selected = null;
+        partsWarehouseId = null;
     }
 
     public void delete() {
@@ -176,15 +177,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     }
 
     public List<String> autoCompleteDeptName(String query) {
-        if (clinicalDeptList == null) {
-            return Collections.emptyList();
-        }
-        List<OrgInfo> res = this.clinicalDeptList.stream()
-                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
-                .collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+        return pageUtil.autoComplete(query, this.clinicalDeptList);
     }
 
     private void loadClinicalDeptList() {

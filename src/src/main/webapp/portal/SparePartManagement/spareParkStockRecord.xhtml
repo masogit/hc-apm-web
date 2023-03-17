@@ -14,16 +14,16 @@
 			<div class="ui-g-12 card">
 				<h:form id="searchForm">
 					<h:panelGrid id="searchPanel" columns="10">
-							<p:selectOneMenu id="filterRecordType" value="#{sparePartStockRecordController.filterRecordType}">
-								<p:ajax update=":recordPartForm:datalist" />
-								<f:selectItem itemValue='1' itemLabel="入库"/>
-								<f:selectItem itemValue='2' itemLabel="出库"/>
-							</p:selectOneMenu>
-							<label class="label">#{msg.StartTime}*</label>
-							<p:calendar id="StartTime" timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{sparePartStockRecordController.startTime}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="开始时间不得为空"/>
-							<label class="label">#{msg.EndTime}*</label>
-							<p:calendar  id="endTime" timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{sparePartStockRecordController.endTime}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="结束时间不得为空"/>
-							<p:commandButton validateClient="true" update=":recordPartForm:datalist" value="查询" />
+						<p:selectOneMenu id="filterRecordType" value="#{sparePartStockRecordController.filterRecordType}" style="margin-right: 20px">
+							<p:ajax update=":recordPartForm:datalist" />
+							<f:selectItem itemValue='1' itemLabel="入库 "/>
+							<f:selectItem itemValue='2' itemLabel="出库 "/>
+						</p:selectOneMenu>
+						<label class="label">#{msg.StartTime}*</label>
+						<p:calendar id="StartTime" timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{sparePartStockRecordController.startTime}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="开始时间不得为空"/>
+						<label class="label">#{msg.EndTime}*</label>
+						<p:calendar  id="endTime" timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{sparePartStockRecordController.endTime}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="结束时间不得为空"/>
+						<p:commandButton validateClient="true" update=":recordPartForm:datalist" value="查询" />
 					</h:panelGrid>
 				</h:form>
 				<h:form id="recordPartForm">
