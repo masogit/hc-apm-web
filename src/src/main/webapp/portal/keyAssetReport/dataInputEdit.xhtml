@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dialog id="keyAssetReportEditDlg" widgetVar="keyAssetReportEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.keyAssetDataInput}" height="600" width="1200">
+            <h:form id="editForm">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">#{msg.formTitle}*</label>
+                        <p:inputText value="#{keyAssetReportController.selected.formTitle}" style="width: 85%" autocomplete="off" required="true" requiredMessage="#{msg.formTitle} #{msg.ValidationRequire}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.reportYear}*</label>
+                        <p:inputNumber id="reportYear" decimalPlaces="0" thousandSeparator="" maxValue="9999" value="#{keyAssetReportController.selected.reportYear}"
+                            inputStyle="width: 85%" required="true" requiredMessage="#{msg.reportYear} #{msg.ValidationRequire}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.EquipmentName}*</label>
+                        <p:inputText value="#{keyAssetReportController.selected.assetName}" style="width: 85%" autocomplete="off" required="true" requiredMessage="#{msg.EquipmentName} #{msg.ValidationRequire}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.formFiller}*</label>
+                        <p:inputText value="#{keyAssetReportController.selected.formFiller}" style="width: 85%" autocomplete="off" required="true" requiredMessage="#{msg.formFiller} #{msg.ValidationRequire}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.formFillTime}*</label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                                    locale="#{userContextService.getCalendarLocale()}"
+                                    pattern="#{userContextService.timeFormat()}"
+                                    value="#{keyAssetReportController.selected.formFillTime}" inputStyle="width: 85%"
+                                    showOn="button" showButtonPanel="true" navigator="true"
+                                    required="true" requiredMessage="#{msg.formFillTime} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.clinicaldepart}</label>
+                        <p:inputText id="dept" readonly="true" style="width: 80%"
+                                     value="#{keyAssetReportController.selectedDept.name}"/>
+                        <p:commandButton id="org" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                        <p:overlayPanel id="popupPanel" widgetVar="varOrg" for="org" hideEffect="fade" style="position: absolute; left: 0; top: 0; width: 300px;" dynamic="false" modal="false" dismissable="true">
+                            <p:scrollPanel style="height:300px; border: 0" mode="native">
+                                <p:tree id="orgTree" value="#{keyAssetReportController.orgTree}" var="node"
+                                        selectionMode="single" class="tree" style="width:98%; border:0">
+                                    <p:ajax process="@this" event="select" update="editForm:dept selectForm:deptName editForm:selectAssetBtn"
+                                            listener="#{keyAssetReportController.onSelectTreeNode}"
+                                            oncomplete="PF('varOrg').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.selectAssetChoose}*</label>
+                        <p:commandButton id="selectAssetBtn" validateClient="true" value="#{msg.selectAssetChoose}" disabled="#{empty keyAssetReportController.selectedDept}"
+                            action="#{keyAssetReportController.resetSelectAssetPage}" update=":keyAssetSelectDlg" oncomplete="PF('keyAssetSelectDialog').show()"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:fieldset legend="#{msg.assetDetail}">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <p:dataTable id="assetDetail" value="#{keyAssetReportController.assetDetail}" var="item" editable="true"
+                                     rowKey="#{item}" rows="999" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="#{msg.functionType}">
+                                <h:outputText value="#{item.functionType}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.brand}">
+                                <h:outputText value="#{item.brand}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.quantity}">
+                                <h:outputText value="#{item.quantity}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.installDate}">
+                                <h:outputText value="#{item.installDate}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.Price}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.price}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{item.price}" inputStyle="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.depreciation}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.depreciation}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{item.depreciation}" inputStyle="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.repairSpend}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.repairSpend}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{item.repairSpend}" inputStyle="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.maintenanceSpend}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.maintenanceSpend}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{item.maintenanceSpend}" inputStyle="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.suppliesSpend}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.suppliesSpend}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{item.suppliesSpend}" inputStyle="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.Operation}" style="width: 70px">
+                                <p:rowEditor editTitle="#{msg.Edit}" cancelTitle="#{msg.Cancel}#{msg.Edit}" saveTitle="#{msg.Save}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="#{msg.assetOperation}">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <p:dataTable id="assetOperation" value="#{keyAssetReportController.assetOperation}" var="item" editable="true"
+                                     rowKey="#{item}" rows="999" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="#{msg.Date}">
+                                <h:outputText value="#{item.month}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.checkPeopleNum}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.checkPeopleNum}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber decimalPlaces="0" value="#{item.checkPeopleNum}" style="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.sumIncome}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.sumIncome}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{item.sumIncome}" inputStyle="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.Operation}" style="width: 70px">
+                                <p:rowEditor editTitle="#{msg.Edit}" cancelTitle="#{msg.Cancel}#{msg.Edit}" saveTitle="#{msg.Save}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panelGrid>
+
+                </p:fieldset>
+                <br/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" update=":growl keyAssetReportListForm:datalist reportYear" icon="ui-icon-check"
+                                 actionListener="#{keyAssetReportController.saveKeyAssetReport}"
+                                 oncomplete="handleSubmit(args, 'keyAssetReportEditDialog');"/>
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('keyAssetReportEditDialog').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

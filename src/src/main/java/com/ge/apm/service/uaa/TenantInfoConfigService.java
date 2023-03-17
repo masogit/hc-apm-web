@@ -168,6 +168,10 @@ public class TenantInfoConfigService {
 			if(key.equals("parts")){
 				tempItem.setValue(false);
 			}
+			//预算管理 his绩效分析 特种设备管理 默认不勾选
+			if (key.equals("budgetMgr") || key.equals("hisPerform") || key.equals("specialAsset") || key.startsWith("budgetMgr.") || key.startsWith("hisPerform.") || key.startsWith("specialAsset.")) {
+				tempItem.setValue(false);
+			}
 			if (edition.equals(VERSION_COMMON)) {
 				//默认不勾选”质控评审“菜单
 				if (key.equals("audit")) {

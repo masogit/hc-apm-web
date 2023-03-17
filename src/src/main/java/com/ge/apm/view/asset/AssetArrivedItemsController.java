@@ -198,6 +198,14 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         selected = getDAO().findById(id);
 
     }
+    public boolean Show(String assetUid) {
+        selected= getDAO().getArrivalListItemByAssetUid(assetUid);
+        if(selected!=null){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     public List<I18nMessage> getInstallStatusList() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);

@@ -137,7 +137,7 @@
                 </p:column>
 
                 <p:column headerText="#{msg.requireName}"  filterBy="#{item.id}" filterMatchMode="IN" rendered="#{!userContextService.hasCurrentTenantName('')}">
-                    <h:outputText value="#{workOrderMgrController.needTwoSubStatus(item.id)?workOrderMgrController.getRepairPersonName(item.id,10): workOrderMgrController.getRepairPersonName(item.id,4)}"/>
+                    <h:outputText value="#{item.repairName}"/>
                 </p:column>
 
 

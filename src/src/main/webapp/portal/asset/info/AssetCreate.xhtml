@@ -369,7 +369,7 @@
                                         <p:ajax process="@this" listener="#{relRuleAssetController.setRuleId()}"/>
                                     </p:autoComplete>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.accessContains('nurseSite.config')}">
                                     <label class="label">日常检查规则(请先选择设备所属科室)</label>
                                     <p:selectManyMenu id="addMaintainConfig" value="#{assetInfoEditController.listSelectedNurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="false"
                                                       filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
@@ -380,16 +380,14 @@
                                         </p:column>
                                     </p:selectManyMenu>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{userContextService.accessContainsOfJiangNing()}">
+                                <h:panelGroup rendered="#{userContextService.authContains('nurseSite.optRecord') and userContextService.versionContains('nurseSite.useRegistration') and !userContextService.versionContains('nurseSite.optRecord') }">
                                     <label class="label">使用登记规则(请先选择设备所属科室)</label>
-                                    <p:selectManyMenu id="addMaintainConfigJN" value="#{assetInfoEditController.listSelectedNurseSiteMaintainConfigJN}" var="t" converter="nurseSiteMaintainConfigJNConverter" required="false"
-                                                      filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
-                                        <p:ajax process="@this" listener="#{maintainConfigJNController.onSelectedCheckItemChange}" update=""></p:ajax>
-                                        <f:selectItems value="#{maintainConfigJNController.getConfigList(assetInfoEditController.selected.clinicalDeptUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
-                                        <p:column style="float: left;text-align:left;">
-                                            <h:outputText value="#{t.name}" />
-                                        </p:column>
-                                    </p:selectManyMenu>
+                                    <p:autoComplete id="addMaintainConfigJN" value="#{assetInfoEditController.selectedNurseSiteMaintainConfigJN}" dropdown="true" scrollHeight="300"
+                                                    forceSelection="true" completeMethod="#{maintainConfigJNController.getConfigList(assetInfoEditController.selected.clinicalDeptUID)}"
+                                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="nurseSiteMaintainConfigJNConverter" >
+                                        <p:ajax process="@this" event="itemSelect" listener="#{maintainConfigJNController.onSelectedCheckItemChange}"/>
+                                        <p:ajax process="@this" listener="#{maintainConfigJNController.onSelectedCheckItemChange}"/>
+                                    </p:autoComplete>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </h:form>
