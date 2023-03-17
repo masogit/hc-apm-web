@@ -22,12 +22,13 @@ import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
 public class SparePartStockRecordController extends GenericCRUDUUIDController<StockRecord> {
-    private PageUtil<SparePart> pageUtil = new PageUtil();
+    private PageUtil<StockRecord> pageUtil = new PageUtil();
 
     private OrgInfoRepository orgDao;
     private UaaService uaaService;
@@ -133,6 +134,10 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
 
     public void delete() {
         dao.delete(selected);
+    }
+
+    public double totalPrice(double price, Integer qty) {
+        return  pageUtil.formatDouble2(Optional.ofNullable(price).orElse(0.0) * Optional.ofNullable(qty).orElse(0));
     }
 
     public List<String> autoCompleteDeptName(String query) {
