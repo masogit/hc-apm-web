@@ -2197,6 +2197,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         saveCountyAreaAddressInfo();
     }
     public void prepareEditAccDetail(V2_WorkOrder_Detail vwd) {
+        if (vwd != null) {
+            setStatusFlagByType(vwd.getPartsType());
+        }
         switchTmp=false;
         accessoryList = woService.getWorkOrderDetails(selectedWorkOrder.getId());
         if (accessoryList.stream().filter(item -> item.getId().equals(vwd.getId())).findAny().isPresent()){
@@ -2206,6 +2209,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         selectedObjectMap.put("supplier",supplierName);
         nochange=false;
+        partsItem = partsItemService.getPartsItem(vwd.getPartsItemId(), vwd.getParts());
     }
 
     public void prepareEditAccDetailonPrice(String itemId) {
@@ -2216,8 +2220,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         supplierName=itemDetail.getSupplier();
 
         nochange = true;
+        setStatusFlagByType(itemDetail.getPartsType());
+        partsItem = partsItemService.getPartsItem(itemDetail.getPartsItemId(), itemDetail.getParts());
     }
 
+    private void setStatusFlagByType(String type) {
+        if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(type)) {
+            statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+        } else if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(type)) {
+            statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+        } else {
+            statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
+        }
+    }
 
     public boolean allowChanged(){
         //is closed
@@ -2400,6 +2415,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail = null;
         coWorkerDetail = null;
         selectedWorkOrderManHoursDetail = null;
+        partsItem = null;
     }
     public List<AssetFaultType> getAssetFaultType() {
         AssetInfo assetinfo = assetDao.findById(this.selectedWorkOrder.getAssetId());
