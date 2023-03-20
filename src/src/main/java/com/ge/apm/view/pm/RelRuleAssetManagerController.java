@@ -147,7 +147,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             searchFilterList.add(new SearchFilter("ruleUID", SearchFilter.Operator.EQ, filterRuleUIDRuleUid));
         }
         if (filterRuleUID4Level!=null && StringUtils.isNotEmpty(filterRuleUID4RuleUid)) {
-            searchFilterList.add(new SearchFilter("ruleUID4", SearchFilter.Operator.EQ, filterRuleUID4RuleUid));
+            String[] ruleUid4s = StringUtils.split(filterRuleUID4RuleUid, "|");
+            searchFilterList.add(new SearchFilter("ruleUID4", SearchFilter.Operator.CONTAINS, Arrays.asList(ruleUid4s)));
         }
         searchFilterList.addAll(searchFilters);
 		if(StringUtils.isNotEmpty(queryCondition)){
