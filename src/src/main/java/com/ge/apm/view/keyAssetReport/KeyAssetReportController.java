@@ -1,6 +1,7 @@
 package com.ge.apm.view.keyAssetReport;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
@@ -229,7 +230,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             this.selected.setCreator(userAccount.getName());
             this.selected.setCreateTime(new Date());
         }
-        this.selected.setAssetDetail(JSON.toJSONString(assetDetail));
+        this.selected.setAssetDetail(JSON.toJSONStringWithDateFormat(assetDetail, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat));
         this.selected.setAssetOperation(JSON.toJSONString(assetOperation));
         dao.save(this.selected);
     }
@@ -237,6 +238,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     @Override
     public void delete(){
         dao.delete(this.selected);
+        this.selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("DeleteSuccess"));
     }
 
