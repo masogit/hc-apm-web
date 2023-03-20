@@ -238,7 +238,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                                 //只有非高值探头的时候才会给销售总监进行提示，
                                 boolean f = true;
-                                if(StrUtil.isEmpty(selected.getProbeQuotaType()) && CopyByInvok.F.equals(selected.getHighCatFlag())){
+                                if(StrUtil.isEmpty(selected.getProbeQuotaType()) && CopyByInvok.T.equals(selected.getHighCatFlag())){
                                     f =false;
                                 }
                                 if(StrUtil.isNotEmpty(selected.getProbeQuotaType()) && ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
