@@ -70,6 +70,7 @@
                         <p:selectOneMenu value="#{workOrderMgrController.itemDetail.partsType}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <p:ajax event="itemSelect"  update="moreAccDialogFormX" listener="#{workOrderMgrController.changeStatus()}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
 
