@@ -405,15 +405,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail.setPartsPrice(null);
         itemDetail.setClosedPrice(null);
         if (itemDetail != null) {
-            String partsType = itemDetail.getPartsType();
-            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
-                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
-                return;
-            }
-            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
-                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
-                return;
-            }
+            setStatusFlagByType(itemDetail.getPartsType());
         }
         statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
     }
