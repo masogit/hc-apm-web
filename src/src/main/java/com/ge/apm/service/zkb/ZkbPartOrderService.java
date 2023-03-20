@@ -1151,6 +1151,30 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(zkbPartOrder.getReturnType())) {
                     if(zkbPartOrder.getReturnQty() != 0){
                         subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getReturnQty(),userAccount);
+                    }else {
+                        if(StringUtils.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())) {
+                            if( CopyByInvok.T.equals(zkbPartOrder.getHighCatFlag()) && StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())){
+                                ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                                if(zkbContractCat != null){
+                                    zkbContractCat.setEnabled(true);
+                                    zkbContractCat.setLastModifiedDate(new Date());
+                                    zkbContractCat.setLastModifiedBy(userAccount.getName());
+                                    zkbContractCatRepository.save(zkbContractCat);
+                                }
+                            }
+                        }else {
+                            if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                                if(StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())) {
+                                    ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                                    if (zkbContractCat != null) {
+                                        zkbContractCat.setEnabled(true);
+                                        zkbContractCat.setLastModifiedDate(new Date());
+                                        zkbContractCat.setLastModifiedBy(userAccount.getName());
+                                        zkbContractCatRepository.save(zkbContractCat);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
@@ -2252,7 +2276,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                                 zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                                 zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(),qty);
                             }
-                            if(qty >0){
+                            if(qty >= 0){
                                 zkbContractCat.setEnabled(true);
                             }else if(qty < 0){
                                 zkbContractCat.setEnabled(false);
