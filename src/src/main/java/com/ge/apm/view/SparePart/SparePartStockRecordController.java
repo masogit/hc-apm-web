@@ -2,9 +2,9 @@ package com.ge.apm.view.SparePart;
 
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.StockRecordRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
+import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -33,7 +33,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     private OrgInfoRepository orgDao;
     private UaaService uaaService;
     private StockRecordRepository stockRecordRepository;
-    private SimplePartsWarehouseRepository warehouseRepository;
+    private SimplePartsWarehouseService warehouseService;
     private StockRecordRepository dao;
 
     @Getter @Setter
@@ -60,7 +60,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         stockRecordRepository =  WebUtil.getBean(StockRecordRepository.class);
-        warehouseRepository = WebUtil.getBean(SimplePartsWarehouseRepository.class);
+        warehouseService = WebUtil.getBean(SimplePartsWarehouseService.class);
         dao = WebUtil.getBean(StockRecordRepository.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
@@ -69,7 +69,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         this.filterBySite = false;
         this.filterByHospital = false;
 
-        initWarehouses(loginUser.getTenantUID());
+        initWarehouses();
         loadClinicalDeptList();
     }
 
@@ -78,13 +78,14 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         return stockRecordRepository;
     }
 
-    private void initWarehouses(String tenantUid) {
-        warehouses = warehouseRepository.findAllWarehouseList(tenantUid);
+    private void initWarehouses() {
+        warehouses = warehouseService.findAllBySiteUidAndUserId(loginUser.getSiteUID());
     }
 
     private void setFilter() {
         this.searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
         this.searchFilters.add(new SearchFilter("recordType", SearchFilter.Operator.EQ, this.filterRecordType));
+        this.searchFilters.add(new SearchFilter("sparePart.partsWarehouseId", SearchFilter.Operator.IN, warehouses.stream().map(SimplePartsWarehouse::getId).collect(Collectors.toList())));
         if (this.startTime != null) {
             this.searchFilters.add(new SearchFilter("recordDate", SearchFilter.Operator.GTE, this.startTime));
             this.searchFilters.add(new SearchFilter("recordDate", SearchFilter.Operator.LTE
@@ -100,6 +101,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         removeFilterOnField("recordType");
         removeFilterOnField("tenantUID");
         removeFilterOnField("recordDate");
+        removeFilterOnField("partsWarehouseId");
         setFilter();
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }

@@ -80,6 +80,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     private void setFilter() {
         this.searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
         this.searchFilters.add(new SearchFilter("quantity", SearchFilter.Operator.GT, 0));
+        this.searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, warehouses.stream().map(SimplePartsWarehouse::getId).collect(Collectors.toList())));
     }
 
     @Override
