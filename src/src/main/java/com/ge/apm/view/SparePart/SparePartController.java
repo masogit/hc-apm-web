@@ -120,6 +120,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     public void save() {
         selected.setPartsWarehouseId(partsWarehouseId);
         saveSparePartAndRecord(1);
+        partsWarehouseId = null;
     }
 
     public void outStock(SparePart sparePart) {
@@ -172,7 +173,6 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         selected = null;
         partsWarehouseId = null;
         remark = null;
-        partsWarehouseId = null;
     }
 
     public void delete() {
