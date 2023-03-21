@@ -25,8 +25,8 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:selectOneMenu id="notGeAsset"  value="#{zkbPartOrderController.notGeAsset}" >
-                                <p:ajax event="change" update="buttonSet datalist" />
+                            <p:selectOneMenu id="notGeAsset" value="#{zkbPartOrderController.notGeAsset}" >
+                                <p:ajax event="change" update="buttonSet datalist" listener="#{zkbPartOrderController.notGeAssetChange()}" oncomplete="openViewWindow(xhr, status, args)" />
                                 <f:selectItem itemLabel="GE" />
                                 <f:selectItem itemLabel="非GE" itemValue="t"/>
                             </p:selectOneMenu>
@@ -38,7 +38,7 @@
                         <p:commandButton value="待办"  process="@this" update="datalist buttonSet" disabled="#{empty zkbPartOrderController.queryStatus}" rendered="#{zkbPartOrderController.showPendingStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('')}" />
                         <p:commandButton value="待技术支持审批"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'TechnicalPending'}" rendered="#{!(zkbPartOrderController.notGeAsset eq 't') and zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('TechnicalPending')}" />
                         <p:commandButton value="待经理审批"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ManagePending'}" rendered="#{!(zkbPartOrderController.notGeAsset eq 't') and zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('ManagePending')}" />
-                        <p:commandButton value="待Tsc审批"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'TsePending'}" rendered="#{zkbPartOrderController.notGeAsset eq 't' and zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('TsePending')}" />
+                        <p:commandButton value="待TSE审批"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'TsePending'}" rendered="#{zkbPartOrderController.notGeAsset eq 't' and zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('TsePending')}" />
                         <p:commandButton value="待OSSC确认"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'OsscPending'}" rendered="#{zkbPartOrderController.notGeAsset eq 't' and zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('OsscPending')}" />
                         <p:commandButton value="待总监审批"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'DirectorPending'}" rendered="#{!(zkbPartOrderController.notGeAsset eq 't') and zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('DirectorPending')}" />
                         <p:commandButton value="待Commercial审批"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'CommericalPending'}" rendered="#{!(zkbPartOrderController.notGeAsset eq 't') and zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('CommercialPending')}" />

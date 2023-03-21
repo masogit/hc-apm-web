@@ -15,20 +15,29 @@
                 <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">GE设备或非GE设备*</label>
-                        <p:selectOneMenu id="notGeAsset" value="#{zkbPartOrderEditController.notGeAsset}" required="true" requiredMessage="GE设备或非GE设备 #{msg.ValidationRequire}">
-                            <p:ajax event="change" update="zkbwkEditForm zkbPartOrderEditForm"  />
+                        <p:selectOneMenu id="notGeAsset" value="#{zkbPartOrderEditController.notGeAsset}"  valueChangeListener="#{zkbPartOrderEditController.notGeAssetChange}" >
+                            <p:ajax event="change" oncomplete="openViewWindow(xhr, status, args)" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="GE设备" itemValue="f"/>
                             <f:selectItem itemLabel="非GE设备" itemValue="t"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup id="orderTypeGroup">
                         <label class="label">订单类型*</label>
-                        <p:selectOneMenu id="orderType" value="#{zkbPartOrderEditController.orderType}" disabled="#{zkbPartOrderEditController.selected.scoreFlag != null and zkbPartOrderEditController.selected.scoreFlag eq 't'}">
-                            <p:ajax event="change" update="zkbPartOrderEditForm zkbHeadEditForm zkbwkEditForm zkbContractDatalist " listener="#{zkbPartOrderEditController.orderTypeChange}" />
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                        </p:selectOneMenu>
+                        <c:if test="#{zkbPartOrderEditController.notGeAsset eq 'f' or empty zkbPartOrderEditController.notGeAsset }">
+                            <p:selectOneMenu id="orderType" value="#{zkbPartOrderEditController.orderType}" disabled="#{zkbPartOrderEditController.selected.scoreFlag != null and zkbPartOrderEditController.selected.scoreFlag eq 't'}">
+                                <p:ajax event="change" update="zkbPartOrderEditForm zkbHeadEditForm zkbwkEditForm zkbContractDatalist " listener="#{zkbPartOrderEditController.orderTypeChange('orderType')}" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </c:if>
+                        <c:if test="#{zkbPartOrderEditController.notGeAsset eq 't'}">
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.orderType}" >
+                                <p:ajax event="change" update="zkbPartOrderEditForm zkbHeadEditForm zkbwkEditForm zkbContractDatalist " listener="#{zkbPartOrderEditController.orderTypeChange}" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="备件申请" itemValue="Parts"/>
+                            </p:selectOneMenu>
+                        </c:if>
                     </h:panelGroup>
                     <h:panelGroup id="artificialTypeGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
                         <label class="label">机型*</label>
@@ -77,6 +86,10 @@
                             <label class="label">设备sysID</label>
                             <p:inputText id="qrCode" value="#{zkbPartOrderEditController.queryWorkFlow.assetInfo.systemId}" maxlength="100" required="false"/>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.notGeAsset eq 't'}">
+                            <label class="label">设备编号（院方）</label>
+                            <p:inputText value="#{zkbPartOrderEditController.queryWorkFlow.assetInfo.departNum}" maxlength="100" required="false"/>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">报修单号</label>
                             <p:inputText id="assetName" value="#{zkbPartOrderEditController.queryWorkFlow.serviceRequest.srNum}" maxlength="100" required="false"/>
@@ -95,6 +108,9 @@
                         </p:column>
                         <p:column headerText="sys ID">
                             <h:outputText value="#{item.systemId}"/>
+                        </p:column>
+                        <p:column headerText="设备编号（院方）" rendered="#{zkbPartOrderEditController.notGeAsset eq 't'}">
+                            <h:outputText value="#{item.departNum}"/>
                         </p:column>
                         <p:column headerText="报修单号">
                             <h:outputText value="#{item.srNum}"/>
@@ -386,7 +402,12 @@
                             <p:inputText id="qty" value="#{zkbPartOrderEditController.selected.qty}" required="true"  requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">剩余数量</label>
+                            <c:if test="#{zkbPartOrderEditController.notGeAsset eq 't'}">
+                                <label class="label">剩余名额</label>
+                            </c:if>
+                            <c:if test="#{!(zkbPartOrderEditController.notGeAsset eq 't')}">
+                                <label class="label">剩余数量</label>
+                            </c:if>
                             <p:inputText id="remainQty" value="#{zkbPartOrderEditController.selected.remainQty}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
@@ -642,6 +663,12 @@
 
             </p:dialog>
         </div>
+
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
     </ui:define>
 </ui:composition>
-

@@ -405,17 +405,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail.setPartsPrice(null);
         itemDetail.setClosedPrice(null);
         if (itemDetail != null) {
-            String partsType = itemDetail.getPartsType();
-            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
-                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
-                return;
-            }
-            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
-                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
-                return;
-            }
+            setStatusFlagByType(itemDetail.getPartsType());
         }
-        statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
     }
     public void onSparePartsValueChange(SelectEvent event) {
         Object object = event.getObject();
@@ -997,7 +988,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             }
             //查询Mvs工单
             if("MVS工单".equals(tabTitle)){
-
                 List<SearchFilter> filters = buildMvsSearchFilter();
                 pageResult = dao.findBySearchFilter(filters, pageRequest);
                 bySearchFilterMVS = pageResult.getContent();
@@ -1076,7 +1066,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             filters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
         }
         for (SearchFilter searchFilter :searchFilters) {
-            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
+            if (("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating,assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType" +
+                    ",serviceRequest.srNum,serviceRequest.casePriority").contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
@@ -2197,6 +2188,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         saveCountyAreaAddressInfo();
     }
     public void prepareEditAccDetail(V2_WorkOrder_Detail vwd) {
+        if (vwd != null) {
+            setStatusFlagByType(vwd.getPartsType());
+        }
         switchTmp=false;
         accessoryList = woService.getWorkOrderDetails(selectedWorkOrder.getId());
         if (accessoryList.stream().filter(item -> item.getId().equals(vwd.getId())).findAny().isPresent()){
@@ -2206,6 +2200,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         selectedObjectMap.put("supplier",supplierName);
         nochange=false;
+        partsItem = partsItemService.getPartsItem(vwd.getPartsItemId(), vwd.getParts());
     }
 
     public void prepareEditAccDetailonPrice(String itemId) {
@@ -2216,8 +2211,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         supplierName=itemDetail.getSupplier();
 
         nochange = true;
+        setStatusFlagByType(itemDetail.getPartsType());
+        partsItem = partsItemService.getPartsItem(itemDetail.getPartsItemId(), itemDetail.getParts());
     }
 
+    private void setStatusFlagByType(String type) {
+        if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(type)) {
+            statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+        } else if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(type)) {
+            statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+        } else {
+            statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
+        }
+    }
 
     public boolean allowChanged(){
         //is closed
@@ -2400,6 +2406,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail = null;
         coWorkerDetail = null;
         selectedWorkOrderManHoursDetail = null;
+        partsItem = null;
     }
     public List<AssetFaultType> getAssetFaultType() {
         AssetInfo assetinfo = assetDao.findById(this.selectedWorkOrder.getAssetId());
@@ -3689,20 +3696,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             return true;
         }
         if ("id".equals(fieldName)) {
+            List<String> stepIds = new ArrayList<>();
             List<V2_WorkOrder_Step> steps = woService.getWorkStepsByStepId(4, tenantInfo.getUid());
-            if (CollectionUtils.isEmpty(steps)) {
-                return true;
+            if (!CollectionUtils.isEmpty(steps)) {
+                Map<String, List<V2_WorkOrder_Step>> map = steps.stream().collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
+                List<V2_WorkOrder_Step> stepList = map.values().stream().map(group -> group.stream()
+                        .max(Comparator.comparing(V2_WorkOrder_Step::getStartTime))
+                        .orElse(null))
+                        .filter(val -> val!=null&&val.getOwnerName().contains(filterVal))
+                        .collect(Collectors.toList());
+                removeFilterOnField("id");
+                stepIds = stepList.stream().map(V2_WorkOrder_Step::getWoId).collect(Collectors.toList());
             }
-            Map<String, List<V2_WorkOrder_Step>> map = steps.stream().collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
-            List<V2_WorkOrder_Step> stepList = map.values().stream().map(group -> group.stream()
-                    .max(Comparator.comparing(V2_WorkOrder_Step::getStartTime))
-                    .orElse(null))
-                    .filter(val -> val!=null&&val.getOwnerName().contains(filterVal))
-                    .collect(Collectors.toList());
-            removeFilterOnField("id");
-            if (!CollectionUtils.isEmpty(stepList)) {
-                searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepList.stream().map(V2_WorkOrder_Step::getWoId).collect(Collectors.toList())));
-            }
+            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepIds));
             return true;
         }
         return false;

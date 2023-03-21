@@ -34,15 +34,16 @@
                 <p:menuitem id="um092" value="#{msg.AssetRiskAssessment}" outcome="/portal/asset/riskAssessment/assetRiskAssessmentList.xhtml" rendered="true"/>
                 <p:menuitem id="um093" value="#{msg.AssetAchievementsRecord}" outcome="/portal/asset/assetAchievements/assetAchievementsList.xhtml" rendered="#{userContextService.accessContains('asset.achievements')}"/>
                 <p:menuitem id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.versionContains('asset.supplierEvaluation')}"/>
-                <p:menuitem value="#{msg.keyAssetDataInput}" outcome="/portal/keyAssetReport/dataInputList.xhtml" rendered="#{userContextService.versionContains('asset.keyAssetDataInput')}"/>
+                <p:menuitem value="#{msg.keyAssetDataInput}" outcome="/portal/keyAssetReport/dataInputList.xhtml" rendered="#{userContextService.versionContains('asset.keyAssetDataInput') and !userContextService.onlyHasRole('DeptHead,ClinicalStaff')}"/>
+                <p:menuitem id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.versionContains('asset.importMvsDataFile') and userContextService.hasAnyRole('ITAdmin')}"/>
             </p:submenu>
             <p:submenu id="um011" label="特种设备管理" icon="fa fa-folder-open-o" rendered="#{userContextService.versionContains('specialAsset')}">
-                <p:menuitem id="um0111" value="台账管理" outcome="/portal/asset/info/specialAssetList"/>
-                <p:menuitem id="um0112" value="维修管理" outcome="/portal/woMgr/specialWorkOrderList.xhtml"/>
-                <p:menuitem id="um0113" value="保养管理" outcome="/portal/pm/specialPmOrderListAll.xhtml"/>
-                <p:menuitem id="um0114" value="年检管理" outcome="/portal/measuring/specialMeasuringResultMain.xhtml"/>
-                <p:menuitem id="um0115" value="档案管理" outcome="/portal/asset/fileAttachment/specialList.xhtml"/>
-                <p:menuitem id="um0116" value="风险管理" outcome="/portal/asset/riskAssessment/specialAssetRiskAssessmentList.xhtml" />
+                <p:menuitem id="um0111" value="台账管理" outcome="/portal/asset/info/specialAssetList" rendered="#{userContextService.versionContains('specialAsset.asset')}"/>
+                <p:menuitem id="um0112" value="维修管理" outcome="/portal/woMgr/specialWorkOrderList.xhtml" rendered="#{userContextService.versionContains('specialAsset.workOrder')}"/>
+                <p:menuitem id="um0113" value="保养管理" outcome="/portal/pm/specialPmOrderListAll.xhtml" rendered="#{userContextService.versionContains('specialAsset.pmOrder')}"/>
+                <p:menuitem id="um0114" value="年检管理" outcome="/portal/measuring/specialMeasuringResultMain.xhtml" rendered="#{userContextService.versionContains('specialAsset.measuring')}"/>
+                <p:menuitem id="um0115" value="档案管理" outcome="/portal/asset/fileAttachment/specialList.xhtml" rendered="#{userContextService.versionContains('specialAsset.fileAttachment')}"/>
+                <p:menuitem id="um0116" value="风险管理" outcome="/portal/asset/riskAssessment/specialAssetRiskAssessmentList.xhtml" rendered="#{userContextService.versionContains('specialAsset.riskAssessment')}"/>
             </p:submenu>
             <!--多级审批  -->
             <p:submenu id="um001" label="审批" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRole('MultiLevelAuditor')}">
@@ -65,6 +66,12 @@
                 <p:menuitem value="备件报表" outcome="/portal/parts/PartsReport.xhtml"/>
             </p:submenu>
             <!-- 备件管理 end  -->
+
+            <p:submenu id="um0101" label="备件管理" icon="fa fa-check-square-o" rendered="#{userContextService.versionContains('sparePartsManagement')}">
+                <p:menuitem value="备件出入库" outcome="/portal/SparePartManagement/sparePart.xhtml"/>
+                <p:menuitem value="备件出入库记录" outcome="/portal/SparePartManagement/spareParkStockRecord.xhtml"/>
+                <p:menuitem value="备件仓库" outcome="/portal/parts/PartsWarehouse.xhtml"/>
+            </p:submenu>
 
             <p:submenu id="um073" label="#{msg.EquipmentSwap}" icon="fa fa-folder-open-o" rendered="#{(userContextService.siteOrgInfoChild.size() > 0) or ((not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.isHospitalUser() and userContextService.accessContains('assetAdjust')) }">
                 <p:menuitem id="um901" value="#{msg.RequestForBorrow}" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.siteOrgInfoChild.size()==0 and userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.borrowApply')}"/>
@@ -140,14 +147,14 @@
             </p:submenu>
 
             <p:submenu label="#{msg.BudgetMgr}" icon="attach_money"
-                       rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}">
-<!--                <p:menuitem value="#{msg.BudgetAsset}" outcome="/portal/budget/asset/List.xhtml"/>-->
+                       rendered="#{userContextService.versionContains('budgetMgr') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}">
+                <!--                <p:menuitem value="#{msg.BudgetAsset}" outcome="/portal/budget/asset/List.xhtml"/>-->
                 <p:menuitem value="#{msg.BudgetApplication}" outcome="/portal/budget/application/List.xhtml"
-                            rendered="#{userContextService.versionContains('budgetMgr') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff')}"/>
+                            rendered="#{userContextService.versionContains('budgetMgr.application') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff')}"/>
                 <p:menuitem value="#{msg.TemporallyPurchase}" outcome="/portal/budget/TemporallyPurchase/List.xhtml"
-                            rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
+                            rendered="#{userContextService.versionContains('budgetMgr.temporallyPurchase') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
                 <p:menuitem value="#{msg.YearPurchase}" outcome="/portal/budget/YearPurchase/YearList.xhtml"
-                            rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
+                            rendered="#{userContextService.versionContains('budgetMgr.yearPurchase') and userContextService.hasAnyRole('SuperAdmin,AssetHead,DeptHead,ClinicalStaff,AssetStaff')}"/>
                 <p:menuitem value="#{msg.DeptPurchaseManage}" outcome="/portal/budget/deptPurchase/deptPurchaseManage.xhtml" rendered="#{userContextService.versionContains('budgetMgr.deptPurchaseManage')}"/>
                 <p:menuitem id="um0819" value="#{msg.preSupplierMgr}" outcome="/portal/budget/supplier/List.xhtml" rendered="#{userContextService.accessContains('budgetMgr.preSupplierMgr')}"/>
 
