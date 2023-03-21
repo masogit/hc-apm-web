@@ -806,6 +806,42 @@
                                     <h:outputText value="#{item.assetQuantity}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'productFamily'}">
+                                <p:column headerText="#{msg.productFamily}" exportable="true" sortBy="#{item.productFamily}" filterBy="#{item.productFamily}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.productFamily}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'productSegment'}">
+                                <p:column headerText="#{msg.productSegment}" exportable="true" sortBy="#{item.productSegment}" filterBy="#{item.productSegment}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('productSegment', item.productSegment)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('productSegment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'mvsContractStartDate'}">
+                                <p:column headerText="#{msg.MVSContractStartDate}" exportable="true" sortBy="#{item.mvsContractStartDate}" filterBy="#{item.mvsContractStartDate}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.mvsContractStartDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterContractStartDate" widgetVar="varFilterContractStartDate" value="#{assetInfoListController.mvsContractStartDate}"/>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'mvsContractEndDate'}">
+                                <p:column headerText="#{msg.MVSContractEndDate}" exportable="true" sortBy="#{item.mvsContractEndDate}" filterBy="#{item.mvsContractEndDate}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.mvsContractEndDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterContractEndDate" widgetVar="varFilterContractEndDate" value="#{assetInfoListController.mvsContractEndDate}"/>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
@@ -907,6 +943,26 @@
             <p:commandButton onclick="PF('panelFilterFactoryWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
 
+        <p:overlayPanel id="idPanelFilterMvsStartDate" widgetVar="panelFilterMvsStartDate" for=":AssetInfoListForm:datalist:filterContractStartDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('mvsContractStartDate')}">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varMvsStartDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varMvsStartDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterContractStartDate', 'varMvsStartDateFrom', 'varMvsStartDateTo'); PF('panelFilterMvsStartDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterMvsStartDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+        <p:overlayPanel id="idPanelFilterMvsEndDate" widgetVar="panelFilterMvsEndDate" for=":AssetInfoListForm:datalist:filterContractEndDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('mvsContractEndDate')}">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varMvsEndDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varMvsEndDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterContractEndDate', 'varMvsEndDateFrom', 'varMvsEndDateTo'); PF('panelFilterMvsEndDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterMvsEndDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
 <!--        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;" rendered="#{assetInfoListController.isShowColumn('clinicalDeptName')}">
             <p:scrollPanel style="height:300px;border: 0" mode="native">
                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoListController.selectSite==null? '':assetInfoListController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">

@@ -121,7 +121,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         currentUser = UserContextService.getCurrentUserAccount();
         blobService = WebUtil.getBean(BlobFileService.class);
         str = WebUtil.getRequestParameter("str");
-        System.out.println(str);
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
@@ -237,7 +236,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(selected.getCurrentStep())){
                         if(StringUtils.isNotEmpty(selected.getCheckApplyNumFlag()) && CopyByInvok.F.equals(selected.getCheckApplyNumFlag())) {
                             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-                                if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                                //只有非高值探头的时候才会给销售总监进行提示，
+                                boolean f = true;
+                                if(StrUtil.isEmpty(selected.getProbeQuotaType()) && CopyByInvok.T.equals(selected.getHighCatFlag())){
+                                    f =false;
+                                }
+                                if(StrUtil.isNotEmpty(selected.getProbeQuotaType()) && ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
+                                    f =false;
+                                }
+                                if(f){
                                     boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
                                     if(r){
                                         WebUtil.addErrorMessage("代理商备件已完成归还，目前未超限，可直接批复。","");
@@ -259,7 +266,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             boolean f = false;
                             if(selected.getZkbPartOrderCat() != null && !ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
                                 f = true;
-                            }else if("t".equals(selected.getHighCatFlag())){
+                            }else if(CopyByInvok.F.equals(selected.getHighCatFlag())){
                                 f = true;
                             }
                             if(f){
@@ -1024,6 +1031,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String acceptNext(){
+        if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(selected.getCurrentStep())){
+            if(StrUtil.isEmpty(selected.getOsscPartNo())){
+                WebUtil.addErrorMessage("备件号不能为空！");
+                return "";
+            }
+        }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+            if(haveTrainCourseFlag){
+                if(StrUtil.isNotEmpty(selected.getHaveTrainCourseFlag())){
+                    WebUtil.addErrorMessage("是否上过培训课不能为空！");
+                    return "";
+                }
+            }
+        }
         zkbPartOrderService.auditNext(this.selected,true,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendMessage(zkbPartOrder,UserContextService.getAccessToken());
@@ -1285,26 +1305,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         } else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && isChoseAdmin){
             if(ZkbPartOrder.PartOrderStatus.PartReturned.toString().equals(selected.getStatus()) || ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus())){
                 List<ZkbPartOrderReturn> auditReturnList = new ArrayList<>();
-
-                String er = "";
                 for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
                     if(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString().equals(r.getModifyFlag())){
                         auditReturnList.add(r);
-                        if("goodReturn".equals(r.getReturnType()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
-                            if(StrUtil.isEmpty(r.getSevenReturnedFlag())){
-                                er += "配件号："+r.getPartNo()+"好还必须填写是否7天内归还！";
-                            }
-                        }
                     }
                 }
                 if(auditReturnList.size() == 0){
                     WebUtil.addErrorMessage("请填写审批数据","");
                     return "";
                 }
-                if(StrUtil.isNotEmpty(er)){
+               /* if(StrUtil.isNotEmpty(er)){
                     WebUtil.addErrorMessage(er,"");
                     return "";
-                }
+                }*/
                 zkbPartOrderService.returnAudit(selected,auditReturnList,currentUser,zkbPartOrderReturnList);
 
                 selected = zkbPartOrderRepository.findById(selected.getId());
@@ -1369,14 +1382,18 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void prepareReturnCreate(){
         this.actionReturnName = "Create";
+        this.returnFormFlag = "edit";
         this.zkbPartOrderReturn = new ZkbPartOrderReturn();
         zkbPartOrderReturn.setReturnDate(new Date());
         zkbPartOrderReturn.setPartOrderId(selected.getId());
+        goodReturnBlobObjectList = new ArrayList<>();
         initPartList();
     }
 
     public void prepareReturnEdit(){
         this.actionReturnName = "Edit";
+        this.returnFormFlag = "edit";
+        goodReturnBlobObjectList = zkbPartOrderService.getBlobObjectRepository().findByBoUuid(zkbPartOrderReturn.getId());
         initPartList();
     }
 
@@ -1397,24 +1414,30 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
 
         this.zkbPartOrderReturn = r;
+        goodReturnBlobObjectList = zkbPartOrderService.getBlobObjectRepository().findByBoUuid(zkbPartOrderReturn.getId());
         initPartList();
     }
 
     public void prepareReturnModifyCreate(){
         this.actionReturnName = "ModifyCreate";
+        this.returnFormFlag = "edit";
         zkbPartOrderReturn = new ZkbPartOrderReturn();
         zkbPartOrderReturn.setReturnDate(new Date());
         zkbPartOrderReturn.setPartOrderId(selected.getId());
+        goodReturnBlobObjectList = new ArrayList<>();
         initPartList();
     }
 
     public void prepareReturnModifyEdit(){
         this.actionReturnName = "ModifyEdit";
+        this.returnFormFlag = "edit";
+        goodReturnBlobObjectList = zkbPartOrderService.getBlobObjectRepository().findByBoUuid(zkbPartOrderReturn.getId());
         initPartList();
     }
 
     public void deleteReturnModify(){
         zkbPartOrderReturnModifyList.remove(zkbPartOrderReturn);
+        goodReturnBlobObjectList = new ArrayList<>();
         zkbPartOrderReturn = null;
     }
 
@@ -1455,12 +1478,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if("goodReturn".equals(zkbPartOrderReturn.getReturnType())){
                     if(goodReturnBlobObjectList == null || goodReturnBlobObjectList.size() == 0){
                         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                        WebUtil.addErrorMessage("请上传图片","");
+                        WebUtil.addErrorMessage("请提供好还的备件照片和寄件时的外包装照片","");
                         return;
+                    }else if(goodReturnBlobObjectList.size() < 2){
+                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                        WebUtil.addErrorMessage("上传图片数量不能低于2张","");
+                        return;
+                    }else {
+                        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
                     }
                 }
             }
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
             boolean flag = true;
             Integer total = 0;
             for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
@@ -1485,10 +1513,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 flag = false;
             }
             if(!flag){
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage("归还数量不能大于配件数量","");
-                zkbPartOrderReturn = null;
-                zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId(),isChoseAdmin);
+                //zkbPartOrderReturn = null;
+                //zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId(),isChoseAdmin);
                 return;
+            }else{
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
             }
             if(StringUtils.isEmpty(zkbPartOrderReturn.getId())){
                 zkbPartOrderReturn.setCreatedDate(new Date());
@@ -1673,15 +1704,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
 
     public void returnAudit(){
-        if("goodReturn".equals(zkbPartOrderReturn.getReturnType())){
-            if(StrUtil.isEmpty(zkbPartOrderReturn.getSevenReturnedFlag())){
+        if("goodReturn".equals(zkbPartOrderReturn.getReturnType()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
+            if(StrUtil.isEmpty(zkbPartOrderReturn.getSevenReturnedFlag()) && ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(zkbPartOrderReturn.getDataStatus())){
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage("是否7天未归还不能为空！");
                 return;
+            }else{
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
             }
         }
-        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
-
 
         zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString());
         for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
