@@ -407,7 +407,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (itemDetail != null) {
             setStatusFlagByType(itemDetail.getPartsType());
         }
-        statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
     }
     public void onSparePartsValueChange(SelectEvent event) {
         Object object = event.getObject();
