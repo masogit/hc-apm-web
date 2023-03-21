@@ -27,3 +27,5 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 UPDATE public.xxl_job_user SET username = 'admin', password = 'b8b69e5233c7fa64bd736c9a47db4ba0', role = 1, permission = null WHERE id = 1;
 INSERT INTO public.xxl_job_group (id, app_name, title, address_type, address_list) VALUES (2, 'my-application-task', 'task', 1, 'http://localhost:9999');
 
+--YHAAO-18146
+ALTER TABLE public.asset_history ALTER COLUMN json_data TYPE text USING json_data::text;
