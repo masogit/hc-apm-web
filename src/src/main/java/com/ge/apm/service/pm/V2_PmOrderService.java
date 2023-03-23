@@ -174,7 +174,12 @@ public class V2_PmOrderService extends MicroServiceInvoker {
                 pmOrderRule= pmOrderRuleRepository.findPmOrderRuleLevel1(v2PmOrder.getAssetUid());break;
             }
             case 4:{
-                pmOrderRule = pmOrderRuleRepository.findPmOrderRuleLevel4(v2PmOrder.getAssetUid());break;
+                pmOrderRule = pmOrderRuleRepository.findPmOrderRuleLevel4(v2PmOrder.getAssetUid());
+                //rule_uid4 存在多个规则,此时v2_pm_order表中会保存本工单实际绑定的保养规则(可增加流程配置项中是否启用质控绑定多个规则限定条件。但是若中途再修改流程配置项会影响正常流程，此处逻辑需产品经理确认？)
+                if(pmOrderRule == null){
+                     pmOrderRule = pmOrderRuleRepository.findByUid(v2PmOrder.getPmRuleUid());
+                }
+                break;
             }
         }
         return pmOrderRule;

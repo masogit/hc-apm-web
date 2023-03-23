@@ -36,6 +36,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
@@ -100,6 +101,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private FileScanService fileScanService;
     @Setter @Getter
     private Boolean isBatchOp=true;
+//    @Setter @Getter
+//    private Boolean isCreatable=true;
     private SupplierController supplierController;
     @Setter @Getter
     private Supplier newSupplier;
@@ -170,6 +173,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private V2_PmOrderService pmOrderService;
     private V2_PmOrder selectedPmOrder;
     private String assetName;
+    private String assetUid;
     private Integer ruleLevel;
     private Date startTime;
     private Date endTime;
@@ -224,6 +228,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Boolean isSelectedCurrentPage = false;
     private List<V2_PmOrder> currentPagePmOrders;
     private Integer pmType;
+    private String pmRuleUid;
     private I18nMessageRepository i18nMessageRepository;
     private String head;
     // cache for maintenance report
@@ -365,7 +370,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                }*//*
            }*/
 
-           String path = new DateTime().toString("yyyyMMddhhmm")+ File.separator+user.getLoginName();
+           String path = new DateTime().toString("yyyyMMddHHmm")+ File.separator+user.getLoginName();
            String filePath = fileScanService.getUploadFileFullPath(path);
            File dest = new File(filePath + File.separator+"pm.xlsx");
           FileUtils.forceMkdir(new File(filePath));
@@ -604,14 +609,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
-        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
-        if(CollectionUtils.isEmpty(pmRuleByPmNum)){
+        PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
+        if(orderRule == null){
             return new PmOrderRule();
+        }else {
+            return orderRule;
         }
-        else{
-            PmOrderRule pmOrderRule = pmRuleByPmNum.get(0);
-            return pmOrderRule;
-        }
+//            return new PmOrderRule();
+//        }
+//        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
+//        if(CollectionUtils.isEmpty(pmRuleByPmNum)){
+//            return new PmOrderRule();
+//        }
+//        else{
+//            PmOrderRule pmOrderRule = pmRuleByPmNum.get(0);
+//            return pmOrderRule;
+//        }
     }
     public void preBatchCancel(){
         cancelReason=null;
@@ -841,6 +854,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
+    }
+    public boolean getPmRuleList(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        return workflowConfig != null
+                && workflowConfig.getPmFourthRuleLevelForAsset()
+                && StringUtils.isNotEmpty(assetUid)
+                && ruleLevel != null
+                && ruleLevel == 4
+                && pmType != null
+                && getPmOrderRulesByAsset() != null
+                ;
     }
 
     public String getRuleLevelName(Integer ruleLevel){
@@ -1400,6 +1425,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             formData.setCustomerName(customerName);
             formData.setCustomerTel(customerName);
             formData.setSiteName(siteName);
+            formData.setPmRuleUid(pmRuleUid);
             Map<String, Object> res = pmOrderService.createPMrequestApi(selectedAsset.getUid(), formData);
             if (res != null && res.get("bizStatusCode") != null) {
                 if (res.get("bizStatusCode").equals("INVALID_PARAM")) {
@@ -2475,7 +2501,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedAsset = null;planTime  = null;planTimeForBatch = null;
         selectedPmOrder = null;assetName = null;endTime = null;
         ruleLevel = null;dptName = null;picList = null;
-        planTimeForBatch = null;comments = null;
+        planTimeForBatch = null;comments = null;assetUid = null;
         resetSignature();
     }
 
@@ -2694,6 +2720,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (asset == null) {
             return;
         }
+        assetUid = asset.getUid();
         assetName = asset.getName();
         dptName = asset.getClinicalDeptName();//orgDao.getByUid(orgInfoUID).getName();
         this.selectedAsset = asset;
@@ -2980,6 +3007,51 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }
         return orgListMVS;
+    }
+
+    public List<PmOrderRule> getPmOrderRulesByAsset(){
+        if(assetUid != null) {
+            RelRuleAsset relRuleAsset = relRuleAssetRepository.findByAssetUid(assetUid);
+            if(relRuleAsset != null) {
+                String ruleUID = "";
+                switch (ruleLevel) {
+                    case 1:
+                        ruleUID = relRuleAsset.getRuleUID1();
+                        break;
+                    case 2:
+                        ruleUID = relRuleAsset.getRuleUID2();
+                        break;
+                    case 3:
+                        ruleUID = relRuleAsset.getRuleUID();
+                        break;
+                    case 4:
+                        ruleUID = relRuleAsset.getRuleUID4();
+                        break;
+                    default:
+                        ruleUID = "";
+                }
+                if (relRuleAsset != null && StringUtils.isNotEmpty(ruleUID)) {
+                    String[] ruleUids = StringUtils.split(ruleUID, "|");
+                    List<String> ruleUidLists = Arrays.asList(ruleUids);
+//                    isCreatable = true;
+                    if(ruleUidLists.size() == 1){
+                        pmRuleUid = ruleUidLists.get(0);
+                    }
+                    return pmOrderRuleRepository.getPmOrderRulesByUids(ruleUidLists);
+                }else{
+//                    isCreatable = false;
+//                    WebUtil.addErrorMessage("资产未绑定对应保养规则,无法创建保养工单");
+//                    RequestContext requestContext = RequestContext.getCurrentInstance();
+//                    requestContext.addCallbackParam("validationFailed", true);
+                }
+            }else{
+//                isCreatable = false;
+//                WebUtil.addErrorMessage("资产未绑定任何保养规则,无法创建保养工单");
+//                RequestContext requestContext = RequestContext.getCurrentInstance();
+//                requestContext.addCallbackParam("validationFailed", true);
+            }
+        }
+        return null;
     }
 
     private void loadMVSClinicalDeptList() {
@@ -3502,5 +3574,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setSignatureId(String signatureId) {
         this.signatureId = signatureId;
+    }
+
+    public String getAssetUid() {
+        return assetUid;
+    }
+
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
+    }
+
+    public String getPmRuleUid() {
+        return pmRuleUid;
+    }
+
+    public void setPmRuleUid(String pmRuleUid) {
+        this.pmRuleUid = pmRuleUid;
     }
 }
