@@ -31,3 +31,8 @@ INSERT INTO public.xxl_job_group (id, app_name, title, address_type, address_lis
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'appTitle', 'Receive a ticket message', '您收到一条工单消息', NULL, '-1');
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'appAlert', 'You have a to-do list, click to view details', '您有一个待办事项, 单击查看详情', NULL, '-1');
 -- APP推送 ↑
+--YHAAO-15907
+update v2_pm_order vpo set pm_rule_uid = rra.rule_uid1 ,last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =1 and vpo.pm_rule_uid is null;
+update v2_pm_order vpo set pm_rule_uid = rra.rule_uid2 , last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =2 and vpo.pm_rule_uid is null;
+update v2_pm_order vpo set pm_rule_uid = rra.rule_uid, last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =3 and vpo.pm_rule_uid is null;
+update v2_pm_order vpo set pm_rule_uid = rra.rule_uid4 , last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =4 and vpo.pm_rule_uid is null;
