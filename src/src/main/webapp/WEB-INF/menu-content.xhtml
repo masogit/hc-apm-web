@@ -67,6 +67,12 @@
             </p:submenu>
             <!-- 备件管理 end  -->
 
+            <p:submenu id="um0101" label="备件管理" icon="fa fa-check-square-o" rendered="#{userContextService.versionContains('sparePartsManagement') and userContextService.hasRole('SparePartsAdmin')}">
+                <p:menuitem value="备件出入库" outcome="/portal/SparePartManagement/sparePart.xhtml"/>
+                <p:menuitem value="备件出入库记录" outcome="/portal/SparePartManagement/spareParkStockRecord.xhtml"/>
+                <p:menuitem value="备件仓库" outcome="/portal/parts/PartsWarehouse.xhtml"/>
+            </p:submenu>
+
             <p:submenu id="um073" label="#{msg.EquipmentSwap}" icon="fa fa-folder-open-o" rendered="#{(userContextService.siteOrgInfoChild.size() > 0) or ((not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.isHospitalUser() and userContextService.accessContains('assetAdjust')) }">
                 <p:menuitem id="um901" value="#{msg.RequestForBorrow}" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.siteOrgInfoChild.size()==0 and userContextService.hasNotAnyRole('SharedAssetMgmt,AssetStaff,AssetHead') and userContextService.accessContains('assetAdjust.borrowApply')}"/>
                 <p:menuitem id="um903" value="#{msg.BorrowAcceptance}" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.accessContains('assetAdjust.borrowAccept')}"/>

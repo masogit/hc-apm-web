@@ -1237,6 +1237,25 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
 
     }
+    public void rejectReturn(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        Map<String, Object> params = new HashMap<>();
+        String id = selected.getId();
+        params.put("id", id);
+        params.put("rejectShelveRemark",selected.getRejectShelveRemark());
+        ResponseEntity<LinkedHashMap> result = null;
+        try {
+            result = sharedAssetService.rejectApply(GatewayURL.REJECT_RETURN, params);
+            logger.info("拒绝归还申请：id="+id);
+            String url = "List.xhtml?faces-redirect=true";
+            requestContext.addCallbackParam("url", url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            WebUtil.addErrorMessage("申请已取消或已受理，请返回并刷新！");
+            requestContext.addCallbackParam("url","norespond");
+        }
+
+    }
     public void AcceptR() throws Exception {
        String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
@@ -2054,6 +2073,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         // 过滤借出的
         List<AssetInfo> collect1 = collect.stream().filter(item -> {
             SharedAssetReqDetail byAssetInfoSharedAssetReqDetail = asdDao.findByAssetInfoSharedAssetReqDetail(item.getUid());
+            if(byAssetInfoSharedAssetReqDetail == null){
+                return  false;
+            }
             String returnId = byAssetInfoSharedAssetReqDetail.getReturnId();
             if (StringUtils.isNotBlank(returnId)) {
                 List<SharedAssetRequest> returnRequestList = dao.findByDept(returnId);

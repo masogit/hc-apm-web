@@ -631,6 +631,14 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">微信消息接收#{msg.StartTime}</label>
+                            <p:calendar id="startSendingTime" value="#{workflowConfigController.selected.startSendingTime}" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" defaultHour="00" defaultMinute="00" defaultSecond="00"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">微信消息接收#{msg.EndTime}</label>
+                            <p:calendar id="endSendingTime" value="#{workflowConfigController.selected.endSendingTime}" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" defaultHour="23" defaultMinute="59" defaultSecond="59"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 
