@@ -104,11 +104,12 @@ public class ZkbContractAssetService {
             }
             String dateStr = DateUtil.getFormatStrByDate(reportDate, format);
             Date reportDatetimp = DateUtil.getDateByFormatStr(dateStr, format);
-            if (reportDatetimp.compareTo(zkbContract.getStartDate()) < 0 || reportDatetimp.compareTo(zkbContract.getEndDate()) > 0) {
+            /*if (reportDatetimp.compareTo(zkbContract.getStartDate()) < 0 || reportDatetimp.compareTo(zkbContract.getEndDate()) > 0) {
                 messageKey = "zkbFePartOrder_contractValidPeriodError";
            //     messageKey = "zkbFePartOrder_599contractSupportTimesCannotBeZero";
                 flag = false;
-            }else if(ZkbFePartOrderService.highArtificialTypeValue.equals(ArtificialType) &&
+            }else */
+            if(ZkbFePartOrderService.highArtificialTypeValue.equals(ArtificialType) &&
                     ZkbFePartOrder.OrderType.SpareParts.toString().equals(orderType) && CopyByInvok.T.equals(zkbContract.getFirstYearFlag())){
                 //高端机备件申请时第一年进行总数的50%验证
                 if(assetUid != null){

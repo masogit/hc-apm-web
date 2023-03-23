@@ -14,7 +14,7 @@ public interface ZkbIbCrossRelationShipRepository extends GenericRepositoryUUID<
 
     @Transactional
     @Modifying
-    @Query("delete from ZkbIbCrossRelationShip")
+    @Query(value = "delete from zkb_ib_cross_relation_ship ",nativeQuery = true)
     void deleteAllBatch();
 
 

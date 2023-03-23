@@ -1,6 +1,6 @@
 package com.ge.apm.service.asset;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;

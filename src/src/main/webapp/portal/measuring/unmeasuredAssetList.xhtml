@@ -25,7 +25,7 @@
                              rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
 
-                    <p:ajax event="filter" listener="#{unmeasuredAssetListController.onFilter}"/>
+                    <p:ajax event="filter" listener="#{unmeasuredAssetListController.onFilter}" />
                     <p:column headerText="设备名称" filterBy="#{item.name}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.name}"/>
                     </p:column>

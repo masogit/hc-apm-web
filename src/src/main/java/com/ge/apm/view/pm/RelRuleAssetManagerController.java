@@ -25,10 +25,10 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -44,6 +44,8 @@ import java.util.stream.Collectors;
 public class RelRuleAssetManagerController extends GenericCRUDUUIDController<RelRuleAsset> {
 
 	private static final long serialVersionUID = -1L;
+    private PageUtil<RelRuleAsset> pageUtil = new PageUtil();
+
 	private RelRuleAssetRepository dao = null;
 	private UserAccount user;
 	private Map<String, AssetInfo> assetMap;
@@ -215,30 +217,10 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             relRuleAssetList.addAll(relRuleAssets);
         }
 		currentPageAssets = relRuleAssetList;
-        int size = relRuleAssetList.size();
-        relRuleAssetList= this.pageNum(relRuleAssetList, pageRequest);
-        Page<RelRuleAsset>  assetInfoPage = new PageImpl<RelRuleAsset>(relRuleAssetList, pageRequest, size);
+        Page<RelRuleAsset> assetInfoPage = pageUtil.pageNum(relRuleAssetList, pageRequest);
 		initMap(relRuleAssetList);
 		return assetInfoPage;
 	}
-    private List<RelRuleAsset> pageNum(List<RelRuleAsset> relRuleAssetList,PageRequest pageRequest){
-        int pageNumber = pageRequest.getPageNumber();
-        int pageSize = pageRequest.getPageSize() - 1;
-        int numStart = pageNumber * pageSize;
-        numStart = numStart + pageNumber;
-        int numEnd = numStart + pageSize + 1;
-        int size = relRuleAssetList.size();
-        if(size > numEnd && CollectionUtils.isNotEmpty(relRuleAssetList)){
-            relRuleAssetList = relRuleAssetList.subList(numStart ,numEnd);
-        }else {
-            if (size > numStart) {
-                relRuleAssetList = relRuleAssetList.subList(numStart ,size);
-            } else {
-                relRuleAssetList = new ArrayList<>();
-            }
-        }
-        return relRuleAssetList;
-    }
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()

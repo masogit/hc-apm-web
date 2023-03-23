@@ -279,6 +279,10 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
         return "Delete".equals(crudActionName);
     }
 
+    public boolean isCreateAction() {
+        return "Create".equals(crudActionName);
+    }
+
     public String getCRUDActionName() {
         return WebUtil.getMessage(crudActionName);
     }

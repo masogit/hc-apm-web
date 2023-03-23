@@ -65,6 +65,8 @@ public class QrCodeLib implements Serializable {
     private String assetName;
     @Column(name = "asset_group")
     private Integer assetGroup;
+    @Column(name = "asset_class") // 1 医疗设备  2 后勤资产 3 信息类设备
+    private Integer assetClass;//管理分类
     @Column(name = "org_id")
     private Integer orgId;
     @Column(name = "user_id")
@@ -403,4 +405,8 @@ public class QrCodeLib implements Serializable {
     public void setComments(String comments) {
         this.comments = comments;
     }
+
+    public Integer getAssetClass() { return assetClass; }
+
+    public void setAssetClass(Integer assetClass) { this.assetClass = assetClass; }
 }

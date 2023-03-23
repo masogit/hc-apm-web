@@ -1,17 +1,17 @@
 package com.ge.apm.mq;
 
 import com.ge.apm.callback.MqContext;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.AmqpTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@Slf4j
 public class MqUtils {
 
+    public static final Logger log = LoggerFactory.getLogger(MqUtils.class);
 
 
 
@@ -19,12 +19,12 @@ public class MqUtils {
     private  RabbitTemplate rabbitTemplate;
 
     public   void sendToMq(MqContext mqContext){
-        log.info("send to mq exchange:{},routingKey:{},message:{}",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject());
+//        log.info("send to mq exchange:{},routingKey:{},message:{}",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject());
         try{
             rabbitTemplate.convertAndSend(mqContext.getExChange(),mqContext.getRoutingKey(),mqContext);
         }catch (Exception e){
             log.error("send to mq error exchange:{},routingKey:{},message:{},e :",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject(),e);
-            throw new RuntimeException(e);
+            throw  e;
         }
 
     }

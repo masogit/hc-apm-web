@@ -11,9 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
@@ -26,12 +25,14 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class JmReportController extends GenericCRUDUUIDController<JmReport> {
 
+    private PageUtil<JmReport> pageUtil = new PageUtil();
+
     private JmReportRepository dao;
     private TenantInfoRepository siteDao;
     private OrgInfoRepository orgDao;
     private UaaService uaaService;
     private UserContextService userContextService;
-    private CustomRoleRepository customRoleRepository;
+    private JmReportAssignTenantRepository assignTenantDao;
 
     @Getter @Setter
     private TenantInfo selectedTenant;
@@ -46,6 +47,8 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
     @Setter
     private List<String> assignedRoles;
     @Setter
+    private List<String> assignedTenants;
+    @Setter
     private List<SysRoleVO> roleListVO;
 
     @Override
@@ -56,12 +59,14 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         uaaService = WebUtil.getBean(UaaService.class);
         loginUser = UserContextService.getCurrentUserAccount();
         siteDao =  WebUtil.getBean(TenantInfoRepository.class);
-        customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         currentOrg = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-        //selectedTenant = siteDao.findByUid(loginUser.getTenantUID());
+        assignTenantDao = WebUtil.getBean(JmReportAssignTenantRepository.class);
+
         this.filterBySite = false;
         this.filterByHospital = false;
+
         initRole();
+
         String reportId = WebUtil.getRequestParameter("reportId");
         if (StringUtils.isNotEmpty(reportId)) {
             selected = dao.findById(reportId);
@@ -77,10 +82,12 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         roleListVO = uaaService.getSysRoleVO(loginUser.getTenantUID());
     }
 
-    private void setFilter() {
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID(), "1*2+"));
-        searchFilters.add(new SearchFilter("assignTenant", SearchFilter.Operator.EQ, loginUser.getTenantUID(), "1*2+"));
-
+    private List<JmReport> setFilter(List<JmReport> reports) {
+        if (CollectionUtils.isNotEmpty(this.searchFilters)) {
+            String name = (String) searchFilters.get(0).value;
+            return reports.stream().filter(val -> val.getName().contains(name)).collect(Collectors.toList());
+        }
+        return reports;
     }
 
     @Override
@@ -88,24 +95,40 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        setFilter();
-        Page<JmReport> pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
-        List<JmReport> reportIds = new ArrayList(pageResult.getContent());
+        List<JmReport> reports = dao.findByTenantUid(loginUser.getTenantUID());
+        List<JmReport> reportIds = new ArrayList();
         if (!userContextService.hasAnyRole("SuperAdmin,ITAdmin")) {
-            pageResult.getContent().forEach(val -> {
-                if (!userContextService.hasAnyRole(val.getAssignRole())) {
-                    reportIds.remove(val);
+            reports.forEach(val -> {
+                List<JmReportAssignTenant> list = val.getJmReportAssignTenants().stream().filter(tenants -> tenants.getAssignTenant()
+                        .equals(loginUser.getTenantUID()) && tenants.getJmReportId().equals(val.getId())).collect(Collectors.toList());
+                if (CollectionUtils.isNotEmpty(list)) {
+                    JmReportAssignTenant tenant = list.get(0);
+                    if (!userContextService.hasAnyRole(tenant.getAssignRole())) {
+                        reportIds.add(val);
+                    }
+                } else {
+                    if (!userContextService.hasAnyRole("ITAdmin")) {
+                        reportIds.add(val);
+                    }
                 }
+
             });
         }
-        pageResult =  new PageImpl<>(reportIds, pageRequest, reportIds.size());
-        return pageResult;
+        reports.removeAll(reportIds);
+        reports = setFilter(reports);
+        Page<JmReport> pages = pageUtil.pageNum(reports, pageRequest);
+        return pages;
     }
 
     @Override
     public void onFilter(FilterEvent event) {
         selected = null;
         super.onFilter(event);
+    }
+
+    public void onSelect() {
+        assignedRoles = new ArrayList<>();
+        assignedTenants = new ArrayList<>();
     }
 
     @Override
@@ -118,51 +141,87 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         super.prepareEdit();
         if (StringUtils.isNotEmpty(selected.getAssignTenant())) {
             selectedTenant = siteDao.findByUid(selected.getAssignTenant());
+        } else {
+            selectedTenant = siteDao.findByUid(selected.getTenantUID());
         }
     }
 
     public void save() {
         if (crudActionName.equals("Create")) {
-            selected.setTenantUID(loginUser.getTenantUID());
-        }
-        if (crudActionName.equals("Edit")) {
-            if (tenantId != null) {
-                TenantInfo tenantInfo = siteDao.findById(tenantId);
-                selected.setAssignTenantName(tenantInfo.getName());
-                selected.setAssignTenant(tenantInfo.getUid());
+            JmReportAssignTenant assignTenant = new JmReportAssignTenant();
+            assignTenant.setAssignTenant(loginUser.getTenantUID());
+            assignTenant.setAssignRole("ITAdmin");
+            selected.setJmReportAssignTenants(Arrays.asList(assignTenant));
+            if (StringUtils.isEmpty(selected.getVisibleRange())) {
+                selected.setVisibleRange("0");
             }
         }
         dao.save(selected);
     }
 
-    public void tenantChange() {
-        if (tenantId != null && tenantId != selectedTenant.getId()) {
-            selectedTenant = siteDao.findById(tenantId);
+    public void assignTenant(ValueChangeEvent e) {
+        assignList(assignedTenants, e);
+    }
+
+    public List<String> getAssignedTenants() {
+        if (CollectionUtils.isEmpty(assignedTenants)) {
+            assignedTenants = new ArrayList<>();
+            if (selected != null && selected.getJmReportAssignTenants() != null) {
+                selected.getJmReportAssignTenants().forEach(val -> assignedTenants.add(val.getAssignTenant()));
+            }
         }
+        return assignedTenants;
+    }
+
+    public void saveAssignTenant() {
+        List<JmReportAssignTenant> assignTenants = Optional.ofNullable(selected.getJmReportAssignTenants()).orElse(new ArrayList<>());
+        assignTenants.clear();
+        JmReportAssignTenant jmReportAssignTenant;
+        for (String item : assignedTenants) {
+            jmReportAssignTenant = new JmReportAssignTenant();
+            jmReportAssignTenant.setJmReportId(selected.getId());
+            jmReportAssignTenant.setAssignTenant(item);
+            jmReportAssignTenant.setAssignRole("ITAdmin");
+            assignTenants.add(jmReportAssignTenant);
+        }
+        selected.setJmReportAssignTenants(assignTenants);
+        dao.save(selected);
     }
 
     public void assignRole(ValueChangeEvent e) {
+        assignList(assignedRoles, e);
+    }
+
+    public void assignList(List<String> list, ValueChangeEvent e) {
         List<String> newValues = (List<String>) e.getNewValue();
         List<String> oldValues = (List<String>) e.getOldValue();
         List<String> newlyCheckedRoles = (List<String>) CollectionUtils.subtract(newValues, oldValues);
-        assignedRoles.clear();
-        newlyCheckedRoles.forEach(val -> assignedRoles.add(val));
+        list.clear();
+        newlyCheckedRoles.forEach(val -> list.add(val));
     }
 
     public void saveAssignRole() {
         StringBuilder role = new StringBuilder();
         assignedRoles.forEach(val -> role.append(val + ","));
         String assignRole = role.toString();
-        selected.setAssignRole(assignRole.substring(0, assignRole.length() - 1));
-        dao.save(selected);
+        JmReportAssignTenant assignTenant = assignTenantDao.findByJmReportIdAndTenantUid(selected.getId(), loginUser.getTenantUID());
+        assignTenant.setAssignRole(assignRole.substring(0, assignRole.length() - 1));
+        assignTenantDao.save(assignTenant);
     }
 
     public List<String> getAssignedRoles() {
         if (CollectionUtils.isEmpty(assignedRoles)) {
-            if (selected != null && StringUtils.isNotEmpty(selected.getAssignRole())) {
-                assignedRoles = Arrays.stream(selected.getAssignRole().split(",")).collect(Collectors.toList());
-            } else {
-                assignedRoles = new ArrayList<>();
+            assignedRoles = new ArrayList<>();
+            if (selected != null) {
+                JmReportAssignTenant assignTenant = assignTenantDao.findByJmReportIdAndTenantUid(selected.getId(), loginUser.getTenantUID());
+                if (assignTenant == null) {
+                    assignTenant = new JmReportAssignTenant();
+                    assignTenant.setJmReportId(selected.getId());
+                    assignTenant.setAssignTenant(loginUser.getTenantUID());
+                    assignTenant.setAssignRole("ITAdmin");
+                    assignTenantDao.save(assignTenant);
+                }
+                assignedRoles = Arrays.stream(assignTenant.getAssignRole().split(",")).collect(Collectors.toList());
             }
         }
         return assignedRoles;
@@ -174,39 +233,37 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
 
     public void cancel() {
         selected = null;
-
+        assignedTenants = null;
+        assignedRoles = null;
     }
 
     public void delete() {
         dao.delete(selected);
     }
 
-    public String getViewUrl(String reportId) {
-        if (StringUtils.isNotEmpty(reportId)) {
-            return "/portal/jmReport/jmReportView.xhtml?faces-redirect=true&amp;reportId=" +  reportId ;
-        }
-        return "";
+    public void getViewUrl(JmReport jmReport) {
+        this.selected = jmReport;
     }
 
-    public String getCheckUrl(String reportId) {
-        if (StringUtils.isNotEmpty(reportId)) {
-            return "/portal/jmReport/jmReportCheck.xhtml?faces-redirect=true&amp;reportId=" +  reportId ;
+    public String openNewWindowView(String reportId) {
+        if (StringUtils.isEmpty(reportId)) {
+            return "";
         }
-        return "";
+        return "/portal/jmReport/jmReportView.xhtml?faces-redirect=true&amp;reportId=" +  reportId ;
     }
 
-    public String view() {
-        if (selected != null) {
-            return  selected.getReportViewUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+    public String view(int type) {
+        if (selected == null) {
+            return "";
         }
-        return "";
-    }
-
-    public String check() {
-        if (selected != null) {
-            return  selected.getReportEditUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+        switch (type) {
+            case 1:
+                return selected.getReportViewUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+            case 2:
+                return selected.getReportEditUrl() + "?token=" + UserContextService.getAccessToken().replace("Bearer ", "");
+            default:
+                return "";
         }
-        return "";
     }
 
 }

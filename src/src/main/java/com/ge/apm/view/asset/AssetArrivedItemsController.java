@@ -96,9 +96,6 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
             searchFilters.add(new SearchFilter("arrivalList.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         }
-        if (!this.hasFilterOnField("arrivalList.processType")) {
-            searchFilters.add(new SearchFilter("arrivalList.processType", SearchFilter.Operator.EQ, "Normal"));
-        }
 
         if (null != fileterDeptOrg) {
             if (selectedNode.isLeaf()) {
@@ -108,8 +105,6 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
                 List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
                 this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalUids, "1*"));
             }
-
-
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
@@ -202,6 +197,14 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         }
         selected = getDAO().findById(id);
 
+    }
+    public boolean Show(String assetUid) {
+        selected= getDAO().getArrivalListItemByAssetUid(assetUid);
+        if(selected!=null){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public List<I18nMessage> getInstallStatusList() {

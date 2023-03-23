@@ -1,11 +1,9 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.ArrivalList;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.ArrivalSupplierReportService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.SupplierService;
@@ -19,6 +17,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.mapper.DefaultMapper;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
@@ -54,6 +53,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     private ArrivalListRepository dao = null;
     private TenantInfoRepository tenantInfoDao = null;
+    private ArrivalListItemRepository itemDao;
 
     private ArrivalSupplierReportService arrivalSupplierReportService;
     private AssetInstallationService aiService;
@@ -72,6 +72,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListRepository.class);
+        itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -161,38 +162,33 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     private void setCanDeleted(Page<ArrivalList> result) {
-        if (result != null) {
-            for (ArrivalList arrivalList : result) {
-                Integer status = arrivalList.getStatus();
-                if (status != null) {
-                    if (status == 1) {
-                        arrivalList.setCannotDeleted(false);
-                    } else if (status == 2) {
-                        List<ArrivalListItem> items = aiService.getListItem(arrivalList.getId());
-                        if (items != null) {
-                            arrivalList.setCannotDeleted(true);
-                            boolean installed = false;
-                            for (ArrivalListItem item : items) {
-                                if (item.getInstallStatus() != null && (!item.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW))) {
-                                    installed = true;
-                                    break;
-                                }
-                            }
-                            if (installed) {
-                                arrivalList.setCannotDeleted(true);
-                            } else {
-                                if (UserContextService.checkRole("AssetHead")) {
-                                    arrivalList.setCannotDeleted(false);
-                                } else {
-                                    arrivalList.setCannotDeleted(true);
-                                }
-                            }
-                            if (arrivalList.getContractItemId() != null) {
-                                arrivalList.setCannotDeleted(true);
+        for (ArrivalList arrivalList : result) {
+            if (arrivalList.getStatus() == 1) {
+                arrivalList.setCannotDeleted(false);
+            } else {
+                List<ArrivalListItem> items = aiService.getListItem(arrivalList.getId());
+                if (items != null) {
+                    arrivalList.setCannotDeleted(true);
+                    boolean canNotDelete = false;
+                    for (ArrivalListItem item : items) {
+                        if (ArrivalListItem.INSTALL_STATUS_NEW.equals(item.getInstallStatus())) {
+                            canNotDelete = true;
+                            break;
+                        }
+                        if (StringUtils.isNotEmpty(item.getAssetUID())) {
+                            //验证设备是否无效
+                            if (!aiService.assetIsInvalid(item.getAssetUID())) {
+                                canNotDelete = true;
+                                break;
                             }
                         }
-                    } else {
-                        arrivalList.setCannotDeleted(true);
+                    }
+                    if (!canNotDelete) {
+                        if (UserContextService.checkRole("AssetHead")) {
+                            arrivalList.setCannotDeleted(false);
+                        } else {
+                            arrivalList.setCannotDeleted(true);
+                        }
                     }
                 }
             }
@@ -220,6 +216,26 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         }
     }
 
+    public void deleteUnLimited() {
+        if (selected.getStatus() == 1) {
+            dao.delete(selected);
+            this.selected = null;
+        } else {
+            List<AssetInfo> assetInfos = deleteArrivalListUnLimited();
+            if (assetInfos.size() > 0) {
+                StringBuilder nameSb = new StringBuilder();
+                StringBuilder functionTypeSb = new StringBuilder();
+                assetInfos.forEach(val -> {
+                    nameSb.append(val.getName()).append(",");
+                    functionTypeSb.append(val.getFunctionType()).append(",");
+                });
+                WebUtil.addErrorMessage("删除失败,存在未报废设备 名称: " + nameSb + " 设备型号:"+ functionTypeSb +"");
+            } else {
+                WebUtil.addErrorMessage("删除成功");
+            }
+        }
+    }
+
     @Transactional
     public void deleteArrivalList() {
         //delete phone and others
@@ -229,6 +245,21 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         //delete list obj
         dao.delete(selected);
         this.selected = null;
+    }
+
+    @Transactional
+    public List<AssetInfo> deleteArrivalListUnLimited() {
+        //delete items and qrCode
+        List<AssetInfo> assetInfos = aiService.deleteListItemUnLimited(this.selected.getId(), this.selected.getSiteUID());
+        if (assetInfos.size() > 0) {
+            return assetInfos;
+        }
+        //delete phone and others
+        aiService.deleteBlobObject(this.selected.getId());
+        //delete list obj
+        dao.delete(selected);
+        this.selected = null;
+        return new ArrayList<>();
     }
 
     public String createAction() {

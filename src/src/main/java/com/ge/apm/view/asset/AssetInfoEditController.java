@@ -26,6 +26,7 @@ import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
@@ -33,6 +34,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -75,6 +77,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private NurseSiteMaintainService nurseSiteMaintainService;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
     private AssetInfoBulkEditCheckService assetInfoBulkEditCheckService;
+    private RelRuleAssetRepository relRuleAssetRepository;
+    private NurseSiteMaintainConfigRepository nurseSiteMaintainConfigRepository;
+    private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
+    private NurseSiteMaintainConfigJNRepository nurseSiteMaintainConfigJNRepository;
+    private NurseSiteMaintainConfigJNItemRepository nurseSiteMaintainConfigJNItemRepository;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -187,6 +194,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
        toDeleteNurseMaintainSite = true;
     }
 
+    @Getter @Setter
+    private PmOrderRule pmOrderRuleTwoLevel;
+    @Getter @Setter
+    private PmOrderRule pmOrderRuleThreeLevel;
+    @Getter @Setter
+    private List<NurseSiteMaintainConfig> listSelectedNurseSiteMaintainConfig;
+    @Getter @Setter
+    private NurseSiteMaintainConfigJN selectedNurseSiteMaintainConfigJN;
+
     // TreeNodeName Filter
     private String treeNodeNameFilter;
     public String getTreeNodeNameFilter() {
@@ -234,6 +250,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         userContextService = WebUtil.getBean(UserContextService.class);
         mqUtils = WebUtil.getBean(MqUtils.class);
         assetInfoBulkEditCheckService = WebUtil.getBean(AssetInfoBulkEditCheckService.class);
+        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
+        nurseSiteMaintainConfigRepository = WebUtil.getBean(NurseSiteMaintainConfigRepository.class);
+        nurseSiteMaintainConfigItemRepository = WebUtil.getBean(NurseSiteMaintainConfigItemRepository.class);
+        nurseSiteMaintainConfigJNRepository = WebUtil.getBean(NurseSiteMaintainConfigJNRepository.class);
+        nurseSiteMaintainConfigJNItemRepository = WebUtil.getBean(NurseSiteMaintainConfigJNItemRepository.class);
 
         countyArea = userContextService.isCountyArea();
 
@@ -383,6 +404,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setDepartNum(createRequest.getDepartNum());//设备编号(院方)
         selected.setMakerShortName(createRequest.getMakerShortName());//品牌/制造商简称
         selected.setRegistrationNo(createRequest.getRegistrationNo());//注册证号
+        selected.setAssetClass(createRequest.getAssetClass());
         selected.setIsValid(true);
         selected.setStatus(1);
         selected.setDeviceStatus(0);
@@ -785,6 +807,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setOfflineUpdateDate(new Date());
         this.saveAssetHistory();
         this.save();
+        creteRule();
         if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain) && toDeleteNurseMaintainSite) {
             assetInfoBulkEditCheckService.deleteNursiteMaintain(unCheckNurseSiteMaintain.get(0));
         }
@@ -815,6 +838,82 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return getListPageLink();
         } else {
             return "";
+        }
+    }
+
+    private void creteRule() {
+        if(pmOrderRuleThreeLevel!=null || pmOrderRuleTwoLevel!=null) {
+            RelRuleAsset rel = new RelRuleAsset();
+            rel.setAssetUID(selected.getUid());
+            rel.setCreatedDate(new Date());
+            rel.setTenantUID(selected.getTenantUID());
+            rel.setInstitutionUID(selected.getInstitutionUID());
+            rel.setHospitalUID(selected.getHospitalUID());
+            rel.setSiteUID(selected.getSiteUID());
+            /* if(pmOrderRule!=null) {  //一级 暂时用不到
+                rel.setRuleUID1(pmOrderRule.getUid());
+            }*/
+            if(pmOrderRuleTwoLevel!=null) { //二级
+                rel.setRuleUID2(pmOrderRuleTwoLevel.getUid());
+            }
+            if(pmOrderRuleThreeLevel!=null) { //三级
+                rel.setRuleUID(pmOrderRuleThreeLevel.getUid());
+            }
+            relRuleAssetRepository.save(rel);
+        }
+        if(CollectionUtils.isNotEmpty(listSelectedNurseSiteMaintainConfig)) {
+            List<NurseSiteMaintainConfigItem> items = new ArrayList<>();
+            for(NurseSiteMaintainConfig config : listSelectedNurseSiteMaintainConfig) {
+                UserAccount userAccount = UserContextService.getCurrentUserAccount();
+                config.setModifyBy(userAccount);
+                config.setModifyByUid(userAccount.getUid());
+                config.setModifyDate(new Date());
+                NurseSiteMaintainConfigItem item = new NurseSiteMaintainConfigItem();
+                item.setAssetUid(selected.getUid());
+                item.setCreateBy(config.getCreateBy());
+                item.setCreateByUid(config.getCreateByUid());
+                item.setCreateDate(config.getCreateDate());
+                item.setHospitalUID(config.getHospitalUID());
+                item.setInstitutionUID(config.getInstitutionUID());
+                item.setClinicalDeptName(config.getClinicalDeptName());
+                item.setClinicalDeptUID(config.getClinicalDeptUID());
+                item.setModifyBy(config.getModifyBy());
+                item.setModifyByUid(config.getModifyByUid());
+                item.setModifyDate(config.getModifyDate());
+                item.setParentId(config.getId());
+                item.setSiteUID(config.getSiteUID());
+                item.setTenantUID(config.getTenantUID());
+                item.setType(config.getType());
+                item.setTypeValue(config.getTypeValue());
+                items.add(item);
+            }
+            nurseSiteMaintainConfigRepository.save(listSelectedNurseSiteMaintainConfig);
+            nurseSiteMaintainConfigItemRepository.save(items);
+        }
+        if(Objects.nonNull(selectedNurseSiteMaintainConfigJN)) {
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            selectedNurseSiteMaintainConfigJN.setModifyBy(userAccount);
+            selectedNurseSiteMaintainConfigJN.setModifyByUid(userAccount.getUid());
+            selectedNurseSiteMaintainConfigJN.setModifyDate(new Date());
+            NurseSiteMaintainConfigJNItem item = new NurseSiteMaintainConfigJNItem();
+            item.setAssetUid(selected.getUid());
+            item.setCreateBy(selectedNurseSiteMaintainConfigJN.getCreateBy());
+            item.setCreateByUid(selectedNurseSiteMaintainConfigJN.getCreateByUid());
+            item.setCreateDate(selectedNurseSiteMaintainConfigJN.getCreateDate());
+            item.setHospitalUID(selectedNurseSiteMaintainConfigJN.getHospitalUID());
+            item.setInstitutionUID(selectedNurseSiteMaintainConfigJN.getInstitutionUID());
+            item.setClinicalDeptName(selectedNurseSiteMaintainConfigJN.getClinicalDeptName());
+            item.setClinicalDeptUID(selectedNurseSiteMaintainConfigJN.getClinicalDeptUID());
+            item.setModifyBy(selectedNurseSiteMaintainConfigJN.getModifyBy());
+            item.setModifyByUid(selectedNurseSiteMaintainConfigJN.getModifyByUid());
+            item.setModifyDate(selectedNurseSiteMaintainConfigJN.getModifyDate());
+            item.setParentId(selectedNurseSiteMaintainConfigJN.getId());
+            item.setSiteUID(selectedNurseSiteMaintainConfigJN.getSiteUID());
+            item.setTenantUID(selectedNurseSiteMaintainConfigJN.getTenantUID());
+            item.setType(selectedNurseSiteMaintainConfigJN.getType());
+            item.setTypeValue(selectedNurseSiteMaintainConfigJN.getTypeValue());
+            nurseSiteMaintainConfigJNRepository.save(selectedNurseSiteMaintainConfigJN);
+            nurseSiteMaintainConfigJNItemRepository.save(item);
         }
     }
 
@@ -1513,6 +1612,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 //        jsonObject.put("assetInfo",selected);
         jsonObject.put("currentUserAccount",currentUserAccount);
         mqContext.setJsonObject(jsonObject);
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
         mqUtils.sendToMq(mqContext);
 //        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
     }

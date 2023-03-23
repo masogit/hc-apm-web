@@ -52,4 +52,7 @@ public interface SharedAssetReqDetailRepository extends GenericRepositoryUUID<Sh
 
     @Query(value = "select a.asset_info_id from shared_asset_req_detail a inner join shared_asset_request b on b.id = a.shared_id where a.asset_info_id in ?1 and b.state  in ?2 ",nativeQuery = true)
     public List<String>  findCountByAssetInfoIdsAndStateByBatchEdit(List<String> assetInfoIds, List<Integer> states);
+
+    @Query(value = "select * from shared_asset_req_detail where asset_info_id=?1 order by create_date desc LIMIT 1",nativeQuery = true)
+    public SharedAssetReqDetail findByAssetInfoSharedAssetReqDetail( String assetInfoId);
 }
