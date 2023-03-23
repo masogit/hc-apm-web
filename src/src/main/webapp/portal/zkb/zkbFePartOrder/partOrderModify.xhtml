@@ -14,12 +14,12 @@
                     <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
                     <p:inputText value="#{zkbFePartOrderProbeController.selected.orderNo}"  required="true" requiredMessage="#{msg.zkbFePartOrder_orderNoa} #{msg.ValidationRequire}"/>
                 </h:panelGroup>
-                <h:panelGroup>
+                <h:panelGroup rendered="#{(!zkbFePartOrderProbeController.selected.notGeAsset eq 't')}">
                     <label class="label">#{msg.zkbFePartOrder_assetPrice}*</label>
                     <p:inputText value="#{zkbFePartOrderProbeController.selected.price}"  required="true" requiredMessage="#{msg.zkbFePartOrder_assetPrice} #{msg.ValidationRequire}"/>
                 </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label" >#{msg.zkbFePartOrder_needProbeLetter}*</label>
+                <h:panelGroup rendered="#{(!zkbFePartOrderProbeController.selected.notGeAsset eq 't')}">
+                    <label class="label"  >#{msg.zkbFePartOrder_needProbeLetter}*</label>
                     <p:selectOneMenu value="#{zkbFePartOrderProbeController.selected.needLetterFlag}" required="true" requiredMessage="#{msg.zkbFePartOrder_needProbeLetter} #{msg.ValidationRequire}" >
                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_needLetterFlag')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                     </p:selectOneMenu>
@@ -42,7 +42,7 @@
                 <p:column headerText="#{msg.zkbFePartOrder_orderNoa}*">
                     <p:inputText value="#{item.orderNo}"  />
                 </p:column>
-                <p:column headerText="#{msg.zkbFePartOrder_assetPrice}*">
+                <p:column headerText="#{msg.zkbFePartOrder_assetPrice}*" rendered="#{(!zkbFePartOrderProbeController.selected.notGeAsset eq 't')}">
                     <p:inputText value="#{item.price}"  />
                 </p:column>
                 <p:column headerText="#{msg.zkbFePartOrder_spareParts}">
