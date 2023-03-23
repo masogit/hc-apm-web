@@ -5,10 +5,11 @@
 <h:form id="inventoryOrderDetailAssetInfoIssueListForm">
 	<p:dataTable id="datalist4" value="#{inventoryOrderDetailAssetInfoIssueController.lazyModel}" var="item" widgetVar="varDataList4" selectionMode="single"
 		selection="#{inventoryOrderDetailAssetInfoIssueController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-		rowKey="#{item.assetInfo.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
 		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoIssueController.onFilter}" />
+		<p:ajax event="rowSelect" update="editButton"/>
 		<p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false" sortBy="#{item.assetInfo.namePyCode}">
 			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
 		</p:column>
@@ -90,12 +91,47 @@
 			</h:outputText>
 		</p:column>
 		<f:facet name="{Toolbar}">
+			<p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{inventoryOrderDetailAssetInfoIssueController.prepareEdit}" update=":inventoryOrderDetailAssetInfoTab:OrderIssueEditDlg" process="@this" oncomplete="PF('OrderIssueEditDlg').show()" disabled="#{empty inventoryOrderDetailAssetInfoIssueController.selected}"/>
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalist4" fileName="InventoryOrderDetailAssetInfoIssue_export" />
 			</p:commandButton>
 		</f:facet>
 	</p:dataTable>
 </h:form>
+<p:dialog id="OrderIssueEditDlg" widgetVar="OrderIssueEditDlg" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="#{inventoryOrderDetailAssetInfoIssueController.CRUDActionName}" >
+	<h:form id="OrderIssueEditForm">
+		<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="min-width: 500px;">
+			<h:panelGroup>
+				<label class="label">#{msg.locationName}</label>
+				<p:inputText id="locationName" value="#{inventoryOrderDetailAssetInfoIssueController.selected.assetInfo.locationName}" autocomplete="new-password"/>
+			</h:panelGroup>
+			<h:panelGroup>
+				<label class="label">#{msg.ProblemDescription}</label>
+				<p:inputText id="comment" value="#{inventoryOrderDetailAssetInfoIssueController.selected.comment}" autocomplete="new-password"/>
+			</h:panelGroup>
+			<h:panelGroup>
+				<label class="label">#{msg.Solved}</label>
+				<p:selectOneRadio value="#{inventoryOrderDetailAssetInfoIssueController.selected.isSolved}" disabled="false">
+					<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+					<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+				</p:selectOneRadio>
+			</h:panelGroup>
+			<h:panelGroup>
+				<label class="label">转入已盘点</label>
+				<p:selectOneRadio value="#{inventoryOrderDetailAssetInfoIssueController.inventorized}" disabled="false">
+					<f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+					<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+				</p:selectOneRadio>
+			</h:panelGroup>
+		</p:panelGrid>
+		<p:commandButton validateClient="true" actionListener="#{inventoryOrderDetailAssetInfoIssueController.save}" value="#{msg.Save}" update="@(.datalist) :growl,
+		inventoryOrderDetailAssetInfoTab:OrderIssueEditDlg,
+		inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoIssueListForm
+		inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm"
+						 icon="ui-icon-check" />
+		<p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('OrderIssueEditDlg').hide()"/>
+	</h:form>
+</p:dialog>
 <p:overlayPanel widgetVar="panelFilterLastModifiedDateIssue" for=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoIssueListForm:datalist4:filterLastModifiedDateIssue" dismissable="false">
 	<h:panelGrid columns="2">
 		<p:outputLabel value="#{msg.From}" />
