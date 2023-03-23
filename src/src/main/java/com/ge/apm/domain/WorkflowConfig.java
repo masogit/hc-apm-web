@@ -864,6 +864,10 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "aa_enable_stock_show")
     private Boolean enableStockShow = Boolean.FALSE;//是否开启库存显示
+    @Column(name = "start_sending_time")
+    private Date startSendingTime;
+    @Column(name = "end_sending_time")
+    private Date endSendingTime;
 
     @Column(name = "aa_default_maintain_man_hour")
     private Double defaultMaintainManHour = 0.0D;
@@ -1558,6 +1562,22 @@ public class WorkflowConfig implements Serializable {
 
     public Boolean getIsPmSupplierAutoEnabled() {
         return  this.isPmSupplierAutoEnabled;
+    }
+
+    public Date getStartSendingTime() {
+        return startSendingTime;
+    }
+
+    public void setStartSendingTime(Date startSendingTime) {
+        this.startSendingTime = startSendingTime;
+    }
+
+    public Date getEndSendingTime() {
+        return endSendingTime;
+    }
+
+    public void setEndSendingTime(Date endSendingTime) {
+        this.endSendingTime = endSendingTime;
     }
 
     public void setIsPmSupplierAutoEnabled(Boolean isPmSupplierTakeOrderEnabled) {
