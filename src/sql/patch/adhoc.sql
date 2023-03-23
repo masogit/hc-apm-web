@@ -36,3 +36,5 @@ update v2_pm_order vpo set pm_rule_uid = rra.rule_uid1 ,last_modified_by = 'YHAA
 update v2_pm_order vpo set pm_rule_uid = rra.rule_uid2 , last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =2 and vpo.pm_rule_uid is null;
 update v2_pm_order vpo set pm_rule_uid = rra.rule_uid, last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =3 and vpo.pm_rule_uid is null;
 update v2_pm_order vpo set pm_rule_uid = rra.rule_uid4 , last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =4 and vpo.pm_rule_uid is null;
+--YHAAO-18146
+ALTER TABLE public.asset_history ALTER COLUMN json_data TYPE text USING json_data::text;
