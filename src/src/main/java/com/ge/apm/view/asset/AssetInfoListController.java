@@ -1,7 +1,7 @@
 package com.ge.apm.view.asset;
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
+import com.ge.healthcare.cn.common.utils.date.DateTime;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
@@ -110,6 +110,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String installDateFormatTime = null;
     private String arriveDateFormatTime = null;
     private String factoryWarrantyDateFormatTime = null;
+    @Getter @Setter
+    private String mvsContractStartDate = null;
+    @Getter @Setter
+    private String mvsContractEndDate = null;
 
     private Boolean needShowAssetApproval;
 
@@ -598,12 +602,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             e.printStackTrace();
         }
     }
-    public void exportExcel() throws IOException {
 
-        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-
+    public void export(List<String> exportFields) throws IOException {
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
-//        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
         List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
@@ -611,8 +612,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<AssetInfo> assetList = getExportList();
 
-//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
@@ -623,6 +622,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
 
         logger.info("export file: AssetInfo_export.xlsx successful.");
+    }
+
+    public void exportExcel() throws IOException {
+        export(ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles()));
+    }
+
+    public void exportAssetExcel() throws IOException {
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        insertCrossSiteColumns(exportFields);
+        export(exportFields);
+    }
+
+    private void insertCrossSiteColumns(List<String> exportFields) {
+        // 增加医院列
+        String hospitalColumn = WebUtil.getMessage("hospitalId");
+        int siteIndex = exportFields.indexOf(hospitalColumn);
+        exportFields.add(siteIndex, WebUtil.getMessage("Hospital"));
+
+        // 增加集团列
+        exportFields.add(exportFields.size(), WebUtil.getMessage("Institution"));
     }
 
     public void batchProcessToBeTerminated() {

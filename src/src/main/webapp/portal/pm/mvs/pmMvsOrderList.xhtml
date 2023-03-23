@@ -137,14 +137,15 @@
                             <h:outputText value="#{v2PmOrderController.getRulePm(item).period}"/>
                         </p:column>
 
-                <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}">
+<!--                <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">-->
                     <h:outputText value="#{item.creatorName}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.Owner}" sortBy="#{item.ownerName}" filterBy="#{item.ownerName}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.Owner}" sortBy="#{item.ownerName}">
+<!--                <p:column headerText="#{msg.Owner}" sortBy="#{item.ownerName}" filterBy="#{item.ownerName}" filterMatchMode="LIKE">-->
                     <h:outputText value="#{item.ownerName}"/>
                 </p:column>
-
 
                 <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.pmNum}"/>
@@ -171,7 +172,8 @@
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE" rendered="#{v2PmOrderController.queryIndex==7 or userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">
+                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" rendered="#{v2PmOrderController.queryIndex==7 or userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">
+<!--                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE" rendered="#{v2PmOrderController.queryIndex==7 or userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">-->
                     <f:facet name="filter">
                         <p:inputText id="filterActualCompletionTime" widgetVar="varFilterActualCompletionTime" value="#{v2PmOrderController.actualCompletionTimeFormat}"/>
                     </f:facet>

@@ -119,7 +119,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
-        initBackUpList();
+        //initBackUpList();
         if(selected != null){
             if(CollectionUtils.isNotEmpty(backUpList))
             {
@@ -136,7 +136,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     @Override
     public void prepareEdit() {
         super.prepareEdit();
-        initBackUpList();
+        initBackUpList(selected.getConfigType());
         if(selected != null){
             for(ZkbPartOrderUserConfig c : backUpList){
                 if(selected.getId().equals(c.getId())){
@@ -152,14 +152,14 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         }
     }
 
-    private void initBackUpList()
+    private void initBackUpList(String configType)
     {
         if(this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
         {
-            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(configType,"US");
         }else
         {
-            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameNotLike(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US",ZkbFePartOrderService.testLoginNameStartWith+"%");
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameNotLike(configType,"US",ZkbFePartOrderService.testLoginNameStartWith+"%");
         }
     }
 
@@ -220,6 +220,12 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             if (doc != null) {
                 doc.release();
             }
+        }
+    }
+
+    public void configTypeChange(){
+        if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(selected.getConfigType()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getConfigType())){
+            initBackUpList(selected.getConfigType());
         }
     }
 

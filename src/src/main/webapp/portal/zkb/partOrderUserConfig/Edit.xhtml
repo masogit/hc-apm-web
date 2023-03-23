@@ -47,7 +47,7 @@
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyUserConfig_type}</label>
                         <p:selectOneMenu id="configType" value="#{zkbPartOrderUserConfigController.selected.configType}"  required="true" requiredMessage="类型#{msg.ValidationRequire}">
-                            <p:ajax event="change" update="checkboxConfigType" />
+                            <p:ajax event="change" update="checkboxConfigType" listener="#{zkbPartOrderUserConfigController.configTypeChange()}" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoStepsRole')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
