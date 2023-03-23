@@ -18,6 +18,8 @@ import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +45,7 @@ import javaslang.Tuple2;
  */
 @Component
 public class ContractInfoService {
+    public static final Logger log = LoggerFactory.getLogger(ContractInfoService.class);
 
     @Autowired
     private ContractInfoItemRepository contractItemDao;
@@ -142,7 +145,7 @@ public class ContractInfoService {
         MqContext mqContex=new MqContext();
         mqContex.setTime(new Date());
         mqContex.setExChange(MQConfig.PHYSICAL_DATA_DEL_CHANGE);
-        mqContex.setRoutingKey("physical.data.delete");
+        mqContex.setRoutingKey("");
         mqContex.setType("physicalDataDelete");
         DataDelVO dataDelVO = new DataDelVO();
         JSONObject jsonObject = new JSONObject();
@@ -157,7 +160,11 @@ public class ContractInfoService {
         dataDelVO.setInstitutionUID(userAccount.getInstitutionUID());
         dataDelVO.setSiteUID(userAccount.getSiteUID());
         dataDelVO.setTenantUID(userAccount.getTenantUID());
-        mqUtils.sendToMq(mqContex);
+        try {
+            mqUtils.sendToMq(mqContex);
+        }catch (Exception e){
+            log.error("contract delete send mq error");
+        }
     }
 
     //    public List<V2_WorkOrder_Detail> getPartsInfo(String contractNum, String tenantUid) {
