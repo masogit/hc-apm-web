@@ -33,9 +33,10 @@
                         </c:if>
                         <c:if test="#{zkbPartOrderEditController.notGeAsset eq 't'}">
                             <p:selectOneMenu value="#{zkbPartOrderEditController.orderType}" >
-                                <p:ajax event="change" update="zkbPartOrderEditForm zkbHeadEditForm zkbwkEditForm zkbContractDatalist " listener="#{zkbPartOrderEditController.orderTypeChange}" />
+                                <p:ajax event="change" update="zkbPartOrderEditForm zkbHeadEditForm zkbwkEditForm zkbContractDatalist " listener="#{zkbPartOrderEditController.orderTypeChange('orderType')}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="备件申请" itemValue="Parts"/>
+                                <f:selectItem itemLabel="探头申请" itemValue="Probe"/>
                             </p:selectOneMenu>
                         </c:if>
                     </h:panelGroup>
@@ -455,7 +456,7 @@
                             <label class="label">Sr#*</label>
                             <p:inputText value="#{zkbPartOrderEditController.selected.srNo}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.notGeAsset eq 't' and zkbPartOrderEditController.orderType eq 'Parts'}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.notGeAsset eq 't'}">
                             <label class="label">品牌*</label>
                             <p:inputText id="makerShortName" value="#{zkbPartOrderEditController.assetInfo.makerShortName}"  disabled="true"/>
                         </h:panelGroup>
@@ -619,7 +620,7 @@
                                 </h:panelGroup>
                             </c:if>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe'}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.notGeAsset eq 'f' }">
                             <label class="label">是否全新探头</label>
                             <p:selectOneMenu id="newCatFlag" value="#{zkbPartOrderEditController.selected.tenantNewCatFlag}"  >
                                 <p:ajax event="change" update="proveFile qty remainQty" listener="#{zkbPartOrderEditController.tenantNewCatFlagChange}"/>
