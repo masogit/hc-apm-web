@@ -21,4 +21,6 @@ public class MqContext implements Serializable {
     private String exChange;
     //消息内容
     private JSONObject jsonObject;
+
+    private int retryCount;
 }
