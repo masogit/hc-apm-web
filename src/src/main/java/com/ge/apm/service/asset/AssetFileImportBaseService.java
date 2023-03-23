@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
@@ -545,6 +546,8 @@ public class AssetFileImportBaseService {
         jsonObject.put("assetInfo",str);
         jsonObject.put("currentUserAccount",currentUserAccount);
         mqContext.setJsonObject(jsonObject);
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
         mqUtils.sendToMq(mqContext);
     }
     public Map checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,List<AssetInfo> unCheckNurseSiteMaintainList) {

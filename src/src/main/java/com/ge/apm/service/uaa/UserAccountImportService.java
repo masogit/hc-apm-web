@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserTagsMapper;

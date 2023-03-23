@@ -428,22 +428,21 @@ public class WorkflowService {
             return insulateConfig;
         }
         List<WorkflowConfig> configs = workflowConfigRepository.findByTenantUID(orgInfo.getTenantUID());//fetchWorkflowConfig();
-        Map<String,WorkflowConfig> siteMap = new HashMap<String,WorkflowConfig>();
-        Map<String,WorkflowConfig> hospitalMap = new HashMap<String,WorkflowConfig>();
-        Map<String,WorkflowConfig> institutionMap = new HashMap<String,WorkflowConfig>();
-        Map<String,WorkflowConfig> tenantMap = new HashMap<String,WorkflowConfig>();
-        for (WorkflowConfig config : configs) {
-            int level = getLevel(config);
-            if(level == 1) {//租户级别
-                tenantMap.put(config.getTenantUID(), config);
-            }else if(level == 2) {//集团级别
-                institutionMap.put(config.getInstitutionUID(), config);
-            }else if(level == 3) {//医院级别
-                hospitalMap.put(config.getHospitalUID(), config);
-            }else if(level == 4) {//院区级别
-                siteMap.put(config.getSiteUID(), config);
-            }
-        }
+		Map<String,WorkflowConfig> siteMap = new HashMap<>();
+		Map<String,WorkflowConfig> hospitalMap = new HashMap<>();
+		Map<String,WorkflowConfig> institutionMap = new HashMap<>();
+		Map<String,WorkflowConfig> tenantMap = new HashMap<>();
+		configs.forEach(config -> {
+			if (config.getSiteUID().equals(orgInfo.getSiteUID())) {
+				siteMap.put(config.getSiteUID(), config);
+			} else if (config.getHospitalUID().equals(orgInfo.getHospitalUID())) {
+				hospitalMap.put(config.getHospitalUID(), config);
+			} else if (config.getInstitutionUID().equals(orgInfo.getInstitutionUID())) {
+				institutionMap.put(config.getInstitutionUID(), config);
+			} else if (config.getTenantUID().equals(orgInfo.getTenantUID())) {
+				tenantMap.put(config.getTenantUID(), config);
+			}
+		});
         if(siteMap.get(orgInfo.getSiteUID()) != null){
             return siteMap.get(orgInfo.getSiteUID());
         }else if(hospitalMap.get(orgInfo.getHospitalUID()) != null){

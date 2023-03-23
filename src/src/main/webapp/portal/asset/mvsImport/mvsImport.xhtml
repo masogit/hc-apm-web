@@ -1,0 +1,181 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.importMvsDataFile}"/>
+            </div>
+            <p:tabView styleClass="ui-g-12">
+                <p:tab title="epop合同时间信息导入">
+                    <div class="ui-g-12 card">
+                        <h:form id="importContractForm">
+                            <p:fieldset legend="#{msg.ImportAssetDataFile}">
+                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.choseFileToUpload}</label>
+                                        <h:outputText   value="#{mvsFileImportController.file.fileName}"  rendered="#{not empty mvsFileImportController.file}"/>
+                                        <p:fileUpload  id="fileUpload" fileUploadListener="#{mvsFileImportController.uploadContractDataFile}" value="#{mvsFileImportController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                                       multiple="false" sizeLimit="10000000" update="importContractForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty mvsFileImportController.file}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p>#{msg.Description}</p>
+                                        <p>
+                                            1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('MVS_CONTRACT')}" styleClass="p-mr-2"/>
+                                        </p>
+                                        <p>2. #{msg.FileNeedAssetData}</p>
+                                        <p>3. #{msg.UpFileImport}</p>
+
+                                    </h:panelGroup>
+
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.PreviewResult}" id="contractDataListPanel">
+                                <h:panelGroup >
+                                    <p:selectOneRadio value="#{mvsFileImportController.displayErrorsOnly}">
+                                        <p:ajax event="change" process="@this" update="importContractForm:contractDataListPanel"/>
+                                        <f:selectItem itemValue="false" itemLabel="#{msg.AllRecord}"/>
+                                        <f:selectItem itemValue="true" itemLabel="#{msg.ErrorRecord}"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <p:dataTable id="contractDataList" rendered="#{null ne mvsFileImportController.getContractInfoList()}"
+                                     value="#{mvsFileImportController.getContractInfoList()}" var="item"
+                                     lazy="false" paginator="true" paginatorPosition="both"
+                                     paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="20,50,100,500" rowKey="#{item.id}">
+                                    <p:column headerText="ContractNo">
+                                        <h:outputText value="#{item.contractNo}" />
+                                    </p:column>
+                                    <p:column headerText="SVCOffering">
+                                        <h:outputText value="#{item.SVCOffering}" />
+                                    </p:column>
+                                    <p:column headerText="OC Status">
+                                        <h:outputText value="#{item.OCStatus}" />
+                                    </p:column>
+                                    <p:column headerText="PackageNo">
+                                        <h:outputText value="#{item.packageNo}" />
+                                    </p:column>
+                                    <p:column headerText="SystemID">
+                                        <h:outputText value="#{item.systemId}" />
+                                    </p:column>
+                                    <p:column headerText="ProductName">
+                                        <h:outputText value="#{item.productName}" />
+                                    </p:column>
+                                    <p:column headerText="CustomerName">
+                                        <h:outputText value="#{item.customerName}" />
+                                    </p:column>
+                                    <p:column headerText="DealerName">
+                                        <h:outputText value="#{item.dealerName}" />
+                                    </p:column>
+                                    <p:column headerText="检查结果">
+                                        <h:outputText value="#{item.checkResult}" />
+                                    </p:column>
+                                </p:dataTable>
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <h:panelGroup>
+                                        <p:commandButton validateClient="true" actionListener="#{mvsFileImportController.importContractData()}" value="#{msg.Import}" update=":growl importContractForm" icon="ui-icon-check"
+                                                         onstart="PF('statusDialogForImport').show()" oncomplete="PF('statusDialogForImport').hide()" disabled="#{null eq mvsFileImportController.getContractInfoList()}"/>
+                                        <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="mvsImport?faces-redirect=true" update=":growl"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:fieldset>
+                        </h:form>
+                    </div>
+                </p:tab>
+
+                <p:tab title="院区信息导入">
+                    <div class="ui-g-12 card">
+
+                        <h:form id="siteImportForm">
+                            <p:fieldset legend="#{msg.ImportAssetDataFile}">
+                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.choseFileToUpload}</label>
+                                        <h:outputText   value="#{mvsFileImportController.file.fileName}"  rendered="#{not empty mvsFileImportController.file}"/>
+                                        <p:fileUpload  id="crossSiteFileUpload" fileUploadListener="#{mvsFileImportController.uploadSiteDataFile}" value="#{mvsFileImportController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                                       multiple="false" sizeLimit="10000000" update="siteImportForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty mvsFileImportController.file}" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p>#{msg.Description}</p>
+                                        <p>
+                                            1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('MVS_SITE')}" styleClass="p-mr-2"/>
+                                        </p>
+                                        <p>2. #{msg.FileNeedAssetData}</p>
+                                        <p>3. #{msg.UpFileImport}</p>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.PreviewResult}" id="orgInfoDataListPanel">
+                                <h:panelGroup >
+                                    <p:selectOneRadio value="#{mvsFileImportController.displayErrorsOnly}">
+                                        <p:ajax event="change" process="@this" update="siteImportForm:orgInfoDataListPanel"/>
+                                        <f:selectItem itemValue="false" itemLabel="#{msg.AllRecord}"/>
+                                        <f:selectItem itemValue="true" itemLabel="#{msg.ErrorRecord}"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <p:dataTable id="orgInfoDataList" rendered="#{null ne mvsFileImportController.getOrgInfoList()}"
+                                             value="#{mvsFileImportController.getOrgInfoList()}" var="item"
+                                             lazy="false" paginator="true" paginatorPosition="both"
+                                             paginatorAlwaysVisible="true"
+                                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                             pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                                             rowsPerPageTemplate="20,50,100,500" rowKey="#{item.id}">
+                                    <p:column headerText="Site ID">
+                                        <h:outputText value="#{item.siteId}" />
+                                    </p:column>
+                                    <p:column headerText="Installed At Alternate Customer Name">
+                                        <h:outputText value="#{item.locationCode}" />
+                                    </p:column>
+                                    <p:column headerText="Province">
+                                        <h:outputText value="#{item.province}" />
+                                    </p:column>
+                                    <p:column headerText="Service Region">
+                                        <h:outputText value="#{item.serviceRegion}" />
+                                    </p:column>
+                                    <p:column headerText="Customer Chinese Address">
+                                        <h:outputText value="#{item.customerChineseAddress}" />
+                                    </p:column>
+                                    <p:column headerText="PL">
+                                        <h:outputText value="#{item.PL}" />
+                                    </p:column>
+                                    <p:column headerText="City">
+                                        <h:outputText value="#{item.city}" />
+                                    </p:column>
+                                    <p:column headerText="HP Level">
+                                        <h:outputText value="#{item.HPLevel}" />
+                                    </p:column>
+                                    <p:column headerText="检查结果">
+                                        <h:outputText value="#{item.checkResult}" />
+                                    </p:column>
+                                </p:dataTable>
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <h:panelGroup>
+                                        <p:commandButton validateClient="true" actionListener="#{mvsFileImportController.importOrgData()}" value="#{msg.Import}" update=":growl siteImportForm" icon="ui-icon-check"
+                                                         onstart="PF('statusDialogForImport').show()" oncomplete="PF('statusDialogForImport').hide()" disabled="#{null eq mvsFileImportController.getOrgInfoList()}"/>
+                                        <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="mvsImport?faces-redirect=true" update=":growl"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:fieldset>
+                        </h:form>
+                    </div>
+                </p:tab>
+            </p:tabView>
+        </div>
+        <p:dialog widgetVar="statusDialogForImport" modal="true" class="ajaxStatusDialog" draggable="false" closable="false" resizable="false" showHeader="false">
+            <i class="fa fa-circle-o-notch fa-spin ajax-loader" style="zoom: 1.5;color: orange;" aria-hidden="true"></i>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

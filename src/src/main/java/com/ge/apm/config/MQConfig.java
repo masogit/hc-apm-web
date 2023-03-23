@@ -10,18 +10,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MQConfig {
 
-//    @Bean
-//    public TopicExchange createChange(){
-//        TopicExchange assetChange = new TopicExchange("asset_change", false, false);
-//        return assetChange;
-//    }
-//
-//    @Bean
-//    public Queue createQueue(){
-//        Queue assetQueue = new Queue("asset_queue", true, false, false);
-//        return assetQueue;
-//
-//    }
+    public static final String ASSET_UPDATE = "assetUpdateQueue";
+    public static final String ASSET_DELETE = "assetDeleteQueue";
+    public static final String ASSET_CHANGE = "assetChange";
+    public static final String UPDATE_ROUTING_KEY = "asset.update";
+    public static final String DELETE_ROUTING_KEY = "asset.delete";
+
+
+    public static final String ASSET_UPDATE_ES = "assetUpdateEsQueue";
+
+    public static final String UPDATE_ES_ROUTING_KEY = "assetes.update";
+
+
+
 
 
 }

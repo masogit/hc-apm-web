@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:p="http://primefaces.org/ui"
+				template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<script>
+			function reload() {
+				window.location.reload();
+			}
+		</script>
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<div class="ui-g-12 card cardTitle">
+					<p:outputLabel class="pageTitle" value="报表中心"/>
+				</div>
+				<h:form id="jmReportForm">
+					<p:panelGrid columns="1" layout="grid">
+						<h:panelGroup>
+							<p:dataTable id="datalist" value="#{jmReportController.lazyModel}" var="item" widgetVar="varDataList"
+										 selectionMode="single" selection="#{jmReportController.selected}"
+										 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+										 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+										 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+										 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+										 rows="20" emptyMessage="#{msg.noRecordFound}"
+										 rowsPerPageTemplate="20,50,100,500">
+
+<!--								<p:ajax event="rowSelect" listener="#{jmReportController.onSelect}" update="roleButton reportName" oncomplete="PF('sidebar').show()"/>-->
+								<p:ajax event="rowSelect" listener="#{jmReportController.onSelect}" update="roleButton" />
+								<p:ajax event="filter" listener="#{jmReportController.onFilter}" update="datalist roleButton"/>
+								<p:column headerText="报表名称"  filterBy="#{item.name}" filterMatchMode="LIKE">
+									<h:outputText value="#{item.name}"/>
+								</p:column>
+								<p:column headerText="报表描述">
+									<h:outputText value="#{item.description}" />
+								</p:column>
+								<p:column  headerText="新窗口预览" selectRow="none">
+									<h:commandLink id="viewReportButton" title="预览" target="_blank" action="#{jmReportController.openNewWindowView(item.id)}" onblur="reload()">
+										<p:graphicImage name="icons/find.png" style="width: 30px; height: 25px;"/>
+									</h:commandLink>
+								</p:column>
+								<f:facet name="{Toolbar}">
+									<p:commandButton id="roleButton"  title="分配访问角色"  icon="ui-icon-people" class="btnEdit" actionListener="#{jmReportController.prepareEdit}" update="@(.updateTrCls) :JmRoleEditDlg" disabled="#{empty jmReportController.selected.id}" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin')}" oncomplete="PF('JmRoleEditDialog').show()"/>
+								</f:facet>
+							</p:dataTable>
+						</h:panelGroup>
+					</p:panelGrid>
+				</h:form>
+<!--				<p:panelGrid columns="1" layout="grid">-->
+<!--					<h:panelGroup>-->
+<!--						<p:sidebar id="reportName" widgetVar="sidebar" position="left" style="width: 100%;height: 90%; " >-->
+<!--							<h3>#{jmReportController.selected.name}预览</h3>-->
+<!--							<iframe src="#{jmReportController.view(1)}" style="width: 100%;height: 90%; " > </iframe>-->
+<!--						</p:sidebar>-->
+<!--					</h:panelGroup>-->
+<!--				</p:panelGrid>-->
+				<ui:include src="jmReportRole.xhtml"/>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

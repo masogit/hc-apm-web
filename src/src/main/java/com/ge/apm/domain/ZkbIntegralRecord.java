@@ -50,6 +50,17 @@ public class ZkbIntegralRecord implements Serializable {
     @Column(name = "created_date")
     private Date createdDate;
 
+    @Column(name = "remark")
+    private String remark;
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public Integer getCurrentKpi() {
         return currentKpi;
     }

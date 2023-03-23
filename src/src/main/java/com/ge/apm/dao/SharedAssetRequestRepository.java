@@ -50,4 +50,6 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
 
     @Query(value = "select o from SharedAssetRequest o where o.state in :states")
     public List<SharedAssetRequest> findListByState(@Param("states") List<Integer> states);
+
+
 }

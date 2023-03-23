@@ -42,6 +42,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -268,7 +269,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     @Override
     protected void init() {
-        super.init();
         try {
             supplierController = WebUtil.getBean(SupplierController.class);
             ccService = WebUtil.getBean(CustomConfigService.class);
@@ -405,17 +405,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         itemDetail.setPartsPrice(null);
         itemDetail.setClosedPrice(null);
         if (itemDetail != null) {
-            String partsType = itemDetail.getPartsType();
-            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
-                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
-                return;
-            }
-            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
-                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
-                return;
-            }
+            setStatusFlagByType(itemDetail.getPartsType());
         }
-        statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
     }
     public void onSparePartsValueChange(SelectEvent event) {
         Object object = event.getObject();
@@ -772,124 +763,16 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         return dao;
     }
 
-    /*
-     * select
-        *
-    from
-        v2_work_order v2_workord0_ 
-    left outer join
-        v2_service_request v2_service1_ 
-            on v2_workord0_.sr_id=v2_service1_.id cross 
-    join
-        v2_service_request v2_service2_ cross 
-    join
-        asset_info assetinfo4_ 
-    where
-        v2_workord0_.sr_id=v2_service2_.id 
-        and v2_workord0_.asset_id=assetinfo4_.id         
-        and v2_workord0_.status=1                           //1*
-        and (
-            v2_workord0_.current_step_id in (
-                2 , 3
-            )
-        )                                                   //1*
-        and (
-            v2_workord0_.site_uid in (
-                ?
-            )                                                //1*2+
-            or v2_workord0_.tenant_uid in (
-                ?
-            )                                                //1*2+
-            or v2_workord0_.institution_uid in (
-                ?
-            )                                                //1*2+
-            or v2_workord0_.hospital_uid in (
-                ?
-            )                                                 //1*2+
-            or v2_service2_.requestor_id=2342                 //1*2+
-            or v2_service2_.from_dept_uid in (
-                ?
-            )                                                 //1*2+
-            or v2_workord0_.current_person_id=2342            //1*2+
-        ) 
-        and (
-            (
-                v2_workord0_.dispatch_mode in (
-                    2 , 3
-                )
-            ) 
-            and (
-                v2_workord0_.current_person_id<>348 
-                or v2_workord0_.current_person_id=348 
-                and v2_workord0_.current_step_id=2
-            ) 
-            and (
-                v2_workord0_.asset_id in (
-                    0
-                ) 
-                or (
-                    v2_workord0_.asset_id in (
-                        0
-                    )
-                ) 
-                and (
-                    assetinfo1_.asset_owner_id=348 
-                    or assetinfo1_.asset_owner_id2=348 
-                    or assetinfo1_.asset_owner_id3=348 
-                    or (
-                        assetinfo1_.asset_owner_id2 is null
-                    ) 
-                    and (
-                        assetinfo1_.asset_owner_id3 is null
-                    ) 
-                    or (
-                        assetinfo1_.asset_owner_id is null
-                    ) 
-                    and (
-                        assetinfo1_.asset_owner_id3 is null
-                    ) 
-                    or (
-                        assetinfo1_.asset_owner_id is null
-                    ) 
-                    and (
-                        assetinfo1_.asset_owner_id2 is null
-                    )
-                )
-            ) 
-            or v2_workord0_.current_person_id=348 
-            and v2_workord0_.current_step_id=3
-        )
-
-     */
-    private void filterStepSet(Integer fillterStepId){
-        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
-    }
-public void test1(){
-    System.out.println("test1------");
-}
-
     /*stepName:StepId 报修:1 待派工: 2 , 待接单:3, 维修中:4 , 待验收:5 待关单:6 ， 待评价:7  , 待审核:8 ， 已计划: 0*/
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
-        Page<V2_WorkOrder> bySearchFilter = null;
+        Page<V2_WorkOrder> pageResult = null;
         try {
             this.setSearchFilter();
-            removeFilterOnField("status");
-            removeFilterOnField("currentStepId");
-            removeFilterOnField("currentStepName");
-            removeFilterOnField("currentPersonId");
-            removeFilterOnField("dispatchMode");
-            removeFilterOnField("srId");
-            removeFilterOnField("feedbackRating");
-            removeFilterOnField("assetId");
-            removeFilterOnField("approvalStatus");
-            removeFilterOnField("assetInfo.assetOwnerId");
-            removeFilterOnField("assetInfo.assetOwnerId2");
-            removeFilterOnField("assetInfo.assetOwnerId3");
-            removeFilterOnField("assetInfo.uid");
-            removeFilterOnField("assetInfo.clinicalDeptUID");
-            removeFilterOnField("approverId");
-            removeFilterOnField("serviceRequest.status");
+            String[] fields = new String[]{"status", "currentStepId", "currentStepName", "currentPersonId", "dispatchMode"
+                    , "srId", "feedbackRating", "assetId", "approvalStatus", "assetInfo.assetOwnerId", "assetInfo.assetOwnerId2"
+                    , "assetInfo.assetOwnerId3", "assetInfo.uid", "assetInfo.clinicalDeptUID", "approverId", "serviceRequest.status"};
+            Arrays.asList(fields).forEach(field -> removeFilterOnField(field));
             Integer fillterStepId;
             if (queryIndex == 1) {//已报修 可取消
                 if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
@@ -901,12 +784,6 @@ public void test1(){
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
                 searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
-
-//            List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
-//            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
-//            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
-//            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
-//            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
             } else if (queryIndex == 3) { //待接单
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
@@ -925,7 +802,6 @@ public void test1(){
                 searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner3*"));
                 //去除派工模式4且待派工的单子
                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+7*"));
-//            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(4,5), "1*3+7*"));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+7*"));
                 //当前责任人是自己且已经派工的单子
                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+9*"));
@@ -951,8 +827,9 @@ public void test1(){
             } else if (queryIndex == 5) { //待验收
                 /*工程师和主任， 如果两个角色同时存在，则优先以主任角色.*/
                 if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
+                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1)), "1*3+"));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
+                    searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*3+"));
                 } else {
                     searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
                     searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
@@ -1111,14 +988,13 @@ public void test1(){
             }
             //查询Mvs工单
             if("MVS工单".equals(tabTitle)){
-
                 List<SearchFilter> filters = buildMvsSearchFilter();
-                bySearchFilter = dao.findBySearchFilter(filters, pageRequest);
-                bySearchFilterMVS = bySearchFilter.getContent();
+                pageResult = dao.findBySearchFilter(filters, pageRequest);
+                bySearchFilterMVS = pageResult.getContent();
                 loadMVSClinicalDeptList();
             }else{
-                bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
-                bySearchFilterInternal = bySearchFilter.getContent();
+                pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
+                bySearchFilterInternal = pageResult.getContent();
             }
             UserAccount userAccount = userContextService.getCurrentUserAccount();
             TenantInfo tenantInfo = tenantInfoRepository.findByuid(userAccount.getTenantUID());
@@ -1133,14 +1009,17 @@ public void test1(){
                     }
                     int size = workOrderList.size();
                     workOrderList= this.pageNum(workOrderList, pageRequest);
-                    bySearchFilter = new PageImpl<V2_WorkOrder>(workOrderList, pageRequest, size);
+                    pageResult = new PageImpl<V2_WorkOrder>(workOrderList, pageRequest, size);
                 }
             }
         } catch (Exception e) {
             LOGGER.error("load data occur exception,{}", e.getMessage());
             throw e;
         }
-        return   bySearchFilter;
+        if (!userContextService.hasCurrentTenantName("")) {
+            needTwoSubStatusBatch(pageResult.getContent());
+        }
+        return pageResult;
     }
     private List<V2_WorkOrder> pageNum(List<V2_WorkOrder> v2_workOrderList,PageRequest pageRequest){
         int pageNumber = pageRequest.getPageNumber();
@@ -1187,7 +1066,8 @@ public void test1(){
             filters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, siteUidFilterMVS));
         }
         for (SearchFilter searchFilter :searchFilters) {
-            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
+            if (("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating,assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType" +
+                    ",serviceRequest.srNum,serviceRequest.casePriority").contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
@@ -1199,15 +1079,6 @@ public void test1(){
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-       /* if (!Strings.isNullOrEmpty(fileterOrgName)) {
-            //先获取 filterOrgName-手术科的 uid
-            List<String> orgUidList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            List<String> filterOrg = orgDao.getOrgBySite(orgUidList, fileterOrgName);
-           if(!filterOrg.isEmpty())
-            this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, filterOrg, "1*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-       }*/
 
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
@@ -1366,6 +1237,10 @@ public void test1(){
 
     }
 
+    public String getRepairNameRefract(String woId, Integer step){
+        List<V2_WorkOrder_Step> v2WorkOrderStep = woService.getMaxStartTimeWorkOrderStepByWoIdAndStepId(woId, step);
+        return CollectionUtils.isEmpty(v2WorkOrderStep)?"":v2WorkOrderStep.get(0).getOwnerName();
+    }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         return woService.getWorkOrderDetails(woId);
@@ -1482,7 +1357,7 @@ public void test1(){
         equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
         takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
     }
-    
+
     public void saveEditedWorkOrder(){
         //故障类型必填校验
         if (requireCaseType() && null == selectedWorkOrder.getCaseType()) {
@@ -2302,7 +2177,7 @@ public void test1(){
             }
             if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
                 statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
-            }   
+            }
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
@@ -2313,6 +2188,9 @@ public void test1(){
         saveCountyAreaAddressInfo();
     }
     public void prepareEditAccDetail(V2_WorkOrder_Detail vwd) {
+        if (vwd != null) {
+            setStatusFlagByType(vwd.getPartsType());
+        }
         switchTmp=false;
         accessoryList = woService.getWorkOrderDetails(selectedWorkOrder.getId());
         if (accessoryList.stream().filter(item -> item.getId().equals(vwd.getId())).findAny().isPresent()){
@@ -2322,6 +2200,7 @@ public void test1(){
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         selectedObjectMap.put("supplier",supplierName);
         nochange=false;
+        partsItem = partsItemService.getPartsItem(vwd.getPartsItemId(), vwd.getParts());
     }
 
     public void prepareEditAccDetailonPrice(String itemId) {
@@ -2332,8 +2211,19 @@ public void test1(){
         supplierName=itemDetail.getSupplier();
 
         nochange = true;
+        setStatusFlagByType(itemDetail.getPartsType());
+        partsItem = partsItemService.getPartsItem(itemDetail.getPartsItemId(), itemDetail.getParts());
     }
 
+    private void setStatusFlagByType(String type) {
+        if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(type)) {
+            statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+        } else if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(type)) {
+            statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+        } else {
+            statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
+        }
+    }
 
     public boolean allowChanged(){
         //is closed
@@ -2516,6 +2406,7 @@ public void test1(){
         itemDetail = null;
         coWorkerDetail = null;
         selectedWorkOrderManHoursDetail = null;
+        partsItem = null;
     }
     public List<AssetFaultType> getAssetFaultType() {
         AssetInfo assetinfo = assetDao.findById(this.selectedWorkOrder.getAssetId());
@@ -3771,6 +3662,14 @@ public void test1(){
 
     }
 
+    public void needTwoSubStatusBatch(List<V2_WorkOrder> workOrders){
+        workOrders.forEach(workOrder -> workOrder.setRepairName(isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairNameRefract(workOrder.getId(), 10):getRepairNameRefract(workOrder.getId(), 4)));
+    }
+
+    public Boolean isConfigNeedTwoSubBySiteUid(String siteUid) {
+        WorkflowConfig woc = workflowService.getWorkflowByOrg(siteUid);
+        return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
+    }
 
     public Boolean isConfigNeedTwoSubStatus(Integer assetId) {
         WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(assetId);
@@ -3785,6 +3684,34 @@ public void test1(){
         List<String> stepIdsList = Arrays.asList(stepIds.split(","));
             return FieldValueMessageController.doGetFieldValueList("woSteps", -1).stream()
                     .filter(item -> stepIdsList.contains(item.getMsgKey())).collect(Collectors.toList());
+    }
+
+    public void onFilterWo(FilterEvent event) {
+        onFilterCustom(event, this::filters);
+    }
+
+    public boolean filters(String fieldName, String filterVal) {
+        if ("serviceRequest.requestTime".equals(fieldName)) {
+            processTimeFiled(filterVal, fieldName);
+            return true;
+        }
+        if ("id".equals(fieldName)) {
+            List<String> stepIds = new ArrayList<>();
+            List<V2_WorkOrder_Step> steps = woService.getWorkStepsByStepId(4, tenantInfo.getUid());
+            if (!CollectionUtils.isEmpty(steps)) {
+                Map<String, List<V2_WorkOrder_Step>> map = steps.stream().collect(Collectors.groupingBy(V2_WorkOrder_Step::getWoId));
+                List<V2_WorkOrder_Step> stepList = map.values().stream().map(group -> group.stream()
+                        .max(Comparator.comparing(V2_WorkOrder_Step::getStartTime))
+                        .orElse(null))
+                        .filter(val -> val!=null&&val.getOwnerName().contains(filterVal))
+                        .collect(Collectors.toList());
+                removeFilterOnField("id");
+                stepIds = stepList.stream().map(V2_WorkOrder_Step::getWoId).collect(Collectors.toList());
+            }
+            searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepIds));
+            return true;
+        }
+        return false;
     }
 }
 

@@ -33,20 +33,24 @@
 <!--    exclusive="false" auto-declare="true"-->
     <rabbit:queue id="assetDeleteQueue" name="assetDeleteQueue" durable="true" auto-delete="false" />
     <rabbit:queue id="assetUpdateQueue" name="assetUpdateQueue" durable="true" auto-delete="false" />
+    <rabbit:queue id="assetUpdateEsQueue" name="assetUpdateEsQueue" durable="true" auto-delete="false" />
 
     <rabbit:topic-exchange  name="assetChange" durable="true" auto-delete="false" auto-declare="true" id="assetChange">
         <rabbit:bindings>
             <rabbit:binding queue="assetDeleteQueue" pattern="asset.delete" ></rabbit:binding>
             <rabbit:binding queue="assetUpdateQueue" pattern="asset.update" ></rabbit:binding>
+            <rabbit:binding queue="assetUpdateEsQueue" pattern="assetes.update" ></rabbit:binding>
         </rabbit:bindings>
     </rabbit:topic-exchange>
 
     <rabbit:listener-container connection-factory="rabbitConnectionFactory" acknowledge="manual" message-converter="jackson2JsonMessageConverter" >
         <!-- 监听一个队列，当队列中有消息，就会自动触发类.方法，传递消息就作为方法的参数，根据方法声明的参数强转 -->
         <rabbit:listener ref="assetChangeConsumer"  queue-names="assetUpdateQueue"/>
+        <rabbit:listener ref="assetHistoryEsConsumer"  queue-names="assetUpdateEsQueue"/>
     </rabbit:listener-container>
 
     <bean id="assetChangeConsumer" class="com.ge.apm.listener.AssetChangeConsumer"/>
+    <bean id="assetHistoryEsConsumer" class="com.ge.apm.listener.AssetChangeEsConsumer"/>
 
 
 

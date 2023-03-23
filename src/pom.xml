@@ -765,7 +765,7 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.10</version>
+            <version>1.4.19</version>
         </dependency>
         <dependency>
             <groupId>org.tiefaces</groupId>
@@ -825,9 +825,9 @@
               <version>1.0.5</version>
           </dependency>-->
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>5.5.1</version>
+            <groupId>com.ge.healthcare.apm</groupId>
+            <artifactId>hc-apm-common-utils</artifactId>
+            <version>1.0.0.RELEASE</version>
         </dependency>
         <!-- zip -->
         <dependency>
