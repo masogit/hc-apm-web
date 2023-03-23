@@ -1,0 +1,88 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            #keyAssetReportEditDlg .ui-datatable tbody tr.ui-state-highlight .ui-inputfield {
+                color: #000000 !important;
+                border-color: #bdbdbd !important;
+            }
+            #keyAssetReportEditDlg .ui-state-active, #keyAssetReportEditDlg .ui-state-highlight {
+                background-color: #e3f2fd !important;
+                color: #000000 !important;
+            }
+            #keyAssetReportEditDlg .ui-state-active .ui-icon, #keyAssetReportEditDlg .ui-state-highlight .ui-icon {
+                color: #757575 !important;
+            }
+            #keyAssetSelectDlg .ui-state-active, body .ui-state-highlight {
+                background-color: #5180ce !important;
+                color: #ffffff !important;
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.keyAssetDataInput}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="keyAssetReportListForm">
+                    <p:dataTable id="datalist" class="datalist" value="#{keyAssetReportController.lazyModel}" var="item" widgetVar="varDataList"
+                        selectionMode="single" selection="#{keyAssetReportController.selected}"
+                        lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                        sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                        paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                        currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                        rows="20" emptyMessage="#{msg.noRecordFound}"
+                        rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="rowSelect" update="editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{keyAssetReportController.onFilter}" />
+
+                        <p:column headerText="#{msg.formTitle}" filterBy="#{item.formTitle}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.formTitle}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.reportYear}" filterBy="#{item.reportYear}" filterMatchMode="EQ">
+                            <h:outputText value="#{item.reportYear}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.formFiller}" filterBy="#{item.formFiller}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.formFiller}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.formFillTime}" filterBy="#{item.formFillTime}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterFillTime" widgetVar="varFilterFillTime" value="#{keyAssetReportController.filterFillTime}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.formFillTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicaldepart}" filterBy="#{item.clinicalDept.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.clinicalDept.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.preview}" style="width: 80px">
+                            <h:outputLink id="viewReportButton" title="#{msg.preview}" target="_blank" value="#{keyAssetReportController.preview(item.id)}" onblur="reload()">
+                                <p:graphicImage name="icons/find.png" style="width: 30px; height: 25px;"/>
+                            </h:outputLink>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{keyAssetReportController.prepareCreate}" update=":keyAssetReportEditDlg" oncomplete="PF('keyAssetReportEditDialog').show()" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{keyAssetReportController.prepareEdit}" update=":keyAssetReportEditDlg" oncomplete="PF('keyAssetReportEditDialog').show()" disabled="#{empty keyAssetReportController.selected}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{keyAssetReportController.delete}" update="keyAssetReportListForm:datalist" disabled="#{empty keyAssetReportController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="dataInputEdit.xhtml"/>
+                <ui:include src="selectAsset.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>

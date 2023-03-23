@@ -324,6 +324,17 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Transient
     private String partApproveSignature;
 
+    @Transient
+    private String repairName;
+
+    public String getRepairName() {
+        return repairName;
+    }
+
+    public void setRepairName(String repairName) {
+        this.repairName = repairName;
+    }
+
     public Integer getIsCoreMemberApproval() {
         return isCoreMemberApproval;
     }

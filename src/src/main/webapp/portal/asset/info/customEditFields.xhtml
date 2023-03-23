@@ -983,4 +983,47 @@
                 value="#{assetInfoEditController.selected.assetQuantity}" readonly="#{!assetInfoEditController.needEdit('assetQuantity')}"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'productFamily')}">
+        <h:panelGroup>
+            <label class="label">#{msg.productFamily}</label>
+            <p:inputText id="productFamily" value="#{assetInfoEditController.selected.productFamily}"
+                 required="#{assetInfoEditController.customConfig.assetFields['productFamily'].required}"
+                 requiredMessage="#{msg.productFamily} #{msg.ValidationRequire}"
+                 readonly="#{!assetInfoEditController.needEdit('productFamily')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'productSegment')}">
+        <h:panelGroup>
+            <label class="label">#{msg.productSegment}</label>
+            <p:selectOneMenu id="productSegment" value="#{assetInfoEditController.selected.productSegment}"
+                         requiredMessage="#{msg.productSegment} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('productSegment')}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('productSegment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'mvsContractStartDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.mvsContractStartDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"
+                        id="mvsContractStartDate" pattern="#{userContextService.timeFormat()}"
+                        value="#{assetInfoEditController.selected.mvsContractStartDate}" showOn="button"
+                        required="#{assetInfoEditController.customConfig.assetFields['mvsContractStartDate'].required}"
+                        requiredMessage="#{msg.mvsContractStartDate} #{msg.ValidationRequire}"
+                        readonly="#{!assetInfoEditController.needEdit('mvsContractStartDate')}"
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'mvsContractEndDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.mvsContractEndDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"
+                        id="mvsContractEndDate" pattern="#{userContextService.timeFormat()}"
+                        value="#{assetInfoEditController.selected.mvsContractEndDate}" showOn="button"
+                        required="#{assetInfoEditController.customConfig.assetFields['mvsContractEndDate'].required}"
+                        requiredMessage="#{msg.mvsContractEndDate} #{msg.ValidationRequire}"
+                        readonly="#{!assetInfoEditController.needEdit('mvsContractEndDate')}"
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

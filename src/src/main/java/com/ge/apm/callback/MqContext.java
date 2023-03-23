@@ -21,4 +21,7 @@ public class MqContext implements Serializable {
     private String exChange;
     //消息内容
     private JSONObject jsonObject;
+
+    //语言格式  zh_CN en_US
+    private String locale;
 }

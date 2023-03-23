@@ -279,8 +279,6 @@ public class AssetHistoryService {
         assetHistoryInfo.setColumnName(fieldName);
         assetHistoryInfo.setOldColumnValue(objToString(fieldName, oldFieldValue));
         assetHistoryInfo.setNewColumnValue(objToString(fieldName, newFieldValue));
-        Locale locale = LocaleContextHolder.getLocale();
-        log.info("asset update label locale.getLanguage:{},local:{}",locale.getLanguage(),locale);
         assetHistoryInfo.setLabel(WebUtil.getMessage(fieldName));
 
         return Optional.of(assetHistoryInfo);
@@ -394,6 +392,8 @@ public class AssetHistoryService {
 //        jsonObject.put("assetInfo",selected);
         jsonObject.put("currentUserAccount",currentUserAccount);
         mqContext.setJsonObject(jsonObject);
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
         mqUtils.sendToMq(mqContext);
     }
 

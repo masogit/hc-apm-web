@@ -27,3 +27,7 @@ INSERT INTO public.config_item (uid, category, default_value, description, key, 
 UPDATE public.xxl_job_user SET username = 'admin', password = 'b8b69e5233c7fa64bd736c9a47db4ba0', role = 1, permission = null WHERE id = 1;
 INSERT INTO public.xxl_job_group (id, app_name, title, address_type, address_list) VALUES (2, 'my-application-task', 'task', 1, 'http://localhost:9999');
 
+-- APP推送 ↓
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'appTitle', 'Receive a ticket message', '您收到一条工单消息', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'appAlert', 'You have a to-do list, click to view details', '您有一个待办事项, 单击查看详情', NULL, '-1');
+-- APP推送 ↑
