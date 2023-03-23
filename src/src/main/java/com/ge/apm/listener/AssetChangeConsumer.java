@@ -48,10 +48,11 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 
     @Override
     public void onMessage(Message message, Channel channel ) throws Exception {
-        MqContext mqContext = JSONObject.parseObject(new String(message.getBody()), MqContext.class);
+        MqContext mqContext = null;
 
         try {
-            LOGGER.info("mq 监听的消息 message :{}",mqContext);
+            mqContext = JSONObject.parseObject(new String(message.getBody()), MqContext.class);
+            LOGGER.info("mq 监听的消息 message :{}",JSON.toJSONString(mqContext));
             JSONObject jsonObject = mqContext.getJsonObject();
             String assetInfoString = (String) jsonObject.get("assetInfo");
             Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -86,9 +87,9 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
                 AssetInfo assetInfo = g.fromJson(assetJson, AssetInfo.class);
                 UserAccountThreadLocal.setUserAccount(currentUserAccount);
                 Locale locale = LocaleContextHolder.getLocale();
-                LOGGER.info("asset update label locale.getLanguage:{},local:{}",locale.getLanguage(),locale);
+//                LOGGER.info("asset update label locale.getLanguage:{},local:{}",locale.getLanguage(),locale);
                 resultList = assetHistoryService.getAssetsHistoryModifiedFields(assetInfo, newAsset);
-                LOGGER.info("mq 数据比对 assetuid:{},  assetHistory:{}",newAsset.getUid(), JSON.toJSONString(resultList));
+//                LOGGER.info("mq 数据比对 assetuid:{},  assetHistory:{}",newAsset.getUid(), JSON.toJSONString(resultList));
 
                 UserAccountThreadLocal.remove();
             }
@@ -108,15 +109,24 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }catch (Exception e){
-            LOGGER.info("mq 消息 error message:{}, e :",mqContext,e);
-            channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
+            int retryCount = mqContext.getRetryCount();
+            if(retryCount>5){
+                LOGGER.info("AssetChangeConsumer mq 消费次数 retryCount:{},message:{} ,error:  ",retryCount,JSON.toJSONString(mqContext),e);
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                return;
+            }
+            retryCount=retryCount+1;
+            mqContext.setRetryCount(retryCount);
+            mqUtils.sendToMq(mqContext);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+//            channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
         }
 
     }
 
     private void saveAssetHistory(AssetHistory assetHistory) {
         AssetHistory assetHistoryResult = assetHistoryRepository.save(assetHistory);
-        LOGGER.info("asset update success save es send mq assetuid:{}",assetHistory.getAssetUid());
+//        LOGGER.info("asset update success save es send mq assetuid:{}",assetHistory.getAssetUid());
 
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
