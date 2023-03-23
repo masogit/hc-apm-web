@@ -18,7 +18,7 @@ public class ZkbPartOrderStep implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum PartOrderStep {
-        TechnicalPending,ProductPending,ManagePending,OrderExtraPending, TsePending,OsscPending,
+        TechnicalPending,ProductPending,ManagePending,OrderExtraPending, TsePending,OsscPending,OsscReturnPending,
         OrderPending,ReturnPending,ClosePending,Complete,DirectorPending,
         ProbeLetterSend,ProbeLetterCC,CommercialPending,Reviewer,FourHundredCancel
     }
