@@ -21,7 +21,6 @@ public class AssetChangeEsConsumer implements ChannelAwareMessageListener {
 
     @Autowired
     private ElasticService elasticService;
-
     @Autowired
     private MqUtils mqUtils;
 
@@ -30,14 +29,26 @@ public class AssetChangeEsConsumer implements ChannelAwareMessageListener {
         MqContext mqContext =null;
         try{
             mqContext = JSONObject.parseObject(new String(message.getBody()), MqContext.class);
-            LOGGER.info("AssetChangeEsConsumer mq 监听的消息 message :{}",JSON.toJSONString(mqContext));
+            LOGGER.info("AssetChangeEsConsumer mq 监听的消息 message :{}", JSON.toJSONString(mqContext));
             JSONObject jsonObject = mqContext.getJsonObject();
             String string = JSONObject.toJSONString(jsonObject.get("assetHistory"));
+
             AssetHistory assetHistory = JSONObject.parseObject(string, new TypeReference<AssetHistory>() {});
+
+
             Boolean aBoolean = elasticService.insertAssetHistory(assetHistory);
             if(!aBoolean){
-                channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
-                return;
+                int retryCount = mqContext.getRetryCount();
+                if(retryCount>5){
+                    LOGGER.info("AssetChangeEsConsumer mq 消费次数 retryCount:{},message:{}   ",retryCount, JSON.toJSONString(mqContext));
+                    channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                    return;
+                }
+                retryCount=retryCount+1;
+                mqContext.setRetryCount(retryCount);
+                mqUtils.sendToMq(mqContext);
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+
             }
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }catch (Exception e){
@@ -51,8 +62,6 @@ public class AssetChangeEsConsumer implements ChannelAwareMessageListener {
             mqContext.setRetryCount(retryCount);
             mqUtils.sendToMq(mqContext);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-
-
         }
 
     }
