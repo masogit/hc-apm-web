@@ -59,7 +59,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.selectAssetChoose}*</label>
-                        <p:commandButton id="selectAssetBtn" validateClient="true" value="#{msg.selectAssetChoose}" disabled="#{empty keyAssetReportController.selectedDept}"
+                        <p:commandButton id="selectAssetBtn" immediate="true" value="#{msg.selectAssetChoose}" disabled="#{empty keyAssetReportController.selectedDept}"
                             action="#{keyAssetReportController.resetSelectAssetPage}" update=":keyAssetSelectDlg" oncomplete="PF('keyAssetSelectDialog').show()"/>
                     </h:panelGroup>
                 </p:panelGrid>
