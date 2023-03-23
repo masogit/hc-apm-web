@@ -899,8 +899,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showUnOrder = true;
                 }
                 showOrder = true;
+                showOsscReturn = true;
                 if(canEditFlag){
-                    showOsscReturn = true;
+                    showClosed = true;
                     showBtn = "1";
                 }
             } else if(ZkbPartOrder.PartOrderStatus.Closed.toString().equals(selected.getStatus())){
@@ -1075,12 +1076,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String acceptNext(){
         if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(selected.getCurrentStep())){
-            if(ZkbPartOrder.OrderType.Parts.equals(selected.getOrderType())){
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
                 if(StrUtil.isEmpty(selected.getOsscPartNo())){
                     WebUtil.addErrorMessage("备件号不能为空！");
                     return "";
                 }
-            }else if(ZkbPartOrder.OrderType.Probe.equals(selected.getOrderType())){
+            }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                 if(StrUtil.isEmpty(selected.getOsscCatNo())){
                     WebUtil.addErrorMessage("探头号不能为空！");
                     return "";
@@ -1206,7 +1207,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     WebUtil.addErrorMessage("归还数量不能大于申请数量","");
                     return "";
                 }
-            }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+            } else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
                 if(StringUtils.isEmpty(c.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(c.getQuotaDeductType())) {
                     if(!selected.getNewCatFlag().equals(selected.getTenantNewCatFlag())){
                         if (CopyByInvok.T.equals(selected.getNewCatFlag())) {
@@ -1260,6 +1261,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                                 return "";
                             }
                         }
+                    }
+                }
+            } else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString())){
+                if(CopyByInvok.F.equals(selected.getTakeFlag())){
+                    if(StrUtil.isEmpty(selected.getUnTakedReason())){
+                        WebUtil.addErrorMessage("拒绝原因不能为空！","");
+                        return "";
                     }
                 }
             }
