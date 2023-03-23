@@ -236,7 +236,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(selected.getCurrentStep())){
                         if(StringUtils.isNotEmpty(selected.getCheckApplyNumFlag()) && CopyByInvok.F.equals(selected.getCheckApplyNumFlag())) {
                             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-                                if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                                //只有非高值探头的时候才会给销售总监进行提示，
+                                boolean f = true;
+                                if(StrUtil.isEmpty(selected.getProbeQuotaType()) && CopyByInvok.T.equals(selected.getHighCatFlag())){
+                                    f =false;
+                                }
+                                if(StrUtil.isNotEmpty(selected.getProbeQuotaType()) && ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
+                                    f =false;
+                                }
+                                if(f){
                                     boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
                                     if(r){
                                         WebUtil.addErrorMessage("代理商备件已完成归还，目前未超限，可直接批复。","");
@@ -258,7 +266,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             boolean f = false;
                             if(selected.getZkbPartOrderCat() != null && !ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
                                 f = true;
-                            }else if("t".equals(selected.getHighCatFlag())){
+                            }else if(CopyByInvok.F.equals(selected.getHighCatFlag())){
                                 f = true;
                             }
                             if(f){

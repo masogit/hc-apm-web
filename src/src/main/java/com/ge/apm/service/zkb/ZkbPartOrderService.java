@@ -1151,6 +1151,30 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(zkbPartOrder.getReturnType())) {
                     if(zkbPartOrder.getReturnQty() != 0){
                         subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getReturnQty(),userAccount);
+                    }else {
+                        if(StringUtils.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())) {
+                            if( CopyByInvok.T.equals(zkbPartOrder.getHighCatFlag()) && StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())){
+                                ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                                if(zkbContractCat != null){
+                                    zkbContractCat.setEnabled(true);
+                                    zkbContractCat.setLastModifiedDate(new Date());
+                                    zkbContractCat.setLastModifiedBy(userAccount.getName());
+                                    zkbContractCatRepository.save(zkbContractCat);
+                                }
+                            }
+                        }else {
+                            if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
+                                if(StringUtils.isNotEmpty(zkbPartOrder.getContractCatId())) {
+                                    ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                                    if (zkbContractCat != null) {
+                                        zkbContractCat.setEnabled(true);
+                                        zkbContractCat.setLastModifiedDate(new Date());
+                                        zkbContractCat.setLastModifiedBy(userAccount.getName());
+                                        zkbContractCatRepository.save(zkbContractCat);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
@@ -2252,7 +2276,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                                 zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                                 zkbContractCatQuotaHistoryService.deleteZkbFeHistory(zkbPartOrder.getId(),qty);
                             }
-                            if(qty >0){
+                            if(qty >= 0){
                                 zkbContractCat.setEnabled(true);
                             }else if(qty < 0){
                                 zkbContractCat.setEnabled(false);
@@ -2570,7 +2594,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
         int oldBackTotal = 0;
+        HashMap<String, String> m = new HashMap<String, String>();
         for(ZkbPartOrderReturn r : oldZkbPartOrderReturnList){
+            m.put(r.getId(),r.getId());
             ZkbPartOrderReturnHistory history = new ZkbPartOrderReturnHistory();
             history.setPartNo(r.getPartNo());
             history.setOrderNo(r.getOrderNo());
@@ -2612,11 +2638,39 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderReturnRepository.deleteByPartOrderId(zkbPartOrder.getId());
 
         //2.保存修改
-        for(ZkbPartOrderReturn zkbPartOrderReturn : zkbPartOrderReturnModifyList){
-            zkbPartOrderReturn.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.Accept.toString());
-            zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
+        if(StrUtil.isEmpty(zkbPartOrder.getNotGeAsset())){
+            for(ZkbPartOrderReturn zkbPartOrderReturn : zkbPartOrderReturnModifyList){
+                zkbPartOrderReturn.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.Accept.toString());
+                zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
+            }
+            zkbPartOrderReturnRepository.save(zkbPartOrderReturnModifyList);
+        }else{
+            for(ZkbPartOrderReturn zkbPartOrderReturn : zkbPartOrderReturnModifyList){
+                String oldId = zkbPartOrderReturn.getId();
+                zkbPartOrderReturn.setId(null);
+                zkbPartOrderReturn.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.Accept.toString());
+                zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
+                zkbPartOrderReturn = zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
+                if(StrUtil.isNotEmpty(oldId)){
+                    if(m.containsKey(oldId)){
+                        m.put(oldId, zkbPartOrderReturn.getId());
+                    }
+                }
+            }
+            for (String key : m.keySet()) {
+                if(key.equals(m.get(key))){
+                    continue;
+                }
+                List<V2_BlobObject> fl = blobObjectRepository.findByBoUuid(key);
+                if(fl != null && fl.size() > 0){
+                    for(V2_BlobObject v : fl){
+                        v.setBoUuid(m.get(key));
+                        blobObjectRepository.save(v);
+                    }
+                }
+            }
         }
-        zkbPartOrderReturnRepository.save(zkbPartOrderReturnModifyList);
+
         //3.名额修改
         if(ce != 0 ){
             //ZKB FE 当备件/探头/工具归还时需要选择是好还还是坏还，当代理商选择了好还关单后，GEAdmin发现归还的备件/探头/工具属于坏还并将信息由好还变为坏还
