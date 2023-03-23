@@ -375,7 +375,7 @@
     <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="450"   header="#{msg.NewMaintenance}">
         <h:form id="PmRequestCreateForm">
             <p:fieldset legend="#{msg.Create}#{msg.Maintenance}">
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="3" id="createPMPanelGrid" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup >
                         <label class="label">#{msg.assetName}*</label>
                         <p:inputText  id="assetName" readonly="true" value="#{v2PmOrderController.assetName}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
@@ -395,6 +395,7 @@
                         <label class="label">#{msg.MaintenanceLevel}*</label>
                         <p:selectOneMenu  value="#{v2PmOrderController.ruleLevel}" required="true" requiredMessage="#{msg.MaintenanceLevel}#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <p:ajax event="change" update="@this createPMPanelGrid"/>
                             <c:if test="#{v2PmOrderController.getPmRule()}">
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </c:if>
@@ -406,8 +407,16 @@
                     <h:panelGroup>
                         <label class="label">#{msg.MaintenanceType}*</label>
                         <p:selectOneMenu  onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.pmType}" required="true" requiredMessage="#{msg.MaintenanceType}#{msg.ValidationRequire}">
+                            <p:ajax event="change" update="@this createPMPanelGrid"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{fieldMsg.getFieldValueList('pmTypeWeb')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="pmRuleUid"  rendered="#{v2PmOrderController.getPmRuleList()}" >
+                        <label class="label">保养规则*</label>
+                        <p:selectOneMenu  value="#{v2PmOrderController.pmRuleUid}" required="true" requiredMessage="#{msg.pmRuleUid}#{msg.ValidationRequire}">
+                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{v2PmOrderController.getPmOrderRulesByAsset()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <c:if test="#{userContextService.countyArea}">
@@ -428,7 +437,7 @@
             </p:fieldset>
             <h:panelGroup >
                 <!-- <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.savePM()}" validateClient="true" update="pmTab:pmOrderListForm pmTab:PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>-->
-                <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.savePM()}" validateClient="true" update="pmTab:pmOrderListForm pmTab:PmRequestCreateForm :growl" style="float:left" oncomplete="handleToAddMaintain(xhr, status, args);"/>
+                <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.savePM()}"  validateClient="true" update="pmTab:pmOrderListForm pmTab:PmRequestCreateForm :growl" style="float:left" oncomplete="handleToAddMaintain(xhr, status, args);"/>
                 <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
             </h:panelGroup>
         </h:form>

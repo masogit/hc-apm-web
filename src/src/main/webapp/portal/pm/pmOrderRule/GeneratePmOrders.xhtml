@@ -137,20 +137,20 @@
 						   </h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
-                       <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="#{msg.Search}" update=":GeneratePmOrderForm:dataTable"/>
+                       <p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.addFilter()}" value="#{msg.Search}" update=":GeneratePmOrderForm:dataTable GeneratePmOrderForm:dataTable1"/>
 				   </p:panelGrid>
 				</p:fieldset>
 				<h:panelGroup id = "AssetsPickList"/>
-			<p:fieldset id="dataTable" legend="#{msg.totalAsset}#{generatePmOrdersController.total}#{msg.SeeMoreAsset}" >
+			<p:fieldset id="dataTable" legend="#{msg.totalAsset}#{generatePmOrdersController.total}#{msg.SeeMoreAsset}">
 				<p:dataTable id="dataScroller" var="item" value="#{generatePmOrdersController.assetInfoList}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}">
 					<p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
 					<p:column width="36"  id="checkBoxColumn">
 						<p:selectBooleanCheckbox value="#{generatePmOrdersController.selectedMap[item.uid]}"  class="selectCheckBox">
-							<p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+							<p:ajax process="@this" listener="#{generatePmOrdersController.prepareAssetRuleList()}" update="@this @(.batch-terminated) GeneratePmOrderForm:dataTable1" oncomplete="updateSelectAllCheckBox();"/>
 						</p:selectBooleanCheckbox>
 						<f:facet name="header"  >
 							<p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-								<p:ajax listener="#{generatePmOrdersController.onSelectAllOfPage}" update="@(.selectCheckBox) :GeneratePmOrderForm:dataScroller" oncomplete="updateSelectAllCheckBox();"/>
+								<p:ajax listener="#{generatePmOrdersController.onSelectAllOfPage}" update="@(.selectCheckBox) :GeneratePmOrderForm:dataScroller GeneratePmOrderForm:dataTable1" oncomplete="updateSelectAllCheckBox();"/>
 							</p:selectBooleanCheckbox>
 						</f:facet>
 					</p:column>
@@ -177,6 +177,45 @@
 				</p:dataTable>
 			</p:fieldset>
 
+			<p:fieldset id="dataTable1" legend="以下资产存在多个同等级保养规则,下拉可查看更多。总计: #{generatePmOrdersController.assetRuleModelTotal} 条" >
+				<p:dataTable id="datalist" value="#{generatePmOrdersController.notOnlyOneModels}" var="item" widgetVar="varDataListgl" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}"
+							 >
+					<p:column width="36"  id="checkBoxRulesColumn">
+						<f:facet name="header"  >
+							<p:selectBooleanCheckbox class="selectRulesCheckBoxHeader" value="#{generatePmOrdersController.isAllRuleSelected}" >
+								<p:ajax listener="#{generatePmOrdersController.onSelectRuleAllOfPage()}"  update="@this datalist " />
+							</p:selectBooleanCheckbox>
+						</f:facet>
+						<p:selectBooleanCheckbox value="#{generatePmOrdersController.selectedRuleMap[item.uniqueUid]}"  class="checkBoxRulesBox">
+							<p:ajax  listener="#{generatePmOrdersController.updateCheckBox()}" update="@this @(.selectRulesCheckBoxHeader)" />
+						</p:selectBooleanCheckbox>
+					</p:column>
+					<p:column headerText="#{msg.assetName}">
+						<h:outputText value="#{item.assetName}"/>
+					</p:column>
+					<p:column headerText="#{msg.ruleName}">
+						<h:outputText value="#{item.pmRuleName}"/>
+					</p:column>
+					<p:column headerText="#{msg.MaintenanceLevel}">
+						<h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour', item.level)}"/>
+					</p:column>
+					<p:column headerText="#{msg.MaintenancePeriod}">
+						<h:outputText value="#{item.period}"/>
+					</p:column>
+					<p:column headerText="#{msg.PlannedCompletionTime}">
+						<h:outputText value="#{item.planTime}">
+							<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="#{msg.MaintenanceType}">
+						<h:outputText value="#{fieldMsg.fieldValue('pmType', item.pmType)}"/>
+					</p:column>
+
+				</p:dataTable>
+<!--				<p:commandButton validateClient="true" actionListener="#{generatePmOrdersController.generatePmOrdersForMuliPMRule4()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" oncomplete="PF('pmCreateDialogBatch').hide()" />-->
+<!--				<p:commandButton id="close" value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{generatePmOrdersController.cancel()}" immediate="true" oncomplete="PF('pmCreateDialogBatch').hide()" />-->
+
+			</p:fieldset>
 			<!--<p:dataScroller id="dataScroller" value="#{generatePmOrdersController.assetInfoList}" var="item" chunkSize="10" mode="inline" scrollHeight="300" rows="#{generatePmOrdersController.total}">
 
 				<f:facet name="header">
@@ -233,11 +272,14 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.EstimatedCompletionTime}</label>
                                 <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generatePmOrdersController.planTime}"
-                                            showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
+											showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+									<p:ajax event="close" process="@this" listener="#{generatePmOrdersController.updatePMPlanTime()}" update="@this GeneratePmOrderForm:dataTable1"></p:ajax>
+								</p:calendar>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.WorkorderType} *</label>
                                 <p:selectOneMenu value="#{generatePmOrdersController.pmType}" >
+									<p:ajax listener="#{generatePmOrdersController.updatePMType()}" update="GeneratePmOrderForm:dataTable1"></p:ajax>
                                     <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
@@ -247,7 +289,7 @@
                     <br/> <br/>
 					<p:commandButton id ="hidden" value="hello" style="display:none"/>
 					<h:panelGroup>
-						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="#{msg.Generate}" icon="ui-icon-check" update=":growl" />
+						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="#{msg.Generate}" icon="ui-icon-check" update=":growl " />
 						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" onclick="javascript:goBack();" immediate="true" />
 					</h:panelGroup>
                     <p:panelGrid id ="PmOrderRule" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -256,6 +298,51 @@
         </h:form>
         </div>
       </div>
+
+
+<!--		<p:dialog class ="pmCreateDialogBatch" id="pmCreateDialogBatch" widgetVar="pmCreateDialogBatch" modal="true"  resizable="false" draggable="true" width="800" closable="false" appendTo="@this" header="#{msg.BatchCreate}">-->
+<!--			<p:dataTable id="datalist" value="#{generatePmOrders4Controller.notOnlyOneModels}" var="item" widgetVar="varDataListgl"-->
+<!--						 paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"-->
+<!--						 rowKey="#{item.uniqueUid}"-->
+<!--						 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"-->
+<!--						 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"-->
+<!--						 rows="20" emptyMessage="#{msg.noRecordFound}"-->
+<!--						 rowsPerPageTemplate="20,50,100,500">-->
+
+<!--				<p:column width="36"  id="checkBoxRulesColumn">-->
+<!--					<p:selectBooleanCheckbox value="#{generatePmOrders4Controller.selectedRuleMap[item.uniqueUid]}"  class="checkBoxRulesBox">-->
+<!--						<p:ajax process="@this" listener="#{generatePmOrders4Controller.updateCheckBox()}" update="@this @(.selectRulesCheckBoxHeader)" />-->
+<!--					</p:selectBooleanCheckbox>-->
+<!--					<f:facet name="header"  >-->
+<!--						<p:selectBooleanCheckbox id="selectRulesCheckBoxHeader" class="selectRulesCheckBoxHeader" value="#{generatePmOrders4Controller.isAllSelected}" >-->
+<!--							<p:ajax listener="#{generatePmOrders4Controller.onSelectRuleAllOfPage()}" process="@this" update="@this @(.checkBoxRulesBox) " />-->
+<!--						</p:selectBooleanCheckbox>-->
+<!--					</f:facet>-->
+<!--				</p:column>-->
+<!--				<p:column headerText="#{msg.assetName}">-->
+<!--					<h:outputText value="#{item.assetName}"/>-->
+<!--				</p:column>-->
+<!--				<p:column headerText="#{msg.pmRuleName}">-->
+<!--					<h:outputText value="#{item.pmRuleName}"/>-->
+<!--				</p:column>-->
+<!--				<p:column headerText="#{msg.level}">-->
+<!--					<h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour', item.level)}"/>-->
+<!--				</p:column>-->
+<!--				<p:column headerText="#{msg.period}">-->
+<!--					<h:outputText value="#{item.period}"/>-->
+<!--				</p:column>-->
+<!--				<p:column headerText="#{msg.planTime}">-->
+<!--					<h:outputText value="#{item.planTime}"/>-->
+<!--				</p:column>-->
+<!--				<p:column headerText="#{msg.pmType}">-->
+<!--					<h:outputText value="#{fieldMsg.fieldValue('pmType', item.pmType)}"/>-->
+<!--				</p:column>-->
+
+<!--			</p:dataTable>-->
+<!--			<p:commandButton validateClient="true" actionListener="#{generatePmOrders4Controller.generatePmOrdersForMuliPMRule4()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" oncomplete="PF('pmCreateDialogBatch').hide()" />-->
+<!--			<p:commandButton id="close" value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{generatePmOrders4Controller.cancel()}" immediate="true" oncomplete="PF('pmCreateDialogBatch').hide()" />-->
+<!--		</p:dialog>-->
+
 		<script type="text/javascript">
 			function updateSelectAllCheckBox() {
 				var checkboxlist = $(".selectCheckBox");
@@ -270,6 +357,21 @@
 					$(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
 				}
 			}
+
+			function updateSelectRuleAllCheckBox() {
+				var checkboxlist = $(".checkBoxRulesBox");
+				var selectAllstatus = true;
+				checkboxlist.each(function () {
+					selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked ;
+				});
+				$("#GeneratePmOrderForm\\:dataTable\\:dataScroller\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+				if (selectAllstatus) {
+					$(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+				} else {
+					$(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+				}
+			}
+
 
 			function goBack() {
 				window.history.back();

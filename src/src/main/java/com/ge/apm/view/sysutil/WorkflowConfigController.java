@@ -737,7 +737,10 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
             selected.setPeriodStart(new DateTime().withMillisOfDay(0).toDate());
             selected.setPeriodEnd(new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
         }
-
+        if (selected.getStartSendingTime() == null && selected.getEndSendingTime() == null) {
+            selected.setStartSendingTime(new DateTime().withHourOfDay(07).withMinuteOfHour(45).withSecondOfMinute(00).toDate());
+            selected.setEndSendingTime(new DateTime().withHourOfDay(23).withMinuteOfHour(00).withSecondOfMinute(00).toDate());
+        }
 /*		if(swapCenter.getString("periodStart") == null && swapCenter.getString("periodEnd") == null){
 			selected.setPeriodStart(new DateTime().withMillisOfDay(0).toDate());
 			selected.setPeriodEnd(new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
