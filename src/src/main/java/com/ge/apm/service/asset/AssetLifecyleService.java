@@ -12,6 +12,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class AssetLifecyleService {
@@ -53,5 +55,20 @@ public class AssetLifecyleService {
         assetLifecycle.setSiteUID(user.getSiteUID());
 
         assetLifecycleRepository.save(assetLifecycle);
+    }
+
+    public AssetLifecycle selectByAssetUidAndStatusOne(String assetUid, int status) {
+        AssetLifecycle assetLifecycle= assetLifecycleRepository.selectByAssetUidAndStatusOne(assetUid,status);
+        return assetLifecycle;
+    }
+
+    public List<AssetLifecycle> selectByUidsAndStatus(Set<String> assetUids, int status) {
+        List<AssetLifecycle> assetLifecycles= assetLifecycleRepository.selectByAssetUidsAndStatus(assetUids,status);
+        return assetLifecycles;
+    }
+
+    public List<AssetLifecycle> selectByAssetUidsAndStatusGroupAssetUid(Set<String> assetUids, int status) {
+        List<AssetLifecycle> assetLifecycles= assetLifecycleRepository.selectByAssetUidsAndStatusGroupAssetUid(assetUids,status);
+        return assetLifecycles;
     }
 }

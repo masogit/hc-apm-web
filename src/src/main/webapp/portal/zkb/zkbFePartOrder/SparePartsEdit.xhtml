@@ -288,7 +288,7 @@
                     <p:column headerText="#{msg.zkbFePartOrder_orderNoa}">
                         <p:inputText  disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.orderNo}"  />
                     </p:column>
-                    <p:column headerText="#{msg.zkbFePartOrder_assetPrice}" rendered="#{(!zkbFePartOrderDetailController.selected.notGeAsset eq 't') and (!zkbFePartOrderSparePartDetailController.configTypeMap.containsKey('Supplier'))}">
+                    <p:column headerText="#{msg.zkbFePartOrder_assetPrice}" rendered="#{(zkbFePartOrderDetailController.selected.notGeAsset != 't') and (!zkbFePartOrderSparePartDetailController.configTypeMap.containsKey('Supplier'))}">
                         <p:inputText  disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.price}"  />
                     </p:column>
                     <p:column headerText="#{msg.zkbFePartOrder_spareParts}">

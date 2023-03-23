@@ -329,18 +329,18 @@
                         <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
                         <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.orderNo}"  />
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{(!zkbFePartOrderProbeController.configTypeMap.containsKey('Supplier')) and (zkbFePartOrderDetailController.fourHundredStatus()) and (!zkbFePartOrderDetailController.selected.notGeAsset eq 't')}" >
+                    <h:panelGroup rendered="#{(!zkbFePartOrderProbeController.configTypeMap.containsKey('Supplier')) and (zkbFePartOrderDetailController.fourHundredStatus()) and (zkbFePartOrderDetailController.selected.notGeAsset != 't')}" >
                         <label class="label">#{msg.zkbFePartOrder_assetPrice}*</label>
                         <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.price}"   />
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{(zkbFePartOrderDetailController.fourHundredStatus()) and (!zkbFePartOrderDetailController.selected.notGeAsset eq 't')}">
+                    <h:panelGroup rendered="#{(zkbFePartOrderDetailController.fourHundredStatus()) and (zkbFePartOrderDetailController.selected.notGeAsset != 't')}">
                         <label class="label">#{msg.zkbFePartOrder_newProbe}*</label>
                         <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.secondNewCatFlag}"  >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()  and (!zkbFePartOrderDetailController.selected.notGeAsset eq 't')}">
+                    <h:panelGroup rendered="#{zkbFePartOrderDetailController.fourHundredStatus()  and (zkbFePartOrderDetailController.selected.notGeAsset != 't')}">
                         <c:choose>
                             <c:when test="#{zkbFePartOrderProbeController.selected.needLetterFlag eq 't' and 'f' eq zkbFePartOrderProbeController.selected.hasUploadLetter}">
                                 <label class="label" style="color: red!important;font-weight:100;font-size :xx-large ">#{msg.zkbFePartOrder_needProbeLetter}*</label>
@@ -404,7 +404,7 @@
                 </p:panel>
             </p:fieldset>
             <p:fieldset id="geAdminFieldset" legend="FE归还信息" rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingGEAdmin')}">
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{(!zkbFePartOrderProbeController.selected.notGeAsset eq 't')}">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{!(zkbFePartOrderProbeController.selected.notGeAsset eq't')}">
                     <h:panelGroup>
                         <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
                         <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.returnType}" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}"  >
