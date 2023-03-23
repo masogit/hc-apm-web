@@ -44,11 +44,11 @@
         </rabbit:bindings>
     </rabbit:topic-exchange>
 
-    <rabbit:topic-exchange  name="physicalDataDelChange" durable="true" auto-delete="false" auto-declare="true" id="physicalDataDel">
+    <rabbit:fanout-exchange name="physicalDataDelChange" durable="true" auto-delete="false" auto-declare="true" id="physicalDataDel">
         <rabbit:bindings>
-            <rabbit:binding queue="physicalDataDelQueue" pattern="physical.data.delete" ></rabbit:binding>
+            <rabbit:binding queue="physicalDataDelQueue"></rabbit:binding>
         </rabbit:bindings>
-    </rabbit:topic-exchange>
+    </rabbit:fanout-exchange>
 
     <rabbit:listener-container connection-factory="rabbitConnectionFactory" acknowledge="manual" message-converter="jackson2JsonMessageConverter" >
         <!-- 监听一个队列，当队列中有消息，就会自动触发类.方法，传递消息就作为方法的参数，根据方法声明的参数强转 -->
