@@ -30,7 +30,9 @@ import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.DbResourcesUtil;
 
+import javax.persistence.Column;
 import java.io.*;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -96,6 +98,8 @@ public class AssetHistoryService {
 //        List<AssetHistory> resultList = assetHistoryRepository.findByUidOrderByCreatedDateDescAtMostFive(assetUid);
         List<SearchFilter> searchFilters =new ArrayList<> ();
         searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ,assetUid));
+        List<String> assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
+        searchFilters.add(new SearchFilter("json_data", SearchFilter.Operator.CONTAINS,assetsImportantFieldsAll));
         Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), 0, 5);
         List<AssetHistory> resultList = assetHistoryPage.getContent();
         CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -303,8 +307,16 @@ public class AssetHistoryService {
     public List<AssetHistory.AssetHistoryInfo> getAssetsHistoryModifiedFields(AssetInfo oldAsset, AssetInfo newAsset) {
 
         List<AssetHistory.AssetHistoryInfo> resultList = new ArrayList<>();
+        Field[] declaredFields = newAsset.getClass().getDeclaredFields();
+        List<Field> fields1 = Arrays.asList(declaredFields);
+        List<Field> fields2 = fields1.stream().filter(item -> {
+            Column annotation = item.getAnnotation(Column.class);
+            return annotation!=null;
+        }).collect(Collectors.toList());
 
-        CustomConfigConstant.getAssetsImportantFieldsAll().stream().forEach(fieldName -> {
+        List<String> collect = fields2.stream().map(item -> item.getName()).collect(Collectors.toList());
+
+        collect.stream().forEach(fieldName -> {
 
             try {
                 Optional<AssetHistory.AssetHistoryInfo> optionalResult;
