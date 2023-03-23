@@ -481,7 +481,7 @@
                             <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
                             <label style="color: red">#{zkbPartOrderAuditController.valueTypeTips}</label>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe'}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and empty zkbPartOrderAuditController.selected.notGeAsset}">
                             <label class="label">是否全新探头</label>
                             <p:selectOneMenu id="tenantNewCatFlag" value="#{zkbPartOrderEditController.selected.tenantNewCatFlag}" disabled="true" >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -1152,7 +1152,7 @@
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.selected.takeFlag eq 't'}">
                             <h:panelGroup>
                                 <label class="label">归还类型*</label>
-                                <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.returnType}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}"  >
+                                <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.returnType}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}"  >
                                     <p:ajax event="change" update="unRepairReasonGroup" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItem itemLabel="已维修完成" itemValue="t"/>
@@ -1160,23 +1160,23 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup id="unRepairReasonGroup">
-                                <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.returnType eq 't'}">
-                                    <label class="label">拒绝原因*</label>
+                                <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.returnType eq 'f'}">
+                                    <label class="label">未维修完成原因*</label>
                                     <p:inputTextarea value="#{zkbPartOrderAuditController.selected.unRepairReason}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}">
                                     </p:inputTextarea>
                                 </h:panelGroup>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">归还运单号*</label>
-                                <p:inputText value="#{zkbPartOrderAuditController.selected.waybillNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                                <p:inputText value="#{zkbPartOrderAuditController.selected.waybillNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">归还日期*</label>
-                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}" Input="false" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">备注</label>
-                                <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.returnRemark}"  rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.returnRemark}"  rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}">
                                 </p:inputTextarea>
                             </h:panelGroup>
                         </p:panelGrid>
