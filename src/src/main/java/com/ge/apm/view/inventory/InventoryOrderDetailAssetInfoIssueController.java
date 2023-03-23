@@ -10,15 +10,14 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.InventoryOrderDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import com.ge.apm.dao.InventoryIssueRepository;
-import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryIssue;
-import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
@@ -38,25 +37,28 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 
 	private UserAccount currentUser;
 	private InventoryIssueRepository dao;
-	private InventoryOrderRepository inventoryOrderRepository;
+	private AssetInfoRepository assetInfoDao;
     private InventoryOrderService inventoryOrderService;
     private UserAccountRepository userAccountRepository;
+	private InventoryOrderDetailAssetInfoRepository inventoryOrderDetailDao;
     private UaaService uaaService;
 	private InventoryOrderService service;
 	private static final String ORG_NAME = "orgName";
 	private String orderId;
 	private List<String> listClinicalDeptName;
     private List<String> listAccessClinical;
+    private Boolean inventorized;
 
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryIssueRepository.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
-		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
+		assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
+		inventoryOrderDetailDao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
 		if (null == orderId){
@@ -147,4 +149,34 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		this.listClinicalDeptName = listClinicalDeptName;
 	}
 
+	@Override
+	public void save() {
+		AssetInfo assetInfo = selected.getAssetInfo();
+		dao.save(selected);
+		assetInfoDao.save(assetInfo);
+		if (Boolean.TRUE.equals(inventorized)) {
+			InventoryOrderDetail inventoryOrderDetail = new InventoryOrderDetail();
+			inventoryOrderDetail.setStatus(1);
+			inventoryOrderDetail.setTenantUID(selected.getTenantUID());
+			inventoryOrderDetail.setInstitutionUID(selected.getInstitutionUID());
+			inventoryOrderDetail.setHospitalUID(selected.getHospitalUID());
+			inventoryOrderDetail.setSiteUID(selected.getSiteUID());
+			inventoryOrderDetail.setInventoryOrderId(selected.getInventoryOrderId());
+			inventoryOrderDetail.setLastModifiedBy(selected.getLastModifiedBy());
+			inventoryOrderDetail.setLastModifiedDate(selected.getLastModifiedDate());
+			inventoryOrderDetail.setClinicalDeptUID(selected.getClinicalDept().getUid());
+			inventoryOrderDetail.setClinicalDeptName(selected.getClinicalDept().getName());
+			inventoryOrderDetail.setAssetInfo(assetInfo);
+			inventoryOrderDetailDao.save(inventoryOrderDetail);
+			dao.delete(selected);
+		}
+	}
+
+	public Boolean getInventorized() {
+		return inventorized;
+	}
+
+	public void setInventorized(Boolean inventorized) {
+		this.inventorized = inventorized;
+	}
 }
