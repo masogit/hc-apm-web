@@ -315,6 +315,14 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public static final int EXCEL_FE_PART_ORDER_IMPORT_MAX_ROW = 10000;
 
 
+
+    public boolean checkContracts(String tenantUID){
+        boolean argContractType = false;
+        List<ZkbContract> zkbContracts = zkbContractRepository.findByTenantUID(tenantUID);
+        argContractType = zkbContracts.stream().anyMatch(item -> "PCB MVS".equals(item.getContractType())||ZkbContract.ContractType.Biomed.toString().equals(item.getContractType()));
+        return argContractType;
+    }
+
     /**
      * @autor by lyj 503277717
      * @date 2022/1/7
