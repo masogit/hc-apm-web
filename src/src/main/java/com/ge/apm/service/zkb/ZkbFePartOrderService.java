@@ -319,13 +319,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public boolean checkContracts(String tenantUID){
         boolean argContractType = false;
         List<ZkbContract> zkbContracts = zkbContractRepository.findByTenantUID(tenantUID);
-        argContractType = zkbContracts.stream().anyMatch(item -> {
-            if("PCB MVS".equals(item.getContractType())||ZkbContract.ContractType.Biomed.equals(item.getContractType())){
-                return true;
-            }else{
-                return false;
-            }
-        });
+        argContractType = zkbContracts.stream().anyMatch(item -> "PCB MVS".equals(item.getContractType())||ZkbContract.ContractType.Biomed.toString().equals(item.getContractType()));
         return argContractType;
     }
 
