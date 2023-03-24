@@ -93,7 +93,7 @@
                                     <p:scrollPanel style="height: 300px; border: 0;" mode="native">
                                         <p:inputText id = "accessOrgSearch" value="#{userAccountController.retrieval}"/>
                                         <p:commandButton partialSubmit="true" icon="ui-icon-search" update="orgTree3" actionListener="#{userAccountController.getFilteredNodes}" value="检索"/>
-                                        <p:tree id="orgTree3" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true" propagateSelectionUp="false">
+                                        <p:tree id="orgTree3" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true" propagateSelectionUp="#{userAccountController.propagateSelectionUp}">
                                             <p:ajax event="select" listener="#{userAccountController.onSelectAccessTreeNode}" />
                                             <p:ajax event="unselect" listener="#{userAccountController.onUnselectAccessTreeNode}" />
 
