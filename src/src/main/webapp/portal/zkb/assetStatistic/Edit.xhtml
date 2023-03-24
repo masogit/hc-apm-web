@@ -58,10 +58,7 @@
                     <label class="label">无法贴码原因归类*</label>
                     <p:selectOneMenu  value="#{zkbAssetStatisticController.selected.reasonCategorize}" required="true" requiredMessage="无法贴码原因归类 #{msg.ValidationRequire}">
                         <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                        <f:selectItem itemLabel="已拆机或已报废" itemValue="scrapped"/>
-                        <f:selectItem itemLabel="与医院无保修，医院不允许贴码" itemValue="notAllowed"/>
-                        <f:selectItem itemLabel="设备找不到" itemValue="notFind"/>
-                        <f:selectItem itemLabel="其他" itemValue="other"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('reasonCategorize')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
                <!-- <h:panelGroup rendered="#{!(zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y')}">
