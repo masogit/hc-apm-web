@@ -1142,8 +1142,8 @@
                         </h:panelGroup>
                         <h:panelGroup id="unTakeReasonGroup">
                             <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.takeFlag eq 'f'}">
-                                <label class="label">拒绝原因*</label>
-                                <p:inputTextarea value="#{zkbPartOrderAuditController.selected.unTakedReason}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                <label class="label">未取货原因*</label>
+                                <p:inputTextarea value="#{zkbPartOrderAuditController.selected.unTakedReason}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="未取货原因 #{msg.ValidationRequire}">
                                 </p:inputTextarea>
                             </h:panelGroup>
                         </h:panelGroup>
@@ -1151,32 +1151,32 @@
                     <h:panelGroup id="takeGroup">
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.selected.takeFlag eq 't'}">
                             <h:panelGroup>
-                                <label class="label">归还类型*</label>
-                                <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.returnType}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}"  >
+                                <label class="label">是否完成维修*</label>
+                                <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.returnType}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="是否完成维修 #{msg.ValidationRequire}" >
                                     <p:ajax event="change" update="unRepairReasonGroup" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItem itemLabel="已维修完成" itemValue="t"/>
-                                    <f:selectItem itemLabel="未维修完成" itemValue="f"/>
+                                    <f:selectItem itemLabel="已完成" itemValue="t"/>
+                                    <f:selectItem itemLabel="未完成" itemValue="f"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup id="unRepairReasonGroup">
                                 <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.returnType eq 'f'}">
                                     <label class="label">未维修完成原因*</label>
-                                    <p:inputTextarea value="#{zkbPartOrderAuditController.selected.unRepairReason}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                    <p:inputTextarea value="#{zkbPartOrderAuditController.selected.unRepairReason}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="未维修完成原因 #{msg.ValidationRequire}" >
                                     </p:inputTextarea>
                                 </h:panelGroup>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">归还运单号*</label>
-                                <p:inputText value="#{zkbPartOrderAuditController.selected.waybillNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                                <p:inputText value="#{zkbPartOrderAuditController.selected.waybillNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="归还运单号 #{msg.ValidationRequire}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">归还日期*</label>
-                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}" Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                                <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="归还日期 #{msg.ValidationRequire}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">备注</label>
-                                <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.returnRemark}"  rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.returnRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscReturnPending' and zkbPartOrderAuditController.canEditFlag)}">
                                 </p:inputTextarea>
                             </h:panelGroup>
                         </p:panelGrid>
