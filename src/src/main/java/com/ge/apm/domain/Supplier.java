@@ -181,6 +181,12 @@ public class Supplier implements Serializable, ChineseName {
     @Temporal(TemporalType.TIMESTAMP)
     private Date registrationCertificateExpireDate;
 
+    //授权书到期时间
+    @Column(name = "power_of_attorney_expire_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date powerOfAttorneyExpireDate;
+
     //供应商状态
     private String status = "Enable";
 
@@ -524,6 +530,14 @@ public class Supplier implements Serializable, ChineseName {
 
     public void setRegistrationCertificateExpireDate(Date registrationCertificateExpireDate) {
         this.registrationCertificateExpireDate = registrationCertificateExpireDate;
+    }
+
+    public Date getPowerOfAttorneyExpireDate() {
+        return powerOfAttorneyExpireDate;
+    }
+
+    public void setPowerOfAttorneyExpireDate(Date powerOfAttorneyExpireDate) {
+        this.powerOfAttorneyExpireDate = powerOfAttorneyExpireDate;
     }
 
     public String getTaxpayerIdentityNumber() {

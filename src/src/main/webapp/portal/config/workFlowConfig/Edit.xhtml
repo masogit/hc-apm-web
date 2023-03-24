@@ -840,6 +840,18 @@
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class = "label">#{msg.PowerOfAttorneyExpireDays}</label>
+                            <p:inputNumber id="powerOfAttorneyExpireDays" value="#{workflowConfigController.selected.powerOfAttorneyExpireDays}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class = "label">#{msg.PowerOfAttorneyExpireTimes}</label>
+                            <p:inputNumber id="powerOfAttorneyExpireTimes" value="#{workflowConfigController.selected.powerOfAttorneyExpireTimes}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">是否启用主子设备信息</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableAssetPreview}">
                                 <p:ajax process="@this" />
