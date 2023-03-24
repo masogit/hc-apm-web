@@ -232,7 +232,6 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     }
 
     public void notGeAssetChange(ValueChangeEvent event){
-        event.getNewValue();
         this.queryStatus = MY_WORK;
         String url = "List.xhtml?faces-redirect=true&queryStatus=" + MY_WORK+"&notGeAssetBox=" + event.getNewValue()+"&queryTenantUID=" + queryTenantUID;
         RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -254,16 +253,14 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         }
         if (!(StringUtils.isNotBlank(this.loginName) && this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))) {
             searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ, ZkbFePartOrderService.testStatusFalseValue)));
-        } else if (true) {
+        } else{
             searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ, ZkbFePartOrderService.testStatusTrueValue)));
         }
         if (MY_WORK.equals(status)) {
             this.getSearchFilterByUserConfig(searchFilters);
         } else {
             this.getAllSearchFilterByUserConfig(searchFilters);
-            if (StringUtils.isNotBlank(status) ) {
-                searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ, status)));
-            }
+            searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ, status)));
         }
         List<ZkbFePartOrder> zkbFePartOrderList = zkbFePartOrderRepository.findBySearchFilter(searchFilters);
         return CollectionUtils.isNotEmpty(zkbFePartOrderList)?zkbFePartOrderList.size():0;
@@ -449,9 +446,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     }
 
     public String queryListByStatus(String status,String notGeAssetArg,String queryTenantUIDArg) {
-        notGeAsset = notGeAssetArg;
-        queryTenantUID = queryTenantUIDArg;
-        queryStatus = status;
+        notGeAsset = notGeAssetArg;queryTenantUID = queryTenantUIDArg;queryStatus = status;
         return "List.xhtml?faces-redirect=true&queryStatus=" + queryStatus+"&notGeAssetBox=" + notGeAsset+"&queryTenantUID=" + queryTenantUID;
     }
 
