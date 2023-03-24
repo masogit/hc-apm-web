@@ -181,7 +181,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             this.selected.setRemainQty(zkbContract.getProbeQuota());
                         }
                     }
-
+                    if(ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString().equals(selected.getCurrentStep())){
+                        selected.setTakeFlag(CopyByInvok.T);
+                    }else if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(selected.getCurrentStep())){
+                        selected.setRepairFlag(CopyByInvok.T);
+                    }
                 }
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
