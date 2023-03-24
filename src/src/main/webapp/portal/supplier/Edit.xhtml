@@ -54,6 +54,12 @@
                                 value="#{supplierController.selected.registrationCertificateExpireDate}" required="false"
                                 showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{supplierController.activeSupplierCertificateManage()}">
+                            <label class="label">#{msg.PowerOfAttorneyExpireDate}</label>
+                            <p:calendar timeZone="GMT+8" id="powerOfAttorneyExpireDate" pattern="yyyy/MM/dd"
+                                        value="#{supplierController.selected.powerOfAttorneyExpireDate}" required="false"
+                                        showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>

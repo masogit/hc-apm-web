@@ -533,6 +533,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if("t".equals(notGeAsset)){
             this.selected.setNotGeAsset("t");
         }
+        if("t".equals(notGeAsset)&&!zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
+            return "";
+        }
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         if (CollectionUtils.isEmpty(this.sparePartsZkbFePartOrderList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("工单不能为空！"));

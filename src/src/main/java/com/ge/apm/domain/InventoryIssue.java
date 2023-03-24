@@ -202,4 +202,20 @@ public class InventoryIssue implements Serializable {
     public Date getLastModifiedDate() { return lastModifiedDate; }
 
     public void setLastModifiedDate(Date lastModifiedDate) { this.lastModifiedDate = lastModifiedDate; }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof InventoryIssue)) {
+            return false;
+        }
+        InventoryIssue other = (InventoryIssue) object;
+        return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
+    }
 }
