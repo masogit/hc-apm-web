@@ -4808,7 +4808,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reasonCategorize', 'scrapped', '已拆机或已报废', 'scrapped', NULL, -1);
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reasonCategorize', 'notAllowed', '有三方保，医院不允许贴码', 'not allowed', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reasonCategorize', 'notAllowed', '与医院无保修，医院不允许贴码', 'not allowed', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reasonCategorize', 'notFind', '设备找不到', 'not find', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reasonCategorize', 'other', '其他', 'other', NULL, -1);
 
