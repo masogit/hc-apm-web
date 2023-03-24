@@ -103,4 +103,7 @@ public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract
 
     @Query(value = "select distinct c.tenant_uid from zkb_contract c where c.start_date = ?1 ", nativeQuery = true)
     List<String> queryByStartDate(Date d1);
+
+    @Query(value = "SELECT count(id)  from zkb_contract c where c.tenant_uid = ?1 and (c.contract_type = 'Biomed' or c.contract_type = 'PCB MVS')", nativeQuery = true)
+    Integer fetchContractCount(String tenantUid);
 }
