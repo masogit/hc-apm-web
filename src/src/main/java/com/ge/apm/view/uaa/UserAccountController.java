@@ -1143,6 +1143,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             retrieval=null;
 
         }else{
+            retrieval=null;
             accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
             //List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
             setSelectedOrgTree(accessOrgTree, orgList);
@@ -1326,6 +1327,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         accessOrgTree.getChildren().get(0).setSelectable(false);
         deleteDisabled = false;
     }
+
+    public void getFilteredNodes() {
+        uaaService.filterTreeNode(accessOrgTree, retrieval, -1, -1);
+    }
+
     //全选按钮 （只保存GE后台运维的uid）(页面上表格也只显示GE后台运维的iD)
     public void selectAll(){
         selectAllButton = true;//1.标为全选
