@@ -238,6 +238,36 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
+
+    public boolean checkAssignmentBox(){
+        boolean resultArg = true;
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())){
+            resultArg = zkbFePartOrderService.checkContracts(this.tenantUID);
+        }
+        return !resultArg;
+    }
+
+    public int statusCountFE(String status){
+        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+        if (StringUtils.isNotBlank(this.queryTenantUID)) {
+            searchFilters.add((new SearchFilter("tenantUid", SearchFilter.Operator.EQ, this.queryTenantUID)));
+        }
+        if (!(StringUtils.isNotBlank(this.loginName) && this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))) {
+            searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ, ZkbFePartOrderService.testStatusFalseValue)));
+        } else if (true) {
+            searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ, ZkbFePartOrderService.testStatusTrueValue)));
+        }
+        if (MY_WORK.equals(status)) {
+            this.getSearchFilterByUserConfig(searchFilters);
+        } else {
+            this.getAllSearchFilterByUserConfig(searchFilters);
+            if (StringUtils.isNotBlank(status) ) {
+                searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ, status)));
+            }
+        }
+        List<ZkbFePartOrder> zkbFePartOrderList = zkbFePartOrderRepository.findBySearchFilter(searchFilters);
+        return CollectionUtils.isNotEmpty(zkbFePartOrderList)?zkbFePartOrderList.size():0;
+    }
     /**
      * 列表加载
      *
