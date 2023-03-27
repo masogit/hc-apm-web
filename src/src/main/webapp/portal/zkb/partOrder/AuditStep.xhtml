@@ -618,7 +618,8 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
                             <label class="label">是否能维修*</label>
-                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.repairFlag}"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscPending')}" >
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.repairFlag}"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscPending')}" required="true" requiredMessage="是否能维修 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="reject accept" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="可以维修" itemValue="t"/>
                                 <f:selectItem itemLabel="不能维修" itemValue="f"/>
@@ -1228,8 +1229,8 @@
                 <p:commandButton validateClient="true" value="提交" action="#{zkbPartOrderAuditController.normalNext}" update=":growl" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.showBtn eq '1' and zkbPartOrderAuditController.canEditFlag and !(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}"/>
                 <p:commandButton immediate="false" process="@this" value="拒绝" update=":growl :zkbCancelReasonDlg" oncomplete="PF('zkbCancelReasonDlg').show()" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' or zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending' ) and zkbPartOrderAuditController.canEditFlag}"/>
                 <!--<p:commandButton immediate="false" process="@this" value="退回" action="#{zkbPartOrderAuditController.closedBack}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag}"/>-->
-                <p:commandButton validateClient="true" value="审批通过" action="#{zkbPartOrderAuditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.showBtn eq '0') and zkbPartOrderAuditController.canEditFlag}"/>
-                <p:commandButton validateClient="true" value="审批不通过" action="#{zkbPartOrderAuditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.showBtn eq '0' and zkbPartOrderAuditController.canEditFlag}"/>
+                <p:commandButton id="accept" validateClient="true" value="审批通过" action="#{zkbPartOrderAuditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.showBtn eq '0') and zkbPartOrderAuditController.canEditFlag}" disabled="#{zkbPartOrderAuditController.selected.repairFlag eq 'f'}"/>
+                <p:commandButton id="reject" validateClient="true" value="审批不通过" action="#{zkbPartOrderAuditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.showBtn eq '0' and zkbPartOrderAuditController.canEditFlag}" disabled="#{zkbPartOrderAuditController.selected.repairFlag eq 't'}"/>
                 <p:commandButton immediate="false"  process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderAuditController.backList}" />
 
             </h:form>
