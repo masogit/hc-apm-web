@@ -1151,7 +1151,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }
-            if(StrUtil.isEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(zkbContract.getAssetQuotaType()) && StrUtil.isNotEmpty(probeType)){
+            if(CopyByInvok.T.equals(zkbContract.getAssetQuotaType()) && StrUtil.isNotEmpty(probeType)){
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
                 boolean r = zkbPartOrderService.checkQuotaHistory("apply", zkbContract, selected,zkbContractAsset, probeType);
                 if(!r){
