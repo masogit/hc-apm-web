@@ -24,4 +24,6 @@ public class MqContext implements Serializable {
 
     //语言格式  zh_CN en_US
     private String locale;
+
+    private int retryCount;
 }

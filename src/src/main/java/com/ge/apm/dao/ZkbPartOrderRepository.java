@@ -26,6 +26,14 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT sum(qty) from zkb_part_order where contract_id in ?1", nativeQuery = true)
     Integer fetchQty(List<String> contractIdList);
 
+    @Query(value = "SELECT count(*) from zkb_part_order where current_step = ?1", nativeQuery = true)
+    Integer fetchQtyByStep(String currentStep);
+
+    @Query(value = "SELECT count(*) from zkb_part_order where current_step = ?1 and tenant_uid = ?2 and data_type is null", nativeQuery = true)
+    Integer fetchQtyByStep(String currentStep,String tenantUid);
+    @Query(value = "SELECT count(*) from zkb_part_order where current_step = ?1 and tenant_uid = ?2 and data_type = 'test.'", nativeQuery = true)
+    Integer fetchQtyByStepForTest(String currentStep,String tenantUid);
+
     @Query(value = "SELECT sum(qty) from zkb_part_order where contract_id = ?1", nativeQuery = true)
     Integer fetchQty(String contractId);
 
