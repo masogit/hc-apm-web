@@ -267,7 +267,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         String thisDeductionMessage = new String();
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if("SpareParts".equals(this.selected.getOrderType())){//备件
-            if(ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){//高端机不扣名额
+            /**
+             * 高端机不扣名额
+             * ccsb合同不扣名额
+             */
+            if(ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())
+                ||ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
                 confirmMessage += "本次申请不扣除名额！";
                 thisDeductionMessage = "本次申请不扣除名额！";
 
@@ -476,8 +481,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_sparePartListError"));
             return "";
         }
-        int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
+        //YHAAO-18235 //ge fe 申请流程关于CCSB 逻辑修改   ccsb 合同需要判断  1.人工额度大于0  3.申请备件不扣额度
+        if(ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())&&
+                (!(zkbContract.getGeArtificialSupportTimes()>0))){
+            WebUtil.addErrorMessage(WebUtil.getMessage("合同类型为CCSB时剩余人工额度需大于0，才能进行备件申请！"));
+            return "";
+        }
         /**
          * 需要兼容历史数据
          */
@@ -500,10 +511,9 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             ||"Biomed".equals(zkbContract.getContractType())){
             reaminApplyCount=zkbContract.getSpareQuota();
         }
-        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
-        {
-            if(reaminApplyCount==null||applyCount>reaminApplyCount)
-            {
+        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())
+                && !ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+            if(reaminApplyCount==null||applyCount>reaminApplyCount){
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
                 return "";
             }
@@ -517,11 +527,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             item.setFePartOrderId(this.selected.getId());
             this.zkbFePartOrderAssetInfoRepository.save(item);
         }
-        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
-        {
-            this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount,this.currentUser,this.selected,"备件申请");
-        }else{
-            updateContractAssetApplyNum(ZkbFePartOrder.workFlowStatus.Requested.toString(),zkbContract);
+        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
+            if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){
+                this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount,this.currentUser,this.selected,"备件申请");
+            }else{
+                updateContractAssetApplyNum(ZkbFePartOrder.workFlowStatus.Requested.toString(),zkbContract);
+            }
         }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
@@ -539,6 +550,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      * @return
      */
     public String supplierAccept(String comment){
+        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         Date date = new Date();
         this.selected.setComment(comment);
         this.selected.setTenantAssignUser(this.userName);
@@ -575,13 +587,15 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 }
             }
         }
-        if(adjustApplyCount<beforeAdjustQty&&!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))//高端机不扣名额
-        {
-            ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        /**
+         * 高端机不扣名额  CCSB 合同类型的不扣名额
+         */
+        if(adjustApplyCount<beforeAdjustQty
+                && !ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())
+                && !ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())){
             this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,beforeAdjustQty-adjustApplyCount,this.currentUser,this.selected,this.i18Map.get("TenantAccept"));
         }
         //GE FE合同到期后400下单前增加Commercial角色进行审批
-        ZkbContract zkbContract = zkbContractRepository.findById(this.selected.getContractId());
         String workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingApm.toString();
         String format = "yyyy-MM-dd";
         String dateStr = DateUtil.getFormatStrByDate(this.selected.getReportDate(), format);
@@ -612,13 +626,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     {
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
-        int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
-        {
-            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("TenantReject"));
-        }else{
-            updateContractAssetApplyNum(ZkbFePartOrder.workFlowStatus.TenantReject.toString(),zkbContract);
+        int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
+        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())) {
+            if (!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {
+                this.zkbFePartOrderService.moveSpareQuota(4, zkbContract, applyCount, this.currentUser, this.selected, this.i18Map.get("TenantReject"));
+            } else {
+                updateContractAssetApplyNum(ZkbFePartOrder.workFlowStatus.TenantReject.toString(), zkbContract);
+            }
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),new Date(),new Date(),GatewayURL.FE_PART_ORDER_SEND_EMAIL,this.notGeAssetBox);
@@ -647,13 +662,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         Date date = new Date();
         this.selected.setCommercialAssignUser(this.userName);
         this.selected.setCommercialAssignDate(date);
-        int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
-        {
-            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("CommercialReject"));
-        }else{
-            updateContractAssetApplyNum(ZkbFePartOrder.workFlowStatus.CommercialReject.toString(),zkbContract);
+        int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
+        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())) {
+            if (!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {
+                this.zkbFePartOrderService.moveSpareQuota(4, zkbContract, applyCount, this.currentUser, this.selected, this.i18Map.get("CommercialReject"));
+            } else {
+                updateContractAssetApplyNum(ZkbFePartOrder.workFlowStatus.CommercialReject.toString(), zkbContract);
+            }
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.CommercialReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL,this.notGeAssetBox);
@@ -688,9 +704,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         this.selected.setFullApmInfoUser(this.userName);
         this.selected.setFullApmInfoDate(new Date());
-        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))//非高端机
-        {
-            ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        /**
+         * 非高端机
+         * CCSB不扣名额
+         */
+        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())
+                && !ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())) {
             int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
             this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("FourHundredsAccept"));
         }
@@ -711,11 +731,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         this.selected.setFullApmInfoUser(this.userName);
         this.selected.setFullApmInfoDate(new Date());
-        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){//非高端机扣名额  高端机不扣名额
-            int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
-            this.zkbFePartOrderService.moveSpareQuota(6,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("FourHundredsReject"));
-        }else{
-            updateContractAssetApplyNum(ZkbFePartOrder.workFlowStatus.TenantReject.toString(),zkbContract);
+        if(!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType())) {
+            if (!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {//非高端机扣名额  高端机不扣名额
+                int applyCount = this.qty(this.selected.getZkbFePartOrderAssetInfoList());
+                this.zkbFePartOrderService.moveSpareQuota(6, zkbContract, applyCount, this.currentUser, this.selected, this.i18Map.get("FourHundredsReject"));
+            } else {
+                updateContractAssetApplyNum(ZkbFePartOrder.workFlowStatus.TenantReject.toString(), zkbContract);
+            }
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),new Date(),null,GatewayURL.FE_PART_ORDER_SEND_WECHART,this.notGeAssetBox);
@@ -764,7 +786,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
-        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())&&returnCount>0)
+        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())&&returnCount>0
+                &&!ZkbContract.ContractType.CCSB.toString().equals(zkbContract.getContractType()))
         {
             String statusType = "GEAdminAcceptPart";
             if(returnComplete)
