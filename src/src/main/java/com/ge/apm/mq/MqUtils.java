@@ -1,11 +1,18 @@
 package com.ge.apm.mq;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.callback.DataDelVO;
 import com.ge.apm.callback.MqContext;
+import com.ge.apm.config.MQConfig;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 
 @Component
@@ -28,4 +35,38 @@ public class MqUtils {
         }
 
     }
+
+
+    /**
+     * 物理数据删除发送接口哦
+     * @param object  数据对象
+     * @param objectType  对象信息 表类型
+     * @param userAccount  操作用户
+     */
+    public void sendPhysicalDataDel(Object object, String objectType, UserAccount userAccount) {
+        MqContext mqContex=new MqContext();
+        mqContex.setTime(new Date());
+        mqContex.setExChange(MQConfig.PHYSICAL_DATA_DEL_CHANGE);
+        mqContex.setRoutingKey("");
+        mqContex.setType(MQConfig.PHYSICALDATADELETE);
+        DataDelVO dataDelVO = new DataDelVO();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("jsonData",dataDelVO);
+        mqContex.setJsonObject(jsonObject);
+        if(userAccount==null){
+            userAccount = UserContextService.getCurrentUserAccount();
+        }
+        dataDelVO.setOperator(userAccount.getLoginName());
+        dataDelVO.setDate(new Date());
+        dataDelVO.setObjectType(objectType);
+        dataDelVO.setObjectValue(JSONObject.toJSONString(object));
+        dataDelVO.setHospitalUID(userAccount.getHospitalUID());
+        dataDelVO.setInstitutionUID(userAccount.getInstitutionUID());
+        dataDelVO.setSiteUID(userAccount.getSiteUID());
+        dataDelVO.setTenantUID(userAccount.getTenantUID());
+        sendToMq(mqContex);
+    }
+
+
+
 }
