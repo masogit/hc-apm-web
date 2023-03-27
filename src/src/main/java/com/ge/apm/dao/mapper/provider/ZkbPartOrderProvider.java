@@ -164,11 +164,11 @@ public class ZkbPartOrderProvider {
         }
         String orderType = param.get("orderType") == null ? "" : (String)param.get("orderType");
         if(StrUtil.isNotEmpty(orderType)){
-            sql.append(" and orderType = '" + orderType + "'");
+            sql.append(" and order_Type = '" + orderType + "'");
         }
         String orderTypeNe = param.get("orderTypeNe") == null ? "" : (String)param.get("orderTypeNe");
         if(StrUtil.isNotEmpty(orderTypeNe)){
-            sql.append(" and orderType != '" + orderTypeNe + "'");
+            sql.append(" and order_Type != '" + orderTypeNe + "'");
         }
         String status = param.get("status") == null ? "" : (String)param.get("status");
         if(StrUtil.isNotEmpty(status)){
