@@ -142,26 +142,9 @@ public class ContractInfoService {
     }
 
     private void sendMq(Object object,String objectType) {
-        MqContext mqContex=new MqContext();
-        mqContex.setTime(new Date());
-        mqContex.setExChange(MQConfig.PHYSICAL_DATA_DEL_CHANGE);
-        mqContex.setRoutingKey("");
-        mqContex.setType("physicalDataDelete");
-        DataDelVO dataDelVO = new DataDelVO();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("jsonData",dataDelVO);
-        mqContex.setJsonObject(jsonObject);
-        UserAccount userAccount = UserContextService.getCurrentUserAccount();
-        dataDelVO.setOperator(userAccount.getLoginName());
-        dataDelVO.setDate(new Date());
-        dataDelVO.setObjectType(objectType);
-        dataDelVO.setObjectValue(JSONObject.toJSONString(object));
-        dataDelVO.setHospitalUID(userAccount.getHospitalUID());
-        dataDelVO.setInstitutionUID(userAccount.getInstitutionUID());
-        dataDelVO.setSiteUID(userAccount.getSiteUID());
-        dataDelVO.setTenantUID(userAccount.getTenantUID());
         try {
-            mqUtils.sendToMq(mqContex);
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            mqUtils.sendPhysicalDataDel(object,objectType,userAccount);
         }catch (Exception e){
             log.error("contract delete send mq error");
         }
