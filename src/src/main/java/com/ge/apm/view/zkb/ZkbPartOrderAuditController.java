@@ -809,7 +809,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     if(StrUtil.isEmpty(selected.getNotGeAsset())){
                         showReturn = true;
                     }else{
-                        showOsscReturn = true;
+                        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                            showOsscReturn = true;
+                        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                            showReturn = true;
+                        }
                     }
                     showBtn = "1";
                 }
@@ -1088,17 +1092,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-                if(StrUtil.isEmpty(selected.getOsscCatNo())){
+               /* if(StrUtil.isEmpty(selected.getOsscCatNo())){
                     WebUtil.addErrorMessage("探头号不能为空！");
                     return "";
-                }
+                }*/
                 if(StrUtil.isEmpty(selected.getRepairFlag())){
                     WebUtil.addErrorMessage("是否能维修不能为空！");
                     return "";
                 }else {
                     if(CopyByInvok.T.equals(selected.getRepairFlag())){
-                        if(StrUtil.isEmpty(selected.getOsscPartNo())){
-                            WebUtil.addErrorMessage("备件号不能为空！");
+                        if(StrUtil.isEmpty(selected.getOsscCatNo())){
+                            WebUtil.addErrorMessage("探头号不能为空！");
                             return "";
                         }
                     }
