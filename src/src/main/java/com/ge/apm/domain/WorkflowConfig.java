@@ -904,6 +904,12 @@ public class WorkflowConfig implements Serializable {
     //注册证到期提醒提前次数
     @Column(name = "registration_certificate_expire_times")
     private Integer registrationCertificateExpireTimes;
+    //授权书到期提醒提前天数
+    @Column(name = "power_of_attorney_expire_days")
+    private Integer powerOfAttorneyExpireDays;
+    //授权书到期提醒提前次数
+    @Column(name = "power_of_attorney_expire_times")
+    private Integer powerOfAttorneyExpireTimes;
 
     public Boolean getMeasurementRepair() {
         return measurementRepair;
@@ -967,6 +973,22 @@ public class WorkflowConfig implements Serializable {
 
     public void setRegistrationCertificateExpireTimes(Integer registrationCertificateExpireTimes) {
         this.registrationCertificateExpireTimes = registrationCertificateExpireTimes;
+    }
+
+    public Integer getPowerOfAttorneyExpireDays() {
+        return powerOfAttorneyExpireDays;
+    }
+
+    public void setPowerOfAttorneyExpireDays(Integer powerOfAttorneyExpireDays) {
+        this.powerOfAttorneyExpireDays = powerOfAttorneyExpireDays;
+    }
+
+    public Integer getPowerOfAttorneyExpireTimes() {
+        return powerOfAttorneyExpireTimes;
+    }
+
+    public void setPowerOfAttorneyExpireTimes(Integer powerOfAttorneyExpireTimes) {
+        this.powerOfAttorneyExpireTimes = powerOfAttorneyExpireTimes;
     }
 
     public Integer getShareAutoConfirm() {

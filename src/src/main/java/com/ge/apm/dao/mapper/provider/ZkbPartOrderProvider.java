@@ -1,9 +1,13 @@
 package com.ge.apm.dao.mapper.provider;
 
+import com.ge.apm.domain.PurchaseInfo;
 import com.ge.apm.domain.ZkbPartOrder;
+import com.ge.apm.service.zkb.CopyByInvok;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.lang.StringUtils;
 import webapp.framework.dao.SearchFilter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -127,6 +131,65 @@ public class ZkbPartOrderProvider {
         if("f".equals(testLogin))
             sql.append(" and data_type is null ");
         sql.append(" order by request_date desc");
+        return sql.toString();
+    }
+
+    public String queryPendCountByUserConfig(Map<String,Object> param){
+        //Map<String,Object> param = (Map<String,Object>)params.get("params");
+        String tenantUid = param.get("tenantUid") == null ? "" : (String)param.get("tenantUid");
+        String testLogin = param.get("testLogin") == null ? "" : (String)param.get("testLogin");
+        StringBuilder sql = new StringBuilder();
+        sql.append("select count(*) from zkb_part_order where 1=1 ");
+        if(StringUtils.isNotBlank(tenantUid)) {
+            sql.append(" and tenant_uid = '" + tenantUid + "' ");
+        }
+        if(CopyByInvok.T.equals(testLogin)){
+            sql.append(" and data_type = 'test.'" );
+        }else{
+            sql.append(" and data_type is null ");
+        }
+        String currentStep = param.get("currentStep") == null ? "" : (String)param.get("currentStep");
+
+        String onlineEngineer = param.get("onlineEngineer") == null ? "" : (String)param.get("onlineEngineer");
+        if(StrUtil.isNotEmpty(onlineEngineer)){
+            sql.append(" and online_engineer = '" + onlineEngineer + "'");
+        }
+        String assetTypeDi = param.get("assetTypeDi") == null ? "" : (String)param.get("assetTypeDi");
+        if(StrUtil.isNotEmpty(assetTypeDi)){
+            sql.append(" and asset_type_di = '" + assetTypeDi + "'");
+        }
+        String region = param.get("region") == null ? "" : (String)param.get("region");
+        if(StrUtil.isNotEmpty(region)){
+            sql.append(" and region = '" + region + "'");
+        }
+        String orderType = param.get("orderType") == null ? "" : (String)param.get("orderType");
+        if(StrUtil.isNotEmpty(orderType)){
+            sql.append(" and order_Type = '" + orderType + "'");
+        }
+        String orderTypeNe = param.get("orderTypeNe") == null ? "" : (String)param.get("orderTypeNe");
+        if(StrUtil.isNotEmpty(orderTypeNe)){
+            sql.append(" and order_Type != '" + orderTypeNe + "'");
+        }
+        String status = param.get("status") == null ? "" : (String)param.get("status");
+        if(StrUtil.isNotEmpty(status)){
+            sql.append(" and (status = '" + status + "' or current_step = '" + currentStep + "')");
+        }else{
+            if(StrUtil.isNotEmpty(currentStep)){
+                sql.append(" and current_step = '" + currentStep + "'");
+            }
+        }
+        List<String> currentSteps = param.get("currentSteps") == null ? new ArrayList<>() : (List<String>)param.get("currentSteps");
+        if(currentSteps != null && currentSteps.size() > 0){
+            sql.append(" and ( 1=1 ");
+            for(String c : currentSteps){
+                sql.append(" and current_step = '"+ c + "'");
+            }
+            sql.append(") ");
+        }
+        String ordersRole = param.get("ordersRole") == null ? "" : (String)param.get("ordersRole");
+        if(StrUtil.isNotEmpty(ordersRole)){
+            sql.append(" and (current_step = 'OrderExtraPending' or (current_step = 'OrderPending' and order_type = 'Probe')) ");
+        }
         return sql.toString();
     }
 }

@@ -45,6 +45,9 @@
                                     <p:column headerText="二维码" >
                                         <h:outputText value="#{item.qrCode}"/>
                                     </p:column>
+                                    <p:column headerText="主机序列号" rendered="#{zkbFePartOrderDetailController.selected.notGeAsset eq 't'}" >
+                                        <h:outputText value="#{item.departNum}"/>
+                                    </p:column>
                                     <p:column headerText="医院名称">
                                         <h:outputText value="#{item.clinicalDeptName}"/>
                                     </p:column>
@@ -59,7 +62,7 @@
                                     <p:inputText maxlength="20" disabled="#{!zkbFePartOrderDetailController.hasEditRight('Requested')}" id="systemId" value="#{zkbFePartOrderDetailController.selected.systemId}" required="true"  requiredMessage="#{msg.zkbFePartOrder_systemId} #{msg.ValidationRequire}" />
                                     <p:commandButton disabled="#{!zkbFePartOrderDetailController.hasEditRight('Requested')}" id="systemIdButton" actionListener="#{zkbFePartOrderDetailController.fullInfoBySystemId(param['zkbFePartOrderEditForm:systemId'])}" update=":zkbFePartOrderEditForm"  process="@this" value="#{msg.Search}"   />
                                 </h:panelGroup>-->
-                                <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.currentStep.equals('Requested')}">
+                                <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('Requested')}">
                                     <label  class="label">#{msg.zkbFePartOrder_orderNo}</label>
                                     <p:inputText id="orderNo" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.partOrderNo}" />
                                 </h:panelGroup>
@@ -75,6 +78,10 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.zkbFePartOrder_hospitalName}</label>
                                     <p:inputText id="hospitalName" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.hospitalName}"  />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.notGeAsset eq 't'}" >
+                                    <label class="label">设备品牌</label>
+                                    <p:inputText id="manufacture" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.manufacture}"  />
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.zkbFePartOrder_hospitalClientName}*</label>

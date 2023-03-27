@@ -13,9 +13,18 @@
         <div  class="ui-g-12 card">
             <h:form id="zkbFeHeadForm">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup>
+                    <h:panelGroup >
+                        <label class="label">GE设备或者非GE设备*</label>
+                        <p:selectOneMenu  id="notGeAsset" valueChangeListener="#{zkbFePartOrderDetailController.notGeAssetChangeEditPage}" disabled="#{!zkbFePartOrderDetailController.selected.currentStep.equals('Requested')}" value="#{zkbFePartOrderDetailController.selected.notGeAsset}" requiredMessage="GE设备或者非GE设备 #{msg.ValidationRequire}">
+                            <p:ajax event="change" oncomplete="openViewWindow(xhr, status, args)" update="orderType zkbFeHeadForm :zkbFePartOrderEditForm :zkbFePartOrderSparePartsEditpanelGroup :zkbFePartOrderProbeEditPanelGroup" />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItem itemLabel="GE" itemValue="f"/>
+                            <f:selectItem itemLabel="非GE" itemValue="t"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup >
                         <label class="label">#{msg.zkbFePartOrder_orderTypeName}*</label>
-                        <p:selectOneMenu id="orderType"  disabled="#{!zkbFePartOrderDetailController.selected.currentStep.equals('Requested')}" value="#{zkbFePartOrderDetailController.selected.orderType}">
+                        <p:selectOneMenu id="orderType"  disabled="#{!zkbFePartOrderDetailController.selected.currentStep.equals('Requested')}"  value="#{zkbFePartOrderDetailController.selected.orderType}">
                             <p:ajax event="change"  update="zkbFeHeadForm :zkbFePartOrderEditForm :zkbFePartOrderSparePartsEditpanelGroup :zkbFePartOrderProbeEditPanelGroup" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_orderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -41,5 +50,11 @@
             <ui:include src="partOrderModify.xhtml"/>
             <ui:include src="partOrderReturnModify.xhtml"/>
         </div>
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
     </ui:define>
 </ui:composition>
