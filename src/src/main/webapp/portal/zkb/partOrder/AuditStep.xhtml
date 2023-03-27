@@ -626,7 +626,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
                             <label class="label">探头号*</label>
-                            <p:inputText value="#{zkbPartOrderAuditController.selected.osscCatNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscPending')}"  />
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.osscPartNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OsscPending')}"  />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}">
                             <label class="label">备件号*</label>

@@ -677,9 +677,6 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "not_ge_asset")
     private String notGeAsset;
 
-    @Column(name = "ossc_cat_no")
-    private String osscCatNo;
-
     @Column(name = "repair_flag")
     private String repairFlag;
 
@@ -714,14 +711,6 @@ public class ZkbPartOrder implements Serializable {
 
     public void setUnRepairReason(String unRepairReason) {
         this.unRepairReason = unRepairReason;
-    }
-
-    public String getOsscCatNo() {
-        return osscCatNo;
-    }
-
-    public void setOsscCatNo(String osscCatNo) {
-        this.osscCatNo = osscCatNo;
     }
 
     public String getRepairFlag() {

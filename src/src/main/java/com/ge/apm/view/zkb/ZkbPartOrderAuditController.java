@@ -1101,7 +1101,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }else {
                     if(CopyByInvok.T.equals(selected.getRepairFlag())){
-                        if(StrUtil.isEmpty(selected.getOsscCatNo())){
+                        if(StrUtil.isEmpty(selected.getOsscPartNo())){
                             WebUtil.addErrorMessage("探头号不能为空！");
                             return "";
                         }
