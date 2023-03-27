@@ -940,14 +940,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showOrder = true;
                 if(StrUtil.isEmpty(selected.getNotGeAsset())){
                     showReturn = true;
+                    showClosed = true;
                 }else {
                     if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                         showOsscReturn = true;
                     }else if (ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
                         showReturn = true;
+                        showClosed = true;
                     }
                 }
-                showClosed = true;
+
                 showBtn = "";
             }
         }
