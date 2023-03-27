@@ -863,7 +863,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 && StringUtils.isNotEmpty(assetUid)
                 && ruleLevel != null
                 && ruleLevel == 4
-                && pmType != null
+//                && pmType != null
                 && getPmOrderRulesByAsset() != null
                 ;
     }
@@ -3012,7 +3012,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public List<PmOrderRule> getPmOrderRulesByAsset(){
         if(assetUid != null) {
             RelRuleAsset relRuleAsset = relRuleAssetRepository.findByAssetUid(assetUid);
-            if(relRuleAsset != null) {
+            if(relRuleAsset != null && ruleLevel != null) {
                 String ruleUID = "";
                 switch (ruleLevel) {
                     case 1:
@@ -3063,6 +3063,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         } catch (Exception e) {
             logger.info("暂无MVS列表");
+        }
+    }
+
+    public String pmRulesListVisable(){
+        if(getPmRuleList()){
+            return "visibility:visible";
+        }else {
+            return "visibility:hidden";
         }
     }
 
