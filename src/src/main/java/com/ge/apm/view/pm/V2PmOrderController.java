@@ -2502,6 +2502,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedPmOrder = null;assetName = null;endTime = null;
         ruleLevel = null;dptName = null;picList = null;
         planTimeForBatch = null;comments = null;assetUid = null;
+        approvaler = null;
         resetSignature();
     }
 
