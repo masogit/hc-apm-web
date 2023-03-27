@@ -1422,7 +1422,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
             zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
         }
-        if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(zkbPartOrder.getCurrentStep())){
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) &&
+            (ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString().equals(zkbPartOrder.getCurrentStep()))){
             zkbPartOrderService.sendEmail(zkbPartOrder, CopyByInvok.EMAIL_URL_TYPE_UNORDER,UserContextService.getAccessToken());
         }
         return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
