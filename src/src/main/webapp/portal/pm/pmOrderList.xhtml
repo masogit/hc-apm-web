@@ -393,9 +393,9 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.MaintenanceLevel}*</label>
-                        <p:selectOneMenu  value="#{v2PmOrderController.ruleLevel}" required="true" requiredMessage="#{msg.MaintenanceLevel}#{msg.ValidationRequire}">
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()"  value="#{v2PmOrderController.ruleLevel}" required="true" requiredMessage="#{msg.MaintenanceLevel}#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <p:ajax event="change" update="@this createPMPanelGrid"/>
+                            <p:ajax event="change" update="@this pmTab:PmRequestCreateForm:pmRuleUid" />
                             <c:if test="#{v2PmOrderController.getPmRule()}">
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </c:if>
@@ -407,14 +407,14 @@
                     <h:panelGroup>
                         <label class="label">#{msg.MaintenanceType}*</label>
                         <p:selectOneMenu  onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.pmType}" required="true" requiredMessage="#{msg.MaintenanceType}#{msg.ValidationRequire}">
-                            <p:ajax event="change" update="@this createPMPanelGrid"/>
+                            <p:ajax event="change" update="@this pmTab:PmRequestCreateForm:pmRuleUid"/>
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{fieldMsg.getFieldValueList('pmTypeWeb')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup id="pmRuleUid"  rendered="#{v2PmOrderController.getPmRuleList()}" >
+                    <h:panelGroup id="pmRuleUid"   style="#{v2PmOrderController.pmRulesListVisable()}" >
                         <label class="label">保养规则*</label>
-                        <p:selectOneMenu  value="#{v2PmOrderController.pmRuleUid}" required="true" requiredMessage="#{msg.pmRuleUid}#{msg.ValidationRequire}">
+                        <p:selectOneMenu  value="#{v2PmOrderController.pmRuleUid}" required="#{v2PmOrderController.getPmRuleList()}" requiredMessage="保养规则#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                             <f:selectItems value="#{v2PmOrderController.getPmOrderRulesByAsset()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                         </p:selectOneMenu>
