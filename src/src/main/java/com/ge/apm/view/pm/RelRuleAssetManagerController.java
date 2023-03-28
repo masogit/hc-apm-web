@@ -561,6 +561,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	 */
 	public void exportRelRuleAssets() {
 		try {
+            searchFilters.addAll(getOrgFilter(user.getSiteUID()));
 			List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(this.searchFilters);
 			List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(relRuleAssets.stream().map(relRuleAsset -> {return relRuleAsset.getAssetUID();}).collect(Collectors.toList()));
 			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
@@ -568,6 +569,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+        searchFilters.removeAll(getOrgFilter(user.getSiteUID()));
 	}
 
 	/**
