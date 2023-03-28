@@ -113,6 +113,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     @Setter @Getter
     private Boolean periodShow;
+    @Setter @Getter
+    private Object  ruleNameObj;
+    @Setter @Getter
+    private Object  periodObj;
     private TableDefinitionService tableService;
 
     private List<String> pmFieldsExport= new ArrayList<>();
@@ -500,13 +504,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void onFilter(FilterEvent event){
         super.onFilter(event);
         Map<String, Object> filters = event.getFilters();
-        Object ruleNameObj = filters.get("ruleName");
-        Object periodObj = filters.get("period");
+         ruleNameObj = filters.get("ruleName");
+         periodObj = filters.get("period");
         removeFilterOnField("ruleName");
         removeFilterOnField("period");
+
+    }
+
+    public void updatePMRuleFilterChange(){
         Set<String> pmRuleUids = getPMRuleUids(ruleNameObj, periodObj);
         if(CollectionUtils.isNotEmpty(pmRuleUids)) {
-            searchFilters.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN,pmRuleUids ));
+            filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN,pmRuleUids ));
         }
     }
 
@@ -2375,6 +2383,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters = new ArrayList();
         }
         filterArrayList.clear();
+        updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if ("MVS保养".equals(tabTitle)){
             if (StringUtils.isNotEmpty(siteUidFilterMVS)) {
