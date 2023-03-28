@@ -35,6 +35,7 @@
     <rabbit:queue id="assetUpdateQueue" name="assetUpdateQueue" durable="true" auto-delete="false" />
     <rabbit:queue id="assetUpdateEsQueue" name="assetUpdateEsQueue" durable="true" auto-delete="false" />
     <rabbit:queue id="physicalDataDelQueue" name="physicalDataDelQueue" durable="true" auto-delete="false" />
+    <rabbit:queue id="businessErrorLogQueue" name="businessErrorLogQueue" durable="true" auto-delete="false" />
 
     <rabbit:topic-exchange  name="assetChange" durable="true" auto-delete="false" auto-declare="true" id="assetChange">
         <rabbit:bindings>
@@ -50,16 +51,25 @@
         </rabbit:bindings>
     </rabbit:fanout-exchange>
 
+
+    <rabbit:fanout-exchange name="businessErrorLogChange" durable="true" auto-delete="false" auto-declare="true" id="mqErrorLog">
+        <rabbit:bindings>
+            <rabbit:binding queue="businessErrorLogQueue"></rabbit:binding>
+        </rabbit:bindings>
+    </rabbit:fanout-exchange>
+
     <rabbit:listener-container connection-factory="rabbitConnectionFactory" acknowledge="manual" message-converter="jackson2JsonMessageConverter" >
         <!-- 监听一个队列，当队列中有消息，就会自动触发类.方法，传递消息就作为方法的参数，根据方法声明的参数强转 -->
         <rabbit:listener ref="assetChangeConsumer"  queue-names="assetUpdateQueue"/>
         <rabbit:listener ref="assetHistoryEsConsumer"  queue-names="assetUpdateEsQueue"/>
         <rabbit:listener ref="physicalDataDelConsumer"  queue-names="physicalDataDelQueue"/>
+        <rabbit:listener ref="businessErrorLogConsumer"  queue-names="businessErrorLogQueue"/>
     </rabbit:listener-container>
 
     <bean id="assetChangeConsumer" class="com.ge.apm.listener.AssetChangeConsumer"/>
     <bean id="assetHistoryEsConsumer" class="com.ge.apm.listener.AssetChangeEsConsumer"/>
     <bean id="physicalDataDelConsumer" class="com.ge.apm.listener.PhysicalDataDelConsumer"/>
+    <bean id="businessErrorLogConsumer" class="com.ge.apm.listener.BusinessErrorLogConsumer"/>
 
 
 

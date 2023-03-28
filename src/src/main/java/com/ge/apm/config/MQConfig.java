@@ -30,6 +30,9 @@ public class MQConfig {
 
 
 
+    //mqErrorLog
+    public static final String BUSINESS_ERROR_LOG_QUEUE = "businessErrorLogQueue";
+    public static final String BUSINESS_ERROR_LOG_CHANGE = "businessErrorLogChange";
 
 
 }
