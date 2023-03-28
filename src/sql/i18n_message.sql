@@ -4976,3 +4976,25 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','PowerOfAttorneyExpireDays','授权书到期提醒提前天数','The number of days in advance of the authorization letter expiration reminder',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','PowerOfAttorneyExpireTimes','授权书到期提醒提前次数','The number of times in advance that the power of attorney expiration reminder is advanced',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','PowerOfAttorneyExpireDate','授权书到期时间','Power of attorney expiration',NULL,-1);
+
+
+
+
+-- YHAAO-18242  报修400wx页面优化相关
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','1','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','2','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','21','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','22','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','23','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','24','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','31','不能开机，有干扰，图像质量问题','不能开机，有干扰，图像质量问题',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','32','不能开机，有干扰，图像质量问题','不能开机，有干扰，图像质量问题',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','33','不能开机，有干扰，图像质量问题','不能开机，有干扰，图像质量问题',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','4','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','5','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','51','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','6','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','7','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','8','不能开机，不能扫描，不能曝光，有伪影','不能开机，不能扫描，不能曝光，有伪影',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','101','不能开机，不能传输，显示器故障','不能开机，不能传输，显示器故障',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('repairRequest400','3','不能开机，有干扰，图像质量问题','不能开机，有干扰，图像质量问题',NULL,-1);
