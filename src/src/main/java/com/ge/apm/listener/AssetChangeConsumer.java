@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.callback.MqContext;
+import com.ge.apm.callback.BusinessErrorLog;
 import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.dao.AssetInfoRepository;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.context.LocaleHolder;
@@ -112,6 +114,7 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
             int retryCount = mqContext.getRetryCount();
             if(retryCount>5){
                 LOGGER.info("AssetChangeConsumer mq 消费次数 retryCount:{},message:{} ,error:  ",retryCount,JSON.toJSONString(mqContext),e);
+                sendMqErrorLog(mqContext,e);
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
                 return;
             }
@@ -122,6 +125,29 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 //            channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,true );
         }
 
+    }
+
+    private void sendMqErrorLog(MqContext mqContext,Exception e) {
+        MqContext newmqContext = new MqContext();
+        BeanUtils.copyProperties(mqContext,newmqContext);
+        newmqContext.setRetryCount(0);
+        newmqContext.setType("mqErrorLog");
+        newmqContext.setExChange(MQConfig.BUSINESS_ERROR_LOG_CHANGE);
+        newmqContext.setRoutingKey("");
+        newmqContext.setTime(new Date());
+        BusinessErrorLog businessErrorLog = new BusinessErrorLog();
+        businessErrorLog.setCreatedDate(new Date());
+        businessErrorLog.setData(JSONObject.toJSONString(mqContext));
+        businessErrorLog.setErrorQueue(MQConfig.ASSET_UPDATE);
+        businessErrorLog.setErrorLevel("ERROR");
+        businessErrorLog.setException(e.getLocalizedMessage()+JSON.toJSONString(e));
+        businessErrorLog.setClassName(mqContext.getClassName());
+        businessErrorLog.setServiceName(mqContext.getServiceName());
+        businessErrorLog.setMethodName(mqContext.getMethodName());
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("mqerrorlog", businessErrorLog);
+        newmqContext.setJsonObject(jsonObject);
+        mqUtils.sendToMq(newmqContext);
     }
 
     private void saveAssetHistory(AssetHistory assetHistory) {

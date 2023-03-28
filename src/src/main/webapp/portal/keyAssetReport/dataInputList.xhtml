@@ -41,9 +41,9 @@
                         <p:ajax event="rowSelect" update="editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{keyAssetReportController.onFilter}" />
 
-                        <p:column headerText="#{msg.formTitle}" filterBy="#{item.formTitle}" filterMatchMode="LIKE">
+                        <!--<p:column headerText="#{msg.formTitle}" filterBy="#{item.formTitle}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.formTitle}"/>
-                        </p:column>
+                        </p:column>-->
                         <p:column headerText="#{msg.reportYear}" filterBy="#{item.reportYear}" filterMatchMode="EQ">
                             <h:outputText value="#{item.reportYear}"/>
                         </p:column>

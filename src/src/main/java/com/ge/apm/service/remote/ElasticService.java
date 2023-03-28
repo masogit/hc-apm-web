@@ -3,6 +3,8 @@ package com.ge.apm.service.remote;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.ge.apm.callback.BusinessErrorLog;
+import com.ge.apm.callback.DataDelVO;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.mq.MqUtils;
@@ -87,5 +89,18 @@ public class ElasticService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         return isOkay(response);
     }
+    public Boolean insertPhysicalDataDel(DataDelVO dataDelVO) throws Exception {
+        HttpEntity<DataDelVO> requestEntity = new HttpEntity<>(dataDelVO);
+        String gatewayURL = getGatewayURL(GatewayURL.INSERT_PHYSICAL_DATA_DEL);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        return isOkay(response);
+    }
 
+
+    public Boolean insertBusinessErrorLog(BusinessErrorLog mqErrorLog) {
+        HttpEntity<BusinessErrorLog> requestEntity = new HttpEntity<>(mqErrorLog);
+        String gatewayURL = getGatewayURL(GatewayURL.INSERT_BUSINESS_ERROR_LOG);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        return isOkay(response);
+    }
 }
