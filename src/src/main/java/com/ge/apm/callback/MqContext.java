@@ -26,4 +26,11 @@ public class MqContext implements Serializable {
     private String locale;
 
     private int retryCount;
+
+    //发送消息位置
+    private String serviceName;
+    private String className;
+    private String methodName;
+    //场景描述
+    private String describe;
 }
