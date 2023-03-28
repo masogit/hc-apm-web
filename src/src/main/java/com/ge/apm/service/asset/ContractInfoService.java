@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.aop.SendMQLog;
 import com.ge.apm.callback.DataDelVO;
 import com.ge.apm.callback.MqContext;
 import com.ge.apm.config.MQConfig;
@@ -122,6 +123,7 @@ public class ContractInfoService {
     }
 
     @Transactional
+    @SendMQLog(serviceName = "hc-apm-web",className ="ContractInfoController",methodName ="deleteContract" ,describe = "合同列表删除合同")
     public boolean deleteContract(ContractInfo contract) {
         if (null == contract) {
             return false;

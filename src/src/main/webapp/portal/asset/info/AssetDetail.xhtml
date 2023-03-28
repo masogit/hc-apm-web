@@ -158,19 +158,115 @@
                     <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{userContextService.isMVSRole()}">
                         <ui:include src="MvsViewFields.xhtml"/>
                     </p:fieldset>
-                    <p:panel id="modifyRecordList"
-                             header="#{msg.ModifyRecord}"
-                             toggleable="true"
-                             toggleSpeed="500" collapsed="#{assetInfoDetailController.assetChangeHistoryCount > 0 ? false : true}" widgetVar="panel"
-                             style="margin-bottom:20px;">
-                        <p:dataTable var="item" value="#{assetInfoDetailController.changeHistoryList}"
-                                     emptyMessage="#{msg.noRecordFound}" lazy="true">
-                            <ui:include src="ImportantFieldsView.xhtml"/>
-                        </p:dataTable>
-                    </p:panel>
+
+                    <h:form>
+                        <p:panel  header="相关设备" rendered="#{assetInfoDetailController.showParentsTree()}">
+                            <p:treeTable styleClass="ui-datatable"  value="#{assetInfoDetailController.getParentsRelationTree()}" var="assetItem">
+                                <f:facet name="header" />
+                                <p:column headerText="#{msg.name}">
+                                    <h:outputText value="#{assetItem.name}" />
+                                </p:column>
+                                <p:column headerText="#{msg.functionType}">
+                                    <h:outputText value="#{assetItem.functionType}" />
+                                </p:column>
+                                <p:column headerText="#{msg.serialNum}">
+                                    <h:outputText value="#{assetItem.serialNum}" />
+                                </p:column>
+                                <p:column headerText="#{msg.financingNum}">
+                                    <h:outputText value="#{assetItem.financingNum}" />
+                                </p:column>
+                                <p:column headerText="#{msg.departNum}">
+                                    <h:outputText value="#{assetItem.departNum}" />
+                                </p:column>
+                                <p:column >
+                                    <p:link  outcome="#{assetInfoDetailController.getDetailPageLink(assetItem.uid)}" disabled="#{assetItem.uid eq assetInfoDetailController.selected.uid}" >#{msg.View}</p:link>
+                                </p:column>
+
+                            </p:treeTable>
+
+                        </p:panel>
+
+                        <p:panel  header="#{msg.EquipmentRelatedContract}">
+                            <f:facet name="actions">
+                                <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}"
+                                               disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                            </f:facet>
+                            <p:dataTable var="item" value="#{assetInfoDetailController.getContractList()}" emptyMessage="#{msg.noRecordFound}">
+                                <p:column headerText="#{msg.name}" >
+                                    <h:outputText value="#{item.name}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.contractNum}" >
+                                    <h:outputText value="#{item.contractNum}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.startTime}"  >
+
+                                    <h:outputText value="#{item.startDate}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="#{msg.endTime}" >
+
+                                    <h:outputText value="#{item.endDate}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.contractAmount}" >
+                                    <h:outputText value="#{item.amount}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.invoiceNum}"  >
+                                    <h:outputText value="#{assetInfoDetailController.getContractInvoice(item)}"/>
+                                </p:column>
+                                <p:column   >
+                                    <p:link outcome="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.id))}" disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}">#{msg.View}</p:link>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                        <p:tabView>
+                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 1)}">
+                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                </p:dataList>
+                            </p:tab>
+                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 2)}">
+                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,2)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                </p:dataList>
+                            </p:tab>
+                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 3)}">
+                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,3)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                </p:dataList>
+                            </p:tab>
+                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 4)}">
+                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,4)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                </p:dataList>
+                            </p:tab>
+                            <c:forEach items="#{assetInfoDetailController.getAttachmentCategories()}" var="attachmentConfig">
+                                <p:tab title="#{attachmentConfig.label}">
+                                    <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    </p:dataList>
+                                </p:tab>
+                            </c:forEach>
+                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 'vlink')}">
+                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,'vlink')}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                                    <p:link href="#{fileitem.extLink}" target="_blank">#{fileitem.objectName}</p:link>
+                                </p:dataList>
+                            </p:tab>
+                            <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoDetailController.selected.qrCode}">
+                                <p:panelGrid columns="2" layout="grid" styleClass="showcase-text-align-center">
+                                    <p:graphicImage id="qrcode" value="#{qrCodeShowController.getImg(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" stream="false" />
+                                    <p:commandButton id="btn" value="打印" icon="ui-icon-print" style="margin-top: 41px;margin-left: 30px">
+                                        <p:printer target="qrcode" />
+                                    </p:commandButton>
+                                </p:panelGrid>
+                            </p:tab>
+                        </p:tabView>
+                    </h:form>
 
                 </p:tab>
-                <p:tab title="#{msg.MaintainanceRecord}">
+                <p:tab title="#{msg.EventRecord}">
                     <h:form>
                         <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank">
 
@@ -390,113 +486,16 @@
                         </p:panelGrid>
                     </h:form>
 
-                    <h:form>
-                        <p:panel  header="相关设备" rendered="#{assetInfoDetailController.showParentsTree()}">
-                            <p:treeTable styleClass="ui-datatable"  value="#{assetInfoDetailController.getParentsRelationTree()}" var="assetItem">
-                                <f:facet name="header" />
-                                <p:column headerText="#{msg.name}">
-                                    <h:outputText value="#{assetItem.name}" />
-                                </p:column>
-                                <p:column headerText="#{msg.functionType}">
-                                    <h:outputText value="#{assetItem.functionType}" />
-                                </p:column>
-                                <p:column headerText="#{msg.serialNum}">
-                                    <h:outputText value="#{assetItem.serialNum}" />
-                                </p:column>
-                                <p:column headerText="#{msg.financingNum}">
-                                    <h:outputText value="#{assetItem.financingNum}" />
-                                </p:column>
-                                <p:column headerText="#{msg.departNum}">
-                                    <h:outputText value="#{assetItem.departNum}" />
-                                </p:column>
-                                <p:column >
-                                    <p:link  outcome="#{assetInfoDetailController.getDetailPageLink(assetItem.uid)}" disabled="#{assetItem.uid eq assetInfoDetailController.selected.uid}" >#{msg.View}</p:link>
-                                </p:column>
-
-                            </p:treeTable>
-
-                        </p:panel>
-
-                        <p:panel  header="#{msg.EquipmentRelatedContract}">
-                            <f:facet name="actions">
-                                <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}"
-                                               disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                            </f:facet>
-                            <p:dataTable var="item" value="#{assetInfoDetailController.getContractList()}" emptyMessage="#{msg.noRecordFound}">
-                                <p:column headerText="#{msg.name}" >
-                                    <h:outputText value="#{item.name}"/>
-                                </p:column>
-                                <p:column headerText="#{msg.contractNum}" >
-                                    <h:outputText value="#{item.contractNum}"/>
-                                </p:column>
-                                <p:column headerText="#{msg.startTime}"  >
-
-                                    <h:outputText value="#{item.startDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="#{msg.endTime}" >
-
-                                    <h:outputText value="#{item.endDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.contractAmount}" >
-                                    <h:outputText value="#{item.amount}"/>
-                                </p:column>
-                                <p:column headerText="#{msg.invoiceNum}"  >
-                                    <h:outputText value="#{assetInfoDetailController.getContractInvoice(item)}"/>
-                                </p:column>
-                                <p:column   >
-                                    <p:link outcome="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.id))}" disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}">#{msg.View}</p:link>
-                                </p:column>
-                            </p:dataTable>
-                        </p:panel>
-
-
-                        <p:tabView>
-                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 1)}">
-                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                </p:dataList>
-                            </p:tab>
-                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 2)}">
-                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,2)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                </p:dataList>
-                            </p:tab>
-                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 3)}">
-                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,3)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                </p:dataList>
-                            </p:tab>
-                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 4)}">
-                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,4)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                </p:dataList>
-                            </p:tab>
-                            <c:forEach items="#{assetInfoDetailController.getAttachmentCategories()}" var="attachmentConfig">
-                                <p:tab title="#{attachmentConfig.label}">
-                                    <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                        <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                    </p:dataList>
-                                </p:tab>
-                            </c:forEach>
-                            <p:tab title="#{fieldMsg.fieldValue('attachmentType', 'vlink')}">
-                                <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,'vlink')}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
-                                    <p:link href="#{fileitem.extLink}" target="_blank">#{fileitem.objectName}</p:link>
-                                </p:dataList>
-                            </p:tab>
-                            <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoDetailController.selected.qrCode}">
-                                <p:panelGrid columns="2" layout="grid" styleClass="showcase-text-align-center">
-                                    <p:graphicImage id="qrcode" value="#{qrCodeShowController.getImg(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" stream="false" />
-                                    <p:commandButton id="btn" value="打印" icon="ui-icon-print" style="margin-top: 41px;margin-left: 30px">
-                                        <p:printer target="qrcode" />
-                                    </p:commandButton>
-                                </p:panelGrid>
-                            </p:tab>
-                        </p:tabView>
-                    </h:form>
+                    <p:panel id="modifyRecordList"
+                             header="#{msg.ModifyRecord}"
+                             toggleable="true"
+                             toggleSpeed="500" collapsed="#{assetInfoDetailController.assetChangeHistoryCount > 0 ? false : true}" widgetVar="panel"
+                             style="margin-bottom:20px;">
+                        <p:dataTable var="item" value="#{assetInfoDetailController.changeHistoryList}"
+                                     emptyMessage="#{msg.noRecordFound}" lazy="true">
+                            <ui:include src="ImportantFieldsView.xhtml"/>
+                        </p:dataTable>
+                    </p:panel>
                 </p:tab>
                 <p:tab title="#{msg.AssetArrivalListItemMgmt}" rendered="#{assetInfoDetailController.show(assetInfoDetailController.selected.uid)}">
                     <ui:include src="ItemView.xhtml"/>
