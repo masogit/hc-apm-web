@@ -1,6 +1,7 @@
 package com.ge.apm.mq;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.aop.SendMqThreadLocal;
 import com.ge.apm.callback.DataDelVO;
 import com.ge.apm.callback.MqContext;
 import com.ge.apm.config.MQConfig;
@@ -28,6 +29,14 @@ public class MqUtils {
     public   void sendToMq(MqContext mqContext){
 //        log.info("send to mq exchange:{},routingKey:{},message:{}",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject());
         try{
+
+            MqContext sendInfo = SendMqThreadLocal.getMqContext();
+            if(sendInfo!=null){
+                mqContext.setServiceName(sendInfo.getServiceName());
+                mqContext.setClassName(sendInfo.getClassName());
+                mqContext.setMethodName(sendInfo.getMethodName());
+                mqContext.setDescribe(sendInfo.getDescribe());
+            }
             rabbitTemplate.convertAndSend(mqContext.getExChange(),mqContext.getRoutingKey(),mqContext);
         }catch (Exception e){
             log.error("send to mq error exchange:{},routingKey:{},message:{},e :",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject(),e);
@@ -57,13 +66,21 @@ public class MqUtils {
             userAccount = UserContextService.getCurrentUserAccount();
         }
         dataDelVO.setOperator(userAccount.getLoginName());
-        dataDelVO.setDate(new Date());
+        dataDelVO.setCreatedDate(new Date());
         dataDelVO.setObjectType(objectType);
         dataDelVO.setObjectValue(JSONObject.toJSONString(object));
         dataDelVO.setHospitalUID(userAccount.getHospitalUID());
         dataDelVO.setInstitutionUID(userAccount.getInstitutionUID());
         dataDelVO.setSiteUID(userAccount.getSiteUID());
         dataDelVO.setTenantUID(userAccount.getTenantUID());
+
+        MqContext sendInfo = SendMqThreadLocal.getMqContext();
+        if(sendInfo!=null){
+            dataDelVO.setServiceName(sendInfo.getServiceName());
+            dataDelVO.setClassName(sendInfo.getClassName());
+            dataDelVO.setMethodName(sendInfo.getMethodName());
+            dataDelVO.setDescribe(sendInfo.getDescribe());
+        }
         sendToMq(mqContex);
     }
 
