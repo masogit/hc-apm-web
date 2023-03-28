@@ -50,6 +50,9 @@
                         <p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
+                        <p:column headerText="#{msg.clinicaldepart}" filterBy="#{item.clinicalDept.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.clinicalDept.name}"/>
+                        </p:column>
                         <p:column headerText="#{msg.formFiller}" filterBy="#{item.formFiller}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.formFiller}"/>
                         </p:column>
@@ -60,9 +63,6 @@
                             <h:outputText value="#{item.formFillTime}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
-                        </p:column>
-                        <p:column headerText="#{msg.clinicaldepart}" filterBy="#{item.clinicalDept.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.clinicalDept.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.preview}" style="width: 80px">
                             <h:outputLink id="viewReportButton" title="#{msg.preview}" target="_blank" value="#{keyAssetReportController.preview(item.id)}" onblur="reload()">
