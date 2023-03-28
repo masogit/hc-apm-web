@@ -77,21 +77,24 @@ public class PhysicalDataDelConsumer implements ChannelAwareMessageListener {
     private void sendMqErrorLog(MqContext mqContext,Exception e) {
         MqContext newmqContext = new MqContext();
         BeanUtils.copyProperties(mqContext,newmqContext);
-        mqContext.setRetryCount(0);
-        mqContext.setType("mqErrorLog");
-        mqContext.setExChange(MQConfig.PHYSICAL_DATA_DEL_CHANGE);
-        mqContext.setRoutingKey("");
-        mqContext.setTime(new Date());
+        newmqContext.setRetryCount(0);
+        newmqContext.setType("mqErrorLog");
+        newmqContext.setExChange(MQConfig.BUSINESS_ERROR_LOG_CHANGE);
+        newmqContext.setRoutingKey("");
+        newmqContext.setTime(new Date());
         BusinessErrorLog businessErrorLog = new BusinessErrorLog();
         businessErrorLog.setCreatedDate(new Date());
         businessErrorLog.setData(JSONObject.toJSONString(mqContext));
         businessErrorLog.setErrorQueue(MQConfig.PHYSICAL_DATA_DEL_QUEUE);
         businessErrorLog.setErrorLevel("ERROR");
-        businessErrorLog.setException(e.toString());
+        businessErrorLog.setException(e.getLocalizedMessage()+JSON.toJSONString(e));
         businessErrorLog.setClassName(mqContext.getClassName());
         businessErrorLog.setServiceName(mqContext.getServiceName());
         businessErrorLog.setMethodName(mqContext.getMethodName());
-        mqUtils.sendToMq(mqContext);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("mqerrorlog", businessErrorLog);
+        newmqContext.setJsonObject(jsonObject);
+        mqUtils.sendToMq(newmqContext);
     }
 
 
