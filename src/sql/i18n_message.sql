@@ -1633,6 +1633,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetReturnStatus','10','归还已取消','Return canceled',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetReturnStatus','11','归还已搁置','Return suspended',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetReturnStatus','12','归还已完成','Return completed',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetReturnStatus','13','归还已失效','Return expired',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('maintenanceType','1','日常维护','Daily Maintenance',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('maintenanceType','2','周期维护','Periodic Maintenance',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('executable','1','可执行','Executable',NULL,-1);
@@ -4962,6 +4963,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','sumIncome','收入总和','Sum of income',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','checkPeopleNum','检查人数','Check the number of people',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','asset.keyAssetDataInput','重点医疗设备使用状况报表','Report on the use of key medical equipment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','historicalGains','历史收益','Historical gains',NULL,-1);
 -- YHAAO-17712 MVS租户--设备信息字段与GE系统匹配
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','asset.importMvsDataFile','MVS设备信息导入','Import MVS device information',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','importMvsDataFile','MVS设备信息导入','Import MVS device information',NULL,-1);

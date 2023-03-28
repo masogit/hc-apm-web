@@ -183,6 +183,26 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     }
 
     public void saveKeyAssetReport(){
+        if(null == this.selected.getReportYear()){
+            WebUtil.addErrorMessage(WebUtil.getMessage("reportYear") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(StringUtils.isBlank(this.selected.getAssetName())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("EquipmentName") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(StringUtils.isBlank(this.selected.getFormFiller())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("formFiller") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
+        if(null == this.selected.getFormFillTime()){
+            WebUtil.addErrorMessage(WebUtil.getMessage("formFillTime") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return;
+        }
         if(null == this.selected.getClinicalDept()){
             WebUtil.addErrorMessage("请选择科室并选择设备!");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -215,7 +235,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             }
         }
         for (Map<String, String> map : assetOperation) {
-            if(null == map.get("checkPeopleNum") || null == map.get("sumIncome")){
+            if((null == map.get("checkPeopleNum") && null != map.get("sumIncome")) ||
+                    (null != map.get("checkPeopleNum") && null == map.get("sumIncome"))){
                 WebUtil.addErrorMessage("设备运营情况数据录入不全,请检查!");
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
