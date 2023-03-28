@@ -458,7 +458,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.notGeAsset eq 't'}">
                             <label class="label">品牌*</label>
-                            <p:inputText id="makerShortName" value="#{zkbPartOrderEditController.assetInfo.makerShortName}"  disabled="true"/>
+                            <p:inputText id="makerShortName" value="#{zkbPartOrderEditController.assetInfo.manufacture}"  disabled="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid  rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
