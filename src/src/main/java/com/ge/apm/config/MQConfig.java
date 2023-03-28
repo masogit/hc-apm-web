@@ -23,6 +23,16 @@ public class MQConfig {
 
 
 
+    //物理数据删除
+    public static final String PHYSICAL_DATA_DEL_CHANGE = "physicalDataDelChange";
+    public static final String PHYSICAL_DATA_DEL_QUEUE = "physicalDataDelQueue";
+    public static final String PHYSICALDATADELETE = "physicalDataDelete";
+
+
+
+    //mqErrorLog
+    public static final String BUSINESS_ERROR_LOG_QUEUE = "businessErrorLogQueue";
+    public static final String BUSINESS_ERROR_LOG_CHANGE = "businessErrorLogChange";
 
 
 }
