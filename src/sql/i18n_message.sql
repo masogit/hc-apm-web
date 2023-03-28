@@ -4963,6 +4963,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','sumIncome','收入总和','Sum of income',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','checkPeopleNum','检查人数','Check the number of people',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','asset.keyAssetDataInput','重点医疗设备使用状况报表','Report on the use of key medical equipment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','historicalGains','历史收益','Historical gains',NULL,-1);
 -- YHAAO-17712 MVS租户--设备信息字段与GE系统匹配
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','asset.importMvsDataFile','MVS设备信息导入','Import MVS device information',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','importMvsDataFile','MVS设备信息导入','Import MVS device information',NULL,-1);
