@@ -113,6 +113,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     @Setter @Getter
     private Boolean periodShow;
+    @Setter @Getter
+    private Object  ruleNameObj;
+    @Setter @Getter
+    private Object  periodObj;
     private TableDefinitionService tableService;
 
     private List<String> pmFieldsExport= new ArrayList<>();
@@ -498,115 +502,43 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     @Override
     public void onFilter(FilterEvent event){
-        Map<String, Object> filters = event.getFilters();
-        Object ruleNameObj = filters.get("ruleName");
-        Object periodObj = filters.get("period");
-        filters.keySet().removeIf(key->(key.equals("ruleName")||key.equals("period")));
-        removeFilterOnFields();
-        List<V2_PmOrder> pmOrders = dao.findBySearchFilter(filterArrayList);
         super.onFilter(event);
-        if((ruleNameObj != null || periodObj != null) && CollectionUtils.isNotEmpty(pmOrders)) {
-            filterRuleNameOrPeriod(ruleNameObj, periodObj,pmOrders);
+        Map<String, Object> filters = event.getFilters();
+         ruleNameObj = filters.get("ruleName");
+         periodObj = filters.get("period");
+        removeFilterOnField("ruleName");
+        removeFilterOnField("period");
+
+    }
+
+    public void updatePMRuleFilterChange(){
+        Set<String> pmRuleUids = getPMRuleUids(ruleNameObj, periodObj);
+        if(CollectionUtils.isNotEmpty(pmRuleUids)) {
+            filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN,pmRuleUids ));
         }
     }
 
-    private void removeFilterOnFields() {
-        removeFilterOnField("id");
-        removeFilterOnField("assetInfo.name");
-        removeFilterOnField("assetInfo.serialNum");
-        removeFilterOnField("assetInfo.departNum");
-        removeFilterOnField("assetInfo.functionType");
-        removeFilterOnField("ruleLevel");
-        removeFilterOnField("pmType");
-        removeFilterOnField("creatorName");
-        removeFilterOnField("ownerName");
-        removeFilterOnField("pmNum");
-        removeFilterOnField("currentStepName");
-        removeFilterOnField("planTime");
-        removeFilterOnField("endTime");
-    }
-
-    private void filterRuleNameOrPeriod(Object ruleNameObj, Object periodObj,List<V2_PmOrder> pmOrders) {
-        Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(V2_PmOrder::getId, Function.identity(), (o1, o2) -> o2));
-        Set<String> assetUids = pmOrderMap.values().stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
-
-        List<SearchFilter> relRuleAssetFilter = new ArrayList<>();
-        String tenantUid = userContextService.getTenantInfo().getUid();
-
-        relRuleAssetFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUid));
-        relRuleAssetFilter.add(new SearchFilter("assetUID", SearchFilter.Operator.IN,assetUids));
-        List<RelRuleAsset> relRuleAssets = relRuleAssetRepository.findBySearchFilter(relRuleAssetFilter);
-//        Map<String, RelRuleAsset> relRuleAssetMap = relRuleAssets.stream().collect(Collectors.toMap(RelRuleAsset::getAssetUID, Function.identity(), (o1, o2) -> o2));
-
-        Map<String,Map<Integer,String>> assetUidLevelPmRuleUidMap = new HashedMap<>();
-        Set<String> pmRuleuids = new HashSet<>();
-        relRuleAssets.stream().forEach(e ->{
-            Map<Integer,String> levelPmRuleUidMap = new HashedMap<>();
-            if(StringUtils.isNotEmpty(e.getRuleUID())){
-                pmRuleuids.add(e.getRuleUID());
-                levelPmRuleUidMap.put(3,e.getRuleUID());
-            }
-            if(StringUtils.isNotEmpty(e.getRuleUID1())){
-                pmRuleuids.add(e.getRuleUID1());
-                levelPmRuleUidMap.put(1,e.getRuleUID1());
-            }
-            if(StringUtils.isNotEmpty(e.getRuleUID2())){
-                pmRuleuids.add(e.getRuleUID2());
-                levelPmRuleUidMap.put(2,e.getRuleUID2());
-            }
-            if(StringUtils.isNotEmpty(e.getRuleUID4())){
-                pmRuleuids.add(e.getRuleUID4());
-                levelPmRuleUidMap.put(4,e.getRuleUID4());
-            }
-            assetUidLevelPmRuleUidMap.put(e.getAssetUID(),levelPmRuleUidMap);
-        });
-
-        List<SearchFilter> pmRuleFilter = new ArrayList<>();
-        relRuleAssetFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUid));
-        relRuleAssetFilter.add(new SearchFilter("uid", SearchFilter.Operator.IN,pmRuleuids));
-        List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findBySearchFilter(pmRuleFilter);
-        if(ruleNameObj != null){
-            pmOrderRules = pmOrderRules.stream().filter(e -> {
-                if(e.getName() != null){
-                   return e.getName().contains(String.valueOf(ruleNameObj));
-                    }
-                    return false;
-                }
-                ).collect(Collectors.toList());
+    private Set<String> getPMRuleUids(Object ruleNameObj,Object periodObj){
+       String ruleName = "";
+       Integer period = null;
+       if(ruleNameObj != null){
+            ruleName = String.valueOf(ruleNameObj);
         }
         if(periodObj != null){
-            AtomicInteger period = new AtomicInteger(-1);
-            try{
-                period.set( Integer.parseInt(String.valueOf(periodObj)));
-            }catch (Exception e1){
-                pmOrderRules.clear();
-            }
-            pmOrderRules = pmOrderRules.stream().filter(e ->{
-                if(e.getPeriod() != null){
-                    return e.getPeriod() == period.get();
-                }
-                return false;
-            } ).collect(Collectors.toList());
+            period = Integer.parseInt(String.valueOf(periodObj));
         }
-
-        Map<String, PmOrderRule> pmOrderRuleMap = pmOrderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, Function.identity(), (o1, o2) -> o2));
-
-        List<V2_PmOrder> pmOrders1 = pmOrders.stream().filter(e -> {
-            if(e.getAssetUid() != null
-                && assetUidLevelPmRuleUidMap.get(e.getAssetUid()) != null
-                && assetUidLevelPmRuleUidMap.get(e.getAssetUid()).get(e.getRuleLevel()) != null
-                && pmOrderRuleMap.get(assetUidLevelPmRuleUidMap.get(e.getAssetUid()).get(e.getRuleLevel())) != null){
-                    return true;
-            }else {
-                return  false;
-            }
-        }).collect(Collectors.toList());
-        if(CollectionUtils.isNotEmpty(pmOrders1)){
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,pmOrders1.stream().map(V2_PmOrder::getId).collect(Collectors.toSet())));
-        }else{
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,"-1"));
+        List<SearchFilter> pmRuleFilter = new ArrayList<>();
+        if(StringUtils.isNotEmpty(ruleName)) {
+            pmRuleFilter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, ruleName));
         }
+        if(period != null) {
+            pmRuleFilter.add(new SearchFilter("period", SearchFilter.Operator.EQ, period));
+        }
+        List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findBySearchFilter(pmRuleFilter);
+        return pmOrderRules.stream().map(PmOrderRule::getUid).collect(Collectors.toSet());
     }
+
+
 
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
         PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
@@ -2451,6 +2383,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters = new ArrayList();
         }
         filterArrayList.clear();
+        updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if ("MVS保养".equals(tabTitle)){
             if (StringUtils.isNotEmpty(siteUidFilterMVS)) {

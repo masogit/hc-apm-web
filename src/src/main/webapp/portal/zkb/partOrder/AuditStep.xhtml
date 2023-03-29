@@ -395,9 +395,9 @@
                             <label class="label">Sr#*</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}"  disabled="true"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.notGeAsset eq 't' and zkbPartOrderAuditController.selected.orderType eq 'Parts'}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.notGeAsset eq 't'}">
                             <label class="label">品牌*</label>
-                            <p:inputText id="makerShortName" value="#{zkbPartOrderAuditController.selected.getAssetInfo().makerShortName}"  disabled="true"/>
+                            <p:inputText id="makerShortName" value="#{zkbPartOrderAuditController.selected.getAssetInfo().manufacture}"  disabled="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid rendered="#{!(zkbPartOrderAuditController.orderType eq 'Artificial')}">
