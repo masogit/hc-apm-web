@@ -31,7 +31,9 @@ public class RuleParam {
 
     private String noticeType;
 
-    private String noticeUser;
+    private List<String> noticeUser;
+
+    private String messageType;
 
     private Integer pushType;
 
