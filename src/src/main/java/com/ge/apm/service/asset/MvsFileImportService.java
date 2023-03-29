@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
+import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MvsContractDateInfoRepository;
 import com.ge.apm.dao.MvsOrgInfoRepository;
@@ -306,8 +307,12 @@ public class MvsFileImportService {
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
-        mqContext.setRoutingKey("asset.update");
-        mqContext.setExChange("assetChange");
+        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
+        mqContext.setExChange(MQConfig.ASSET_CHANGE);
+        mqContext.setClassName("MvsFileImportService");
+        mqContext.setMethodName("saveContractInfo");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setDescribe("MVS合同导入修改设备");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         JSONObject jsonObject =new JSONObject();
 
