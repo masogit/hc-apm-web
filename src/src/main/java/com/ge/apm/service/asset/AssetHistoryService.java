@@ -56,7 +56,7 @@ public class AssetHistoryService {
     public static final String IS_VALID = "isValid";
     public static final String ASSET_DISPOSAL_RESULTS = "assetDisposalResults";
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private AssetHistoryRepository assetHistoryRepository;
@@ -296,7 +296,6 @@ public class AssetHistoryService {
         }
 
         if (fieldValue instanceof Date) {
-
             return sdf.format(fieldValue);
         }
 
@@ -316,7 +315,7 @@ public class AssetHistoryService {
         }).collect(Collectors.toList());
 
         List<String> collect = fields2.stream().map(item -> item.getName()).collect(Collectors.toList());
-
+        collect.remove("id");
         collect.stream().forEach(fieldName -> {
 
             try {

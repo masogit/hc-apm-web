@@ -406,7 +406,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         }*/
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         if("t".equals(this.selected.getNotGeAsset())){
-            if(zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
+            if(!zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
                 WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
                 return "";
             }
