@@ -310,6 +310,9 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.orderAnnotationChange();
         initHighList(item.getId(),true);
         this.initBlobObjectList(this.selected.getId());
+        List<AssetInfo> assetInfoList = this.zkbFePartOrderService.initAssetInfo(this.selected);
+        AssetInfo assetInfo = (assetInfoList!=null&&assetInfoList.size()>0)?assetInfoList.get(0):new AssetInfo();
+        this.selected.setManufacture(assetInfo.getManufacture());
     }
 
 
