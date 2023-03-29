@@ -285,6 +285,7 @@
                 <p:menuitem id="um5026" value="#{msg.SystemClientInfo}" outcome="/portal/iot/systemClientInfo.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
                 <p:menuitem id="um5027" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/configItemList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
                 <p:menuitem id="um5028" value="报表管理中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="#{userContextService.hasRole('SuperAdmin')}"   />
+                <p:menuitem id="um5029" value="#{msg.ReminderConfiguration}" outcome="/portal/config/reminder/apm/apmReminderRuleList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
             </p:submenu>
             <p:submenu label="#{msg.ZKBBasicInfo}" icon="settings" rendered="#{userContextService.accessContains('zkbBasicInfo')}">
                 <p:menuitem value="#{msg.ZKBAgentContactPersonMgt}" outcome="/portal/zkb/contactPerson/List.xhtml" rendered="#{userContextService.accessContains('zkbBasicInfo.agentContactPersonMgt')}"/>

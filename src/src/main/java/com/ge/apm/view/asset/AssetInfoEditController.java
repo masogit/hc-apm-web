@@ -2,6 +2,7 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
+import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -1594,8 +1595,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
-        mqContext.setRoutingKey("asset.update");
-        mqContext.setExChange("assetChange");
+        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
+        mqContext.setExChange(MQConfig.ASSET_CHANGE);
+
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setClassName("AssetInfoEditController");
+        mqContext.setMethodName("applyChange");
+        mqContext.setDescribe("设备详情单个修改/设备状态修改待审核");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         JSONObject jsonObject =new JSONObject();
 

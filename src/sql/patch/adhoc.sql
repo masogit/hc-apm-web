@@ -11,3 +11,5 @@ update v2_pm_order vpo set pm_rule_uid = rra.rule_uid4 , last_modified_by = 'YHA
 ALTER TABLE public.asset_history ALTER COLUMN json_data TYPE text USING json_data::text;
 -- YHAAO-18007
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '临床科室人员切换自己到其它可见范围内科室', 'departmentSwitching', '切换可见范围内科室', 'f', 't', 3 where not exists (select * from config_item where key = 'departmentSwitching');
+-- 修改提醒规则为平台级
+UPDATE reminder_rule SET tenant_uid = null, institution_uid = null, hospital_uid = null, site_uid = null
