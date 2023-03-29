@@ -2,6 +2,7 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
+import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
@@ -623,8 +624,12 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
-        mqContext.setRoutingKey("asset.update");
-        mqContext.setExChange("assetChange");
+        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
+        mqContext.setExChange(MQConfig.ASSET_CHANGE);
+        mqContext.setDescribe("批量修改设备");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setClassName("AssetInfoBulkEditController");
+        mqContext.setMethodName("verifyIfRequiredBeforeApplyChange");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         JSONObject jsonObject =new JSONObject();
         assetInfo.setHospital(null);
