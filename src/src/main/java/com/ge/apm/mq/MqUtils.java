@@ -1,10 +1,8 @@
 package com.ge.apm.mq;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.aop.SendMqThreadLocal;
 import com.ge.apm.callback.DataDelVO;
 import com.ge.apm.callback.MqContext;
-import com.ge.apm.config.MQConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
@@ -29,14 +27,6 @@ public class MqUtils {
     public   void sendToMq(MqContext mqContext){
 //        log.info("send to mq exchange:{},routingKey:{},message:{}",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject());
         try{
-
-            MqContext sendInfo = SendMqThreadLocal.getMqContext();
-            if(sendInfo!=null){
-                mqContext.setServiceName(sendInfo.getServiceName());
-                mqContext.setClassName(sendInfo.getClassName());
-                mqContext.setMethodName(sendInfo.getMethodName());
-                mqContext.setDescribe(sendInfo.getDescribe());
-            }
             rabbitTemplate.convertAndSend(mqContext.getExChange(),mqContext.getRoutingKey(),mqContext);
         }catch (Exception e){
             log.error("send to mq error exchange:{},routingKey:{},message:{},e :",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject(),e);
@@ -52,12 +42,8 @@ public class MqUtils {
      * @param objectType  对象信息 表类型
      * @param userAccount  操作用户
      */
-    public void sendPhysicalDataDel(Object object, String objectType, UserAccount userAccount) {
-        MqContext mqContex=new MqContext();
-        mqContex.setTime(new Date());
-        mqContex.setExChange(MQConfig.PHYSICAL_DATA_DEL_CHANGE);
-        mqContex.setRoutingKey("");
-        mqContex.setType(MQConfig.PHYSICALDATADELETE);
+    public void sendPhysicalDataDel(Object object, String objectType, UserAccount userAccount,MqContext mqContex) {
+
         DataDelVO dataDelVO = new DataDelVO();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("jsonData",dataDelVO);
@@ -74,13 +60,11 @@ public class MqUtils {
         dataDelVO.setSiteUID(userAccount.getSiteUID());
         dataDelVO.setTenantUID(userAccount.getTenantUID());
 
-        MqContext sendInfo = SendMqThreadLocal.getMqContext();
-        if(sendInfo!=null){
-            dataDelVO.setServiceName(sendInfo.getServiceName());
-            dataDelVO.setClassName(sendInfo.getClassName());
-            dataDelVO.setMethodName(sendInfo.getMethodName());
-            dataDelVO.setDescribe(sendInfo.getDescribe());
-        }
+        dataDelVO.setServiceName(mqContex.getServiceName());
+        dataDelVO.setClassName(mqContex.getClassName());
+        dataDelVO.setMethodName(mqContex.getMethodName());
+        dataDelVO.setDescribe(mqContex.getDescribe());
+
         sendToMq(mqContex);
     }
 
