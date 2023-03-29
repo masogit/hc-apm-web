@@ -501,13 +501,22 @@ public class AssetFileImportBaseService {
         supportingService.removeParentAssetIfNotExists(newAsset);
 
         //if import status failure, already returned, will not reach here.
-        if(org.apache.commons.lang3.StringUtils.isEmpty(newAsset.getUid()) && newAsset.getId()==null){
-            String uid = UUID.randomUUID().toString().replace("-", "");
-            newAsset.setUid(uid);
+//        if(org.apache.commons.lang3.StringUtils.isEmpty(newAsset.getUid()) && newAsset.getId()==null){
+//            String uid = UUID.randomUUID().toString().replace("-", "");
+//            newAsset.setUid(uid);
+//        }
+        boolean isCreate=false;
+        if(newAsset.getId()==null){
+            isCreate=true;
         }
-        this.saveAssetHistory( newAsset);
 
         assetDao.save(newAsset);
+        AssetInfo assetInfo = new AssetInfo();
+        BeanUtils.copyProperties(newAsset,assetInfo);
+        if(isCreate){
+            assetInfo.setId(null);
+        }
+        this.saveAssetHistory(assetInfo);
 
         assetDepreciationService.saveAssetDerpeciation(newAsset);
 
