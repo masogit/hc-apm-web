@@ -788,6 +788,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
     }
     public boolean getPmRuleList(){
+        autoSetPmRuleUid(assetUid,ruleLevel);
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         return workflowConfig != null
@@ -2668,6 +2669,30 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             customerName = orgInfo.getContactPerson();
             customerTel = orgInfo.getContactPhone();
             siteName = orgInfo.getName();
+        }
+        autoSetPmRuleUid(assetUid,ruleLevel);
+    }
+
+    private void autoSetPmRuleUid(String assetUid, Integer ruleLevel) {
+        if(StringUtils.isNotEmpty(assetUid)&&ruleLevel != null){
+            RelRuleAsset relRuleAsset = relRuleAssetRepository.findByAssetUid(assetUid);
+            List<String> ruleUids = new ArrayList<>();
+            switch (ruleLevel) {
+                case 1:
+                    ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID1(),"|"));break;
+                case 2:
+                    ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID2(),"|"));break;
+                case 3:
+                    ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID(),"|"));break;
+                case 4:
+                    ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID4(),"|"));break;
+                    default:
+                        LOGGER.warn("保养等级不符合要求，其值为{}",ruleLevel);
+            }
+            if(ruleUids.size() == 1){
+                pmRuleUid = ruleUids.get(0);
+            }
+
         }
     }
 
