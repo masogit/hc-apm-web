@@ -512,10 +512,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void updatePMRuleFilterChange(){
-        Set<String> pmRuleUids = getPMRuleUids(ruleNameObj, periodObj);
-        if(CollectionUtils.isNotEmpty(pmRuleUids)) {
-            filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN,pmRuleUids ));
-        }
+       if(ruleNameObj != null || periodObj != null) {
+           Set<String> pmRuleUids = getPMRuleUids(ruleNameObj, periodObj);
+           if (CollectionUtils.isNotEmpty(pmRuleUids)) {
+               filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN, pmRuleUids));
+           }
+       }
     }
 
     private Set<String> getPMRuleUids(Object ruleNameObj,Object periodObj){
@@ -2677,20 +2679,32 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(StringUtils.isNotEmpty(assetUid)&&ruleLevel != null){
             RelRuleAsset relRuleAsset = relRuleAssetRepository.findByAssetUid(assetUid);
             List<String> ruleUids = new ArrayList<>();
-            switch (ruleLevel) {
-                case 1:
-                    ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID1(),"|"));break;
-                case 2:
-                    ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID2(),"|"));break;
-                case 3:
-                    ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID(),"|"));break;
-                case 4:
-                    ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID4(),"|"));break;
+            if(relRuleAsset != null) {
+                switch (ruleLevel) {
+                    case 1:
+                        if (relRuleAsset.getRuleUID1() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID1(), "|"));
+                        break;
+                    case 2:
+                        if (relRuleAsset.getRuleUID2() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID2(), "|"));
+                        break;
+                    case 3:
+                        if (relRuleAsset.getRuleUID() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID(), "|"));
+                        break;
+                    case 4:
+                        if (relRuleAsset.getRuleUID4() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID4(), "|"));
+                        break;
                     default:
-                        LOGGER.warn("保养等级不符合要求，其值为{}",ruleLevel);
+                        LOGGER.warn("保养等级不符合要求，其值为{}", ruleLevel);
+                }
             }
             if(ruleUids.size() == 1){
                 pmRuleUid = ruleUids.get(0);
+            }else{
+                pmRuleUid = null;
             }
 
         }
