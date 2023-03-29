@@ -473,7 +473,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
                 return "";
             }
-            if(!zkbFePartOrderService.assetTypeHighMachineValue.equals(this.selected.getArtificialType())){
+            if(!zkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){
                 WebUtil.addErrorMessage(WebUtil.getMessage("非GE设备只能申请高端机！"));
                 return "";
             }
