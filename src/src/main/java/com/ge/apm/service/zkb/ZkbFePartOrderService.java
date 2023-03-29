@@ -1066,11 +1066,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @return
      */
     public ZkbFePartOrder calDeductQty(ZkbFePartOrder zkbFePartOrder, ZkbContract zkbContract) {
-        //  非 ge 设备额度扣除：统一扣除一个额度
-        if("t".equals(zkbFePartOrder.getNotGeAsset())){
-            zkbFePartOrder.setQty(1);
-            return zkbFePartOrder;
-        }
         if (ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())) {
             return this.calDeductQtyByNew(zkbFePartOrder);
         }
@@ -1423,6 +1418,26 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         return selected;
     }
+
+    /**
+     * 判断是否是高端机
+     * @return
+     */
+    public boolean checkMachineType(ZkbContract zkbContract,AssetInfo assetInfo){
+        boolean resultArg = false;
+        Set<ZkbContractAsset> zkbContractAssetSet = zkbContract.getZkbContractAssets();
+        ZkbContractAsset zkbContractAsset = new ZkbContractAsset();
+        if(zkbContractAssetSet!=null){
+            zkbContractAsset = zkbContractAssetSet.stream().filter(z -> z.getAssetId().equals(assetInfo.getUid())).findAny().orElse(new ZkbContractAsset()) ;
+        }
+        if(StringUtils.isNotBlank(zkbContractAsset.getAssetType())){
+            if(assetTypeHighMachineValue.equals(zkbContractAsset.getAssetType())){
+                resultArg = true;
+            }
+        }
+        return resultArg;
+    }
+
 
     /**
      * 生成excel
