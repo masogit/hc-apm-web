@@ -1,0 +1,58 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="保养模板导入"/>
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="tenantEditForm">
+                    <h:panelGroup id="display2"  >
+                        <div   class="ui-tabs "   >
+                            <p:panelGrid  style="width: 100%;" columns="2"  >
+                                <h:panelGroup >
+                                    <p:panelGrid  style="width: 100%;" columns="2"  >
+                                        <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbTenantTemplateController.queryTenantUIDS}">
+                                            <p:ajax  update="datalist"/>
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{zkbTenantTemplateController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                        </p:selectOneMenu>
+                                        <p:selectManyMenu id="datalist" styleClass="manymenu-advanced" scrollHeight="500" style="width: 400px" value="#{zkbTenantTemplateController.tableDefineIds}" filter="true" filterMatchMode="contains" showCheckbox="true">
+                                            <f:selectItems value="#{zkbTenantTemplateController.getTableDefinitionListByTenantUID()}" var="tableDefinition" itemLabel="#{tableDefinition.name}" itemValue="#{tableDefinition.id}"   />
+                                        </p:selectManyMenu>
+                                    </p:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:outputLabel value="目标租户范围"/>
+                                    <p:selectManyMenu  styleClass="manymenu-advanced"  scrollHeight="500" style="width: 400px"  value="#{zkbTenantTemplateController.tenantInfoUids}" filter="true" filterMatchMode="contains" showCheckbox="true">
+                                        <f:selectItems value="#{zkbTenantTemplateController.tenantInfoList}" var="tenantInfo" itemLabel="#{tenantInfo.name}" itemValue="#{tenantInfo.uid}"   />
+                                    </p:selectManyMenu>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <h:panelGroup>
+                                <p:selectBooleanCheckbox  label="所有租户" value="#{zkbTenantTemplateController.allTenant}"/>
+                            </h:panelGroup>
+                        </div>
+                        <br/>
+                        <p:commandButton validateClient="true" actionListener="#{zkbTenantTemplateController.importTemplate}" value="导入"    icon="ui-icon-check" />
+                        <p:commandButton validateClient="true" actionListener="#{zkbTenantTemplateController.updateTemplate}" value="更新"   icon="ui-icon-check" />
+                        <p:commandButton validateClient="true" action="#{zkbTenantTemplateController.backList}" value="返回"   icon="ui-icon-check" />
+                    </h:panelGroup>
+                </h:form>
+
+            </div>
+        </div>
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
+    </ui:define>
+</ui:composition>
