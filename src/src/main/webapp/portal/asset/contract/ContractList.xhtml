@@ -51,6 +51,14 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+                        <p:column headerText="#{msg.plannedArriveDate}" sortBy="#{item.expectArrivalDate}">
+                            <f:facet name="filter">
+                                <p:inputText id="filterExpectArrivalDate" widgetVar="varfilterExpectArrivalDate"/>
+                            </f:facet>
+                            <h:outputText value="#{item.expectArrivalDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="#{msg.startTime}" sortBy="#{item.startDate}" >
                             <f:facet name="filter">
                                 <p:inputText id="filterStartTime" widgetVar="varFilterStartTime"/>

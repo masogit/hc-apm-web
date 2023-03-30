@@ -62,13 +62,10 @@
 								<p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}" actionListener="#{reminderRuleController.setToUsing(item.id,true)}" update="datalist"  rendered="#{item.state eq 0}"/>
 								<p:commandButton icon="ui-icon-close" style="zoom:0.7" title="#{msg.Disabled}" actionListener="#{reminderRuleController.setToUsing(item.id,false)}" update="datalist"  rendered="#{item.state eq 1}"/>
 								<p:commandButton icon="ui-icon-search" style="zoom:0.7" title="#{msg.View}" actionListener="#{reminderRuleController.onRuleEvent(item.id)}" update="datalist" oncomplete="openEventListWindow(xhr, status, args)"/>
-<!--								<p:link target="_detail" title="#{msg.View}" outcome="#{reminderRuleController.getEventPage(item.id)}">-->
-<!--									<p:graphicImage name="icons/eye.png" style="zoom:0.7"/>-->
-<!--								</p:link>-->
 							</h:panelGroup>
 						</p:column>
 						<f:facet name="{Toolbar}">
-							<p:commandButton id="createButton" actionListener="#{reminderRuleController.prepareCreate}" icon="ui-icon-plus" title="#{msg.Create}" update=":reminderRuleEditDlg" oncomplete="PF('reminderRuleEditDialog').show()"/>
+							<p:commandButton id="createButton" actionListener="#{reminderRuleController.prepareCreate}" icon="ui-icon-plus" title="#{msg.Create}" update=":reminderRuleCreateDlg" oncomplete="PF('reminderRuleCreateDialog').show()"/>
 							<p:commandButton id="editButton" actionListener="#{reminderRuleController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":reminderRuleEditDlg" oncomplete="PF('reminderRuleEditDialog').show()" disabled="#{empty reminderRuleController.selected}"/>
 							<p:commandButton id="deleteButton" actionListener="#{reminderRuleController.delete}" icon="ui-icon-close" title="#{msg.Delete}" update="datalist" disabled="#{empty reminderRuleController.selected}">
 								<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
@@ -79,6 +76,7 @@
 				</h:form>
 			</div>
 		</div>
+		<ui:include src="reminderRuleCreate.xhtml"/>
 		<ui:include src="reminderRuleEdit.xhtml"/>
 		<ui:include src="reminderRuleSetting.xhtml"/>
 		<script>

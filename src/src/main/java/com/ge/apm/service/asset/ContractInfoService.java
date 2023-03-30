@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.aop.SendMQLog;
 import com.ge.apm.callback.DataDelVO;
 import com.ge.apm.callback.MqContext;
 import com.ge.apm.config.MQConfig;
@@ -143,8 +144,18 @@ public class ContractInfoService {
 
     private void sendMq(Object object,String objectType) {
         try {
+            MqContext mqContext = new MqContext();
+            mqContext.setClassName("ContractInfoController");
+            mqContext.setServiceName("hc-apm-web");
+            mqContext.setMethodName("deleteContract");
+            mqContext.setDescribe("合同列表删除合同");
+
+            mqContext.setTime(new Date());
+            mqContext.setExChange(MQConfig.PHYSICAL_DATA_DEL_CHANGE);
+            mqContext.setRoutingKey("");
+            mqContext.setType(MQConfig.PHYSICALDATADELETE);
             UserAccount userAccount = UserContextService.getCurrentUserAccount();
-            mqUtils.sendPhysicalDataDel(object,objectType,userAccount);
+            mqUtils.sendPhysicalDataDel(object,objectType,userAccount,mqContext);
         }catch (Exception e){
             log.error("contract delete send mq error");
         }
