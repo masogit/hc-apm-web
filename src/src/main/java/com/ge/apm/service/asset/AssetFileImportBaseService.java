@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
+import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -500,13 +501,22 @@ public class AssetFileImportBaseService {
         supportingService.removeParentAssetIfNotExists(newAsset);
 
         //if import status failure, already returned, will not reach here.
-        if(org.apache.commons.lang3.StringUtils.isEmpty(newAsset.getUid()) && newAsset.getId()==null){
-            String uid = UUID.randomUUID().toString().replace("-", "");
-            newAsset.setUid(uid);
+//        if(org.apache.commons.lang3.StringUtils.isEmpty(newAsset.getUid()) && newAsset.getId()==null){
+//            String uid = UUID.randomUUID().toString().replace("-", "");
+//            newAsset.setUid(uid);
+//        }
+        boolean isCreate=false;
+        if(newAsset.getId()==null){
+            isCreate=true;
         }
-        this.saveAssetHistory( newAsset);
 
         assetDao.save(newAsset);
+        AssetInfo assetInfo = new AssetInfo();
+        BeanUtils.copyProperties(newAsset,assetInfo);
+        if(isCreate){
+            assetInfo.setId(null);
+        }
+        this.saveAssetHistory(assetInfo);
 
         assetDepreciationService.saveAssetDerpeciation(newAsset);
 
@@ -529,8 +539,13 @@ public class AssetFileImportBaseService {
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
-        mqContext.setRoutingKey("asset.update");
-        mqContext.setExChange("assetChange");
+        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
+        mqContext.setExChange(MQConfig.ASSET_CHANGE);
+
+        mqContext.setDescribe("资产导入添加");
+        mqContext.setMethodName("importOneAsset");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setClassName("AssetFileImportBaseService");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         JSONObject jsonObject =new JSONObject();
 

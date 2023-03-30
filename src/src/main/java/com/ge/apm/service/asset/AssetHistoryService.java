@@ -3,6 +3,7 @@ package com.ge.apm.service.asset;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
+import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -55,7 +56,7 @@ public class AssetHistoryService {
     public static final String IS_VALID = "isValid";
     public static final String ASSET_DISPOSAL_RESULTS = "assetDisposalResults";
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private AssetHistoryRepository assetHistoryRepository;
@@ -295,7 +296,6 @@ public class AssetHistoryService {
         }
 
         if (fieldValue instanceof Date) {
-
             return sdf.format(fieldValue);
         }
 
@@ -315,7 +315,7 @@ public class AssetHistoryService {
         }).collect(Collectors.toList());
 
         List<String> collect = fields2.stream().map(item -> item.getName()).collect(Collectors.toList());
-
+        collect.remove("id");
         collect.stream().forEach(fieldName -> {
 
             try {
@@ -388,8 +388,12 @@ public class AssetHistoryService {
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
-        mqContext.setRoutingKey("asset.update");
-        mqContext.setExChange("assetChange");
+        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
+        mqContext.setExChange(MQConfig.ASSET_CHANGE);
+        mqContext.setClassName("AssetHistoryService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("saveAssetHistoryIfUpdated");
+        mqContext.setDescribe("批量修改设备院区/调剂等");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         JSONObject jsonObject =new JSONObject();
         assetInfo.setHospital(null);

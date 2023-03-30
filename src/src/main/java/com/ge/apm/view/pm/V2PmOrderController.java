@@ -113,6 +113,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     @Setter @Getter
     private Boolean periodShow;
+    @Setter @Getter
+    private Object  ruleNameObj;
+    @Setter @Getter
+    private Object  periodObj;
     private TableDefinitionService tableService;
 
     private List<String> pmFieldsExport= new ArrayList<>();
@@ -500,14 +504,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void onFilter(FilterEvent event){
         super.onFilter(event);
         Map<String, Object> filters = event.getFilters();
-        Object ruleNameObj = filters.get("ruleName");
-        Object periodObj = filters.get("period");
+         ruleNameObj = filters.get("ruleName");
+         periodObj = filters.get("period");
         removeFilterOnField("ruleName");
         removeFilterOnField("period");
-        Set<String> pmRuleUids = getPMRuleUids(ruleNameObj, periodObj);
-        if(CollectionUtils.isNotEmpty(pmRuleUids)) {
-            searchFilters.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN,pmRuleUids ));
-        }
+
+    }
+
+    public void updatePMRuleFilterChange(){
+       if(ruleNameObj != null || periodObj != null) {
+           Set<String> pmRuleUids = getPMRuleUids(ruleNameObj, periodObj);
+           if (CollectionUtils.isNotEmpty(pmRuleUids)) {
+               filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN, pmRuleUids));
+           }
+       }
     }
 
     private Set<String> getPMRuleUids(Object ruleNameObj,Object periodObj){
@@ -780,6 +790,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
     }
     public boolean getPmRuleList(){
+        autoSetPmRuleUid(assetUid,ruleLevel);
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         return workflowConfig != null
@@ -2375,6 +2386,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters = new ArrayList();
         }
         filterArrayList.clear();
+        updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if ("MVS保养".equals(tabTitle)){
             if (StringUtils.isNotEmpty(siteUidFilterMVS)) {
@@ -2659,6 +2671,42 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             customerName = orgInfo.getContactPerson();
             customerTel = orgInfo.getContactPhone();
             siteName = orgInfo.getName();
+        }
+        autoSetPmRuleUid(assetUid,ruleLevel);
+    }
+
+    private void autoSetPmRuleUid(String assetUid, Integer ruleLevel) {
+        if(StringUtils.isNotEmpty(assetUid)&&ruleLevel != null){
+            RelRuleAsset relRuleAsset = relRuleAssetRepository.findByAssetUid(assetUid);
+            List<String> ruleUids = new ArrayList<>();
+            if(relRuleAsset != null) {
+                switch (ruleLevel) {
+                    case 1:
+                        if (relRuleAsset.getRuleUID1() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID1(), "|"));
+                        break;
+                    case 2:
+                        if (relRuleAsset.getRuleUID2() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID2(), "|"));
+                        break;
+                    case 3:
+                        if (relRuleAsset.getRuleUID() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID(), "|"));
+                        break;
+                    case 4:
+                        if (relRuleAsset.getRuleUID4() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID4(), "|"));
+                        break;
+                    default:
+                        LOGGER.warn("保养等级不符合要求，其值为{}", ruleLevel);
+                }
+            }
+            if(ruleUids.size() == 1){
+                pmRuleUid = ruleUids.get(0);
+            }else{
+                pmRuleUid = null;
+            }
+
         }
     }
 

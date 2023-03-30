@@ -327,6 +327,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                 && !"t".equals(this.selected.getMaintainFlag())){
             this.subtractTotalStatusDisabled = true;
         }
+        if("t".equals(this.selected.getNotGeAsset())){
+            if(!zkbFePartOrderService.checkMachineType(zkbContract,this.zkbAssetInfo)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("非GE设备只能申请高端机！"));
+                return ;
+            }
+        }
 
     }
 
@@ -398,10 +404,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractCannotBeNull"));
             return "";
         }
-        if("t".equals(this.selected.getNotGeAsset())&&!zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
-            WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
-            return "";
-        }
         //检查合同号和systemId是否一致
         /*Boolean consist = this.zkbFePartOrderService.checkSystemIdAndContract(this.selected);
         if (!consist) {
@@ -409,6 +411,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return "";
         }*/
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        if("t".equals(this.selected.getNotGeAsset())){
+            if(!zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
+                return "";
+            }
+        }
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             return "";

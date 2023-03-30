@@ -341,7 +341,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     /**
      * 选择单据
      */
-    public void selectedWorkFlow() {
+    public void selectedWorkFlow(String notGeAsset) {
         this.contractError = false;
         //设备类型为超声类默认是高端机
         this.selected = this.zkbFePartOrderService.selectedWorkFlow(this.selected,this.selectZkbFePartOrder);
@@ -352,6 +352,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             return;
         }
         ZkbContract zkbContract =  contractList.get(0);
+        if("t".equals(notGeAsset)){
+            if(!zkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("非GE设备只能申请高端机！"));
+                return ;
+            }
+        }
         /**
          * 需要兼容历史数据
          */
@@ -468,9 +474,11 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if("t".equals(notGeAsset)){
             this.selected.setNotGeAsset("t");
         }
-        if("t".equals(notGeAsset)&&!zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
-            WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
-            return "";
+        if("t".equals(notGeAsset)){
+            if(!zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
+                return "";
+            }
         }
         if (CollectionUtils.isEmpty(this.sparePartsZkbFePartOrderList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("工单不能为空！"));
