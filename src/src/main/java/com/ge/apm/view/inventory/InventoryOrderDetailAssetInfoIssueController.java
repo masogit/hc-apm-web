@@ -153,21 +153,13 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		UserAccount user = UserContextService.getCurrentUserAccount();
 		List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
 		covSearchFilters(searchFilters, orgUidList);
-		List<InventoryIssue> assetInventoryIssue = dao.findBySearchFilter(searchFilters);
-		InventoryOrderDetail inventoryOrderDetail = new InventoryOrderDetail();
-		inventoryOrderDetail.setStatus(1);
-		inventoryOrderDetail.setTenantUID(inventoryIssue.getTenantUID());
-		inventoryOrderDetail.setInstitutionUID(inventoryIssue.getInstitutionUID());
-		inventoryOrderDetail.setHospitalUID(inventoryIssue.getHospitalUID());
-		inventoryOrderDetail.setSiteUID(inventoryIssue.getSiteUID());
-		inventoryOrderDetail.setInventoryOrderId(inventoryIssue.getInventoryOrderId());
+		List<InventoryIssue> assetInventoryIssues = dao.findBySearchFilter(searchFilters);
+		List<InventoryOrderDetail> assetInventoryOrderDetails = inventoryOrderDetailDao.findBySearchFilter(searchFilters);
+		InventoryOrderDetail inventoryOrderDetail = assetInventoryOrderDetails.get(0);
 		inventoryOrderDetail.setLastModifiedBy(user.getLoginName());
 		inventoryOrderDetail.setLastModifiedDate(DateUtil.now());
-		inventoryOrderDetail.setClinicalDeptUID(inventoryIssue.getClinicalDept().getUid());
-		inventoryOrderDetail.setClinicalDeptName(inventoryIssue.getClinicalDept().getName());
-		inventoryOrderDetail.setAssetInfo(assetInfo);
 		inventoryOrderDetailDao.save(inventoryOrderDetail);
-		dao.delete(assetInventoryIssue);
+		dao.delete(assetInventoryIssues);
 	}
 
 	static void covSearchFilters(List<SearchFilter> searchFilters, List<String> orgUidList) {
