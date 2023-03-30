@@ -24,6 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -303,7 +304,9 @@ public class MvsFileImportService {
         mvsOrgInfoRepository.save(list);
     }
 
-    private void saveAssetHistory(AssetInfo assetInfo){
+    private void saveAssetHistory(AssetInfo asset){
+        AssetInfo assetInfo = new AssetInfo();
+        BeanUtils.copyProperties(asset,assetInfo);
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
