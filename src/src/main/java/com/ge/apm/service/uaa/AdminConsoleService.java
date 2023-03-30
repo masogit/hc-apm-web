@@ -661,9 +661,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		saveLevelValue(key);
 	}
 	private void saveLevelValue(String key){
-		Iterable<WorkflowConfig> workflowConfigIterable = workflowConfigRepository.findAll();
-		if(workflowConfigIterable == null) return;
-		ArrayList<WorkflowConfig> workflowConfigs = Lists.newArrayList(workflowConfigIterable);
+		List<WorkflowConfig> workflowConfigs = getWorkflowConfig();
 		if(CollectionUtils.isEmpty(workflowConfigs)) return;
 		List<ConfigItemValue> byKey = configItemValueRepository.findByKey(key);
 		List<ConfigItemValue> result=new ArrayList<>();
@@ -682,6 +680,20 @@ public class AdminConsoleService extends MicroServiceInvoker {
 					}).map(item->initConfigItemValue(item,key)).filter(item ->item != null).collect(Collectors.toList());
 		}
 		configItemValueRepository.save(result);
+	}
+	private List<WorkflowConfig> getWorkflowConfig(){
+		Map<String,WorkflowConfig> workflowConfigMap=new HashMap<>();
+		Iterable<WorkflowConfig> workflowConfigIterable = workflowConfigRepository.findAll();
+		if(workflowConfigIterable == null) return null;
+		Iterator<WorkflowConfig> iterator = workflowConfigIterable.iterator();
+		while (iterator.hasNext()){
+			WorkflowConfig next = iterator.next();
+			if(StringUtils.isNotEmpty(next.getSiteUID())){
+				workflowConfigMap.put(next.getSiteUID(),next);
+			}
+		}
+		return workflowConfigMap.entrySet().stream().map(item->item.getValue()).collect(Collectors.toList());
+
 	}
 	private ConfigItemValue initConfigItemValue(WorkflowConfig item,String key){
 		String siteUID = item.getSiteUID();
