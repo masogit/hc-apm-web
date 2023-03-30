@@ -327,6 +327,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                 && !"t".equals(this.selected.getMaintainFlag())){
             this.subtractTotalStatusDisabled = true;
         }
+        if("t".equals(this.selected.getNotGeAsset())){
+            if(!zkbFePartOrderService.checkMachineType(zkbContract,this.zkbAssetInfo)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("非GE设备只能申请高端机！"));
+                return ;
+            }
+        }
 
     }
 
@@ -410,11 +416,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                 WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
                 return "";
             }
-            if(!zkbFePartOrderService.checkMachineType(zkbContract,this.zkbAssetInfo)){
-                WebUtil.addErrorMessage(WebUtil.getMessage("非GE设备只能申请高端机！"));
-                return "";
-            }
-
         }
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
