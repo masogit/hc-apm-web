@@ -663,8 +663,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
             int originStatus = assetInfo.getStatus();
             assetInfo.setStatus(4);
-            assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo);
             dao.save(assetInfo);
+            assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo);
             aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
             assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         }
