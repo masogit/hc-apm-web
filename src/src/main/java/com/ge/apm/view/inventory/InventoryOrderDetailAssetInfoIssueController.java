@@ -11,14 +11,13 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.InventoryOrderDetail;
+import com.ge.apm.domain.*;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import com.ge.apm.domain.InventoryIssue;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -47,7 +46,6 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	private String orderId;
 	private List<String> listClinicalDeptName;
     private List<String> listAccessClinical;
-    private Boolean inventorized;
 
 	@Override
 	protected void init() {
@@ -83,15 +81,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		}
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
-        searchFilters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
-        searchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
+		covSearchFilters(searchFilters, orgUidList);
        	boolean hasLastModifiedBy = false; String lastModifiedByFilter = null;
        	for (SearchFilter searchFilter :searchFilters) {
        		if ("lastModifiedBy".equals(searchFilter.fieldName)) {
@@ -154,29 +144,41 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		AssetInfo assetInfo = selected.getAssetInfo();
 		dao.save(selected);
 		assetInfoDao.save(assetInfo);
-		if (Boolean.TRUE.equals(inventorized)) {
-			InventoryOrderDetail inventoryOrderDetail = new InventoryOrderDetail();
-			inventoryOrderDetail.setStatus(1);
-			inventoryOrderDetail.setTenantUID(selected.getTenantUID());
-			inventoryOrderDetail.setInstitutionUID(selected.getInstitutionUID());
-			inventoryOrderDetail.setHospitalUID(selected.getHospitalUID());
-			inventoryOrderDetail.setSiteUID(selected.getSiteUID());
-			inventoryOrderDetail.setInventoryOrderId(selected.getInventoryOrderId());
-			inventoryOrderDetail.setLastModifiedBy(selected.getLastModifiedBy());
-			inventoryOrderDetail.setLastModifiedDate(selected.getLastModifiedDate());
-			inventoryOrderDetail.setClinicalDeptUID(selected.getClinicalDept().getUid());
-			inventoryOrderDetail.setClinicalDeptName(selected.getClinicalDept().getName());
-			inventoryOrderDetail.setAssetInfo(assetInfo);
-			inventoryOrderDetailDao.save(inventoryOrderDetail);
-			dao.delete(selected);
-		}
 	}
 
-	public Boolean getInventorized() {
-		return inventorized;
+	public void transferInventorized(InventoryIssue inventoryIssue) {
+		AssetInfo assetInfo = inventoryIssue.getAssetInfo();
+		List<SearchFilter> searchFilters = ListUtil.newArrayList(new SearchFilter("assetInfo.id", SearchFilter.Operator.EQ, assetInfo.getId(), "1*"));
+		searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, inventoryIssue.getInventoryOrderId(), "1*"));
+		UserAccount user = UserContextService.getCurrentUserAccount();
+		List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+		covSearchFilters(searchFilters, orgUidList);
+		List<InventoryIssue> assetInventoryIssue = dao.findBySearchFilter(searchFilters);
+		InventoryOrderDetail inventoryOrderDetail = new InventoryOrderDetail();
+		inventoryOrderDetail.setStatus(1);
+		inventoryOrderDetail.setTenantUID(inventoryIssue.getTenantUID());
+		inventoryOrderDetail.setInstitutionUID(inventoryIssue.getInstitutionUID());
+		inventoryOrderDetail.setHospitalUID(inventoryIssue.getHospitalUID());
+		inventoryOrderDetail.setSiteUID(inventoryIssue.getSiteUID());
+		inventoryOrderDetail.setInventoryOrderId(inventoryIssue.getInventoryOrderId());
+		inventoryOrderDetail.setLastModifiedBy(user.getLoginName());
+		inventoryOrderDetail.setLastModifiedDate(DateUtil.now());
+		inventoryOrderDetail.setClinicalDeptUID(inventoryIssue.getClinicalDept().getUid());
+		inventoryOrderDetail.setClinicalDeptName(inventoryIssue.getClinicalDept().getName());
+		inventoryOrderDetail.setAssetInfo(assetInfo);
+		inventoryOrderDetailDao.save(inventoryOrderDetail);
+		dao.delete(assetInventoryIssue);
 	}
 
-	public void setInventorized(Boolean inventorized) {
-		this.inventorized = inventorized;
+	static void covSearchFilters(List<SearchFilter> searchFilters, List<String> orgUidList) {
+		searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+		searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
+		searchFilters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
+		searchFilters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
 	}
 }
