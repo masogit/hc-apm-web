@@ -180,9 +180,15 @@ public class ZkbPartOrderProvider {
         }
         List<String> currentSteps = param.get("currentSteps") == null ? new ArrayList<>() : (List<String>)param.get("currentSteps");
         if(currentSteps != null && currentSteps.size() > 0){
-            sql.append(" and ( 1=1 ");
+            sql.append(" and (");
+            int i= 0;
             for(String c : currentSteps){
-                sql.append(" and current_step = '"+ c + "'");
+                if(i == (currentSteps.size() - 1)){
+                    sql.append(" current_step = '"+ c + "'");
+                }else{
+                    sql.append(" current_step = '"+ c + "' or ");
+                }
+                i++;
             }
             sql.append(") ");
         }
