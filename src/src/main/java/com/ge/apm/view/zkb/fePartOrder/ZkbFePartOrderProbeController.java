@@ -458,7 +458,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     /**
      * 选择单据
      */
-    public void selectedWorkFlow() {
+    public void selectedWorkFlow(String notGeAsset) {
         this.contractError = false;
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfoWithCheck(this.selectZkbFePartOrder.getContractId(),this.selectZkbFePartOrder.getSystemId());
         //未匹配到合同
@@ -473,13 +473,18 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             this.contractError = true;
             return;
         }
-
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             this.selected.setFatherPartOrderNo(null);
             return ;
         }
         this.selected = this.zkbFePartOrderService.selectedWorkFlow(this.selected,this.selectZkbFePartOrder);
+        if("t".equals(notGeAsset)){
+            if(!zkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("非GE设备只能申请高端机！"));
+                return ;
+            }
+        }
         this.selected.setProductNumber(this.selectZkbFePartOrder.getFunctionType());
         this.showZkbPoProbeQuotaType=false;
         this.showZkbhighCatFlag=false;
@@ -539,10 +544,6 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if("t".equals(notGeAsset)){
             if(!zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
                 WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
-                return "";
-            }
-            if(!zkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())){
-                WebUtil.addErrorMessage(WebUtil.getMessage("非GE设备只能申请高端机！"));
                 return "";
             }
         }

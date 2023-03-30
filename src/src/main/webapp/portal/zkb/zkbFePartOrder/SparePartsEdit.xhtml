@@ -30,7 +30,7 @@
                              widgetVar="sparePartsZkbFePartOrder" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrder}"
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.reportDate}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                        <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm messages" />
+                        <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow(zkbFePartOrderDetailController.selected.notGeAsset)}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm messages" />
                         <p:column headerText="报修单号">
                             <h:outputText value="#{item.partOrderNo}"/>
                         </p:column>

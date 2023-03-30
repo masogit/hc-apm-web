@@ -1599,8 +1599,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
 
-    private void saveAssetHistory(AssetInfo assetInfo) {
+    private void saveAssetHistory(AssetInfo newAsset) {
 //        AssetInfo oldAsset = dao.findByUid(selected.getUid());
+        AssetInfo assetInfo = new AssetInfo();
+        BeanUtils.copyProperties(newAsset,assetInfo);
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");

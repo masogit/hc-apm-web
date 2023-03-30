@@ -315,7 +315,8 @@ public class AssetHistoryService {
         }).collect(Collectors.toList());
 
         List<String> collect = fields2.stream().map(item -> item.getName()).collect(Collectors.toList());
-        collect.remove("id");
+        List<String> removeList=Arrays.asList("id","createdDate","lastModifiedDate");
+        collect.removeAll(removeList);
         collect.stream().forEach(fieldName -> {
 
             try {
