@@ -752,6 +752,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
     }
 	public void updatePMType(){
+		addFilter();
 	    notOnlyOneModels.stream().forEach(e->{
 	        e.setPmType(pmType);
         });

@@ -279,7 +279,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.WorkorderType} *</label>
                                 <p:selectOneMenu value="#{generatePmOrdersController.pmType}" >
-									<p:ajax listener="#{generatePmOrdersController.updatePMType()}" update="GeneratePmOrderForm:dataTable1"></p:ajax>
+									<p:ajax listener="#{generatePmOrdersController.updatePMType()}" update=":GeneratePmOrderForm:dataTable GeneratePmOrderForm:dataTable1"></p:ajax>
                                     <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
