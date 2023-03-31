@@ -270,24 +270,24 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
-        Set<String> uids = currentPageAssets.stream().filter(item -> item.getUid() != null).map(item -> item.getUid()).collect(Collectors.toSet());
-        List<AssetLifecycle> lifecycles= assetLifecyleService.selectByUidsAndStatus(uids, AssetConstant.ASSET_STATUS_TO_TERMINATED);
-//        List<AssetLifecycle> lifecycles= assetLifecyleService.selectByAssetUidsAndStatusGroupAssetUid(uids,4);
-        Map<String, List<AssetLifecycle>> collect = lifecycles.stream().collect(Collectors.groupingBy(AssetLifecycle::getAssetUid));
-        currentPageAssets.forEach(item -> {
-            List<AssetLifecycle> assetLifecycles = collect.get(item.getUid());
-            if(!CollectionUtils.isEmpty(assetLifecycles)){
-                List<AssetLifecycle> assetLifecycleSortDesc = assetLifecycles.stream().sorted(Comparator.comparing(AssetLifecycle::getModifyTime).reversed()).collect(Collectors.toList());
-                item.setTerminateOperation(assetLifecycleSortDesc.get(0).getModifyBy());
-                item.setTerminateOperationDate(assetLifecycleSortDesc.get(0).getModifyTime());
-            }
-
-        });
-
         if (orgUids.isEmpty()) {
             return;
         }
+        Set<String> uids = currentPageAssets.stream().filter(item -> item.getUid() != null).map(item -> item.getUid()).collect(Collectors.toSet());
+        if(!CollectionUtils.isEmpty(uids)){
+            List<AssetLifecycle> lifecycles= assetLifecyleService.selectByUidsAndStatus(uids, AssetConstant.ASSET_STATUS_TO_TERMINATED);
+//        List<AssetLifecycle> lifecycles= assetLifecyleService.selectByAssetUidsAndStatusGroupAssetUid(uids,4);
+            Map<String, List<AssetLifecycle>> collect = lifecycles.stream().collect(Collectors.groupingBy(AssetLifecycle::getAssetUid));
+            currentPageAssets.forEach(item -> {
+                List<AssetLifecycle> assetLifecycles = collect.get(item.getUid());
+                if(!CollectionUtils.isEmpty(assetLifecycles)){
+                    List<AssetLifecycle> assetLifecycleSortDesc = assetLifecycles.stream().sorted(Comparator.comparing(AssetLifecycle::getModifyTime).reversed()).collect(Collectors.toList());
+                    item.setTerminateOperation(assetLifecycleSortDesc.get(0).getModifyBy());
+                    item.setTerminateOperationDate(assetLifecycleSortDesc.get(0).getModifyTime());
+                }
 
+            });
+        }
         List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
 
         Map<String, OrgInfo> orgInfoMap = orgInfoList.stream().collect(Collectors.toMap(item -> item.getUid(), item -> item));
