@@ -15,6 +15,8 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.remote.ElasticService;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.context.LocaleHolder;
 
+import javax.persistence.Column;
 import java.util.*;
 
 
@@ -104,7 +107,21 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
 
             String jsonData = JSONArray.toJSONString(resultList);
             //gson序列化只与属性(字段)有关，与get开头的方法无关
-            String assetJson = g.toJson(newAsset);
+
+            ExclusionStrategy strategy = new ExclusionStrategy() {
+                @Override
+                public boolean shouldSkipClass(Class<?> clazz) {
+                    return false;
+                }
+                @Override
+                public boolean shouldSkipField(FieldAttributes field) {
+                    return field.getAnnotation(Column.class) == null;
+                }
+            };
+            //gson序列化只与属性(字段)有关，与get开头的方法无关
+            Gson gson = new GsonBuilder().setExclusionStrategies(strategy)
+                    .setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            String assetJson = gson.toJson(newAsset);
             AssetHistory assetHistory = buildAssetHistory(newAsset, currentUserAccount, jsonData, assetJson);
 //            elasticService.insertAssetHistory(assetHistory);
             saveAssetHistory(assetHistory);
