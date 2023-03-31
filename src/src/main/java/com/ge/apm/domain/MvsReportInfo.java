@@ -352,6 +352,9 @@ public class MvsReportInfo implements Serializable{
     @Column(name = "account_segment_second_level")
     private String accountSegmentSecondLevel;
 
+    @Column(name = "contract_type2")
+    private String contractType2;
+
     @Column(name = "report_date")
     @Temporal(TemporalType.DATE)
     private Date reportDate;
