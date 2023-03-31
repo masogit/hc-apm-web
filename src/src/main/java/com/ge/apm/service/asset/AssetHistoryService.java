@@ -283,22 +283,16 @@ public class AssetHistoryService {
             }
         }
         Temporal temporal = field.getAnnotation(Temporal.class);
-        if(temporal!=null && temporal.value().equals(TemporalType.DATE)){
-            if (oldFieldValue instanceof Date) {
-                SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-                oldFieldValue = sdf2.format(oldFieldValue);
-                newFieldValue = sdf2.format(newFieldValue);
-                if (Objects.equals(oldFieldValue, newFieldValue)) {
-                    return Optional.empty();
-                }
-            }
-        }
-
         AssetHistory.AssetHistoryInfo assetHistoryInfo = new AssetHistory.AssetHistoryInfo();
         assetHistoryInfo.setColumnName(fieldName);
         if(temporal!=null && temporal.value().equals(TemporalType.DATE)){
-            assetHistoryInfo.setOldColumnValue(oldFieldValue.toString());
-            assetHistoryInfo.setNewColumnValue(newFieldValue.toString());
+            oldFieldValue= objToString(field, oldFieldValue);
+            newFieldValue = objToString(field, newFieldValue);
+            if (Objects.equals(oldFieldValue, newFieldValue)) {
+                return Optional.empty();
+            }
+            assetHistoryInfo.setOldColumnValue(oldFieldValue==null?null:oldFieldValue.toString());
+            assetHistoryInfo.setNewColumnValue(newFieldValue==null?null:newFieldValue.toString());
         }else{
             assetHistoryInfo.setOldColumnValue(objToString(fieldName, oldFieldValue));
             assetHistoryInfo.setNewColumnValue(objToString(fieldName, newFieldValue));
@@ -308,6 +302,19 @@ public class AssetHistoryService {
 
         return Optional.of(assetHistoryInfo);
 
+    }
+    private String objToString(Field field, Object fieldValue) {
+        if (null == fieldValue) {
+            return null;
+        }
+
+        if (fieldValue instanceof Date) {
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+            return  sdf2.format(fieldValue);
+        }
+        String result = fieldValue.toString();
+
+        return result;
     }
 
     private String objToString(String fieldName, Object fieldValue) {
