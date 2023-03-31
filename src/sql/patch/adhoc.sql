@@ -7,6 +7,11 @@ update v2_pm_order vpo set pm_rule_uid = rra.rule_uid1 ,last_modified_by = 'YHAA
 update v2_pm_order vpo set pm_rule_uid = rra.rule_uid2 , last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =2 and vpo.pm_rule_uid is null;
 update v2_pm_order vpo set pm_rule_uid = rra.rule_uid, last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =3 and vpo.pm_rule_uid is null;
 update v2_pm_order vpo set pm_rule_uid = rra.rule_uid4 , last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =4 and vpo.pm_rule_uid is null;
+--更新原预生成表中绑定保养规则uid
+update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid1 from rel_rule_asset rra where popc.asset_uid = rra.asset_uid and popc.rule_level = 1 and popc.pm_rule_uid  is null;
+update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid2 from rel_rule_asset rra where popc.asset_uid = rra.asset_uid and popc.rule_level = 2 and popc.pm_rule_uid  is null;
+update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid from rel_rule_asset rra where popc.asset_uid = rra.asset_uid and popc.rule_level = 3 and popc.pm_rule_uid  is null;
+update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid4 from rel_rule_asset rra where popc.asset_uid = rra.asset_uid and popc.rule_level = 4 and popc.pm_rule_uid  is null;
 --YHAAO-18146
 ALTER TABLE public.asset_history ALTER COLUMN json_data TYPE text USING json_data::text;
 -- YHAAO-18007

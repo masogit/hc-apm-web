@@ -1115,6 +1115,28 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return false;
     }
 
+    public boolean isCheckedForBatchComplate() {
+
+        if(null == pmIdList || pmIdList.size() == 0){
+            return false;
+        }
+        WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
+        boolean autoAck = null == wfc || null == wfc.getAutoAckMaintenance() ? true : wfc.getAutoAckMaintenance();
+        boolean match = dao.getBatchPmOrderList(this.pmIdList).stream().anyMatch(item -> autoAck != item.getAutoAckMaintenance());
+        if(match){
+            return false;
+        }
+
+        Map<String, Boolean> map = this.selectedMap;
+        sameOpHashmap = map;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getTableDefName(String templateId) {
         TableDefinition tb = tableDao.findById(templateId);
         if (tb != null) {
@@ -3046,6 +3068,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return "visibility:hidden";
         }
     }
+
 
     public V2_WorkOrder_Detail getItemDetail() {
         return itemDetail;
