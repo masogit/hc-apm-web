@@ -75,6 +75,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private Integer pendingCommercialQty = 0;
     private Integer pendingDirectorQty = 0;
     private Integer pendingOrderQty = 0;
+    private Integer pendingOsscReturnQty = 0;
     private Integer pendingUnOrderQty = 0;
     private Integer pendingReturnQty = 0;
     private Integer pendingCloseQty = 0;
@@ -231,6 +232,11 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             mm = initQtyMap();
             mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
             pendingCloseQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
+            mm = initQtyMap();
+            mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.OsscReturnPending.toString());
+            pendingOsscReturnQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
+
         }
     }
 
@@ -968,5 +974,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setPendingCloseQty(Integer pendingCloseQty) {
         this.pendingCloseQty = pendingCloseQty;
+    }
+
+    public Integer getPendingOsscReturnQty() {
+        return pendingOsscReturnQty;
+    }
+
+    public void setPendingOsscReturnQty(Integer pendingOsscReturnQty) {
+        this.pendingOsscReturnQty = pendingOsscReturnQty;
     }
 }
