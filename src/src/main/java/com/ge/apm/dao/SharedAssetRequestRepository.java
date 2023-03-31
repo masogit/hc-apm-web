@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
+import java.util.Date;
 import java.util.List;
 
 public interface SharedAssetRequestRepository extends GenericRepositoryUUID<SharedAssetRequest> {
@@ -19,8 +20,8 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
 
     @Modifying
     @Transactional
-    @Query("update SharedAssetRequest a set a.state = :state, a.owner = :owner where a.id = :id")
-    public void updateStateAndOwner(@Param("id") String id, @Param("state") int state, @Param("owner") String owner);
+    @Query("update SharedAssetRequest a set a.state = :state, a.owner = :owner,a.modifyBy= :modifyBy,a.modifyDate= :modifyDate where a.id = :id")
+    public void updateStateAndOwner(@Param("id") String id, @Param("state") int state, @Param("owner") String owner, @Param("modifyBy")String modifyBy,@Param("modifyDate") Date modifyDate);
 
     public List<SharedAssetRequest> findByState(int state);
     
