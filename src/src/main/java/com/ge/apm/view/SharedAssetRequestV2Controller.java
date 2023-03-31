@@ -1190,7 +1190,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        List<SharedAssetReqType> sartList = selected.getSartList();
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 1) {
-        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
+            String useUid = UserContextService.getCurrentUserAccount().getUid();
+        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName(),useUid,new Date());
         } 
         if(sta == 5){
         	dao.updateState(uid, state);
@@ -1263,7 +1264,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int state = 8;//2归还待交付状态
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 7) {
-        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
+            String useUid = UserContextService.getCurrentUserAccount().getUid();
+            dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName(),useUid,new Date());
         }
         if(sta == 11) {
         	dao.updateState(uid, state);
