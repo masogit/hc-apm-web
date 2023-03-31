@@ -865,16 +865,6 @@ public class AssetInfo implements ChineseName,Serializable {
     private Date terminateOperationDate;
 
 
-    private Double test;
-
-    public Double getTest() {
-        return test;
-    }
-
-    public void setTest(Double test) {
-        this.test = test;
-    }
-
     public String getTerminateOperation() {
         return terminateOperation;
     }
