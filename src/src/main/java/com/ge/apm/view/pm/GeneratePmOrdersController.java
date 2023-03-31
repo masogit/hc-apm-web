@@ -508,7 +508,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public boolean prepareGenPmOrders(){
 		UserAccount userAccount = UserContextService.getCurrentUserAccount();
 		WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
-		if(workflowConfig != null && workflowConfig.getPmFourthRuleLevelForAsset() && level == 4) {
+		if(workflowConfig != null && workflowConfig.getPmRuleLevelFour()&& workflowConfig.getPmFourthRuleLevelForAsset() && level != null && level == 4) {
 			return true;
 		}else {
 			return false;
@@ -532,7 +532,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		Map<String, PmOrderRule> ruleNameMap = orderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, v->v,(o1,o2)->o2));
 		if(!StringUtils.isEmpty(ruleUID)&&ruleUID.contains("|")){
 				ruleUids.stream().forEach(item->{
-				    if(pmOrderMap.get(e.getAssetUID()+level+item) == null) {
+				    if(pmOrderMap.get(e.getAssetUID()+level+pmType+item) == null) {
                         AssetRuleModel model = new AssetRuleModel();
                         model.setPmType(pmType);
                         model.setUid(e.getAssetUID());
@@ -547,7 +547,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
                     }
 					});
 				}else{
-			if(pmOrderMap.get(e.getAssetUID()+level+ruleUID) == null) {
+			if(pmOrderMap.get(e.getAssetUID()+level+pmType+ruleUID) == null) {
 				AssetRuleModel model = new AssetRuleModel();
 				model.setPmType(pmType);
 				model.setUid(e.getAssetUID());
@@ -558,6 +558,14 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				onlyOneModels.add(model);
 				}
 			}
+	}
+
+	public String mulitPmOrderList(){
+		if(prepareGenPmOrders()){
+			return "visibility:visible";
+		}else {
+			return "visibility:hidden";
+		}
 	}
 
 	public void prepareAssetRuleList(){
@@ -571,7 +579,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
                 List<RelRuleAsset> ruleAssets = relRuleAssetRepository.findByAssetUids1(targetAssets.stream().map(AssetInfo::getUid).collect(Collectors.toSet()));
                 List<String> assetUids = ruleAssets.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
                 List<V2_PmOrder> pmOrders = pmOrderRepository.findByAssets(assetUids);
-                Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(e -> e.getAssetUid() + e.getRuleLevel() + e.getPmRuleUid(), v -> v, (v1, v2) -> v2));
+                Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(e -> e.getAssetUid() + e.getRuleLevel() +e.getPmType()+ e.getPmRuleUid(), v -> v, (v1, v2) -> v2));
                 if(CollectionUtils.isNotEmpty(ruleAssets)) {
                     ruleAssets.stream().forEach(
                             e -> {
@@ -744,6 +752,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
     }
 	public void updatePMType(){
+		addFilter();
 	    notOnlyOneModels.stream().forEach(e->{
 	        e.setPmType(pmType);
         });

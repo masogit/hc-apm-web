@@ -177,8 +177,8 @@
 				</p:dataTable>
 			</p:fieldset>
 
-			<p:fieldset id="dataTable1" legend="以下资产存在多个同等级保养规则,下拉可查看更多。总计: #{generatePmOrdersController.assetRuleModelTotal} 条" >
-				<p:dataTable id="datalist" value="#{generatePmOrdersController.notOnlyOneModels}" var="item" widgetVar="varDataListgl" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="150" emptyMessage="#{msg.noRecordFound}"
+			<p:fieldset id="dataTable1" legend="以下资产存在多个同等级保养规则,下拉可查看更多。总计: #{generatePmOrdersController.assetRuleModelTotal} 条"  style="#{generatePmOrdersController.mulitPmOrderList()}">
+				<p:dataTable id="datalist" value="#{generatePmOrdersController.notOnlyOneModels}" var="item" widgetVar="varDataListgl" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="#{generatePmOrdersController.prepareGenPmOrders()?150:1}" emptyMessage="#{msg.noRecordFound}"
 							 >
 					<p:column width="36"  id="checkBoxRulesColumn">
 						<f:facet name="header"  >
@@ -279,7 +279,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.WorkorderType} *</label>
                                 <p:selectOneMenu value="#{generatePmOrdersController.pmType}" >
-									<p:ajax listener="#{generatePmOrdersController.updatePMType()}" update="GeneratePmOrderForm:dataTable1"></p:ajax>
+									<p:ajax listener="#{generatePmOrdersController.updatePMType()}" update=":GeneratePmOrderForm:dataTable GeneratePmOrderForm:dataTable1"></p:ajax>
                                     <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>

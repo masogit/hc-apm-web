@@ -32,6 +32,8 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.DbResourcesUtil;
 
 import javax.persistence.Column;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -280,10 +282,28 @@ public class AssetHistoryService {
                 newFieldValue = df.format(newFieldValue);
             }
         }
+        Temporal temporal = field.getAnnotation(Temporal.class);
+        if(temporal!=null && temporal.value().equals(TemporalType.DATE)){
+            if (oldFieldValue instanceof Date) {
+                SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+                oldFieldValue = sdf2.format(oldFieldValue);
+                newFieldValue = sdf2.format(newFieldValue);
+                if (Objects.equals(oldFieldValue, newFieldValue)) {
+                    return Optional.empty();
+                }
+            }
+        }
+
         AssetHistory.AssetHistoryInfo assetHistoryInfo = new AssetHistory.AssetHistoryInfo();
         assetHistoryInfo.setColumnName(fieldName);
-        assetHistoryInfo.setOldColumnValue(objToString(fieldName, oldFieldValue));
-        assetHistoryInfo.setNewColumnValue(objToString(fieldName, newFieldValue));
+        if(temporal!=null && temporal.value().equals(TemporalType.DATE)){
+            assetHistoryInfo.setOldColumnValue(oldFieldValue.toString());
+            assetHistoryInfo.setNewColumnValue(newFieldValue.toString());
+        }else{
+            assetHistoryInfo.setOldColumnValue(objToString(fieldName, oldFieldValue));
+            assetHistoryInfo.setNewColumnValue(objToString(fieldName, newFieldValue));
+        }
+
         assetHistoryInfo.setLabel(WebUtil.getMessage(fieldName));
 
         return Optional.of(assetHistoryInfo);
@@ -315,7 +335,8 @@ public class AssetHistoryService {
         }).collect(Collectors.toList());
 
         List<String> collect = fields2.stream().map(item -> item.getName()).collect(Collectors.toList());
-        collect.remove("id");
+        List<String> removeList=Arrays.asList("id","createdDate");
+        collect.removeAll(removeList);
         collect.stream().forEach(fieldName -> {
 
             try {
