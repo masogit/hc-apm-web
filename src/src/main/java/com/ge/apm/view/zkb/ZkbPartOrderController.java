@@ -103,7 +103,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             Integer c = zkbPartOrderService.getZkbContractRepository().fetchContractCount(selectionTenantInfo);
             if(c == null || c == 0){
                 if(StrUtil.isEmpty(notGeAsset)){
-                    notGeAsset = CopyByInvok.F;
+                    notGeAsset = "";
                 }
                 disableNotGeAsset = true;
             }
