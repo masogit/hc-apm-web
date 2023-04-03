@@ -346,6 +346,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (null != queryAsset.getAssetGroup()) {
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
         }
+        if (queryAsset.getEmergencyEquipment()!=null) {
+            assetFilters.add(new SearchFilter("emergencyEquipment", SearchFilter.Operator.EQ, queryAsset.getEmergencyEquipment()));
+        }
+
+
         if (clinicalOrgInfo != null){
             Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(clinicalOrgInfo.getUid());
             List<String> results = new ArrayList<>(clinicalUids);

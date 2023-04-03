@@ -27,6 +27,8 @@ public class QueryAsset {
 	private Integer riskGrade;
  	private String mainDirectory;
  	private String secondDirectory;
+	private Integer emergencyEquipment;
+
 
 	public String getMainDirectory() {
 		return mainDirectory;
@@ -185,5 +187,14 @@ public class QueryAsset {
 
 	public void setGenerate(boolean generate) {
 		this.generate = generate;
+	}
+
+
+	public Integer getEmergencyEquipment() {
+		return emergencyEquipment;
+	}
+
+	public void setEmergencyEquipment(Integer emergencyEquipment) {
+		this.emergencyEquipment = emergencyEquipment;
 	}
 }
