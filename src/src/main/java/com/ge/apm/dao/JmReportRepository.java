@@ -11,7 +11,6 @@ public interface JmReportRepository extends GenericRepositoryUUID<JmReport>{
             "or a.visible_range = '-1' ;")
     List<JmReport> findByTenantUid(String tenantUID);
 
-    @Query(nativeQuery = true, value = "SELECT a.* FROM table_jm_report a WHERE a.id in(SELECT b.jm_report_id FROM jm_report_assign_tenant b) \n" +
-            "or a.visible_range = '-1' ;")
+    @Query(nativeQuery = true, value = "SELECT a.* FROM table_jm_report a WHERE a.id in(SELECT b.jm_report_id FROM jm_report_assign_tenant b) ;")
     List<JmReport> findAll();
 }
