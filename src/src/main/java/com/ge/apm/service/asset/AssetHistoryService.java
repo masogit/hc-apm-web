@@ -342,8 +342,11 @@ public class AssetHistoryService {
         }).collect(Collectors.toList());
 
         List<String> collect = fields2.stream().map(item -> item.getName()).collect(Collectors.toList());
+        List<String> assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
         List<String> removeList=Arrays.asList("id","createdDate");
+        collect.addAll(assetsImportantFieldsAll);
         collect.removeAll(removeList);
+        collect = collect.stream().distinct().collect(Collectors.toList());
         collect.stream().forEach(fieldName -> {
 
             try {

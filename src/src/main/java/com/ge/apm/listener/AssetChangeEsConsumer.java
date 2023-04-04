@@ -47,8 +47,6 @@ public class AssetChangeEsConsumer implements ChannelAwareMessageListener {
                 retryCount=retryCount+1;
                 mqContext.setRetryCount(retryCount);
                 mqUtils.sendToMq(mqContext);
-                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-
             }
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }catch (Exception e){
