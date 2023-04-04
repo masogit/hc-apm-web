@@ -457,7 +457,7 @@
                                 <f:facet name="header" >
                                     <h:outputText value="#{msg.operation}" />
                                 </f:facet>
-                                <p:link target="_blank" outcome="#{contractInfoEditController.getDetailPageLink(item.assetInfo)}" style="padding:10px" disabled="#{empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
+                                <p:link target="_blank" outcome="#{contractInfoEditController.getDetailPageLinkByAsset(item.assetInfo)}" style="padding:10px" disabled="#{empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
                             </p:column>
 
                         </p:dataTable>
@@ -485,7 +485,7 @@
                                 </f:facet>
 
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete} "  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Parts'}" />
-                                <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item.assetUid)}">#{msg.View}</p:link>
+                                <p:link  outcome="#{contractInfoEditController.getDetailPageLinkByUid(item.assetUid)}">#{msg.View}</p:link>
 <!--                                <p:commandLink value="#{msg.View}" action="#{contractInfoEditController.getDetailPageLink(item.assetUid)}"/>-->
                             </p:column>
 
@@ -579,7 +579,7 @@
                                 <f:facet name="header" >
                                     <h:outputText value="#{msg.operation}" />
                                 </f:facet>
-                                <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item[0])}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
+                                <p:link  outcome="#{contractInfoEditController.getDetailPageLinkByAsset(item[0])}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
                             </p:column>
 
                         </p:dataTable>
