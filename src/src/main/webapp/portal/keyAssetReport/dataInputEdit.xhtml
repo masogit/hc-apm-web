@@ -77,6 +77,16 @@
                             <p:column headerText="#{msg.installDate}">
                                 <h:outputText value="#{item.installDate}"/>
                             </p:column>
+                            <p:column headerText="#{msg.historicalGains}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.historicalGains}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{item.historicalGains}" inputStyle="max-width: 80%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
                             <p:column headerText="#{msg.Price}">
                                 <p:cellEditor>
                                     <f:facet name="output">
@@ -124,16 +134,6 @@
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:inputNumber value="#{item.suppliesSpend}" inputStyle="max-width: 80%"/>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-                            <p:column headerText="#{msg.historicalGains}">
-                                <p:cellEditor>
-                                    <f:facet name="output">
-                                        <h:outputText value="#{item.historicalGains}"/>
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:inputNumber value="#{item.historicalGains}" inputStyle="max-width: 80%"/>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
