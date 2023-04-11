@@ -14,7 +14,7 @@ update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid from rel_rule_ass
 update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid4 from rel_rule_asset rra where popc.asset_uid = rra.asset_uid and popc.rule_level = 4 and popc.pm_rule_uid  is null;
 --YHAAO-18146
 ALTER TABLE public.asset_history ALTER COLUMN json_data TYPE text USING json_data::text;
--- YHAAO-18007
-insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '临床科室人员切换自己到其它可见范围内科室', 'departmentSwitching', '切换可见范围内科室', 'f', 't', 3 where not exists (select * from config_item where key = 'departmentSwitching');
 -- 修改提醒规则为平台级
-UPDATE reminder_rule SET tenant_uid = null, institution_uid = null, hospital_uid = null, site_uid = null
+UPDATE reminder_rule SET tenant_uid = null, institution_uid = null, hospital_uid = null, site_uid = null;
+-- YHAAO-18320 云阜需求-删除科室 去除外键约束
+ALTER TABLE ONLY inventory_issue DROP CONSTRAINT fk_q7k1ps27403hpv9jrcww0glhj;
