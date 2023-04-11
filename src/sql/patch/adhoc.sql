@@ -15,4 +15,6 @@ update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid4 from rel_rule_as
 --YHAAO-18146
 ALTER TABLE public.asset_history ALTER COLUMN json_data TYPE text USING json_data::text;
 -- 修改提醒规则为平台级
-UPDATE reminder_rule SET tenant_uid = null, institution_uid = null, hospital_uid = null, site_uid = null
+UPDATE reminder_rule SET tenant_uid = null, institution_uid = null, hospital_uid = null, site_uid = null;
+-- YHAAO-18320 云阜需求-删除科室 去除外键约束
+ALTER TABLE ONLY inventory_issue DROP CONSTRAINT fk_q7k1ps27403hpv9jrcww0glhj;
