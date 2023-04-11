@@ -5007,3 +5007,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 --YHAAO-18221
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('field_name','EventRecord','事件记录','Event Record',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','EventRecord','事件记录','Event Record',NULL,	-1	);
+--YHAAO-18340 邵逸夫报损鉴定表导出 支持院区字段
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SiteInconsistent', '所选设备的院区信息不一致', 'The campus information of the selected device is inconsistent', NULL, '-1');
