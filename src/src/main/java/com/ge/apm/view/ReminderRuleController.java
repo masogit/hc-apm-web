@@ -1,5 +1,6 @@
 package com.ge.apm.view;
 
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
@@ -28,6 +29,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author 503310146
@@ -35,7 +37,7 @@ import java.util.List;
 @ManagedBean
 @ViewScoped
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRule> {
 
     private static final long serialVersionUID = 6868159463011514707L;
@@ -44,6 +46,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private ReminderRuleRepository dao;
     private SysRoleRepository sysRoleRepository;
     private UserAccountMapper userAccountMapper;
+    private UaaService uaaService;
 
     private UserAccount loginUser;
     private List<SysRole> roles;
@@ -62,6 +65,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         dao = WebUtil.getBean(ReminderRuleRepository.class);
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         userAccountMapper = WebUtil.getBean(UserAccountMapper.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         loginUser = UserContextService.getCurrentUserAccount();
         roles = sysRoleRepository.find();
     }
@@ -72,14 +76,18 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         List<ReminderRule> resultList;
         if (isApm) {
             searchFilters.add(new SearchFilter("parentUid", SearchFilter.Operator.IsNull, null));
-            resultList = dao.findBySearchFilter(searchFilters);
         } else {
             List<SearchFilter> filters = ListUtil.newArrayList(new SearchFilter("parentUid", SearchFilter.Operator.IsNull, null));
             apmRuleList = dao.findBySearchFilter(filters);
             super.removeFilterOnField("parentUid");
             searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
-            resultList = dao.findBySearchFilter(searchFilters);
+//            List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+//            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
+        resultList = dao.findBySearchFilter(searchFilters);
 
         for (ReminderRule reminderRule : resultList) {
             reminderRule.setRuleParam(JSON.parseObject(reminderRule.getParameters(), RuleParam.class));
@@ -88,28 +96,32 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         return pageUtil.pageNum(resultList, pageRequest);
     }
 
-    public void save(String actionName){
+    public void save(String actionName) {
         if ("Create".equals(crudActionName)) {
             if (!isApm) {
                 String parentUid = selected.getParentUid();
                 ReminderRule reminderRule = apmRuleList.stream().filter(rule -> rule.getId().equals(parentUid)).findFirst().orElse(new ReminderRule());
                 BeanUtils.copyProperties(reminderRule, selected);
                 selected.setId(null);
+                selected.setState(-1);
                 selected.setParentUid(parentUid);
                 selected.setTenantUid(loginUser.getTenantUID());
-                selected.setInstitutionUid(loginUser.getInstitutionUID());
-                selected.setHospitalUid(loginUser.getHospitalUID());
-                selected.setSiteUid(loginUser.getSiteUID());
+                selected.setInstitutionUid(loginUser.getTenantUID());
+                selected.setHospitalUid(loginUser.getTenantUID());
+                selected.setSiteUid(loginUser.getTenantUID());
+//                selected.setInstitutionUid(loginUser.getInstitutionUID());
+//                selected.setHospitalUid(loginUser.getHospitalUID());
+//                selected.setSiteUid(loginUser.getSiteUID());
+                dao.save(selected);
+                return;
             }
             selected.setState(-1);
         } else if ("Edit".equals(crudActionName) && "base".equals(actionName)) {
             selected.setState(-1);
         }
-        if (isApm) {
-            JSONObject parameters = JSON.parseObject(JSON.toJSONString(selected.getRuleParam()));
-            parameters.putAll(JSON.parseObject(JSON.toJSONString(selected.getWechatParam())));
-            selected.setParameters(JSON.toJSONString(parameters));
-        }
+        JSONObject parameters = JSON.parseObject(JSON.toJSONString(selected.getRuleParam()));
+        parameters.putAll(JSON.parseObject(JSON.toJSONString(selected.getWechatParam())));
+        selected.setParameters(JSON.toJSONString(parameters));
         dao.save(selected);
     }
 
