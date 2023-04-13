@@ -1249,10 +1249,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         requestContext.addCallbackParam("url", url);
     }
 
-    public void orderTypeChange(String ty){
-        if("notGeAsset".equals(ty)){
-            orderType = null;
-        }
+    public void orderTypeChange(){
         v2_listHashMap = new ArrayList<>();
         contractList = new ArrayList<>();
         assetInfo  = new AssetInfo();
@@ -1279,35 +1276,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             this.selected.setCatNum(1);
         }
-        /*if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-            this.selected.setQty(1);
-            if(StringUtils.isEmpty(maintainFlag)){
-                maintainFlag = CopyByInvok.F;
-            }
-        }else{
-            maintainFlag = "";
-            this.selected.setQty(0);
-            if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                this.selected.setCatNum(1);
-            }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
-                if(assetInfo == null || StringUtils.isEmpty(assetInfo.getUid()) || selectedContract == null){
-                    this.selected.setArtificialType(CopyByInvok.NORMAL_THREE);
-                }else{
-                    ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(selectedContract.getId(),assetInfo.getUid());
-                    if(ZkbContract.YOrNEnum.Y.toString().equals(selectedContract.getFiveNineNineFlag()) && ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType()) ){
-                        this.selected.setArtificialType(CopyByInvok.NORMAL_TWO);
-                    } else{
-                        if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
-                            this.selected.setArtificialType(CopyByInvok.NORMAL_THREE);
-                        }else if(ZkbContractAsset.AssetTypeEnum.depot.toString().equals(zkbContractAsset.getAssetType())){
-                            this.selected.setArtificialType(CopyByInvok.NORMAL_DEPOT);
-                        }
-
-                    }
-                }
-            }
-        }
-        calcRemainQty();*/
     }
 
     public void supplementFlagChange(){

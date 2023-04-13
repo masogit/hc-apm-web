@@ -8,6 +8,7 @@ import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -63,7 +64,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean whetherDeductEdit = false;
     private boolean showBtnFourHundredCancel = false;
     private String notGeAsset;
-
+    private List<ZkbPartOrderCat> zkbPartOrderCatList ;
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
@@ -143,6 +144,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 contractList = new ArrayList<>();
                 contractList.add(zkbContract);
             }
+            initZknPartCat(zkbContract.getStartDate());
             selectedWorkFlow = m.get("V2_WorkOrder") == null ? null : (V2_WorkOrder)m.get("V2_WorkOrder");
             HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");
             v2_listHashMap = new ArrayList<>();
@@ -1638,7 +1640,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     private boolean haveTrainCourseFlag = false;
     public void trainCourseRender(){
-        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && "1".equals(selected.getArtificialType())){
+        if(StrUtil.isEmpty(selected.getNotGeAsset()) && ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && "1".equals(selected.getArtificialType())){
             if(zkbContract != null ){
                 if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
                     haveTrainCourseFlag = true;
@@ -1925,6 +1927,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void removeReturnFile(V2_BlobObject v2_blobObject){
         goodReturnBlobObjectList = goodReturnBlobObjectList.stream().filter(item -> !item.getId().equals(v2_blobObject.getId())).collect(Collectors.toList());
         blobService.deleteBlobFile(v2_blobObject);
+    }
+
+    public void initZknPartCat(Date contractDate){
+        zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat(contractDate);
+    }
+    public List<ZkbPartOrderCat> autoCompleteCat(String query){
+        List<ZkbPartOrderCat> res = zkbPartOrderCatList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCatModel().contains(query)).collect(Collectors.toList());
+
+        return res;
     }
 
     //region get、set
