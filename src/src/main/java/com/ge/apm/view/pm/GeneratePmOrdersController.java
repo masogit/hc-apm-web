@@ -667,6 +667,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			model.setUid(ai.getUid());
 			model.setLevel(level);
 			model.setPlanTime(planTime);
+			model.setPmRuleUid(rule.getUid());
 			models.add(model);
 		}else {
 			for (AssetInfo ai : targetAssets) {
@@ -701,6 +702,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				model.setUid(ai.getUid());
 				model.setLevel(level);
 				model.setPlanTime(planTime);
+				model.setPmRuleUid(rule.getUid());
 				models.add(model);
 			}
 			if (CollectionUtils.isEmpty(models)) {
