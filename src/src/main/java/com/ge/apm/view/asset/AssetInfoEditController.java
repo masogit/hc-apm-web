@@ -1,6 +1,9 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.ge.apm.callback.MqContext;
 import com.ge.apm.config.MQConfig;
@@ -49,6 +52,8 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.persistence.Column;
+import javax.persistence.Transient;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1605,44 +1610,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
     private void saveAssetHistory(AssetInfo newAsset) {
-//        AssetInfo oldAsset = dao.findByUid(selected.getUid());
-        AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(newAsset,assetInfo);
         MqContext mqContext = new MqContext();
-        mqContext.setTime(new Date());
-        mqContext.setType("asset");
-        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
-        mqContext.setExChange(MQConfig.ASSET_CHANGE);
-
         mqContext.setServiceName("hc-apm-web");
         mqContext.setClassName("AssetInfoEditController");
         mqContext.setMethodName("applyChange");
         mqContext.setDescribe("设备详情单个修改/设备状态修改待审核");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        JSONObject jsonObject =new JSONObject();
-
-        ExclusionStrategy strategy = new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-            @Override
-            public boolean shouldSkipField(FieldAttributes field) {
-                return field.getAnnotation(Column.class) == null;
-            }
-        };
-        //gson序列化只与属性(字段)有关，与get开头的方法无关
-        Gson g = new GsonBuilder().setExclusionStrategies(strategy)
-                .setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String str = g.toJson(assetInfo);
-        jsonObject.put("assetInfo",str);
-//        jsonObject.put("assetInfo",selected);
-        jsonObject.put("currentUserAccount",currentUserAccount);
-        mqContext.setJsonObject(jsonObject);
-        Locale locale = LocaleContextHolder.getLocale();
-        mqContext.setLocale(locale.getLanguage());
-        mqUtils.sendToMq(mqContext);
-//        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
+        mqUtils.sendToMQ(newAsset,currentUserAccount,mqContext);
     }
 
     public int getAssetChangeHistoryCount() {

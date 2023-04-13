@@ -534,37 +534,21 @@ public class AssetFileImportBaseService {
 
     }
     private void saveAssetHistory(AssetInfo newAsset) {
-        AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(newAsset,assetInfo);
         MqContext mqContext = new MqContext();
-        mqContext.setTime(new Date());
-        mqContext.setType("asset");
-        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
-        mqContext.setExChange(MQConfig.ASSET_CHANGE);
-
         mqContext.setDescribe("资产导入添加");
         mqContext.setMethodName("importOneAsset");
         mqContext.setServiceName("hc-apm-web");
         mqContext.setClassName("AssetFileImportBaseService");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        JSONObject jsonObject =new JSONObject();
-
-
-        assetInfo.setHospital(null);
-        assetInfo.setQrCodeLib(null);
-        assetInfo.setAssetTags(null);
-        assetInfo.setBrand(null);
-        assetInfo.setTags(null);
-        //gson序列化只与属性(字段)有关，与get开头的方法无关
-        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String str = g.toJson(assetInfo);
-        jsonObject.put("assetInfo",str);
-        jsonObject.put("currentUserAccount",currentUserAccount);
-        mqContext.setJsonObject(jsonObject);
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
-        mqUtils.sendToMq(mqContext);
+        try {
+            mqUtils.sendToMQ(newAsset,currentUserAccount,mqContext);
+        }catch (Exception e){
+            logger.error("importOneAsset send mq error:",e);
+        }
     }
+
     public Map checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,List<AssetInfo> unCheckNurseSiteMaintainList) {
         LocalDateTime startTime = LocalDateTime.now();
 
