@@ -33,7 +33,7 @@ import webapp.framework.context.LocaleHolder;
 import javax.persistence.Column;
 import java.util.*;
 
-
+@Deprecated
 public class AssetChangeConsumer implements ChannelAwareMessageListener {
     public static final Logger LOGGER = LoggerFactory.getLogger(AssetChangeConsumer.class);
 
