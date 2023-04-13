@@ -1,7 +1,5 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.healthcare.cn.common.utils.collection.ListUtil;
-import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
@@ -159,6 +157,18 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private OrgInfo orgInfo46 = new OrgInfo();//初始化GE46号节点
     private String originalTelephone=null;//原始
     private Integer originaSelectId;
+
+    public boolean isPropagateSelectionUp() {
+        return propagateSelectionUp;
+    }
+
+    public void setPropagateSelectionUp(boolean propagateSelectionUp) {
+        this.propagateSelectionUp = propagateSelectionUp;
+    }
+
+    private boolean propagateSelectionUp = true;
+
+
 
     public Integer getOriginaSelectId() {
         return originaSelectId;
@@ -1143,6 +1153,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             retrieval=null;
 
         }else{
+            retrieval=null;
+            propagateSelectionUp = true;
             accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
             //List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
             setSelectedOrgTree(accessOrgTree, orgList);
@@ -1326,6 +1338,18 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         accessOrgTree.getChildren().get(0).setSelectable(false);
         deleteDisabled = false;
     }
+
+    public void getFilteredNodes() {
+        if (StringUtils.isEmpty(retrieval)) {
+                propagateSelectionUp = true;
+        } else {
+            if (!accessOrgTree.getChildren().get(0).isSelected()) {
+                propagateSelectionUp = false;
+            }
+        }
+        uaaService.filterTreeNode(accessOrgTree, retrieval, -1, -1);
+    }
+
     //全选按钮 （只保存GE后台运维的uid）(页面上表格也只显示GE后台运维的iD)
     public void selectAll(){
         selectAllButton = true;//1.标为全选

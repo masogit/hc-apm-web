@@ -134,6 +134,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
     }
+    public boolean isMultiplePMRuleWithAsset(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        return workflowConfig != null && workflowConfig.getPmFourthRuleLevelForAsset();
+    }
     /**
      * 根据主目录值获取子目录信息
      * @return
@@ -341,6 +346,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (null != queryAsset.getAssetGroup()) {
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
         }
+        if (queryAsset.getEmergencyEquipment()!=null) {
+            assetFilters.add(new SearchFilter("emergencyEquipment", SearchFilter.Operator.EQ, queryAsset.getEmergencyEquipment()));
+        }
+
+
         if (clinicalOrgInfo != null){
             Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(clinicalOrgInfo.getUid());
             List<String> results = new ArrayList<>(clinicalUids);
@@ -559,7 +569,14 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                         } else if (level == 3) {
                             rel.setRuleUID(pmOrderRule.getUid());
                         }else if (level == 4) {
-                            rel.setRuleUID4(pmOrderRule.getUid());
+                            String ruleUid4 = rel.getRuleUID4();
+                            if(isMultiplePMRuleWithAsset() && !StringUtils.isEmpty(ruleUid4)){
+                                if(!ruleUid4.contains(pmOrderRule.getUid())){
+                                    rel.setRuleUID4(ruleUid4+"|"+pmOrderRule.getUid());
+                                }
+                            }else {
+                                rel.setRuleUID4(pmOrderRule.getUid());
+                            }
                         }
                         rels.add(rel);
                     }

@@ -315,6 +315,14 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public static final int EXCEL_FE_PART_ORDER_IMPORT_MAX_ROW = 10000;
 
 
+
+    public boolean checkContracts(String tenantUID){
+        boolean argContractType = false;
+        List<ZkbContract> zkbContracts = zkbContractRepository.findByTenantUID(tenantUID);
+        argContractType = zkbContracts.stream().anyMatch(item -> "PCB MVS".equals(item.getContractType())||ZkbContract.ContractType.Biomed.toString().equals(item.getContractType()));
+        return argContractType;
+    }
+
     /**
      * @autor by lyj 503277717
      * @date 2022/1/7
@@ -467,7 +475,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoByUid(zkbFePartOrder.getAssetId());
         }else{
             listAssetInfo = this.zkbFePartOrderMapper.loadAssetInfoForHisData(zkbFePartOrder.getSystemId(),zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
-
         }
         return CollectionUtils.isNotEmpty(listAssetInfo)?listAssetInfo:new ArrayList<AssetInfo>();
     }
@@ -488,6 +495,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             zkbFePartOrder.setTenantUid(null);
             zkbFePartOrder.setSubtractTotalStatus(null);
             zkbFePartOrder.setAssetType(null);
+            zkbFePartOrder.setManufacture(null);
             return list;
         }
         ZkbFePartOrder item = list.get(0);
@@ -496,6 +504,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         zkbFePartOrder.setHospitalName(item.getHospitalName());
         zkbFePartOrder.setTenantUid(item.getTenantUid());
         zkbFePartOrder.setAssetType(item.getAssetType());
+        zkbFePartOrder.setManufacture(item.getManufacture());
         zkbFePartOrder.setAssetId(assetInfo.getUid());
         if (assetTypeHighMachineValue.equals(zkbFePartOrder.getAssetType())) {
             zkbFePartOrder.setSubtractTotalStatus("false");
@@ -610,8 +619,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param queryStatus 查询状态
      * @return
      */
-    public String backList(String queryStatus) {
-        return "List.xhtml?faces-redirect=true&queryStatus=" + queryStatus;
+    public String backList(String queryStatus,String notGeAsset) {
+        return "List.xhtml?faces-redirect=true&queryStatus=" + queryStatus + "&notGeAssetBox=" + notGeAsset;
     }
 
     /**
@@ -636,7 +645,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                                      String currentStep,
                                      Date startTime,
                                      Date endTime,
-                                     GatewayURL gatewayURL) {
+                                     GatewayURL gatewayURL,String notGeAsset) {
         if (ZkbFePartOrder.workFlowSteps.Requested.toString().equals(zkbFePartOrder.getCurrentStep())) {
             List<ZkbFePartOrder> listZkbFePartOrder = this.zkbFePartOrderRepository.findByPartOrderNo(zkbFePartOrder.getPartOrderNo());
             if (CollectionUtils.isNotEmpty(listZkbFePartOrder)) {
@@ -651,6 +660,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         zkbFePartOrder.setStatus(status);
         zkbFePartOrder.setCurrentStep(currentStep);
+        zkbFePartOrder.setNotGeAsset("f".equals(zkbFePartOrder.getNotGeAsset())?null:zkbFePartOrder.getNotGeAsset());
         this.zkbFePartOrderRepository.save(zkbFePartOrder);
         this.zkbFePartOrderStepService.updateLatestStepEndTime(zkbFePartOrder.getId(), startTime);
         this.zkbFePartOrderStepService.addNewItem(
@@ -665,7 +675,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             this.sendMessage(zkbFePartOrder.getId(), gatewayURL);
         }
 
-        return this.backList(queryStatus);
+        return this.backList(queryStatus,notGeAsset);
     }
 
     /**
@@ -1063,6 +1073,17 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     }
 
     /**
+     * 计算扣除数量
+     * 非 ge 设备额度扣除：统一扣除一个额度
+     * @param zkbFePartOrder
+     * @return
+     */
+    public ZkbFePartOrder calDeductQtyNotGE(ZkbFePartOrder zkbFePartOrder) {
+        zkbFePartOrder.setQty(1);
+        return zkbFePartOrder;
+    }
+
+    /**
      * 新逻辑扣除数量计算
      *
      * @param zkbFePartOrder
@@ -1296,6 +1317,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if (CollectionUtils.isNotEmpty(zkbPartOrderList)) {
             List<ZkbFePartOrder> list = new ArrayList<>();
             for (ZkbPartOrder item : zkbPartOrderList) {
+                AssetInfo zkbAssetInfo = assetInfoRepository.findByUid(item.getAssetId());
                 ZkbFePartOrder zkbFePartOrder = new ZkbFePartOrder();
                 zkbFePartOrder.setPartOrderNo(item.getPartOrderNo());
                 zkbFePartOrder.setSr(item.getSrNo());
@@ -1314,6 +1336,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbFePartOrder.setHospitalClientName(item.getHospitalRepairer());
                 zkbFePartOrder.setHospitalClientPhone(item.getHospitalRepairerPhone());
                 zkbFePartOrder.setUrgencyStatus(item.getUrgentOrder());
+                zkbFePartOrder.setQrCode(zkbAssetInfo.getQrCode());
+                zkbFePartOrder.setDepartNum(zkbAssetInfo.getDepartNum());
                 if ("t".equals(item.getUrgentOrder())) {
                     zkbFePartOrder.setUrgencyStatus("1");
                 }
@@ -1365,7 +1389,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if (CollectionUtils.isNotEmpty(assetInfoList)) {
             AssetInfo assetInfo = assetInfoList.get(0);
             selected.setArtificialType("");
-            if (assetInfo.getAssetGroup() != null && "2".equals(assetInfo.getAssetGroup().toString())) {
+            if (assetInfo.getAssetGroup() != null && "2".equals(assetInfo.getAssetGroup().toString())) {//  设备分类为超声的时候
                 Set<ZkbContractAsset> zkbContractAssetSet = zkbContract.getZkbContractAssets();
                 ZkbContractAsset zkbContractAsset = new ZkbContractAsset();
                 if(zkbContractAssetSet!=null){
@@ -1382,6 +1406,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     }
                 }
             }
+            selected.setManufacture(assetInfo.getManufacture());
+            selected.setQrCode(assetInfo.getQrCode());
+            selected.setDepartNum(assetInfo.getDepartNum());
             selected.setAssetGroup(assetInfo.getAssetGroup().toString());
             selected.setProductNumber(assetInfo.getFunctionType());
             selected.setAssetType(assetInfo.getAssetType());
@@ -1391,6 +1418,26 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         return selected;
     }
+
+    /**
+     * 判断是否是高端机
+     * @return
+     */
+    public boolean checkMachineType(ZkbContract zkbContract,AssetInfo assetInfo){
+        boolean resultArg = false;
+        Set<ZkbContractAsset> zkbContractAssetSet = zkbContract.getZkbContractAssets();
+        ZkbContractAsset zkbContractAsset = new ZkbContractAsset();
+        if(zkbContractAssetSet!=null){
+            zkbContractAsset = zkbContractAssetSet.stream().filter(z -> z.getAssetId().equals(assetInfo.getUid())).findAny().orElse(new ZkbContractAsset()) ;
+        }
+        if(StringUtils.isNotBlank(zkbContractAsset.getAssetType())){
+            if(assetTypeHighMachineValue.equals(zkbContractAsset.getAssetType())){
+                resultArg = true;
+            }
+        }
+        return resultArg;
+    }
+
 
     /**
      * 生成excel
@@ -1827,7 +1874,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param importSparePartList 批量配件信息
      * @param importProbeList     批量探头信息
      */
-    public void importData(List<Map<String, Object>> importSparePartList, List<Map<String, Object>> importProbeList, String userId, String userName, String tenantUid, UserAccount userAccount, Map<String, String> i18Map) {
+    public void importData(List<Map<String, Object>> importSparePartList, List<Map<String, Object>> importProbeList, String userId, String userName, String tenantUid, UserAccount userAccount, Map<String, String> i18Map,String notGeAsset) {
         Boolean validate = true;
         LocalDateTime startTime = LocalDateTime.now();
         List<ZkbFePartOrder> zkbFePartOrderSparePartList = new ArrayList<>();
@@ -1879,7 +1926,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     if (ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())) {
                         showZkbPoProbeQuotaType = true;
                     }
-                    this.geAdminReturn(zkbFePartOrder, showZkbPoProbeQuotaType, userId, userName, tenantUid, "", userAccount, i18Map);
+                    this.geAdminReturn(zkbFePartOrder, showZkbPoProbeQuotaType, userId, userName, tenantUid, "", userAccount, i18Map,notGeAsset);
                 }
             }
 
@@ -1895,7 +1942,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbFePartOrderReturn.setReturnType(item.getReturnType());
                     zkbFePartOrderReturn.setComment(item.getGeAdminComment());
                     this.zkbFePartOrderReturnRepository.save(zkbFePartOrderReturn);
-                    String status = this.changeStatus(item1.getId(), userId, userName, tenantUid);
+                    String status = this.changeStatus(item1.getId(), userId, userName, tenantUid,notGeAsset);
                     if (ZkbFePartOrderService.highArtificialTypeValue.equals(item1.getArtificialType()) || ZkbFePartOrderSparePartDetailController.badReturnValue.equals(item.getReturnType())) {
                         continue;
                     }
@@ -1918,7 +1965,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param tenantUid
      * @return
      */
-    public String changeStatus(String id, String userId, String userName, String tenantUid) {
+    public String changeStatus(String id, String userId, String userName, String tenantUid,String notGeAsset) {
         ZkbFePartOrder zkbFePartOrder = this.zkbFePartOrderRepository.findById(id);
         Integer returnCount = zkbFePartOrderReturnRepository.fetchQty(id); //归还数量
         Integer applyCount = this.zkbFePartOrderAssetInfoRepository.fetchQty(id); //申请数量
@@ -1947,7 +1994,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 tenantUid,
                 "",
                 workFlowStatus,
-                workFlowSteps, startDate, endDate, gatewayURL);
+                workFlowSteps, startDate, endDate, gatewayURL,notGeAsset);
         return workFlowStatus;
     }
 
@@ -1980,9 +2027,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                                 String tenantUID,
                                 String queryStatus,
                                 UserAccount userAccount,
-                                Map<String, String> i18Map) {
+                                Map<String, String> i18Map,String notGeAssetBox) {
         ZkbContract zkbContract = this.zkbContractRepository.findById(zkbFePartOrder.getContractId());
-        if (!ZkbFePartOrderSparePartDetailController.badReturnValue.equals(zkbFePartOrder.getReturnType())) {
+        if (!ZkbFePartOrderSparePartDetailController.badReturnValue.equals(zkbFePartOrder.getReturnType())&&!"t".equals(zkbFePartOrder.getNotGeAsset())) {
             if (zkbFePartOrder.getQty() != null && zkbFePartOrder.getQty() > 0) {
                 this.moveProbe(5, zkbContract, zkbFePartOrder.getQty(), showZkbPoProbeQuotaType, zkbFePartOrder.getZkbPoProbeQuotaType(), userAccount, zkbFePartOrder, true, i18Map.get("GEAdminAccept"));
                 //TODO liyonjian ZKB - 2022年新探头逻辑
@@ -2003,7 +2050,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 tenantUID,
                 queryStatus,
                 ZkbFePartOrder.workFlowStatus.GEAdminAccept.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_WECHART);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_WECHART,notGeAssetBox);
     }
 
 

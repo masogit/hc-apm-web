@@ -2,6 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
+import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MvsContractDateInfoRepository;
 import com.ge.apm.dao.MvsOrgInfoRepository;
@@ -23,6 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -302,12 +304,18 @@ public class MvsFileImportService {
         mvsOrgInfoRepository.save(list);
     }
 
-    private void saveAssetHistory(AssetInfo assetInfo){
+    private void saveAssetHistory(AssetInfo asset){
+        AssetInfo assetInfo = new AssetInfo();
+        BeanUtils.copyProperties(asset,assetInfo);
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
-        mqContext.setRoutingKey("asset.update");
-        mqContext.setExChange("assetChange");
+        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
+        mqContext.setExChange(MQConfig.ASSET_CHANGE);
+        mqContext.setClassName("MvsFileImportService");
+        mqContext.setMethodName("saveContractInfo");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setDescribe("MVS合同导入修改设备");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         JSONObject jsonObject =new JSONObject();
 

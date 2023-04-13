@@ -11,6 +11,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
@@ -18,6 +19,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ValueChangeEvent;
 import java.util.*;
 
 /**
@@ -129,6 +131,10 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      */
     private String thisDeductionMessage;
 
+    private String encodeStr;
+
+    private String notGeAssetBox;
+
     @Override
     protected void init() {
         super.init();
@@ -141,13 +147,15 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.userName = currentUser.getName();
         this.userUid = currentUser.getUid();
         this.tenantUID = currentUser.getTenantUID();
-        String encodeStr = WebUtil.getRequestParameter("str");
+        encodeStr = WebUtil.getRequestParameter("str");
         String action = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         this.id = (String) UrlEncryptController.getValueFromMap(encodeStr, "id");
         this.queryStatus = (String) UrlEncryptController.getValueFromMap(encodeStr, "queryStatus");
+        this.notGeAssetBox = (String) UrlEncryptController.getValueFromMap(encodeStr, "notGeAssetBox");
         try {
             if (ZkbFePartOrderController.CREATE_ACTION.equals(action)) {
                 this.prepareCreate();
+                this.selected.setNotGeAsset(WebUtil.getRequestParameter("notGeAsset"));
             } else if (ZkbFePartOrderController.EDIT_ACTION.equals(action)) {
                 this.prepareEdit();
             }
@@ -198,6 +206,18 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.zkbFePartOrderService.initTestStatus(this.loginName, this.selected);
     }
 
+
+
+
+    public void notGeAssetChangeEditPage(ValueChangeEvent event){
+        String url = "Edit.xhtml?str=" + encodeStr + "&notGeAsset=" + (event.getNewValue()==null?"":event.getNewValue().toString());
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
+
+
+
+
     /**
      * 编辑数据前,初始化
      */
@@ -205,13 +225,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public void prepareEdit() {
         super.prepareEdit();
         this.selected = this.zkbFePartOrderRepository.findById(this.id);
-       /* if(StringUtils.isBlank(this.selected.getMaintainFlag())){
-            this.selected.setMaintainFlag("f");
-        }*/
         this.contractList = this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.zkbAssetInfoList = this.zkbFePartOrderService.initAssetInfo(this.selected);
         this.zkbAssetInfo = (this.zkbAssetInfoList!=null&&this.zkbAssetInfoList.size()>0)?this.zkbAssetInfoList.get(0):new AssetInfo();
         this.zkbAssetInfoList.stream().forEach(e -> e.setAssetGroupName(WebUtil.getFieldValueMessage("assetGroup",  e.getAssetGroup()!=null? e.getAssetGroup().toString():"")));
+        this.selected.setNotGeAsset("t".equals(this.selected.getNotGeAsset())?this.selected.getNotGeAsset():"f");
+        this.selected.setManufacture(this.zkbAssetInfo.getManufacture());
         this.confirmMessage =this.genConfirmMessage();
     }
 
@@ -308,6 +327,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                 && !"t".equals(this.selected.getMaintainFlag())){
             this.subtractTotalStatusDisabled = true;
         }
+        if("t".equals(this.selected.getNotGeAsset())){
+            if(!zkbFePartOrderService.checkMachineType(zkbContract,this.zkbAssetInfo)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("非GE设备只能申请高端机！"));
+                return ;
+            }
+        }
 
     }
 
@@ -350,6 +375,10 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.zkbAssetInfo = null;
         this.zkbAssetInfoList = null;
         this.selected.setSystemId(systemId);
+        if (StringUtils.isBlank(this.selected.getNotGeAsset())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("错误：请选择是否GE设备或者非GE设备"));
+            return;
+        }
         if (StringUtils.isBlank(this.selected.getMaintainFlag())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("错误：请选择是否为保养申请"));
             return;
@@ -367,7 +396,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     }
 
     public String backList() {
-        return this.zkbFePartOrderService.backList(this.queryStatus);
+        return this.zkbFePartOrderService.backList(this.queryStatus,this.notGeAssetBox);
     }
 
     public String saveAndToListPage() {
@@ -382,6 +411,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return "";
         }*/
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        if("t".equals(this.selected.getNotGeAsset())){
+            if(!zkbFePartOrderService.checkContracts(this.selected.getTenantUid())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("该设备所在代理商没有biomed 和PCB MVS类型合同，不能进行非GE设备申请！"));
+                return "";
+            }
+        }
         Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             return "";
@@ -405,7 +440,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         }
 
         String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.Requested.toString(),
-                ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(), new Date(), null, GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
+                ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(), new Date(), null, GatewayURL.FE_PART_ORDER_SEND_MESSAGE,this.notGeAssetBox);
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
     }
@@ -428,11 +463,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         String dateStr = DateUtil.getFormatStrByDate(this.selected.getReportDate(), format);
         Date reportDate = DateUtil.getDateByFormatStr(dateStr, format);
         //GE FE合同到期后400下单前增加Commercial角色进行审批  且不是599合同
-        if ((reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0)&&!"Y".equals(zkbContract.getFiveNineNineFlag())){
+        if (((reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0)&&!"Y".equals(zkbContract.getFiveNineNineFlag()))&&!"t".equals(this.selected.getNotGeAsset())){
             workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString();
         }
         String result = this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
-                workFlowStep, date, null, GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+                workFlowStep, date, null, GatewayURL.FE_PART_ORDER_SEND_EMAIL,this.notGeAssetBox);
         //注意：流程为WaitingCommercial审批时需要发微信、短信、邮件通知
         if(workFlowStep.equals(ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString())&&!"Y".equals(zkbContract.getFiveNineNineFlag())){
             this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
@@ -457,7 +492,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(this.zkbAssetInfo,zkbContract, 3, this.selected, this.currentUser, this.i18Map.get("TenantReject"));
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_EMAIL,this.notGeAssetBox);
     }
 
     /**
@@ -471,7 +506,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.selected.setCommercialAssignUser(this.userName);
         this.selected.setCommercialAssignDate(date);
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.CommercialAccept.toString(),
-                ZkbFePartOrder.workFlowSteps.WaitingApm.toString(), date, null, GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+                ZkbFePartOrder.workFlowSteps.WaitingApm.toString(), date, null, GatewayURL.FE_PART_ORDER_SEND_EMAIL,this.notGeAssetBox);
     }
 
     /**
@@ -486,7 +521,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(this.zkbAssetInfo,zkbContract, 3, this.selected, this.currentUser, this.i18Map.get("CommercialReject"));
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.CommercialReject.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), date, date, GatewayURL.FE_PART_ORDER_SEND_EMAIL,this.notGeAssetBox);
     }
 
     /**
@@ -500,7 +535,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(this.zkbAssetInfo,zkbContract, 2, this.selected, this.currentUser, this.i18Map.get("FourHundredsAccept"));
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART,this.notGeAssetBox);
     }
 
     /**
@@ -514,7 +549,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.zkbFePartOrderService.moveRemianTimeOfContract(this.zkbAssetInfo,zkbContract, 4, this.selected, this.currentUser, this.i18Map.get("FourHundredsReject"));
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.FourHundredsReject.toString(),
-                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
+                ZkbFePartOrder.workFlowSteps.Complete.toString(), new Date(), new Date(), GatewayURL.FE_PART_ORDER_SEND_WECHART,this.notGeAssetBox);
     }
 
     /**
@@ -590,5 +625,13 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     }
     public void setSubtractTotalStatusDisabled(Boolean subtractTotalStatusDisabled) {
         this.subtractTotalStatusDisabled = subtractTotalStatusDisabled;
+    }
+
+    public String getNotGeAssetBox() {
+        return notGeAssetBox;
+    }
+
+    public void setNotGeAssetBox(String notGeAssetBox) {
+        this.notGeAssetBox = notGeAssetBox;
     }
 }

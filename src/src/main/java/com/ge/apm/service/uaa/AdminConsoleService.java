@@ -11,6 +11,7 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
@@ -99,6 +100,14 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private AssetHistoryRepository assetHistoryRepository;
+
+	@Autowired
+	private WorkflowConfigRepository workflowConfigRepository;
+
+	@Autowired
+	private ConfigItemRepository configItemRepository;
+	@Autowired
+	private ConfigItemValueRepository configItemValueRepository;
 
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
@@ -646,4 +655,76 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			logger.info("batchUpdateAssetHistoryEvent error e:",e);
 		}
 	}
+	public void batchSynchronizationConfig() {
+		String key = "shareAutoConfirm";
+		saveDefaultValue( key);
+		saveLevelValue(key);
+	}
+	private void saveLevelValue(String key){
+		List<WorkflowConfig> workflowConfigs = getWorkflowConfig();
+		if(CollectionUtils.isEmpty(workflowConfigs)) return;
+		List<ConfigItemValue> byKey = configItemValueRepository.findByKey(key);
+		List<ConfigItemValue> result=new ArrayList<>();
+		if(CollectionUtils.isEmpty(byKey)) {
+			result = workflowConfigs.stream().filter(item -> {
+				Integer shareAutoConfirm = item.getShareAutoConfirm();
+				return shareAutoConfirm !=null && shareAutoConfirm.intValue() > 0;
+			}).map(item -> initConfigItemValue(item,key)).filter(item ->item != null).collect(Collectors.toList());
+		}else{
+			Map<String, ConfigItemValue> configItemValueMap = byKey.stream().filter(item->StringUtils.isNotEmpty(item.getSiteUid())).collect(Collectors.toMap(ConfigItemValue::getSiteUid, item -> item));
+			result=workflowConfigs.stream()
+					.filter(item-> item.getSiteUID() !=null && !configItemValueMap.containsKey(item.getSiteUID()))
+					.filter(item -> {
+						Integer shareAutoConfirm = item.getShareAutoConfirm();
+						return shareAutoConfirm !=null && shareAutoConfirm.intValue() > 0;
+					}).map(item->initConfigItemValue(item,key)).filter(item ->item != null).collect(Collectors.toList());
+		}
+		configItemValueRepository.save(result);
+	}
+	private List<WorkflowConfig> getWorkflowConfig(){
+		Map<String,WorkflowConfig> workflowConfigMap=new HashMap<>();
+		Iterable<WorkflowConfig> workflowConfigIterable = workflowConfigRepository.findAll();
+		if(workflowConfigIterable == null) return null;
+		Iterator<WorkflowConfig> iterator = workflowConfigIterable.iterator();
+		while (iterator.hasNext()){
+			WorkflowConfig next = iterator.next();
+			if(StringUtils.isNotEmpty(next.getSiteUID())){
+				workflowConfigMap.put(next.getSiteUID(),next);
+			}
+		}
+		return workflowConfigMap.entrySet().stream().map(item->item.getValue()).collect(Collectors.toList());
+
+	}
+	private ConfigItemValue initConfigItemValue(WorkflowConfig item,String key){
+		String siteUID = item.getSiteUID();
+		if(StringUtils.isEmpty(siteUID)){
+			return null;
+		}
+		ConfigItemValue value = new ConfigItemValue();
+		Integer shareAutoConfirm = item.getShareAutoConfirm();
+		value.setTenantUid(item.getTenantUID());
+		value.setInstitutionUid(item.getInstitutionUID());
+		value.setHospitalUid(item.getHospitalUID());
+		value.setSiteUid(siteUID);
+		value.setKey(key);
+		value.setValue(String.valueOf(shareAutoConfirm));
+		return value;
+	}
+	private ConfigItem saveDefaultValue(String key){
+		ConfigItem configItemDefault = configItemRepository.findByDefaultValueForKey(key);
+		if(configItemDefault == null){
+			configItemDefault = new ConfigItem();
+			configItemDefault.setKey(key);
+			configItemDefault.setCategory(2);
+			configItemDefault.setDefaultValue("0");
+			configItemDefault.setUserParentConfig(true);
+			configItemDefault.setSuperAdminEdit(false);
+			configItemDefault.setValueType(2);
+			configItemDefault.setName("自动确认时间（分钟）");
+			configItemDefault.setDescription("自动确认时间（分钟）");
+			configItemRepository.save(configItemDefault);
+		}
+		return configItemDefault;
+	}
+
 }
