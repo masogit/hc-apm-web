@@ -305,27 +305,15 @@ public class MvsFileImportService {
     }
 
     private void saveAssetHistory(AssetInfo asset){
-        AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(asset,assetInfo);
         MqContext mqContext = new MqContext();
-        mqContext.setTime(new Date());
-        mqContext.setType("asset");
-        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
-        mqContext.setExChange(MQConfig.ASSET_CHANGE);
         mqContext.setClassName("MvsFileImportService");
         mqContext.setMethodName("saveContractInfo");
         mqContext.setServiceName("hc-apm-web");
         mqContext.setDescribe("MVS合同导入修改设备");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        JSONObject jsonObject =new JSONObject();
-
-        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String str = g.toJson(assetInfo);
-        jsonObject.put("assetInfo", str);
-        jsonObject.put("currentUserAccount",currentUserAccount);
-        mqContext.setJsonObject(jsonObject);
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
-        mqUtils.sendToMq(mqContext);
+        mqUtils.sendToMQ(asset,currentUserAccount,mqContext);
+
     }
 }
