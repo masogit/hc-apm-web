@@ -2,6 +2,7 @@ package com.ge.apm.listener;
 
 import com.ge.apm.domain.UserAccount;
 
+@Deprecated
 public class UserAccountThreadLocal {
     static ThreadLocal<UserAccount> userAccount=new ThreadLocal<>();
 
