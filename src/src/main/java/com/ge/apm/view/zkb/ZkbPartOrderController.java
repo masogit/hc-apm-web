@@ -166,7 +166,6 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         disableNotGeAsset = true;
                     }else if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(c.getConfigType()) ||
                             ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(c.getConfigType()) ||
-                            ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(c.getConfigType()) ||
                             ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(c.getConfigType())){
                         notGeAsset = "";
                         disableNotGeAsset = true;

@@ -49,7 +49,7 @@
                         <p:commandButton value="待审核 #{zkbPartOrderController.pendingCloseQty}"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ClosePending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('ClosePending')}" />
                         <p:commandButton value="完成"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Complete'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('Complete')}" />
                         <p:commandButton value="全部"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbPartOrderController.queryListByStatus('all')}" />
-                        <p:commandButton value="待上传探头说明函"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'letter'}" style="color: white ;font-weight: bolder;background: #088A29" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('letter')}" />
+                        <p:commandButton value="待上传探头说明函"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'letter'}" style="color: white ;font-weight: bolder;background: #088A29" rendered="#{zkbPartOrderController.showStatusBtn and !(zkbPartOrderController.notGeAsset eq 't')}" action="#{zkbPartOrderController.queryListByStatus('letter')}" />
 
                         <p:commandLink id="btnRemindLetter" immediate="false" process="@this" style="text-align: right" oncomplete="PF('zkbVacationDlg').show()" rendered="#{zkbPartOrderController.vacationBtn}">
                             <h:outputText value="是否休假" />
@@ -192,8 +192,7 @@
                                 <label class="label">是否休假：</label>
                                 <p:selectOneMenu id="isVacation" value="#{zkbPartOrderController.isVacation}" >
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItem itemLabel="是" itemValue="t"/>
-                                    <f:selectItem itemLabel="否" itemValue="f"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </p:panelGrid>
