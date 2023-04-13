@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : 503189362
@@ -42,6 +43,6 @@ public interface ZkbPartOrderMapper {
     @SelectProvider(type = ZkbPartOrderProvider.class, method = "batchExport")
     List<ZkbPartOrder> batchExport(@Param("testLogin")String testLogin, @Param("tenantUid")String tenantUid);
 
-
-
+    @SelectProvider(type = ZkbPartOrderProvider.class, method = "queryPendCountByUserConfig")
+    Integer queryPendCountByUserConfig(Map<String, Object> params);
 }

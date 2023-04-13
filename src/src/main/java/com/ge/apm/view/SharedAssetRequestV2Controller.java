@@ -1190,7 +1190,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        List<SharedAssetReqType> sartList = selected.getSartList();
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 1) {
-        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
+            String useUid = UserContextService.getCurrentUserAccount().getUid();
+        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName(),useUid,new Date());
         } 
         if(sta == 5){
         	dao.updateState(uid, state);
@@ -1237,6 +1238,25 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
 
     }
+    public void rejectReturn(){
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        Map<String, Object> params = new HashMap<>();
+        String id = selected.getId();
+        params.put("id", id);
+        params.put("rejectShelveRemark",selected.getRejectShelveRemark());
+        ResponseEntity<LinkedHashMap> result = null;
+        try {
+            result = sharedAssetService.rejectApply(GatewayURL.REJECT_RETURN, params);
+            logger.info("拒绝归还申请：id="+id);
+            String url = "List.xhtml?faces-redirect=true";
+            requestContext.addCallbackParam("url", url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            WebUtil.addErrorMessage("申请已取消或已受理，请返回并刷新！");
+            requestContext.addCallbackParam("url","norespond");
+        }
+
+    }
     public void AcceptR() throws Exception {
        String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
@@ -1244,7 +1264,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int state = 8;//2归还待交付状态
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 7) {
-        	dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName());
+            String useUid = UserContextService.getCurrentUserAccount().getUid();
+            dao.updateStateAndOwner(uid, state, UserContextService.getCurrentUserAccount().getLoginName(),useUid,new Date());
         }
         if(sta == 11) {
         	dao.updateState(uid, state);

@@ -47,7 +47,7 @@
                         </p:selectOneRadio>
                     </h:panelGroup>
                 </p:panelGrid>
-                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{reminderRuleController.save}" update=":reminderRuleEditDlg,:reminderRuleListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'reminderRuleEditDialog');" />
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{reminderRuleController.save('base')}" update=":reminderRuleEditDlg,:reminderRuleListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'reminderRuleEditDialog');" />
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('reminderRuleEditDialog').hide()"/>
             </h:form>
         </p:dialog>

@@ -33,12 +33,10 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -114,7 +112,10 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      */
     private String tenantUID = "";
 
-    private String queryTenantUID = "";
+    private String queryTenantUID;
+
+    /** * 是否非ge设备  t/f */
+    private String notGeAsset = "f";
 
     /**
      * 当前用户在config中的配置权限
@@ -202,6 +203,12 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         String token = UserContextService.getAccessToken();
         this.loginName = currentUser.getLoginName();
         this.queryStatus = WebUtil.getRequestParameter("queryStatus");
+        if(StringUtils.isNotBlank(WebUtil.getRequestParameter("notGeAssetBox"))){
+            this.notGeAsset = WebUtil.getRequestParameter("notGeAssetBox");
+        }
+        if(StringUtils.isNotBlank(WebUtil.getRequestParameter("queryTenantUID"))){
+            this.queryTenantUID = WebUtil.getRequestParameter("queryTenantUID");
+        }
         this.tenantUID = currentUser.getTenantUID();
         this.userName = currentUser.getName();
         this.userUid = currentUser.getUid();
@@ -224,7 +231,40 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.status);
     }
 
+    public void notGeAssetChange(ValueChangeEvent event){
+        this.queryStatus = MY_WORK;
+        String url = "List.xhtml?faces-redirect=true&queryStatus=" + MY_WORK+"&notGeAssetBox=" + event.getNewValue()+"&queryTenantUID=" + queryTenantUID;
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
+    }
 
+    public boolean checkAssignmentBox(){
+        boolean resultArg = true;
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())){
+            resultArg = zkbFePartOrderService.checkContracts(this.tenantUID);
+        }
+        return !resultArg;
+    }
+
+    public int statusCountFE(String status){
+        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+        if (StringUtils.isNotBlank(this.queryTenantUID)) {
+            searchFilters.add((new SearchFilter("tenantUid", SearchFilter.Operator.EQ, this.queryTenantUID)));
+        }
+        if (!(StringUtils.isNotBlank(this.loginName) && this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))) {
+            searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ, ZkbFePartOrderService.testStatusFalseValue)));
+        } else{
+            searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ, ZkbFePartOrderService.testStatusTrueValue)));
+        }
+        if (MY_WORK.equals(status)) {
+            this.getSearchFilterByUserConfig(searchFilters);
+        } else {
+            this.getAllSearchFilterByUserConfig(searchFilters);
+            searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ, status)));
+        }
+        List<ZkbFePartOrder> zkbFePartOrderList = zkbFePartOrderRepository.findBySearchFilter(searchFilters);
+        return CollectionUtils.isNotEmpty(zkbFePartOrderList)?zkbFePartOrderList.size():0;
+    }
     /**
      * 列表加载
      *
@@ -252,6 +292,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         if (StringUtils.isNotBlank(this.queryTenantUID)) {
             searchFilters.add((new SearchFilter("tenantUid", SearchFilter.Operator.EQ, this.queryTenantUID)));
         }
+        searchFilters.add((new SearchFilter("notGeAsset","t".equals(this.notGeAsset)?SearchFilter.Operator.EQ:SearchFilter.Operator.IsNull, "t".equals(this.notGeAsset)?this.notGeAsset:null)));
         if (!(StringUtils.isNotBlank(this.loginName) && this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))) {
             searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ, ZkbFePartOrderService.testStatusFalseValue)));
         } else if (!export) {
@@ -392,7 +433,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      * @return
      */
     public String intoCreateModel() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.CREATE_ACTION + "&id=" + "&queryStatus=" + queryStatus);
+        return UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.CREATE_ACTION + "&id=" + "&queryStatus=" + queryStatus + "&notGeAssetBox=" + this.notGeAsset);
     }
 
     /**
@@ -401,12 +442,12 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      * @return
      */
     public String intoEditModel() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=" + queryStatus);
+        return UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=" + queryStatus + "&notGeAssetBox=" + this.notGeAsset);
     }
 
-    public String queryListByStatus(String status) {
-        queryStatus = status;
-        return "List.xhtml?faces-redirect=true&queryStatus=" + queryStatus;
+    public String queryListByStatus(String status,String notGeAssetArg,String queryTenantUIDArg) {
+        notGeAsset = notGeAssetArg;queryTenantUID = queryTenantUIDArg;queryStatus = status;
+        return "List.xhtml?faces-redirect=true&queryStatus=" + queryStatus+"&notGeAssetBox=" + notGeAsset+"&queryTenantUID=" + queryTenantUID;
     }
 
     /**
@@ -419,7 +460,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     }
 
     public void doubleClick(SelectEvent event) {
-        String str = "action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=" + queryStatus;
+        String str = "action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=" + queryStatus + "&notGeAssetBox=" + notGeAsset;
         String url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(str);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
@@ -458,7 +499,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             Map<String, String> i18Map = this.zkbFePartOrderService.getI18ToMap("zkbFePartOrder_zkbPoReturnType");
             List<Map<String, Object>> importSparePartList = this.zkbFePartOrderService.getZkbFePartOrderSparePartMapFromTemplate(doc, i18Map);
             List<Map<String, Object>> importProbeList = this.zkbFePartOrderService.getZkbFePartOrderProbeMapFromTemplate(doc, i18Map);
-            this.zkbFePartOrderService.importData(importSparePartList, importProbeList, this.userUid, this.userName, this.tenantUID, this.currentUser, this.i18Map);
+            this.zkbFePartOrderService.importData(importSparePartList, importProbeList, this.userUid, this.userName, this.tenantUID, this.currentUser, this.i18Map,this.notGeAsset);
             errorZkbFePartList = this.zkbFePartOrderService.filterErrorRecords(importSparePartList, importProbeList);
             if (!errorZkbFePartList.isEmpty()) {
                 WebUtil.addErrorMessage("导入失败");
@@ -571,5 +612,13 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
 
     public void setQueryTenantUID(String queryTenantUID) {
         this.queryTenantUID = queryTenantUID;
+    }
+
+    public String getNotGeAsset() {
+        return notGeAsset;
+    }
+
+    public void setNotGeAsset(String notGeAsset) {
+        this.notGeAsset = notGeAsset;
     }
 }

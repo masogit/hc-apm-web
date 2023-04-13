@@ -571,6 +571,18 @@
                         </p:selectOneMenu>
                     </f:facet>
                 </p:column>
+                <p:column headerText="#{msg.terminateDate}">
+<!--                    <h:outputText value="#{assetInfoTerminatedListController.getTerminateDate(item.uid,4)}">-->
+<!--                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />-->
+<!--                    </h:outputText>-->
+                    <h:outputText value="#{item.terminateOperationDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="报废操作人">
+<!--                    <h:outputText value="#{assetInfoTerminatedListController.getTerminateBy(item.uid,4)}"/>-->
+                    <h:outputText value="#{item.terminateOperation}"/>
+                </p:column>
                 <f:facet name="{Toolbar}">
                     <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray"
                                      actionListener="#{assetInfoToBeTerminatedListController.exportExcel}"

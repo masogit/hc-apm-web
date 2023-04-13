@@ -95,7 +95,12 @@ public class JmReportController extends GenericCRUDUUIDController<JmReport> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        List<JmReport> reports = dao.findByTenantUid(loginUser.getTenantUID());
+        List<JmReport> reports = new ArrayList<>();
+        if (userContextService.hasRole("SuperAdmin")) {
+            reports = dao.findAll();
+        } else {
+            reports = dao.findByTenantUid(loginUser.getTenantUID());
+        }
         List<JmReport> reportIds = new ArrayList();
         if (!userContextService.hasAnyRole("SuperAdmin,ITAdmin")) {
             reports.forEach(val -> {

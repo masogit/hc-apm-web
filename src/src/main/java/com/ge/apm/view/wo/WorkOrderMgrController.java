@@ -1177,6 +1177,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         signatureContent = null;
         newSignature = true;
         workHoursList = null;
+        selectedApproverUid = null;
     }
 
     public void onSelectWorkOrder() {

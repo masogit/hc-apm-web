@@ -37,6 +37,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -146,7 +147,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             searchFilterList.add(new SearchFilter("ruleUID", SearchFilter.Operator.EQ, filterRuleUIDRuleUid));
         }
         if (filterRuleUID4Level!=null && StringUtils.isNotEmpty(filterRuleUID4RuleUid)) {
-            searchFilterList.add(new SearchFilter("ruleUID4", SearchFilter.Operator.EQ, filterRuleUID4RuleUid));
+            String[] ruleUid4s = StringUtils.split(filterRuleUID4RuleUid, "|");
+            searchFilterList.add(new SearchFilter("ruleUID4", SearchFilter.Operator.CONTAINS, Arrays.asList(ruleUid4s)));
         }
         searchFilterList.addAll(searchFilters);
 		if(StringUtils.isNotEmpty(queryCondition)){
@@ -440,11 +442,15 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	}
 
 	public String getRuleName(String ruleUID) {
-		PmOrderRule rule = ruleMap.get(ruleUID);//pmOrderRuleRepository.findByUid(ruleUID);
-		if (rule != null) {
-			return rule.getName();
-		}
-		return null;
+        String[] split = StringUtils.split(ruleUID, '|');
+        List<String> ruleUids = Arrays.asList(split);
+
+        List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findByUidIn(ruleUids);
+         String ruleName = "";
+        if(CollectionUtils.isNotEmpty(pmOrderRules)){
+             ruleName = pmOrderRules.stream().map(PmOrderRule::getName).collect(Collectors.joining("|"));
+        }
+        return ruleName;
 	}
     public boolean getPmRule(){
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
@@ -555,6 +561,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	 */
 	public void exportRelRuleAssets() {
 		try {
+            searchFilters.addAll(getOrgFilter(user.getSiteUID()));
 			List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(this.searchFilters);
 			List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(relRuleAssets.stream().map(relRuleAsset -> {return relRuleAsset.getAssetUID();}).collect(Collectors.toList()));
 			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
@@ -562,6 +569,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+        searchFilters.removeAll(getOrgFilter(user.getSiteUID()));
 	}
 
 	/**
