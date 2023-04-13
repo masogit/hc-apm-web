@@ -1,6 +1,7 @@
 package com.ge.apm.view;
 
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
@@ -16,9 +17,12 @@ import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.primefaces.context.RequestContext;
-import org.springframework.beans.BeanUtils;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
@@ -28,7 +32,9 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -47,11 +53,16 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private SysRoleRepository sysRoleRepository;
     private UserAccountMapper userAccountMapper;
     private UaaService uaaService;
+    private ReminderRuleOrgRepository ruleOrgRepository;
 
     private UserAccount loginUser;
     private List<SysRole> roles;
     private boolean isApm;
     private List<ReminderRule> apmRuleList;
+    private String retrieval;
+    private boolean propagateSelectionUp = true;
+    private TreeNode accessOrgTree;
+    private TreeNode[] selectedAccessOrgNodes;
 
     @Override
     protected ReminderRuleRepository getDAO() {
@@ -66,6 +77,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         userAccountMapper = WebUtil.getBean(UserAccountMapper.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        ruleOrgRepository = WebUtil.getBean(ReminderRuleOrgRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         roles = sysRoleRepository.find();
     }
@@ -73,21 +85,27 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     @Override
     protected Page<ReminderRule> loadData(PageRequest pageRequest) {
         searchFilters = ObjectUtil.isEmpty(searchFilters) ? ListUtil.toList() : searchFilters;
-        List<ReminderRule> resultList;
-        if (isApm) {
-            searchFilters.add(new SearchFilter("parentUid", SearchFilter.Operator.IsNull, null));
-        } else {
-            List<SearchFilter> filters = ListUtil.newArrayList(new SearchFilter("parentUid", SearchFilter.Operator.IsNull, null));
-            apmRuleList = dao.findBySearchFilter(filters);
-            super.removeFilterOnField("parentUid");
-            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
+//        List<ReminderRule> resultList;
+//        if (isApm) {
+//            searchFilters.add(new SearchFilter("parentUid", SearchFilter.Operator.IsNull, null));
+//        } else {
+//            List<SearchFilter> filters = ListUtil.newArrayList(new SearchFilter("parentUid", SearchFilter.Operator.IsNull, null));
+//            filters.add(new SearchFilter("universal", SearchFilter.Operator.NE, true));
+//            apmRuleList = dao.findBySearchFilter(filters);
+//            super.removeFilterOnField("parentUid");
+////            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
 //            List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
 //            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, orgUidList, "1*2+"));
 //            searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 //            searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 //            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }
-        resultList = dao.findBySearchFilter(searchFilters);
+//        }
+        List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        List<ReminderRule> resultList = dao.findBySearchFilter(searchFilters);
 
         for (ReminderRule reminderRule : resultList) {
             reminderRule.setRuleParam(JSON.parseObject(reminderRule.getParameters(), RuleParam.class));
@@ -98,29 +116,36 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
     public void save(String actionName) {
         if ("Create".equals(crudActionName)) {
-            if (!isApm) {
-                String parentUid = selected.getParentUid();
-                ReminderRule reminderRule = apmRuleList.stream().filter(rule -> rule.getId().equals(parentUid)).findFirst().orElse(new ReminderRule());
-                BeanUtils.copyProperties(reminderRule, selected);
-                selected.setId(null);
-                selected.setState(-1);
-                selected.setParentUid(parentUid);
-                selected.setTenantUid(loginUser.getTenantUID());
-                selected.setInstitutionUid(loginUser.getTenantUID());
-                selected.setHospitalUid(loginUser.getTenantUID());
-                selected.setSiteUid(loginUser.getTenantUID());
+//            if (!isApm) {
+//                String parentUid = selected.getParentUid();
+//                ReminderRule reminderRule = apmRuleList.stream().filter(rule -> rule.getId().equals(parentUid)).findFirst().orElse(new ReminderRule());
+//                BeanUtils.copyProperties(reminderRule, selected);
+//                selected.setId(null);
+//                selected.setState(-1);
+//                selected.setParentUid(parentUid);
+//                selected.setTenantUid(loginUser.getTenantUID());
 //                selected.setInstitutionUid(loginUser.getInstitutionUID());
 //                selected.setHospitalUid(loginUser.getHospitalUID());
 //                selected.setSiteUid(loginUser.getSiteUID());
-                dao.save(selected);
-                return;
-            }
+//                dao.save(selected);
+//                return;
+//            }
             selected.setState(-1);
+            selected.setTenantUid(loginUser.getTenantUID());
+            selected.setInstitutionUid(loginUser.getInstitutionUID());
+            selected.setHospitalUid(loginUser.getHospitalUID());
+            selected.setSiteUid(loginUser.getSiteUID());
         } else if ("Edit".equals(crudActionName) && "base".equals(actionName)) {
             selected.setState(-1);
         }
+//        if (isApm && Boolean.TRUE.equals(selected.getUniversal()) && "noticeTypeUser".equals(selected.getRuleParam().getNoticeType())) {
+//            WebUtil.addErrorMessage("通用版配置通知类型只能为角色！");
+//            return;
+//        }
         JSONObject parameters = JSON.parseObject(JSON.toJSONString(selected.getRuleParam()));
-        parameters.putAll(JSON.parseObject(JSON.toJSONString(selected.getWechatParam())));
+        WechatParam wechatParam = selected.getWechatParam();
+        wechatParam.setTemplateId(ReminderType.getWechatTemplateId(selected.getType()));
+        parameters.putAll(JSON.parseObject(JSON.toJSONString(wechatParam)));
         selected.setParameters(JSON.toJSONString(parameters));
         dao.save(selected);
     }
@@ -143,6 +168,117 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         url = "reminderEventList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
+    }
+
+    public void prepareUserScope() {
+        // 已选中的组织
+        List<OrgInfo> orgList = uaaService.getOrgListByReminderRule(selected.getId());
+        retrieval = null;
+        propagateSelectionUp = true;
+        accessOrgTree = uaaService.getOrgTreeBySiteWithoutClinical(selected.getTenantUid());
+        setSelectedOrgTree(accessOrgTree, orgList);
+        TreeNodeUtil.expandTreeNode(accessOrgTree);
+    }
+
+    private void setSelectedOrgTree(TreeNode node, List<OrgInfo> accessiableOrgList) {
+        OrgInfo org = (OrgInfo) node.getData();
+        if (accessiableOrgList.contains(org) || (node.getParent() != null && node.getParent().isSelected())) {
+            node.setSelected(true);
+        }
+        for (TreeNode item : node.getChildren()) {
+            setSelectedOrgTree(item, accessiableOrgList);
+        }
+    }
+
+    public void getFilteredNodes() {
+        if (StringUtils.isEmpty(retrieval)) {
+            propagateSelectionUp = true;
+        } else {
+            if (!accessOrgTree.getChildren().get(0).isSelected()) {
+                propagateSelectionUp = false;
+            }
+        }
+        uaaService.filterTreeNode(accessOrgTree, retrieval, -1, -1);
+    }
+
+    public void onSelectAccessTreeNode(NodeSelectEvent event) {
+        setTreeNodes(event.getTreeNode(), true);
+    }
+
+    public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+    }
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
+        }
+    }
+
+    public void saveOrgs() {
+        Set<OrgInfo> selectedOrgList = new HashSet<>();
+        readSelectedOrgTree(accessOrgTree, selectedOrgList);
+        addMissingChildClinical(accessOrgTree, selectedOrgList);
+        ruleOrgRepository.deleteByReminderRuleUid(selected.getId());
+        List<ReminderRuleOrg> ruleOrgList = ListUtil.newArrayList();
+        for (OrgInfo selectedOrg : selectedOrgList) {
+            ReminderRuleOrg ruleOrg = new ReminderRuleOrg();
+            ruleOrg.setOrgType(selectedOrg.getOrgType());
+            ruleOrg.setOrgUid(selectedOrg.getUid());
+            ruleOrg.setRuleUid(selected.getId());
+            ruleOrgList.add(ruleOrg);
+        }
+        ruleOrgRepository.save(ruleOrgList);
+    }
+
+    private void readSelectedOrgTree(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
+        if (node.isSelected()) {
+            if (node.getParent() != null && node.getParent().isSelected()) {
+                return;
+            } else {
+                selectedTreeNodeList.add((OrgInfo) node.getData());
+            }
+        } else {
+            for (TreeNode item : node.getChildren()) {
+                readSelectedOrgTree(item, selectedTreeNodeList);
+            }
+        }
+    }
+
+    private void addMissingChildClinical(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
+
+        OrgInfo data = (OrgInfo) node.getData();
+        if (data == null) {
+            //root
+            for (TreeNode item : node.getChildren()) {
+                addMissingChildClinical(item, selectedTreeNodeList);
+            }
+
+        } else if (data.getOrgType() < 4) {
+            if (!node.isSelected()) {
+                for (TreeNode item : node.getChildren()) {
+                    addMissingChildClinical(item, selectedTreeNodeList);
+                }
+            }
+        } else if (data.getOrgType() == 5 || data.getOrgType() == 4) {
+            //if site is selected, will not traverse here
+            if (node.isSelected()) {
+                selectedTreeNodeList.add(data);
+            }
+
+            //大科室下面可能还有大科室
+            for (TreeNode item : node.getChildren()) {
+                addMissingChildClinical(item, selectedTreeNodeList);
+            }
+
+        }
+
     }
 
     public List<SysRole> getRoleList() {
