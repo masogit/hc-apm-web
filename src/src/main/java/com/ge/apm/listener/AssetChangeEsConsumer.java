@@ -15,6 +15,7 @@ import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
+@Deprecated
 public class AssetChangeEsConsumer implements ChannelAwareMessageListener {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(AssetChangeEsConsumer.class);

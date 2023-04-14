@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
+
+@Deprecated
 public class PhysicalDataDelConsumer implements ChannelAwareMessageListener {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(PhysicalDataDelConsumer.class);
@@ -36,7 +38,7 @@ public class PhysicalDataDelConsumer implements ChannelAwareMessageListener {
         try {
             mqContext = JSONObject.parseObject(new String(message.getBody()), MqContext.class);
 
-            LOGGER.info("PhysicalDataDelConsumer mq 监听的消息 message :{}",JSONObject.toJSONString(mqContext));
+            LOGGER.debug("PhysicalDataDelConsumer mq 监听的消息 message :{}",JSONObject.toJSONString(mqContext));
             JSONObject jsonObject = mqContext.getJsonObject();
             String string = JSONObject.toJSONString(jsonObject.get("jsonData"));
             DataDelVO dataDelVO = JSONObject.parseObject(string, new TypeReference<DataDelVO>() {});

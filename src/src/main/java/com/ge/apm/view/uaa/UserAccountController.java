@@ -128,6 +128,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private SysRoleRepository sysRoleRepository;
 
+    private SupplierUserRepository supplierUserRepository;
+
     private CustomRoleRepository customRoleRepository;
     private ZkbIbCrossUserStatusRepository zkbIbCrossUserStatusRepository;
     private UserRoleRepository userRoleRepository;
@@ -259,6 +261,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userDetailsService = WebUtil.getBean(UserDetailsServiceImpl.class);
         zkbIbCrossUserStatusRepository = WebUtil.getBean(ZkbIbCrossUserStatusRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
+        supplierUserRepository = WebUtil.getBean(SupplierUserRepository.class);
 
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
@@ -759,7 +762,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selected.setLastModifiedBy(loginUser.getLoginName());
             selected.setLastModifiedDate(new Timestamp(System.currentTimeMillis()));
             selected.setWeChatId(null);
+            selected.setTelephone(null);
             dao.save(selected);
+            supplierUserRepository.deleteUserWxApp(selected.getId());
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
             /* 物理删除
             log.info("start delete user, uid: {}",this.selected.getUid());
