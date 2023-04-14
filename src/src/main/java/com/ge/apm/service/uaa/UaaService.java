@@ -524,6 +524,10 @@ public class UaaService {
         return orgInfoDao.getByUser(userUid);
     }
 
+    public List<OrgInfo> getOrgListByReminderRule(String ruleUid){
+        return orgInfoDao.getByReminderRule(ruleUid);
+    }
+
     public List<OrgInfo> getOrgListByPermissionGroup(List<String> permissionGroupUidList){
         return orgInfoDao.getOrgListByPermissionGroup(permissionGroupUidList);
     }

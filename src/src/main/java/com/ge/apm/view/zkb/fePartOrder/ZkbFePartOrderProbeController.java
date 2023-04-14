@@ -335,7 +335,9 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 confirmMessage += "本次扣除"+qyt+"个探头特殊名额；";
                 thisDeductionMessage = "本次扣除"+qyt+"个探头特殊名额；";
                 confirmMessage += "探头特殊剩余名额为"+probeQuotaSpecial+"。";
-            }else if("Normal".equals(this.selected.getZkbPoProbeQuotaType())){
+            }else if(("Normal".equals(this.selected.getZkbPoProbeQuotaType()))
+                ||("t".equals(this.selected.getHighCatFlag()))
+                    ||("High".equals(this.selected.getZkbPoProbeQuotaType()))){
                 confirmMessage += "本次扣除"+qyt+"个探头普通名额；";
                 thisDeductionMessage = "本次扣除"+qyt+"个探头普通名额；";
                 confirmMessage += "探头普通剩余名额为"+probeQuotaNormal+"。";
