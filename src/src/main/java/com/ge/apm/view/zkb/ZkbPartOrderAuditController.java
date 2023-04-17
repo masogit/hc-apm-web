@@ -1113,7 +1113,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
         }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
             if(haveTrainCourseFlag){
-                if(StrUtil.isNotEmpty(selected.getHaveTrainCourseFlag())){
+                if(StrUtil.isEmpty(selected.getHaveTrainCourseFlag())){
                     WebUtil.addErrorMessage("是否上过培训课不能为空！");
                     return "";
                 }
