@@ -372,7 +372,7 @@
                             <p:selectOneMenu id="urgentOrder" value="#{zkbPartOrderEditController.selected.urgentOrder}" required="true" requiredMessage="#{msg.zkbPartOrder_urgentOrder} #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="urgencyReasonsGrid" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbUrgentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbUrgentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup id="urgencyReasonsGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" >
