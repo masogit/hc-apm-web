@@ -34,6 +34,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.*;
@@ -247,8 +249,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             }
         });
     }
-    public List<String> autoLevelRulePMName(Integer level) {
-	    getRuleList();
+    public List<String> autoLevelRulePMName(String query) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Integer level = Integer.valueOf(UIComponent.getCurrentComponent(context).getAttributes().get("level").toString() == null
+                ? "0" : UIComponent.getCurrentComponent(context).getAttributes().get("level").toString());
+        getRuleList();
         if(level!=null){
             filterRuleLevel=level;
             switch (level) {
@@ -265,7 +270,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                     filterRuleUID4Level = level;
                     break;
             }
-            pmOrderRuleList = pmOrderRuleList.stream().filter(s -> s.getLevel() ==level).collect(Collectors.toList());
+            pmOrderRuleList = pmOrderRuleList.stream().filter(s -> s.getLevel() == level && s.getName().contains(query)).collect(Collectors.toList());
         }
         return pmOrderRuleList.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
