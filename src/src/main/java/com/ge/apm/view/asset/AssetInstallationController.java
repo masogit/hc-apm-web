@@ -661,6 +661,11 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             blobObject.setBoUuid(arrivalListItem.getId());
             blobObject.setBoSubType(typeName);
             blobService.saveBlobObject(blobObject);
+            try {
+                blobService.sendImageCompressMQ(blobObject);
+            }catch (Exception e){
+                logger.error("安装入库，图片生成缩略图MQ发生失败：", e);
+            }
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
