@@ -154,7 +154,6 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         break;
                     }
                 }
-
             }
             Map<String, String> mm =  FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
             if(!mm.containsKey("notGeAsset")){
