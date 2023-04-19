@@ -370,7 +370,7 @@ public class MeasuringService {
 
         List<MeasuringCertificateDetail> noFoundList = Lists.newArrayList();
         // 获取压缩文件中的每个子文件
-        ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"));
+        try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
         ZipEntry entry;
         while ((entry = zipInputStream.getNextEntry()) != null) {
             String fileName = entry.getName();
@@ -395,6 +395,10 @@ public class MeasuringService {
                 noFoundDetail.setErrorInfo(errInfo);
                 noFoundList.add(noFoundDetail);
             }
+        }
+        }catch (Exception e){
+            LOGGER.error("handle zip error:{}",e.getMessage());
+            throw  new RuntimeException("handleZip error",e);
         }
         return noFoundList;
     }
