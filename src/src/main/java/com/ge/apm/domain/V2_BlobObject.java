@@ -129,6 +129,9 @@ public class V2_BlobObject implements Serializable {
     @JsonBackReference
     private AssetInfo assetInfo;
 
+    @Column(name = "compress_object_id")
+    private String compressObjectId;
+
     public String getId() {
         return id;
     }
@@ -279,6 +282,14 @@ public class V2_BlobObject implements Serializable {
 
     public void setSecondDirectory(String secondDirectory) {
         this.secondDirectory = secondDirectory;
+    }
+
+    public String getCompressObjectId() {
+        return compressObjectId;
+    }
+
+    public void setCompressObjectId(String compressObjectId) {
+        this.compressObjectId = compressObjectId;
     }
 
     @Override

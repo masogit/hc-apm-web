@@ -416,9 +416,16 @@
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                    <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                    <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                                        <img data-original="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"
+                                                             src="#{fileDownloadService.getFileUrl(fileitem.compressObjectId)}"
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                                        <img data-original="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"
+                                                             src="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                    </h:panelGroup>
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
@@ -622,7 +629,7 @@
         </p:dialog>
         <script type="text/javascript">
             var arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm'),{
-                // url:'data-original',
+                url:'data-original',
                 show: function() {
                     arrivalListImg.update();
                 }
