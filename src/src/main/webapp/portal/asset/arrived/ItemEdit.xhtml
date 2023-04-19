@@ -469,9 +469,16 @@
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                        <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                            <img data-original="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"
+                                                 src="#{fileDownloadService.getFileUrl(fileitem.compressObjectId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                            <img data-original="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"
+                                                 src="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
                                     </h:panelGroup>
                                     <p:commandButton style="margin-left: 5px;" actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{fileitem.boType eq 'ArrivalList'}" oncomplete="updatePreviewImg()">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
@@ -719,7 +726,7 @@
 
         <script type="text/javascript">
             var arrivalListItemImg = new Viewer(document.getElementById('ItemEditDlgForm:arrivalListItemAttachment'),{
-                // url:'data-original',
+                url:'data-original',
                 show: function() {
                     arrivalListItemImg.update();
                 }
