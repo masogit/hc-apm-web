@@ -915,7 +915,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(CopyByInvok.T.equals(maintainFlag)){
                 ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(selectedContract.getId(),assetInfo.getUid());
                 if("t".equals(zkbContractAsset.getSupportMaintainFlag())){
-                    boolean b = zkbPartOrderService.checkDeductMaintain(zkbContractAsset);
+                    boolean b = zkbPartOrderService.checkDeductMaintain(zkbContractAsset,(Date)selectedWorkFlow.get("requestTime"));
                     if(b){
                         this.selected.setMaintainFirstFlag(CopyByInvok.F);
                     }else{
