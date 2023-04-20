@@ -41,9 +41,18 @@
                             </ui:fragment>
                         </c:when>
                         <c:otherwise>
-                            <ui:fragment>
-                                <ui:include src="./menu-content.xhtml"/>
-                            </ui:fragment>
+                            <c:choose>
+                                <c:when test="${userContextService.openNewMenuRoles}">
+                                    <ui:fragment>
+                                        <ui:include src="./menu-content-refact.xhtml"/>
+                                    </ui:fragment>
+                                </c:when>
+                                <c:otherwise>
+                                    <ui:fragment>
+                                        <ui:include src="./menu-content.xhtml"/>
+                                    </ui:fragment>
+                                </c:otherwise>
+                            </c:choose>
                         </c:otherwise>
                     </c:choose>
                 </div>

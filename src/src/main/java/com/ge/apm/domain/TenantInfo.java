@@ -3,6 +3,7 @@
 package com.ge.apm.domain;
 
 import com.ge.apm.service.utils.Digests;
+import org.apache.commons.lang3.BooleanUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.util.StringUtils;
@@ -118,6 +119,9 @@ public class TenantInfo implements Serializable {
     @Column(name="tenant_config",columnDefinition="text")
     private String tenantConfig;
 
+    @Column(name="feature_list",columnDefinition="text")
+    private String featureList;
+
     @Size(max = 255)
     @Column(name = "initial_password")
     private String initialPassword;
@@ -170,6 +174,17 @@ public class TenantInfo implements Serializable {
 
     @Column(name="is_enables_adverse_events" )
     private Boolean isEnablesAdverseEvents; // 控制不良事件相关微信卡片是否显示 （true/false 默认false不显示）
+
+    @Column(name="is_enables_new_menu", nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean isEnablesNewMenu; // 控制控制租户是否启动新菜单配置 （true/false 默认true显示）
+
+    public Boolean getEnablesNewMenu() {
+        return BooleanUtils.isTrue(isEnablesNewMenu);
+    }
+
+    public void setEnablesNewMenu(Boolean enablesNewMenu) {
+        isEnablesNewMenu = enablesNewMenu;
+    }
 
     public Boolean getIsEnablesAdverseEvents() {
         return isEnablesAdverseEvents==null?Boolean.FALSE:isEnablesAdverseEvents;
@@ -448,7 +463,15 @@ public class TenantInfo implements Serializable {
 		this.tenantConfig = tenantConfig;
 	}
 
-	public String getCpmURL() {
+    public String getFeatureList() {
+        return featureList;
+    }
+
+    public void setFeatureList(String featureList) {
+        this.featureList = featureList;
+    }
+
+    public String getCpmURL() {
 		return cpmURL;
 	}
 
