@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BudgetPersistService {
-    private static Logger logger = LoggerFactory.getLogger(BudgetApplicationController.class);
+    private static Logger logger = LoggerFactory.getLogger(BudgetPersistService.class);
 
     @Autowired
     private BudgetApplicationRepository budgetApplicationDao;
