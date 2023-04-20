@@ -273,23 +273,23 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         switch (org.getOrgType()) {
             case 4:
                 // 科室
-                updateSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, account.getOrgInfoId()));
+                updateSearchFilter(new SearchFilter("applicationDeptId", SearchFilter.Operator.EQ, org.getId()));
                 break;
             case 3:
                 // 院区
-                updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, account.getSiteUID()));
+                updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
                 break;
             case 2:
                 // 医院
-                updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, account.getHospitalUID()));
+                updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
                 break;
             case 1:
                 // 集团
-                updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, account.getInstitutionUID()));
+                updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
                 break;
             default:
                 // 租户
-                updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
+                updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
         }
     }
     public void searchAsset() {
