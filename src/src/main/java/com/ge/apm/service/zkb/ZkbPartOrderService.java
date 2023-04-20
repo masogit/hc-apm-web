@@ -11,6 +11,7 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.primefaces.event.FileUploadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1120,7 +1121,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())) {
             if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
-                if("t".equals(zkbPartOrder.getWhetherDeduct())){
+                if(CopyByInvok.T.equals(zkbPartOrder.getWhetherDeduct())){
                     subUseQty(zkbContract, zkbPartOrder, qty,userAccount);
                 }else {
                     //不扣除名额，那么申请中-1，剩余+1
@@ -1391,8 +1392,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         newZkbPartOrderStep.setPartOrderId(zkbPartOrder.getId());
         zkbPartOrderStepRepository.save(newZkbPartOrderStep);
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-        fourHundredCancelSubApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
-
+        if(CopyByInvok.T.equals(zkbPartOrder.getWhetherDeduct())){
+            fourHundredCancelSubApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
+        }
     }
 
     @Autowired
@@ -1598,7 +1600,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                             AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                             if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
                                 zkbContract.setGeArtificialSupportTimes((zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes()) - qty);
-                                zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
+                                zkbContract.setGeArtificialSupportTimesUse((zkbContract.getGeArtificialSupportTimesUse() == null ? 0 : zkbContract.getGeArtificialSupportTimesUse()) + qty);
                                 zkbContractRepository.save(zkbContract);
                                 zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                             }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
@@ -1608,7 +1610,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                         if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 1) { //内修
                             zkbContract.setCcsbMaintenanceQuota((zkbContract.getCcsbMaintenanceQuota() == null ? 0 : zkbContract.getCcsbMaintenanceQuota()) - qty);
-                            zkbContract.setCcsbMaintenanceQuotaApply((zkbContract.getCcsbMaintenanceQuotaApply() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaApply()) + qty);
+                            zkbContract.setCcsbMaintenanceQuotaUse((zkbContract.getCcsbMaintenanceQuotaUse() == null ? 0 : zkbContract.getCcsbMaintenanceQuotaUse()) + qty);
                             zkbContractRepository.save(zkbContract);
                             zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.CssbMaintenance.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                         }else if(assetInfo.getRepairForm() != null && assetInfo.getRepairForm() == 2) { //外修不扣名额
