@@ -14,6 +14,9 @@ import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import javaslang.control.Option;
@@ -47,8 +50,6 @@ import java.util.stream.Collectors;
 @ManagedBean(name = "userContextService")
 @SessionScoped
 public class UserContextService implements Serializable {
-
-
     public static  final Logger logger = LoggerFactory.getLogger(UserContextService.class);
 
     private static final long serialVersionUID = 1L;
@@ -61,6 +62,9 @@ public class UserContextService implements Serializable {
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
+    private Set<String> apmFunctionList = null;
+    private Set<ApmSystemRole> apmSystemRoles = null;
+    private Set<String> apmFeatures = null;
     private Boolean activeSupplierFlag = null;
     private String selectedSiteUid;
     //选定的院区
@@ -84,9 +88,19 @@ public class UserContextService implements Serializable {
         userContextService.flagIsHospitalUser = null;
 
         userContextService.tenant = null;
+
+        userContextService.apmFeatures = null;
+        userContextService.apmSystemRoles = null;
+        userContextService.apmFunctionList = null;
+        userContextService.listSysRole = null;
+        userContextService.listCustomRole = null;
+
         userContextService.getTenantInfo();
         userContextService.getListCustomRole(user.getId());
         userContextService.getListSysRole(user.getId());
+        userContextService.getFunctionListByFeatureAndRoles();
+        userContextService.getFeatureList();
+        userContextService.getApmSysRole();
     }
 
     public void processAfterLogin() {
@@ -298,6 +312,12 @@ public class UserContextService implements Serializable {
     	}
         return tenant;
     }
+
+    public boolean hasLocationEn() {
+        TenantInfo tenantInfo = getTenantInfo();
+        return tenantInfo.getLocationEn() != null;
+    }
+
     public List<CustomRole> getListCustomRole(Integer userId){
     	if(listCustomRole==null){
     		CustomRoleRepository customRoleRepository=WebUtil.getBean(CustomRoleRepository.class);
@@ -315,6 +335,24 @@ public class UserContextService implements Serializable {
 
     public boolean accessContains(String menuName){
     	return authContains(menuName)&&versionContains(menuName);
+    }
+
+    public boolean accessContainsFunctionMenu(String functionName) {
+        Set<String> functions = getFunctionListByFeatureAndRoles();
+        functions = functions.stream().filter(function -> function.startsWith(functionName)).collect(Collectors.toSet());
+        return functions.size() > 0;
+    }
+
+    public boolean hasAnyRoleByApmRoles(ApmSystemRole ... roleList) {
+        List<ApmSystemRole> roles = Optional.ofNullable(Arrays.asList(roleList)).orElse(new ArrayList<>());
+        if (roles.size() < 1) return false;
+        return getApmSysRole().stream().anyMatch(roles::contains);
+    }
+
+    public boolean hasRoleByApmRoles(ApmSystemRole ... roleList) {
+        List<ApmSystemRole> roles = Optional.ofNullable(Arrays.asList(roleList)).orElse(new ArrayList<>());
+        if (roles.size() < 1) return false;
+        return getApmSysRole().stream().allMatch(roles::contains);
     }
 
     public boolean accessContainsOfJiangNing(){
@@ -617,6 +655,65 @@ public class UserContextService implements Serializable {
     public static List<SysRole> getSysRole(Integer userId){
     	UserContextService userContextService = WebUtil.getBean(UserContextService.class);
     	return userContextService.getListSysRole(userId);
+    }
+
+    public Set<String> getFeatureList() {
+        if (CollectionUtils.isEmpty(apmFeatures)) {
+            apmFeatures = ((List<String>)JSONObject.parse(getTenantInfo().getFeatureList())).stream().collect(Collectors.toSet());
+        }
+        return apmFeatures;
+    }
+
+    public Set<ApmSystemRole> getApmSysRole() {
+        if (CollectionUtils.isEmpty(apmSystemRoles)) {
+            UserAccount userAccount = getLoginUser();
+            Set<String> roles = getSysRole(getUserID()).stream().map(SysRole::getName).collect(Collectors.toSet());
+            apmSystemRoles = Arrays.stream(ApmSystemRole.values()).filter(r -> roles.contains(r.name())).collect(Collectors.toSet());
+            if (userAccount.getIsSuperAdmin()) {
+                apmSystemRoles.add(ApmSystemRole.SuperAdmin);
+            }
+            if (userAccount.getIsSiteAdmin()) {
+                apmSystemRoles.add(ApmSystemRole.SiteAdmin);
+            }
+            if (userAccount.getIsGeOp()) {
+                apmSystemRoles.add(ApmSystemRole.GeOp);
+            }
+            if (userAccount.getIsLocalAdmin()) {
+                apmSystemRoles.add(ApmSystemRole.LocalAdmin);
+            }
+            if (userAccount.getMvsRoleType() != null) {
+                if (userAccount.getMvsRoleType() == 1 || userAccount.getMvsRoleType() == 3) {
+                    apmSystemRoles.add(ApmSystemRole.MVSAdmin);
+                } else if (userAccount.getMvsRoleType() == 2) {
+                    apmSystemRoles.add(ApmSystemRole.MVSFE);
+                }
+            }
+        }
+        return apmSystemRoles;
+    }
+
+    public Set<String> getFunctionListByFeatureAndRoles() {
+        if (CollectionUtils.isEmpty(apmFunctionList)) {
+            apmFunctionList = new HashSet<>();
+            List<CustomRole> customRoles = getCustomRole(getUserID());
+            Set<ApmSystemRole> sysRoles = getApmSysRole();
+            customRoles.forEach(customRole -> apmFunctionList.addAll((List<String>)JSONObject.parse(customRole.getFunctionList())));
+            Set<String> featureList = getFeatureList();
+            List<ApmFeature> apmFeatures = Arrays.asList(ApmFeature.values()).stream().filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
+            apmFeatures.forEach(feature -> apmFunctionList.addAll(feature.getFunctionList().stream()
+                    .filter(function -> sysRoles.stream().anyMatch(function.getRoleList()::contains) || CollectionUtils.isEmpty(function.getRoleList()))
+                    .map(f -> f.name()).collect(Collectors.toSet())));
+        }
+        return apmFunctionList;
+    }
+
+    public static List<String> getCustomRoleListByFunction() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        Set<String> functionList = userContextService.getFunctionListByFeatureAndRoles();
+        List<String> roles = getCustomRole(getUserID()).stream().filter(roleFunction -> functionList.contains(JSONObject.parse(roleFunction.getFunctionList())))
+                .map(CustomRole::getName)
+                .collect(Collectors.toList());
+        return roles;
     }
 
     public static UserAuth getCustomRoleAuth(Integer userId,String authKey){
@@ -1045,6 +1142,11 @@ public class UserContextService implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public boolean isOpenNewMenuRoles() {
+        TenantInfo tenantInfo = getTenantInfo();
+        return tenantInfo.getEnablesNewMenu();
     }
 
     public boolean isZkbAccount() {
@@ -1650,6 +1752,16 @@ public class UserContextService implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public static Set<ApmFeature> getInitFeature() {
+        return Arrays.stream(ApmFeature.values()).filter(f -> f.isNecessary()).collect(Collectors.toSet());
+    }
+
+    public static Set<ApmFunction> getInitFunction() {
+        Set<ApmFunction> apmFunctions = new HashSet<>();
+        getInitFeature().forEach(f -> apmFunctions.addAll(f.getFunctionList()));
+        return apmFunctions;
     }
 
     public OrgInfo getSelectSiteSchedule() {

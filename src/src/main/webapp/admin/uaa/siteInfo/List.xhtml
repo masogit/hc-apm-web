@@ -119,7 +119,6 @@
                         <p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{tenantInfoController.prepareView}" update=":SiteInfoViewDlg" oncomplete="PF('SiteInfoViewDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="editButton" rendered="#{tenantInfoController.showTestTenant}" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{tenantInfoController.prepareEdit('edit')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="editVersionButton" rendered="#{tenantInfoController.showTestTenant}"  icon="fa fa-fw fa-reorder" class="btn btn-sm btn-gray" title="版本功能" actionListener="#{tenantInfoController.prepareEdit}" update=":SiteInfoEditVersionDlg" oncomplete="PF('SiteInfoEditVersionDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
-
                         <p:commandButton id="disableButton" rendered="#{userContextService.partnerAccount}" icon="ui-icon-lock-outline" process="@this" title="#{msg.disableTenant}" actionListener="#{tenantInfoController.markDeleted}" update="datalist" disabled="#{empty tenantInfoController.selected}">
                             <p:confirm header="#{msg.disableTenant}" message="#{msg.disableTenantConfirm}" icon="ui-icon-alert"/>
                         </p:commandButton>
@@ -135,10 +134,9 @@
                 <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton datalist:editButton datalist:editVersionButton datalist:viewButton datalist:disableButton" immediate="true"/>
             </h:form>
 
-            <ui:include src="Edit.xhtml"/>
-            <ui:include src="EditVersion.xhtml"/>
-            <ui:include src="View.xhtml"/>
-
+                <ui:include src="Edit.xhtml"/>
+                <ui:include src="EditVersion.xhtml"/>
+                <ui:include src="View.xhtml"/>
             </div>
         </div>
         

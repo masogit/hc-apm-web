@@ -519,6 +519,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             assignedRoles.add(sysRoleVO.getRoleDesc());
         }else{
             roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
+            Set<String> tenantSysRoles = uaaService.getSysRoleListByTenantUid(selected.getTenantUID());
+            Set<String> tenantCustomRoles = uaaService.getTenantCustomRoles(selected.getTenantUID()).stream().map(CustomRole::getName).collect(Collectors.toSet());
+            roleListVO = roleListVO.stream().filter(role -> tenantSysRoles.contains(role.getName()) || tenantCustomRoles.contains(role.getName())).collect(Collectors.toList());
             List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(selected.getId());
             if(CollectionUtils.isNotEmpty(customRoles)){
                 for (CustomRole customRole : customRoles) {

@@ -1,5 +1,8 @@
 package com.ge.apm.service.uaa;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.PermissionGroupMapper;
@@ -1622,4 +1625,32 @@ public class UaaService {
     public List<String> getPermissionGroupsByUserUid(String uid) {
         return permissionGroupUserMapper.getPermissionGroupsByUserUid(uid);
     }
+
+    public List<String> getFeatureListByTenantUid(String tenantUid) {
+        TenantInfo tenantInfo = tenantInfoDao.findByUid(tenantUid);
+        if (tenantInfo != null && StringUtils.isNotEmpty(tenantInfo.getFeatureList())) {
+            return (List<String>) JSONObject.parse(tenantInfo.getFeatureList());
+        }
+        return new ArrayList<>();
+    }
+
+    public Set<String> getFunctionListByTenantUid(String tenantUid) {
+        Set<String> functionList = new HashSet<>();
+        List<String> featureList = getFeatureListByTenantUid(tenantUid);
+        if (CollectionUtils.isNotEmpty(featureList)) {
+            List<ApmFeature> apmFeatures = Arrays.asList(ApmFeature.values()).stream().filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
+            apmFeatures.forEach(feature -> functionList.addAll(feature.getFunctionList().stream().map(f -> f.name()).collect(Collectors.toSet())));
+        }
+        return functionList;
+    }
+
+    public Set<String> getSysRoleListByTenantUid(String tenantUid) {
+        Set<String> functionList = getFunctionListByTenantUid(tenantUid);
+        Set<ApmFunction> apmFunctions = Arrays.asList(ApmFunction.values()).stream()
+                .filter(function -> functionList.contains(function.name())).collect(Collectors.toSet());
+        Set<String> roles = new HashSet<>();
+        apmFunctions.forEach(f -> roles.addAll(f.getRoleList().stream().map(r -> r.name()).collect(Collectors.toSet())));
+        return roles;
+    }
+
 }

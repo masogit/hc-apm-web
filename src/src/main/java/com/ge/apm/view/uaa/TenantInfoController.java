@@ -1,5 +1,6 @@
 package com.ge.apm.view.uaa;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TableDefinition;
@@ -7,6 +8,7 @@ import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,10 +31,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -50,6 +50,15 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	boolean tempAlready = false;
 	String type = "";
+
+	@Getter@Setter
+	private List<ApmFeature> allFeatures;
+	@Getter@Setter
+	private List<ApmFeature> features;
+	@Getter@Setter
+	private List<ApmFeature> selectedFeatures;
+	@Getter@Setter
+	private String filterFeatureStr;
 
 	private boolean isTestTenant = false;
 	private boolean isShowTestTenant = true;
@@ -79,7 +88,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		tbDao = WebUtil.getBean(TableDefinitionRepository.class);
 		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
-
+		allFeatures = Arrays.asList(ApmFeature.values()).stream().collect(Collectors.toList());
+		features = allFeatures;
 		//判断是否是理想用户
 		if(LX_USER_TYPE.equals(loginUser.getType())){
 			this.isShowTestTenant = Boolean.FALSE;
@@ -201,6 +211,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	@Transactional
 	@Override
 	public void save() {
+		String features = null;
 		if (type.equalsIgnoreCase("create")) {// 如果租户已经创建过则退出
 			List<TenantInfo> byName = dao.getByName(this.selected.getName());
 			if (byName.size() > 0) {
@@ -208,11 +219,16 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				RequestContext.getCurrentInstance().addCallbackParam("tenantEstablished", true);
 				return;
 			}
+			features = JSONObject.toJSONString(UserContextService.getInitFunction().stream().map(f -> f.name()).collect(Collectors.toSet()));
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
 		this.selected.setLastModifiedDate(new Date());
+		if (StringUtils.isEmpty(features)) {
+			this.selected.setFeatureList(JSONObject.toJSONString(selectedFeatures));
+		} else {
+			this.selected.setFeatureList(features);
+		}
 		super.save();
-
 		if (!StringUtils.isEmpty(this.selected.getUid())) {
 			OrgInfo tenantOrg = orgInfoDao.findFirstByTenantUIDAndOrgType(this.selected.getUid(), 0);
 			if (tenantOrg != null) {
@@ -454,8 +470,34 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	private void parseTenantConfig() {
 		String configJsonStr = this.selected.getTenantConfig();
+		selectedFeatures = getApmFeatureList(this.selected.getFeatureList());
 		tenantConfigService.parseStr(configJsonStr);
 	}
+
+	public void filterFeature() {
+		features = allFeatures;
+		if (StringUtils.isEmpty(filterFeatureStr)) {
+			return;
+		} else {
+			features = features.stream().filter(item -> item.getFeatureName().toLowerCase().contains(filterFeatureStr.toLowerCase())).collect(Collectors.toList());
+		}
+	}
+
+	public List<ApmFeature> getApmFeatureList(String tenantFeatureList) {
+		if (StringUtils.isEmpty(tenantFeatureList)) {
+			return new ArrayList<>();
+		}
+		List<String> features = (List<String>)JSONObject.parse(tenantFeatureList);
+		return Arrays.stream(ApmFeature.values()).filter(f -> features.contains(f.name())).collect(Collectors.toList());
+	}
+
+	public boolean isOpenNewMenuRoles() {
+		if (selected == null) {
+			return false;
+		}
+		return selected.getEnablesNewMenu();
+	}
+
 	public String getType() {
 		return type;
 	}
