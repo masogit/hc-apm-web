@@ -273,7 +273,7 @@ public class BudgetApplicationController extends GenericCRUDUUIDController<Budge
         switch (org.getOrgType()) {
             case 4:
                 // 科室
-                updateSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, account.getOrgInfoId()));
+                updateSearchFilter(new SearchFilter("applicantDeptId", SearchFilter.Operator.EQ, account.getOrgInfoId()));
                 break;
             case 3:
                 // 院区
