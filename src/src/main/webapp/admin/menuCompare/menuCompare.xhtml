@@ -1,0 +1,23 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:pu="http://primefaces.org/ultima">
+
+	<ui:define name="content">
+		<h1>菜单比较</h1>
+		<h:form id="menuCompareFormId">
+			<h:panelGroup>
+				<p:fieldset legend="新旧版本菜单比较">
+					<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<label>新版本</label>
+							<ui:include src="newMenu.xhtml"/>
+						</h:panelGroup>
+						<h:panelGroup>
+							<label>旧版本</label>
+							<ui:include src="oldMenu.xhtml"/>
+						</h:panelGroup>
+					</p:panelGrid>
+				</p:fieldset>
+			</h:panelGroup>
+		</h:form>
+	</ui:define>
+</ui:composition>
