@@ -495,7 +495,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		}
 		UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 		TenantInfo tenantInfo = userContextService.getTenantInfo();
-		return  tenantInfo.getEnablesNewMenu() & StringUtils.isNotEmpty(tenantInfo.getFeatureList());
+		return  tenantInfo.getEnablesNewMenu() && StringUtils.isNotEmpty(tenantInfo.getFeatureList());
 	}
 
 	public void filterFunction() {
