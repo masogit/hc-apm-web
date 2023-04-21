@@ -1,12 +1,7 @@
 package com.ge.apm.view.asset;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.baomidou.mybatisplus.annotations.TableField;
 import com.ge.apm.callback.MqContext;
-import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -26,15 +21,9 @@ import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.internal.Excluder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
@@ -43,7 +32,6 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -51,9 +39,6 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.persistence.Column;
-import javax.persistence.Transient;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -812,10 +797,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-//        if(org.apache.commons.lang3.StringUtils.isEmpty(selected.getUid()) && selected.getId()==null){
-//            String uid = UUID.randomUUID().toString().replace("-", "");
-//            selected.setUid(uid);
-//        }
+
         boolean isCreate=false;
         if(selected.getId()==null){
             isCreate=true;
@@ -1616,7 +1598,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         mqContext.setMethodName("applyChange");
         mqContext.setDescribe("设备详情单个修改/设备状态修改待审核");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        mqUtils.sendToMQ(newAsset,currentUserAccount,mqContext);
+        mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
     }
 
     public int getAssetChangeHistoryCount() {

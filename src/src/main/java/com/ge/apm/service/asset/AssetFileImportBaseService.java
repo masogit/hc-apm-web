@@ -5,11 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.callback.MqContext;
-import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -21,14 +17,9 @@ import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -543,7 +534,7 @@ public class AssetFileImportBaseService {
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
         try {
-            mqUtils.sendToMQ(newAsset,currentUserAccount,mqContext);
+            mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
         }catch (Exception e){
             logger.error("importOneAsset send mq error:",e);
         }

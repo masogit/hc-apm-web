@@ -1,5 +1,7 @@
 package com.ge.apm.service.asset;
 
+import com.ge.apm.callback.MqContext;
+import com.ge.apm.mq.MqUtils;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
@@ -18,6 +20,7 @@ import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import webapp.framework.util.DateUtil;
 
@@ -72,6 +75,10 @@ public class MeasuringService {
     private MeasuringCertificateDetailMapper certificateDetailMapper;
     @Autowired
     private BlobObjectRepository blobDao;
+
+
+    @Autowired
+    private MqUtils mqUtils;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -183,6 +190,7 @@ public class MeasuringService {
             tempAssetInfo.setMeasuringType(needUpdateAssetMcd.getType());
 
             assetInfoDao.save(tempAssetInfo);
+            sendMq(tempAssetInfo);
 
         }
 
@@ -193,7 +201,17 @@ public class MeasuringService {
             return null;
         }
     }
-
+    public void sendMq(AssetInfo assetInfo) {
+        MqContext mqContext = new MqContext();
+        mqContext.setClassName("MeasuringService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("handleExcel- operateMeasuringAndAssetInfo/operateMeasuringAndAssetInfo_For_ShaoYiFu");
+        mqContext.setDescribe("计量导入修改设备信息");
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
+        mqUtils.sendAssetToMQ(assetInfo,currentUserAccount,mqContext);
+    }
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo_For_ShaoYiFu(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -317,6 +335,7 @@ public class MeasuringService {
 
             assetInfoDao.save(tempAssetInfo);
 
+            sendMq(tempAssetInfo);
         }
 
         if(!flag){

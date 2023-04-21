@@ -37,7 +37,6 @@ public class MqUtils {
     private  RabbitTemplate rabbitTemplate;
 
     public   void sendToMq(MqContext mqContext)   {
-//        log.info("send to mq exchange:{},routingKey:{},message:{}",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject());
         try{
             rabbitTemplate.convertAndSend(mqContext.getExChange(),mqContext.getRoutingKey(),mqContext);
         }catch (Exception e){
@@ -66,7 +65,7 @@ public class MqUtils {
         dataDelVO.setOperator(userAccount.getLoginName());
         dataDelVO.setCreatedDate(new Date());
         dataDelVO.setObjectType(objectType);
-        dataDelVO.setObjectValue(JSONObject.toJSONString(object));
+        dataDelVO.setObjectValue(JSON.toJSONString(object));
         dataDelVO.setHospitalUID(userAccount.getHospitalUID());
         dataDelVO.setInstitutionUID(userAccount.getInstitutionUID());
         dataDelVO.setSiteUID(userAccount.getSiteUID());
@@ -83,7 +82,7 @@ public class MqUtils {
 
 
     //设备新增assetInfo中id值设置为null
-    public void sendToMQ(AssetInfo asset, UserAccount userAccount, MqContext mqContext) {
+    public void sendAssetToMQ(AssetInfo asset, UserAccount userAccount, MqContext mqContext) {
         AssetInfo assetInfo = new AssetInfo();
         BeanUtils.copyProperties(asset,assetInfo);
         MqContext mqContextDTO=new MqContext();
