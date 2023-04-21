@@ -25,6 +25,14 @@
                                 <f:selectItems value="#{reminderRuleController.getUserList()}" var="userItem" itemLabel="#{userItem.name}" itemValue="#{userItem.id}"/>
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">周期单位<span style="color:red">*</span></label >
+                            <p:selectOneMenu value="#{reminderRuleController.selected.pushDateUnit}" required="true">
+                                <f:selectItem   itemLabel="天" itemValue="0"/>
+                                <f:selectItem  itemLabel="小时" itemValue="1"/>
+                                <f:selectItem   itemLabel="分钟" itemValue="2"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.pushType eq 1}">
                             <label class="label">#{msg.messageType}<span style="color:red">*</span></label >
                             <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.messageType}" required="true">

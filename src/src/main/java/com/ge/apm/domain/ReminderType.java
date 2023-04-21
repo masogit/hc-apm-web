@@ -11,6 +11,7 @@ public enum ReminderType {
     ASSET("AssetLifecycle", "un_take_task_template_id"),
     MEASURING("Measuring", "un_take_task_template_id"),
     CONTRACT("ContractOverdue", "un_take_task_template_id"),
+    UNATTENDED("UnattendedApproval", "workorder_change_template_id"),
     ;
 
     private final String type;
