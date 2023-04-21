@@ -411,19 +411,27 @@
                                 </p:panelGrid>
                                 <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" id="arrivalListAttachment">
                                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                        <h:panelGroup >
-                                            <p:dataList id="pictureList" value="#{assetArrivedListEditController.getAttachList('asset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                        <h:panelGroup>
+                                            <p:dataList id="pictureList"
+                                                value="#{assetArrivedListEditController.getAttachList('asset')}"
+                                                var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                                paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
+                                                <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                    <p:remoteCommand id="getImgBase64"
+                                                         process="@this" immediate="true" partialSubmit="true" update="@this" global="false"
+                                                         name="getImgBase64" action="#{fileDownloadService.getImgBase64ForReq()}"
+                                                         oncomplete="setOriginal(args)" async="true" />
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                        <img data-original="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"
-                                                             src="#{fileDownloadService.getFileUrl(fileitem.compressObjectId)}"
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
-                                                        <img data-original="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"
-                                                             src="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"
+                                                        <img id="#{fileitem.objectStorageId}" class="objectStorageId"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
                                                 </h:panelGroup>
@@ -628,12 +636,31 @@
             </h:form>
         </p:dialog>
         <script type="text/javascript">
+            $(document).ready(function () {
+                loadPreImg();
+            });
             var arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm'),{
                 url:'data-original',
                 show: function() {
-                    arrivalListImg.update();
                 }
             });
+            function loadPreImg(){
+                let imgList = $("[id='AssetArrivalEditForm:pictureList']").find('img');
+                $.each(imgList, function(i) {
+                    if($(imgList[i]).attr("data-original") == null){
+                        if(imgList[i].class == 'objectStorageId'){
+                            $(imgList[i]).attr("data-original",imgList[i].src);
+                            arrivalListImg.update();
+                        }else{
+                            getImgBase64([{name: 'objectId',value:imgList[i].id}])
+                        }
+                    }
+                });
+            }
+            function setOriginal(args){
+                $("#" + args.objectId).attr("data-original",args.objectBase64);
+                arrivalListImg.update();
+            }
             function updatePreviewImg(){
                 arrivalListImg.update();
                 // arrivalListImg.show();
