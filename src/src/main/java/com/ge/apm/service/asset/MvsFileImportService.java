@@ -1,8 +1,6 @@
 package com.ge.apm.service.asset;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
-import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MvsContractDateInfoRepository;
 import com.ge.apm.dao.MvsOrgInfoRepository;
@@ -12,8 +10,6 @@ import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -24,7 +20,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -313,7 +308,7 @@ public class MvsFileImportService {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
-        mqUtils.sendToMQ(asset,currentUserAccount,mqContext);
+        mqUtils.sendAssetToMQ(asset,currentUserAccount,mqContext);
 
     }
 }
