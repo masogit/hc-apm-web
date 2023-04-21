@@ -3,6 +3,7 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.SupplierUser;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public interface SupplierUserRepository extends GenericRepositoryUUID<SupplierUs
 
     void deleteBySupplierIDAndStatusAndUserIDIn(Integer supplierID, String status, List<Integer> userIDList);
 
+    @Transactional
     @Modifying
     @Query(nativeQuery = true, value = "delete from user_wx_app where user_id = ?1 and app_name='hc-apm-supplier'")
     void deleteUserWxApp(Integer userId);
