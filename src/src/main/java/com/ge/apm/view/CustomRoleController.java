@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import org.apache.commons.collections.CollectionUtils;
@@ -493,7 +494,8 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			return false;
 		}
 		UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-		return  userContextService.getTenantInfo().getEnablesNewMenu();
+		TenantInfo tenantInfo = userContextService.getTenantInfo();
+		return  tenantInfo.getEnablesNewMenu() & StringUtils.isNotEmpty(tenantInfo.getFeatureList());
 	}
 
 	public void filterFunction() {
