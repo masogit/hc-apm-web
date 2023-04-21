@@ -3,7 +3,6 @@ package com.ge.apm.service.asset;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.callback.MqContext;
-import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -16,11 +15,8 @@ import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.remote.ElasticService;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -29,13 +25,11 @@ import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.service.DbResourcesUtil;
 
 import javax.persistence.Column;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.*;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -422,7 +416,7 @@ public class AssetHistoryService {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
-        mqUtils.sendToMQ(newAsset,currentUserAccount,mqContext);
+        mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
     }
 
     public  <T> T depCopy(T srcList) {
