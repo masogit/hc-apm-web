@@ -495,7 +495,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		if (selected == null) {
 			return false;
 		}
-		return selected.getEnablesNewMenu();
+		return selected.getEnablesNewMenu() && StringUtils.isNotEmpty(selected.getFeatureList());
 	}
 
 	public String getType() {
