@@ -1146,7 +1146,7 @@ public class UserContextService implements Serializable {
 
     public boolean isOpenNewMenuRoles() {
         TenantInfo tenantInfo = getTenantInfo();
-        return tenantInfo.getEnablesNewMenu();
+        return tenantInfo.getEnablesNewMenu() && StringUtils.isNotEmpty(tenantInfo.getFeatureList());
     }
 
     public boolean isZkbAccount() {
