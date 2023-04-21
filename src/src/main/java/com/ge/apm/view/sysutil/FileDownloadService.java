@@ -9,6 +9,10 @@ import com.ge.apm.domain.DownloadTemplateFileType;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.lang3.StringUtils;
+import org.primefaces.PrimeFaces;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.StreamUtils;
 import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
@@ -50,6 +54,15 @@ public class FileDownloadService {
 
     public String getImgBase64(String fileId) {
         return msService.getImgBase64(fileId);
+    }
+
+    public void getImgBase64ForReq() {
+        String objectId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("objectId");
+
+        if(StringUtils.isNotBlank(objectId)){
+            PrimeFaces.current().ajax().addCallbackParam("objectId", objectId);
+            PrimeFaces.current().ajax().addCallbackParam("objectBase64", msService.getImgBase64(objectId));
+        }
     }
 
     public void exportTemplateFile(String type) {
