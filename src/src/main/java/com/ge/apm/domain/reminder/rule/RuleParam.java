@@ -17,8 +17,6 @@ public class RuleParam {
 
     private Boolean afterReminder;
 
-    private Integer pushDateUnit;
-
     private Integer pushDateValue;
 
     private String content;

@@ -1,20 +1,2 @@
--- APP推送 ↓
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'appTitle', 'Receive a ticket message', '您收到一条工单消息', NULL, '-1');
-INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'appAlert', 'You have a to-do list, click to view details', '您有一个待办事项, 单击查看详情', NULL, '-1');
--- APP推送 ↑
---YHAAO-15907
-update v2_pm_order vpo set pm_rule_uid = rra.rule_uid1 ,last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =1 and vpo.pm_rule_uid is null;
-update v2_pm_order vpo set pm_rule_uid = rra.rule_uid2 , last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =2 and vpo.pm_rule_uid is null;
-update v2_pm_order vpo set pm_rule_uid = rra.rule_uid, last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =3 and vpo.pm_rule_uid is null;
-update v2_pm_order vpo set pm_rule_uid = rra.rule_uid4 , last_modified_by = 'YHAAO-15907' from rel_rule_asset rra where vpo.asset_uid = rra.asset_uid and vpo.rule_level =4 and vpo.pm_rule_uid is null;
---更新原预生成表中绑定保养规则uid
-update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid1 from rel_rule_asset rra where popc.asset_uid = rra.asset_uid and popc.rule_level = 1 and popc.pm_rule_uid  is null;
-update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid2 from rel_rule_asset rra where popc.asset_uid = rra.asset_uid and popc.rule_level = 2 and popc.pm_rule_uid  is null;
-update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid from rel_rule_asset rra where popc.asset_uid = rra.asset_uid and popc.rule_level = 3 and popc.pm_rule_uid  is null;
-update pm_order_pre_create popc set pm_rule_uid = rra.rule_uid4 from rel_rule_asset rra where popc.asset_uid = rra.asset_uid and popc.rule_level = 4 and popc.pm_rule_uid  is null;
---YHAAO-18146
-ALTER TABLE public.asset_history ALTER COLUMN json_data TYPE text USING json_data::text;
--- 修改提醒规则为平台级
-UPDATE reminder_rule SET tenant_uid = null, institution_uid = null, hospital_uid = null, site_uid = null;
--- YHAAO-18320 云阜需求-删除科室 去除外键约束
-ALTER TABLE ONLY inventory_issue DROP CONSTRAINT fk_q7k1ps27403hpv9jrcww0glhj;
+-- YHAAO-18200
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13, 'false', '无人值守是否开启审批', 'enableUnattendedApproval', '无人值守是否开启审批', 'f', 't', 3 where not exists (select * from config_item where key = 'enableUnattendedApproval');
