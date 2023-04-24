@@ -463,6 +463,10 @@
                     </p:fieldset>
 
                     <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" id="arrivalListItemAttachment">
+                        <p:remoteCommand id="getImgBase64"
+                             process="@this" immediate="true" partialSubmit="true" update="@this" global="false"
+                             name="getImgBase64" action="#{fileDownloadService.getImgBase64ForReq()}"
+                             oncomplete="setOriginal(args)" async="true"/>
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup >
                                 <p:dataList id="pictureList" value="#{assetInstallationController.getAttachList('asset')}"
@@ -472,10 +476,6 @@
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                        <p:remoteCommand id="getImgBase64"
-                                             process="@this" immediate="true" partialSubmit="true" update="@this" global="false"
-                                             name="getImgBase64" action="#{fileDownloadService.getImgBase64ForReq()}"
-                                             oncomplete="setOriginal(args)" async="true" />
                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
                                             <img id="#{fileitem.objectStorageId}" class="compressObjectId"
                                                  src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
@@ -495,13 +495,22 @@
                                               multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" oncomplete="updatePreviewImg()"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:dataList id="contractList" value="#{assetInstallationController.getAttachList('asset2')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataList id="contractList" value="#{assetInstallationController.getAttachList('asset2')}"
+                                    var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                    paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                        <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                        <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                            <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                 src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                            <img id="#{fileitem.objectStorageId}" class="objectStorageId"
+                                                 src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
                                     </h:panelGroup>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{fileitem.boType eq 'ArrivalList'}" oncomplete="updatePreviewImg()">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
@@ -511,13 +520,22 @@
                                               multiple="true"  sizeLimit="100000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <p:dataList id="manualList" value="#{assetInstallationController.getAttachList('asset3')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataList id="manualList" value="#{assetInstallationController.getAttachList('asset3')}"
+                                    var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                    paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                        <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                        <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                            <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                 src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                            <img id="#{fileitem.objectStorageId}" class="objectStorageId"
+                                                 src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
                                     </h:panelGroup>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{fileitem.boType eq 'ArrivalList'}" oncomplete="updatePreviewImg()">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
@@ -527,13 +545,22 @@
                                               multiple="true"  sizeLimit="100000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
                             <h:panelGroup rendered="#{userContextService.activeSupplier()}">
-                                <p:dataList id="accessoryList" value="#{assetInstallationController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataList id="accessoryList" value="#{assetInstallationController.getAttachList('asset4')}"
+                                    var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                    paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                     <f:facet name="header">临床验收确认</f:facet>
                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                     <h:panelGroup rendered="#{assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
-                                        <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                            <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                 src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                            <img id="#{fileitem.objectStorageId}" class="objectStorageId"
+                                                 src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                        </h:panelGroup>
                                     </h:panelGroup>
                                     <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
@@ -544,13 +571,23 @@
                             </h:panelGroup>
                             <c:forEach items="#{assetInstallationController.getAttachmentCategories()}" var="attachmentConfig">
                                 <h:panelGroup >
-                                    <p:dataList id="#{attachmentConfig.boType.concat('List')}" value="#{assetInstallationController.getAttachList(attachmentConfig.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <p:dataList id="#{attachmentConfig.boType.concat('List')}"
+                                        value="#{assetInstallationController.getAttachList(attachmentConfig.boType)}"
+                                        var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                        paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                         <f:facet name="header">#{attachmentConfig.label}</f:facet>
                                         <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                         <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                            <img data-original="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                 src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                            <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                                <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                     src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
+                                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                            </h:panelGroup>
+                                            <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                                <img id="#{fileitem.objectStorageId}" class="objectStorageId"
+                                                     src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                            </h:panelGroup>
                                         </h:panelGroup>
                                         <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{fileitem.boType eq 'ArrivalList'}" oncomplete="updatePreviewImg()">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
@@ -742,7 +779,7 @@
                 }
             });
             function loadPreImg(){
-                let imgList = $("[id='ItemEditDlgForm:pictureList']").find('img');
+                let imgList = $("[id='ItemEditDlgForm:arrivalListItemAttachment']").find('img');
                 $.each(imgList, function(i) {
                     if($(imgList[i]).attr("data-original") == null){
                         if(imgList[i].class == 'objectStorageId'){
