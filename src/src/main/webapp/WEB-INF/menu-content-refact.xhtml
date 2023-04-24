@@ -185,12 +185,6 @@
             <p:menuitem id="um444" value="#{msg.review}" icon="fa fa-gavel" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT_VIEW')}" url="/audit/#/dashboard" target="_blank"></p:menuitem>
             <p:menuitem id="um445" value="#{msg.review}2.0" icon="fa fa-gavel" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT2_VIEW')}"  url="/auditV2/#/mainPage/" target="_blank"></p:menuitem>
 
-            <!-- 其他链接 -->
-            <p:submenu id="um100" label="#{msg.otherLink}" icon="fa fa-external-link" rendered="#{userContextService.accessContainsFunctionMenu('LINK_')}">
-                <p:menuitem id="nnm102" value="#{msg.assetMgt}" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContainsFunctionMenu('LINK_CPM1_VIEW') and (not empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
-                <p:menuitem id="nnm103" value="#{msg.assetMgt}" outcome="/portal/asset/assetMgtNone.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LINK_CPM2_VIEW') and (empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
-            </p:submenu>
-
             <!-- 系统配置 -->
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_')}">
                 <p:menuitem id="um54" value="#{msg.MessageSubscriber}" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_MESSAGE_EDIT')}"/>
