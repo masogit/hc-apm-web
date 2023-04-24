@@ -50,7 +50,7 @@ public enum AssetManagementEnum {
     HISPERFORMANCE("His绩效分析", true, false, "hisPerform", false, null, null, false),
     REPORT_CENTER("报表中心", true, false, "jmReport", false, null, null, false),
     CONFIG("系统配置", true, true, "config", false, null, null, false),
-    ASSET_ACCOUNT_DASHBOARD("资产管理一览", true, false, "config.accountDash", false, null, null, false),
+    ASSET_ACCOUNT_DASHBOARD("资产管理一览", true, false, "config.accountdash", false, null, null, false),
     PLATFORM_CONFIG("平台管理", true, true, "config.platform", false, null, null, false),
     AUDIT_CONFIG("质控评审配置", true, false, "config.auditConfig", false, null, null, false),
     MVS_ASSET("MVS设备管理", false, false, "mvs.asset", false, null, null, false),
