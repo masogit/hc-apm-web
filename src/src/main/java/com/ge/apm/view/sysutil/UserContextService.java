@@ -18,7 +18,6 @@ import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import javaslang.control.Option;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -34,7 +33,6 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
 
-import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
@@ -54,9 +52,6 @@ public class UserContextService implements Serializable {
 
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
-    public static final Integer INTERNATIONAL_VERSION = 1;
-    public static List<String> internationalList= Lists.newArrayList("asset","repair","maintain","config");
-
 
     private TenantInfo tenant = null;
     private UserAccount userAccount = null;
@@ -67,6 +62,9 @@ public class UserContextService implements Serializable {
     private Set<String> apmFeatures = null;
     private Boolean activeSupplierFlag = null;
     private String selectedSiteUid;
+    private Boolean flagIsUltraSoundTenant = null;
+    private Boolean flagIsAgentTenant = null;
+    private Boolean flagIsHospitalUser = null;
     //选定的院区
     private OrgInfo selectSite;
     private OrgInfo selectSiteSchedule;
@@ -130,28 +128,6 @@ public class UserContextService implements Serializable {
         return UserContext.ANONYMOUS_USER.equalsIgnoreCase(getUserLoginName());
     }
 
-    private boolean isFirstRequestAfterLogin = true;
-
-    public boolean isIsFirstRequestAfterLogin() {
-        return isFirstRequestAfterLogin;
-    }
-
-    public void checkIsSuperAdminAndFirstRequest() {
-        if (!getLoginUser().getIsSuperAdmin()) {
-            return;
-        }
-
-        if (!isFirstRequestAfterLogin) {
-            return;
-        }
-        isFirstRequestAfterLogin = false;
-
-        //navigate to super admin's home page
-        FacesContext context = FacesContext.getCurrentInstance();
-        ConfigurableNavigationHandler handler = (ConfigurableNavigationHandler) context.getApplication().getNavigationHandler();
-        handler.performNavigation("admin/adminHome.xhtml?faces-redirect=true");
-    }
-
     public static List<String> getRoles() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount user = userContextService.getLoginUser();
@@ -159,63 +135,29 @@ public class UserContextService implements Serializable {
         return user.getRoleNames();
     }
 
-    public boolean isOnlyAssetStaff(){
+    public boolean isOnlyAssetStaff() {
         List<String> roles = getRoles();
-        if(roles.size()==1){
-            if(roles.get(0).toString().equalsIgnoreCase("AssetStaff")){
-                return true;
-            }else{
-                return false;
-            }
-
-        }else{
+        if (roles.size() == 1) {
+            return roles.get(0).equalsIgnoreCase(ApmSystemRole.AssetStaff.name());
+        } else {
             return false;
         }
-
     }
 
     public boolean hasRole(String role) {
         return UserContextService.checkRole(role);
     }
 
-    //add MVSAdmin,MVSFE
     public boolean hasAnyRole(String roleList) {
+        List<String> roles = Arrays.asList(roleList.split(","));
+        if (CollectionUtils.isEmpty(roles)) return false;
         UserAccount user = getLoginUser();
-        Integer userId = user.getId();
-        if(roleList.contains("SuperAdmin") && user.getIsSuperAdmin()){
-            return true;
-        }
-        if(roleList.contains("SiteAdmin") && user.getIsSiteAdmin()){
-            return true;
-        }
         List<String> userRoles = user.getRoleNames();
-        String[] roles = roleList.split(",");
-        for (String role : roles) {
-            role = role.trim();
-            boolean roleAllowed = userRoles.contains(role);
-            if (roleAllowed) {
-                return true;
-            }
-        }
+        if (userRoles.stream().anyMatch(roles::contains)) return true;
         //增加自定义角色判断
-//        CustomRoleRepository customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
-//        List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(userId);
-        List<CustomRole> customRoles=getListCustomRole(userId);
-        List<String> names = new ArrayList<>();
-        if(CollectionUtils.isNotEmpty(customRoles)){
-            for (CustomRole customRole : customRoles) {
-                if(StringUtils.isNotEmpty(customRole.getGroups())){
-                    names.addAll(Arrays.asList(customRole.getGroups().split(",")));
-                }
-            }
-            names = names.stream().distinct().collect(Collectors.toList());
-            for (String role : roles) {
-                if(names.contains(role.trim())){
-                    return true;
-                }
-            }
-        }
-        return false;
+        List<CustomRole> customRoles = getListCustomRole(user.getId());
+        List<String> names = customRoles.stream().map(CustomRole::getGroups).collect(Collectors.toList());
+        return names.stream().anyMatch(roles::contains);
     }
 
     /**
@@ -224,7 +166,7 @@ public class UserContextService implements Serializable {
      */
     public static boolean isDeparmentUser() {
         OrgInfo org = WebUtil.getBean(OrgInfoRepository.class).getByUid(getCurrentUserAccount().getOrgInfoUID());
-        return  null == org.getOrgType() ? false : 4 == org.getOrgType();
+        return  null == org.getOrgType() ? Boolean.FALSE : 4 == org.getOrgType();
     }
     /**
      * 判断当前登录是
@@ -232,25 +174,12 @@ public class UserContextService implements Serializable {
      * 该租户已开启了小型物联网设备(急救类)服务
      * @return boolean
      */
-    public boolean accessContain(){
-        List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
-//            for (String s : usname) {
-//                if (s.equals("OpWorker")) {
-//                    return false;
-//                }
-//            }
+    public boolean accessContain() {
         List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (bySiteUID!=null&&bySiteUID.size()!=0){
-            if (bySiteUID.get(0).getWhethertoenableunattended()!=null && bySiteUID.get(0).getIsiotenabled()!=null){
-                if (bySiteUID.get(0).getWhethertoenableunattended()==true && bySiteUID.get(0).getIsiotenabled()==true){
-                    return true;
-                }
-                return false;
-            }
-            return false;
+        if (CollectionUtils.isNotEmpty(bySiteUID)) {
+            return BooleanUtils.isTrue(bySiteUID.get(0).getWhethertoenableunattended()) && BooleanUtils.isTrue(bySiteUID.get(0).getIsiotenabled());
         }
         return false;
-
     }
 
     public boolean enableSiteToSiteAllocation() {
@@ -278,40 +207,27 @@ public class UserContextService implements Serializable {
         return workflowConfig.getEnableSendRepair() != null && workflowConfig.getEnableSendRepair();
     }
 
-    public boolean byOpWorker(){
-        List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
-            for (String s : usname) {
-                if (s.equals("OpWorker")) {
-                    return false;
-                }
-            }
-        return true;
-    }
-    //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
     }
-    public TenantInfo getTenantInfo(){
-        if(tenant!=null) return tenant;
-    	TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
-    	tenant = tenantInfoRepository.findByuid(getLoginUser().getTenantUID());
-    	if(tenant.getCpmURL()==null){
-    		String configStr=tenant.getTenantConfig();
-        	if(StringUtils.isNotEmpty(configStr)){
-        		try {
-    				JSONObject jsonObj=JSONObject.parseObject(configStr);
-    				String cpmURL=jsonObj.getString("cpmURL");
-    				if(StringUtils.isEmpty(cpmURL)){
-    				}
-    				else{
-    					tenant.setCpmURL(cpmURL);
-    				}
-    			} catch (Exception e) {
-    				// TODO: handle exception
-    				tenant.setCpmURL("");
-    			}
-        	}
-    	}
+
+    public TenantInfo getTenantInfo() {
+        if (tenant != null) return tenant;
+        TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        tenant = tenantInfoRepository.findByuid(getLoginUser().getTenantUID());
+        if (tenant.getCpmURL() == null) {
+            String configStr = tenant.getTenantConfig();
+            if (StringUtils.isNotEmpty(configStr)) {
+                try {
+                    String cpmURL = JSON.parseObject(configStr).getString("cpmURL");
+                    if (StringUtils.isNotEmpty(cpmURL)) {
+                        tenant.setCpmURL(cpmURL);
+                    }
+                } catch (Exception e) {
+                    tenant.setCpmURL("");
+                }
+            }
+        }
         return tenant;
     }
 
@@ -342,36 +258,31 @@ public class UserContextService implements Serializable {
     public boolean accessContainsFunctionMenu(String functionName) {
         Set<String> functions = getFunctionListByFeatureAndRoles();
         functions = functions.stream().filter(function -> function.startsWith(functionName)).collect(Collectors.toSet());
-        return functions.size() > 0;
+        return CollectionUtils.isNotEmpty(functions);
     }
 
     public boolean hasAnyRoleByApmRoles(ApmSystemRole ... roleList) {
         List<ApmSystemRole> roles = Optional.ofNullable(Arrays.asList(roleList)).orElse(new ArrayList<>());
-        if (roles.size() < 1) return false;
+        if (CollectionUtils.isEmpty(roles)) return false;
         return getApmSysRole().stream().anyMatch(roles::contains);
     }
 
     public boolean hasRoleByApmRoles(ApmSystemRole ... roleList) {
         List<ApmSystemRole> roles = Optional.ofNullable(Arrays.asList(roleList)).orElse(new ArrayList<>());
-        if (roles.size() < 1) return false;
+        if (CollectionUtils.isEmpty(roles)) return false;
         return getApmSysRole().stream().allMatch(roles::contains);
     }
 
-    public boolean accessContainsOfJiangNing(){
-        TenantInfoRepository tenantInfoRepository=WebUtil.getBean(TenantInfoRepository.class);
-        List<TenantInfo> tenantIfos = tenantInfoRepository.findByCustomTenant("2");
-        if(tenantIfos == null || tenantIfos.size() == 0){
+    public boolean accessContainsOfJiangNing() {
+        TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        List<TenantInfo> tenantInfos = tenantInfoRepository.findByCustomTenant("2");
+        if (CollectionUtils.isEmpty(tenantInfos)) {
             return false;
         }
-        TenantInfo tf = tenantIfos.get(0);
-        String jiangNingUid = tf.getUid();
-        String currentTenantUid = userAccount.getTenantUID();
-        if(jiangNingUid.equals(currentTenantUid)){
-            return true;
-        }else{
-            return false;
-        }
+        TenantInfo tf = tenantInfos.get(0);
+        return tf.getUid().equals(userAccount.getTenantUID());
     }
+
     public boolean getUserAccountApprove(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccountRepository userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
@@ -382,11 +293,10 @@ public class UserContextService implements Serializable {
             String groupMemberItem = auditGroupConfiguration.getGroupMemberItem();
             List<AuditGroupConfigurationNode> auditGroupConfigurationNodes = JSON.parseObject(groupMemberItem, new TypeReference<List<AuditGroupConfigurationNode>>() {});
             if (auditGroupConfigurationNodes != null && !auditGroupConfigurationNodes.isEmpty()) {
-                for (int i = 0; i < auditGroupConfigurationNodes.size(); i++) {
-                    AuditGroupConfigurationNode auditGroupConfigurationNode = auditGroupConfigurationNodes.get(i);
-                    List<String> userUids = auditGroupConfigurationNode.getUserUids();
-                    UserAccount user = userAccountRepository.getByUid(userUids.get(0));
-                    if (user!=null && userAccount.getUid().equals(user.getUid())){
+                for (AuditGroupConfigurationNode auditGroupConfigurationNode : auditGroupConfigurationNodes) {
+                    List<String> userUIds = auditGroupConfigurationNode.getUserUids();
+                    UserAccount user = userAccountRepository.getByUid(userUIds.get(0));
+                    if (user != null && userAccount.getUid().equals(user.getUid())) {
                         return true;
                     }
                 }
@@ -395,67 +305,53 @@ public class UserContextService implements Serializable {
         }
         return false;
     }
-    public boolean authContains(String menuName){
-    	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()||userAccount.getIsGeOp()){
-    		return true;
-    	}
-    	List<CustomRole> listCustomRole=getListCustomRole(userAccount.getId());
-    	List<SysRole> listSysRole=getListSysRole(userAccount.getId());
-    	if(listCustomRole!=null && listCustomRole.size()>0){
-    		for(int i=0;i<listCustomRole.size();++i){
-    			CustomRole tempRole=listCustomRole.get(i);
-    			String menus=tempRole.getMenus();
-    			if(StringUtils.isNotEmpty(menus)){
-    				String [] menuArr=menus.split(",");
-    				for(int j=0;j<menuArr.length;++j){
-    					String tempStr=menuArr[j].trim();
-    					if(tempStr.equals(menuName)){
-    						return true;
-    					}
-    				}
-    			}
-    		}
-    	}
-    	if(listSysRole!=null && listSysRole.size()>0){
-    		for(int i=0;i<listSysRole.size();++i){
-    			SysRole tempRole=listSysRole.get(i);
-    			String menus=tempRole.getMenus();
-    			if(StringUtils.isNotEmpty(menus)){
-    				String [] menuArr=menus.split(",");
-    				for(int j=0;j<menuArr.length;++j){
-    					String tempStr=menuArr[j].trim();
-    					if(tempStr.equals(menuName)){
-    						return true;
-    					}
-    				}
-    			}
-    		}
-    	}
-    	return false;
+
+    public boolean isSuperAdminOrSiteAdminOrGeOp(UserAccount userAccount) {
+        return userAccount.getIsSuperAdmin() || userAccount.getIsSiteAdmin() || userAccount.getIsGeOp();
     }
 
-    public boolean versionContains(String menuName){
-    	TenantInfo tenantInfo=getTenantInfo();
-    	String configStr=tenantInfo.getTenantConfig();
-    	if(StringUtils.isNotEmpty(configStr)){
-    		try {
-				JSONObject jsonObj=JSONObject.parseObject(configStr);
-				JSONArray jsonArray=jsonObj.getJSONArray("menuList");
-				menuName=menuName.trim();
-				for(int i=0;i<jsonArray.size();++i){
-					if(jsonArray.getString(i).equals(menuName)){
-						return true;
-					}
-				}
-				return false;
-			} catch (Exception e) {
-				// TODO: handle exception
-				return false;
-			}
-    	}
-    	else{
-    		return true;
-    	}
+    public boolean authContains(String menuName) {
+        if (isSuperAdminOrSiteAdminOrGeOp(userAccount)) {
+            return true;
+        }
+        List<CustomRole> customRoles = getListCustomRole(userAccount.getId());
+        List<SysRole> sysRoles = getListSysRole(userAccount.getId());
+        if (CollectionUtils.isNotEmpty(customRoles)) {
+            return customRoles.stream()
+                    .filter(customRole -> customRole.getMenus() != null)
+                    .flatMap(customRole -> Arrays.stream(customRole.getMenus().split(",")))
+                    .map(String::trim)
+                    .anyMatch(menu -> menu.equals(menuName));
+        }
+        if (CollectionUtils.isNotEmpty(sysRoles)) {
+            return sysRoles.stream()
+                    .filter(customRole -> customRole.getMenus() != null)
+                    .flatMap(customRole -> Arrays.stream(customRole.getMenus().split(",")))
+                    .map(String::trim)
+                    .anyMatch(menu -> menu.equals(menuName));
+        }
+        return false;
+    }
+
+    public boolean versionContains(String menuName) {
+        TenantInfo tenantInfo = getTenantInfo();
+        String configStr = tenantInfo.getTenantConfig();
+        if (StringUtils.isNotEmpty(configStr)) {
+            try {
+                JSONArray jsonArray = JSON.parseObject(configStr).getJSONArray("menuList");
+                menuName = menuName.trim();
+                for (int i = 0; i < jsonArray.size(); ++i) {
+                    if (jsonArray.getString(i).equals(menuName)) {
+                        return true;
+                    }
+                }
+                return false;
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 
     public static boolean checkRole(String role) {
@@ -468,8 +364,6 @@ public class UserContextService implements Serializable {
             return false;
         }
 
-//        if (UserContextService.isSiteAdmin()) return true;
-//        else if ("SiteAdmin".equals(role)) return false;
         if ("SiteAdmin".equals(role)) {
             return user.getIsSiteAdmin();
         }
@@ -502,79 +396,41 @@ public class UserContextService implements Serializable {
             UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
             userAccount = dao.getByLoginName(userName);
         }
-
-    /* else {
-            // check if user has switch account by WeChat Client
-            HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-            String userName = UserContext.getUsername(request);
-
-            if (!userAccount.getLoginName().equals(userName)) {
-                userAccount = WebUtil.getUserAccountFromRequest();
-            }
-        }
-     */
-
         return userAccount;
     }
 
-    public boolean isIBTenant(){
+    public boolean isIBTenant() {
         UserAccount currentUser = getLoginUser();
-        int siteId= currentUser.getSiteId();
-
+        int siteId = currentUser.getSiteId();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-
-        if(siteId==46){
-            if(userContextService.hasRole("AssetStaff")|| userContextService.hasRole("AssetHead")){
-                return false;
-            }
+        if (siteId == 46 && (userContextService.hasRole("AssetStaff") || userContextService.hasRole("AssetHead"))) {
+            return false;
         }
-        return siteId==46;
+        return siteId == 46;
     }
 
-    private Boolean flagIsAgentTenant = null;
+
     public boolean isAgentTenant() {
         if(flagIsAgentTenant!=null) return flagIsAgentTenant;
-
-        UserAccount user = getLoginUser();
         tenant = getTenantInfo();
         flagIsAgentTenant = tenant.getType() != null && tenant.getType() == 1;
 
         return flagIsAgentTenant;
     }
 
-    private Boolean flagIsUltraSoundTenant = null;
     public boolean isUltraSoundTenant() {
-        if(flagIsUltraSoundTenant!=null) return flagIsUltraSoundTenant;
-
-        UserAccount user = getLoginUser();
-        TenantInfo tenant = getTenantInfo();
-        flagIsUltraSoundTenant = tenant.getTenantConfig() != null && tenant.getTenantConfig().contains("\"edition\":\"ultrasound\"");
-
-        return flagIsUltraSoundTenant;
+        if (flagIsUltraSoundTenant != null) return flagIsUltraSoundTenant;
+        TenantInfo tenantInfo = getTenantInfo();
+        return tenantInfo.getTenantConfig() != null && tenantInfo.getTenantConfig().contains("\"edition\":\"ultrasound\"");
     }
 
-    WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
-
-    /**
-     * 获取智康宝用户
-     */
-    ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
-
-    ZkbCourseTrainUserConfigRepository zkbCourseTrainUserConfigRepository = WebUtil.getBean(ZkbCourseTrainUserConfigRepository.class);
-
-    /**
-     * 获取 fe part order user config
-     */
-    ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
-
-    private Boolean flagIsHospitalUser = null;
     public boolean isHospitalUser(){
         if(flagIsHospitalUser!=null) return flagIsHospitalUser;
 
         UserAccount loginUser = getLoginUser();
         //判断医院级别是否有调剂中心
-        List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getSiteUID());
-        if(list.size() > 0) {
+        List<WorkflowConfig> list = WebUtil.getBean(WorkflowConfigRepository.class).findHospitalLevel(loginUser.getSiteUID());
+        if(CollectionUtils.isNotEmpty(list)) {
             flagIsHospitalUser = Boolean.TRUE;
         } else {
             flagIsHospitalUser = Boolean.FALSE;
@@ -661,37 +517,32 @@ public class UserContextService implements Serializable {
 
     public Set<String> getFeatureList() {
         if (CollectionUtils.isEmpty(apmFeatures)) {
-            apmFeatures = ((List<String>)JSONObject.parse(getTenantInfo().getFeatureList())).stream().collect(Collectors.toSet());
+            apmFeatures = ((List<String>)JSON.parse(getTenantInfo().getFeatureList())).stream().collect(Collectors.toSet());
         }
         return apmFeatures;
     }
 
     public Set<ApmSystemRole> getApmSysRole() {
         if (CollectionUtils.isEmpty(apmSystemRoles)) {
-            UserAccount userAccount = getLoginUser();
+            UserAccount user = getLoginUser();
             Set<String> roles = getSysRole(getUserID()).stream().map(SysRole::getName).collect(Collectors.toSet());
             apmSystemRoles = Arrays.stream(ApmSystemRole.values()).filter(r -> roles.contains(r.name())).collect(Collectors.toSet());
-            if (userAccount.getIsSuperAdmin()) {
-                apmSystemRoles.add(ApmSystemRole.SuperAdmin);
-            }
-            if (userAccount.getIsSiteAdmin()) {
-                apmSystemRoles.add(ApmSystemRole.SiteAdmin);
-            }
-            if (userAccount.getIsGeOp()) {
-                apmSystemRoles.add(ApmSystemRole.GeOp);
-            }
-            if (userAccount.getIsLocalAdmin()) {
-                apmSystemRoles.add(ApmSystemRole.LocalAdmin);
-            }
-            if (userAccount.getMvsRoleType() != null) {
-                if (userAccount.getMvsRoleType() == 1 || userAccount.getMvsRoleType() == 3) {
-                    apmSystemRoles.add(ApmSystemRole.MVSAdmin);
-                } else if (userAccount.getMvsRoleType() == 2) {
-                    apmSystemRoles.add(ApmSystemRole.MVSFE);
-                }
+            addRoleIfTrue(user.getIsSuperAdmin(), ApmSystemRole.SuperAdmin);
+            addRoleIfTrue(user.getIsSiteAdmin(), ApmSystemRole.SiteAdmin);
+            addRoleIfTrue(BooleanUtils.isTrue(user.getIsGeOp()), ApmSystemRole.GeOp);
+            addRoleIfTrue(user.getIsLocalAdmin(), ApmSystemRole.LocalAdmin);
+            if (user.getMvsRoleType() != null) {
+                addRoleIfTrue(user.getMvsRoleType() == 1 || user.getMvsRoleType() == 3, ApmSystemRole.MVSAdmin);
+                addRoleIfTrue(user.getMvsRoleType() == 2, ApmSystemRole.MVSFE);
             }
         }
         return apmSystemRoles;
+    }
+
+    private void addRoleIfTrue(boolean condition, ApmSystemRole role) {
+        if (condition) {
+            apmSystemRoles.add(role);
+        }
     }
 
     public Set<String> getFunctionListByFeatureAndRoles() {
@@ -699,60 +550,49 @@ public class UserContextService implements Serializable {
             apmFunctionList = new HashSet<>();
             List<CustomRole> customRoles = getCustomRole(getUserID());
             Set<ApmSystemRole> sysRoles = getApmSysRole();
-            customRoles.forEach(customRole -> apmFunctionList.addAll((List<String>)JSONObject.parse(customRole.getFunctionList())));
+            customRoles.forEach(customRole -> apmFunctionList.addAll((List<String>)JSON.parse(customRole.getFunctionList())));
             Set<String> featureList = getFeatureList();
-            List<ApmFeature> apmFeatures = Arrays.asList(ApmFeature.values()).stream().filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
-            apmFeatures.forEach(feature -> apmFunctionList.addAll(feature.getFunctionList().stream()
+            List<ApmFeature> features = Arrays.asList(ApmFeature.values()).stream().filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
+            features.forEach(feature -> apmFunctionList.addAll(feature.getFunctionList().stream()
                     .filter(function -> sysRoles.stream().anyMatch(function.getRoleList()::contains) || CollectionUtils.isEmpty(function.getRoleList()))
-                    .map(f -> f.name()).collect(Collectors.toSet())));
+                    .map(ApmFunction::name).collect(Collectors.toSet())));
         }
         return apmFunctionList;
     }
 
-    public static List<String> getCustomRoleListByFunction() {
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        Set<String> functionList = userContextService.getFunctionListByFeatureAndRoles();
-        List<String> roles = getCustomRole(getUserID()).stream().filter(roleFunction -> functionList.contains(JSONObject.parse(roleFunction.getFunctionList())))
-                .map(CustomRole::getName)
-                .collect(Collectors.toList());
-        return roles;
-    }
+    public static UserAuth getCustomRoleAuth(Integer userId, String authKey) {
+        UserAuth customRoleAuth = new UserAuth();
+        customRoleAuth.setAuthKey(authKey);
 
-    public static UserAuth getCustomRoleAuth(Integer userId,String authKey){
-    	UserAuth customRoleAuth=new UserAuth();
-    	customRoleAuth.setAuthKey(authKey);
-    	List<CustomRole> listCustomRole=getCustomRole(userId);
-    	List<SysRole> listSysRole=getSysRole(userId);
-    	if(listSysRole!=null && listSysRole.size()>0){
-    		customRoleAuth.setAllAuth(authKey,true);
-    	}
-    	else if(StringUtils.isNotEmpty(authKey) && listCustomRole!=null && listCustomRole.size()>0){
-			for(int i=0;i<listCustomRole.size();++i){
-				CustomRole customRole=listCustomRole.get(i);
-				String jsonStr=customRole.getWebAuthorities();
-				if(StringUtils.isNotEmpty(jsonStr)){
-					JSONArray jsonArr=JSONArray.parseArray(jsonStr);
-					for(int j=0;j<jsonArr.size();++j){
-						JSONObject jsonObj=jsonArr.getJSONObject(j);
-						String key=jsonObj.getString("k");
-						if(authKey.equals(key)){
-							customRoleAuth.setAuthCreate(jsonObj.getBooleanValue("a"));
-							customRoleAuth.setAuthDelete(jsonObj.getBooleanValue("d"));
-							customRoleAuth.setAuthModify(jsonObj.getBooleanValue("m"));
-							customRoleAuth.setAuthSearch(jsonObj.getBooleanValue("s"));
-							customRoleAuth.setAuthExport(jsonObj.getBooleanValue("o"));
-							customRoleAuth.setAuthImport(jsonObj.getBooleanValue("i"));
-							return customRoleAuth;
-						}
-					}
-				}
+        List<CustomRole> listCustomRole = getCustomRole(userId);
+        List<SysRole> listSysRole = getSysRole(userId);
 
-			}
-		}
-		else{
-			customRoleAuth.setAllAuth(authKey,true);
-		}
-		return customRoleAuth;
+        if (CollectionUtils.isNotEmpty(listSysRole)) {
+            customRoleAuth.setAllAuth(authKey, true);
+        } else if (StringUtils.isNotEmpty(authKey) && CollectionUtils.isNotEmpty(listCustomRole)) {
+            Optional<JSONObject> jsonObject = listCustomRole.stream()
+                    .map(CustomRole::getWebAuthorities)
+                    .filter(StringUtils::isNotEmpty)
+                    .map(JSON::parseArray)
+                    .flatMap(Collection::stream)
+                    .map(JSONObject.class::cast)
+                    .filter(obj -> authKey.equals(obj.getString("k")))
+                    .findFirst();
+
+            jsonObject.ifPresent(jsonObj -> {
+                customRoleAuth.setAuthCreate(jsonObj.getBooleanValue("a"));
+                customRoleAuth.setAuthDelete(jsonObj.getBooleanValue("d"));
+                customRoleAuth.setAuthModify(jsonObj.getBooleanValue("m"));
+                customRoleAuth.setAuthSearch(jsonObj.getBooleanValue("s"));
+                customRoleAuth.setAuthExport(jsonObj.getBooleanValue("o"));
+                customRoleAuth.setAuthImport(jsonObj.getBooleanValue("i"));
+            });
+
+        } else {
+            customRoleAuth.setAllAuth(authKey, true);
+        }
+
+        return customRoleAuth;
     }
 
     public static boolean isSuperAdmin() {
@@ -775,27 +615,16 @@ public class UserContextService implements Serializable {
         return userAccount.getIsGeOp();
     }
 
-    public static boolean isMVSAdmin(){
-    	UserAccount userAccount=getCurrentUserAccount();
-    	Integer mvsRoleType=userAccount.getMvsRoleType();
-    	if(mvsRoleType!=null && (mvsRoleType== ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType== ApmConstant.MVS_ROLE_TYPE_ADMIN_2)){
-    		return true;
-    	}
-    	else{
-    		return false;
-    	}
+    public static boolean isMVSAdmin() {
+        UserAccount userAccount = getCurrentUserAccount();
+        Integer mvsRoleType = userAccount.getMvsRoleType();
+        return mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN_2);
     }
 
     public static boolean isMVSRole(){
-        UserAccount userAccount=getCurrentUserAccount();
-        Integer mvsRoleType=userAccount.getMvsRoleType();
-        if(mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE
-                                    || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN_2)){
-            return true;
-        }
-        else{
-            return false;
-        }
+        UserAccount userAccount = getCurrentUserAccount();
+        Integer mvsRoleType = userAccount.getMvsRoleType();
+        return mvsRoleType != null && (mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_FE || mvsRoleType == ApmConstant.MVS_ROLE_TYPE_ADMIN_2);
     }
 
     public static int getUserID() {
@@ -834,7 +663,6 @@ public class UserContextService implements Serializable {
     }
 
     public String getUserDefaultHomePage() {
-//    	return "/portal/profile.xhtml";
         this.getLoginUser();
         if (userAccount == null) {
             return "/login.xhtml";
@@ -859,6 +687,7 @@ public class UserContextService implements Serializable {
             try {
                 request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
             } catch (Exception ex) {
+                logger.error("method getAccessToken get current request fail");
             }
         }
         if (request != null) {
@@ -868,47 +697,35 @@ public class UserContextService implements Serializable {
     }
 
     public String getSystemInMaintainConfig() {
-        ApmConfigInfoRepository repository = WebUtil.getBean(ApmConfigInfoRepository.class);
-        ApmConfigInfo info = null;
-        try {
-            info = repository.findByItem("system_maintain");
-            if (info != null && info.getExpireDate() != null && (new Date()).after(info.getExpireDate())) {
-                info = null;
-            }
-        } catch (Exception e) {
+        ApmConfigInfo info = WebUtil.getBean(ApmConfigInfoRepository.class).findByItem("system_maintain");
+        if (info != null && info.getExpireDate() != null && (new Date()).after(info.getExpireDate())) {
+            info = null;
         }
         if (info != null && "1".equals(info.getValue())) {
-            ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
             try {
+                ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
                 ec.redirect("/wx/mrr?message=" + URLEncoder.encode(info.getMessage(), "UTF-8"));
             } catch (IOException e) {
+                logger.error("method getSystemInMaintainConfig is error message:{}", e.getMessage());
             }
         }
         return "0";
     }
 
     public String getSystemInMaintainConfigMessage() {
-        ApmConfigInfoRepository repository = WebUtil.getBean(ApmConfigInfoRepository.class);
-        try {
-            ApmConfigInfo info = repository.findByItem("system_maintain");
-            if (info == null || info.getExpireDate() != null && (new Date()).after(info.getExpireDate())) {
-                return null;
-            } else {
-                return info.getMessage();
-            }
-        } catch (Exception e) {
+        ApmConfigInfo info = WebUtil.getBean(ApmConfigInfoRepository.class).findByItem("system_maintain");
+        if (info == null || info.getExpireDate() != null && (new Date()).after(info.getExpireDate())) {
+            return null;
+        } else {
+            return info.getMessage();
         }
-        return null;
     }
 
     private Boolean isDispatcher = null;
     private Boolean isPmDispatcher = null;
     private Boolean isMeasuringDispatcher = null;
-
     private Boolean isAssetApprover = null;
-
     private Boolean needAssetApproval = null;
-
     private Boolean needInstorageCheck = null;
 
     public Boolean needInstorageCheck(){
@@ -973,30 +790,19 @@ public class UserContextService implements Serializable {
         needInstorageCheck = wcList.stream().anyMatch(item -> null!=item.getNeedInstorageCheck() && item.getNeedInstorageCheck());
     }
 
-    private List<WorkflowConfig> getSiteConfigurations(){
+    private List<WorkflowConfig> getSiteConfigurations() {
         long l = System.currentTimeMillis();
-        logger.info("getSiteConfigurations ：start {}",l);
-        /*UaaService uuaService = WebUtil.getBean(UaaService.class);
-        List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        logger.info("getSiteConfigurations ：start {}", l);
+        List<String> orgList = new ArrayList<>();
         orgList.add(userAccount.getTenantUID());
         orgList.add(userAccount.getInstitutionUID());
         orgList.add(userAccount.getHospitalUID());
         orgList.add(userAccount.getSiteUID());
-        WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
-        List<String> collect = orgList.stream().distinct().collect(Collectors.toList());
-        collect.removeIf(Objects::isNull);
-        return wcDao.getBySiteUIDList(collect);*/
-        List<String> orgList = new ArrayList<String>();
-        orgList.add(userAccount.getTenantUID());
-        orgList.add(userAccount.getInstitutionUID());
-        orgList.add(userAccount.getHospitalUID());
-        orgList.add(userAccount.getSiteUID());
-//        WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
-//        List<WorkflowConfig> bySiteUIDList1 = wcDao.getBySiteUIDList1(orgList, userAccount.getUid());
-        List<WorkflowConfig> bySiteUIDList1 =getWWorkflowConfig(orgList,userAccount);
-       logger.info("getSiteConfigurations ：end {}",System.currentTimeMillis()-l);
+        List<WorkflowConfig> bySiteUIDList1 = getWWorkflowConfig(orgList, userAccount);
+        logger.info("getSiteConfigurations ：end {}", System.currentTimeMillis() - l);
         return bySiteUIDList1;
     }
+
     private List<WorkflowConfig> getWWorkflowConfig(List<String> orgList,UserAccount user){
         WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         List<WorkflowConfig> bySiteUIDList = wcDao.getBySiteUIDList(orgList);
@@ -1073,53 +879,37 @@ public class UserContextService implements Serializable {
         return isAgentTenant();
     }
 
-    public boolean isIBorUltraSoundIBorDealerEndUser(){
-        return isIBEndUser() || isUltraSoundIBEndUser() || isDealerEndUser();
-    }
-
     public boolean isAccountEndUser() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount currentUser = getLoginUser();
         int siteId = currentUser.getSiteId();
         /* 如果ib是46的话，工程师AssetStaff和医工主任AssetHead可以看到3个tab，其它人不能看到内部保养*/
-        if (siteId == 46) {
-            if (userContextService.hasRole("AssetStaff") || userContextService.hasRole("AssetHead")) {
-                return false;
-            }
-        }
-
-        if (isOpsOrSiteAdminUser()) {
+        if (siteId == 46 && (userContextService.hasRole("AssetStaff") || userContextService.hasRole("AssetHead"))) {
             return false;
         }
-        if (isDealerEndUser()) {
-            return false;
-        }
-        if (isIBEndUser()) {
+        if (isOpsOrSiteAdminUser() || isDealerEndUser() || isIBEndUser()) {
             return false;
         }
         return !isUltraSoundIBEndUser();
     }
 
-    public boolean isAccessMyTrain(){
+    public boolean isAccessMyTrain() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount currentUser = getLoginUser();
         TenantInfo currentTenantInfo = userContextService.getCurrentUserTenantInfo();
-        List<String> usname = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
-            for (String s : usname) {
-                if (s.equals("OpWorker")) {
-                    return false;
-                }
+        List<String> userName = WebUtil.getBean(UserAccountRepository.class).findUsname(getCurrentUserAccount().getId());
+        for (String s : userName) {
+            if (s.equals("OpWorker")) {
+                return false;
             }
-        int siteId = currentUser.getSiteId();
-        if (siteId == 46 || BooleanUtils.isTrue(currentTenantInfo.getHaveIbDevice())) {
-            return true;
         }
-        return false;
+        int siteId = currentUser.getSiteId();
+        return siteId == 46 || BooleanUtils.isTrue(currentTenantInfo.getHaveIbDevice());
     }
 
 
     public boolean isHaveIbDeviceUser() {
-        return tenant.getHaveIbDevice() == null ? false : tenant.getHaveIbDevice();
+        return tenant.getHaveIbDevice() == null ? Boolean.FALSE : tenant.getHaveIbDevice();
     }
     /**
      * this api is to check whether login user is for lixiang company.
@@ -1130,20 +920,15 @@ public class UserContextService implements Serializable {
         if (null == user.getType()) {
             return false;
         }
-        if (ApmConstant.USER_ACCOUNT_TYPE_PARTNER == user.getType() && user.getIsSuperAdmin()) {
-            return true;
-        }
-        return false;
+        return ApmConstant.USER_ACCOUNT_TYPE_PARTNER == user.getType() && user.getIsSuperAdmin();
+
     }
     public boolean isPartnerAccount46() {
         UserAccount user = getLoginUser();
         if (null == user.getSiteId()) {
             return false;
         }
-        if (ApmConstant.IB_TENANT_ID == user.getSiteId()) {
-            return true;
-        }
-        return false;
+        return ApmConstant.IB_TENANT_ID == user.getSiteId();
     }
 
     public boolean isOpenNewMenuRoles() {
@@ -1153,59 +938,34 @@ public class UserContextService implements Serializable {
 
     public boolean isZkbAccount() {
         TenantInfo tenantInfo = getTenantInfo();
-        if(tenantInfo.getType() != null && tenantInfo.getType() == 3){
-            return true;
-        }
-        return false;
+        return tenantInfo.getType() != null && tenantInfo.getType() == 3;
     }
 
     public boolean isGeAdmin() {
-        UserAccount user = getLoginUser();
-        if(StringUtils.isBlank(user.getLoginName()))
-            return false;
-        List<ZkbPartOrderUserConfig>  zkbPartOrderUserConfig= this.zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(user.getLoginName(),"ClosePending");
-        if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfig))
-            return true;
-        return false;
+        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfig = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class).findByLoginNameAndConfigType(getLoginUser().getLoginName(), "ClosePending");
+        return CollectionUtils.isNotEmpty(zkbPartOrderUserConfig);
     }
 
     public boolean isEditCourseScheduleAdmin() {
-        UserAccount user = getLoginUser();
-        if(StringUtils.isBlank(user.getLoginName()))
-            return false;
-        List<ZkbCourseTrainUserConfig>  zkbCourseTrainUserConfigList = this.zkbCourseTrainUserConfigRepository.findByLoginName(user.getLoginName());
-        if(CollectionUtils.isNotEmpty(zkbCourseTrainUserConfigList))
-            return true;
-        return false;
+        List<ZkbCourseTrainUserConfig> zkbCourseTrainUserConfigList = WebUtil.getBean(ZkbCourseTrainUserConfigRepository.class).findByLoginName(getLoginUser().getLoginName());
+        return CollectionUtils.isNotEmpty(zkbCourseTrainUserConfigList);
     }
 
-    public boolean isZkbFeUserConfig(String configType)
-    {
-        UserAccount user = getLoginUser();
-        if(StringUtils.isBlank(user.getLoginName()))
-            return false;
-        List<ZkbFePartOrderUserConfig>  zkbFePartOrderUserConfig= this.zkbFePartOrderUserConfigRepository.findByLoginNameAndConfigType(user.getLoginName(),configType);
-        if(CollectionUtils.isNotEmpty(zkbFePartOrderUserConfig))
-            return true;
-        return false;
+    public boolean isZkbFeUserConfig(String configType) {
+        List<ZkbFePartOrderUserConfig> zkbFePartOrderUserConfig = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class).findByLoginNameAndConfigType(getLoginUser().getLoginName(), configType);
+        return CollectionUtils.isNotEmpty(zkbFePartOrderUserConfig);
     }
 
-    public boolean isZkbConfigAdmin()
-    {
+    public boolean isZkbConfigAdmin() {
         UserAccount user = getLoginUser();
-        if(StringUtils.isBlank(user.getLoginName()))
+        if (StringUtils.isBlank(user.getLoginName()))
             return false;
-        if(user.getLoginName().contains("zkbConfigAdmin"))
-            return true;
-            return false;
+        return user.getLoginName().contains("zkbConfigAdmin");
     }
 
     public boolean isZtbTenant() {
         TenantInfo tenantInfo = getTenantInfo();
-        if(tenantInfo.getType() != null && tenantInfo.getType() == 4){
-            return true;
-        }
-        return false;
+        return tenantInfo.getType() != null && tenantInfo.getType() == 4;
     }
 
     public boolean isMvsTenant() {
@@ -1215,26 +975,19 @@ public class UserContextService implements Serializable {
 
     public boolean isSupportMultiLanguage(){
         TenantInfo tenantInfo = getTenantInfo();
-        if(tenantInfo.getIsSupportMultiLanguage() != null && tenantInfo.getIsSupportMultiLanguage() == true){
-            return true;
-        }
-        return false;
+        return tenantInfo.getIsSupportMultiLanguage() != null && tenantInfo.getIsSupportMultiLanguage() == Boolean.TRUE;
     }
 
     public boolean isYiMaiYangGuangTenant() {
         Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
-        if (tenantOptionConfigOptional.isPresent()) {
-            return tenantOptionConfigOptional.get().getSynchronizeWorkOrder()!=null? tenantOptionConfigOptional.get().getSynchronizeWorkOrder():false;
+        if (tenantOptionConfigOptional.isPresent() && tenantOptionConfigOptional.get().getSynchronizeWorkOrder()!=null) {
+            return tenantOptionConfigOptional.get().getSynchronizeWorkOrder();
         }
         return false;
     }
 
     public static boolean isYiMaiYangGuangTenantForServer() {
-        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
-        if (tenantOptionConfigOptional.isPresent()) {
-            return tenantOptionConfigOptional.get().getSynchronizeWorkOrder()!=null? tenantOptionConfigOptional.get().getSynchronizeWorkOrder():false;
-        }
-        return false;
+        return WebUtil.getBean(UserContextService.class).isYiMaiYangGuangTenant();
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
@@ -1246,14 +999,9 @@ public class UserContextService implements Serializable {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount user = userContextService.getLoginUser();
         List<String> userRoles = user.getRoleNames();
-
-        if(userRoles.contains("LocalITAdmin")){
-            if(userRoles.contains("ITAdmin") || isSuperAdmin()){
-                return false;
-            }else{
-                return true;
-            }
-        }else{
+        if (userRoles.contains(ApmSystemRole.LocalAdmin.name())) {
+            return !(userRoles.contains(ApmSystemRole.ITAdmin.name()) || isSuperAdmin());
+        } else {
             return false;
         }
     }
@@ -1261,10 +1009,7 @@ public class UserContextService implements Serializable {
     public static boolean isInsulate() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         TenantInfo tenantInfo = userContextService.getTenantInfo();
-        if(tenantInfo.getInsulate() != null && tenantInfo.getInsulate() && !userContextService.hasAnyRole(ADMIN)) {
-            return true;
-        }
-        return false;
+        return tenantInfo.getInsulate() != null && tenantInfo.getInsulate() && !userContextService.hasAnyRole(ADMIN);
     }
 
     public static String decryptData(String data){
@@ -1278,7 +1023,7 @@ public class UserContextService implements Serializable {
                     tempSecondDecryptionArray[i] = secondDecryptionArray[i - 1];
                 }
             }
-            StringBuffer secondDecryptionArrayStringBuffer = new StringBuffer();
+            StringBuilder secondDecryptionArrayStringBuffer = new StringBuilder();
             for (String tempData : tempSecondDecryptionArray) {
                 secondDecryptionArrayStringBuffer.append(tempData);
             }
@@ -1296,13 +1041,11 @@ public class UserContextService implements Serializable {
                     tempFirstDecryptionArray[i] = firstDecryptionArray[i - 1];
                 }
             }
-            StringBuffer firstDecryptionArrayStringBuffer = new StringBuffer();
+            StringBuilder firstDecryptionArrayStringBuffer = new StringBuilder();
             for (String tempData : tempFirstDecryptionArray) {
                 firstDecryptionArrayStringBuffer.append(tempData);
             }
-            String decryptionData = B64Code.decode(firstDecryptionArrayStringBuffer.toString(), "utf-8");
-
-            return decryptionData;
+            return B64Code.decode(firstDecryptionArrayStringBuffer.toString(), "utf-8");
         }catch (Exception ex){
             return null;
         }
@@ -1330,7 +1073,6 @@ public class UserContextService implements Serializable {
      */
     public boolean isLocale(){
         Locale locale = LocaleHolder.getLocale();
-        //System.out.println("locale  is "+locale);
         return "zh".equalsIgnoreCase(locale.getLanguage());
     }
 
@@ -1367,11 +1109,7 @@ public class UserContextService implements Serializable {
     }
 
     public String getCalendarLocale(){
-//        if(!isLocale()){
-//            return Locale.US.toString();
-//        }else{
-            return Locale.CHINESE.getLanguage();
-//        }
+        return Locale.CHINESE.getLanguage();
     }
 
     public boolean isZkbUser(){
@@ -1426,21 +1164,15 @@ public class UserContextService implements Serializable {
     public static boolean isPartsAdmin(){
         UserAccount userAccount = getCurrentUserAccount();
         List<String> roleNames = userAccount.getRoleNames();
-        if (roleNames.contains(SimplePartsConstant.PARTS_ADMIN_MANAGER)) {
-            return true;
-        } else {
-            return false;
-        }
+        return roleNames.contains(SimplePartsConstant.PARTS_ADMIN_MANAGER);
     }
 
-    //判断是否有报废资产菜单权限
     public boolean hasScrappedMenuAuthority() {
-
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
-        CustomRoleRepository customeRoleDao = WebUtil.getBean(CustomRoleRepository.class);
+        CustomRoleRepository customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         List<UserRole> userRoleList = userRoleDao.findByUserIdAndRoleType(UserContextService.getCurrentUserAccount().getId(), ApmConstant.CUSTOME_ROLE_TYPE);
         for (UserRole userRole : userRoleList) {
-            String menus = customeRoleDao.findById(userRole.getRoleId()).getMenus();
+            String menus = customRoleRepository.findById(userRole.getRoleId()).getMenus();
             if(null != menus && menus.contains("asset.scrap")){
                 return true;
             }
@@ -1481,23 +1213,11 @@ public class UserContextService implements Serializable {
 
     }
 
-    /***
-     *  判断是否是云南阜外医院
-     * @param tenantName
-     * @return
-     */
-    public  Boolean isYunNanFuWai(String tenantName){
-        if(this.getTenantInfo().getName().equals("云南省阜外心血管病医院")){
-            return true;
-        }else {
-            return false;
-        }
+    public Boolean isYunNanFuWai(String tenantName){
+        logger.warn(tenantName);
+        return this.getTenantInfo().getName().equals("云南省阜外心血管病医院");
     }
-    /***
-     *  判断是否是北京积水潭医院
-     * @param tenantName
-     * @return
-     */
+
     public static Boolean isHospitalName(String tenantName){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         TenantInfo currentTenantInfo = userContextService.getTenantInfo();
@@ -1505,7 +1225,6 @@ public class UserContextService implements Serializable {
             return Boolean.FALSE;
         }
         if(StringUtils.isBlank(tenantName)){
-            //tenantName为空则验证下面租户
             if(WorkOrderConstant.DESIGNATED_USER.equals(currentTenantInfo.getName().trim())){
                 return Boolean.TRUE;
             }
@@ -1532,7 +1251,6 @@ public class UserContextService implements Serializable {
         }
         String name = currentTenantInfo.getName().trim();
         if(StringUtils.isBlank(tenantName)){
-            //tenantName为空则验证下面租户
             if("云南省阜外心血管病医院".equals(name)){
                 return Boolean.TRUE;
             }
@@ -1564,24 +1282,21 @@ public class UserContextService implements Serializable {
      */
     public boolean activeSupplier(){
         if(activeSupplierFlag == null){
-            activeSupplierFlag = false;
+            activeSupplierFlag = Boolean.FALSE;
             UserAccount user = getCurrentUserAccount();
             WorkflowConfigRepository workflowConfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
             List<WorkflowConfig> workflowConfigList = workflowConfigDao.findBySiteUID(user.getSiteUID());
-            if(workflowConfigList.isEmpty()){
+            if(CollectionUtils.isEmpty(workflowConfigList)){
                 workflowConfigList = workflowConfigDao.findBySiteUID(user.getHospitalUID());
             }
-            if(workflowConfigList.isEmpty()){
+            if(CollectionUtils.isEmpty(workflowConfigList)){
                 workflowConfigList = workflowConfigDao.findBySiteUID(user.getInstitutionUID());
             }
-            if(workflowConfigList.isEmpty()){
+            if(CollectionUtils.isEmpty(workflowConfigList)){
                 workflowConfigList = workflowConfigDao.findBySiteUID(user.getTenantUID());
             }
-
-            if(!workflowConfigList.isEmpty()){
-                if (workflowConfigList.get(0).getActiveSupplier() != null && workflowConfigList.get(0).getActiveSupplier()){
-                    activeSupplierFlag = true;
-                }
+            if (CollectionUtils.isNotEmpty(workflowConfigList) && BooleanUtils.isTrue(workflowConfigList.get(0).getActiveSupplier())) {
+                activeSupplierFlag = Boolean.TRUE;
             }
         }
         return activeSupplierFlag;
@@ -1602,17 +1317,11 @@ public class UserContextService implements Serializable {
         return msgRepo.getByMsgTypeAndMsgKey(msgType, msgKey);
     }
 
-    /**
-     * 是否是县域租户
-     * @return
-     */
     public boolean isCountyArea(){
         TenantInfo tenantInfo = getTenantInfo();
-        if(tenantInfo.getType() != null && tenantInfo.getType() == 6){
-            return true;
-        }
-        return false;
+        return tenantInfo.getType() != null && tenantInfo.getType() == 6;
     }
+
     public void updateSiteUid(){
         if(userAccount == null)return;
         if(StringUtils.isEmpty(selectedSiteUid)){
@@ -1629,41 +1338,50 @@ public class UserContextService implements Serializable {
         this.selectedSiteUid = selectedSiteUid;
     }
 
-    public List<OrgInfo> getSiteOrgInfoChild(){
-            if(CollectionUtils.isNotEmpty(child)) return child;
-            String hospitalUID = userAccount.getHospitalUID();
-            if(userAccount.getOrgLevel() == 2 && hospitalUID.equals(userAccount.getSiteUID())){
-                WorkflowConfigRepository workflowConfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
-                OrgInfoRepository orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-                child= orgInfoRepository.getHospitalByTenantUIDAndType(hospitalUID);
-                if(child.size() > 0){
-                    child=child.stream().filter(item->{
-                        if(item == null)return false;
-                        Integer orgLevel = item.getOrgLevel();
-                        Integer orgType = item.getOrgType();
-                        return orgLevel !=null && orgType !=null && orgLevel == 3 && orgType==3;
-                    }).filter(item->{
-                        List<WorkflowConfig> siteWorkflowConfigList = workflowConfigDao.findBySiteUID(item.getUid());
-                        if(CollectionUtils.isEmpty(siteWorkflowConfigList)){
-                            return false;
-                        }
-                        WorkflowConfig workflowConfig = siteWorkflowConfigList.get(0);
-                        return workflowConfig !=null && workflowConfig.getEnableHospitalAdjustment() != null && workflowConfig.getEnableHospitalAdjustment();
-                    }).collect(Collectors.toList());
-                    if(child.size() > 0){
-                        List<WorkflowConfig> siteWorkflowConfigList = workflowConfigDao.findBySiteUID(hospitalUID);
-                        if (CollectionUtils.isNotEmpty(siteWorkflowConfigList) && StringUtils.isNotEmpty(siteWorkflowConfigList.get(0).getDeptForSharedAsset())) {
-                            OrgInfo orgInfo = orgInfoRepository.getByUid(hospitalUID);
-                            selectSite=orgInfo;
-                            child.add(orgInfo);
-                        }else{
-                            selectSite=child.get(0);
-                        }
-                        //UserContextService.getCurrentUserAccount().setSiteUID(selectSite.getUid());
-                    }
+    public List<OrgInfo> getSiteOrgInfoChild() {
+        if (CollectionUtils.isNotEmpty(child)) return child;
+        String hospitalUID = userAccount.getHospitalUID();
+        if (userAccount.getOrgLevel() == 2 && hospitalUID.equals(userAccount.getSiteUID())) {
+            WorkflowConfigRepository workflowConfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+            OrgInfoRepository orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+            child = orgInfoRepository.getHospitalByTenantUIDAndType(hospitalUID);
+            if (CollectionUtils.isNotEmpty(child)) {
+                child = filterChildOrgInfo(child, workflowConfigDao);
+                if (CollectionUtils.isNotEmpty(child)) {
+                    selectSite = getSelectSite(hospitalUID, workflowConfigDao, orgInfoRepository, child);
                 }
             }
-        return  child;
+        }
+        return child;
+    }
+
+    private List<OrgInfo> filterChildOrgInfo(List<OrgInfo> orgInfoList, WorkflowConfigRepository workflowConfigDao) {
+        return orgInfoList.stream().filter(item -> {
+            if (item == null) return false;
+            Integer orgLevel = item.getOrgLevel();
+            Integer orgType = item.getOrgType();
+            return orgLevel != null && orgType != null && orgLevel == 3 && orgType == 3;
+        }).filter(item -> {
+            List<WorkflowConfig> siteWorkflowConfigList = workflowConfigDao.findBySiteUID(item.getUid());
+            if (CollectionUtils.isEmpty(siteWorkflowConfigList)) {
+                return false;
+            }
+            WorkflowConfig workflowConfig = siteWorkflowConfigList.get(0);
+            return workflowConfig != null && workflowConfig.getEnableHospitalAdjustment() != null && workflowConfig.getEnableHospitalAdjustment();
+        }).collect(Collectors.toList());
+    }
+
+    private OrgInfo getSelectSite(String hospitalUID, WorkflowConfigRepository workflowConfigDao, OrgInfoRepository orgInfoRepository, List<OrgInfo> orgInfoList) {
+        OrgInfo info;
+        List<WorkflowConfig> siteWorkflowConfigList = workflowConfigDao.findBySiteUID(hospitalUID);
+        if (CollectionUtils.isNotEmpty(siteWorkflowConfigList) && StringUtils.isNotEmpty(siteWorkflowConfigList.get(0).getDeptForSharedAsset())) {
+            OrgInfo orgInfo = orgInfoRepository.getByUid(hospitalUID);
+            info = orgInfo;
+            orgInfoList.add(orgInfo);
+        } else {
+            info = orgInfoList.get(0);
+        }
+        return info;
     }
 
     public OrgInfo getSelectSite() {
@@ -1700,13 +1418,12 @@ public class UserContextService implements Serializable {
             }
         }
         tree.setExpanded(true);
-        for (TreeNode child : tree.getChildren()) {
-            expandedByOrgType(child, type);
+        for (TreeNode children : tree.getChildren()) {
+            expandedByOrgType(children, type);
         }
 
     }
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
-        UserContextService bean = WebUtil.getBean(UserContextService.class);
         if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             selectSite = (OrgInfo) event.getTreeNode().getData();
         } else {
@@ -1716,16 +1433,13 @@ public class UserContextService implements Serializable {
         if (selectSite != null && selectSite.getId() == -1) {
             selectSite = null;
         }
-        //UserContextService.getCurrentUserAccount().setSiteUID(selectSite.getUid());
     }
     public List<SelectItem> getOrgInfoNode(){
         List<SelectItem> selectItems=new ArrayList<>();
         if(selectSite != null){
             List<OrgInfo> orgInfos = WebUtil.getBean(OrgInfoRepository.class).getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(selectSite.getUid());
             if(!org.springframework.util.CollectionUtils.isEmpty(orgInfos)){
-                selectItems = orgInfos.stream().map(item -> {
-                    return new SelectItem(item.getUid(), item.getName(), "", item.getOrgType() != 4);
-                }).collect(Collectors.toList());
+                selectItems = orgInfos.stream().map(item -> new SelectItem(item.getUid(), item.getName(), "", item.getOrgType() != 4)).collect(Collectors.toList());
             }
         }
         return selectItems;
@@ -1749,15 +1463,11 @@ public class UserContextService implements Serializable {
             }
         }
         // 指定的角色比拥有的角色多，则判断用户的所有角色是否都在指定角色列表中
-        if((roleList.length == userRoles.size() && count == roleList.length) ||
-                (roleList.length > userRoles.size() && count == userRoles.size())){
-            return true;
-        }
-        return false;
+        return (roleList.length == userRoles.size() && count == roleList.length) || (roleList.length > userRoles.size() && count == userRoles.size());
     }
 
     public static Set<ApmFeature> getInitFeature() {
-        return Arrays.stream(ApmFeature.values()).filter(f -> f.isNecessary()).collect(Collectors.toSet());
+        return Arrays.stream(ApmFeature.values()).filter(ApmFeature::isNecessary).collect(Collectors.toSet());
     }
 
     public static Set<ApmFunction> getInitFunction() {
