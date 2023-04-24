@@ -111,7 +111,6 @@
                 <p:menuitem id="nhis005" value="#{msg.manualTasks}" outcome="/portal/his/other/manualJob.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_MANUAL_TASK')}"/>
                 <p:menuitem id="nhis007" value="#{msg.chargeDetailSource}" outcome="/portal/his/dataDetail/dataSource.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_SOURCE')}"/>
                 <p:menuitem id="nhis008" value="#{msg.chargeDetailResult}" outcome="/portal/his/dataDetail/dataResult.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_RESULT')}"/>
-                <p:menuitem id="nhis009" value="#{msg.importData}" outcome="/portal/his/import/import.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_IMPORT_DATA')}"/>
             </p:submenu>
 
             <!-- 维修流程 -->
@@ -147,11 +146,6 @@
                 <p:menuitem id="nnm0819" value="#{msg.preSupplierMgr}" outcome="/portal/budget/supplier/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_PRESUPPLIER_EDIT')}"/>
             </p:submenu>
 
-            <!-- 培训 -->
-            <p:submenu id="nnm25" label="#{msg.MyTrain}" icon="fa fa-pencil-square-o" rendered="#{userContextService.isAccessMyTrain()}">
-                <p:menuitem value="#{msg.TrainReport}" outcome="/portal/trainreport/trainReport.xhtml"/>
-            </p:submenu>
-
             <!-- 计量 -->
             <p:submenu id="nnm5024" label="#{msg.DeviceMetrologyMgmt}" icon="fa fa-clock-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('MEASURE_')}">
                 <p:menuitem id="nnm305" value="#{msg.MeasurementCategoryConfiguration}" outcome="/portal/measuring/measuringTypeConfigList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_CATEGORY_VIEW')}"/>
@@ -172,8 +166,6 @@
             <!-- 知识文档 -->
             <p:submenu id="nnm31" label="#{msg.AssetKnowledgeBaseMgmt}" icon="fa fa-book" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('KNOWLEDGE_')}">
                 <p:menuitem id="nnm32" value="#{msg.AssetDocMgmt}" outcome="/portal/asset/fileAttachment/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('KNOWLEDGE_DOC_VIEW')}"/>
-                <p:menuitem id="nnm321" value="#{msg.zkbKnowledgeMgmt}" outcome="/portal/asset/fileAttachment/zkbFileAttachment/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('KNOWLEDGE_ZKB_DOC_EDIT') and userContextService.zkbAdmin}"/>
-                <p:menuitem id="nnm322" value="#{msg.zkbKnowledgeView}" outcome="/portal/asset/fileAttachment/zkbFileAttachment/ZkbUserList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('KNOWLEDGE_ZKB_DOC_VIEW') and userContextService.zkbUser}"/>
             </p:submenu>
 
             <!-- 绩效分析 -->
@@ -195,8 +187,8 @@
 
             <!-- 其他链接 -->
             <p:submenu id="nnm100" label="#{msg.otherLink}" icon="fa fa-external-link" rendered="#{userContextService.accessContainsFunctionMenu('LINK_')}">
-                <p:menuitem id="nnm102" value="#{msg.assetMgt}" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContainsFunctionMenu('LINK_CPM1_VIEW1') and (not empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
-                <p:menuitem id="nnm103" value="#{msg.assetMgt}" outcome="/portal/asset/assetMgtNone.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LINK_CPM1_VIEW2') and (empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
+                <p:menuitem id="nnm102" value="#{msg.assetMgt}" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContainsFunctionMenu('LINK_CPM1_VIEW') and (not empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
+                <p:menuitem id="nnm103" value="#{msg.assetMgt}" outcome="/portal/asset/assetMgtNone.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LINK_CPM2_VIEW') and (empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
             </p:submenu>
 
             <!-- 系统配置 -->
@@ -239,13 +231,6 @@
                 <p:menuitem id="nnm3002" value="#{msg.PurchaseManagement}" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MVS_DEVICE_PURCHASE')}"/>
             </p:submenu>
 
-            <!-- 检测管理 -->
-            <p:submenu id="nnm5000" label="#{msg.ExaminationManagement}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_') and (userContextService.isUltraSoundIBEndUser())}">
-                    <p:menuitem id="nnm5001" value="#{msg.ProbeExamination}" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_PCC')}"/>
-                    <p:menuitem id="nnm5002" value="#{msg.ProbeExaminationConfiguration}" outcome="/portal/examine/pccReportConfig.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_PCC_CONFIG')}"/>
-                    <p:menuitem id="nnm5003" value="#{msg.SSOUserImport}" outcome="/portal/ssouser/import/import.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_SSO_IMPORT')}"/>
-            </p:submenu>
-
             <!-- APM平台管理 -->
             <p:submenu id="nnm4000" label="#{msg.APMPlatformManagement}" icon="fa fa-cogs" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_')}">
                 <p:menuitem id="nnm45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_TENANT_EDIT') }"/>
@@ -261,13 +246,6 @@
                 <p:menuitem id="nnm5026" value="#{msg.SystemClientInfo}" outcome="/portal/iot/systemClientInfo.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_CHILD_ACCT_EDIT')}"/>
                 <p:menuitem id="nnm5027" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/configItemList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_DICTIONARY_BINDING')}"/>
                 <p:menuitem id="nnm5028" value="报表管理中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_JMREPORT_EDIT')}"   />
-                <p:menuitem id="nnm5029" value="#{msg.ReminderConfiguration}" outcome="/portal/config/reminder/apm/apmReminderRuleList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_REMINDER_CONFIG')}"/>
-            </p:submenu>
-
-            <!-- 公司档案 -->
-            <p:submenu label="#{msg.ZKBBasicInfo}" icon="fa fa-file-text" rendered="#{userContextService.accessContainsFunctionMenu('ZKBBASICINFO_')}">
-                <p:menuitem value="#{msg.ZKBAgentContactPersonMgt}" outcome="/portal/zkb/contactPerson/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ZKBBASICINFO_AGENTCONTACTPERSONMGT')}"/>
-                <p:menuitem value="#{msg.ZKBEngineerMgt}" outcome="/portal/zkb/engineer/List.xhtml " rendered="#{userContextService.accessContainsFunctionMenu('ZKBBASICINFO_ENGINEERMGT')}"/>
             </p:submenu>
 
             <!-- 日志审计 -->
