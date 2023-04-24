@@ -1011,7 +1011,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private void isRepeatedAfter() {
         userAccountEditFlag = true;
         super.save();
-        if (Boolean.TRUE.equals(selected.getIsLocked())) {
+        if (Boolean.TRUE.equals(selected.getIsLocked()) || Boolean.TRUE.equals(selected.getIsDisable())) {
             userApi.removeUser(selected.getLoginName());
         } else {
             userApi.resetUser(selected.getLoginName());
