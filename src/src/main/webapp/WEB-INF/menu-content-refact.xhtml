@@ -147,11 +147,6 @@
                 <p:menuitem id="um0819" value="#{msg.preSupplierMgr}" outcome="/portal/budget/supplier/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('BUDGET_PRESUPPLIER_EDIT')}"/>
             </p:submenu>
 
-            <!-- 培训 -->
-            <p:submenu id="um25" label="#{msg.MyTrain}" icon="fa fa-pencil-square-o" rendered="#{userContextService.isAccessMyTrain()}">
-                <p:menuitem value="#{msg.TrainReport}" outcome="/portal/trainreport/trainReport.xhtml"/>
-            </p:submenu>
-
             <!-- 计量 -->
             <p:submenu id="um5024" label="#{msg.DeviceMetrologyMgmt}" icon="fa fa-clock-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('MEASURE_')}">
                 <p:menuitem id="um305" value="#{msg.MeasurementCategoryConfiguration}" outcome="/portal/measuring/measuringTypeConfigList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_CATEGORY_VIEW')}"/>
@@ -172,8 +167,6 @@
             <!-- 知识文档 -->
             <p:submenu id="um31" label="#{msg.AssetKnowledgeBaseMgmt}" icon="fa fa-book" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('KNOWLEDGE_')}">
                 <p:menuitem id="um32" value="#{msg.AssetDocMgmt}" outcome="/portal/asset/fileAttachment/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('KNOWLEDGE_DOC_VIEW')}"/>
-                <p:menuitem id="um321" value="#{msg.zkbKnowledgeMgmt}" outcome="/portal/asset/fileAttachment/zkbFileAttachment/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('KNOWLEDGE_ZKB_DOC_EDIT') and userContextService.zkbAdmin}"/>
-                <p:menuitem id="um322" value="#{msg.zkbKnowledgeView}" outcome="/portal/asset/fileAttachment/zkbFileAttachment/ZkbUserList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('KNOWLEDGE_ZKB_DOC_VIEW') and userContextService.zkbUser}"/>
             </p:submenu>
 
             <!-- 绩效分析 -->
@@ -262,12 +255,6 @@
                 <p:menuitem id="um5027" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/configItemList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_DICTIONARY_BINDING')}"/>
                 <p:menuitem id="um5028" value="报表管理中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_JMREPORT_EDIT')}"   />
                 <p:menuitem id="um5029" value="#{msg.ReminderConfiguration}" outcome="/portal/config/reminder/apm/apmReminderRuleList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_REMINDER_CONFIG')}"/>
-            </p:submenu>
-
-            <!-- 公司档案 -->
-            <p:submenu label="#{msg.ZKBBasicInfo}" icon="fa fa-file-text" rendered="#{userContextService.accessContainsFunctionMenu('ZKBBASICINFO_')}">
-                <p:menuitem value="#{msg.ZKBAgentContactPersonMgt}" outcome="/portal/zkb/contactPerson/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ZKBBASICINFO_AGENTCONTACTPERSONMGT')}"/>
-                <p:menuitem value="#{msg.ZKBEngineerMgt}" outcome="/portal/zkb/engineer/List.xhtml " rendered="#{userContextService.accessContainsFunctionMenu('ZKBBASICINFO_ENGINEERMGT')}"/>
             </p:submenu>
 
             <!-- 日志审计 -->
