@@ -111,7 +111,6 @@
                 <p:menuitem id="his005" value="#{msg.manualTasks}" outcome="/portal/his/other/manualJob.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_MANUAL_TASK')}"/>
                 <p:menuitem id="his007" value="#{msg.chargeDetailSource}" outcome="/portal/his/dataDetail/dataSource.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_SOURCE')}"/>
                 <p:menuitem id="his008" value="#{msg.chargeDetailResult}" outcome="/portal/his/dataDetail/dataResult.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_RESULT')}"/>
-                <p:menuitem id="his009" value="#{msg.importData}" outcome="/portal/his/import/import.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_IMPORT_DATA')}"/>
             </p:submenu>
 
             <!-- 维修流程 -->
@@ -230,13 +229,6 @@
             <p:submenu id="um3000" label="#{msg.MVSEquipmentManagement}" icon="fa fa-folder-open-o" rendered="#{userContextService.accessContainsFunctionMenu('MVS_')}">
                 <p:menuitem id="um3001" value="#{msg.BasicInfo}" outcome="/portal/asset/info/AssetList" rendered="#{userContextService.accessContainsFunctionMenu('MVS_DEVICE_INFO')}"/>
                 <p:menuitem id="um3002" value="#{msg.PurchaseManagement}" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MVS_DEVICE_PURCHASE')}"/>
-            </p:submenu>
-
-            <!-- 检测管理 -->
-            <p:submenu id="um5000" label="#{msg.ExaminationManagement}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_') and (userContextService.isUltraSoundIBEndUser())}">
-                    <p:menuitem id="um5001" value="#{msg.ProbeExamination}" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_PCC')}"/>
-                    <p:menuitem id="um5002" value="#{msg.ProbeExaminationConfiguration}" outcome="/portal/examine/pccReportConfig.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_PCC_CONFIG')}"/>
-                    <p:menuitem id="um5003" value="#{msg.SSOUserImport}" outcome="/portal/ssouser/import/import.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_SSO_IMPORT')}"/>
             </p:submenu>
 
             <!-- APM平台管理 -->

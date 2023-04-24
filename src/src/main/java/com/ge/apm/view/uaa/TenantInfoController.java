@@ -1,5 +1,6 @@
 package com.ge.apm.view.uaa;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.OrgInfo;
@@ -9,6 +10,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
@@ -219,7 +221,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				RequestContext.getCurrentInstance().addCallbackParam("tenantEstablished", true);
 				return;
 			}
-			features = JSONObject.toJSONString(UserContextService.getInitFunction().stream().map(f -> f.name()).collect(Collectors.toSet()));
+			features = JSON.toJSONString(UserContextService.getInitFeature().stream().map(ApmFeature::name).collect(Collectors.toSet()));
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
 		this.selected.setLastModifiedDate(new Date());
