@@ -156,7 +156,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }
             }
             Map<String, String> mm =  FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-            if(!mm.containsKey("notGeAsset")){
+            //if(!mm.containsKey("notGeAsset")){
                 for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
                     if(ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(c.getConfigType()) ||
                         ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(c.getConfigType())
@@ -170,7 +170,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         disableNotGeAsset = true;
                     }
                 }
-            }
+            //}
         }
 
         tenantInfoList = zkbPartOrderService.getSourceTenantInfoList();
