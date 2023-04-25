@@ -111,7 +111,6 @@
                 <p:menuitem id="his005" value="#{msg.manualTasks}" outcome="/portal/his/other/manualJob.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_MANUAL_TASK')}"/>
                 <p:menuitem id="his007" value="#{msg.chargeDetailSource}" outcome="/portal/his/dataDetail/dataSource.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_SOURCE')}"/>
                 <p:menuitem id="his008" value="#{msg.chargeDetailResult}" outcome="/portal/his/dataDetail/dataResult.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_CHARGE_DETAIL_RESULT')}"/>
-                <p:menuitem id="his009" value="#{msg.importData}" outcome="/portal/his/import/import.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('HISPERFORM_IMPORT_DATA')}"/>
             </p:submenu>
 
             <!-- 维修流程 -->
@@ -186,12 +185,6 @@
             <p:menuitem id="um444" value="#{msg.review}" icon="fa fa-gavel" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT_VIEW')}" url="/audit/#/dashboard" target="_blank"></p:menuitem>
             <p:menuitem id="um445" value="#{msg.review}2.0" icon="fa fa-gavel" rendered="#{userContextService.accessContainsFunctionMenu('QUALITY_AUDIT2_VIEW')}"  url="/auditV2/#/mainPage/" target="_blank"></p:menuitem>
 
-            <!-- 其他链接 -->
-            <p:submenu id="um100" label="#{msg.otherLink}" icon="fa fa-external-link" rendered="#{userContextService.accessContainsFunctionMenu('LINK_')}">
-                <p:menuitem id="um102" value="#{msg.assetMgt}" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContainsFunctionMenu('LINK_CPM1_VIEW1') and (not empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
-                <p:menuitem id="um103" value="#{msg.assetMgt}" outcome="/portal/asset/assetMgtNone.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LINK_CPM1_VIEW2') and (empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
-            </p:submenu>
-
             <!-- 系统配置 -->
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_')}">
                 <p:menuitem id="um54" value="#{msg.MessageSubscriber}" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_MESSAGE_EDIT')}"/>
@@ -232,13 +225,6 @@
                 <p:menuitem id="um3002" value="#{msg.PurchaseManagement}" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MVS_DEVICE_PURCHASE')}"/>
             </p:submenu>
 
-            <!-- 检测管理 -->
-            <p:submenu id="um5000" label="#{msg.ExaminationManagement}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_') and (userContextService.isUltraSoundIBEndUser())}">
-                    <p:menuitem id="um5001" value="#{msg.ProbeExamination}" outcome="/portal/examine/pccReportList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_PCC')}"/>
-                    <p:menuitem id="um5002" value="#{msg.ProbeExaminationConfiguration}" outcome="/portal/examine/pccReportConfig.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_PCC_CONFIG')}"/>
-                    <p:menuitem id="um5003" value="#{msg.SSOUserImport}" outcome="/portal/ssouser/import/import.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('EXAMINE_SSO_IMPORT')}"/>
-            </p:submenu>
-
             <!-- APM平台管理 -->
             <p:submenu id="um4000" label="#{msg.APMPlatformManagement}" icon="fa fa-cogs" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_')}">
                 <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_TENANT_EDIT') }"/>
@@ -254,7 +240,6 @@
                 <p:menuitem id="um5026" value="#{msg.SystemClientInfo}" outcome="/portal/iot/systemClientInfo.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_CHILD_ACCT_EDIT')}"/>
                 <p:menuitem id="um5027" value="#{msg.i18nConfig}" outcome="/portal/config/i18nConfig/configItemList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_DICTIONARY_BINDING')}"/>
                 <p:menuitem id="um5028" value="报表管理中心" outcome="/portal/jmReport/jmReport.xhtml"  rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_JMREPORT_EDIT')}"   />
-                <p:menuitem id="um5029" value="#{msg.ReminderConfiguration}" outcome="/portal/config/reminder/apm/apmReminderRuleList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PLATFORM_REMINDER_CONFIG')}"/>
             </p:submenu>
 
             <!-- 日志审计 -->
