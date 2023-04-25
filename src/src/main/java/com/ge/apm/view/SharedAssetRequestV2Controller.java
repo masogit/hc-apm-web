@@ -3,6 +3,7 @@ package com.ge.apm.view;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.callback.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
@@ -1464,6 +1465,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 selected.setState(state);
                 dao.save(selected);
                 asiDao.save(selected.getInfoList());
+               sharedAssetRequestService.sendMq(selected.getInfoList());
 
                apdDao.save(selected.getSartList());
 
@@ -1485,6 +1487,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            return;
        }
     }
+
 
     public int getSwapQty2(String Uid,String clinicalDeptUID){
         if(null == Uid||Uid.equalsIgnoreCase("")){
