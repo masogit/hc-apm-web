@@ -680,6 +680,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			if (StringUtils.isNotEmpty(tenantInfo.getTenantConfig())) {
 				List<String> finalEnumNames = Arrays.asList(tenantInfo.getTenantConfig().replaceAll("[\\[\\]\\{\\}\"]", "").replace("menuList:", "").split(","));
 				List<String> requiredEnums = new ArrayList<>();
+				if (tenantInfo.getId() == 70) {
+					System.out.println(tenantInfo.getTenantConfig());
+				}
 				for (AssetManagementEnum e : AssetManagementEnum.values()) {
 					if (e.isRequired()) {
 						requiredEnums.add(e.name());
