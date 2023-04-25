@@ -140,6 +140,12 @@ public class AssetHistoryService {
             //multiple column value changed
             objects.stream().forEach(item -> {
                 String columnName = ((JSONObject) item).getString("columnName");
+                if("createdBy".equals(columnName)){
+                    return;
+                }
+                if("createdDate".equals(columnName)){
+                    return;
+                }
                 String oldColumnValue = "";
                 if (((JSONObject) item).containsKey("oldColumnValue")) {
                     oldColumnValue = ((JSONObject) item).getString("oldColumnValue");
