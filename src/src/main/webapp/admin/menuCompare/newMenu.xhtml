@@ -128,7 +128,7 @@
             </p:submenu>
 
             <!-- 预防维护 -->
-            <p:submenu id="nnm24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-plus-square" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_')}">
+            <p:submenu id="nnm24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-plus-square" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_')}">
                 <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/pmOrderListAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_VIEW')}"/>
                 <p:menuitem id="nnm303" value="#{msg.PmOrderRule}" outcome="/portal/pm/pmOrderRule/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_VIEW')}"/>
                 <p:menuitem id="nnm306" value="#{msg.assetRuleManager}" outcome="/portal/pm/relRuleAsset/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_VIEW')}"/>
