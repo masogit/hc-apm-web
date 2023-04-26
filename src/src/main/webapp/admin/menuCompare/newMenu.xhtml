@@ -253,12 +253,12 @@
             <p:menuitem value="设备数据概览" icon="fa fa-bar-chart"  rendered="#{userContextService.accessContainsFunctionMenu('DEVICEDATAPREVIEW_VIEW')}" outcome="/portal/nine.xhtml"/>
 
             <!-- 供应商保养工作台 -->
-            <p:submenu id="nnm24_supplier" label="供应商#{msg.PreventiveMaintainceMgmt}" icon="fa fa-plus-square" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_')}">
+            <p:submenu id="nnm24_supplier" label="供应商#{msg.PreventiveMaintainceMgmt}" icon="fa fa-plus-square" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_MAINTAIN_EDIT')}">
                 <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/supplier/pmSupplierOrderListAll.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_MAINTAIN_EDIT')}"/>
             </p:submenu>
 
             <!-- 供应商维修工作台 -->
-            <p:submenu id="nnm25_supplier" label="供应商#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_')}">
+            <p:submenu id="nnm25_supplier" label="供应商#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_REPAIR_EDIT')}">
                 <p:menuitem value="#{msg.RepairWorkbench}" outcome="/portal/woMgr/supplier/workOrderSupplierList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('SUPPLIER_REPAIR_EDIT')}"/>
             </p:submenu>
 
