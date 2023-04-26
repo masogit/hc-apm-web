@@ -8,57 +8,28 @@
 			  width="700px" height="600px;" maximizable="true">
 		<p:ajax event="close" update=":SiteInfoListForm:datalist" />
 		<h:form id="SiteInfoEditVersionForm" rendered="#{tenantInfoController.selected != null}">
-			<c:choose>
-			<c:when test="${tenantInfoController.openNewMenuRoles}">
-				<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-					<h:panelGroup>
-						<label class="label">功能列表</label>
-						<p:inputText id="filterInput" value="#{tenantInfoController.filterFeatureStr}" placeholder="输入搜索关键字" >
-							<p:ajax event="keyup" listener="#{tenantInfoController.filterFeature}" update="features"/>
-						</p:inputText>
-					</h:panelGroup>
-					<h:panelGroup>
-						<label class="label">版本</label>
-						<p:selectOneMenu value="#{tenantInfoController.tenantConfigService.edition}">
-							<p:ajax update=":SiteInfoEditVersionForm"></p:ajax>
-							<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-						</p:selectOneMenu>
-						<label class="label">设备运营管理链接</label>
-						<p:inputText value="#{tenantInfoController.tenantConfigService.cpmURL}"></p:inputText>
-					</h:panelGroup>
-				</p:panelGrid>
-				<p:scrollPanel style="height: 500px; border: 0;" mode="native">
-					<p:selectManyCheckbox id="features" widgetVar="features" value="#{tenantInfoController.selectedFeatures}"  layout="pageDirection" columns="1" styleClass="grid-checkbox">
-						<p:ajax update="@this"/>
-						<f:selectItems value="#{tenantInfoController.features}" var="item" itemLabel="#{item.featureName}" itemValue="#{item}"/>
-					</p:selectManyCheckbox>
-				</p:scrollPanel>
-			</c:when>
-			<c:otherwise>
-				<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-					<h:panelGroup>
-						<label class="label">版本</label>
-						<p:selectOneMenu value="#{tenantInfoController.tenantConfigService.edition}">
-							<p:ajax update=":SiteInfoEditVersionForm"></p:ajax>
-							<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-						</p:selectOneMenu>
-					</h:panelGroup>
-					<h:panelGroup>
-						<label class="label">设备运营管理链接</label>
-						<p:inputText value="#{tenantInfoController.tenantConfigService.cpmURL}"></p:inputText>
-					</h:panelGroup>
-				</p:panelGrid>
-				<p:scrollPanel style="height: 500px; border: 0;" mode="native">
-					<p:tree id="tenantConfigTreeTable" class="tree" value="#{tenantInfoController.tenantConfigService.root}" selection="#{tenantInfoController.tenantConfigService.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox" highlight="true" >
-						<p:ajax event="select" listener="#{tenantInfoController.tenantConfigService.onSelectTenantConfig}" process="@this"/>
-						<p:ajax event="unselect" listener="#{tenantInfoController.tenantConfigService.onUnSelectTenantConfig}" process="@this"/>
-						<p:treeNode type="tenantConfigTree">
-							<h:outputText value="#{item.label}"/>
-						</p:treeNode>
-					</p:tree>
-				</p:scrollPanel>
-			</c:otherwise>
-			</c:choose>
+			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+				<h:panelGroup>
+					<label class="label">版本</label>
+					<p:selectOneMenu value="#{tenantInfoController.tenantConfigService.edition}">
+						<p:ajax update=":SiteInfoEditVersionForm"></p:ajax>
+						<f:selectItems value="#{fieldMsg.getFieldValueList('tenantVersion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+					</p:selectOneMenu>
+				</h:panelGroup>
+				<h:panelGroup>
+					<label class="label">设备运营管理链接</label>
+					<p:inputText value="#{tenantInfoController.tenantConfigService.cpmURL}"></p:inputText>
+				</h:panelGroup>
+			</p:panelGrid>
+			<p:scrollPanel style="height: 500px; border: 0;" mode="native">
+				<p:tree id="tenantConfigTreeTable" class="tree" value="#{tenantInfoController.tenantConfigService.root}" selection="#{tenantInfoController.tenantConfigService.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox" highlight="true" >
+					<p:ajax event="select" listener="#{tenantInfoController.tenantConfigService.onSelectTenantConfig}" process="@this"/>
+					<p:ajax event="unselect" listener="#{tenantInfoController.tenantConfigService.onUnSelectTenantConfig}" process="@this"/>
+					<p:treeNode type="tenantConfigTree">
+						<h:outputText value="#{item.label}"/>
+					</p:treeNode>
+				</p:tree>
+			</p:scrollPanel>
 			<br />
 			<p:commandButton validateClient="true" actionListener="#{tenantInfoController.save}" value="#{msg.Save}" update=":growl" icon="ui-icon-check"
 							 oncomplete="handleSubmit(args, 'SiteInfoEditVersionDialog');" />
