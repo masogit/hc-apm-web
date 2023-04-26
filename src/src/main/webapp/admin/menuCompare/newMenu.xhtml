@@ -43,8 +43,8 @@
             </p:submenu>
 
             <!--多级审批  -->
-            <p:submenu id="um001" label="审批" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRoleByApmRoles('MultiLevelAuditor')}">
-                <p:menuitem id="um0011" value="多级审批" outcome="/portal/approval/MultiLevelApproval.xhtml" rendered="true"/>
+            <p:submenu id="num001" label="审批" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRoleByApmRoles('MultiLevelAuditor')}">
+                <p:menuitem id="num0011" value="多级审批" outcome="/portal/approval/MultiLevelApproval.xhtml" rendered="true"/>
             </p:submenu>
 
             <!-- 备件管理 -->
@@ -114,7 +114,7 @@
             </p:submenu>
 
             <!-- 维修流程 -->
-            <p:submenu id="nnm09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_')}">
+            <p:submenu id="nnm09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_')}">
                 <p:menuitem value="#{msg.RepairWorkbench}" outcome="/portal/woMgr/workOrderList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_VIEW')}"/>
                 <p:menuitem id="nnm221" value="核心组审核进度查看" outcome="/portal/approval/approveSchedule.xhtml" rendered="#{userContextService.getUserAccountApprove() and userContextService.accessContainsFunctionMenu('REPAIR_APPROVE_PROCESS_VIEW')}"/>
                 <p:menuitem id="nnm13" value="#{msg.EquipmentRepairStatistics}" outcome="/portal/wo/assetWorkOrder.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_STATISTICS_VIEW')}"/>
