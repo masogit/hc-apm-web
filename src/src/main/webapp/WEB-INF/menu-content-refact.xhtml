@@ -43,8 +43,8 @@
             </p:submenu>
 
             <!--多级审批  -->
-            <p:submenu id="um001" label="审批" icon="fa fa-check-square-o" rendered="#{userContextService.hasAnyRoleByApmRoles('MultiLevelAuditor')}">
-                <p:menuitem id="um0011" value="多级审批" outcome="/portal/approval/MultiLevelApproval.xhtml" rendered="true"/>
+            <p:submenu id="um001" label="审批" icon="fa fa-check-square-o" rendered="#{userContextService.accessContainsFunctionMenu('MULTILEVEL_')}">
+                <p:menuitem id="um0011" value="多级审批" outcome="/portal/approval/MultiLevelApproval.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('MULTILEVEL_APPROVE_APPROVE')}"/>
             </p:submenu>
 
             <!-- 备件管理 -->
