@@ -104,6 +104,10 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	private List<String> selectedMenuFeaturesDeviceDataReview;
 	@Getter@Setter
 	private List<String> selectedMenuFeaturesSupplierTenant;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesConfig;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesPlatform;
 
 	private boolean isTestTenant = false;
 	private boolean isShowTestTenant = true;
@@ -301,6 +305,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesLogAudit);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesSupplierTenant);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesDeviceDataReview);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesConfig);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesPlatform);
 		if (CollectionUtils.isNotEmpty(allSelectedMenuFeatures)) {
 			selected.setFeatureList(JSON.toJSONString(allSelectedMenuFeatures));
 		} else {
@@ -558,6 +564,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			selectedMenuFeaturesLogAudit = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("LOG_AUDIT")).collect(Collectors.toList());
 			selectedMenuFeaturesSupplierTenant = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("SUPPLIER_TENANT")).collect(Collectors.toList());
 			selectedMenuFeaturesDeviceDataReview = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("DEVICEDATAPREVIEW")).collect(Collectors.toList());
+			selectedMenuFeaturesConfig = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("CONFIG")).collect(Collectors.toList());
+			selectedMenuFeaturesPlatform = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PLATFORM")).collect(Collectors.toList());
 		}
 	}
 
