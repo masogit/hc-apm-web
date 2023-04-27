@@ -57,7 +57,7 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
     private V2_BlobObject uploadedFileObject;
     private StreamedContent reportTemplateFile;
     private OrgInfoRepository orgInfoRepository;
-    private Boolean isInsulate;
+//    private Boolean isInsulate;
     private Integer loginUserOrgType;
     private UserCommonService userCommonService;
     private UaaService uaaService;
@@ -95,7 +95,7 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         relMeasureRuleRepository = WebUtil.getBean(RelMeasureRuleRepository.class);
         supplierService = WebUtil.getBean(SupplierService.class);
-        isInsulate = UserContextService.isInsulate();
+//        isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
         //initTree(user.getTenantUID());
@@ -775,13 +775,13 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
         this.deletedCheckListIds = deletedCheckListIds;
     }
 
-    public Boolean getInsulate() {
-        return isInsulate;
-    }
-
-    public void setInsulate(Boolean insulate) {
-        isInsulate = insulate;
-    }
+//    public Boolean getInsulate() {
+//        return isInsulate;
+//    }
+//
+//    public void setInsulate(Boolean insulate) {
+//        isInsulate = insulate;
+//    }
 
     public Integer getLoginUserOrgType() {
         return loginUserOrgType;
