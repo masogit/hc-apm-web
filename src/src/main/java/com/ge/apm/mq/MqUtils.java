@@ -31,35 +31,40 @@ public class MqUtils {
 
     public static final Logger log = LoggerFactory.getLogger(MqUtils.class);
 
-
-
     @Autowired
-    private  RabbitTemplate rabbitTemplate;
+    private RabbitTemplate rabbitTemplate;
 
-    public   void sendToMq(MqContext mqContext)   {
-        try{
-            rabbitTemplate.convertAndSend(mqContext.getExChange(),mqContext.getRoutingKey(),mqContext);
-        }catch (Exception e){
-            log.error("send to mq error exchange:{},routingKey:{},message:{},e :",mqContext.getExChange(),mqContext.getRoutingKey(),mqContext.getJsonObject(),e);
+    public void sendToMq(MqContext mqContext) {
+        try {
+            rabbitTemplate.convertAndSend(mqContext.getExChange(), mqContext.getRoutingKey(), mqContext);
+        } catch (Exception e) {
+            log.error("send to mq error exchange:{},routingKey:{},message:{},e :", mqContext.getExChange(), mqContext.getRoutingKey(), mqContext.getJsonObject(), e);
             throw e;
         }
-
     }
 
+    public void sendStringToMq(MqContext mqContext) {
+        try {
+            rabbitTemplate.convertAndSend(mqContext.getExChange(), mqContext.getRoutingKey(), JSON.toJSONString(mqContext));
+        } catch (Exception e) {
+            log.error("send to mq error exchange:{},routingKey:{},message:{},e :", mqContext.getExChange(), mqContext.getRoutingKey(), mqContext.getJsonObject(), e);
+            throw e;
+        }
+    }
 
     /**
      * 物理数据删除发送接口哦
-     * @param object  数据对象
+     *
+     * @param object      数据对象
      * @param objectType  对象信息 表类型
-     * @param userAccount  操作用户
+     * @param userAccount 操作用户
      */
-    public void sendPhysicalDataDel(Object object, String objectType, UserAccount userAccount,MqContext mqContex) {
-
+    public void sendPhysicalDataDel(Object object, String objectType, UserAccount userAccount, MqContext mqContex) {
         DataDelVO dataDelVO = new DataDelVO();
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("jsonData",dataDelVO);
+        jsonObject.put("jsonData", dataDelVO);
         mqContex.setJsonObject(jsonObject);
-        if(userAccount==null){
+        if (userAccount == null) {
             userAccount = UserContextService.getCurrentUserAccount();
         }
         dataDelVO.setOperator(userAccount.getLoginName());
@@ -79,13 +84,11 @@ public class MqUtils {
         sendToMq(mqContex);
     }
 
-
-
     //设备新增assetInfo中id值设置为null
     public void sendAssetToMQ(AssetInfo asset, UserAccount userAccount, MqContext mqContext) {
         AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(asset,assetInfo);
-        MqContext mqContextDTO=new MqContext();
+        BeanUtils.copyProperties(asset, assetInfo);
+        MqContext mqContextDTO = new MqContext();
         mqContextDTO.setTime(new Date());
         mqContextDTO.setType("asset");
         mqContextDTO.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
@@ -94,31 +97,20 @@ public class MqUtils {
         mqContextDTO.setMethodName(mqContext.getMethodName());
         mqContextDTO.setDescribe(mqContext.getDescribe());
         mqContextDTO.setLocale(mqContext.getLocale());
-        JSONObject jsonObject =new JSONObject();
-        jsonObject.put("currentUserAccount",userAccount);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("currentUserAccount", userAccount);
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         Field[] declaredFields = asset.getClass().getDeclaredFields();
         List<Field> fields1 = Arrays.asList(declaredFields);
         List<Field> fields2 = fields1.stream().filter(item -> {
             Column annotation = item.getAnnotation(Column.class);
-            return annotation ==null;
+            return annotation == null;
         }).collect(Collectors.toList());
-        List<String> collect = fields2.stream().map(item -> item.getName()).collect(Collectors.toList());
+        List<String> collect = fields2.stream().map(Field::getName).collect(Collectors.toList());
         filter.getExcludes().addAll(collect);
         String str = JSON.toJSONString(assetInfo, filter, SerializerFeature.WriteDateUseDateFormat);
-        jsonObject.put("assetInfo",str);
+        jsonObject.put("assetInfo", str);
         mqContextDTO.setJsonObject(jsonObject);
         sendToMq(mqContextDTO);
     }
-
-
-
-
-
-
-
-
-
-
-
 }
