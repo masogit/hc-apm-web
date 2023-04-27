@@ -1342,6 +1342,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             return;
         }
         zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrderRepository.save(zkbPartOrder);
 
         for(ZkbPartOrderStep s :zkbPartOrder.getZkbPartOrderStepSet()){
@@ -1373,6 +1376,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrder.setUnOrderAuditer(userAccount.getName());
         zkbPartOrder.setUnOrderAuditerUid(userAccount.getUid());
         zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.FourHundredCancel.toString());
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrderRepository.save(zkbPartOrder);
 
         List<ZkbPartOrderStep> zkbPartOrderStepList = zkbPartOrderStepRepository.findByPartOrderIdAndStepKey(zkbPartOrder.getId(),ZkbPartOrderStep.PartOrderStep.Complete.toString());
