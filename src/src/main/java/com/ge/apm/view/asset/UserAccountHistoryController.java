@@ -44,19 +44,10 @@ public class UserAccountHistoryController extends GenericCRUDController<UserAcco
         setSearchFilter();
         Page<UserAccountHistory> pgData = dao.findBySearchFilter(this.searchFilters, pageRequest);
         List<UserAccountHistory> content = pgData.getContent();
-        content.stream().forEach(c -> {
+        content.forEach(c -> {
             if (StringUtils.isNotEmpty(c.getOperationType())) {
-                switch (c.getOperationType()) {
-                    case "CREATE":
-                        c.setOperationType("新增");
-                        break;
-                    case "DELETE":
-                        c.setOperationType("删除");
-                        break;
-                    case "UPDATE":
-                        c.setOperationType("修改");
-                        break;
-                }
+                UserAccount.HistoryAction historyAction = UserAccount.HistoryAction.valueOf(c.getOperationType());
+                c.setOperationType(historyAction.getValue());
             }
         });
         return pgData;

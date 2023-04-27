@@ -2,7 +2,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
@@ -135,7 +135,14 @@
             </h:form>
 
                 <ui:include src="Edit.xhtml"/>
-                <ui:include src="EditVersion.xhtml"/>
+                <c:choose>
+                    <c:when test="#{tenantInfoController.openNewMenuRoles}">
+                        <ui:include src="EditMenuFeature.xhtml"/>
+                    </c:when>
+                    <c:otherwise>
+                        <ui:include src="EditVersion.xhtml"/>
+                    </c:otherwise>
+                </c:choose>
                 <ui:include src="View.xhtml"/>
             </div>
         </div>

@@ -10,13 +10,14 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
-import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.ApmFeatureVersion;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ValueChangeEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,10 +41,9 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class TenantInfoController extends JpaCRUDController<TenantInfo> {
-	private static final Logger logger = Logger.getLogger(TenantInfoController.class);
-	private static org.slf4j.Logger log = LoggerFactory.getLogger(TenantInfoController.class);
+	private static final Logger log = LoggerFactory.getLogger(TenantInfoController.class);
 
-	TenantInfoRepository dao = null;
+	TenantInfoRepository dao;
 	UserAccountRepository userAccountRepository;
 	UserAccount loginUser;
 	TenantInfoConfigService tenantConfigService;
@@ -58,18 +59,63 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	@Getter@Setter
 	private List<ApmFeature> features;
 	@Getter@Setter
-	private List<ApmFeature> selectedFeatures;
+	private Set<String> allSelectedMenuFeatures;
 	@Getter@Setter
-	private String filterFeatureStr;
+	private List<String> selectedMenuFeaturesAsset;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesApprove;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesInstall;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesSpecialAsset;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesParts;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesRepair;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesMaintain;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesMeasure;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesNurseSite;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesKnowledge;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesAdjust;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesAudit;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesPerformance;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesBudget;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesHisPerformance;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesReportCenter;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesAssetAccountDashboard;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesAuditConfig;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesMvsAsset;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesLogAudit;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesDeviceDataReview;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesSupplierTenant;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesConfig;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesPlatform;
 
 	private boolean isTestTenant = false;
 	private boolean isShowTestTenant = true;
-	private static final Integer NORMAL_Tenant_STATUS = 0; //NORMALTenant
-	private static final Integer TEST_Tenant_STATUS = -1; //TestTenant
+	private static final Integer NORMAL_TENANT_STATUS = 0; //NORMALTenant
+	private static final Integer TEST_TENANT_STATUS = -1; //TestTenant
 	private static final Integer LX_USER_TYPE = -1; // lixiang user type
 
-	@Getter
-	@Setter
+	@Getter@Setter
 	private boolean disableCreateTemplateBt = false; // 如果编辑状态初是'通用版',添加模版按钮就设置为灰色
 
 	public boolean createOrEdit() {
@@ -98,7 +144,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		}else {
 			this.isShowTestTenant = Boolean.TRUE;
 		}
-
 	}
 
 	@Override
@@ -112,10 +157,10 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
-			searchFilters = new ArrayList<SearchFilter>();
+			searchFilters = new ArrayList<>();
 		}
 		if(LX_USER_TYPE.equals(loginUser.getType())){
-			searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.NE, TEST_Tenant_STATUS));
+			searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.NE, TEST_TENANT_STATUS));
 		}
 		return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
@@ -167,7 +212,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		return thisTenant.getId() == 46;
 	}
 	public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
-		// TODO Auto-generated method stub
 		super.prepareCreate();
 		selected.setHaveIbDevice(true);
 		tenantConfigService.init();
@@ -177,14 +221,12 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	@Override
 	public void prepareEdit() {
-		// TODO Auto-generated method stub
 		super.prepareEdit();
 		parseTenantConfig();
 		this.type="edit";
 	}
 
 	public void prepareEdit(String type) {
-		// TODO Auto-generated method stub
 		super.prepareEdit();
 		parseTenantConfig();
 		this.type = type;
@@ -203,7 +245,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		tempAlready = false;
 
 		//判断是否是测试租户
-		if(TEST_Tenant_STATUS.equals(selected.getTestStatus())){
+		if(TEST_TENANT_STATUS.equals(selected.getTestStatus())){
 			this.isTestTenant = Boolean.TRUE;
 		}else{
 			this.isTestTenant = Boolean.FALSE;
@@ -213,7 +255,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	@Transactional
 	@Override
 	public void save() {
-		String features = null;
 		if (type.equalsIgnoreCase("create")) {// 如果租户已经创建过则退出
 			List<TenantInfo> byName = dao.getByName(this.selected.getName());
 			if (byName.size() > 0) {
@@ -221,15 +262,11 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				RequestContext.getCurrentInstance().addCallbackParam("tenantEstablished", true);
 				return;
 			}
-			features = JSON.toJSONString(UserContextService.getInitFeature().stream().map(ApmFeature::name).collect(Collectors.toSet()));
+			Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst();
+			selected.setFeatureList(JSON.toJSONString(features.get().getFeatureList()));
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
 		this.selected.setLastModifiedDate(new Date());
-		if (StringUtils.isEmpty(features)) {
-			this.selected.setFeatureList(JSONObject.toJSONString(selectedFeatures));
-		} else {
-			this.selected.setFeatureList(features);
-		}
 		super.save();
 		if (!StringUtils.isEmpty(this.selected.getUid())) {
 			OrgInfo tenantOrg = orgInfoDao.findFirstByTenantUIDAndOrgType(this.selected.getUid(), 0);
@@ -240,6 +277,47 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			}
 		}
 		log.info("save/update TenantInfo successful, tenantName:{}", this.selected.getName());
+	}
+
+	@Transactional
+	public void saveFeature() {
+		selected.setLastModifiedDate(new Date());
+		allSelectedMenuFeatures.clear();
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAsset);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesApprove);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesInstall);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesSpecialAsset);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesParts);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesRepair);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesMaintain);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesMeasure);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesNurseSite);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesKnowledge);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAdjust);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAudit);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesPerformance);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesBudget);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesHisPerformance);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesReportCenter);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAssetAccountDashboard);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAuditConfig);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesMvsAsset);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesLogAudit);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesSupplierTenant);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesDeviceDataReview);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesConfig);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesPlatform);
+		if (CollectionUtils.isNotEmpty(allSelectedMenuFeatures)) {
+			selected.setFeatureList(JSON.toJSONString(allSelectedMenuFeatures));
+		} else {
+			WebUtil.addErrorMessage("租户功能模块不能为空已");
+			return;
+		}
+		JSONObject jsonObject = JSON.parseObject(selected.getTenantConfig());
+		jsonObject.remove("edition");
+		jsonObject.put("edition", tenantConfigService.getEdition());
+		selected.setTenantConfig(jsonObject.toJSONString());
+		dao.save(selected);
 	}
 
 	List<TableDefinition> tbList = new ArrayList<TableDefinition>();
@@ -333,17 +411,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	@Override
 	public void onAfterNewObject(TenantInfo tenant, boolean isOK) {
-		if (!isOK)
-			return;
-		/*
-		 * // import field code type data for this site try{ String sql =
-		 * "insert into i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) select distinct msg_type, msg_key, value_zh, value_en, value_tw, %d as site_id from i18n_message where msg_type in (select msg_type from field_code_type)"
-		 * ; NativeSqlUtil.execute(String.format(sql, site.getId()), null); }
-		 * catch(Exception ex){ logger.error(ex.getMessage(), ex); }
-		 */
-
-		// and create an default org for this site
-		// String orgUID = UUID.randomUUID().toString().replace("-", "");
+		if (!isOK) return;
 		OrgInfo org = new OrgInfo();
 		org.setSiteId(tenant.getId());
 
@@ -399,12 +467,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	@Transactional
 	public void onAfterUpdateObject(TenantInfo tenant, boolean isOK) {
 		/* 如果由非通用版改成通用版，查找tabledef表(tenantUid,name)有没有存在模版，没有的话添加 */
-		// String config=tenantConfig.getJSONStr();
-
-		// List<TableDefinition> tbList= new ArrayList<TableDefinition>();
-		if (!isOK) {
-			return;
-		}
+		if (!isOK) return;
 		if (selected.getIsEnabled() != null && selected.getIsEnabled()) {
 			// 如果超级管理员激活某个租户，则激活该租户下的所有用户
 			userAccountRepository.updateMembersStatus(selected.getUid());
@@ -418,7 +481,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void onBeforeNewObject(TenantInfo tenant) {
 		tenant.setLastModifiedDate(new Date());
 		tenant.setCreatedDate(new Date());
-		tenant.setTestStatus(NORMAL_Tenant_STATUS);
+		tenant.setTestStatus(NORMAL_TENANT_STATUS);
 		tenant.setIsEnabled(false);
 		super.onBeforeNewObject(tenant);
 	}
@@ -450,9 +513,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		}
 
 		if(this.isTestTenant){
-			tenantInfo.setTestStatus(TEST_Tenant_STATUS);
+			tenantInfo.setTestStatus(TEST_TENANT_STATUS);
 		}else{
-            tenantInfo.setTestStatus(NORMAL_Tenant_STATUS);
+            tenantInfo.setTestStatus(NORMAL_TENANT_STATUS);
         }
 
 	}
@@ -472,25 +535,38 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	private void parseTenantConfig() {
 		String configJsonStr = this.selected.getTenantConfig();
-		selectedFeatures = getApmFeatureList(this.selected.getFeatureList());
+		buildFeature(selected.getFeatureList());
 		tenantConfigService.parseStr(configJsonStr);
 	}
 
-	public void filterFeature() {
-		features = allFeatures;
-		if (StringUtils.isEmpty(filterFeatureStr)) {
-			return;
-		} else {
-			features = features.stream().filter(item -> item.getFeatureName().toLowerCase().contains(filterFeatureStr.toLowerCase())).collect(Collectors.toList());
+	private void buildFeature(String featureList) {
+		if (StringUtils.isNotEmpty(featureList)) {
+			allSelectedMenuFeatures = ((List<String>) JSON.parse(featureList)).stream().collect(Collectors.toSet());
+			selectedMenuFeaturesAsset = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("ASSET")).collect(Collectors.toList());
+			selectedMenuFeaturesApprove = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("MULTILEVEL")).collect(Collectors.toList());
+			selectedMenuFeaturesInstall = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("INSTALL")).collect(Collectors.toList());
+			selectedMenuFeaturesSpecialAsset = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("SPECIAL")).collect(Collectors.toList());
+			selectedMenuFeaturesParts = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PARTS")).collect(Collectors.toList());
+			selectedMenuFeaturesRepair = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("REPAIR")).collect(Collectors.toList());
+			selectedMenuFeaturesMaintain = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("MAINTAIN")).collect(Collectors.toList());
+			selectedMenuFeaturesMeasure = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("MEASURE")).collect(Collectors.toList());
+			selectedMenuFeaturesNurseSite = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("NURSESITE")).collect(Collectors.toList());
+			selectedMenuFeaturesKnowledge = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("KNOWLEDGE")).collect(Collectors.toList());
+			selectedMenuFeaturesAdjust = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("ADJUST")).collect(Collectors.toList());
+			selectedMenuFeaturesAudit = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("AUDIT")).collect(Collectors.toList());
+			selectedMenuFeaturesPerformance = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PERFORMANCE")).collect(Collectors.toList());
+			selectedMenuFeaturesBudget = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("BUDGET")).collect(Collectors.toList());
+			selectedMenuFeaturesHisPerformance = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("HISPERFORMANCE")).collect(Collectors.toList());
+			selectedMenuFeaturesReportCenter = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("REPORT_CENTER")).collect(Collectors.toList());
+			selectedMenuFeaturesAssetAccountDashboard = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("ASSET_ACCOUNT_DASHBOARD")).collect(Collectors.toList());
+			selectedMenuFeaturesAuditConfig = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("AUDIT_CONFIG")).collect(Collectors.toList());
+			selectedMenuFeaturesMvsAsset = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("MVS_ASSET")).collect(Collectors.toList());
+			selectedMenuFeaturesLogAudit = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("LOG_AUDIT")).collect(Collectors.toList());
+			selectedMenuFeaturesSupplierTenant = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("SUPPLIER_TENANT")).collect(Collectors.toList());
+			selectedMenuFeaturesDeviceDataReview = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("DEVICEDATAPREVIEW")).collect(Collectors.toList());
+			selectedMenuFeaturesConfig = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("CONFIG")).collect(Collectors.toList());
+			selectedMenuFeaturesPlatform = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PLATFORM")).collect(Collectors.toList());
 		}
-	}
-
-	public List<ApmFeature> getApmFeatureList(String tenantFeatureList) {
-		if (StringUtils.isEmpty(tenantFeatureList)) {
-			return new ArrayList<>();
-		}
-		List<String> features = (List<String>)JSONObject.parse(tenantFeatureList);
-		return Arrays.stream(ApmFeature.values()).filter(f -> features.contains(f.name())).collect(Collectors.toList());
 	}
 
 	public boolean isOpenNewMenuRoles() {
@@ -498,6 +574,11 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			return false;
 		}
 		return selected.getEnablesNewMenu() && StringUtils.isNotEmpty(selected.getFeatureList());
+	}
+
+	public void changeListener() {
+		Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst();
+		buildFeature(JSON.toJSONString(features.get().getFeatureList()));
 	}
 
 	public String getType() {

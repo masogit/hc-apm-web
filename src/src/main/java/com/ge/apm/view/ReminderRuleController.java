@@ -142,6 +142,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 //            WebUtil.addErrorMessage("通用版配置通知类型只能为角色！");
 //            return;
 //        }
+        if(!verifyEmpty(actionName)) return;
         JSONObject parameters = JSON.parseObject(JSON.toJSONString(selected.getRuleParam()));
         WechatParam wechatParam = selected.getWechatParam();
         wechatParam.setTemplateId(ReminderType.getWechatTemplateId(selected.getType()));
@@ -149,7 +150,25 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         selected.setParameters(JSON.toJSONString(parameters));
         dao.save(selected);
     }
-
+    private boolean verifyEmpty(String actionName){
+        boolean flag=true;
+        if("setting".equals(actionName)){
+            RuleParam ruleParam = selected.getRuleParam();
+            Integer pushCycle = ruleParam.getPushCycle();
+            Integer pushNum = ruleParam.getPushNum();
+            if(pushCycle == null || pushCycle < 1){
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                WebUtil.addErrorMessageKey("pushCycle 不能小于0");
+                flag=false;
+            }
+            if(pushNum == null || pushNum < 1){
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                WebUtil.addErrorMessageKey("pushNum 不能小于0");
+                flag=false;
+            }
+        }
+        return flag;
+    }
     public void setToUsing(String id, boolean using) {
         selected = dao.findById(id);
         selected.setId(id);
