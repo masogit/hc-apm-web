@@ -63,6 +63,9 @@ public class UaaService {
     private UserRoleRepository userRoleRepository;
 
     @Autowired
+    private UserAccountHistoryService userAccountHistoryService;
+
+    @Autowired
     private PermissionGroupMapper permissionGroupMapper;
     @Autowired
     private PermissionGroupUserMapper permissionGroupUserMapper;
@@ -279,13 +282,10 @@ public class UaaService {
     }
     
     @Transactional
-    public void setUserRoles(UserAccount userAccount, List<String> newRoleNames){
+    public void setUserRoles(boolean isCreated, UserAccount userAccount, List<String> newRoleNames){
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-        if(userAccount.getId()!=null){
-            userRoleDao.deleteByUserAccount(userAccount.getId());
-        }
         //then set user roles
         SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
         if((!newRoleNames.contains(TEMP_STAFF)) && (userAccount.getUserRoleNames().contains(TEMP_STAFF))){
@@ -301,6 +301,7 @@ public class UaaService {
         if(newRoleNames.isEmpty()){
             newRoleNames.add("临床科室人员");
         }
+        List<UserRole> userRoles = ListUtil.newArrayList();
         for(String newRoleName: newRoleNames){
             SysRole role = sysRoleDao.getByRoleDesc(newRoleName);
             if (role == null){
@@ -312,7 +313,7 @@ public class UaaService {
                     userRole.setUserId(userAccount.getId());
                     userRole.setRoleId(customRole.getId());
                     userRole.setRoleType(1);
-                    userRoleDao.save(userRole);
+                    userRoles.add(userRole);
                 }
             }
             else {
@@ -320,9 +321,20 @@ public class UaaService {
                 userRole.setUserId(userAccount.getId());
                 userRole.setRoleId(role.getId());
                 userRole.setRoleType(0);
-                userRoleDao.save(userRole);
+                userRole.setRole(role);
+                userRoles.add(userRole);
             }
         }
+        if (isCreated) {
+            userAccountHistoryService.updateNewUser(userAccount.getUid(), userAccount.getLoginName());
+        } else {
+            userAccount.setUserRoleList(userRoles);
+            userAccountHistoryService.save(UserAccount.HistoryAction.UPDATE_ROLE.name(), userAccount);
+        }
+        if(userAccount.getId()!=null){
+            userRoleDao.deleteByUserAccount(userAccount.getId());
+        }
+        userRoleDao.save(userRoles);
     }
 
     @Transactional

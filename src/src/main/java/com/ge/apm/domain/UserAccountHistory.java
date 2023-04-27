@@ -77,4 +77,13 @@ public class UserAccountHistory implements Serializable {
 
     @Column(name = "tenant_uid")
     private String tenantUID;
+
+    @Column(name = "user_uid")
+    private String userUid;
+
+    @Column(name = "json_data", columnDefinition = "text")
+    private String jsonData;
+
+    @Column(name = "user_json", columnDefinition = "text")
+    private String userJson;
 }
