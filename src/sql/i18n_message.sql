@@ -4902,7 +4902,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'noticeSetting', '通知配置', 'notice setting', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'pushSetting', '推送配置', 'push setting', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'wechatTemplateSetting', '微信模板配置', 'wechat template setting', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'pushCycle', '推送周期(天)', 'push cycle', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'pushCycle', '推送周期', 'push cycle', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'pushNum', '推送次数', 'number of push', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label', 'reminderEvent', '提醒事件信息', 'reminder event', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name', 'reminderDate', '提醒日期', 'reminder date', NULL, '-1');
