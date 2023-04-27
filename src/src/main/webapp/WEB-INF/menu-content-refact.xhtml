@@ -20,7 +20,7 @@
                 <p:menuitem id="um0889" value="供应商负责人赋权" outcome="/portal/supplier/empowerment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EMPOWERMENT_VIEW') and customConfigController.showSupplierViewAndEditFieldsTable()}"/>
                 <p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/AssetTerminateEntryList.xhtml" rendered="#{(!userContextService.needScrappedControl() and userContextService.accessContainsFunctionMenu('ASSET_SCRAP_VIEW'))}"/>
                 <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CREATE_VIEW')}"/>
-                <p:menuitem value="#{msg.AssetApproval}" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.isAssetApprover()) and userContextService.accessContainsFunctionMenu('ASSET_APPROVE')}"/>
+                <p:menuitem value="#{msg.AssetApproval}" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.isAssetApprover()) and userContextService.accessContainsFunctionMenu('ASSET_AUDIT_APPROVE')}"/>
                 <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_BATCH_IMPORT')}"/>
                 <p:menuitem id="um088" value="#{msg.inventoryWorkorder}" outcome="#{userContextService.hasCurrentTenantName('') ? '/portal/inventory/inventoryOrderDetailAssetInfoMainAll.xhtml':'/portal/inventory/inventoryOrder.xhtml'}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INVENTORY_EDIT')}"/>
                 <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_TEMPLATE_VIEW')}"/>
@@ -29,7 +29,7 @@
                 <p:menuitem id="um093" value="#{msg.AssetAchievementsRecord}" outcome="/portal/asset/assetAchievements/assetAchievementsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_ACHIEVEMENTS_VIEW')}"/>
                 <p:menuitem id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EVALUATION_VIEW')}"/>
                 <p:menuitem value="#{msg.keyAssetDataInput}" outcome="/portal/keyAssetReport/dataInputList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_KEYASSETDATAINPUT_EDIT')}"/>
-                <p:menuitem id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.hasAnyRoleByApmRoles('ITAdmin')}"/>
+                <p:menuitem id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_MVS_DATA_IMPORT')}"/>
             </p:submenu>
 
             <!-- 特种设备管理 -->
@@ -172,12 +172,12 @@
             <p:submenu id="um38" label="#{msg.DeviceOperationKPIAnalysis}" icon="fa fa-bar-chart" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContainsFunctionMenu('PERFORMANCE_')}">
                 <p:menuitem id="um381" value="#{msg.BigScreenForEquipmentManagement}" url="../../dashboard/#/dashboard2" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_DASHBOARD_SCREEN')}" />
                 <p:menuitem id="um240" value="#{msg.DepartmentTransactionManagement}" outcome="/portal/transactionManage/deptTransactionManage.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_DEPT_MANAGE_EDIT')}"/>
-                <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_SCAN')}"/>
+                <p:menuitem id="um16" value="#{msg.DeviceStatusMonitor}" outcome="/portal/analysis/deviceStatusMonitor" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_STATUS_MONITOR')}"/>
                 <p:menuitem id="um23" value="#{msg.AdvancedDeviceInfoTracking}" url="/geapm/portal/analysis/reports.xhtml#/ScanDetails" rendered="#{userContextService.loginUserSiteId eq 112 and userContextService.accessContainsFunctionMenu('PERFORMANCE_SCAN_STATISTIC')}"/>
                 <p:menuitem id="um151" value="#{msg.CTBulbTubePrediction}" rendered="#{userContextService.isAgentTenant() and userContextService.accessContainsFunctionMenu('PERFORMANCE_CT_PREDICT')}" outcome="/portal/config/tubeData/List.xhtml"/>
                 <p:menuitem id="um50" value="#{msg.SmallAssetPerformanceConfig}" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_CONFIG')}"/>
                 <p:menuitem id="um51" value="#{msg.EquipmentPerformanceImport}" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_IMPORT')}"/>
-                <p:menuitem id="um52" value="#{msg.EquipmentPerformanceReportForm}" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml" rendered="#{!userContextService.isOnlyAssetStaff()}"/>
+                <p:menuitem id="um52" value="#{msg.EquipmentPerformanceReportForm}" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('PERFORMANCE_REPORT')}"/>
                 <p:menuitem id="um42" value="#{msg.BIPerformanceAnalysisPlatform}" rendered="#{true and !userContextService.isOnlyAssetStaff() and userContextService.accessContainsFunctionMenu('PERFORMANCE_BI_BOARD')}" url="/geapm/web/bi" target="_new"/>
             </p:submenu>
 
