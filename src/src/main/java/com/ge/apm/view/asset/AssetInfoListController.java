@@ -237,9 +237,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         long l = System.currentTimeMillis();
         logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<SearchFilter>();
-        }
+
         setUserSearchFilters();
         Integer newLifecyle = null;
         for(SearchFilter searchFilter : searchFilters) {
@@ -378,6 +376,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void setUserSearchFilters() {
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
         boolean assetStatus = "-1".equals(filterAssetStatus);
         if(assetStatus){
             this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, true));
@@ -724,6 +726,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         if (assetUids.isEmpty()) {
             //PageRequest pageRequest = new PageRequest(0,100,lastPageSort);
             //Page<AssetInfo> esultList = dao.findBySearchFilter(searchFilters,pageRequest);
+            if(CollectionUtils.isEmpty(searchFilters)){
+                this.setUserSearchFilters();
+            }
             resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
@@ -752,6 +757,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
         List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
+            if(CollectionUtils.isEmpty(searchFilters)){
+                this.setUserSearchFilters();
+            }
             resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
