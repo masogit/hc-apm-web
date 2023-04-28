@@ -86,7 +86,7 @@
             </p:submenu>
 
             <!-- 科室借调 -->
-            <p:submenu id="nSiteToSiteAllocation" label="科室借调" icon="fa fa-share-square" rendered="#{userContextService.hasAnyRoleByApmRoles('AssetStaff', 'ClinicalStaff', 'NursingStaff', 'DeptHead') and userContextService.enableSiteToSiteAllocation()}">
+            <p:submenu id="nSiteToSiteAllocation" label="科室借调" icon="fa fa-share-square" rendered="#{userContextService.accessContainsFunctionMenu('ADJUST_DEPTMENT') and userContextService.enableSiteToSiteAllocation()}">
                 <p:menuitem id="nmirage_SiteToSiteAllocation_stats"   value="科室借调情况" outcome="/portal/secondment/departmentSecondment.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ADJUST_DEPT_EDIT')}"/>
             </p:submenu>
 

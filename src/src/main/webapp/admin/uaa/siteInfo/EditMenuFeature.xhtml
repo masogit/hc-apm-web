@@ -2,10 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
-
 <ui:composition>
     <p:dialog id="SiteInfoEditVersionDlg" widgetVar="SiteInfoEditVersionDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="修改版本信息"
-              width="1000px" height="700px;" maximizable="true">
+              width="1000px" height="700px" maximizable="true">
         <p:ajax event="close" update=":SiteInfoListForm:datalist" />
         <h:form id="SiteInfoEditVersionForm" rendered="#{tenantInfoController.selected != null}">
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -21,7 +20,7 @@
                     <p:inputText value="#{tenantInfoController.tenantConfigService.cpmURL}"></p:inputText>
                 </h:panelGroup>
             </p:panelGrid>
-            <p:scrollPanel style="height: 600px; border: 0;" mode="native">
+            <p:scrollPanel style="height: 600; border: 0;" mode="native">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                     <h:panelGroup>
                         <p:fieldset legend="设备档案">
