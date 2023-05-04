@@ -16,6 +16,7 @@ import com.ge.apm.service.uaa.UserAccountHistoryService;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.*;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
@@ -1065,7 +1066,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             role.add(SYSTEM_ACTIVE_ROLE);
         } else {
             Set<String> roles = uaaService.getSysRoleListByTenantUid(selected.getTenantUID());
-            if (roles.contains(DEFAULT_USER_ROLE)) {
+            if (roles.contains(ApmSystemRole.ClinicalStaff.name())) {
                 role.add(DEFAULT_USER_ROLE);
             } else {
                 role.add(IT_ADMIN_ROLE);
