@@ -26,13 +26,11 @@
                         <p:fieldset legend="设备档案">
                             <p:selectManyCheckbox id="asset" widgetVar="asset" value="#{tenantInfoController.selectedMenuFeaturesAsset}" layout="grid" columns="5" styleClass="grid-checkbox" >
                                 <p:ajax update="@this"/>
-                                <f:selectItem itemLabel="基本信息" itemValue="ASSET_INFO"/>
+                                <f:selectItem itemLabel="资产管理" itemValue="ASSET_INFO"/>
                                 <f:selectItem itemLabel="主子设备信息" itemValue="ASSET_PARENTS_INFO"/>
                                 <f:selectItem itemLabel="资产批量修改院区" itemValue="ASSET_BATCH_MODIFY"/>
                                 <f:selectItem itemLabel="设备风险评估" itemValue="ASSET_RISK_EVALUATE"/>
-                                <f:selectItem itemLabel="报废资产" itemValue="ASSET_SCRAP"/>
                                 <f:selectItem itemLabel="设备定位" itemValue="ASSET_LOCATION"/>
-                                <f:selectItem itemLabel="批量导入资产数据" itemValue="ASSET_BATCH_IMPORT"/>
                                 <f:selectItem itemLabel="报损模板管理" itemValue="ASSET_SCRAP_TEMPLATE"/>
                                 <f:selectItem itemLabel="资产审核" itemValue="ASSET_APPROVE"/>
                                 <f:selectItem itemLabel="盘点工单" itemValue="ASSET_INVENTORY"/>
