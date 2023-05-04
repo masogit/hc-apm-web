@@ -684,7 +684,10 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				List<String> finalEnumNames = jsonObject.getObject("menuList", List.class);
 				List<String> requiredEnums = new ArrayList<>();
 				for (AssetManagementEnum e : AssetManagementEnum.values()) {
-					if (e.isRequired() && !e.getIgnore().contains(version)) {
+					if (e.isRequired()) {
+						if (e.getIgnore().contains(version)) {
+							continue;
+						}
 						if (e.isChekConfig()) {
 							if (chekConfig(e, tenantInfo)) {
 								requiredEnums.add(e.name());
