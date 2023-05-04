@@ -73,7 +73,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
      *
      */
     private static final long serialVersionUID = -1L;
-
+    public static final String IT_ADMIN_ROLE = "ITAdmin";
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
     public static final String SYSTEM_ACTIVE_ROLE = "系统激活专用";
     public static final String SYSTEM_ACTIVE = "ActivationPerson";
@@ -1064,7 +1064,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (creatorUserType != null && creatorUserType.equals(LX_USER_TYPE)) {
             role.add(SYSTEM_ACTIVE_ROLE);
         } else {
-            role.add(DEFAULT_USER_ROLE);
+            Set<String> roles = uaaService.getSysRoleListByTenantUid(selected.getTenantUID());
+            if (roles.contains(DEFAULT_USER_ROLE)) {
+                role.add(DEFAULT_USER_ROLE);
+            } else {
+                role.add(IT_ADMIN_ROLE);
+            }
         }
         uaaService.setUserRoles(true, selected, role);
         uaaService.setDefaultScope(selected);

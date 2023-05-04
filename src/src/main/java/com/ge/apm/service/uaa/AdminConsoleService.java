@@ -1,5 +1,6 @@
 package com.ge.apm.service.uaa;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
@@ -678,21 +679,24 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		//find menus by tenant_config
 		for (TenantInfo tenantInfo : tenantInfos) {
 			if (StringUtils.isNotEmpty(tenantInfo.getTenantConfig())) {
-				List<String> finalEnumNames = Arrays.asList(tenantInfo.getTenantConfig().replaceAll("[\\[\\]\\{\\}\"]", "").replace("menuList:", "").split(","));
+				JSONObject jsonObject = JSON.parseObject(tenantInfo.getTenantConfig());
+				String version = jsonObject.getString("edition");
+				List<String> finalEnumNames = jsonObject.getObject("menuList", List.class);
 				List<String> requiredEnums = new ArrayList<>();
-				if (tenantInfo.getId() == 70) {
-					System.out.println(tenantInfo.getTenantConfig());
-				}
 				for (AssetManagementEnum e : AssetManagementEnum.values()) {
-					if (e.isRequired()) {
+					if (e.isRequired() && !e.getIgnore().contains(version)) {
+						if (e.isChekConfig()) {
+							if (chekConfig(e, tenantInfo)) {
+								requiredEnums.add(e.name());
+							}
+							continue;
+						}
 						requiredEnums.add(e.name());
 						continue;
 					}
 					if (finalEnumNames.contains(e.getOldName())) {
 						if (e.isChekConfig()) {
-							Method method = ReflectionUtils.findMethod(e.getChekClass(), e.getChekMethod(), TenantInfo.class);
-							Boolean result = (Boolean) ReflectionUtils.invokeMethod(method, updateTenantFeatureService, tenantInfo);
-							if (result == e.isExpectedValue()) {
+							if (chekConfig(e, tenantInfo)) {
 								requiredEnums.add(e.name());
 							}
 						} else {
@@ -714,6 +718,12 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				customRoleRepository.save(customRole);
 			}
 		});
+	}
+
+	private boolean chekConfig(AssetManagementEnum e, TenantInfo tenantInfo) {
+		Method method = ReflectionUtils.findMethod(e.getChekClass(), e.getChekMethod(), TenantInfo.class);
+		Boolean result = (Boolean) ReflectionUtils.invokeMethod(method, updateTenantFeatureService, tenantInfo);
+		return result == e.isExpectedValue();
 	}
 
 	private List<String> analyseCustomRole(String webAuth) {
