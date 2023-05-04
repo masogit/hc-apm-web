@@ -73,7 +73,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
      *
      */
     private static final long serialVersionUID = -1L;
-    public static final String IT_ADMIN_ROLE = "ITAdmin";
+    public static final String IT_ADMIN_ROLE = "后台运营管理";
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
     public static final String SYSTEM_ACTIVE_ROLE = "系统激活专用";
     public static final String SYSTEM_ACTIVE = "ActivationPerson";
