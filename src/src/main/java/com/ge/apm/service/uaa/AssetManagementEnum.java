@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum AssetManagementEnum {
-    ASSET_INFO("资产管理",  true, true, "asset.info", false, null, null, false, "audit", "swapCenter", "supplierVersion"),
+    ASSET_INFO("资产管理",  true, true, "asset.info", false, null, null, false, "audit", "supplierVersion"),
     ASSET_PARENTS_INFO("主子设备信息", false, true, "asset.parents.info", false, UpdateTenantFeatureService.class, "enableAssetPreview", true, "audit", "swapCenter", "supplierVersion"),
-    ASSET_BATCH_MODIFY("资产批量修改院区", false,true, "asset.batch.modify", true, UpdateTenantFeatureService.class, "isAllowAssetBatchUpdate", true, "audit", "swapCenter", "supplierVersion"),
+    ASSET_BATCH_MODIFY("资产批量修改院区", false, true, "asset.batch.modify", true, UpdateTenantFeatureService.class, "isAllowAssetBatchUpdate", true, "audit", "swapCenter", "supplierVersion"),
     ASSET_RISK_EVALUATE("设备风险评估", false, true , "asset.risk.evaluate", false, null, null, false, "audit", "swapCenter", "supplierVersion"),
     ASSET_SCRAP("报废资产", true, false, "asset.scrap", false, UpdateTenantFeatureService.class, "needScrappedControl", true),
     ASSET_LOCATION("设备定位", false, true, "asset.location", false, UpdateTenantFeatureService.class, "hasLocationEn", true, "audit", "swapCenter", "supplierVersion"),
