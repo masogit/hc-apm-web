@@ -308,7 +308,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         searchFilters.clear();
         selectedOrg = null;
-
+        selected = null;
         selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
