@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.callback.BusinessErrorLog;
 import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.AssetHistoryRepository;

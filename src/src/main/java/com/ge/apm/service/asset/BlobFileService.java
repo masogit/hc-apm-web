@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.config.MQConfig;
 import com.ge.apm.mq.MqUtils;
 import org.primefaces.event.FileUploadEvent;

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.aop.SendMQLog;
 import com.ge.apm.callback.DataDelVO;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.mq.MqUtils;

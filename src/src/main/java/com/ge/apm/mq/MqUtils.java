@@ -6,7 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 
 import com.ge.apm.callback.DataDelVO;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.config.MQConfig;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;

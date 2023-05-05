@@ -1,6 +1,6 @@
 package com.ge.apm.service.sharedasset;
 
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetReqTypeRepository;
