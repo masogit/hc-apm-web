@@ -1665,4 +1665,9 @@ public class UaaService {
         return roles;
     }
 
+    public boolean isOpenNewMenuRoles(String tenantUid) {
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUid);
+        return tenantInfo.getEnablesNewMenu() && StringUtils.isNotEmpty(tenantInfo.getFeatureList());
+    }
+
 }
