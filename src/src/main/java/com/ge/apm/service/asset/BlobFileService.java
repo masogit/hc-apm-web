@@ -15,7 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ge.healthcare.cn.common.mq.MqContext;
-import com.ge.apm.config.MQConfig;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.mq.MqUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
@@ -365,8 +365,8 @@ public class BlobFileService {
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("imageCompress");
-        mqContext.setRoutingKey(MQConfig.IMAGE_COMPRESS_ROUTING_KEY);
-        mqContext.setExChange(MQConfig.IMAGE_COMPRESS_CHANGE);
+        mqContext.setRoutingKey(RabbitConfig.IMAGE_COMPRESS_ROUTING_KEY);
+        mqContext.setExChange(RabbitConfig.IMAGE_COMPRESS_CHANGE);
 
         List<V2_BlobObject> list = new ArrayList<>();
         list.add(blobObject);

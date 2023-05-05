@@ -3,7 +3,7 @@ package com.ge.apm.service.uaa;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ge.apm.config.MQConfig;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
@@ -273,7 +273,7 @@ public class UserAccountHistoryService {
         MqContext mqContext = new MqContext();
         mqContext.setTime(DateUtil.now());
         mqContext.setType(MqContext.Type.USER_HISTORY.name());
-        mqContext.setExChange(MQConfig.USER_CHANGE);
+        mqContext.setExChange(RabbitConfig.USER_CHANGE);
         mqContext.setClassName(this.getClass().getSimpleName());
         mqContext.setServiceName("hc-apm-web");
         mqContext.setMethodName("saveUserAccount");
