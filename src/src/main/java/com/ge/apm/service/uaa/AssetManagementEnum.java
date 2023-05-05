@@ -39,7 +39,7 @@ public enum AssetManagementEnum {
     MEASURE("计量", true, true, "measure", false, null, null, false, "audit", "swapCenter", "supplierVersion", "opsVersion", "ZKBVersion"),
     NURSESITE("日常检查", true, false, "nurseSite", false, null, null, false),
     NURSESITE_RECORD("开关机登记", true, false, "nurseSite.optRecord", false, null, null, false),
-    NURSESITE_USING("使用登记", true, false, "nurseSite_useRegistration", false, null, null, false),
+    NURSESITE_USING("使用登记", true, false, "nurseSite.useRegistration", false, null, null, false),
     KNOWLEDGE("知识文档", true, false, "knowledge", false, null, null, false),
     KNOWLEDGE_ZKB("智康保文档", true, false, "knowledge_zkbMgt", false, null, null, false),
     ADJUST_ASSET("调剂中心", true, false, "assetAdjust", false, null, null, false),

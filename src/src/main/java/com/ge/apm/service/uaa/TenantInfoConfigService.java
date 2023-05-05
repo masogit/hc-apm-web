@@ -170,7 +170,7 @@ public class TenantInfoConfigService {
 			}
 			//预算管理 his绩效分析 特种设备管理 默认不勾选
 			if (key.equals("budgetMgr") || key.equals("hisPerform") || key.equals("specialAsset") || key.startsWith("budgetMgr.") || key.startsWith("hisPerform.") || key.startsWith("specialAsset.")
-			|| key.equals("sparePartsManagement") || key.equals("asset.keyAssetDataInput") || key.equals("asset.importMvsDataFile")) {
+			|| key.equals("sparePartsManagement") || key.equals("asset.keyAssetDataInput") || key.equals("asset.importMvsDataFile") || key.equals("nurseSite.useRegistration")) {
 				tempItem.setValue(false);
 			}
 			if (edition.equals(VERSION_COMMON)) {
