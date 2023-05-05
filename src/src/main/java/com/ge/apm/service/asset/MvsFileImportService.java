@@ -1,6 +1,6 @@
 package com.ge.apm.service.asset;
 
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MvsContractDateInfoRepository;
 import com.ge.apm.dao.MvsOrgInfoRepository;

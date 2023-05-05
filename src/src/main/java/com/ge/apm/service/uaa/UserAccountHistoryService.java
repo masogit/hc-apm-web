@@ -3,15 +3,14 @@ package com.ge.apm.service.uaa;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ge.apm.callback.MqContext;
 import com.ge.apm.config.MQConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.hisory.HistoryInfo;
 import com.ge.apm.mq.MqUtils;
-import com.ge.apm.service.utils.BeanChangeUtil;
-import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.utils.bean.BeanChangeUtil;
+import com.ge.healthcare.cn.common.utils.bean.HistoryInfo;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Column;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -84,8 +82,8 @@ public class UserAccountHistoryService {
             history.setSiteUID(userAccount.getSiteUID());
             history.setTenantUID(userAccount.getTenantUID());
             List<HistoryInfo> historyInfos = ListUtil.newArrayList();
-            UserAccount.HistoryAction action = UserAccount.HistoryAction.valueOf(historyAction);
-            switch (action) {
+            HistoryInfo.TypeAction typeAction = HistoryInfo.TypeAction.valueOf(historyAction);
+            switch (typeAction) {
                 case CREATE:
                 case IMPORT_CREATE:
                     break;
@@ -274,7 +272,7 @@ public class UserAccountHistoryService {
         Locale locale = LocaleContextHolder.getLocale();
         MqContext mqContext = new MqContext();
         mqContext.setTime(DateUtil.now());
-        mqContext.setType("user");
+        mqContext.setType(MqContext.Type.USER_HISTORY.name());
         mqContext.setExChange(MQConfig.USER_CHANGE);
         mqContext.setClassName(this.getClass().getSimpleName());
         mqContext.setServiceName("hc-apm-web");
