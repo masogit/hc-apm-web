@@ -1,7 +1,7 @@
 package com;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.AssetInfo;
