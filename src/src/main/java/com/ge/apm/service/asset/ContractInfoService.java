@@ -15,7 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.aop.SendMQLog;
 import com.ge.apm.callback.DataDelVO;
 import com.ge.healthcare.cn.common.mq.MqContext;
-import com.ge.apm.config.MQConfig;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -151,9 +151,9 @@ public class ContractInfoService {
             mqContext.setDescribe("合同列表删除合同");
 
             mqContext.setTime(new Date());
-            mqContext.setExChange(MQConfig.PHYSICAL_DATA_DEL_CHANGE);
+            mqContext.setExChange(RabbitConfig.PHYSICAL_DATA_DEL_CHANGE);
             mqContext.setRoutingKey("");
-            mqContext.setType(MQConfig.PHYSICALDATADELETE);
+            mqContext.setType(RabbitConfig.PHYSICALDATADELETE);
             UserAccount userAccount = UserContextService.getCurrentUserAccount();
             mqUtils.sendPhysicalDataDel(object,objectType,userAccount,mqContext);
         }catch (Exception e){
