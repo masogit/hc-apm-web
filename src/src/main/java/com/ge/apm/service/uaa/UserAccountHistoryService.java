@@ -3,6 +3,7 @@ package com.ge.apm.service.uaa;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserTagsMapper;
@@ -64,7 +65,7 @@ public class UserAccountHistoryService {
         try {
             UserAccountHistory history = new UserAccountHistory();
             history.setUserUid(userAccount.getUid());
-            history.setCreatedBy(userAccount.getLastModifiedBy());
+            history.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
             history.setCreatedDate(DateUtil.now());
             history.setOperationType(historyAction);
             history.setOrgName(orgInfoRepository.getDepName(userAccount.getOrgInfoId()));
