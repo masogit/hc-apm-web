@@ -65,7 +65,7 @@ public class UserAccountHistoryService {
             UserAccountHistory history = new UserAccountHistory();
             history.setUserUid(userAccount.getUid());
             history.setCreatedBy(userAccount.getLastModifiedBy());
-            history.setCreatedDate(userAccount.getLastModifiedDate());
+            history.setCreatedDate(DateUtil.now());
             history.setOperationType(historyAction);
             history.setOrgName(orgInfoRepository.getDepName(userAccount.getOrgInfoId()));
             history.setLoginName(userAccount.getLoginName());
