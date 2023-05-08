@@ -12,6 +12,7 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -121,6 +122,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private UpdateTenantFeatureService updateTenantFeatureService;
+
+	@Autowired
+	private ReminderRuleRepository reminderRuleRepository;
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -879,6 +883,27 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			configItemRepository.save(configItemDefault);
 		}
 		return configItemDefault;
+	}
+
+	public void batchUpdateReminderRule() {
+		reminderRuleRepository.deleteByType("AssetLifecycle");
+		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
+		List<ReminderRule> list = ListUtil.newArrayList();
+		for (TenantInfo tenantInfo : tenantInfos) {
+			ReminderRule reminderRule = new ReminderRule();
+			reminderRule.setTenantUid(tenantInfo.getUid());
+			reminderRule.setInstitutionUid(tenantInfo.getUid());
+			reminderRule.setHospitalUid(tenantInfo.getUid());
+			reminderRule.setSiteUid(tenantInfo.getUid());
+			reminderRule.setDescription("资产到期提醒推送微信消息");
+			reminderRule.setName("资产到期提醒");
+			reminderRule.setParameters("{\"_templateId\":\"un_take_task_template_id\",\"keyword1\":\"设备名称：{name}\\r\\n设备编号：{departNum}\\r\\n出厂序列号：{serialNum}\",\"keyword2\":\"{agencyDate}\",\"pushNum\":3,\"noticeType\":\"noticeTypeRole\",\"remark\":\"设备待报废提醒, 设备即将达到出厂使用年限要求，请进一步处理\",\"noticeUser\":[\"2\"],\"pushCycle\":5,\"first\":\"即将达到使用年限的设备提醒\",\"pushType\":2}");
+			reminderRule.setReminderType("wechat");
+			reminderRule.setState(1);
+			reminderRule.setType("AssetLifecycle");
+			list.add(reminderRule);
+		}
+		reminderRuleRepository.save(list);
 	}
 
 }
