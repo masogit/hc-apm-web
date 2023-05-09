@@ -138,23 +138,19 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
                 return;
             }
         }
-        if(StringUtils.isBlank(this.selected.getId()))
-        {
+        /*if(StringUtils.isBlank(this.selected.getId())){
             List<ZkbFePartOrderUserConfig> list = this.zkbFePartOrderUserConfigRepository.findByLoginName(this.selected.getLoginName());
-            if(CollectionUtils.isNotEmpty(list))
-            {
+            if(CollectionUtils.isNotEmpty(list)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
                 return;
             }
-        }else
-            {
-                List<ZkbFePartOrderUserConfig> list =this.zkbFePartOrderUserConfigRepository.findByLoginNameAndIdNot(this.selected.getLoginName(),this.selected.getId());
-                if(CollectionUtils.isNotEmpty(list))
-                {
-                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
-                    return;
-                }
+        }else{
+            List<ZkbFePartOrderUserConfig> list =this.zkbFePartOrderUserConfigRepository.findByLoginNameAndIdNot(this.selected.getLoginName(),this.selected.getId());
+            if(CollectionUtils.isNotEmpty(list)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
+                return;
             }
+        }*/
         this.selected.setTenantUid(userAccount.getTenantUID());
         super.save();
         this.selected=null;
