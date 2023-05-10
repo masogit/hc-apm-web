@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
+import java.util.List;
+
 /**
  * @author 503310146
  */
@@ -14,4 +16,6 @@ public interface ReminderRuleRepository extends GenericRepositoryUUID<ReminderRu
     @Modifying
     @Query(value = "delete from reminder_rule where type = ?1", nativeQuery = true)
     void deleteByType(String type);
+
+    List<ReminderRule> findByType(String type);
 }
