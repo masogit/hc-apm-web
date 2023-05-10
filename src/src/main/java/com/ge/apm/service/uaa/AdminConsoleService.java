@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
@@ -901,6 +902,21 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			reminderRule.setReminderType("wechat");
 			reminderRule.setState(1);
 			reminderRule.setType("AssetLifecycle");
+			list.add(reminderRule);
+		}
+		List<ReminderRule> contractOverdue = reminderRuleRepository.findByType("ContractOverdue");
+		for (ReminderRule reminderRule : contractOverdue) {
+			String parameters = reminderRule.getParameters();
+			WechatParam wechatParam = JSON.parseObject(parameters, WechatParam.class);
+			wechatParam.setTemplateId("un_take_task_template_id");
+			wechatParam.setFirst("合同应到货日期逾期提醒");
+			wechatParam.setRemark("合同编号：{contractNum}\n合同名称：{name}\n合同类型：设备\n供应商：{supplierName}\n合同设备数量：{equipmentNum}\n应到货日期：{expectArrivalDate}");
+			wechatParam.setKeyword1("{name}合同已逾期，请尽快处理！");
+			wechatParam.setKeyword2("{agencyDate}");
+			String wechatParamStr = JSON.toJSONString(wechatParam);
+			JSONObject jsonObject = JSON.parseObject(parameters);
+			jsonObject.putAll(JSON.parseObject(wechatParamStr));
+			reminderRule.setParameters(JSON.toJSONString(jsonObject));
 			list.add(reminderRule);
 		}
 		reminderRuleRepository.save(list);
