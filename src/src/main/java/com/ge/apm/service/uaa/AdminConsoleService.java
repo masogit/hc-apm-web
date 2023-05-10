@@ -14,6 +14,7 @@ import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -888,6 +889,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	public void batchUpdateReminderRule() {
 		reminderRuleRepository.deleteByType("AssetLifecycle");
+		reminderRuleRepository.deleteByType("measuring");
 		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
 		List<ReminderRule> list = ListUtil.newArrayList();
 		for (TenantInfo tenantInfo : tenantInfos) {
@@ -906,13 +908,16 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		}
 		List<ReminderRule> contractOverdue = reminderRuleRepository.findByType("ContractOverdue");
 		for (ReminderRule reminderRule : contractOverdue) {
+			if (ObjectUtil.isEmpty(reminderRule.getSiteUid())) {
+				reminderRule.setState(0);
+			}
 			String parameters = reminderRule.getParameters();
 			WechatParam wechatParam = JSON.parseObject(parameters, WechatParam.class);
 			wechatParam.setTemplateId("un_take_task_template_id");
 			wechatParam.setFirst("合同应到货日期逾期提醒");
 			wechatParam.setRemark("合同编号：{contractNum}\n合同名称：{name}\n合同类型：设备\n供应商：{supplierName}\n合同设备数量：{equipmentNum}\n应到货日期：{expectArrivalDate}");
 			wechatParam.setKeyword1("{name}合同已逾期，请尽快处理！");
-			wechatParam.setKeyword2("{agencyDate}");
+			wechatParam.setKeyword2("{expectArrivalDate}");
 			String wechatParamStr = JSON.toJSONString(wechatParam);
 			JSONObject jsonObject = JSON.parseObject(parameters);
 			jsonObject.putAll(JSON.parseObject(wechatParamStr));
