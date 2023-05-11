@@ -117,9 +117,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
+                    ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
                 ){
                     showStatusBtn =false;
                 }
