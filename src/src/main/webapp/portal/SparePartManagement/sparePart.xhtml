@@ -52,6 +52,9 @@
 								<p:column headerText="总价">
 									<h:outputText value="#{sparePartController.totalPrice(item.unitPrice, item.quantity)}" />
 								</p:column>
+								<p:column headerText="发票号">
+									<h:outputText value="#{item.invoiceNumber}" />
+								</p:column>
 								<p:column headerText="仓库" filterBy="#{item.partsWarehouse.name}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.partsWarehouse.name}" />
 								</p:column>

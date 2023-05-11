@@ -47,6 +47,10 @@
                         <label class ="label">总价* </label>
                         <p:outputLabel id="totalPrice" value="#{sparePartController.totalPrice(sparePartController.selected.unitPrice, sparePartController.selected.quantity)}" rendered="#{not empty sparePartController.selected}"/>
                     </h:panelGroup>
+                    <h:panelGroup>
+                        <label class ="label">发票号* </label>
+                        <p:inputText id="invoiceNumber" value="#{sparePartController.selected.invoiceNumber}" />
+                    </h:panelGroup>
                     <h:panelGroup >
                         <label class ="label">仓库* </label>
                         <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" disabled="true">

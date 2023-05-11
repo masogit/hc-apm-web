@@ -437,7 +437,7 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
                     UserAccount currentUser = UserContextService.getCurrentUserAccount();
                     userAccount.setLastModifiedBy(currentUser.getLoginName());
                     userAccount.setLastModifiedDate(new Date());
-                    userAccountHistoryService.save(persistAction, userAccount);
+                    userAccountHistoryService.save(persistAction.name(), userAccount);
                 }
                 if (persistAction != WebUtil.PersistAction.DELETE) {
                     getDAO().save(selected);

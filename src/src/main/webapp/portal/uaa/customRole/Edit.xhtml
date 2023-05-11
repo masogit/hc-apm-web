@@ -25,42 +25,75 @@
 						</h:panelGroup>
 					</p:panelGrid>
 				</p:fieldset>
-				<p:fieldset id="menuConfig" legend="#{msg.WebMenuConfiguration}">
-					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-						<h:panelGroup>
-							<p:selectManyCheckbox value="#{customRoleController.menus}" layout="responsive" columns="4">
-								<f:selectItems value="#{customRoleController.listI18nMenus}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"  />
-						</p:selectManyCheckbox>
-						</h:panelGroup>
-					</p:panelGrid>
-				</p:fieldset>
-				<p:fieldset id="authConfig" legend="#{msg.WebAuthorityConfiguration}"  rendered="#{userContextService.isLocale()}">
-					<p:repeat var="domainAuth" value="#{customRoleController.authJSONArr}">
-						<label class="label">#{domainAuth['v']}</label>
-						<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-						<p:selectBooleanCheckbox value="#{domainAuth['s']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 's')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 's')}">
-						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['a']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'a')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'a')}">
-						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['m']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'm')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'm')}">
-						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['d']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'd')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'd')}">
-						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['i']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'i')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'i')}">
-						</p:selectBooleanCheckbox>
-						<p:selectBooleanCheckbox value="#{domainAuth['o']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'o')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'o')}">
-						</p:selectBooleanCheckbox>
-						</p:panelGrid>
-					</p:repeat>
-				</p:fieldset>
+				<c:choose>
+					<c:when test="${customRoleController.openNewMenuRoles}">
+						<p:fieldset id="function" legend="网页端功能列表">
+							<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+								<h:panelGroup>
+									<p:fieldset id="selected" legend="已选功能项">
+										<p:scrollPanel style="height: 500px; border: 0;" mode="native">
+											<p:selectManyCheckbox id="selecteds" widgetVar="selecteds" value="#{customRoleController.customSelectedFunctions}"  layout="pageDirection" columns="1" styleClass="grid-checkbox">
+												<p:ajax update="@this:CustomRoleEditForm:functions " listener="#{customRoleController.unSelectChekBox}"/>
+												<f:selectItems value="#{customRoleController.customFunctions}" var="item" itemLabel="#{item.functionName}" itemValue="#{item}"/>
+											</p:selectManyCheckbox>
+										</p:scrollPanel>
+									</p:fieldset>
+								</h:panelGroup>
+								<h:panelGroup>
+									<p:fieldset id="unSelected" legend="未选功能列表">
+										<p:inputText id="filterInput" value="#{customRoleController.filterFunctionStr}" placeholder="输入搜索关键字" >
+											<p:ajax event="keyup" listener="#{customRoleController.filterFunction}" update="functions"/>
+										</p:inputText>
+										<p:scrollPanel style="height: 500px; border: 0;" mode="native">
+											<p:selectManyCheckbox id="functions" widgetVar="functions" value="#{customRoleController.selectedFunctions}"  layout="pageDirection" columns="1" styleClass="grid-checkbox">
+												<p:ajax update="@this :CustomRoleEditForm:selecteds" listener="#{customRoleController.selectChekBox}"/>
+												<f:selectItems value="#{customRoleController.functions}" var="item" itemLabel="#{item.functionName}" itemValue="#{item}"/>
+											</p:selectManyCheckbox>
+										</p:scrollPanel>
+									</p:fieldset>
+								</h:panelGroup>
+							</p:panelGrid>
+						</p:fieldset>
+					</c:when>
+					<c:otherwise>
+						<p:fieldset id="menuConfig" legend="#{msg.WebMenuConfiguration}">
+							<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+								<h:panelGroup>
+									<p:selectManyCheckbox value="#{customRoleController.menus}" layout="responsive" columns="4">
+										<f:selectItems value="#{customRoleController.listI18nMenus}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"  />
+									</p:selectManyCheckbox>
+								</h:panelGroup>
+							</p:panelGrid>
+						</p:fieldset>
+						<p:fieldset id="authConfig" legend="#{msg.WebAuthorityConfiguration}"  rendered="#{userContextService.isLocale()}">
+							<p:repeat var="domainAuth" value="#{customRoleController.authJSONArr}">
+								<label class="label">#{domainAuth['v']}</label>
+								<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+									<p:selectBooleanCheckbox value="#{domainAuth['s']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 's')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 's')}">
+									</p:selectBooleanCheckbox>
+									<p:selectBooleanCheckbox value="#{domainAuth['a']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'a')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'a')}">
+									</p:selectBooleanCheckbox>
+									<p:selectBooleanCheckbox value="#{domainAuth['m']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'm')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'm')}">
+									</p:selectBooleanCheckbox>
+									<p:selectBooleanCheckbox value="#{domainAuth['d']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'd')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'd')}">
+									</p:selectBooleanCheckbox>
+									<p:selectBooleanCheckbox value="#{domainAuth['i']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'i')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'i')}">
+									</p:selectBooleanCheckbox>
+									<p:selectBooleanCheckbox value="#{domainAuth['o']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 'o')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 'o')}">
+									</p:selectBooleanCheckbox>
+								</p:panelGrid>
+							</p:repeat>
+						</p:fieldset>
+					</c:otherwise>
+				</c:choose>
 				<p:fieldset id="cardConfig" legend="#{msg.WeChatCardConfiguration}">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
 							<p:selectManyCheckbox value="#{customRoleController.cards}" layout="responsive" columns="4" >
 								<c:forEach items="#{customRoleController.listI18nCards}" var="item">
-								<c:if test="#{!('adverseEvents_supplement'.equals(item.msgKey) and !'1'.equals(userContextService.tenantInfo.customTenant))}" >
-									<f:selectItem itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-								</c:if>
+									<c:if test="#{!('adverseEvents_supplement'.equals(item.msgKey) and !'1'.equals(userContextService.tenantInfo.customTenant))}" >
+										<f:selectItem itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+									</c:if>
 								</c:forEach>
 							</p:selectManyCheckbox>
 						</h:panelGroup>
@@ -99,9 +132,7 @@
 							</p:selectManyCheckbox>
 						</h:panelGroup>
 					</p:panelGrid>
-
 				</p:fieldset>
-
 				<br />
 				<p:commandButton validateClient="true" actionListener="#{customRoleController.save}" value="#{msg.Save}"
 					update="display,:CustomRoleEditDlg, :CustomRoleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'CustomRoleEditDialog');" />

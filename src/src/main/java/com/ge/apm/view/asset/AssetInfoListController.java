@@ -637,11 +637,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     private void insertCrossSiteColumns(List<String> exportFields) {
-        // 增加医院列
         String hospitalColumn = WebUtil.getMessage("hospitalId");
         int siteIndex = exportFields.indexOf(hospitalColumn);
+        if (siteIndex == -1){
+            return;
+        }
+        // 增加医院列
         exportFields.add(siteIndex, WebUtil.getMessage("Hospital"));
-
         // 增加集团列
         exportFields.add(exportFields.size(), WebUtil.getMessage("Institution"));
     }

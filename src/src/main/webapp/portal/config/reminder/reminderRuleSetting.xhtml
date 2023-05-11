@@ -25,6 +25,14 @@
                                 <f:selectItems value="#{reminderRuleController.getUserList()}" var="userItem" itemLabel="#{userItem.name}" itemValue="#{userItem.id}"/>
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">周期单位<span style="color:red">*</span></label >
+                            <p:selectOneMenu value="#{reminderRuleController.selected.pushDateUnit}" required="true">
+                                <f:selectItem   itemLabel="天" itemValue="0"/>
+                                <f:selectItem  itemLabel="小时" itemValue="1"/>
+                                <f:selectItem   itemLabel="分钟" itemValue="2"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{reminderRuleController.selected.ruleParam.pushType eq 1}">
                             <label class="label">#{msg.messageType}<span style="color:red">*</span></label >
                             <p:selectOneMenu value="#{reminderRuleController.selected.ruleParam.messageType}" required="true">
@@ -46,22 +54,22 @@
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup>
                                     <label class="label">#{msg.pushCycle}<span style="color:red">*</span></label>
-                                    <p:inputNumber id="pushCycle" value="#{reminderRuleController.selected.ruleParam.pushCycle}" required="true" maxValue="365" minValue="1" decimalPlaces="0"/>
+                                    <p:inputNumber id="pushCycle" value="#{reminderRuleController.selected.ruleParam.pushCycle}" required="true" maxValue="365"  decimalPlaces="0" requiredMessage="#{msg.pushCycle} #{msg.ValidationRequire}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.pushNum}<span style="color:red">*</span></label>
-                                    <p:inputNumber id="pushNum" value="#{reminderRuleController.selected.ruleParam.pushNum}" required="true" maxValue="365" minValue="1" decimalPlaces="0"/>
+                                    <p:inputNumber id="pushNum" value="#{reminderRuleController.selected.ruleParam.pushNum}" required="true" maxValue="365"  decimalPlaces="0" requiredMessage="#{msg.pushNum} #{msg.ValidationRequire}"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </h:panelGroup>
-                        <h:panelGroup rendered="false">
-<!--                        <h:panelGroup rendered="#{reminderRuleController.selected.reminderType eq msg.wechat}">-->
+<!--                        <h:panelGroup rendered="false">-->
+                        <h:panelGroup rendered="#{reminderRuleController.selected.reminderType eq msg.wechat}">
                             <label class="label">#{msg.wechatTemplateSetting}</label>
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                                <h:panelGroup>
-                                    <label class="label">templateId<span style="color:red">*</span></label>
-                                    <p:inputText id="templateId" value="#{reminderRuleController.selected.wechatParam.templateId}" required="true" style="width: 95%;"/>
-                                </h:panelGroup>
+<!--                                <h:panelGroup>-->
+<!--                                    <label class="label">templateId<span style="color:red">*</span></label>-->
+<!--                                    <p:inputText id="templateId" value="#{reminderRuleController.selected.wechatParam.templateId}" required="true" style="width: 95%;"/>-->
+<!--                                </h:panelGroup>-->
                                 <h:panelGroup>
                                     <label class="label">first<span style="color:red">*</span></label>
                                     <p:inputText id="first" value="#{reminderRuleController.selected.wechatParam.first}" required="true" style="width: 95%;"/>
@@ -96,7 +104,7 @@
                                 </h:panelGroup>
                             </p:panelGrid>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{(reminderRuleController.apm and reminderRuleController.selected.universal eq true) or !reminderRuleController.apm}">
                             <label class="label">#{msg.isEnabled}<span style="color:red">*</span></label>
                             <p:selectOneRadio id="valueState" value="#{reminderRuleController.selected.state}" required="true" style="width: 15%;">
                                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>

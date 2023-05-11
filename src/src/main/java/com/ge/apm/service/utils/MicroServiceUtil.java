@@ -16,6 +16,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -59,14 +60,17 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
             String suffix = Arrays.asList(fileName.substring(1, fileName.length() - 1).split("\\.")).get(1);
             byte[] result = response.getBody();
-            InputStream inputStream = new ByteArrayInputStream(result);
+
+            res += Base64Utils.encodeToString(result);
+
+            /*InputStream inputStream = new ByteArrayInputStream(result);
             BufferedImage image = ImageIO.read(inputStream);
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
             ImageIO.write(image, suffix, byteOut);
             ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
             byte[] bytes = new byte[byteIn.available()];
             byteIn.read(bytes);
-            res += encoder.encodeToString(bytes);
+            res += encoder.encodeToString(bytes);*/
         } catch (Exception e) {
             e.printStackTrace();
         }

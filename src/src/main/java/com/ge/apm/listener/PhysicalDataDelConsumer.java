@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.callback.DataDelVO;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.callback.BusinessErrorLog;
-import com.ge.apm.config.MQConfig;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.remote.ElasticService;
 import com.rabbitmq.client.Channel;
@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
+
+@Deprecated
 public class PhysicalDataDelConsumer implements ChannelAwareMessageListener {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(PhysicalDataDelConsumer.class);
@@ -36,7 +38,7 @@ public class PhysicalDataDelConsumer implements ChannelAwareMessageListener {
         try {
             mqContext = JSONObject.parseObject(new String(message.getBody()), MqContext.class);
 
-            LOGGER.info("PhysicalDataDelConsumer mq 监听的消息 message :{}",JSONObject.toJSONString(mqContext));
+            LOGGER.debug("PhysicalDataDelConsumer mq 监听的消息 message :{}",JSONObject.toJSONString(mqContext));
             JSONObject jsonObject = mqContext.getJsonObject();
             String string = JSONObject.toJSONString(jsonObject.get("jsonData"));
             DataDelVO dataDelVO = JSONObject.parseObject(string, new TypeReference<DataDelVO>() {});
@@ -79,13 +81,13 @@ public class PhysicalDataDelConsumer implements ChannelAwareMessageListener {
         BeanUtils.copyProperties(mqContext,newmqContext);
         newmqContext.setRetryCount(0);
         newmqContext.setType("mqErrorLog");
-        newmqContext.setExChange(MQConfig.BUSINESS_ERROR_LOG_CHANGE);
+        newmqContext.setExChange(RabbitConfig.BUSINESS_ERROR_LOG_CHANGE);
         newmqContext.setRoutingKey("");
         newmqContext.setTime(new Date());
         BusinessErrorLog businessErrorLog = new BusinessErrorLog();
         businessErrorLog.setCreatedDate(new Date());
         businessErrorLog.setData(JSONObject.toJSONString(mqContext));
-        businessErrorLog.setErrorQueue(MQConfig.PHYSICAL_DATA_DEL_QUEUE);
+        businessErrorLog.setErrorQueue(RabbitConfig.PHYSICAL_DATA_DEL_QUEUE);
         businessErrorLog.setErrorLevel("ERROR");
         businessErrorLog.setException(e.getLocalizedMessage()+JSON.toJSONString(e));
         businessErrorLog.setClassName(mqContext.getClassName());

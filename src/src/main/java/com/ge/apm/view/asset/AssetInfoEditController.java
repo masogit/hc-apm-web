@@ -1,9 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.ge.apm.callback.MqContext;
-import com.ge.apm.config.MQConfig;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -23,15 +21,9 @@ import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.internal.Excluder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
@@ -40,7 +32,6 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -48,7 +39,6 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.persistence.Column;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -807,10 +797,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-//        if(org.apache.commons.lang3.StringUtils.isEmpty(selected.getUid()) && selected.getId()==null){
-//            String uid = UUID.randomUUID().toString().replace("-", "");
-//            selected.setUid(uid);
-//        }
+
         boolean isCreate=false;
         if(selected.getId()==null){
             isCreate=true;
@@ -1605,44 +1592,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
     private void saveAssetHistory(AssetInfo newAsset) {
-//        AssetInfo oldAsset = dao.findByUid(selected.getUid());
-        AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(newAsset,assetInfo);
         MqContext mqContext = new MqContext();
-        mqContext.setTime(new Date());
-        mqContext.setType("asset");
-        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
-        mqContext.setExChange(MQConfig.ASSET_CHANGE);
-
         mqContext.setServiceName("hc-apm-web");
         mqContext.setClassName("AssetInfoEditController");
         mqContext.setMethodName("applyChange");
         mqContext.setDescribe("设备详情单个修改/设备状态修改待审核");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        JSONObject jsonObject =new JSONObject();
-
-        ExclusionStrategy strategy = new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-            @Override
-            public boolean shouldSkipField(FieldAttributes field) {
-                return field.getAnnotation(Column.class) == null;
-            }
-        };
-        //gson序列化只与属性(字段)有关，与get开头的方法无关
-        Gson g = new GsonBuilder().setExclusionStrategies(strategy)
-                .setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String str = g.toJson(assetInfo);
-        jsonObject.put("assetInfo",str);
-//        jsonObject.put("assetInfo",selected);
-        jsonObject.put("currentUserAccount",currentUserAccount);
-        mqContext.setJsonObject(jsonObject);
-        Locale locale = LocaleContextHolder.getLocale();
-        mqContext.setLocale(locale.getLanguage());
-        mqUtils.sendToMq(mqContext);
-//        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
+        mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
     }
 
     public int getAssetChangeHistoryCount() {

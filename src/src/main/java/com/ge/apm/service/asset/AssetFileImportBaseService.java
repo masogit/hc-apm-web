@@ -5,11 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.callback.MqContext;
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.callback.MqContext;
-import com.ge.apm.config.MQConfig;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -21,14 +17,9 @@ import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -534,37 +525,21 @@ public class AssetFileImportBaseService {
 
     }
     private void saveAssetHistory(AssetInfo newAsset) {
-        AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(newAsset,assetInfo);
         MqContext mqContext = new MqContext();
-        mqContext.setTime(new Date());
-        mqContext.setType("asset");
-        mqContext.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
-        mqContext.setExChange(MQConfig.ASSET_CHANGE);
-
         mqContext.setDescribe("资产导入添加");
         mqContext.setMethodName("importOneAsset");
         mqContext.setServiceName("hc-apm-web");
         mqContext.setClassName("AssetFileImportBaseService");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        JSONObject jsonObject =new JSONObject();
-
-
-        assetInfo.setHospital(null);
-        assetInfo.setQrCodeLib(null);
-        assetInfo.setAssetTags(null);
-        assetInfo.setBrand(null);
-        assetInfo.setTags(null);
-        //gson序列化只与属性(字段)有关，与get开头的方法无关
-        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String str = g.toJson(assetInfo);
-        jsonObject.put("assetInfo",str);
-        jsonObject.put("currentUserAccount",currentUserAccount);
-        mqContext.setJsonObject(jsonObject);
         Locale locale = LocaleContextHolder.getLocale();
         mqContext.setLocale(locale.getLanguage());
-        mqUtils.sendToMq(mqContext);
+        try {
+            mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
+        }catch (Exception e){
+            logger.error("importOneAsset send mq error:",e);
+        }
     }
+
     public Map checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,List<AssetInfo> unCheckNurseSiteMaintainList) {
         LocalDateTime startTime = LocalDateTime.now();
 

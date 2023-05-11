@@ -239,4 +239,14 @@ public class AdminConsoleController {
 		t.start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+
+	public void  batchAnalyseMenus(){
+		new Thread(() -> adminConsoleService.analyseMenus()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void  batchUpdateReminderRule(){
+		new Thread(() -> adminConsoleService.batchUpdateReminderRule()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
 }

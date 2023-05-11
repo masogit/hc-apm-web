@@ -175,9 +175,8 @@ public class ZkbFePartOrderProvider {
     {
         List<SearchFilter> filters = (List<SearchFilter>) params.get("filters");
         StringBuilder sb = new StringBuilder();
-        sb=sb.append(" SELECT distinct fe.*,ass.qr_code,ass.depart_num from zkb_fe_part_order fe " +
-                " INNER JOIN asset_info ass on fe.system_id = ass.system_id and  ass.is_deleted = 'false'" +
-                " INNER JOIN tenant_info tenant ON tenant.uid = ass.tenant_uid and tenant.TYPE = 3 " +
+        sb=sb.append(" SELECT fe.*,ass.qr_code,ass.depart_num from zkb_fe_part_order fe " +
+                " INNER JOIN asset_info ass on fe.system_id = ass.system_id and  fe.tenant_uid = ass.tenant_uid and  ass.is_deleted = 'false'" +
                 " where 1=1");
         String filter = buildFilter_queryZkbFePartDetail(filters);
         sb=sb.append(filter);
