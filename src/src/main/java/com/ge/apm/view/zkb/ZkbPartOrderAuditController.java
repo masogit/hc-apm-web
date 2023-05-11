@@ -8,11 +8,13 @@ import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.RowEditEvent;
+import org.springframework.http.ResponseEntity;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -63,7 +65,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean whetherDeductEdit = false;
     private boolean showBtnFourHundredCancel = false;
     private String notGeAsset;
-
+    private List<ZkbPartOrderCat> zkbPartOrderCatList ;
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
@@ -143,6 +145,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 contractList = new ArrayList<>();
                 contractList.add(zkbContract);
             }
+            initZknPartCat(zkbContract.getStartDate());
             selectedWorkFlow = m.get("V2_WorkOrder") == null ? null : (V2_WorkOrder)m.get("V2_WorkOrder");
             HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");
             v2_listHashMap = new ArrayList<>();
@@ -405,10 +408,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
                     List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
                     if(zkbPartOrderUserConfigs.size() > 0){
-                        for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
+                        /*for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
                             if(currentUser.getLoginName().equals(c.getLoginName())){
                                 canEditFlag = true;
                             }
+                        }*/
+                        boolean matchAny = zkbPartOrderUserConfigs.stream().anyMatch(t -> currentUser.getLoginName().equals(t.getLoginName()));
+                        if(matchAny){
+                            canEditFlag = true;
                         }
                     }
                 }
@@ -1087,6 +1094,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String acceptNext(){
+        ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
+        Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
+        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+            WebUtil.addErrorMessage("数据已被审批！");
+            return "";
+        }
+
         if(ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(selected.getCurrentStep())){
             if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
                 if(StrUtil.isEmpty(selected.getOsscPartNo())){
@@ -1094,10 +1109,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-               /* if(StrUtil.isEmpty(selected.getOsscCatNo())){
-                    WebUtil.addErrorMessage("探头号不能为空！");
-                    return "";
-                }*/
                 if(StrUtil.isEmpty(selected.getRepairFlag())){
                     WebUtil.addErrorMessage("是否能维修不能为空！");
                     return "";
@@ -1134,6 +1145,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String rejectNext(){
+        ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
+        Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
+        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+            WebUtil.addErrorMessage("数据已被审批！");
+            return "";
+        }
         zkbPartOrderService.auditNext(this.selected,false,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendMessage(zkbPartOrder,UserContextService.getAccessToken());
@@ -1206,6 +1224,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String normalNext(){
+        ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
+        Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
+        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+            WebUtil.addErrorMessage("数据已被操作，不需要重复进行！");
+            return "";
+        }
         String checkResult = normalCheck();
         if(StrUtil.isNotEmpty(checkResult)){
             WebUtil.addErrorMessage(checkResult,"");
@@ -1430,6 +1455,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String orderCancelNext(){
+        ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
+        Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
+        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+            WebUtil.addErrorMessage("数据已被审批！");
+            return "";
+        }
         zkbPartOrderService.orderCancelNext(this.selected,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
@@ -1437,13 +1469,18 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String fourHundredCancel(){
+        ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
+        Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
+        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+            WebUtil.addErrorMessage("数据已被审批！");
+            return "";
+        }
         zkbPartOrderService.fourHundredCancelNext(this.selected,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
     }
-
-
 
     public void preModifyApply(){
         modifySsaKey = selected.getSsaKeyFlag();
@@ -1638,7 +1675,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     private boolean haveTrainCourseFlag = false;
     public void trainCourseRender(){
-        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && "1".equals(selected.getArtificialType())){
+        if(StrUtil.isEmpty(selected.getNotGeAsset()) && ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && "1".equals(selected.getArtificialType())){
             if(zkbContract != null ){
                 if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
                     haveTrainCourseFlag = true;
@@ -1925,6 +1962,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void removeReturnFile(V2_BlobObject v2_blobObject){
         goodReturnBlobObjectList = goodReturnBlobObjectList.stream().filter(item -> !item.getId().equals(v2_blobObject.getId())).collect(Collectors.toList());
         blobService.deleteBlobFile(v2_blobObject);
+    }
+
+    public void initZknPartCat(Date contractDate){
+        zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat(contractDate);
+    }
+    public List<ZkbPartOrderCat> autoCompleteCat(String query){
+        List<ZkbPartOrderCat> res = zkbPartOrderCatList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCatModel().contains(query)).collect(Collectors.toList());
+
+        return res;
     }
 
     //region get、set

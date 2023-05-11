@@ -122,7 +122,9 @@
                             <h:outputText value="#{item.makerShortName}"/>
                         </p:column>
                         <p:column headerText="#{msg.purchasePrice}" sortBy="#{item.purchasePrice}" filterBy="#{item.purchasePrice}" filterMatchMode="GTE">
-                            <h:outputText value="#{item.purchasePrice}"/>
+                            <h:outputText value="#{item.purchasePrice}">
+                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                            </h:outputText>
                         </p:column>
 
                         <p:column headerText="调剂设备名称" sortBy="#{item.sharedAssetTypeUid}" filterBy="#{item.sharedAssetTypeUid}" filterMatchMode="LIKE">

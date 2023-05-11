@@ -460,7 +460,7 @@
                     </h:panelGroup>
                     <h:panelGroup id="geAdminNgeComment">
                         <h:panelGroup  rendered="#{zkbFePartOrderProbeController.selected.returnType eq 'notRepaired'}">
-                            <label class="label">原因</label>
+                            <label class="label">原因*</label>
                             <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" value="#{zkbFePartOrderProbeController.selected.geAdminNgeComment}" rows="2" cols="20">
                             </p:inputTextarea>
                         </h:panelGroup>

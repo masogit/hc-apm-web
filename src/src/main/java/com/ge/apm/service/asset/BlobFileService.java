@@ -7,13 +7,16 @@ package com.ge.apm.service.asset;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
+import com.ge.apm.mq.MqUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
@@ -44,6 +47,9 @@ public class BlobFileService {
 
     @Autowired
     FileScanService fsService;
+
+    @Autowired
+    private MqUtils mqUtils;
     
     public V2_BlobObject uploadFile(FileUploadEvent event) {
         return uploadFile(event.getFile());
@@ -350,5 +356,25 @@ public class BlobFileService {
             return null;
         }
 
+    }
+
+    public void sendImageCompressMQ(V2_BlobObject blobObject){
+        if(null == blobObject){
+            return;
+        }
+        MqContext mqContext = new MqContext();
+        mqContext.setTime(new Date());
+        mqContext.setType("imageCompress");
+        mqContext.setRoutingKey(RabbitConfig.IMAGE_COMPRESS_ROUTING_KEY);
+        mqContext.setExChange(RabbitConfig.IMAGE_COMPRESS_CHANGE);
+
+        List<V2_BlobObject> list = new ArrayList<>();
+        list.add(blobObject);
+        JSONObject jsonObject = new JSONObject();
+        String str = JSON.toJSONString(list, SerializerFeature.WriteDateUseDateFormat);
+        jsonObject.put("blobObject", str);
+        mqContext.setJsonObject(jsonObject);
+
+        mqUtils.sendToMq(mqContext);
     }
 }

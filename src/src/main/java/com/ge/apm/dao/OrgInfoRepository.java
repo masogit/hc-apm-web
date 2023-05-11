@@ -71,6 +71,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query("select o from OrgInfo o,UserOrgInfo u where o.uid=u.orgUid and u.userUid=?1")
     public List<OrgInfo> getByUser(String userUid);
 
+    @Query("select o from OrgInfo o,ReminderRuleOrg r where o.uid=r.orgUid and r.ruleUid=?1")
+    public List<OrgInfo> getByReminderRule(String userUid);
+
     @Query("select o from OrgInfo o,PermissionGroupOrg p where o.uid=p.orgUid and p.permissionGroupUid in ?1")
     public List<OrgInfo> getOrgListByPermissionGroup(List<String> permissionGroupUidList);
 

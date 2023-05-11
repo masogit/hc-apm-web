@@ -66,4 +66,7 @@ public class ReminderRule implements Serializable {
     @TableField(exist = false)
     private WechatParam wechatParam = new WechatParam();
 
+    @Column(name = "push_date_unit")
+    private Integer pushDateUnit;
+
 }

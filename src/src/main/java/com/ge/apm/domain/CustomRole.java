@@ -40,6 +40,9 @@ public class CustomRole implements Serializable {
     
     @Column(name = "menus",columnDefinition="text")
     private String menus;
+
+    @Column(name = "function_list",columnDefinition="text")
+    private String functionList;
     
     @Column(name = "menus_ch")
     private String menusCH;
@@ -234,7 +237,15 @@ public class CustomRole implements Serializable {
 		this.menus = menus;
 	}
 
-	public String getMenusCH() {
+    public String getFunctionList() {
+        return functionList;
+    }
+
+    public void setFunctionList(String functionList) {
+        this.functionList = functionList;
+    }
+
+    public String getMenusCH() {
 		return menusCH;
 	}
 	

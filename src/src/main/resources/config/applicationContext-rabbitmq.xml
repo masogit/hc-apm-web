@@ -60,10 +60,10 @@
 
     <rabbit:listener-container connection-factory="rabbitConnectionFactory" acknowledge="manual" message-converter="jackson2JsonMessageConverter" >
         <!-- 监听一个队列，当队列中有消息，就会自动触发类.方法，传递消息就作为方法的参数，根据方法声明的参数强转 -->
-        <rabbit:listener ref="assetChangeConsumer"  queue-names="assetUpdateQueue"/>
-        <rabbit:listener ref="assetHistoryEsConsumer"  queue-names="assetUpdateEsQueue"/>
-        <rabbit:listener ref="physicalDataDelConsumer"  queue-names="physicalDataDelQueue"/>
-        <rabbit:listener ref="businessErrorLogConsumer"  queue-names="businessErrorLogQueue"/>
+<!--        <rabbit:listener ref="assetChangeConsumer"  queue-names="assetUpdateQueue"/>-->
+<!--        <rabbit:listener ref="assetHistoryEsConsumer"  queue-names="assetUpdateEsQueue"/>-->
+<!--        <rabbit:listener ref="physicalDataDelConsumer"  queue-names="physicalDataDelQueue"/>-->
+<!--        <rabbit:listener ref="businessErrorLogConsumer"  queue-names="businessErrorLogQueue"/>-->
     </rabbit:listener-container>
 
     <bean id="assetChangeConsumer" class="com.ge.apm.listener.AssetChangeConsumer"/>

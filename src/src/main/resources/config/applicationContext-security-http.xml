@@ -50,7 +50,13 @@
         <intercept-url pattern="/home.xhtml" access="isAuthenticated()"/>
         <intercept-url pattern="/api/**" access="isAuthenticated()"/>
         <intercept-url pattern="/sysadmin/**" access="hasRole('SuperAdmin')"/>
-        <intercept-url pattern="/admin/**" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
+        <intercept-url pattern="/admin/adminCache.xhtml" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
+        <intercept-url pattern="/admin/adminConsole.xhtml" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
+        <intercept-url pattern="/admin/adminConsolePm.xhtml" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
+        <intercept-url pattern="/admin/AssetGroupSecondaryImport.xhtml" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
+        <intercept-url pattern="/admin/sql.xhtml" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
+        <intercept-url pattern="/admin/sqlExprot.xhtml" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
+        <intercept-url pattern="/admin/TenantPasswordSetup.xhtml" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
 
         <!-- 首页 -->
         <intercept-url pattern="/homeHead**" access="hasAnyRole('SuperAdmin','HospitalHead')"/>
@@ -62,7 +68,7 @@
         <!-- 系统管理 -->
         <intercept-url pattern="/admin/uaa/orgInfo/List.xhtml" access="hasAnyRole('SuperAdmin')"/>
         <intercept-url pattern="/portal/loginAs/List.xhtml" access="hasAnyRole('SuperAdmin')"/>
-        <intercept-url pattern="/portal/asset/assetTag/TagSubscriberAll.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','LocalITAdmin')"/>
+<!--        <intercept-url pattern="/portal/asset/assetTag/TagSubscriberAll.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','LocalITAdmin')"/>-->
         <intercept-url pattern="/portal/uaa/orgInfo/Main.xhtml" access="hasAnyRole('ITAdmin','LocalITAdmin')"/>
         <intercept-url pattern="/portal/asset/qrCode/qrCodeLibList.xhtml" access="hasAnyRole('SuperAdmin')"/>
         <intercept-url pattern="/portal/asset/bulkEdit/AssetBulkEditSite.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','AssetHead')"/><!-- 资产批量修改院区-->

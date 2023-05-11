@@ -1,17 +1,21 @@
 package com.ge.apm.service.uaa;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.collect.Lists;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
@@ -25,11 +29,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.RestTemplate;
+import webapp.framework.web.WebUtil;
 
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.ge.healthcare.cn.common.cons.ApmFunction.*;
 
 @Service
 public class AdminConsoleService extends MicroServiceInvoker {
@@ -61,6 +70,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	
 	@Autowired
 	UserRoleRepository userRoleRepository;
+
+	@Autowired
+	CustomRoleRepository customRoleRepository;
 	
 	@Autowired
 	NurseSiteMaintainRepository nurseSiteMaintainRepository;
@@ -106,9 +118,15 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private ConfigItemRepository configItemRepository;
+
 	@Autowired
 	private ConfigItemValueRepository configItemValueRepository;
 
+	@Autowired
+	private UpdateTenantFeatureService updateTenantFeatureService;
+
+	@Autowired
+	private ReminderRuleRepository reminderRuleRepository;
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -660,6 +678,148 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		saveDefaultValue( key);
 		saveLevelValue(key);
 	}
+
+	public void analyseMenus() {
+		//analyse tenant_config
+		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
+		//find menus by tenant_config
+		for (TenantInfo tenantInfo : tenantInfos) {
+			if (StringUtils.isNotEmpty(tenantInfo.getTenantConfig())) {
+				JSONObject jsonObject = JSON.parseObject(tenantInfo.getTenantConfig());
+				String version = jsonObject.getString("edition");
+				List<String> finalEnumNames = jsonObject.getObject("menuList", List.class);
+				List<String> requiredEnums = new ArrayList<>();
+				for (AssetManagementEnum e : AssetManagementEnum.values()) {
+					if (e.isRequired()) {
+						if (e.getIgnore().contains(version)) {
+							continue;
+						}
+						if (e.isChekConfig()) {
+							if (chekConfig(e, tenantInfo)) {
+								requiredEnums.add(e.name());
+							}
+							continue;
+						}
+						requiredEnums.add(e.name());
+						continue;
+					}
+					if (finalEnumNames.contains(e.getOldName())) {
+						if (e.isChekConfig()) {
+							if (chekConfig(e, tenantInfo)) {
+								requiredEnums.add(e.name());
+							}
+						} else {
+							requiredEnums.add(e.name());
+						}
+						continue;
+					}
+				}
+				tenantInfo.setFeatureList(JSONObject.toJSON(requiredEnums).toString());
+				tenantInfoRepository.save(tenantInfo);
+			}
+		}
+		//analyse custom_role
+		List<CustomRole> customRoles = customRoleRepository.find();
+		customRoles.forEach(customRole -> {
+			if (StringUtils.isNotEmpty(customRole.getWebAuthorities())) {
+				List<String> functionList = analyseCustomRole(customRole.getWebAuthorities());
+				customRole.setFunctionList(JSONObject.toJSON(functionList).toString());
+				customRoleRepository.save(customRole);
+			}
+		});
+	}
+
+	private boolean chekConfig(AssetManagementEnum e, TenantInfo tenantInfo) {
+		Method method = ReflectionUtils.findMethod(e.getChekClass(), e.getChekMethod(), TenantInfo.class);
+		Boolean result = (Boolean) ReflectionUtils.invokeMethod(method, updateTenantFeatureService, tenantInfo);
+		return result == e.isExpectedValue();
+	}
+
+	private List<String> analyseCustomRole(String webAuth) {
+		List<String> functionList = new ArrayList<>();
+		List<Map<String, Object>> authList = new Gson().fromJson(webAuth, new TypeToken<List<Map<String, Object>>>() {}.getType());
+		for (Map<String, Object> auth : authList) {
+			String name = (String) auth.get("v");
+			boolean create = (boolean) auth.get("a");
+			boolean view = (boolean) auth.get("s");
+			boolean delete = (boolean) auth.get("d");
+			boolean importData = (boolean) auth.get("i");
+			boolean process = (boolean) auth.get("m");
+			boolean exportData = (boolean) auth.get("o");
+			switch (name) {
+				case "日常检查":
+					if (view) {
+						functionList.add(NURSESITE_VIEW.name());
+					}
+					if (process) {
+						functionList.add(NURSESITE_CHECK.name());
+					}
+					if (create) {
+						functionList.add(NURSESITE_CREATE.name());
+					}
+					if (delete) {
+						functionList.add(NURSESITE_DELETE.name());
+					}
+					break;
+				case "日常检查设置":
+					if (view) {
+						functionList.add(NURSESITE_CONFIGITEM_VIEW.name());
+					}
+					if (process || create || delete) {
+						functionList.add(NURSESITE_CONFIGITEM_EDIT.name());
+					}
+					break;
+				case "日常检查报表":
+					if (view || exportData) {
+						functionList.add(NURSESITE_HISTORY_VIEW.name());
+					}
+					break;
+				case "开关机登记":
+					if (view || exportData) {
+						functionList.add(NURSESITE_OPERATE_RECORD_EDIT.name());
+					}
+					break;
+				case "计量信息":
+					if (view || exportData) {
+						functionList.add(MEASURE_INFO_VIEW.name());
+
+					}
+					if (process || create || delete) {
+						functionList.add(MEASURE_INFO_EDIT.name());
+					}
+					break;
+				case "资产报废":
+					if (view) {
+						functionList.add(ASSET_SCRAP_VIEW.name());
+						functionList.add(ASSET_SCRAPED_VIEW.name());
+					}
+					if (process || create) {
+						functionList.add(ASSET_SCRAP_EDIT.name());
+						functionList.add(ASSET_SCRAPED_EDIT.name());
+						functionList.add(ASSET_SCRAP_EVALUATE.name());
+						functionList.add(ASSET_SCRAPED.name());
+					}
+					if (delete) {
+						functionList.add(ASSET_SCRAP_DELETE.name());
+						functionList.add(ASSET_SCRAPED_DELETE.name());
+					}
+					break;
+				case "资产信息":
+					if (view || exportData) {
+						functionList.add(ASSET_INFO_READ.name());
+					}
+					if (create || process) {
+						functionList.add(ASSET_INFO_EDIT.name());
+					}
+					if (delete) {
+						functionList.add(ASSET_INFO_DELETE.name());
+					}
+					break;
+			}
+		}
+		return functionList;
+	}
+
 	private void saveLevelValue(String key){
 		List<WorkflowConfig> workflowConfigs = getWorkflowConfig();
 		if(CollectionUtils.isEmpty(workflowConfigs)) return;
@@ -725,6 +885,46 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			configItemRepository.save(configItemDefault);
 		}
 		return configItemDefault;
+	}
+
+	public void batchUpdateReminderRule() {
+		reminderRuleRepository.deleteByType("AssetLifecycle");
+		reminderRuleRepository.deleteByType("measuring");
+		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
+		List<ReminderRule> list = ListUtil.newArrayList();
+		for (TenantInfo tenantInfo : tenantInfos) {
+			ReminderRule reminderRule = new ReminderRule();
+			reminderRule.setTenantUid(tenantInfo.getUid());
+			reminderRule.setInstitutionUid(tenantInfo.getUid());
+			reminderRule.setHospitalUid(tenantInfo.getUid());
+			reminderRule.setSiteUid(tenantInfo.getUid());
+			reminderRule.setDescription("资产到期提醒推送微信消息");
+			reminderRule.setName("资产到期提醒");
+			reminderRule.setParameters("{\"_templateId\":\"un_take_task_template_id\",\"keyword1\":\"设备名称：{name}\\r\\n设备编号：{departNum}\\r\\n出厂序列号：{serialNum}\",\"keyword2\":\"{agencyDate}\",\"pushNum\":3,\"noticeType\":\"noticeTypeRole\",\"remark\":\"设备待报废提醒, 设备即将达到出厂使用年限要求，请进一步处理\",\"noticeUser\":[\"2\"],\"pushCycle\":5,\"first\":\"即将达到使用年限的设备提醒\",\"pushType\":2}");
+			reminderRule.setReminderType("wechat");
+			reminderRule.setState(1);
+			reminderRule.setType("AssetLifecycle");
+			list.add(reminderRule);
+		}
+		List<ReminderRule> contractOverdue = reminderRuleRepository.findByType("ContractOverdue");
+		for (ReminderRule reminderRule : contractOverdue) {
+			if (ObjectUtil.isEmpty(reminderRule.getSiteUid())) {
+				reminderRule.setState(0);
+			}
+			String parameters = reminderRule.getParameters();
+			WechatParam wechatParam = JSON.parseObject(parameters, WechatParam.class);
+			wechatParam.setTemplateId("un_take_task_template_id");
+			wechatParam.setFirst("合同应到货日期逾期提醒");
+			wechatParam.setRemark("合同编号：{contractNum}\n合同名称：{name}\n合同类型：设备\n供应商：{supplierName}\n合同设备数量：{equipmentNum}\n应到货日期：{expectArrivalDate}");
+			wechatParam.setKeyword1("{name}合同已逾期，请尽快处理！");
+			wechatParam.setKeyword2("{expectArrivalDate}");
+			String wechatParamStr = JSON.toJSONString(wechatParam);
+			JSONObject jsonObject = JSON.parseObject(parameters);
+			jsonObject.putAll(JSON.parseObject(wechatParamStr));
+			reminderRule.setParameters(JSON.toJSONString(jsonObject));
+			list.add(reminderRule);
+		}
+		reminderRuleRepository.save(list);
 	}
 
 }

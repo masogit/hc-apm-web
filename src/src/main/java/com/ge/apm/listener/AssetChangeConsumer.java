@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.callback.BusinessErrorLog;
-import com.ge.apm.config.MQConfig;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetHistory;
@@ -33,7 +33,7 @@ import webapp.framework.context.LocaleHolder;
 import javax.persistence.Column;
 import java.util.*;
 
-
+@Deprecated
 public class AssetChangeConsumer implements ChannelAwareMessageListener {
     public static final Logger LOGGER = LoggerFactory.getLogger(AssetChangeConsumer.class);
 
@@ -149,13 +149,13 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
         BeanUtils.copyProperties(mqContext,newmqContext);
         newmqContext.setRetryCount(0);
         newmqContext.setType("mqErrorLog");
-        newmqContext.setExChange(MQConfig.BUSINESS_ERROR_LOG_CHANGE);
+        newmqContext.setExChange(RabbitConfig.BUSINESS_ERROR_LOG_CHANGE);
         newmqContext.setRoutingKey("");
         newmqContext.setTime(new Date());
         BusinessErrorLog businessErrorLog = new BusinessErrorLog();
         businessErrorLog.setCreatedDate(new Date());
         businessErrorLog.setData(JSONObject.toJSONString(mqContext));
-        businessErrorLog.setErrorQueue(MQConfig.ASSET_UPDATE);
+        businessErrorLog.setErrorQueue(RabbitConfig.ASSET_UPDATE);
         businessErrorLog.setErrorLevel("ERROR");
         businessErrorLog.setException(e.getLocalizedMessage()+JSON.toJSONString(e));
         businessErrorLog.setClassName(mqContext.getClassName());
@@ -173,8 +173,8 @@ public class AssetChangeConsumer implements ChannelAwareMessageListener {
         MqContext mqContext = new MqContext();
         mqContext.setTime(new Date());
         mqContext.setType("asset");
-        mqContext.setRoutingKey(MQConfig.UPDATE_ES_ROUTING_KEY);
-        mqContext.setExChange(MQConfig.ASSET_CHANGE);
+        mqContext.setRoutingKey(RabbitConfig.UPDATE_ES_ROUTING_KEY);
+        mqContext.setExChange(RabbitConfig.ASSET_CHANGE);
         JSONObject jsonObject =new JSONObject();
         jsonObject.put("assetHistory",assetHistoryResult);
 
