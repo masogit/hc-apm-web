@@ -54,6 +54,10 @@
                             <p:inputText id="totalPrice" value="#{sparePartController.totalPrice()}" rendered="#{not empty sparePartController.selected}" readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup >
+                            <label class ="label">发票号 </label>
+                            <p:inputText id="invoiceNumber" value="#{sparePartController.selected.invoiceNumber}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
                             <label class ="label">仓库* </label>
                             <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" required="true" requiredMessage="仓库必填">
                                 <f:selectItems value="#{sparePartController.warehouses}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>

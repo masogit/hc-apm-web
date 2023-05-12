@@ -89,6 +89,7 @@ public class ZkbProbeService {
                 tempProbeList.add(probe);
                 continue;
             }
+            // TODO 需要调整现有逻辑，当数据存在的时需要做更新操做
             zkbPartOrderCatRepository.save(this.convertDownBox(probe));
         }
         return tempProbeList;

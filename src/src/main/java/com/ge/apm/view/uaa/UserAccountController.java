@@ -16,6 +16,7 @@ import com.ge.apm.service.uaa.UserAccountHistoryService;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.*;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
@@ -73,7 +74,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
      *
      */
     private static final long serialVersionUID = -1L;
-
+    public static final String IT_ADMIN_ROLE = "后台运营管理";
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
     public static final String SYSTEM_ACTIVE_ROLE = "系统激活专用";
     public static final String SYSTEM_ACTIVE = "ActivationPerson";
@@ -307,7 +308,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         searchFilters.clear();
         selectedOrg = null;
-
+        selected = null;
         selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
@@ -524,9 +525,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             assignedRoles.add(sysRoleVO.getRoleDesc());
         } else {
             roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
-            Set<String> tenantSysRoles = uaaService.getSysRoleListByTenantUid(selected.getTenantUID());
-            Set<String> tenantCustomRoles = uaaService.getTenantCustomRoles(selected.getTenantUID()).stream().map(CustomRole::getName).collect(Collectors.toSet());
-            roleListVO = roleListVO.stream().filter(role -> tenantSysRoles.contains(role.getName()) || tenantCustomRoles.contains(role.getName())).collect(Collectors.toList());
+
+            if (uaaService.isOpenNewMenuRoles(selected.getTenantUID())) {
+                Set<String> tenantSysRoles = uaaService.getSysRoleListByTenantUid(selected.getTenantUID());
+                Set<String> tenantCustomRoles = uaaService.getTenantCustomRoles(selected.getTenantUID()).stream().map(CustomRole::getName).collect(Collectors.toSet());
+                roleListVO = roleListVO.stream().filter(role -> tenantSysRoles.contains(role.getName()) || tenantCustomRoles.contains(role.getName())).collect(Collectors.toList());
+            }
             List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(selected.getId());
             if (CollectionUtils.isNotEmpty(customRoles)) {
                 for (CustomRole customRole : customRoles) {
@@ -1064,7 +1068,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (creatorUserType != null && creatorUserType.equals(LX_USER_TYPE)) {
             role.add(SYSTEM_ACTIVE_ROLE);
         } else {
-            role.add(DEFAULT_USER_ROLE);
+            Set<String> roles = uaaService.getSysRoleListByTenantUid(selected.getTenantUID());
+            if (roles.contains(ApmSystemRole.ClinicalStaff.name())) {
+                role.add(DEFAULT_USER_ROLE);
+            } else {
+                role.add(IT_ADMIN_ROLE);
+            }
         }
         uaaService.setUserRoles(true, selected, role);
         uaaService.setDefaultScope(selected);

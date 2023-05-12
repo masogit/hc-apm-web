@@ -33,7 +33,7 @@ public class TenantInfoConfigService {
 	public static final String OPS_VERSION ="opsVersion";//OPS版
 	public static final String ZKB_VERSION ="ZKBVersion";//智康宝版
 	public static final String AUDIT_VERSION ="audit";//质控评审版
-	public static final String SWAP_CENTER_VERSION ="swapCenter";//质控评审版
+	public static final String SWAP_CENTER_VERSION ="swapCenter";//调剂中心版
 	public static final String SUPPLIER_VERSION ="supplierVersion";//供应商版
 
 	public static final String TREE_TYPE = "tenantConfigTree";
@@ -169,7 +169,8 @@ public class TenantInfoConfigService {
 				tempItem.setValue(false);
 			}
 			//预算管理 his绩效分析 特种设备管理 默认不勾选
-			if (key.equals("budgetMgr") || key.equals("hisPerform") || key.equals("specialAsset") || key.startsWith("budgetMgr.") || key.startsWith("hisPerform.") || key.startsWith("specialAsset.")) {
+			if (key.equals("budgetMgr") || key.equals("hisPerform") || key.equals("specialAsset") || key.startsWith("budgetMgr.") || key.startsWith("hisPerform.") || key.startsWith("specialAsset.")
+			|| key.equals("sparePartsManagement") || key.equals("asset.keyAssetDataInput") || key.equals("asset.importMvsDataFile") || key.equals("nurseSite.useRegistration")) {
 				tempItem.setValue(false);
 			}
 			if (edition.equals(VERSION_COMMON)) {
