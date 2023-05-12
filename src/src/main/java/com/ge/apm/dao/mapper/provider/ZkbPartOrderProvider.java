@@ -194,7 +194,7 @@ public class ZkbPartOrderProvider {
         }
         String ordersRole = param.get("ordersRole") == null ? "" : (String)param.get("ordersRole");
         if(StrUtil.isNotEmpty(ordersRole)){
-            sql.append(" and (current_step = 'OrderExtraPending' or (current_step = 'OrderPending' and order_type = 'Probe')) ");
+            sql.append(" and (current_step = 'OrderExtraPending' or (current_step = 'OrderPending' and order_type != 'Probe')) ");
         }
         return sql.toString();
     }
