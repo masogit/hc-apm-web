@@ -1,16 +1,20 @@
 package com.ge.apm.service.uaa;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.reminder.WechatParam;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -120,6 +124,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private UpdateTenantFeatureService updateTenantFeatureService;
+
+	@Autowired
+	private ReminderRuleRepository reminderRuleRepository;
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -678,21 +685,27 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		//find menus by tenant_config
 		for (TenantInfo tenantInfo : tenantInfos) {
 			if (StringUtils.isNotEmpty(tenantInfo.getTenantConfig())) {
-				List<String> finalEnumNames = Arrays.asList(tenantInfo.getTenantConfig().replaceAll("[\\[\\]\\{\\}\"]", "").replace("menuList:", "").split(","));
+				JSONObject jsonObject = JSON.parseObject(tenantInfo.getTenantConfig());
+				String version = jsonObject.getString("edition");
+				List<String> finalEnumNames = jsonObject.getObject("menuList", List.class);
 				List<String> requiredEnums = new ArrayList<>();
-				if (tenantInfo.getId() == 70) {
-					System.out.println(tenantInfo.getTenantConfig());
-				}
 				for (AssetManagementEnum e : AssetManagementEnum.values()) {
 					if (e.isRequired()) {
+						if (e.getIgnore().contains(version)) {
+							continue;
+						}
+						if (e.isChekConfig()) {
+							if (chekConfig(e, tenantInfo)) {
+								requiredEnums.add(e.name());
+							}
+							continue;
+						}
 						requiredEnums.add(e.name());
 						continue;
 					}
 					if (finalEnumNames.contains(e.getOldName())) {
 						if (e.isChekConfig()) {
-							Method method = ReflectionUtils.findMethod(e.getChekClass(), e.getChekMethod(), TenantInfo.class);
-							Boolean result = (Boolean) ReflectionUtils.invokeMethod(method, updateTenantFeatureService, tenantInfo);
-							if (result == e.isExpectedValue()) {
+							if (chekConfig(e, tenantInfo)) {
 								requiredEnums.add(e.name());
 							}
 						} else {
@@ -714,6 +727,12 @@ public class AdminConsoleService extends MicroServiceInvoker {
 				customRoleRepository.save(customRole);
 			}
 		});
+	}
+
+	private boolean chekConfig(AssetManagementEnum e, TenantInfo tenantInfo) {
+		Method method = ReflectionUtils.findMethod(e.getChekClass(), e.getChekMethod(), TenantInfo.class);
+		Boolean result = (Boolean) ReflectionUtils.invokeMethod(method, updateTenantFeatureService, tenantInfo);
+		return result == e.isExpectedValue();
 	}
 
 	private List<String> analyseCustomRole(String webAuth) {
@@ -866,6 +885,46 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			configItemRepository.save(configItemDefault);
 		}
 		return configItemDefault;
+	}
+
+	public void batchUpdateReminderRule() {
+		reminderRuleRepository.deleteByType("AssetLifecycle");
+		reminderRuleRepository.deleteByType("measuring");
+		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
+		List<ReminderRule> list = ListUtil.newArrayList();
+		for (TenantInfo tenantInfo : tenantInfos) {
+			ReminderRule reminderRule = new ReminderRule();
+			reminderRule.setTenantUid(tenantInfo.getUid());
+			reminderRule.setInstitutionUid(tenantInfo.getUid());
+			reminderRule.setHospitalUid(tenantInfo.getUid());
+			reminderRule.setSiteUid(tenantInfo.getUid());
+			reminderRule.setDescription("资产到期提醒推送微信消息");
+			reminderRule.setName("资产到期提醒");
+			reminderRule.setParameters("{\"_templateId\":\"un_take_task_template_id\",\"keyword1\":\"设备名称：{name}\\r\\n设备编号：{departNum}\\r\\n出厂序列号：{serialNum}\",\"keyword2\":\"{agencyDate}\",\"pushNum\":3,\"noticeType\":\"noticeTypeRole\",\"remark\":\"设备待报废提醒, 设备即将达到出厂使用年限要求，请进一步处理\",\"noticeUser\":[\"2\"],\"pushCycle\":5,\"first\":\"即将达到使用年限的设备提醒\",\"pushType\":2}");
+			reminderRule.setReminderType("wechat");
+			reminderRule.setState(1);
+			reminderRule.setType("AssetLifecycle");
+			list.add(reminderRule);
+		}
+		List<ReminderRule> contractOverdue = reminderRuleRepository.findByType("ContractOverdue");
+		for (ReminderRule reminderRule : contractOverdue) {
+			if (ObjectUtil.isEmpty(reminderRule.getSiteUid())) {
+				reminderRule.setState(0);
+			}
+			String parameters = reminderRule.getParameters();
+			WechatParam wechatParam = JSON.parseObject(parameters, WechatParam.class);
+			wechatParam.setTemplateId("un_take_task_template_id");
+			wechatParam.setFirst("合同应到货日期逾期提醒");
+			wechatParam.setRemark("合同编号：{contractNum}\n合同名称：{name}\n合同类型：设备\n供应商：{supplierName}\n合同设备数量：{equipmentNum}\n应到货日期：{expectArrivalDate}");
+			wechatParam.setKeyword1("{name}合同已逾期，请尽快处理！");
+			wechatParam.setKeyword2("{expectArrivalDate}");
+			String wechatParamStr = JSON.toJSONString(wechatParam);
+			JSONObject jsonObject = JSON.parseObject(parameters);
+			jsonObject.putAll(JSON.parseObject(wechatParamStr));
+			reminderRule.setParameters(JSON.toJSONString(jsonObject));
+			list.add(reminderRule);
+		}
+		reminderRuleRepository.save(list);
 	}
 
 }

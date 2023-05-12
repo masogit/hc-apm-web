@@ -68,7 +68,7 @@
         <!-- 系统管理 -->
         <intercept-url pattern="/admin/uaa/orgInfo/List.xhtml" access="hasAnyRole('SuperAdmin')"/>
         <intercept-url pattern="/portal/loginAs/List.xhtml" access="hasAnyRole('SuperAdmin')"/>
-        <intercept-url pattern="/portal/asset/assetTag/TagSubscriberAll.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','LocalITAdmin')"/>
+<!--        <intercept-url pattern="/portal/asset/assetTag/TagSubscriberAll.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','LocalITAdmin')"/>-->
         <intercept-url pattern="/portal/uaa/orgInfo/Main.xhtml" access="hasAnyRole('ITAdmin','LocalITAdmin')"/>
         <intercept-url pattern="/portal/asset/qrCode/qrCodeLibList.xhtml" access="hasAnyRole('SuperAdmin')"/>
         <intercept-url pattern="/portal/asset/bulkEdit/AssetBulkEditSite.xhtml" access="hasAnyRole('SuperAdmin','ITAdmin','AssetHead')"/><!-- 资产批量修改院区-->

@@ -316,21 +316,22 @@ public class UserContextService implements Serializable {
         }
         List<CustomRole> customRoles = getListCustomRole(userAccount.getId());
         List<SysRole> sysRoles = getListSysRole(userAccount.getId());
-        if (CollectionUtils.isNotEmpty(customRoles)) {
-            return customRoles.stream()
-                    .filter(customRole -> customRole.getMenus() != null)
-                    .flatMap(customRole -> Arrays.stream(customRole.getMenus().split(",")))
-                    .map(String::trim)
-                    .anyMatch(menu -> menu.equals(menuName));
-        }
+        boolean result = Boolean.FALSE;
         if (CollectionUtils.isNotEmpty(sysRoles)) {
-            return sysRoles.stream()
+            result = sysRoles.stream()
                     .filter(customRole -> customRole.getMenus() != null)
                     .flatMap(customRole -> Arrays.stream(customRole.getMenus().split(",")))
                     .map(String::trim)
                     .anyMatch(menu -> menu.equals(menuName));
         }
-        return false;
+        if (CollectionUtils.isNotEmpty(customRoles) && BooleanUtils.isFalse(result)) {
+            result = customRoles.stream()
+                    .filter(customRole -> customRole.getMenus() != null)
+                    .flatMap(customRole -> Arrays.stream(customRole.getMenus().split(",")))
+                    .map(String::trim)
+                    .anyMatch(menu -> menu.equals(menuName));
+        }
+        return result;
     }
 
     public boolean versionContains(String menuName) {

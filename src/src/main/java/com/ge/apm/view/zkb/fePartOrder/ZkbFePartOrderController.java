@@ -332,7 +332,14 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, NO_STEP));
             return;
         }
-        if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())) {
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()) && (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString()))) {
+            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbFePartOrder.workFlowSteps.WaitingApm.toString()));
+            List<String> orderTypeListNew = new ArrayList<>();
+            orderTypeListNew.add(ZkbFePartOrder.OrderType.ManMade.toString());
+            orderTypeListNew.add(ZkbFePartOrder.OrderType.SpareParts.toString());
+            orderTypeListNew.add(ZkbFePartOrder.OrderType.Probe.toString());
+            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.IN, orderTypeListNew));
+        }else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())) {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbFePartOrder.workFlowSteps.WaitingApm.toString()));
             searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.IN, orderTypeList));
         } else if ((configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString()))) {

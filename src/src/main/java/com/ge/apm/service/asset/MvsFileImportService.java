@@ -1,6 +1,6 @@
 package com.ge.apm.service.asset;
 
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MvsContractDateInfoRepository;
 import com.ge.apm.dao.MvsOrgInfoRepository;
@@ -168,51 +168,46 @@ public class MvsFileImportService {
                 }
             }
             List<MvsContractDateInfo> dateInfoList = null;
-            AssetInfo assetInfo = assetList.get(0);
 
+            boolean hasOrderChangeDate = true;
             if(orderChanged){
+                // 查询批准日期最新的一条order changed记录
                 dateInfoList = mvsContractRepository.findNewestByStatusAndContractNo(ORDER_CHANGED ,contractNo);
-                if(CollectionUtils.isNotEmpty(dateInfoList)){
-                    assetInfo.setFactoryWarrantyDate(dateInfoList.get(0).getOCSvcStartDate());
-                    assetInfo.setWarrantyDate(dateInfoList.get(0).getOCSvcEndDate());
-                }else{
-                    if(null != assetInfo.getFactoryWarrantyDate() && null != assetInfo.getWarrantyDate()){
-                        continue;
-                    }
+                // 如果为空，表示没有状态为order changed 且批准日期不为空的记录，则查询全部order changed记录，取任意一条记录的start date和end date
+                if(CollectionUtils.isEmpty(dateInfoList)){
+                    hasOrderChangeDate = false;
                     dateInfoList = mvsContractRepository.findByStatusAndContractNo(ORDER_CHANGED ,contractNo);
-                    if(CollectionUtils.isEmpty(dateInfoList)){
-                        continue;
-                    }
-                    MvsContractDateInfo dateInfo = dateInfoList.get(0);
-                    if(dateInfo.getOCSvcStartDate() != null && dateInfo.getOCSvcEndDate() != null){
-                        assetInfo.setFactoryWarrantyDate(dateInfo.getOCSvcStartDate());
-                        assetInfo.setWarrantyDate(dateInfo.getOCSvcEndDate());
-                    }else{
-                        assetInfo.setFactoryWarrantyDate(dateInfo.getStartDate());
-                        assetInfo.setWarrantyDate(dateInfo.getEndDate());
-                    }
                 }
-
-            }else if (null == assetInfo.getFactoryWarrantyDate() && null == assetInfo.getWarrantyDate()){
-                if(inOrderChange){
-                    dateInfoList = mvsContractRepository.findByStatusAndContractNo(IN_ORDER_CHANGE ,contractNo);
-                    if(CollectionUtils.isEmpty(dateInfoList)){
-                        continue;
-                    }
-                    assetInfo.setFactoryWarrantyDate(dateInfoList.get(0).getStartDate());
-                    assetInfo.setWarrantyDate(dateInfoList.get(0).getEndDate());
-                }else if(none){
-                    dateInfoList = mvsContractRepository.findByStatusAndContractNo(NONE ,contractNo);
-                    if(CollectionUtils.isEmpty(dateInfoList)){
-                        continue;
-                    }
-                    assetInfo.setFactoryWarrantyDate(dateInfoList.get(0).getStartDate());
-                    assetInfo.setWarrantyDate(dateInfoList.get(0).getEndDate());
-                }
+            }else if(inOrderChange){
+                dateInfoList = mvsContractRepository.findByStatusAndContractNo(IN_ORDER_CHANGE ,contractNo);
+            }else if(none){
+                dateInfoList = mvsContractRepository.findByStatusAndContractNo(NONE ,contractNo);
             }
 
-            assetInfoRepository.save(assetInfo);
-            saveAssetHistory(assetInfo);
+            if(CollectionUtils.isEmpty(dateInfoList)){
+                continue;
+            }
+
+            for (AssetInfo assetInfo : assetList) {
+                if(orderChanged){
+                    if(hasOrderChangeDate){
+                        assetInfo.setFactoryWarrantyDate(dateInfoList.get(0).getOCSvcStartDate());
+                        assetInfo.setWarrantyDate(dateInfoList.get(0).getOCSvcEndDate());
+                    }else{
+                        if(null != assetInfo.getFactoryWarrantyDate() && null != assetInfo.getWarrantyDate()){
+                            continue;
+                        }
+                        assetInfo.setFactoryWarrantyDate(dateInfoList.get(0).getStartDate());
+                        assetInfo.setWarrantyDate(dateInfoList.get(0).getEndDate());
+                    }
+
+                }else if (null == assetInfo.getFactoryWarrantyDate() && null == assetInfo.getWarrantyDate()){
+                    assetInfo.setFactoryWarrantyDate(dateInfoList.get(0).getStartDate());
+                    assetInfo.setWarrantyDate(dateInfoList.get(0).getEndDate());
+                }
+                assetInfoRepository.save(assetInfo);
+                saveAssetHistory(assetInfo);
+            }
         }
     }
 

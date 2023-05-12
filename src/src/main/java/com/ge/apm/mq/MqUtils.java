@@ -6,8 +6,8 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 
 import com.ge.apm.callback.DataDelVO;
-import com.ge.apm.callback.MqContext;
-import com.ge.apm.config.MQConfig;
+import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -91,8 +91,8 @@ public class MqUtils {
         MqContext mqContextDTO = new MqContext();
         mqContextDTO.setTime(new Date());
         mqContextDTO.setType("asset");
-        mqContextDTO.setRoutingKey(MQConfig.UPDATE_ROUTING_KEY);
-        mqContextDTO.setExChange(MQConfig.ASSET_CHANGE);
+        mqContextDTO.setRoutingKey(RabbitConfig.UPDATE_ROUTING_KEY);
+        mqContextDTO.setExChange(RabbitConfig.ASSET_CHANGE);
         mqContextDTO.setClassName(mqContext.getClassName());
         mqContextDTO.setMethodName(mqContext.getMethodName());
         mqContextDTO.setDescribe(mqContext.getDescribe());

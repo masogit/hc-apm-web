@@ -5,6 +5,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserAccountHistory;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.bean.HistoryInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,8 +47,8 @@ public class UserAccountHistoryController extends GenericCRUDController<UserAcco
         List<UserAccountHistory> content = pgData.getContent();
         content.forEach(c -> {
             if (StringUtils.isNotEmpty(c.getOperationType())) {
-                UserAccount.HistoryAction historyAction = UserAccount.HistoryAction.valueOf(c.getOperationType());
-                c.setOperationType(historyAction.getValue());
+                HistoryInfo.TypeAction typeAction = HistoryInfo.TypeAction.valueOf(c.getOperationType());
+                c.setOperationType(typeAction.getValue());
             }
         });
         return pgData;

@@ -41,16 +41,16 @@
 								<p:column headerText="备件名称" filterBy="#{item.sparePart.name}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.name}"/>
 								</p:column>
-								<p:column headerText="规格型号">
+								<p:column headerText="规格型号" filterBy="#{item.sparePart.model}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.model}" />
 								</p:column>
-								<p:column headerText="序列号">
+								<p:column headerText="序列号" filterBy="#{item.sparePart.serialNumber}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.serialNumber}" />
 								</p:column>
-								<p:column headerText="厂家">
+								<p:column headerText="厂家" filterBy="#{item.sparePart.manufacturer}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.manufacturer}" />
 								</p:column>
-								<p:column headerText="供应商">
+								<p:column headerText="供应商" filterBy="#{item.sparePart.supplier}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.supplier}" />
 								</p:column>
 								<p:column headerText="单位">
@@ -64,6 +64,9 @@
 								</p:column>
 								<p:column headerText="总价">
 									<h:outputText value="#{sparePartStockRecordController.totalPrice(item.sparePart.unitPrice, item.quantity)}" />
+								</p:column>
+								<p:column headerText="发票号">
+									<h:outputText value="#{item.sparePart.invoiceNumber}" />
 								</p:column>
 								<p:column headerText="仓库">
 									<h:outputText value="#{item.sparePart.partsWarehouse.name}" />
