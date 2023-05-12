@@ -55,6 +55,10 @@
                         <label class="label">备注</label>
                         <p:inputText id="remark" value="#{zkbFePartOrderUserConfigController.selected.remark}" maxlength="40" required="false" requiredMessage="备注#{msg.ValidationRequire}" />
                     </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label" style="font-size: medium; font-weight: bold">负责相关设备</label>
+                        <p:selectBooleanCheckbox  id="responsibleAsset" value="#{zkbFePartOrderUserConfigController.selected.responsibleAsset}"  />
+                    </h:panelGroup>
                 </p:panelGrid>
                 <h:panelGroup>
                     <p:commandButton validateClient="true" actionListener="#{zkbFePartOrderUserConfigController.save}" update=":zkbFePartOrderUserConfigListForm :zkbFePartOrderUserConfigEditForm :growl" value="#{msg.Save}" icon="ui-icon-check"/>
