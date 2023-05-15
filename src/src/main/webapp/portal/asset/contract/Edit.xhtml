@@ -12,15 +12,6 @@
             <p:fieldset  id="editSet" legend="#{assetContractController.CRUDActionName}" style="margin-bottom:20px" rendered="#{assetContractController.selected != null}">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-
-                        <!--                        <h:panelGroup>
-                                                    <label class="label">#{msg.fileType}*</label>
-                                                    <p:selectOneMenu id="fileType" value="#{assetContractController.selected.fileType}" required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
-                                                        <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-                                                        <f:selectItems value="#{fieldMsg.getFieldValueList('attachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-                                                    </p:selectOneMenu>
-                                                </h:panelGroup>-->
-
                         <h:panelGroup>
                             <label class="label">#{msg.AssetContractName}*</label>
                             <p:inputText   id="contractName"  value="#{assetContractController.selected.name}" required="true" requiredMessage="#{msg.AssetContractName} #{msg.ValidationRequire}"/>

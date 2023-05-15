@@ -341,7 +341,6 @@
                 <p:panel header="#{qrCodeLibController.qrCode}" id="preview" style="text-align:center" rendered="#{not empty assetArrivedItemsController.selected.qrCode}">
                     <h:panelGrid columns="1" style="width:100%">
                         <img src="#{assetArrivedItemsController.getQrCodeImageForAsset()}" />
-                        <!--<img src="#{qrCodeShowController.getQrCodeImageBase64(assetArrivedItemsController.selected.qrCode)}" />-->
                     </h:panelGrid>
                 </p:panel>
             </h:form>
