@@ -39,7 +39,7 @@ public class MqUtils {
             rabbitTemplate.convertAndSend(mqContext.getExChange(), mqContext.getRoutingKey(), mqContext);
         } catch (Exception e) {
             log.error("send to mq error exchange:{},routingKey:{},message:{},e :", mqContext.getExChange(), mqContext.getRoutingKey(), mqContext.getJsonObject(), e);
-            throw e;
+            throw new RuntimeException("send mq error");
         }
     }
 
@@ -48,7 +48,7 @@ public class MqUtils {
             rabbitTemplate.convertAndSend(mqContext.getExChange(), mqContext.getRoutingKey(), JSON.toJSONString(mqContext));
         } catch (Exception e) {
             log.error("send to mq error exchange:{},routingKey:{},message:{},e :", mqContext.getExChange(), mqContext.getRoutingKey(), mqContext.getJsonObject(), e);
-            throw e;
+            throw new RuntimeException("send mq error");
         }
     }
 
