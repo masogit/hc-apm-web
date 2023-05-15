@@ -11,7 +11,6 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.primefaces.event.FileUploadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +26,7 @@ import webapp.framework.web.WebUtil;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -3067,6 +3067,32 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
     //endregion
 
+    //region 备件探头技术审批不真实判定
+    public String decisionTechAudit(ZkbPartOrder zkbPartOrder,List<ZkbPartOrderItem> zkbPartOrderItemList){
+        String result = "";
+        ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findByAssetIdTopOne(zkbPartOrder.getAssetId(), zkbPartOrder.getId());
+        if(oldZkbPartOrder != null){
+            if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(oldZkbPartOrder.getStatus())){
+                List<ZkbPartOrderItem> oldItems = zkbPartOrderItemRepository.findByPartOrderId(oldZkbPartOrder.getId());
+                if(zkbPartOrderItemList.size() == oldItems.size()){
+                    Map<String,String> map =  oldItems.stream().collect(Collectors.toMap(ZkbPartOrderItem::getPartNo,ZkbPartOrderItem::getPartNo,(value1, value2) -> value1));
+                    boolean f = true;
+                    for(ZkbPartOrderItem i : zkbPartOrderItemList){
+                        if(!map.containsKey(i.getPartNo())){
+                            f = false;
+                            break;
+                        }
+                    }
+                    if(f){
+                        result = "上次申请被拒绝并被判定为不真实";
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    //endregion
+
     public boolean checkDeductMaintain(ZkbContractAsset zkbContractAsset,Date requestTime){
         if(zkbContractAsset.getMaintainStartDate() == null && zkbContractAsset.getMaintainEndDate() == null){
             return false;
@@ -3100,7 +3126,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Transactional(rollbackFor = Exception.class)
     public void saveContractAsset(ZkbContract zkbContract, ZkbContractAsset zkbContractAsset,Date now){
         if(zkbContractAsset.getMaintainStartDate() != null && zkbContractAsset.getMaintainEndDate() != null){
-            //Date now = new Date();
             if(now.getTime() >= zkbContractAsset.getMaintainStartDate().getTime() && now.getTime() <= zkbContractAsset.getMaintainEndDate().getTime()){
                 return;
             }else{

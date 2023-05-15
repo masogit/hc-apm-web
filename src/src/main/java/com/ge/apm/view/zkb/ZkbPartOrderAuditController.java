@@ -1008,6 +1008,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return false;
     }
 
+    public String decisionTechAudit(){
+        return zkbPartOrderService.decisionTechAudit(selected,selected.getZkbPartOrderItems());
+    }
+
     public String techFieldsetName(){
         if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
             return "TSE审批";
@@ -1942,7 +1946,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String probeCloseReject() throws InterruptedException {
         zkbPartOrderService.probeCloseReject(selected, currentUser);
-        WebUtil.addErrorMessage("操作成功！","操作成功w2");
+        WebUtil.addErrorMessage("操作成功！","操作成功");
         return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
     }
 
