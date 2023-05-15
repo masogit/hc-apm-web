@@ -955,6 +955,132 @@ public class AssetInfoFormatter {
 
     }
 
+    public Map<String, Object> buildExcelColumnKeyValueMap1(Map<String, String> userMap, boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers) {
+
+        Map<String, Object> map = new HashMap<>();
+
+        // key "name" is used by a lot of modules, the definition is wrong, so use a new key name to redefine
+        map.put(getMessage("EquipmentName"), this.getName());
+
+        map.put(getMessage("departNum"), this.getDepartNum());
+        map.put(getMessage("financingNum"), this.getFinancingNum());
+        map.put(getMessage("aliasName"), this.getAliasName());
+
+        map.put(getMessage("assetOwnerName"), this.getAssetOwnerName());
+        map.put(getMessage("assetOwnerTel"), assetInfo.getAssetOwnerTel());
+        map.put(getMessage("assetOwnerName2"), this.getAssetOwnerName2());
+        map.put(getMessage("assetOwnerTel2"), assetInfo.getAssetOwnerTel2());
+        map.put(getMessage("assetOwnerName3"), this.getAssetOwnerName3());
+        map.put(getMessage("assetOwnerTel3"), assetInfo.getAssetOwnerTel3());
+
+        map.put(getMessage("pmOwnerName"), this.getPmOwnerName());
+        map.put(getMessage("pmOwnerTel"), assetInfo.getPmOwnerTel());
+        map.put(getMessage("measuringOwner"), assetInfo.getMeasuringOwnerName());
+
+        if (crossSite) {
+            map.put(getMessage("Hospital"), this.getHospitalName());
+            map.put(getMessage("Institution"), this.getInstitutionName());
+        }
+
+        map.put(getMessage("hospitalId"), this.getSiteName());
+        map.put(getMessage("clinicalDeptName"), this.getClinicalDeptName());
+        map.put(getMessage("clinicalOwnerName"),  this.getClinicalOwnerName());
+        map.put(getMessage("clinicalOwnerTel"), assetInfo.getClinicalOwnerTel());
+        map.put(getMessage("assetDeptName"), this.getAssetDeptName());
+        map.put(getMessage("manufacture"), this.getManufacture());
+        map.put(getMessage("makerShortName"), this.getMakerShortName());
+        map.put(getMessage("deviceName"), this.getDeviceName());
+        map.put(getMessage("registrationNo"), this.getRegistrationNo());
+        map.put(getMessage("vendor"), this.getVendor());
+        map.put(getMessage("vendorTel"), this.getVendorTel(supliers));
+        map.put(getMessage("parentAsset"), this.getParentAssetName(parentAssets));
+
+        map.put(getMessage("functionGroup"), this.getFunctionGroupAsString());
+        map.put(getMessage("assetCode68"), this.getAssetCode68AsString());
+
+        map.put(getMessage("assetGroup"),this.getAssetGroupAsString());
+
+        map.put(getMessage("functionGrade"),  this.getFunctionGrade());
+        map.put(getMessage("repairForm"), this.getRepairFormAsString());
+        map.put(getMessage("functionType"), this.getFunctionType());
+        map.put(getMessage("serialNum"), this.getSerialNum());
+        map.put(getMessage("systemId"), this.getSystemId());
+        map.put(getMessage("barcode"), this.getBarcode());
+        map.put(getMessage("nationalStandardCode"), this.getNationalStandardCode());
+        map.put(getMessage("modalityId"), this.getModalityId());
+
+        map.put(getMessage("purchasePrice"), this.getPurchasePrice());
+        map.put(getMessage("salvageValue"), this.getSalvageValue());
+        map.put(getMessage("lifecycle"), this.getLifecycleInYear());
+        map.put(getMessage("depreciationMethod"), this.getDepreciationMethodAsString());
+
+        map.put(getMessage("manufactDate"),this.getManufactDate());
+        map.put(getMessage("purchaseDate"),  this.getPurchaseDate());
+        map.put(getMessage("arriveDate"), this.getArriveDate());
+        map.put(getMessage("installDate"), this.getInstallDate());
+        map.put(getMessage("factoryWarrantyDate"),this.getFactoryWarrantyDate());
+        map.put(getMessage("warrantyDate"), this.getWarrantyDate());
+        map.put(getMessage("terminateDate"), this.getTerminateDate());
+        map.put(getMessage("lastPmDate"), this.getLastPmDate());
+        map.put(getMessage("lastMeteringDate"), this.getLastMeteringDate());
+        map.put(getMessage("lastQaDate"), this.getLastQaDate());
+
+        map.put(getMessage("maitanance"), this.getMaitanance());
+        map.put(getMessage("maitananceTel"), this.getMaitananceTel());
+        map.put(getMessage("qrCode"), this.getQrCode());
+        map.put(getMessage("locationCode"), this.getLocationCode());
+        map.put(getMessage("locationName"), this.getLocationName());
+        map.put(getMessage("comments"), this.getComments());
+
+        map.put(getMessage("assetUsage"),this.getAssetUsageAsString());
+        map.put(getMessage("capitalSource"), this.getCapitalSourceAsString());
+        map.put(getMessage("riskGrade"), this.getRiskGradeAsString());
+        map.put(getMessage("measureGrade"), this.getMeasureGradeAsString());
+        map.put(getMessage("measuringItemCategory"), this.getMeasuringItemCategoryAsString());
+        map.put(getMessage("emergencyEquipment"),  this.getEmergencyEquipmentAsString());
+        map.put(getMessage("importEquipment"), this.getImportEquipmentAsString());
+        map.put(getMessage("status"), this.getStatusAsString());
+        map.put(getMessage("assetClass"), this.getAssetClassAsString());
+        map.put(getMessage("accountingCategory"), this.getAccountingCategoryAsString());
+        map.put(getMessage("isAssetPMed"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? getMessage("true") : getMessage("false"));
+        map.put(getMessage("isFixed"), assetInfo.getIsFixed() == null || assetInfo.getIsFixed() ? getMessage("true") : getMessage("false"));
+        map.put(getMessage("isUseRegistration"), assetInfo.getIsUseRegistration() == null || assetInfo.getIsUseRegistration() ? getMessage("true") : getMessage("false"));
+        map.put(getMessage("isAssetChecked"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? getMessage("true") : getMessage("false"));
+
+        map.put(getMessage("assetValueCategory"), this.getAssetValueCategoryName());
+        map.put(getMessage("deviceStatus"), this.getDeviceStatusAsString());
+        map.put(getMessage("networkingStatus"), this.getNetworkingStatusAsString());
+        map.put(getMessage("capitalSource2"), this.getCapitalSource2AsString());
+        map.put(getMessage("isWarrantyNotice"), this.getWarrantyAsString());
+        map.put(getMessage("assetTags"), this.joinTags(assetMap));
+        map.put(getMessage("UCMID"), assetInfo.getUCMID());
+
+        //fields not used by default
+        map.put(getMessage("createdDate"), assetInfo.getCreatedDate());
+        map.put(getMessage("assetGroupSecondary"), this.getAssetGroupSecondayName());
+        map.put(getMessage("subjectProject"), assetInfo.getSubjectProject());
+        map.put(getMessage("acceptDate"), assetInfo.getAcceptDate());
+        map.put(getMessage("warrantyMonth"), assetInfo.getWarrantyMonth());
+        map.put(getMessage("proprietaryClass"), this.getProprietaryClassAsString());
+
+        map.put(getMessage("medicalApparatusClassification") + "编码", assetInfo.getMedicalApparatusClassification());
+        map.put(getMessage("medicalApparatusClassification"),this.getMedicalApparatusClassificationName(assetInfo.getMedicalApparatusClassification()));
+
+        map.put(getMessage("createdBy"), userMap.get(assetInfo.getCreatedBy()));
+        map.put(getMessage("mainDirectory"), assetInfo.getMainDirectory());
+        map.put(getMessage("secondDirectory"), assetInfo.getSecondDirectory());
+        map.put(getMessage("UUID"), this.getUid());
+        map.put(getMessage("rfId"), assetInfo.getRfId());
+        map.put(getMessage("rfGroup"), assetInfo.getRfGroup());
+        map.put(getMessage("powerOnThreshold"), assetInfo.getPowerOnThreshold());
+        map.put(getMessage("assetQuality"), this.getAssetQualityAsString());
+        map.put(getMessage("currentId"), assetInfo.getCurrentId());
+        map.put(getMessage("assetUsedLifecycle"), assetInfo.getAssetUsedLifecycle());
+        map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
+        return map;
+
+    }
+
     private String getMedicalApparatusClassificationName(String medicalApparatusClassification) {
         if(StringUtils.isEmpty(medicalApparatusClassification)){
             return "";
