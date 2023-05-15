@@ -7,10 +7,7 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.Supplier;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
@@ -18,6 +15,7 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.formula.BaseFormulaEvaluator;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Row;
@@ -458,6 +456,62 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
+    public ExcelDocumentStreamingWriter initExcelWriter(int size, List<String> exportFields, List<OrgInfo> clinicalDeptList) {
+        logger.info("export asset meta data");
+        writeMetaData(exportFields);
+
+        if (!crossSite) {
+            logger.info("export clinical dept list");
+            writeClinicalDeptList(clinicalDeptList);
+        }
+
+        ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
+
+        int maxRows = Math.max(size + EXCEL_ASSET_HEADER_ROW, ASSET_FORMULA_DEFAULT_MAX_ROWS);
+        //write sum formula
+        writeSummaryFormula(writer, exportFields, maxRows);
+
+        String[] columnTitles = exportFields.toArray(new String[] {});
+
+        writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
+        return writer;
+    }
+
+    public int writeAsset1(ExcelDocumentStreamingWriter writer, List<AssetInfo> assetList, List<OrgInfo> sites, boolean siteFlag, int startRow) {
+        boolean flag = this.crossSite;
+        if (!flag && siteFlag) {
+            flag = true;
+        }
+
+        GetAllElement getAllElement = new GetAllElement(assetList).invoke();
+        Map<String, List<String>> assetMap = getAllElement.getAssetMap();
+        Map parentAssets = getAllElement.getParentAssets();
+        Map supliers = getAllElement.getSupliers();
+
+        Set<String> loginNames = assetList.stream().map(AssetInfo::getCreatedBy).filter(Objects::nonNull).collect(Collectors.toSet());
+        List<Map<String, String>> userAccounts = userAccountMapper.findNameByLoginNames(loginNames);
+        Map<String, String> userMap = userAccounts.stream().collect(Collectors.toMap(map -> map.get("loginname"), map -> map.get("name")));
+        for (AssetInfo assetInfo: assetList) {
+            assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites ,this, assetDao, orgDao, supplierDao,userDao,authGroupDao);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap1(userMap, flag,assetMap,parentAssets, supliers);
+
+            writer.writeRowData(startRow, rowMap);
+
+            if (startRow % 5000 == 0) {
+                logger.info("export asset rows {}", startRow);
+            }
+            ++startRow;
+        }
+        return startRow;
+    }
+
+    public void setFormula() {
+        workBook.setForceFormulaRecalculation(true);
+        BaseFormulaEvaluator.evaluateAllFormulaCells(workBook);
+        assetSheet.setSelected(true);
+    }
+
     public void writeSampleAsset(List<String> exportFields, List<OrgInfo> clinicalDeptList) {
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, assetSheet.getSheetName(), exportFields);
@@ -678,13 +732,13 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             //每次查1万条
             List<HashMap> map = new ArrayList<>();
             int size = uids.size();
-            int num = size / 10000;
+            int num = size / 5000;
             for (int i = 0; i <= num; i++) {
                 List<String> tempList;
                 if(i == num){
-                    tempList = uids.subList(i * 10000, size);
+                    tempList = uids.subList(i * 5000, size);
                 }else{
-                    tempList = uids.subList(i * 10000, (i + 1) * 10000 -1);
+                    tempList = uids.subList(i * 5000, (i + 1) * 5000 -1);
                 }
                 map.addAll(assetTagsMapper.getTagsByAssetMap(tempList));
             }

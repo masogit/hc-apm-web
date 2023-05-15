@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
@@ -88,6 +89,9 @@ public class AssetFileImportBaseService {
 
     @Autowired
     protected UserAccountRepository userDao;
+
+    @Autowired
+    protected UserAccountMapper userAccountMapper;
 
     @Autowired
     protected QrCodeLibRepository qrcodeDao;
