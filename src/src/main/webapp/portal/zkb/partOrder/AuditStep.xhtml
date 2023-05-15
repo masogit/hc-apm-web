@@ -531,7 +531,9 @@
                             <p:commandLink immediate="false" process="@this" id="historyData" update="growl zkbHistoryQueryDlg" action="#{zkbPartOrderAuditController.preHistoryData}" oncomplete="PF('zkbHistoryQueryDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' and zkbPartOrderAuditController.canEditFlag}">
                                 <h:outputText value="历史数据查询" />
                             </p:commandLink>
+                            <!--<p:outputLabel style="color: red;font-weight:bold;margin-left: 20px;font-size: x-large" value="#{zkbPartOrderAuditController.decisionTechAudit()}"/>-->
                         </h:panelGroup>
+
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.showTse}">
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
