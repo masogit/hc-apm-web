@@ -1,5 +1,6 @@
 package com.ge.apm.view;
 
+import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -53,6 +54,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private SysRoleRepository sysRoleRepository;
     private UserAccountMapper userAccountMapper;
     private UaaService uaaService;
+    private OrgInfoService orgInfoService;
     private ReminderRuleOrgRepository ruleOrgRepository;
 
     private UserAccount loginUser;
@@ -77,6 +79,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         userAccountMapper = WebUtil.getBean(UserAccountMapper.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoService = WebUtil.getBean(OrgInfoService.class);
         ruleOrgRepository = WebUtil.getBean(ReminderRuleOrgRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         roles = sysRoleRepository.find();
@@ -85,23 +88,8 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     @Override
     protected Page<ReminderRule> loadData(PageRequest pageRequest) {
         searchFilters = ObjectUtil.isEmpty(searchFilters) ? ListUtil.toList() : searchFilters;
-//        List<ReminderRule> resultList;
-//        if (isApm) {
-//            searchFilters.add(new SearchFilter("parentUid", SearchFilter.Operator.IsNull, null));
-//        } else {
-//            List<SearchFilter> filters = ListUtil.newArrayList(new SearchFilter("parentUid", SearchFilter.Operator.IsNull, null));
-//            filters.add(new SearchFilter("universal", SearchFilter.Operator.NE, true));
-//            apmRuleList = dao.findBySearchFilter(filters);
-//            super.removeFilterOnField("parentUid");
-////            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
-//            List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
-//            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, orgUidList, "1*2+"));
-//            searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-//            searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-//            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-//        }
         List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -116,20 +104,6 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
     public void save(String actionName) {
         if ("Create".equals(crudActionName)) {
-//            if (!isApm) {
-//                String parentUid = selected.getParentUid();
-//                ReminderRule reminderRule = apmRuleList.stream().filter(rule -> rule.getId().equals(parentUid)).findFirst().orElse(new ReminderRule());
-//                BeanUtils.copyProperties(reminderRule, selected);
-//                selected.setId(null);
-//                selected.setState(-1);
-//                selected.setParentUid(parentUid);
-//                selected.setTenantUid(loginUser.getTenantUID());
-//                selected.setInstitutionUid(loginUser.getInstitutionUID());
-//                selected.setHospitalUid(loginUser.getHospitalUID());
-//                selected.setSiteUid(loginUser.getSiteUID());
-//                dao.save(selected);
-//                return;
-//            }
             selected.setState(-1);
             selected.setTenantUid(loginUser.getTenantUID());
             selected.setInstitutionUid(loginUser.getInstitutionUID());
@@ -138,11 +112,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         } else if ("Edit".equals(crudActionName) && "base".equals(actionName)) {
             selected.setState(-1);
         }
-//        if (isApm && Boolean.TRUE.equals(selected.getUniversal()) && "noticeTypeUser".equals(selected.getRuleParam().getNoticeType())) {
-//            WebUtil.addErrorMessage("通用版配置通知类型只能为角色！");
-//            return;
-//        }
-        if(!verifyEmpty(actionName)) return;
+        if (!verifyEmpty(actionName)) return;
         JSONObject parameters = JSON.parseObject(JSON.toJSONString(selected.getRuleParam()));
         WechatParam wechatParam = selected.getWechatParam();
         wechatParam.setTemplateId(ReminderType.getWechatTemplateId(selected.getType()));
@@ -150,25 +120,27 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         selected.setParameters(JSON.toJSONString(parameters));
         dao.save(selected);
     }
-    private boolean verifyEmpty(String actionName){
-        boolean flag=true;
-        if("setting".equals(actionName)){
+
+    private boolean verifyEmpty(String actionName) {
+        boolean flag = true;
+        if ("setting".equals(actionName)) {
             RuleParam ruleParam = selected.getRuleParam();
             Integer pushCycle = ruleParam.getPushCycle();
             Integer pushNum = ruleParam.getPushNum();
-            if(pushCycle == null || pushCycle < 1){
+            if (pushCycle == null || pushCycle < 1) {
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessageKey("pushCycle 不能小于0");
-                flag=false;
+                flag = false;
             }
-            if(pushNum == null || pushNum < 1){
+            if (pushNum == null || pushNum < 1) {
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessageKey("pushNum 不能小于0");
-                flag=false;
+                flag = false;
             }
         }
         return flag;
     }
+
     public void setToUsing(String id, boolean using) {
         selected = dao.findById(id);
         selected.setId(id);
@@ -258,9 +230,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
     private void readSelectedOrgTree(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
         if (node.isSelected()) {
-            if (node.getParent() != null && node.getParent().isSelected()) {
-                return;
-            } else {
+            if (node.getParent() == null || !node.getParent().isSelected()) {
                 selectedTreeNodeList.add((OrgInfo) node.getData());
             }
         } else {
@@ -271,14 +241,12 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     }
 
     private void addMissingChildClinical(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
-
         OrgInfo data = (OrgInfo) node.getData();
         if (data == null) {
             //root
             for (TreeNode item : node.getChildren()) {
                 addMissingChildClinical(item, selectedTreeNodeList);
             }
-
         } else if (data.getOrgType() < 4) {
             if (!node.isSelected()) {
                 for (TreeNode item : node.getChildren()) {
@@ -290,14 +258,35 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             if (node.isSelected()) {
                 selectedTreeNodeList.add(data);
             }
-
             //大科室下面可能还有大科室
             for (TreeNode item : node.getChildren()) {
                 addMissingChildClinical(item, selectedTreeNodeList);
             }
-
         }
+    }
 
+    public List<OrgInfo> getHospitalList(String orgLevel) {
+        return orgInfoService.getHospitalList(orgLevel);
+    }
+
+    public String getOrgNameById(Integer orgId) {
+        return orgInfoService.getOrgNameById(orgId);
+    }
+
+    public String getInsNameByUId(String uid) {
+        return orgInfoService.getInsNameByUId(uid);
+    }
+
+    public String getHospitalNameByUId(String uid) {
+        return orgInfoService.getHospitalNameByUId(uid);
+    }
+
+    public String getSiteNameByUId(String uid) {
+        return orgInfoService.getSiteNameByUId(uid);
+    }
+
+    public String getTenantName(String tenantUID) {
+        return orgInfoService.getTenantName(tenantUID);
     }
 
     public List<SysRole> getRoleList() {
