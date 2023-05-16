@@ -15,8 +15,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
-import com.ge.healthcare.cn.common.cons.Function;
 import com.google.common.base.Strings;
 import javaslang.control.Option;
 import org.apache.commons.collections.CollectionUtils;
@@ -556,7 +556,7 @@ public class UserContextService implements Serializable {
             List<ApmFeature> features = Arrays.asList(ApmFeature.values()).stream().filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
             features.forEach(feature -> apmFunctionList.addAll(feature.getFunctionList().stream()
                     .filter(function -> sysRoles.stream().anyMatch(function.getRoleList()::contains) || CollectionUtils.isEmpty(function.getRoleList()))
-                    .map(Function::getName).collect(Collectors.toSet())));
+                    .map(ApmFunction::name).collect(Collectors.toSet())));
         }
         return apmFunctionList;
     }
@@ -1471,8 +1471,8 @@ public class UserContextService implements Serializable {
         return Arrays.stream(ApmFeature.values()).filter(ApmFeature::isNecessary).collect(Collectors.toSet());
     }
 
-    public static Set<Function> getInitFunction() {
-        Set<Function> apmFunctions = new HashSet<>();
+    public static Set<ApmFunction> getInitFunction() {
+        Set<ApmFunction> apmFunctions = new HashSet<>();
         getInitFeature().forEach(f -> apmFunctions.addAll(f.getFunctionList()));
         return apmFunctions;
     }
