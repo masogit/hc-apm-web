@@ -116,7 +116,7 @@
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup></h:panelGroup>
                        <h:panelGroup>
-                           <p:outputLabel id="tipChange" style="color: red!important;font-size: smaller!important;" rendered="#{userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">#{pmOrderRuleController.getRuleLevelTip()}</p:outputLabel>
+                           <p:outputLabel id="tipChange" style="color: red!important;font-size: smaller!important;" rendered="#{userContextService.hasCurrentTenantName('')}">#{pmOrderRuleController.getRuleLevelTip()}</p:outputLabel>
                        </h:panelGroup>
                    </p:panelGrid>
 

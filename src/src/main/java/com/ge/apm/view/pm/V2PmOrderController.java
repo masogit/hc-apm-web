@@ -1627,7 +1627,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }else {
             if (Strings.isNullOrEmpty(query)) {
-                if(userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())){
+                if(userContextService.hasCurrentTenantName("")){
                     queryIndex = 10;
                 }else{
                     queryIndex = -1;

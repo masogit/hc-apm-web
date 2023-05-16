@@ -323,12 +323,6 @@
                             <f:selectItems value="#{workOrderMgrController.getWorkerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <!-- <h:panelGroup>
-                         <label class="label">#{msg.intExtType}*</label>
-                         <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.intExtType}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
-                             <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                         </p:selectOneMenu>
-                     </h:panelGroup>-->
                 </p:panelGrid>
                 <br/>
                 <h:panelGroup>
@@ -345,7 +339,6 @@
                     <h:panelGroup>
                         <label class="label">#{msg.deviceStatus}*</label>
                         <p:selectOneMenu value="#{workOrderMgrController.assetStatus}" >
-                            <!--<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                             <f:selectItems value="#{assetInfoEditController.assetStatusList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{!item.editable}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
@@ -375,7 +368,6 @@
                         <label class="label">#{msg.status}</label>
                         <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
                             <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
-                            <!--<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(0).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(0).msgKey}" />
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(1).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(1).msgKey}" itemDisabled="false"/>
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(2).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(2).msgKey}" />

@@ -1214,11 +1214,6 @@ public class UserContextService implements Serializable {
 
     }
 
-    public Boolean isYunNanFuWai(String tenantName){
-        logger.warn(tenantName);
-        return this.getTenantInfo().getName().equals("云南省阜外心血管病医院");
-    }
-
     public static Boolean isHospitalName(String tenantName){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         TenantInfo currentTenantInfo = userContextService.getTenantInfo();
