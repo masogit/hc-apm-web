@@ -12,29 +12,32 @@
 
         <h:form id="woMgrListForm">
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                <p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==0}" rendered="#{!userContextService.hasCurrentTenantName('')}" action="workOrderList.xhtml?faces-redirect=true&amp;query=0" />
-                <p:commandButton value="#{msg.RequestForRepair}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="#{!userContextService.hasCurrentTenantName('') and workOrderMgrController.canCreate('AssetHead')}" oncomplete="PF('createSRDialog').show()"/>
-                <p:commandButton value="#{msg.repaired}" process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"  disabled="#{workOrderMgrController.queryIndex==1}" rendered="#{!userContextService.hasCurrentTenantName('')}" onclick="onButtonChange()" action="workOrderList.xhtml?faces-redirect=true&amp;query=1" />
-                <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=10"  disabled="#{workOrderMgrController.queryIndex==10}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=2"  disabled="#{workOrderMgrController.queryIndex==2}" rendered="#{(userContextService.isDispatcher() or userContextService.hasRole('AssetHead')) and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=3"  disabled="#{workOrderMgrController.queryIndex==3}" rendered="#{userContextService.hasRole('AssetStaff') and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=4"  disabled="#{workOrderMgrController.queryIndex==4}" rendered="#{userContextService.hasRole('AssetStaff') and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitAck}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=5"  disabled="#{workOrderMgrController.queryIndex==5}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitFeedback}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=6"  disabled="#{workOrderMgrController.queryIndex==6}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=7"  disabled="#{workOrderMgrController.queryIndex==7}" rendered="#{userContextService.hasRole('AssetStaff') and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=8"  disabled="#{workOrderMgrController.queryIndex==8}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.canceled}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=9"  disabled="#{workOrderMgrController.queryIndex==9}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==11}" rendered="#{!userContextService.hasCurrentTenantName('')}" action="workOrderList.xhtml?faces-redirect=true&amp;query=11" />
-                <!--                        <p:commandButton value="已派工" id="btn1" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(3)}"  disabled="#{workOrderMgrController.queryIndex==3}" />
-                                    <p:commandButton value="已关单" id="btn2" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}"/>-->
-                <!--<p:commandButton value="已取消" id="btn5" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}"/>-->
-                <p:remoteCommand id="createSR" name="createSR" update="woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" oncomplete="PF('createSRDialog').show()" />
+            <c:choose>
+                <c:when test="#{!userContextService.hasCurrentTenantName('')}">
+                    <p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==0}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_WAIT')}" action="workOrderList.xhtml?faces-redirect=true&amp;query=0" />
+                    <p:commandButton value="#{msg.RequestForRepair}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="#{workOrderMgrController.canCreate('AssetHead') and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CREATE')}" oncomplete="PF('createSRDialog').show()"/>
+                    <p:commandButton value="#{msg.repaired}" process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"  disabled="#{workOrderMgrController.queryIndex==1}" onclick="onButtonChange()" action="workOrderList.xhtml?faces-redirect=true&amp;query=1" />
+                    <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=10"  disabled="#{workOrderMgrController.queryIndex==10}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_APPROVE')}"/>
+                    <p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=2"  disabled="#{workOrderMgrController.queryIndex==2}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}"/>
+                    <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=3"  disabled="#{workOrderMgrController.queryIndex==3}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+                    <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=4"  disabled="#{workOrderMgrController.queryIndex==4}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+                    <p:commandButton value="#{msg.waitAck}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=5"  disabled="#{workOrderMgrController.queryIndex==5}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_ACCEPT')}"/>
+                    <p:commandButton value="#{msg.waitFeedback}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=6"  disabled="#{workOrderMgrController.queryIndex==6}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_EVALUATE')}"/>
+                    <p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=7"  disabled="#{workOrderMgrController.queryIndex==7}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE')}"/>
+                    <p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=8"  disabled="#{workOrderMgrController.queryIndex==8}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE')}"/>
+                    <p:commandButton value="#{msg.canceled}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=9"  disabled="#{workOrderMgrController.queryIndex==9}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_EDIT')}"/>
+                    <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==11}" action="workOrderList.xhtml?faces-redirect=true&amp;query=11" />
+                    <p:remoteCommand id="createSR" name="createSR" update="woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" oncomplete="PF('createSRDialog').show()" />
+                </c:when>
+                <c:otherwise>
+                    <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==11}" action="workOrderList.xhtml?faces-redirect=true&amp;query=11" />
+                    <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=3"  disabled="#{workOrderMgrController.queryIndex==3}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+                    <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=4"  disabled="#{workOrderMgrController.queryIndex==4}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+                    <p:commandButton value="已完成"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=8"  disabled="#{workOrderMgrController.queryIndex==8}"/>
+                </c:otherwise>
+            </c:choose>
             <!--云阜 全部、待接单、维修中、已完成-->
-                <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==11}" rendered="#{userContextService.hasCurrentTenantName('')}" action="workOrderList.xhtml?faces-redirect=true&amp;query=11" />
-                <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=3"  disabled="#{workOrderMgrController.queryIndex==3}" rendered="#{userContextService.hasRole('AssetStaff') and userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=4"  disabled="#{workOrderMgrController.queryIndex==4}" rendered="#{userContextService.hasRole('AssetStaff') and userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="已完成"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=8"  disabled="#{workOrderMgrController.queryIndex==8}" rendered="#{userContextService.hasCurrentTenantName('')}"/>
-            </h:panelGrid>
+                </h:panelGrid>
             <p:dataTable id="datalist" value="#{workOrderMgrController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{workOrderMgrController.selected}"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.serviceRequest.requestTime}"
@@ -96,10 +99,6 @@
                 </p:column>
                 <p:column width="90" headerText="#{msg.intExtType}" >
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
-                </p:column>
-
-                <p:column rendered="false" headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetInfo.functionType}"/>
                 </p:column>
 
                 <c:if test="#{userContextService.isCountyArea()}">
@@ -200,9 +199,6 @@
                     <h:outputText  value="#{workOrderMgrController.getStepName(item)}"/>
                 </p:column>
 
-                <!--                        <p:column headerText="#{msg.currentPersonName}">
-                                        <h:outputText value="#{item.currentPersonName}"/>
-                                    </p:column>-->
                 <p:column rendered="false" headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
                     <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
                 </p:column>
@@ -211,50 +207,49 @@
                 <p:column headerText="#{msg.Actions}" style="width: 100px" rendered="#{workOrderMgrController.queryIndex==1}" exportable="false">
                     <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
-                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH'))}">
                     <p:commandButton value="#{msg.dispatchWorkOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
 
-                    <p:commandButton  value="#{msg.Cancel}"  actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead')}" oncomplete="PF('cancelDialog').show()"/>
+                    <p:commandButton  value="#{msg.Cancel}"  actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}" oncomplete="PF('cancelDialog').show()"/>
 
                 </p:column>
-                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.hasRole('AssetStaff') or userContextService.hasRole('AssetHead'))}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==3 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}">
                     <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId and item.currentStepId==3? msg.takeorder:msg.CompeteOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
                     <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
-                    <p:commandButton  value="#{msg.Cancel}"  actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
-
+                    <p:commandButton  value="#{msg.Cancel}"  actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
-                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}">
                     <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
                     <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'? '':'transferOrderDialogForm'}" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}"/>
                     <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="#{item.approvalStatus eq '1'  or item.approvalStatus eq '5'? '':'@(.x0) @(.pictureListCls) woTab:repairCompleteDialogForm'}" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}"/>
                     <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="#{item.approvalStatus eq '1'  or item.approvalStatus eq '5'? '':'woTab:newWorkorderDlgForm  :growl'}"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}"/>
                     <!--报修后，被接单的工单 医工主任有权限能够取消 -->
-                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
+                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==10}"><!--审批-->
-                    <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
+                    <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item)}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_APPROVE')}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
                     <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm"  oncomplete="PF('ackDialog').show()"/>
-                    <p:commandButton value="#{msg.Edit}" disabled="#{!userContextService.hasRole('AssetHead')}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:ackEditForm" oncomplete="PF('ackEditDialog').show()"/>
+                    <p:commandButton value="#{msg.Edit}" disabled="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_ACCEPT')}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:ackEditForm" oncomplete="PF('ackEditDialog').show()"/>
 
                 </p:column>
-                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6}">
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_EVALUATE')}">
                     <p:commandButton value="#{msg.feedback}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:rateDialogForm" oncomplete="PF('rateDialog').show()"  disabled="#{item.feedbackRating gt 0}" />
                 </p:column>
-                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}"><!--关单-->
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE') and workOrderMgrController.queryIndex==7}"><!--关单-->
                     <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
                 </p:column>
                 <p:column headerText="#{msg.maintenanceValue}" style="width: 100px" sortBy="#{item.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8 and !userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{item.maintenanceValue}"/>
                 </p:column>
-                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==8}"><!--已关单-->
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and workOrderMgrController.queryIndex==8}"><!--已关单-->
                     <p:commandButton value="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()"/>
                 </p:column>
 
-                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.hasRole('AssetHead') and workOrderMgrController.queryIndex==0}">
-   <!--待派工 待接单 待维修-->
-                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead')}" disabled="#{workOrderMgrController.isStep(item)}" oncomplete="PF('cancelDialog').show()"/>
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and workOrderMgrController.queryIndex==0}">
+                    <!--待派工 待接单 待维修-->
+                    <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" disabled="#{workOrderMgrController.isStep(item)}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
                 <f:facet name="{Toolbar}">
                     <p:commandButton id="manHoursManageButton" value="工时管理" actionListener="#{workOrderMgrController.prepareMoreManHoursView}" update="woTab:moreManHoursDialogForm" disabled="#{empty workOrderMgrController.selected or !(workOrderMgrController.queryIndex gt 3 and workOrderMgrController.queryIndex lt 8)}" oncomplete="PF('moreManHoursDialog').show()" rendered="#{userContextService.countyArea}"/>
