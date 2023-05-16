@@ -1651,7 +1651,7 @@ public class UaaService {
         List<String> featureList = getFeatureListByTenantUid(tenantUid);
         if (CollectionUtils.isNotEmpty(featureList)) {
             List<ApmFeature> apmFeatures = Arrays.asList(ApmFeature.values()).stream().filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
-            apmFeatures.forEach(feature -> functionList.addAll(feature.getFunctionList().stream().map(f -> f.getName()).collect(Collectors.toSet())));
+            apmFeatures.forEach(feature -> functionList.addAll(feature.getFunctionList().stream().map(f -> f.name()).collect(Collectors.toSet())));
         }
         return functionList;
     }
