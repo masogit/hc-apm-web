@@ -15,13 +15,13 @@
             <div class="ui-g-12 card ">
                 <p:tabView id="woTab">
                     <p:ajax event="tabChange"/>
-                    <p:tab title="#{msg.ExportWorkorderReports}" id="export">
+                    <p:tab title="#{msg.ExportWorkorderReports}" id="export" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}">
                         <ui:include src="export.xhtml"/>
                     </p:tab>
-                    <p:tab title="#{msg.ExportWorkorderPartReports}" id="woDetailExport">
+                    <p:tab title="#{msg.ExportWorkorderPartReports}" id="woDetailExport" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}">
                         <ui:include src="woDetailExport.xhtml"/>
                     </p:tab>
-                    <p:tab title="#{msg.WorkorderReportStatistics}" id="statistics">
+                    <p:tab title="#{msg.WorkorderReportStatistics}" id="statistics" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_REPORT_VEIW')}">
                         <ui:include src="statistics.xhtml"/>
                     </p:tab>
                 </p:tabView>

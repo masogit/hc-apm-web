@@ -11,32 +11,29 @@
     <div class="ui-g-12 card">
         <h:form id="pmMvsListForm">
             <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-
-                <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(10)}" disabled="#{v2PmOrderController.queryIndex==10}" rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff'))and !userContextService.hasCurrentTenantName('')}"/>
-
-                <p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff'))and !userContextService.hasCurrentTenantName('')}"/>
-<!--                <p:commandButton value="#{msg.CreateMaintenance}" rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff'))and !userContextService.hasCurrentTenantName('')}" actionListener="#{v2PmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm pmTab:PmMvsRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />-->
-                <p:commandButton value="#{msg.WorkorderToBeAssigned}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(2)}" disabled="#{v2PmOrderController.queryIndex==2}" rendered="#{(userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead')) and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.WorkorderToPickUp}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(3)}" disabled="#{v2PmOrderController.queryIndex==3}"  rendered="#{userContextService.hasRole('AssetStaff')and !userContextService.hasCurrentTenantName('')}"  />
-
-                <p:commandButton value="#{msg.OrderToCompete}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(31)}" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{ userContextService.hasRole('AssetStaff') and !userContextService.hasCurrentTenantName('')}"  />
-
-                <p:commandButton value="#{msg.Planned}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(0)}" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('AssetStaff') and !userContextService.hasCurrentTenantName('')}"  />
-                <p:commandButton value="#{msg.pendingAcceptance}" process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(11)}" disabled="#{v2PmOrderController.queryIndex==11}" rendered="#{userContextService.hasAnyRole('ClinicalStaff,DeptHead,AssetStaff,AssetHead')}"  />
-                <p:commandButton value="#{msg.ToBeApproved}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(8)}" disabled="#{v2PmOrderController.queryIndex==8}" rendered="#{(userContextService.hasRole('DeptHead') or userContextService.hasRole('ClinicalStaff') or userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetHead') or userContextService.hasRole('Guest')) and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.Finished}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(7)}" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff'))and !userContextService.hasCurrentTenantName('')}"  />
-                <p:commandButton value="#{msg.Canceled}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(20)}" disabled="#{v2PmOrderController.queryIndex==20}"  rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')) and !userContextService.hasCurrentTenantName('')}"  />
-
-                <!--云南阜外保养目录 创建保养，全部、待接单、保养中、已完成。-->
-                <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(10)}" disabled="#{v2PmOrderController.queryIndex==10}" rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')) and userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.CreateMaintenance}" rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')) and userContextService.hasCurrentTenantName('')}" actionListener="#{v2PmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm pmTab:PmMvsRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />
-                <p:commandButton value="#{msg.BatchCreateMaintenance}" rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')) and userContextService.hasCurrentTenantName('')}" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml" />
-                <p:commandButton value="#{msg.WorkorderToPickUp}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(31)}" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{ userContextService.hasRole('AssetStaff') and userContextService.hasCurrentTenantName('')}"  />
-                <p:commandButton value="#{msg.maintenance1}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(0)}" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('AssetStaff') and userContextService.hasCurrentTenantName('')}"  />
-                <p:commandButton value="#{msg.Completed1}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(7)}" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff'))and userContextService.hasCurrentTenantName('')}"  />
-
-
-
+                <c:choose>
+                    <c:when test="#{!userContextService.hasCurrentTenantName('')}">
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(10)}" disabled="#{v2PmOrderController.queryIndex==10}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_VIEW_ALL')}"/>
+                        <p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_VIEW_ALL')}"/>
+                        <p:commandButton value="#{msg.WorkorderToBeAssigned}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(2)}" disabled="#{v2PmOrderController.queryIndex==2}" rendered="#{userContextService.isPmDispatcher() or userContextService.hasAnyRoleByApmRoles('AssetHead')}"/>
+                        <p:commandButton value="#{msg.WorkorderToPickUp}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(3)}" disabled="#{v2PmOrderController.queryIndex==3}"  rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}"  />
+                        <p:commandButton value="#{msg.OrderToCompete}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(31)}" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{ userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_TAKE')}"  />
+                        <p:commandButton value="#{msg.Planned}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(0)}" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_TAKE')}"  />
+                        <p:commandButton value="#{msg.pendingAcceptance}" process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(11)}" disabled="#{v2PmOrderController.queryIndex==11}" rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_ACCEPT')}"  />
+                        <p:commandButton value="#{msg.ToBeApproved}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(8)}" disabled="#{v2PmOrderController.queryIndex==8}" rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_APPROVE') }"/>
+                        <p:commandButton value="#{msg.Finished}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(7)}" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_VIEW_ALL')}"  />
+                        <p:commandButton value="#{msg.Canceled}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(20)}" disabled="#{v2PmOrderController.queryIndex==20}"  rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_VIEW_ALL')}"  />
+                    </c:when>
+                    <c:otherwise>
+                        <!--云南阜外保养目录 创建保养，全部、待接单、保养中、已完成。-->
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(10)}" disabled="#{v2PmOrderController.queryIndex==10}" rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_VIEW_ALL')}"/>
+                        <p:commandButton value="#{msg.CreateMaintenance}" rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_CREATE')}" actionListener="#{v2PmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm pmTab:PmMvsRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />
+                        <p:commandButton value="#{msg.BatchCreateMaintenance}" rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_CREATE')}" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml" />
+                        <p:commandButton value="#{msg.WorkorderToPickUp}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(31)}" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_TAKE')}"  />
+                        <p:commandButton value="#{msg.maintenance1}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(0)}" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_TAKE')}"  />
+                        <p:commandButton value="#{msg.Completed1}"  process="@this" update="datalist buttonSet pmTab:pmMvsOrderDetailForm" action="#{v2PmOrderController.updateQueryIndex(7)}" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{userContextService.hasaccessContainsFunctionMenuRole('MAINTAIN_ORDER_VIEW_ALL')}"  />
+                    </c:otherwise>
+                </c:choose>
             </h:panelGrid>
 
             <p:dataTable id="datalist" value="#{v2PmOrderController.lazyModel}" var="item" widgetVar="varDataListgl"
@@ -59,21 +56,11 @@
                         <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
                             <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();"/>
 
-                            <!-- <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton)"/>-->
-
                         </p:selectBooleanCheckbox>
                     </f:facet>
-                    <!-- <f:facet name="header">
-                         <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{v2PmOrderController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
-                             <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.batch-piliangjiedan)"/>
-                         </p:selectBooleanCheckbox>
-                     </f:facet>-->
                 </p:column>
                 <p:column headerText="#{msg.hospitalId}">
                     <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
-                    <!--<f:facet name="filter">
-                        <p:inputText id="btnOrg2" class="btnOrg2clss" readonly="true" value="#{empty v2PmOrderController.selectSite? msg.AllHospitals:v2PmOrderController.selectSite.name}"/>
-                    </f:facet>-->
                 </p:column>
 
                 <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
@@ -123,11 +110,6 @@
                         <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{msg.PmOrderRule}"/><br/>
-                                <!--<p:autoComplete dropdown="true" value="#{v2PmOrderController.filterRule}" appendTo="@(Body)"
-                                                scrollHeight="300" forceSelection="ture" completeMethod="#{v2PmOrderController.autoCompleteRuleName()}" size="5">
-                                    <p:ajax event="itemSelect" listener="#{v2PmOrderController.onRuleFilterChange}" process="@this"  update="pmTab:pmMvsListForm:datalist" ></p:ajax>
-                                    <p:ajax process="@this" listener="#{v2PmOrderController.onRuleFilterChange}"   update="pmTab:pmMvsListForm:datalist"/>
-                                </p:autoComplete>-->
                             </f:facet>
                             <h:outputText value="#{v2PmOrderController.getRulePm(item).name}"/>
 
@@ -173,7 +155,6 @@
                 </p:column>
 
                 <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" rendered="#{v2PmOrderController.queryIndex==7 or userContextService.hasCurrentTenantName('')}">
-<!--                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE" rendered="#{v2PmOrderController.queryIndex==7 or userContextService.hasCurrentTenantName('')}">-->
                     <f:facet name="filter">
                         <p:inputText id="filterActualCompletionTime" widgetVar="varFilterActualCompletionTime" value="#{v2PmOrderController.actualCompletionTimeFormat}"/>
                     </f:facet>
@@ -181,61 +162,6 @@
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
-
-                <!--待派工 2-->
-<!--                <p:column headerText="#{msg.Operation}" style="width: 100px" rendered="#{v2PmOrderController.queryIndex==-1 and userContextService.hasRole('AssetHead')}" exportable="false">-->
-<!--                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmMvsCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmMvsCancelDialog').show()" />-->
-<!--                </p:column>-->
-<!--                <p:column headerText="#{msg.Operation}" style="width: 100px" rendered="#{v2PmOrderController.queryIndex==2 and (userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead'))}" exportable="false">-->
-<!--                    <p:commandButton class="dispatchOrderButton" value="#{msg.Dispatch}" disabled="#{v2PmOrderController.isChecked()}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:dispatchMvsDialogForm" oncomplete="PF('dispatchDialog').show()"/>-->
-
-<!--                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmMvsCancelForm" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmMvsCancelDialog').show()" />-->
-<!--                </p:column>-->
-<!--                &lt;!&ndash;待接单 3&ndash;&gt;-->
-<!--                <p:column headerText="#{msg.Operation}" style="width: 100px" rendered="#{v2PmOrderController.queryIndex==3 ||v2PmOrderController.queryIndex==3}" exportable="false">-->
-
-<!--                    <p:commandButton  class="completeButton" value="#{msg.Complete}" disabled="#{v2PmOrderController.isChecked()}" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>-->
-<!--                    &lt;!&ndash;v2PmOrderController.isChecked()加了后 一选中了checkbox 接单按钮就会灰掉 保证不能即批量又单个接单&ndash;&gt;-->
-<!--                    <p:commandButton class="takeOrderbutton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" rendered="#{item.simplify ne true}" value="#{msg.TakeOrder}" actionListener="#{v2PmOrderController.prepareActTakeGrap(item.id,msg.OrderDialog)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>-->
-
-<!--                    &lt;!&ndash;医工主任：待办 状态为待派工、待接单、已计划的可操作【取消】按钮，其他步骤按钮为灰色&ndash;&gt;-->
-<!--                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmMvsCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmMvsCancelDialog').show()" />-->
-
-<!--                </p:column>-->
-
-<!--                &lt;!&ndash;待抢单tab 31 qingtao&ndash;&gt;-->
-<!--                <p:column style="width: 100px" headerText="#{msg.Operation}" rendered="#{v2PmOrderController.queryIndex==31}" exportable="false">-->
-<!--                    <p:commandButton  class="finishButton" value="#{msg.Complete}" disabled="#{v2PmOrderController.isChecked()}" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>-->
-
-<!--                    <p:commandButton  class="competeButton" disabled="#{v2PmOrderController.isChecked()}" value="#{userContextService.hasCurrentTenantName('')?msg.TakeOrder:msg.Compete }" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareActTakeGrap(item.id,msg.OrderCompetitionDialog)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>-->
-<!--                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmMvsCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmMvsCancelDialog').show()" />-->
-<!--                </p:column>-->
-
-<!--                &lt;!&ndash;已计划 0&ndash;&gt;-->
-<!--                <p:column headerText="#{msg.Operation}"  style="width: 100px" rendered="#{v2PmOrderController.queryIndex==0}" exportable="false">-->
-<!--                    <p:commandButton value="#{msg.Maintenance}" class="maintainButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.approvalStatus==5 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>-->
-
-
-<!--                    <p:commandButton value="#{msg.Reassign}" class="transButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.approvalStatus==5 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>-->
-<!--                    <p:commandButton  class="planedCompleteButton" value="#{msg.Complete}"  disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5' or v2PmOrderController.isChecked()}"  rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>-->
-
-<!--                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmMvsCancelForm" disabled="#{!userContextService.hasRole('AssetHead')}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmMvsCancelDialog').show()" />-->
-<!--                </p:column>-->
-
-
-<!--                &lt;!&ndash;待审核 8&ndash;&gt;-->
-<!--                <p:column headerText="#{msg.Operation}" style="width: 100px" rendered="#{v2PmOrderController.queryIndex==8}" exportable="false">-->
-<!--                    <p:commandButton value="#{msg.Approval}" actionListener="#{v2PmOrderController.prepareAproval(item.id)}" update="@(.pmapproveDialogCls)" oncomplete="PF('pmapproveDialog').show()"/>-->
-<!--                </p:column>-->
-<!--                <p:column headerText="#{msg.Operation}" style="width: 100px" rendered="#{v2PmOrderController.queryIndex==6}" exportable="false">-->
-<!--                    <p:commandButton value="#{msg.Close}" class="closeButton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:pmMvsListForm @(.closeMvsPmDialogClass)" oncomplete="PF('closePmDialog').show()" />-->
-<!--                </p:column>-->
-
-<!--                &lt;!&ndash;待验收 11&ndash;&gt;-->
-<!--                <p:column headerText="#{msg.Operation}"  style="width: 100px" rendered="#{v2PmOrderController.queryIndex==11}" exportable="false">-->
-<!--                    <p:commandButton  class="planedCompleteButton" value="验收"  disabled="#{v2PmOrderController.isChecked()}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:ackMvsDialogForm" oncomplete="PF('ackDialog').show()"/>-->
-<!--                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmMvsCancelForm" disabled="#{!userContextService.hasRole('AssetHead')}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmMvsCancelDialog').show()" />-->
-<!--                </p:column>-->
 
                 <f:facet name="{Toolbar}" >
                     <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderController.exportExcel}" disabled="#{v2PmOrderController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
@@ -257,8 +183,6 @@
                         <p:commandButton  icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchComplete}"  update="@(.pmMvsCompleteDialogBatch)" actionListener="#{v2PmOrderController.sameType()}" rendered="#{v2PmOrderController.isAllowBatchComplate()}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="forbidBatchComplete(xhr, status, args)">
                         </p:commandButton>
 
-                        <!--<p:commandButton  icon="ui-icon-aspect-ratio" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="pmTab:pmMvsListForm @(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.isBatchOp and (v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0)}" disabled="#{not v2PmOrderController.isBatchComplete()}" oncomplete="PF('pmCompleteDialogBatch').show()">
-                        </p:commandButton>-->
                         <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchCancel}"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2PmOrderController.preBatchCancel()}"  rendered="#{ (v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==-1)}" disabled="#{v2PmOrderController.batchCancelShow() or not v2PmOrderController.isChecked()}" oncomplete="PF('pmBatchCancelDialog').show()">
                         </p:commandButton>
 
@@ -276,12 +200,7 @@
             </p:dataTable>
         </h:form>
         <ui:include src="pmMvsOrderView.xhtml"/>
-<!--        <ui:include src="pmRepairCompleteDlg.xhtml"/>-->
-<!--        <ui:include src="pmApproveDlg.xhtml"/>-->
-<!--        <ui:include src="pmMoreAccDialogPrice.xhtml"/>-->
-
     </div>
-    <!-- </div>-->
 
     <!--取消对话框 -->
     <p:dialog id="pmMvsCancelDialog" widgetVar="pmMvsCancelDialog" modal="true" width="400"  resizable="true" draggable="true" header="#{msg.CancelDialog}">
@@ -292,8 +211,6 @@
                     <!--批量类型是2 和3 的话非周期性-->
                     <f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3}" itemLabel="#{msg.CancelAllOfPeriodicWorkorders}" itemValue="2"/>
                 </p:selectOneRadio>
-                <!--<f:selectItem itemDisabled="#{v2PmOrderController.selected.pmType eq 2 or v2PmOrderController.selected.pmType eq 3}" itemLabel="取消所有周期性工单" itemValue="2"/>
-            </p:selectOneRadio>-->
                 <h:panelGroup>
                     <label class="label">#{msg.CancellationReason}</label>
                     <p:inputTextarea  value="#{v2PmOrderController.cancelReason}" maxlength="256" />

@@ -72,13 +72,13 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
                                 actionListener="#{maintainConfigController.prepareCreate}" update=":maintainConfigCreateDlg"
-                                oncomplete="PF('maintainConfigCreateDialog').show()" onclick="NurseSiteMaintain.on()" rendered="#{maintainConfigController.customRoleAuth.authCreate}"/>
+                                oncomplete="PF('maintainConfigCreateDialog').show()" onclick="NurseSiteMaintain.on()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIGITEM_EDIT')}"/>
                             <p:commandButton id="editButton" actionListener="#{maintainConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
                                 update=":maintainConfigEditDlg" oncomplete="PF('maintainConfigEditDialog').show()"
-                                disabled="#{(empty maintainConfigController.listSelected) or (maintainConfigController.listSelected.size()>1)}" onclick="NurseSiteMaintain.on()" rendered="#{maintainConfigController.customRoleAuth.authModify}"/>
+                                disabled="#{(empty maintainConfigController.listSelected) or (maintainConfigController.listSelected.size()>1)}" onclick="NurseSiteMaintain.on()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIGITEM_EDIT')}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
                                 actionListener="#{maintainConfigController.delete}" update=":maintainConfigListForm:datalist"
-                                disabled="#{empty maintainConfigController.listSelected}" rendered="#{maintainConfigController.customRoleAuth.authDelete}">
+                                disabled="#{empty maintainConfigController.listSelected}" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIGITEM_EDIT')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteNurseSiteMaintainConfig}" icon="ui-icon-alert" />
                             </p:commandButton>
                         </f:facet>
