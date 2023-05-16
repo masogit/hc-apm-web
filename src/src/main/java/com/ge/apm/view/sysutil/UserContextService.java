@@ -96,7 +96,7 @@ public class UserContextService implements Serializable {
         userContextService.getTenantInfo();
         userContextService.getListCustomRole(user.getId());
         userContextService.getListSysRole(user.getId());
-        if (userContextService.isOpenNewMenuRoles()) {
+        if (StringUtils.isNotEmpty(userContextService.tenant.getFeatureList())) {
             userContextService.getFunctionListByFeatureAndRoles();
             userContextService.getFeatureList();
             userContextService.getApmSysRole();

@@ -56,22 +56,12 @@
                     <f:facet name="header">
                         <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
                             <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();"/>
-
-                            <!-- <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton)"/>-->
-
                         </p:selectBooleanCheckbox>
                     </f:facet>
-                    <!-- <f:facet name="header">
-                         <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{v2PmOrderController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
-                             <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.batch-piliangjiedan)"/>
-                         </p:selectBooleanCheckbox>
-                     </f:facet>-->
+
                 </p:column>
                 <p:column headerText="#{msg.hospitalId}">
                     <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
-<!--                    <f:facet name="filter">-->
-<!--                        <p:inputText id="btnOrg2" class="btnOrg2clss" readonly="false" value="#{empty v2PmOrderController.selectSite? msg.AllHospitals:v2PmOrderController.selectSite.name}"/>-->
-<!--                    </f:facet>-->
                 </p:column>
 
                 <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
