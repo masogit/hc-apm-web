@@ -729,21 +729,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                 }
             }
 
-            //每次查1万条
-            List<HashMap> map = new ArrayList<>();
-            int size = uids.size();
-            int num = size / 5000;
-            for (int i = 0; i <= num; i++) {
-                List<String> tempList;
-                if(i == num){
-                    tempList = uids.subList(i * 5000, size);
-                }else{
-                    tempList = uids.subList(i * 5000, (i + 1) * 5000 -1);
-                }
-                map.addAll(assetTagsMapper.getTagsByAssetMap(tempList));
-            }
-
-            assetMap = new HashMap<String, List<String>>();
+            List<HashMap> map = assetTagsMapper.getTagsByAssetMap(uids);
+            assetMap = new HashMap<>();
 
             for (int i = 0; i <map.size() ; i++) {
                 //判断assetMap中有没有当前的key
