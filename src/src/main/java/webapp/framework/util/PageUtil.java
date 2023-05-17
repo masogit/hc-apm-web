@@ -51,7 +51,7 @@ public class PageUtil<T> {
 
     public double formatDouble2(double d) {
         // 新方法，如果不需要四舍五入，可以使用RoundingMode.DOWN
-        BigDecimal bg = new BigDecimal(d).setScale(2, RoundingMode.UP);
+        BigDecimal bg = new BigDecimal(d).setScale(2, BigDecimal.ROUND_HALF_UP);
         return bg.doubleValue();
     }
 }

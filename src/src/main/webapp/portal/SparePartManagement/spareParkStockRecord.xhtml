@@ -30,13 +30,14 @@
 					<p:panelGrid columns="1" layout="grid">
 						<h:panelGroup>
 							<p:dataTable id="datalist" value="#{sparePartStockRecordController.lazyModel}" var="item" widgetVar="varDataList"
-										 selectionMode="single" selection="#{sparePartStockRecordController.selected}"
+										 selection="#{sparePartStockRecordController.selectedItems}"
 										 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 										 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 										 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 										 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
 										 rows="20" emptyMessage="#{msg.noRecordFound}"
 										 rowsPerPageTemplate="20,50,100,500">
+								<p:column exportable="false" selectionMode="multiple" style="width:50px;text-align:center"/>
 								<p:ajax event="filter" listener="#{sparePartStockRecordController.onFilter}"/>
 								<p:column headerText="备件名称" filterBy="#{item.sparePart.name}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.sparePart.name}"/>
@@ -96,6 +97,11 @@
 								<f:facet name="{Toolbar}">
 									<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
 										<p:dataExporter type="xls" target="datalist" fileName="#{sparePartStockRecordController.filterRecordType eq 1?'备件入库记录':'备件出库记录'}" />
+									</p:commandButton>
+									<p:commandButton title="导出到word" ajax="false"
+													 actionListener="#{sparePartStockRecordController.exportToDocx()}"
+													 icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+										<p:fileDownload value="#{sparePartStockRecordController.exportDocx}"/>
 									</p:commandButton>
 								</f:facet>
 							</p:dataTable>

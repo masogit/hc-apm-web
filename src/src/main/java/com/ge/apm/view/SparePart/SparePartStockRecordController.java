@@ -5,12 +5,19 @@ import com.ge.apm.dao.StockRecordRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
+import com.ge.apm.service.sparepart.SparePartStockRecordService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.service.wo.WorkOrderPublishRenderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -19,10 +26,10 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import javax.faces.context.FacesContext;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -34,6 +41,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     private UaaService uaaService;
     private StockRecordRepository stockRecordRepository;
     private SimplePartsWarehouseService warehouseService;
+    private SparePartStockRecordService stockRecordService;
     private StockRecordRepository dao;
 
     @Getter @Setter
@@ -55,10 +63,17 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     @Getter@Setter
     private Date endTime;
 
+    @Getter@Setter
+    private List<StockRecord> selectedItems;
+    @Getter@Setter
+    private StreamedContent exportDocx;
+
+
     @Override
     protected void init() {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        stockRecordService = WebUtil.getBean(SparePartStockRecordService.class);
         stockRecordRepository =  WebUtil.getBean(StockRecordRepository.class);
         warehouseService = WebUtil.getBean(SimplePartsWarehouseService.class);
         dao = WebUtil.getBean(StockRecordRepository.class);
@@ -151,4 +166,52 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
     }
 
+    public void exportToDocx(){
+        exportDocx = null;
+        if (CollectionUtils.isEmpty(this.selectedItems)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("NotSelectTheRecordsThatNeedToBeExported"));
+            return;
+        }
+        if(checkSelectedItems()){
+            String fileName = "";
+            if(1 == filterRecordType){
+                fileName = "设备配件入库单.docx";
+            }else if(2 == filterRecordType){
+                fileName = "设备配件出库单.docx";
+            }
+            try {
+                byte[] templateBytes = stockRecordService.getTemplate(fileName);
+                SparePartStockRecordService.RenderResult renderResult = stockRecordService.renderDocx(selectedItems, templateBytes,fileName,filterRecordType);
+                exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
+            } catch (IOException e) {
+                logger.error("Fail to export part stock record", e);
+                WebUtil.addErrorMessage(WebUtil.getMessage("ExportFailed"));
+            }
+        }
+    }
+
+    private boolean checkSelectedItems(){
+        if(1 == filterRecordType){
+            String supplier = null;
+            for (StockRecord selectedItem : selectedItems) {
+                if(StringUtils.isNotEmpty(supplier) && !supplier.equals(selectedItem.getSparePart().getSupplier())){
+                    WebUtil.addErrorMessage("选中的数据中供应商不同，无法导出！");
+                    return false;
+                }else if(StringUtils.isEmpty(supplier)){
+                    supplier = selectedItem.getSparePart().getSupplier();
+                }
+            }
+        }else if(2 == filterRecordType){
+            String dept = null;
+            for (StockRecord selectedItem : selectedItems) {
+                if(StringUtils.isNotEmpty(dept) && !dept.equals(selectedItem.getReceivingDepartmentUid())){
+                    WebUtil.addErrorMessage("选中的数据中领取科室不同，无法导出！");
+                    return false;
+                }else if(StringUtils.isEmpty(dept)){
+                    dept = selectedItem.getReceivingDepartmentUid();
+                }
+            }
+        }
+        return true;
+    }
 }
