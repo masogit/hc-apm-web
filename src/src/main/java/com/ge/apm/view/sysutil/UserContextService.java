@@ -96,7 +96,7 @@ public class UserContextService implements Serializable {
         userContextService.getTenantInfo();
         userContextService.getListCustomRole(user.getId());
         userContextService.getListSysRole(user.getId());
-        if (userContextService.isOpenNewMenuRoles()) {
+        if (StringUtils.isNotEmpty(userContextService.tenant.getFeatureList())) {
             userContextService.getFunctionListByFeatureAndRoles();
             userContextService.getFeatureList();
             userContextService.getApmSysRole();
@@ -1212,11 +1212,6 @@ public class UserContextService implements Serializable {
 
         return tenantOptionConfig.getAllowAssetBatchUpdate();
 
-    }
-
-    public Boolean isYunNanFuWai(String tenantName){
-        logger.warn(tenantName);
-        return this.getTenantInfo().getName().equals("云南省阜外心血管病医院");
     }
 
     public static Boolean isHospitalName(String tenantName){

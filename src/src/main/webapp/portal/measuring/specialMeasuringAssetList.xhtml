@@ -8,8 +8,8 @@
 
     <ui:composition>
         <div class="ui-g-12 card">
-            <h:form id="measuringAssetListForm" rendered="#{measureAssetListController.customRoleAuth.authSearch}">
-                <h:outputLabel class="label" style="color: black!important;font-size: 16px!important;" rendered="#{userContextService.hasCurrentTenantName('')}">计量日期到期提醒：本月&nbsp;<span style="color:orange;">#{measureAssetListController.currentMonthCount}</span>&nbsp;台，下月&nbsp;<span style="color: orange;">#{measureAssetListController.nextMonthCount}</span>&nbsp;台</h:outputLabel>
+            <h:form id="measuringAssetListForm">
+                <h:outputLabel class="label" style="color: black!important;font-size: 16px!important;">计量日期到期提醒：本月&nbsp;<span style="color:orange;">#{measureAssetListController.currentMonthCount}</span>&nbsp;台，下月&nbsp;<span style="color: orange;">#{measureAssetListController.nextMonthCount}</span>&nbsp;台</h:outputLabel>
                 <p:dataTable id="datalist_measuringAsset" value="#{measureAssetListController.lazyModel}" var="item" widgetVar="varDataList_measuringAsset"
                              selectionMode="single" selection="#{measureAssetListController.selected}"
                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -47,43 +47,6 @@
                     </p:column>
                     <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.manufacture}"/>
-                    </p:column>
-                    <p:column rendered="false" headerText="#{msg.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
-                        <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
-                        <f:facet name="filter">
-                            <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
-                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </f:facet>
-                    </p:column>
-                    <p:column rendered="false" headerText="#{msg.clinicalDeptName}">
-                        <f:facet name="header">
-                            <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                            <p:inputText id="clinicalDept"  value="#{measureAssetListController.filterOrg.name}"  readonly="true"/>
-                        </f:facet>
-                        <h:outputText value="#{item.clinicalDeptName}"/>
-                    </p:column>
-                    <p:column rendered="false" headerText="计量等级" filterBy="#{item.measureGrade}" filterMatchMode="EQ">
-                        <h:outputText value="#{fieldMsg.fieldValue('measureGrade',item.measureGrade)}"/>
-                        <f:facet name="filter">
-                            <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()">
-                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{fieldMsg.getMeasureGradeList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </f:facet>
-                    </p:column>
-                    <p:column  rendered="false" headerText="计量类别" filterBy="#{item.measuringItemCategory}" filterMatchMode="EQ">
-                        <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory',item.measuringItemCategory)}"/>
-                        <f:facet name="filter">
-                            <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()">
-                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </f:facet>
-                    </p:column>
-                    <p:column rendered="false" headerText="计量证书编号" filterBy="#{item.meteringNO}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.meteringNO}"/>
                     </p:column>
                     <p:column headerText="年检种别" filterBy="#{item.measuringType}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.measuringType}"/>
