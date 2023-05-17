@@ -312,6 +312,23 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				}
 			}
 		}
+		if (authorities.length > 0) {
+			StringBuilder sb1 = new StringBuilder();
+			Set<String> group = new HashSet<>();
+			for (String authority : authorities) {
+				if (map.containsKey(authority)) {
+					group.add(authority.split("\\.")[0]);
+					sb1.append(map.get(authority).getValue() + ",");
+				}
+			}
+			selected.setGroups(StringUtils.join(group, ","));
+			selected.setAuthoritiesCH(removeComma(sb1));
+			selected.setAuthorities(StringUtils.join(authorities, ","));
+		} else{
+			selected.setGroups("");
+			selected.setAuthoritiesCH("");
+			selected.setAuthorities("");
+		}
 		if (isOpenNewMenuRoles()) {
 			if (CollectionUtils.isNotEmpty(customSelectedFunctions)) {
 				Set<ApmFunction> apmFunctions = Arrays.stream(ApmFunction.values()).filter(f -> customSelectedFunctions.contains(f.name())).collect(Collectors.toSet());
@@ -320,41 +337,23 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				selected.setFunctionList(JSONObject.toJSONString(customSelectedFunctions));
 			}
 		} else {
-			if (authorities.length > 0) {
-				StringBuilder sb1 = new StringBuilder();
-				Set<String> group = new HashSet<>();
-				for (String authority : authorities) {
-					if (map.containsKey(authority)) {
-						group.add(authority.split("\\.")[0]);
-						sb1.append(map.get(authority).getValue() + ",");
-					}
-				}
-				selected.setGroups(StringUtils.join(group, ","));
-				selected.setAuthoritiesCH(removeComma(sb1));
-				selected.setAuthorities(StringUtils.join(authorities, ","));
-			}
-			else{
-				selected.setGroups("");
-				selected.setAuthoritiesCH("");
-				selected.setAuthorities("");
-			}
 			authChange();
 			selected.setWebAuthoritiesCH(service.parseAuthArray(authJSONArr));
 			selected.setWebAuthorities(authJSONArr.toString());
-			if (menus.length > 0) {
-				StringBuilder sb2 = new StringBuilder();
-				for (String card : menus) {
-					if (map.containsKey(card)) {
-						sb2.append(map.get(card).getValue() + ",");
-					}
+		}
+		if (menus.length > 0) {
+			StringBuilder sb2 = new StringBuilder();
+			for (String card : menus) {
+				if (map.containsKey(card)) {
+					sb2.append(map.get(card).getValue() + ",");
 				}
-				selected.setMenusCH(removeComma(sb2));
-				selected.setMenus(parseMenus(menus));
 			}
-			else{
-				selected.setMenusCH("");
-				selected.setMenus("");
-			}
+			selected.setMenusCH(removeComma(sb2));
+			selected.setMenus(parseMenus(menus));
+		}
+		else{
+			selected.setMenusCH("");
+			selected.setMenus("");
 		}
 		if (cards.length > 0) {
 			StringBuilder sb2 = new StringBuilder();
