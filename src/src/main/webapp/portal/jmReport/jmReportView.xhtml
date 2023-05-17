@@ -8,19 +8,17 @@
         <ui:define name="content">
             <script>
                 function goBack() {
-                    window.location.href = '../jmReport/jmReport.xhtml' ;
+                    window.location.href = '../jmReport/jmReportList.xhtml' ;
                 }
             </script>
             <div class="ui-g">
                 <div class="ui-g-12 card cardTitle">
-                    <div class="ui-g-12 card cardTitle">
-                        <p:outputLabel class="pageTitle" value="报表预览"/>
-                    </div>
-                    <p:panelGrid columns="1" layout="grid">
-                        <iframe src="#{jmReportController.view(1)}" style="width: 1650px;height: 800px"> </iframe>
-                    </p:panelGrid>
-                    <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back"  immediate="true" onclick="javascript:goBack();"/>
+                    <p:outputLabel class="pageTitle" value="报表预览"/>
                 </div>
+                <p:panelGrid columns="1" layout="grid">
+                    <iframe src="#{jmReportController.view(1)}" style="width: 1650px;height: 800px"> </iframe>
+                </p:panelGrid>
+                <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back"  immediate="true" onclick="javascript:goBack();"/>
             </div>
         </ui:define>
     </ui:composition>
