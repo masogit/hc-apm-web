@@ -101,12 +101,12 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <p:inputText id="searchText" value="#{assetInfoListController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}/#{msg.assetTags}" maxlength="100" style="width: 500px">
-                            <p:ajax event="keyup" update=":AssetInfoListForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''} searchButtons " />
+                            <p:ajax event="keyup" update=":AssetInfoListForm #{assetInfoListController.isShowColumn('warrantyDate')?'':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''} searchButtons " />
                         </p:inputText>
 
                         <h:panelGroup id='searchButtons'>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}"  rendered="#{empty assetInfoListController.oneSearchStr}"/>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" actionListener="#{assetInfoListController.setOneSearchStr('')}" rendered="#{not empty assetInfoListController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?'':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}"  rendered="#{empty assetInfoListController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?'':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" actionListener="#{assetInfoListController.setOneSearchStr('')}" rendered="#{not empty assetInfoListController.oneSearchStr}"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
@@ -178,8 +178,8 @@
                                 <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                 <p:autoComplete dropdown="true" value="#{assetInfoListController.filterClinicalDeptOrg}" appendTo="@(Body)"
                                                 scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
-                                    <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" oncomplete="afterLoadRender()" />
-                                    <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>
+                                    <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  " oncomplete="afterLoadRender()" />
+                                    <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  "  oncomplete="afterLoadRender()"/>
                                 </p:autoComplete>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
