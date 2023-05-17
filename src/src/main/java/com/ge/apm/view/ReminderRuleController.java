@@ -123,8 +123,8 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
     private boolean verifyEmpty(String actionName) {
         boolean flag = true;
-        if ("setting".equals(actionName)) {
-            RuleParam ruleParam = selected.getRuleParam();
+        RuleParam ruleParam = selected.getRuleParam();
+        if ("setting".equals(actionName) && ruleParam.getPushType().equals(2)) {
             Integer pushCycle = ruleParam.getPushCycle();
             Integer pushNum = ruleParam.getPushNum();
             if (pushCycle == null || pushCycle < 1) {
