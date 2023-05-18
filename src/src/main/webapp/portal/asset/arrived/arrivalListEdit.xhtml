@@ -527,7 +527,8 @@
                                             <p:fileUpload disabled="#{userContextService.activeSupplier()}" id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="accessoryList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
-                                        <c:forEach items="#{assetArrivedListEditController.getAttachmentCategories()}" var="attachmentConfig">
+                                        <c:if test="#{assetArrivedListEditController.selected.status eq 2}">
+                                          <c:forEach items="#{assetArrivedListEditController.getAttachmentCategories()}" var="attachmentConfig">
                                             <h:panelGroup >
                                                 <p:dataList id="#{attachmentConfig.boType.concat('List')}"
                                                     value="#{assetArrivedListEditController.getAttachList(attachmentConfig.boType)}"
@@ -556,135 +557,108 @@
                                                               multiple="true"  sizeLimit="100000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                             </h:panelGroup>
                                         </c:forEach>
+                                        </c:if>
                                     </p:panelGrid>
                                 </p:fieldset>
                                 <h:panelGroup>
                                     <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveEasyItem()}"  update=":growl"/>
                                 </h:panelGroup>
                             </p:fieldset>
-
-                            <p:fieldset legend="#{fieldMsg.fieldValue('attachmentType', 4)}" rendered="#{assetArrivedListEditController.selected.status eq 3}">
-                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <h:panelGroup>
-                                        <p:dataList id="pictureList1"
-                                                    value="#{assetArrivedListEditController.getAttachList('asset')}"
-                                                    var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
-                                                    paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
-                                            <p:ajax event="page" oncomplete="loadPreImg()"/>
-                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                            <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                    <img id="#{fileitem.objectStorageId}" class="compressObjectId"
-                                                         src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
-                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
-                                                </h:panelGroup>
-                                                <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
-                                                    <img id="#{fileitem.objectStorageId}" class="objectStorageId"
-                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
-                                                </h:panelGroup>
-                                            </h:panelGroup>
-                                            <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList1" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
-                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                            </p:commandButton>
-                                        </p:dataList>
-                                        <p:fileUpload id="jiuyuantypeasset"    rendered="#{assetArrivedListEditController.activeSupplier()}"  allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
-                                                      multiple="true"  sizeLimit="100000000"  update="pictureList1" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup >
-                                        <p:dataList id="contractList1" value="#{assetArrivedListEditController.getAttachList('asset2')}"
-                                                    var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
-                                                    paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
-                                            <p:ajax event="page" oncomplete="loadPreImg()"/>
-                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                            <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                    <img id="#{fileitem.objectStorageId}" class="compressObjectId"
-                                                         src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
-                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
-                                                </h:panelGroup>
-                                                <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
-                                                    <img id="#{fileitem.objectStorageId}" class="objectStorageId"
-                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
-                                                </h:panelGroup>
-                                            </h:panelGroup>
-                                            <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="contractList1" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
-                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                            </p:commandButton>
-                                        </p:dataList>
-                                        <p:fileUpload id="jiuyuantypeasset2"  rendered="#{assetArrivedListEditController.activeSupplier()}"  allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
-                                                      multiple="true"  sizeLimit="100000000"  update="contractList1" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup >
-                                        <p:dataList id="manualList1" value="#{assetArrivedListEditController.getAttachList('asset3')}"
-                                                    var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
-                                                    paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
-                                            <p:ajax event="page" oncomplete="loadPreImg()"/>
-                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
-                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                            <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
-                                                <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                    <img id="#{fileitem.objectStorageId}" class="compressObjectId"
-                                                         src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
-                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
-                                                </h:panelGroup>
-                                                <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
-                                                    <img id="#{fileitem.objectStorageId}" class="objectStorageId"
-                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
-                                                </h:panelGroup>
-                                            </h:panelGroup>
-                                            <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="manualList1" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
-                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                            </p:commandButton>
-                                        </p:dataList>
-                                        <p:fileUpload id="jiuyuantypeasset3"  rendered="#{assetArrivedListEditController.activeSupplier()}"  allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
-                                                      multiple="true"  sizeLimit="100000000"  update="manualList1" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup >
-                                        <p:dataList id="accessoryList1" value="#{assetArrivedListEditController.getAttachList('asset4')}"
-                                                    var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
-                                                    paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
-                                            <p:ajax event="page" oncomplete="loadPreImg()"/>
-                                            <c:choose>
-                                                <c:when test="#{userContextService.activeSupplier()}">
-                                                    <f:facet name="header">临床验收确认</f:facet>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
-                                                </c:otherwise>
-                                            </c:choose>
-                                            <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                            <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
-                                                <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                    <img id="#{fileitem.objectStorageId}" class="compressObjectId"
-                                                         src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
-                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
-                                                </h:panelGroup>
-                                                <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
-                                                    <img id="#{fileitem.objectStorageId}" class="objectStorageId"
-                                                         src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
-                                                </h:panelGroup>
-                                            </h:panelGroup>
-                                            <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList1" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
-                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                            </p:commandButton>
-                                        </p:dataList>
-                                        <p:fileUpload  id="jiuyuantypeasset4"   rendered="#{assetArrivedListEditController.activeSupplier()}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
-                                                      multiple="true"  sizeLimit="100000000"  update="accessoryList1" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
-                                    </h:panelGroup>
-                                    <c:forEach items="#{assetArrivedListEditController.getAttachmentCategories()}" var="attachmentConfig">
-                                        <h:panelGroup >
-                                            <p:dataList id="#{attachmentConfig.boType.concat('List')}"
-                                                        value="#{assetArrivedListEditController.getAttachList(attachmentConfig.boType)}"
+                            <c:if test="#{assetArrivedListEditController.selected.status eq 3}">
+                                <p:fieldset legend="#{fieldMsg.fieldValue('attachmentType', 4)}"   rendered="#{assetArrivedListEditController.selected.status eq 3}">
+                                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                        <h:panelGroup>
+                                            <p:dataList id="pictureList1"
+                                                        value="#{assetArrivedListEditController.getAttachList('asset')}"
                                                         var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
                                                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
-                                                <f:facet name="header">#{attachmentConfig.label}</f:facet>
+                                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                    <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                                        <img id="#{fileitem.objectStorageId}" class="objectStorageId"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                    </h:panelGroup>
+                                                </h:panelGroup>
+                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList1" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                                </p:commandButton>
+                                            </p:dataList>
+                                            <p:fileUpload id="jiuyuantypeasset"    rendered="#{assetArrivedListEditController.activeSupplier()}"  allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                                          multiple="true"  sizeLimit="100000000"  update="pictureList1" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup >
+                                            <p:dataList id="contractList1" value="#{assetArrivedListEditController.getAttachList('asset2')}"
+                                                        var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                                        paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
+                                                <p:ajax event="page" oncomplete="loadPreImg()"/>
+                                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                    <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                                        <img id="#{fileitem.objectStorageId}" class="objectStorageId"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                    </h:panelGroup>
+                                                </h:panelGroup>
+                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="contractList1" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                                </p:commandButton>
+                                            </p:dataList>
+                                            <p:fileUpload id="jiuyuantypeasset2"  rendered="#{assetArrivedListEditController.activeSupplier()}"  allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                                          multiple="true"  sizeLimit="100000000"  update="contractList1" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup >
+                                            <p:dataList id="manualList1" value="#{assetArrivedListEditController.getAttachList('asset3')}"
+                                                        var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                                        paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
+                                                <p:ajax event="page" oncomplete="loadPreImg()"/>
+                                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
+                                                <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                    <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                                        <img id="#{fileitem.objectStorageId}" class="objectStorageId"
+                                                             src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                    </h:panelGroup>
+                                                </h:panelGroup>
+                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="manualList1" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                                </p:commandButton>
+                                            </p:dataList>
+                                            <p:fileUpload id="jiuyuantypeasset3"  rendered="#{assetArrivedListEditController.activeSupplier()}"  allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                                          multiple="true"  sizeLimit="100000000"  update="manualList1" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup >
+                                            <p:dataList id="accessoryList1" value="#{assetArrivedListEditController.getAttachList('asset4')}"
+                                                        var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                                        paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
+                                                <p:ajax event="page" oncomplete="loadPreImg()"/>
+                                                <c:choose>
+                                                    <c:when test="#{userContextService.activeSupplier()}">
+                                                        <f:facet name="header">临床验收确认</f:facet>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
+                                                    </c:otherwise>
+                                                </c:choose>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
@@ -698,17 +672,47 @@
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
                                                 </h:panelGroup>
-                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList1" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="#{'type'.concat(attachmentConfig.boType)}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
-                                                          multiple="true"  sizeLimit="100000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                            <p:fileUpload  id="jiuyuantypeasset4"   rendered="#{assetArrivedListEditController.activeSupplier()}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                                           multiple="true"  sizeLimit="100000000"  update="accessoryList1" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
-                                    </c:forEach>
-                                </p:panelGrid>
+                                        <c:forEach items="#{assetArrivedListEditController.getAttachmentCategories()}" var="attachmentConfig">
+                                            <h:panelGroup >
+                                                <p:dataList id="#{attachmentConfig.boType.concat('List')}"
+                                                            value="#{assetArrivedListEditController.getAttachList(attachmentConfig.boType)}"
+                                                            var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}"
+                                                            paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false" rows="5">
+                                                    <p:ajax event="page" oncomplete="loadPreImg()"/>
+                                                    <f:facet name="header">#{attachmentConfig.label}</f:facet>
+                                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
+                                                        <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
+                                                            <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                                 src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
+                                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                        </h:panelGroup>
+                                                        <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                                            <img id="#{fileitem.objectStorageId}" class="objectStorageId"
+                                                                 src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                        </h:panelGroup>
+                                                    </h:panelGroup>
+                                                    <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                                    </p:commandButton>
+                                                </p:dataList>
+                                                <p:fileUpload id="#{'type'.concat(attachmentConfig.boType)}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                                              multiple="true"  sizeLimit="100000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                            </h:panelGroup>
+                                        </c:forEach>
+                                    </p:panelGrid>
 
-                            </p:fieldset>
+                                </p:fieldset>
+
+                            </c:if>
 
                             <p:dataTable id="itemList" rendered="#{not empty assetArrivedListEditController.arrivalItemList}" selection="#{assetArrivedItemsController.selected}"
                                          selectionMode="single" rowKey="#{item.id}" sortBy="#{item.itemNum}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
