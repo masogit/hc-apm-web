@@ -91,9 +91,7 @@ public class SparePartStockRecordService {
 
             map.put("totalPrice", null == bigDecimal ? "" : bigDecimal.toString());
 
-            if(null != bigDecimal){
-                totalPrice = totalPrice.add(bigDecimal);
-            }
+            totalPrice = totalPrice.add(bigDecimal);
 
             tableData.add(map);
             index++;
@@ -106,11 +104,11 @@ public class SparePartStockRecordService {
     }
 
     private BigDecimal calcTotalPrice(Double unitPrice, Integer quantity){
-        if(null != unitPrice && 0 != unitPrice && null != quantity && 0 != quantity){
+        if(null != unitPrice && 0 != unitPrice && null != quantity && 0 != quantity) {
             BigDecimal total = new BigDecimal(unitPrice * quantity);
             return total.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
-        return null;
+        return new BigDecimal(0);
     }
     
     public class RenderResult {

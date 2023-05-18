@@ -341,7 +341,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			selected.setWebAuthoritiesCH(service.parseAuthArray(authJSONArr));
 			selected.setWebAuthorities(authJSONArr.toString());
 		}
-		if (menus.length > 0) {
+		if (menus.length > 0 && !isOpenNewMenuRoles()) {
 			StringBuilder sb2 = new StringBuilder();
 			for (String card : menus) {
 				if (map.containsKey(card)) {
