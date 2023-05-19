@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="JmAssignTenantEditDlg" widgetVar="JmAssignTenantEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="租户设置">
+            <h:form id="AssignTenantEditForm">
+                <h:panelGroup id="display">
+                    <p:tabView class="ui-g-12" id="tabview"  style="height: 362px; overflow: auto;" dynamic="false"   cache="false">
+                        <p:tab title="租户设置" class="ui-g-12" >
+                            <p:panelGrid columns="2">
+                                <p:outputLabel value="报表名称"/>
+                                <p:outputLabel value="#{jmReportController.selected.name}"/>
+                                <p:outputLabel value="报表描述"/>
+                                <p:outputLabel value="#{jmReportController.selected.description}"/>
+
+                                <p:outputLabel value="设置可见租户" for="tenantNames" />
+                                <p:selectManyCheckbox id="tenantNames" value="#{jmReportController.assignedTenants}" layout="pageDirection" valueChangeListener="#{jmReportController.assignTenant}">
+                                    <p:ajax update="@this"/>
+                                    <f:selectItems value="#{tenantInfoController.itemList}" var="tenantItem" itemLabel="#{tenantItem.name}" itemValue="#{tenantItem.uid}" />
+                                </p:selectManyCheckbox>
+                            </p:panelGrid>
+                        </p:tab>
+                    </p:tabView>
+                    <br/>
+                    <p:commandButton validateClient="true" action="#{jmReportController.saveAssignTenant()}" value="#{msg.Save}" update="display,:JmAssignTenantEditDlg, :jmReportForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'JmAssignTenantEditDialog');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" onclick="PF('JmAssignTenantEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:composition>
+</html>

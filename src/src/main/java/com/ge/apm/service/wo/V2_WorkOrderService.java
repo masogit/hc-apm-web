@@ -105,8 +105,13 @@ public class V2_WorkOrderService {
     public List<V2_WorkOrder_Step> getWorkOrderDetailResponsor(String woId, Integer step){
        return  stepDao.findResponsor(woId,step);
     }
+
     public List<V2_WorkOrder_Step> getWorkOrderRepaireName(String woId, Integer step){
         return  stepDao.findRepaireName(woId,step);
+    }
+
+    public List<V2_WorkOrder_Step> getMaxStartTimeWorkOrderStepByWoIdAndStepId(String woId, Integer step) {
+        return stepDao.findMaxStartTimeWorkOrderStepByWoIdAndStepId(woId, step);
     }
 
     public List<V2_WorkOrder_Step> getWorkIds(String owerName){
@@ -119,6 +124,10 @@ public class V2_WorkOrderService {
 
     public List<V2_WorkOrder_Step> findWorkSteps(String owerName){
         return  stepDao.findWorkSteps(owerName);
+    }
+
+    public List<V2_WorkOrder_Step> getWorkStepsByStepId(Integer stepId, String tenantUid){
+        return  stepDao.findWorkStepsByStepIdAndTenantUid(stepId, tenantUid);
     }
 
     public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName){
@@ -248,6 +257,7 @@ public class V2_WorkOrderService {
         formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setDesc(reason);
         formData.setAssetStatus(String.valueOf(status));
+        formData.setRepairType(tmpwo.getRepairType());
         String res = srApi.invokeWorkOrderAction(token, formData, "ackFailed", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("Acknowledge")));
@@ -306,6 +316,30 @@ public class V2_WorkOrderService {
         }
         selectedWorkOrder.setCurrentStepId(4);
     }
+    public void confirmSend(V2_WorkOrder selectedWorkOrder) {
+        //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+        //   selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String res = srApi.invokeWorkOrderAction(token, formData, "confirmSend", selectedWorkOrder.getId());
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "送修"));
+        }
+        selectedWorkOrder.setCurrentStepId(4);
+    }
+    public void confirmReturn(V2_WorkOrder selectedWorkOrder) {
+        //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+        //   selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String res = srApi.invokeWorkOrderAction(token, formData, "confirmReturn", selectedWorkOrder.getId());
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "返还"));
+        }
+        selectedWorkOrder.setCurrentStepId(4);
+    }
 
     public void takeWorkOrder(V2_WorkOrder selectedWorkOrder, Date takeTime, String taker) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
@@ -347,6 +381,8 @@ public class V2_WorkOrderService {
         formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
         formData.setSignature(selectedWorkOrder.getPartApproveSignature());
+        // 标记用于微服务端避免重复生成备件申领申购单
+        formData.setGeneratePartsRequest(false);
 
         String approvalType = "approvalReject";
         if (approvedDetails.stream().anyMatch(item -> item.getApproved())) {
@@ -434,7 +470,7 @@ public class V2_WorkOrderService {
         selectedWorkOrder.setCurrentStepName("维修中");
         formData.setDesc(comments);
         formData.setRepairResult(selectedWorkOrder.getRepairResult());
-
+        formData.setRepairType(selectedWorkOrder.getRepairType());
         if(selectedWorkOrder.getStatusCloseTime()!=null) {
             formData.setStatusCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(selectedWorkOrder.getStatusCloseTime()));
         }

@@ -8,7 +8,6 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <ui:composition>
 
-    <!--<ui:define name="content">-->
     <div class="ui-g clearfix">
         <div class="ui-g-12 card cardTitle">
             <p:outputLabel class="pageTitle" value="#{msg.LabelDeviceMessageSubscription}"/>
@@ -38,11 +37,11 @@
                     <p:column headerText="#{msg.overtimenotification}" ><h:outputText value="#{item.isReceiveTimeoutMsg?msg.Push:msg.NotPush}" style="color:#{item.isReceiveTimeoutMsg?'blue':'red'} "/></p:column>
 
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tagSubscriberController.prepareCreate}" update="scriTab:AssetTagSubscribEditDlg scriTab:AssetTagSubscribEditForm" oncomplete="PF('AssetTagSubscribEditDialog').show()"/>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_MESSAGE_EDIT')}" title="#{msg.Create}" actionListener="#{tagSubscriberController.prepareCreate}" update="scriTab:AssetTagSubscribEditDlg scriTab:AssetTagSubscribEditForm" oncomplete="PF('AssetTagSubscribEditDialog').show()"/>
 
-                        <p:commandButton id="editButton" class ="editCls" actionListener="#{tagSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update="scriTab:AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()" disabled="#{empty tagSubscriberController.selected or tagSubscriberController.selected.getReceiveMsgMode()==3}"/>
+                        <p:commandButton id="editButton" class ="editCls" actionListener="#{tagSubscriberController.prepareEdit}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_MESSAGE_EDIT')}" icon="ui-icon-pencil" title="#{msg.Edit}"  update="scriTab:AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()" disabled="#{empty tagSubscriberController.selected or tagSubscriberController.selected.getReceiveMsgMode()==3}"/>
 
-                        <p:commandButton id="deleteButton" class="delCls" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{tagSubscriberController.delete}" update="scriTab:TagSubscriberForm:dataList" disabled="#{empty tagSubscriberController.selected}">
+                        <p:commandButton id="deleteButton" class="delCls" process="@this" icon="ui-icon-close" title="#{msg.Delete}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_MESSAGE_DELETE')}" actionListener="#{tagSubscriberController.delete}" update="scriTab:TagSubscriberForm:dataList" disabled="#{empty tagSubscriberController.selected}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>
                     </f:facet>
@@ -51,7 +50,6 @@
             <ui:include src="EditSub.xhtml"/>
         </div>
     </div>
-    <!-- </ui:define>-->
 
 </ui:composition>
 </html>

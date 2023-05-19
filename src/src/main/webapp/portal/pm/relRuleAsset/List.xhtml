@@ -79,9 +79,10 @@
                         <f:facet name="header">
                             <h:outputText value="#{msg.Level1RulePM}"/><br/>
                             <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterRuleUIDInspectionName}" appendTo="@(Body)"
-                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName(1)}" size="3">
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName}" size="3">
                                 <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
                                 <p:ajax process="@this" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                                <f:attribute name="level" value="1" />
                             </p:autoComplete>
                         </f:facet>
                         <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUIDInspection)}"/>
@@ -90,9 +91,10 @@
                         <f:facet name="header">
                             <h:outputText value="#{msg.Level2RulePM}"/><br/>
                             <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterRuleUID2Name}" appendTo="@(Body)"
-                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName(2)}" size="3">
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName}" size="3">
                                 <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
                                 <p:ajax process="@this" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                                <f:attribute name="level" value="2" />
                             </p:autoComplete>
                         </f:facet>
                         <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID2)}"/>
@@ -101,9 +103,10 @@
                         <f:facet name="header">
                             <h:outputText value="#{msg.Level3RulePM}"/><br/>
                             <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterRuleUIDName}" appendTo="@(Body)"
-                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName(3)}" size="3">
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName}" size="3">
                                 <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
                                 <p:ajax process="@this" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                                <f:attribute name="level" value="3" />
                             </p:autoComplete>
                         </f:facet>
                         <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID)}"/>
@@ -112,9 +115,10 @@
                         <f:facet name="header">
                             <h:outputText value="#{msg.Level4RulePM}"/><br/>
                             <p:autoComplete dropdown="true" value="#{relRuleAssetManagerController.filterRuleUID4Name}" appendTo="@(Body)"
-                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName(4)}" size="3">
+                                            scrollHeight="300"  forceSelection="true" completeMethod="#{relRuleAssetManagerController.autoLevelRulePMName}" size="3">
                                 <p:ajax event="itemSelect" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" process="@this"  update=":RelRuleAssetListForm:datalist "   />
                                 <p:ajax process="@this" listener="#{relRuleAssetManagerController.onLevelRulePMNameFilterChange}" update=":RelRuleAssetListForm:datalist"   />
+                                <f:attribute name="level" value="4" />
                             </p:autoComplete>
                         </f:facet>
                         <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID4)}"/>
@@ -167,24 +171,22 @@
                      	<h:outputText value="#{relRuleAssetManagerController.getQrCode(item.assetUID)}"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings" class="btn btn-sm btn-gray"  title="#{msg.SetRulesInBatch}"/>
-                    	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-collections" class="btn btn-sm btn-gray"  title="#{msg.GenerateMaintenanceWorkordersInBatch}"/>
-<!--                        <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                            <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
-                        </p:commandButton>-->
-                        <p:commandButton title="已配置规则设备导出" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.exportRelRuleAssets}" update=":growl"
+                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings" class="btn btn-sm btn-gray"  title="#{msg.SetRulesInBatch}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_SETTING')}"/>
+                    	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-collections" class="btn btn-sm btn-gray"  title="#{msg.GenerateMaintenanceWorkordersInBatch}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_CREATE')}"/>
+
+                        <p:commandButton title="已配置规则设备导出" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.exportRelRuleAssets}" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_VIEW')}"
                                          onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
                             <p:fileDownload value="#{relRuleAssetManagerController.excelFile}" />
                         </p:commandButton>
-                        <p:commandButton title="全量导出" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.exportAllAssets}" update=":growl"
+                        <p:commandButton title="全量导出" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.exportAllAssets}" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_VIEW')}"
                                          onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
                             <p:fileDownload value="#{relRuleAssetManagerController.excelFile}" />
                         </p:commandButton>
 
-                        <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}"
+                        <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_SETTING')}"
                                          update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
                         <ui:fragment >
-                            <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}"
+                            <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_DELETE')}"
                                              actionListener="#{relRuleAssetManagerController.batchDelete}" update=":RelRuleAssetListForm" disabled="#{not relRuleAssetManagerController.isChecked()}">
                                 <p:confirm header="#{msg.BatchDeleRuleConfig}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
                             </p:commandButton>

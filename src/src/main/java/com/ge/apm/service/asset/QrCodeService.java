@@ -331,6 +331,19 @@ public class QrCodeService {
                     case "locationName":
                         itemObject.put("TextShowValue", textValue.concat(asset.getLocationName() == null ? "" : asset.getLocationName()));
                         break;
+                    case "riskGrade":
+                        if(asset.getRiskGrade() == null){
+                            itemObject.put("TextShowValue", textValue);
+                        }else{
+                            if(configService.useNewRiskGrade()){
+                                itemObject.put("TextShowValue",
+                                        textValue.concat(FieldValueMessageController.fieldValue("riskGradeNew", asset.getRiskGrade().toString())));
+                            }else {
+                                itemObject.put("TextShowValue",
+                                        textValue.concat(FieldValueMessageController.fieldValue("riskGrade", asset.getRiskGrade().toString())));
+                            }
+                        }
+                        break;
                 }
             }
         });
@@ -629,6 +642,31 @@ public class QrCodeService {
         //TODO v2_blobObject
         qrCodeLibDao.delete(qrCodeLib);
         return true;
+    }
+
+    public List<AssetInfo> deleteQrcodeAndAsset(String qrCode, String siteUid) {
+        List<AssetInfo> invalidAsset = new ArrayList<>();
+        List<AssetInfo> validAsset = new ArrayList<>();
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
+        if (null == qrCodeLib) {
+            return new ArrayList<>();
+        }
+        List<AssetInfo> assetList = assetDao.findByQrCodeAndSiteUID(qrCode, siteUid);
+        if (null != assetList && !assetList.isEmpty()) {
+            assetList.forEach(val -> {
+                if (val.getStatus() == 4 && !val.getIsValid()) {
+                    invalidAsset.add(val);
+                } else {
+                    validAsset.add(val);
+                }
+            });
+            if (assetList.size() != invalidAsset.size()) {
+               return validAsset;
+            }
+            assetDao.delete(invalidAsset);
+        }
+        qrCodeLibDao.delete(qrCodeLib);
+        return new ArrayList<>();
     }
 
     public boolean isQrcodeAvailableInStatus(String qrCode, String siteUid, int status) {

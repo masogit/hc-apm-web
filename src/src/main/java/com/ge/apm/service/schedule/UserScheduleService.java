@@ -524,7 +524,7 @@ public class UserScheduleService {
     }
 
     //scheduleDateStage[ALL:返回用户该时间所有记录，AM:用户该时间AM和ALL的数据记录，返回PM:用户该时间PM和ALL的数据记录],得到用户请假记录
-    private List<UserSchedule> getUserVacationList(Date scheduleDate, String userUID, String scheduleDateStage, String auditStatus){
+    public List<UserSchedule> getUserVacationList(Date scheduleDate, String userUID, String scheduleDateStage, String auditStatus){
         List<UserSchedule> tempUserScheduleList;
         if(auditStatus != null) {
             tempUserScheduleList = userScheduleDao.findByTypeAndUserUIDAndScheduleDateAndAuditStatus(UserSchedule.Type.V.name(), userUID, scheduleDate, auditStatus);

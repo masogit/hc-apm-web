@@ -2,6 +2,9 @@ package com.ge.apm.job;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateTime;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import javaslang.Tuple2;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -68,7 +71,7 @@ public class NurseSiteMaintainJob {
     @Autowired
     NurseSiteMaintainCheckItemRepository nurseSiteMaintainCheckItemRepository;
 
-    @Scheduled(cron = "5/20 * * * * *")
+//    @Scheduled(cron = "5/20 * * * * *")
     public void execute() {
         try {
             checkJob();
@@ -123,7 +126,7 @@ public class NurseSiteMaintainJob {
             } else if ("delete".equals(action)) {
                 doJobDelete(params);
             } else if ("dailyUpdate".equals(action)) {
-                doJobDailyUpdate(content);
+                doJobDailyUpdate();
             } else if ("deleteCheckConfig".equals(action)) {
                 doJobDeleteConfig(params);
             }
@@ -139,82 +142,26 @@ public class NurseSiteMaintainJob {
         LOGGER.info("NurseSiteMaintainJob end check ...");
     }
 
-    public void doJobDailyUpdate(String content) {
-        //2,3,5
-        //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用,6:报警
-        Date startDate = null;
-        Date nextDate = null;
-        Date weekFirst = null;
-        Date nextWeekFirst = null;
-        Date monthFirst = null;
-        Date nextMonthFirst = null;
-        Calendar cd = Calendar.getInstance();
-        Date currentDate = cd.getTime();
-        List<Integer> listStatus = new ArrayList<Integer>();
-        listStatus.add(2);
-        listStatus.add(3);
-        listStatus.add(4);
-        listStatus.add(5);
-        if (StringUtils.isEmpty(content)) {
-            startDate = cd.getTime();
-        } else {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-            try {
-                startDate = sdf.parse(content);
-                cd.setTime(startDate);
-            } catch (ParseException e) {
-                // TODO Auto-generated catch block
-                startDate = cd.getTime();
-            }
-        }
-        cd.set(Calendar.HOUR, 0);
-        cd.set(Calendar.MINUTE, 0);
-        cd.set(Calendar.SECOND, 0);
-        startDate = cd.getTime();
-        cd.add(Calendar.DAY_OF_YEAR, 1);
-        nextDate = cd.getTime();
-        cd.setTime(startDate);
-        cd.set(Calendar.DAY_OF_WEEK, 1);
-        weekFirst = cd.getTime();
-        cd.add(Calendar.WEEK_OF_YEAR, 1);
-        nextWeekFirst = cd.getTime();
-        cd.setTime(startDate);
-        cd.set(Calendar.DAY_OF_MONTH, 1);
-        monthFirst = cd.getTime();
-        cd.add(Calendar.MONTH, 1);
-        nextMonthFirst = cd.getTime();
+    public void doJobDailyUpdate() {
+        Date currentDate = DateUtil.now();
+        DateTime startTime = DateUtil.beginOfDay(currentDate);
+        DateTime endTime = DateUtil.offsetDay(startTime, 1);
+        Date startDate = new Date(startTime.getTime());
+        Date endDate = new Date(endTime.getTime());
 
-        //day
         //0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
-        nurseSiteMaintainDataRepository.updateDailyByStatus(startDate, nextDate, listStatus, 1);
-        nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, nextDate, 2, 1, "停机");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, nextDate, 3, 1, "限制功能使用");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, nextDate, 4, 1, "待报废");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, nextDate, 5, 1, "停用");
-        nurseSiteMaintainItemRepository.updateDailyByValid(startDate, nextDate, false, 1, "报废");
-        nurseSiteMaintainItemRepository.updateDailyByDelete(startDate, nextDate, true, 1, "已删除");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, nextDate, listStatus, 1, currentDate, 8,true);
-        nurseSiteMaintainRepository.updateDailyByStatus(startDate, nextDate, listStatus, 1, currentDate, 8, 8);
-        //week
-        nurseSiteMaintainDataRepository.updateDailyByStatus(weekFirst, nextWeekFirst, listStatus, 2);
-        nurseSiteMaintainItemRepository.updateDailyByStatus(weekFirst, nextWeekFirst, 2, 2, "停机");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(weekFirst, nextWeekFirst, 3, 2, "限制功能使用");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(weekFirst, nextWeekFirst, 4, 2, "待报废");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(weekFirst, nextWeekFirst, 5, 2, "停用");
-        nurseSiteMaintainItemRepository.updateDailyByValid(weekFirst, nextWeekFirst, false, 2, "报废");
-        nurseSiteMaintainItemRepository.updateDailyByDelete(weekFirst, nextWeekFirst, true, 2, "已删除");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(weekFirst, nextWeekFirst, listStatus, 2, currentDate, 8,true);
-        nurseSiteMaintainRepository.updateDailyByStatus(weekFirst, nextWeekFirst, listStatus, 2, currentDate, 8, 8);
-        //month
-        nurseSiteMaintainDataRepository.updateDailyByStatus(monthFirst, nextMonthFirst, listStatus, 3);
-        nurseSiteMaintainItemRepository.updateDailyByStatus(monthFirst, nextMonthFirst, 2, 3, "停机");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(monthFirst, nextMonthFirst, 3, 3, "限制功能使用");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(monthFirst, nextMonthFirst, 4, 3, "待报废");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(monthFirst, nextMonthFirst, 5, 3, "停用");
-        nurseSiteMaintainItemRepository.updateDailyByValid(monthFirst, nextMonthFirst, false, 3, "报废");
-        nurseSiteMaintainItemRepository.updateDailyByDelete(monthFirst, nextMonthFirst, true, 3, "已删除");
-        nurseSiteMaintainItemRepository.updateDailyByStatus(monthFirst, nextMonthFirst, listStatus, 3, currentDate, 8,true);
-        nurseSiteMaintainRepository.updateDailyByStatus(monthFirst, nextMonthFirst, listStatus, 3, currentDate, 8, 8);
+        List<Integer> listStatus = ListUtil.newArrayList(2, 3, 4, 5);
+        for (int configType = 1; configType <= 3; configType++) {
+            nurseSiteMaintainDataRepository.updateDailyByStatus(startDate, endDate, listStatus, configType);
+            nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, endDate, 2, configType, "停机");
+            nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, endDate, 3, configType, "限制功能使用");
+            nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, endDate, 4, configType, "待报废");
+            nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, endDate, 5, configType, "停用");
+            nurseSiteMaintainItemRepository.updateDailyByValid(startDate, endDate, false, configType, "报废");
+            nurseSiteMaintainItemRepository.updateDailyByDelete(startDate, endDate, true, configType, "已删除");
+            nurseSiteMaintainItemRepository.updateDailyByStatus(startDate, endDate, listStatus, configType, currentDate, 8,true);
+            nurseSiteMaintainRepository.updateDailyByStatus(startDate, endDate, listStatus, configType, currentDate, 8, 8);
+        }
         nurseSiteMaintainRepository.updaIsFinish();
     }
 

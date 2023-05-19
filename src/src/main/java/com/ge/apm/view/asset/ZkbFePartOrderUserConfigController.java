@@ -122,7 +122,6 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
 
     @Override
     public void save() {
-
         UserAccount userAccount = this.userAccountRepository.getByLoginName(this.selected.getLoginName());
         if(userAccount==null)
         {
@@ -131,30 +130,52 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
         }
         if(!userContextService.isZkbAdmin())
         {
-
             if(userAccount.getTenantUID()==null||!userAccount.getTenantUID().equals(this.tenantUID))
             {
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameNotExist"));
                 return;
             }
         }
-        if(StringUtils.isBlank(this.selected.getId()))
-        {
-            List<ZkbFePartOrderUserConfig> list = this.zkbFePartOrderUserConfigRepository.findByLoginName(this.selected.getLoginName());
-            if(CollectionUtils.isNotEmpty(list))
-            {
+        //新增非备件探头走原有逻辑不可以新增多个
+
+        if(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString().equals(this.selected.getConfigType())
+                ||ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString().equals(this.selected.getConfigType())){
+            List<String> configTypes = new ArrayList<String>();
+            configTypes.add(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString());
+            configTypes.add(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString());
+            List<ZkbFePartOrderUserConfig> listF = this.zkbFePartOrderUserConfigRepository.findByLoginNameAndConfigTypeNotIn(this.selected.getLoginName(),configTypes);
+            if(CollectionUtils.isNotEmpty(listF)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
                 return;
             }
-        }else
-            {
+            if(StringUtils.isBlank(this.selected.getId())){
+                List<ZkbFePartOrderUserConfig> list = this.zkbFePartOrderUserConfigRepository.findByLoginNameAndConfigType(this.selected.getLoginName(),this.selected.getConfigType());
+                if(CollectionUtils.isNotEmpty(list)){
+                    WebUtil.addErrorMessage("错误：角色不能重复");
+                    return;
+                }
+            }else{
+                List<ZkbFePartOrderUserConfig> list =this.zkbFePartOrderUserConfigRepository.findByLoginNameAndConfigTypeAndIdNot(this.selected.getLoginName(),this.selected.getConfigType(),this.selected.getId());
+                if(CollectionUtils.isNotEmpty(list)){
+                    WebUtil.addErrorMessage("错误：角色不能重复");
+                    return;
+                }
+            }
+        }else{
+            if(StringUtils.isBlank(this.selected.getId())){
+                List<ZkbFePartOrderUserConfig> list = this.zkbFePartOrderUserConfigRepository.findByLoginName(this.selected.getLoginName());
+                if(CollectionUtils.isNotEmpty(list)){
+                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
+                    return;
+                }
+            }else{
                 List<ZkbFePartOrderUserConfig> list =this.zkbFePartOrderUserConfigRepository.findByLoginNameAndIdNot(this.selected.getLoginName(),this.selected.getId());
-                if(CollectionUtils.isNotEmpty(list))
-                {
+                if(CollectionUtils.isNotEmpty(list)){
                     WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
                     return;
                 }
             }
+        }
         this.selected.setTenantUid(userAccount.getTenantUID());
         super.save();
         this.selected=null;

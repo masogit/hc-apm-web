@@ -92,28 +92,33 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
             searchFilters = new ArrayList<>();
         }
         updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, 0));
+        queryScope(org);
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+    private void queryScope(OrgInfo org){
+        if(org == null) return;
         switch (org.getOrgType()) {
             case 4:
                 // 科室
-                updateSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, account.getOrgInfoId()));
+                updateSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, org.getId()));
+                break;
             case 3:
                 // 院区
-                updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, account.getSiteUID()));
+                updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, org.getSiteUID()));
+                break;
             case 2:
                 // 医院
-                updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, account.getHospitalUID()));
+                updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, org.getHospitalUID()));
+                break;
             case 1:
                 // 集团
-                updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, account.getInstitutionUID()));
-            case 0:
-                // 租户
-            default:
-                updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, account.getTenantUID()));
+                updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, org.getInstitutionUID()));
                 break;
+            default:
+                // 租户
+                updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, org.getTenantUID()));
         }
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
-
     @Override
     public void save() {
         // 保存时设置科室
@@ -171,25 +176,7 @@ public class BudgetAssetInfoController extends GenericCRUDUUIDController<BudgetA
     private void addSearchFilter() {
         if (null != searchForm.getDept()) {
             OrgInfo orgInfo = searchForm.getDept();
-            switch (orgInfo.getOrgType()) {
-                case 4:
-                    // 科室
-                    updateSearchFilter(new SearchFilter("deptId", SearchFilter.Operator.EQ, orgInfo.getId()));
-                case 3:
-                    // 院区
-                    updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getSiteUID()));
-                case 2:
-                    // 医院
-                    updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getHospitalUID()));
-                case 1:
-                    // 集团
-                    updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getInstitutionUID()));
-                case 0:
-                    // 租户
-                default:
-                    updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getTenantUID()));
-                    break;
-            }
+            queryScope(orgInfo);
         }
         if (null != searchForm.getAssetGroup()) {
             updateSearchFilter(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, searchForm.getAssetGroup()));

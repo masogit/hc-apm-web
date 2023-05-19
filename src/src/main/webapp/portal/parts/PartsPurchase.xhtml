@@ -65,7 +65,7 @@
                                      rowsPerPageTemplate="5,20,50,100,500">
                             <p:ajax event="rowSelect"
                                     listener="#{simplePartsRequestListController.onRowSelect}"
-                                    update="editButton sparePartsDetailsForm"/>
+                                    update="editButton sparePartsDetailsForm deleteButton"/>
                             <p:column headerText="申购人">
                                 <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
@@ -112,6 +112,12 @@
                                                  oncomplete="PF('EditPartsPurchaseFormDialog').show()"
                                                  actionListener="#{simplePartsRequestListController.editPartsRequest()}"
                                                  update="SparePartsDetailEditForm SparePartsEditForm"/>
+                                <p:commandButton id="deleteButton" class="btn btn-sm btn-gray" icon="ui-icon-delete"
+                                                 disabled="#{not simplePartsRequestListController.deleteCheck()}"
+                                                 actionListener="#{simplePartsRequestListController.deletePartsRequset()}"
+                                                 update="sparePartsClaimForm sparePartsDetailsForm :growl">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning" />
+                                </p:commandButton>
                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
                                                  class="btn btn-sm btn-gray"
                                                  ajax="false">
@@ -296,7 +302,7 @@
                                     <p:autoComplete id="sparePartName" dropdown="true" inputStyle="width: 160px"
                                                     value="#{simplePartsRequestEditController.newLineItem.partsItem}"
                                                     readonly="false" forceSelection="true" required="true" requiredMessage="备件选择 #{msg.ValidationRequire}"
-                                                    completeMethod="#{simplePartsConfigReadController.getAllPartsItemList()}"
+                                                    completeMethod="#{simplePartsConfigReadController.getAllPartsItemList}"
                                                     var="item" itemLabel="#{item.name}"
                                                     itemValue="#{item}"
                                                     converter="simplePartsItemConverter">

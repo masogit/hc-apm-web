@@ -32,16 +32,7 @@ public class I18nMessageService {
     }
 
     public String getMsgLabelByMsgTypeAndMsgKey(String msgType, String msgKey) {
-        UserAccount userAccount =null;
-        try{
-            userAccount= UserContextService.getCurrentUserAccount();
-        }catch (Exception e){
-            userAccount = UserAccountThreadLocal.getUserAccount();
-            if(userAccount==null){
-                throw e;
-            }
-        }
-
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
 
         I18nMessage foundMsg = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(msgType, msgKey, userAccount.getSiteId());
         if (foundMsg == null) {

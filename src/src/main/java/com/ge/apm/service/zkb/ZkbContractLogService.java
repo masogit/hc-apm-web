@@ -21,7 +21,7 @@ public class ZkbContractLogService {
     ZkbContractLogRepository zkbContractLogRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public void addLog(String contractId,String contractNo, String logType,String courseData,String assetData, String reason, UserAccount currentUser,String catData){
+    public void addLog(String contractId,String contractNo, String logType,String courseData,String assetData, String reason, UserAccount currentUser,String catData,String jsonData){
         ZkbContractLog zkbContractLog = new ZkbContractLog();
         zkbContractLog.setContractId(contractId);
         zkbContractLog.setContractNo(contractNo);
@@ -32,6 +32,7 @@ public class ZkbContractLogService {
         zkbContractLog.setCreatedDate(new Date());
         zkbContractLog.setReason(reason);
         zkbContractLog.setCatData(catData);
+        zkbContractLog.setJsonData(jsonData);
         zkbContractLogRepository.save(zkbContractLog);
     }
 

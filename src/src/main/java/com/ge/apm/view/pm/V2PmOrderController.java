@@ -36,6 +36,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
@@ -100,6 +101,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private FileScanService fileScanService;
     @Setter @Getter
     private Boolean isBatchOp=true;
+//    @Setter @Getter
+//    private Boolean isCreatable=true;
     private SupplierController supplierController;
     @Setter @Getter
     private Supplier newSupplier;
@@ -110,6 +113,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     @Setter @Getter
     private Boolean periodShow;
+    @Setter @Getter
+    private Object  ruleNameObj;
+    @Setter @Getter
+    private Object  periodObj;
     private TableDefinitionService tableService;
 
     private List<String> pmFieldsExport= new ArrayList<>();
@@ -170,6 +177,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private V2_PmOrderService pmOrderService;
     private V2_PmOrder selectedPmOrder;
     private String assetName;
+    private String assetUid;
     private Integer ruleLevel;
     private Date startTime;
     private Date endTime;
@@ -224,6 +232,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Boolean isSelectedCurrentPage = false;
     private List<V2_PmOrder> currentPagePmOrders;
     private Integer pmType;
+    private String pmRuleUid;
     private I18nMessageRepository i18nMessageRepository;
     private String head;
     // cache for maintenance report
@@ -365,7 +374,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                }*//*
            }*/
 
-           String path = new DateTime().toString("yyyyMMddhhmm")+ File.separator+user.getLoginName();
+           String path = new DateTime().toString("yyyyMMddHHmm")+ File.separator+user.getLoginName();
            String filePath = fileScanService.getUploadFileFullPath(path);
            File dest = new File(filePath + File.separator+"pm.xlsx");
           FileUtils.forceMkdir(new File(filePath));
@@ -493,125 +502,63 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     @Override
     public void onFilter(FilterEvent event){
-        Map<String, Object> filters = event.getFilters();
-        Object ruleNameObj = filters.get("ruleName");
-        Object periodObj = filters.get("period");
-        filters.keySet().removeIf(key->(key.equals("ruleName")||key.equals("period")));
-        removeFilterOnFields();
-        List<V2_PmOrder> pmOrders = dao.findBySearchFilter(filterArrayList);
         super.onFilter(event);
-        if((ruleNameObj != null || periodObj != null) && CollectionUtils.isNotEmpty(pmOrders)) {
-            filterRuleNameOrPeriod(ruleNameObj, periodObj,pmOrders);
-        }
+        Map<String, Object> filters = event.getFilters();
+         ruleNameObj = filters.get("ruleName");
+         periodObj = filters.get("period");
+        removeFilterOnField("ruleName");
+        removeFilterOnField("period");
+
     }
 
-    private void removeFilterOnFields() {
-        removeFilterOnField("id");
-        removeFilterOnField("assetInfo.name");
-        removeFilterOnField("assetInfo.serialNum");
-        removeFilterOnField("assetInfo.departNum");
-        removeFilterOnField("assetInfo.functionType");
-        removeFilterOnField("ruleLevel");
-        removeFilterOnField("pmType");
-        removeFilterOnField("creatorName");
-        removeFilterOnField("ownerName");
-        removeFilterOnField("pmNum");
-        removeFilterOnField("currentStepName");
-        removeFilterOnField("planTime");
-        removeFilterOnField("endTime");
+    public void updatePMRuleFilterChange(){
+       if(ruleNameObj != null || periodObj != null) {
+           Set<String> pmRuleUids = getPMRuleUids(ruleNameObj, periodObj);
+           if (CollectionUtils.isNotEmpty(pmRuleUids)) {
+               filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN, pmRuleUids));
+           }
+       }
     }
 
-    private void filterRuleNameOrPeriod(Object ruleNameObj, Object periodObj,List<V2_PmOrder> pmOrders) {
-        Map<String, V2_PmOrder> pmOrderMap = pmOrders.stream().collect(Collectors.toMap(V2_PmOrder::getId, Function.identity(), (o1, o2) -> o2));
-        Set<String> assetUids = pmOrderMap.values().stream().map(V2_PmOrder::getAssetUid).collect(Collectors.toSet());
-
-        List<SearchFilter> relRuleAssetFilter = new ArrayList<>();
-        String tenantUid = userContextService.getTenantInfo().getUid();
-
-        relRuleAssetFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUid));
-        relRuleAssetFilter.add(new SearchFilter("assetUID", SearchFilter.Operator.IN,assetUids));
-        List<RelRuleAsset> relRuleAssets = relRuleAssetRepository.findBySearchFilter(relRuleAssetFilter);
-//        Map<String, RelRuleAsset> relRuleAssetMap = relRuleAssets.stream().collect(Collectors.toMap(RelRuleAsset::getAssetUID, Function.identity(), (o1, o2) -> o2));
-
-        Map<String,Map<Integer,String>> assetUidLevelPmRuleUidMap = new HashedMap<>();
-        Set<String> pmRuleuids = new HashSet<>();
-        relRuleAssets.stream().forEach(e ->{
-            Map<Integer,String> levelPmRuleUidMap = new HashedMap<>();
-            if(StringUtils.isNotEmpty(e.getRuleUID())){
-                pmRuleuids.add(e.getRuleUID());
-                levelPmRuleUidMap.put(3,e.getRuleUID());
-            }
-            if(StringUtils.isNotEmpty(e.getRuleUID1())){
-                pmRuleuids.add(e.getRuleUID1());
-                levelPmRuleUidMap.put(1,e.getRuleUID1());
-            }
-            if(StringUtils.isNotEmpty(e.getRuleUID2())){
-                pmRuleuids.add(e.getRuleUID2());
-                levelPmRuleUidMap.put(2,e.getRuleUID2());
-            }
-            if(StringUtils.isNotEmpty(e.getRuleUID4())){
-                pmRuleuids.add(e.getRuleUID4());
-                levelPmRuleUidMap.put(4,e.getRuleUID4());
-            }
-            assetUidLevelPmRuleUidMap.put(e.getAssetUID(),levelPmRuleUidMap);
-        });
-
-        List<SearchFilter> pmRuleFilter = new ArrayList<>();
-        relRuleAssetFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenantUid));
-        relRuleAssetFilter.add(new SearchFilter("uid", SearchFilter.Operator.IN,pmRuleuids));
-        List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findBySearchFilter(pmRuleFilter);
-        if(ruleNameObj != null){
-            pmOrderRules = pmOrderRules.stream().filter(e -> {
-                if(e.getName() != null){
-                   return e.getName().contains(String.valueOf(ruleNameObj));
-                    }
-                    return false;
-                }
-                ).collect(Collectors.toList());
+    private Set<String> getPMRuleUids(Object ruleNameObj,Object periodObj){
+       String ruleName = "";
+       Integer period = null;
+       if(ruleNameObj != null){
+            ruleName = String.valueOf(ruleNameObj);
         }
         if(periodObj != null){
-            AtomicInteger period = new AtomicInteger(-1);
-            try{
-                period.set( Integer.parseInt(String.valueOf(periodObj)));
-            }catch (Exception e1){
-                pmOrderRules.clear();
-            }
-            pmOrderRules = pmOrderRules.stream().filter(e ->{
-                if(e.getPeriod() != null){
-                    return e.getPeriod() == period.get();
-                }
-                return false;
-            } ).collect(Collectors.toList());
+            period = Integer.parseInt(String.valueOf(periodObj));
         }
-
-        Map<String, PmOrderRule> pmOrderRuleMap = pmOrderRules.stream().collect(Collectors.toMap(PmOrderRule::getUid, Function.identity(), (o1, o2) -> o2));
-
-        List<V2_PmOrder> pmOrders1 = pmOrders.stream().filter(e -> {
-            if(e.getAssetUid() != null
-                && assetUidLevelPmRuleUidMap.get(e.getAssetUid()) != null
-                && assetUidLevelPmRuleUidMap.get(e.getAssetUid()).get(e.getRuleLevel()) != null
-                && pmOrderRuleMap.get(assetUidLevelPmRuleUidMap.get(e.getAssetUid()).get(e.getRuleLevel())) != null){
-                    return true;
-            }else {
-                return  false;
-            }
-        }).collect(Collectors.toList());
-        if(CollectionUtils.isNotEmpty(pmOrders1)){
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN,pmOrders1.stream().map(V2_PmOrder::getId).collect(Collectors.toSet())));
-        }else{
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,"-1"));
+        List<SearchFilter> pmRuleFilter = new ArrayList<>();
+        if(StringUtils.isNotEmpty(ruleName)) {
+            pmRuleFilter.add(new SearchFilter("name", SearchFilter.Operator.LIKE, ruleName));
         }
+        if(period != null) {
+            pmRuleFilter.add(new SearchFilter("period", SearchFilter.Operator.EQ, period));
+        }
+        List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findBySearchFilter(pmRuleFilter);
+        return pmOrderRules.stream().map(PmOrderRule::getUid).collect(Collectors.toSet());
     }
 
+
+
     public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
-        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
-        if(CollectionUtils.isEmpty(pmRuleByPmNum)){
+        PmOrderRule orderRule = pmOrderRuleRepository.findByUid(v2_pmOrder.getPmRuleUid());
+        if(orderRule == null){
             return new PmOrderRule();
+        }else {
+            return orderRule;
         }
-        else{
-            PmOrderRule pmOrderRule = pmRuleByPmNum.get(0);
-            return pmOrderRule;
-        }
+//            return new PmOrderRule();
+//        }
+//        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum(),v2_pmOrder.getTenantUID());
+//        if(CollectionUtils.isEmpty(pmRuleByPmNum)){
+//            return new PmOrderRule();
+//        }
+//        else{
+//            PmOrderRule pmOrderRule = pmRuleByPmNum.get(0);
+//            return pmOrderRule;
+//        }
     }
     public void preBatchCancel(){
         cancelReason=null;
@@ -785,6 +732,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<SimplePartsItem> partsItemList = partsItemService.findAll();
         return partsItemList;
     }
+
+    public List<SimplePartsItem> autosparePartNameForPm(String name) {
+        List<SimplePartsItem> all = partsInventoryService.findAllByName(name);
+        return all;
+    }
+    public List<SimplePartsItem> initSparePartsMasterForPm(String name) {
+        List<SimplePartsItem> partsItemList = partsItemService.findAllByName(name);
+        return partsItemList;
+    }
+
     public void onSparePartsMasterValueChange(SelectEvent event) {
         SimplePartsItem partsItem = (SimplePartsItem) event.getObject();
         if (partsItem == null) return;
@@ -831,6 +788,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
         return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
+    }
+    public boolean getPmRuleList(){
+        autoSetPmRuleUid(assetUid,ruleLevel);
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        return workflowConfig != null
+                && workflowConfig.getPmFourthRuleLevelForAsset()
+                && StringUtils.isNotEmpty(assetUid)
+                && ruleLevel != null
+                && ruleLevel == 4
+//                && pmType != null
+                && getPmOrderRulesByAsset() != null
+                ;
     }
 
     public String getRuleLevelName(Integer ruleLevel){
@@ -1145,6 +1115,28 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return false;
     }
 
+    public boolean isCheckedForBatchComplate() {
+
+        if(null == pmIdList || pmIdList.size() == 0){
+            return false;
+        }
+        WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
+        boolean autoAck = null == wfc || null == wfc.getAutoAckMaintenance() ? true : wfc.getAutoAckMaintenance();
+        boolean match = dao.getBatchPmOrderList(this.pmIdList).stream().anyMatch(item -> autoAck != item.getAutoAckMaintenance());
+        if(match){
+            return false;
+        }
+
+        Map<String, Boolean> map = this.selectedMap;
+        sameOpHashmap = map;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getTableDefName(String templateId) {
         TableDefinition tb = tableDao.findById(templateId);
         if (tb != null) {
@@ -1390,6 +1382,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             formData.setCustomerName(customerName);
             formData.setCustomerTel(customerName);
             formData.setSiteName(siteName);
+            formData.setPmRuleUid(pmRuleUid);
             Map<String, Object> res = pmOrderService.createPMrequestApi(selectedAsset.getUid(), formData);
             if (res != null && res.get("bizStatusCode") != null) {
                 if (res.get("bizStatusCode").equals("INVALID_PARAM")) {
@@ -1634,7 +1627,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }else {
             if (Strings.isNullOrEmpty(query)) {
-                if(userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())){
+                if(userContextService.hasCurrentTenantName("")){
                     queryIndex = 10;
                 }else{
                     queryIndex = -1;
@@ -2045,12 +2038,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<SearchFilter> filters = new ArrayList<>();
 
         List<String> orderIds = getVisableMvsAssetSystemId();
-        if (!CollectionUtils.isEmpty(orderIds)) {
-            filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+        if (org.springframework.util.CollectionUtils.isEmpty(orderIds)) {
+            orderIds = new ArrayList<>();
+            orderIds.add("0");
+            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
+        } else {
+            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
         }
 
         for (SearchFilter searchFilter : filterArrayList) {
-            if ("clinicalDeptId,siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
+            if (("clinicalDeptId,siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
+                    ",assetInfo.name,assetInfo.serialNum,assetInfo.departNum,assetInfo.functionType,pmType,ruleLevel,pmNum,planTime").contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
             }
         }
@@ -2070,6 +2068,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         String token = UserContextService.getAccessToken();
 //        String to = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ5bXlnQWRtaW4iLCJhdXRoIjoieW15Z0FkbWluIiwidWlkIjoiYmI5MDQ5NDYxMWIxNDllYzk0MWMzZTUyMTUwZDQ0YjQiLCJ1c2VySWQiOjE4Mjg4LCJleHAiOjE2MzgzNDYzOTB9.S6s0ow5Ab9RUO5Efo9XG-lAQmQxbxrf6aDsuUsnApStJ3iCdE7bjJHLs6hKJAQK-QYY4i9w8VmTlps7WZk0-iA";
         List<Integer> orgUidList = pmOrderService.getMvsAssectUids(token);
+        if (CollectionUtils.isEmpty(orgUidList)) {
+            orgUidList.add(0);
+        }
         return assetInfoMapper.getMvsPmOrders(orgUidList,tenantUid);
     }
 
@@ -2407,6 +2408,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters = new ArrayList();
         }
         filterArrayList.clear();
+        updatePMRuleFilterChange();
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName)).collect(Collectors.toList()));
         if ("MVS保养".equals(tabTitle)){
             if (StringUtils.isNotEmpty(siteUidFilterMVS)) {
@@ -2457,7 +2459,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedAsset = null;planTime  = null;planTimeForBatch = null;
         selectedPmOrder = null;assetName = null;endTime = null;
         ruleLevel = null;dptName = null;picList = null;
-        planTimeForBatch = null;comments = null;
+        planTimeForBatch = null;comments = null;assetUid = null;
+        approvaler = null;
         resetSignature();
     }
 
@@ -2676,6 +2679,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (asset == null) {
             return;
         }
+        assetUid = asset.getUid();
         assetName = asset.getName();
         dptName = asset.getClinicalDeptName();//orgDao.getByUid(orgInfoUID).getName();
         this.selectedAsset = asset;
@@ -2689,6 +2693,42 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             customerName = orgInfo.getContactPerson();
             customerTel = orgInfo.getContactPhone();
             siteName = orgInfo.getName();
+        }
+        autoSetPmRuleUid(assetUid,ruleLevel);
+    }
+
+    private void autoSetPmRuleUid(String assetUid, Integer ruleLevel) {
+        if(StringUtils.isNotEmpty(assetUid)&&ruleLevel != null){
+            RelRuleAsset relRuleAsset = relRuleAssetRepository.findByAssetUid(assetUid);
+            List<String> ruleUids = new ArrayList<>();
+            if(relRuleAsset != null) {
+                switch (ruleLevel) {
+                    case 1:
+                        if (relRuleAsset.getRuleUID1() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID1(), "|"));
+                        break;
+                    case 2:
+                        if (relRuleAsset.getRuleUID2() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID2(), "|"));
+                        break;
+                    case 3:
+                        if (relRuleAsset.getRuleUID() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID(), "|"));
+                        break;
+                    case 4:
+                        if (relRuleAsset.getRuleUID4() != null)
+                            ruleUids = Arrays.asList(StringUtils.split(relRuleAsset.getRuleUID4(), "|"));
+                        break;
+                    default:
+                        LOGGER.warn("保养等级不符合要求，其值为{}", ruleLevel);
+                }
+            }
+            if(ruleUids.size() == 1){
+                pmRuleUid = ruleUids.get(0);
+            }else{
+                pmRuleUid = null;
+            }
+
         }
     }
 
@@ -2964,6 +3004,51 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return orgListMVS;
     }
 
+    public List<PmOrderRule> getPmOrderRulesByAsset(){
+        if(assetUid != null) {
+            RelRuleAsset relRuleAsset = relRuleAssetRepository.findByAssetUid(assetUid);
+            if(relRuleAsset != null && ruleLevel != null) {
+                String ruleUID = "";
+                switch (ruleLevel) {
+                    case 1:
+                        ruleUID = relRuleAsset.getRuleUID1();
+                        break;
+                    case 2:
+                        ruleUID = relRuleAsset.getRuleUID2();
+                        break;
+                    case 3:
+                        ruleUID = relRuleAsset.getRuleUID();
+                        break;
+                    case 4:
+                        ruleUID = relRuleAsset.getRuleUID4();
+                        break;
+                    default:
+                        ruleUID = "";
+                }
+                if (relRuleAsset != null && StringUtils.isNotEmpty(ruleUID)) {
+                    String[] ruleUids = StringUtils.split(ruleUID, "|");
+                    List<String> ruleUidLists = Arrays.asList(ruleUids);
+//                    isCreatable = true;
+                    if(ruleUidLists.size() == 1){
+                        pmRuleUid = ruleUidLists.get(0);
+                    }
+                    return pmOrderRuleRepository.getPmOrderRulesByUids(ruleUidLists);
+                }else{
+//                    isCreatable = false;
+//                    WebUtil.addErrorMessage("资产未绑定对应保养规则,无法创建保养工单");
+//                    RequestContext requestContext = RequestContext.getCurrentInstance();
+//                    requestContext.addCallbackParam("validationFailed", true);
+                }
+            }else{
+//                isCreatable = false;
+//                WebUtil.addErrorMessage("资产未绑定任何保养规则,无法创建保养工单");
+//                RequestContext requestContext = RequestContext.getCurrentInstance();
+//                requestContext.addCallbackParam("validationFailed", true);
+            }
+        }
+        return null;
+    }
+
     private void loadMVSClinicalDeptList() {
         try {
             if (org.springframework.util.CollectionUtils.isEmpty(clinicalDeptListMVS)) {
@@ -2975,6 +3060,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             logger.info("暂无MVS列表");
         }
     }
+
+    public String pmRulesListVisable(){
+        if(getPmRuleList()){
+            return "visibility:visible";
+        }else {
+            return "visibility:hidden";
+        }
+    }
+
 
     public V2_WorkOrder_Detail getItemDetail() {
         return itemDetail;
@@ -3484,5 +3578,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setSignatureId(String signatureId) {
         this.signatureId = signatureId;
+    }
+
+    public String getAssetUid() {
+        return assetUid;
+    }
+
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
+    }
+
+    public String getPmRuleUid() {
+        return pmRuleUid;
+    }
+
+    public void setPmRuleUid(String pmRuleUid) {
+        this.pmRuleUid = pmRuleUid;
     }
 }

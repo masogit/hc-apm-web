@@ -90,6 +90,15 @@
 				<!-- <p:fieldset legend="删除无效objecthub文件（只用点击一次即可，请勿重复点击）">
 					<p:commandButton actionListener="#{adminConsoleController.deleteObjectHub()}" value="批量更新所有租户" update=":growl"></p:commandButton>
 				</p:fieldset> -->
+				<p:fieldset legend="批量更新workflow表配置到config_item数据(shareAutoConfirm)，（只用点击一次即可，请勿重复点击）">
+					<p:commandButton actionListener="#{adminConsoleController.batchSynchronizationConfig()}" value="批量同步配置" update=":growl"></p:commandButton>
+				</p:fieldset>
+				<p:fieldset legend="批量根据旧菜单项计算并保存到新菜单模块">
+					<p:commandButton actionListener="#{adminConsoleController.batchAnalyseMenus()}" value="批量计算" update=":growl"></p:commandButton>
+				</p:fieldset>
+				<p:fieldset legend="批量更新租户消息提醒规则，（只用点击一次即可，请勿重复点击）">
+					<p:commandButton actionListener="#{adminConsoleController.batchUpdateReminderRule()}" value="批量更新" update=":growl"></p:commandButton>
+				</p:fieldset>
 			</h:panelGroup>
 		</h:form>
 	</ui:define>

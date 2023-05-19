@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -66,6 +67,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private AssetInfoService assetInfoService;
     private ContractInfoService contractService;
     private SupplierController supplierController;
+    private ArrivalListRepository arrivalListRepository;
 
     private List<V2_BlobObject> attachements;
     private List<Supplier> supplierList = Collections.emptyList();
@@ -116,6 +118,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
+        arrivalListRepository = WebUtil.getBean(ArrivalListRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
@@ -300,7 +303,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 }
             }
         }
-
+        boolean isEdit = selected.getId() == null ? false : true;
         selected = dao.save(this.selected);
         attachements.stream().forEach(item -> {
             item.setBoUuid(selected.getId());
@@ -322,6 +325,19 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         allItemList.stream().forEach(item -> item.setContractId(selected.getId()));
         contractItemDao.save(allItemList);
         allItemList = contractService.getContractItems(selected.getId());
+        if(isEdit && CollectionUtils.isNotEmpty(allItemList)) {
+            List<String> itemIds = new ArrayList<>();
+            for(ContractInfoItem item : allItemList) {
+                itemIds.add(item.getId());
+            }
+            List<ArrivalList> arrivalLists = arrivalListRepository.findByContractItemIdIn(itemIds);
+            if(CollectionUtils.isNotEmpty(arrivalLists)) {
+                for(ArrivalList arrivalList : arrivalLists) {
+                    arrivalList.setContractNum(selected.getContractNum());
+                }
+                arrivalListRepository.save(arrivalLists);
+            }
+        }
         WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
     }
 
@@ -429,7 +445,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return contractInfoItem == null ? null : contractInfoItem.getContractAssetName();
     }
 
-    public String getDetailPageLink(AssetInfo item) {
+    public String getDetailPageLinkByAsset(AssetInfo item) {
         String url = "";
         if (null != item) {
             AssetInfo asset = item;
@@ -440,7 +456,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return url;
     }
     //==============================================
-    public String getDetailPageLink(String uid) {
+    public String getDetailPageLinkByUid(String uid) {
         AssetInfo viewAsset = assetDao.findByUid(uid);
         String url = "actionName=View&selectedid="
                 + viewAsset.getUid()
@@ -456,7 +472,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void viewContractItemPage(ContractInfoItem item) {
-        String url = getDetailPageLink(item.getAssetInfo());
+        String url = getDetailPageLinkByAsset(item.getAssetInfo());
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }

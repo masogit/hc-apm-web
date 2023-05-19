@@ -53,6 +53,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ZKB_FE_PART_ORDER = "ZkbFePartOrder";
     public static final String BO_TYPE_ZKB_PART_ORDER_LETTER = "ZkbPartOrderLetter";
     public static final String BO_TYPE_ZKB_PART_ORDER_PROVE = "ZkbPartOrderProve";
+    public static final String BO_TYPE_ZKB_PART_ORDER_RETURN = "ZkbPartOrderReturn";
     public static final String BO_TYPE_COIL_OPPORTUNITY = "CoilOpportunity";
     public static final String BO_TYPE_ADJUST_EQUIPMENT = "AdjustEquipment";
     public static final String BO_TYPE_IBU_INFO = "IBUInfo";
@@ -127,6 +128,9 @@ public class V2_BlobObject implements Serializable {
     @Where(clause = "bo_type = 'AssetInfo'")
     @JsonBackReference
     private AssetInfo assetInfo;
+
+    @Column(name = "compress_object_id")
+    private String compressObjectId;
 
     public String getId() {
         return id;
@@ -278,6 +282,14 @@ public class V2_BlobObject implements Serializable {
 
     public void setSecondDirectory(String secondDirectory) {
         this.secondDirectory = secondDirectory;
+    }
+
+    public String getCompressObjectId() {
+        return compressObjectId;
+    }
+
+    public void setCompressObjectId(String compressObjectId) {
+        this.compressObjectId = compressObjectId;
     }
 
     @Override

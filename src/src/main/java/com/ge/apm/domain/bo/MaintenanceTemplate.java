@@ -69,6 +69,31 @@ public class MaintenanceTemplate {
             this.content.put(Component.PM_PICTURE2.toString(), Component.PM_PICTURE2.value());
             this.content.put(Component.PM_PICTURE3.toString(), Component.PM_PICTURE3.value());
             this.content.put(Component.PM_PICTURE4.toString(), Component.PM_PICTURE4.value());
+            this.content.put(Component.PM_PICTURE5.toString(), Component.PM_PICTURE5.value());
+            this.content.put(Component.PM_PICTURE6.toString(), Component.PM_PICTURE6.value());
+            this.content.put(Component.PM_PICTURE7.toString(), Component.PM_PICTURE7.value());
+            this.content.put(Component.PM_PICTURE8.toString(), Component.PM_PICTURE8.value());
+            this.content.put(Component.PM_PICTURE9.toString(), Component.PM_PICTURE9.value());
+            this.content.put(Component.PM_PICTURE10.toString(), Component.PM_PICTURE10.value());
+            this.content.put(Component.PM_PICTURE11.toString(), Component.PM_PICTURE11.value());
+            this.content.put(Component.PM_PICTURE12.toString(), Component.PM_PICTURE12.value());
+            this.content.put(Component.PM_PICTURE13.toString(), Component.PM_PICTURE13.value());
+            this.content.put(Component.PM_PICTURE14.toString(), Component.PM_PICTURE14.value());
+            this.content.put(Component.PM_PICTURE15.toString(), Component.PM_PICTURE15.value());
+            this.content.put(Component.PM_PICTURE16.toString(), Component.PM_PICTURE16.value());
+            this.content.put(Component.PM_PICTURE17.toString(), Component.PM_PICTURE17.value());
+            this.content.put(Component.PM_PICTURE18.toString(), Component.PM_PICTURE18.value());
+            this.content.put(Component.PM_PICTURE19.toString(), Component.PM_PICTURE19.value());
+            this.content.put(Component.PM_PICTURE20.toString(), Component.PM_PICTURE20.value());
+            this.content.put(Component.PM_PICTURE21.toString(), Component.PM_PICTURE21.value());
+            this.content.put(Component.PM_PICTURE22.toString(), Component.PM_PICTURE22.value());
+            this.content.put(Component.PM_PICTURE23.toString(), Component.PM_PICTURE23.value());
+            this.content.put(Component.PM_PICTURE24.toString(), Component.PM_PICTURE24.value());
+            this.content.put(Component.PM_PICTURE25.toString(), Component.PM_PICTURE25.value());
+            this.content.put(Component.PM_PICTURE26.toString(), Component.PM_PICTURE26.value());
+            this.content.put(Component.PM_PICTURE27.toString(), Component.PM_PICTURE27.value());
+            this.content.put(Component.PM_PICTURE28.toString(), Component.PM_PICTURE28.value());
+            this.content.put(Component.PM_PICTURE29.toString(), Component.PM_PICTURE29.value());
             this.content.put(Component.PARTS_PICTURE0.toString(), Component.PARTS_PICTURE0.value());
             this.content.put(Component.PARTS_PICTURE1.toString(), Component.PARTS_PICTURE1.value());
             this.content.put(Component.PARTS_PICTURE2.toString(), Component.PARTS_PICTURE2.value());
@@ -82,6 +107,31 @@ public class MaintenanceTemplate {
             this.content.put(Component.PM_PICTURE_HOLDER2.toString(), Component.PM_PICTURE_HOLDER2.value());
             this.content.put(Component.PM_PICTURE_HOLDER3.toString(), Component.PM_PICTURE_HOLDER3.value());
             this.content.put(Component.PM_PICTURE_HOLDER4.toString(), Component.PM_PICTURE_HOLDER4.value());
+            this.content.put(Component.PM_PICTURE_HOLDER5.toString(), Component.PM_PICTURE_HOLDER5.value());
+            this.content.put(Component.PM_PICTURE_HOLDER6.toString(), Component.PM_PICTURE_HOLDER6.value());
+            this.content.put(Component.PM_PICTURE_HOLDER7.toString(), Component.PM_PICTURE_HOLDER7.value());
+            this.content.put(Component.PM_PICTURE_HOLDER8.toString(), Component.PM_PICTURE_HOLDER8.value());
+            this.content.put(Component.PM_PICTURE_HOLDER9.toString(), Component.PM_PICTURE_HOLDER9.value());
+            this.content.put(Component.PM_PICTURE_HOLDER10.toString(), Component.PM_PICTURE_HOLDER10.value());
+            this.content.put(Component.PM_PICTURE_HOLDER11.toString(), Component.PM_PICTURE_HOLDER11.value());
+            this.content.put(Component.PM_PICTURE_HOLDER12.toString(), Component.PM_PICTURE_HOLDER12.value());
+            this.content.put(Component.PM_PICTURE_HOLDER13.toString(), Component.PM_PICTURE_HOLDER13.value());
+            this.content.put(Component.PM_PICTURE_HOLDER14.toString(), Component.PM_PICTURE_HOLDER14.value());
+            this.content.put(Component.PM_PICTURE_HOLDER15.toString(), Component.PM_PICTURE_HOLDER15.value());
+            this.content.put(Component.PM_PICTURE_HOLDER16.toString(), Component.PM_PICTURE_HOLDER16.value());
+            this.content.put(Component.PM_PICTURE_HOLDER17.toString(), Component.PM_PICTURE_HOLDER17.value());
+            this.content.put(Component.PM_PICTURE_HOLDER18.toString(), Component.PM_PICTURE_HOLDER18.value());
+            this.content.put(Component.PM_PICTURE_HOLDER19.toString(), Component.PM_PICTURE_HOLDER19.value());
+            this.content.put(Component.PM_PICTURE_HOLDER20.toString(), Component.PM_PICTURE_HOLDER20.value());
+            this.content.put(Component.PM_PICTURE_HOLDER21.toString(), Component.PM_PICTURE_HOLDER21.value());
+            this.content.put(Component.PM_PICTURE_HOLDER22.toString(), Component.PM_PICTURE_HOLDER22.value());
+            this.content.put(Component.PM_PICTURE_HOLDER23.toString(), Component.PM_PICTURE_HOLDER23.value());
+            this.content.put(Component.PM_PICTURE_HOLDER24.toString(), Component.PM_PICTURE_HOLDER24.value());
+            this.content.put(Component.PM_PICTURE_HOLDER25.toString(), Component.PM_PICTURE_HOLDER25.value());
+            this.content.put(Component.PM_PICTURE_HOLDER26.toString(), Component.PM_PICTURE_HOLDER26.value());
+            this.content.put(Component.PM_PICTURE_HOLDER27.toString(), Component.PM_PICTURE_HOLDER27.value());
+            this.content.put(Component.PM_PICTURE_HOLDER28.toString(), Component.PM_PICTURE_HOLDER28.value());
+            this.content.put(Component.PM_PICTURE_HOLDER29.toString(), Component.PM_PICTURE_HOLDER29.value());
             this.content.put(Component.PARTS_PICTURE_HOLDER0.toString(), Component.PARTS_PICTURE_HOLDER0.value());
             this.content.put(Component.PARTS_PICTURE_HOLDER1.toString(), Component.PARTS_PICTURE_HOLDER1.value());
             this.content.put(Component.PARTS_PICTURE_HOLDER2.toString(), Component.PARTS_PICTURE_HOLDER2.value());
@@ -220,6 +270,31 @@ public class MaintenanceTemplate {
         PM_PICTURE2("pm_picture2",Widget.PICTURE),
         PM_PICTURE3("pm_picture3",Widget.PICTURE),
         PM_PICTURE4("pm_picture4",Widget.PICTURE),
+        PM_PICTURE5("pm_picture5",Widget.PICTURE),
+        PM_PICTURE6("pm_picture6",Widget.PICTURE),
+        PM_PICTURE7("pm_picture7",Widget.PICTURE),
+        PM_PICTURE8("pm_picture8",Widget.PICTURE),
+        PM_PICTURE9("pm_picture9",Widget.PICTURE),
+        PM_PICTURE10("pm_picture10",Widget.PICTURE),
+        PM_PICTURE11("pm_picture11",Widget.PICTURE),
+        PM_PICTURE12("pm_picture12",Widget.PICTURE),
+        PM_PICTURE13("pm_picture13",Widget.PICTURE),
+        PM_PICTURE14("pm_picture14",Widget.PICTURE),
+        PM_PICTURE15("pm_picture15",Widget.PICTURE),
+        PM_PICTURE16("pm_picture16",Widget.PICTURE),
+        PM_PICTURE17("pm_picture17",Widget.PICTURE),
+        PM_PICTURE18("pm_picture18",Widget.PICTURE),
+        PM_PICTURE19("pm_picture19",Widget.PICTURE),
+        PM_PICTURE20("pm_picture20",Widget.PICTURE),
+        PM_PICTURE21("pm_picture21",Widget.PICTURE),
+        PM_PICTURE22("pm_picture22",Widget.PICTURE),
+        PM_PICTURE23("pm_picture23",Widget.PICTURE),
+        PM_PICTURE24("pm_picture24",Widget.PICTURE),
+        PM_PICTURE25("pm_picture25",Widget.PICTURE),
+        PM_PICTURE26("pm_picture26",Widget.PICTURE),
+        PM_PICTURE27("pm_picture27",Widget.PICTURE),
+        PM_PICTURE28("pm_picture28",Widget.PICTURE),
+        PM_PICTURE29("pm_picture29",Widget.PICTURE),
         PARTS_PICTURE0("parts_picture0",Widget.PICTURE),
         PARTS_PICTURE1("parts_picture1",Widget.PICTURE),
         PARTS_PICTURE2("parts_picture2",Widget.PICTURE),
@@ -233,6 +308,31 @@ public class MaintenanceTemplate {
         PM_PICTURE_HOLDER2("pm_picture_holder2",Widget.TEXT),
         PM_PICTURE_HOLDER3("pm_picture_holder3",Widget.TEXT),
         PM_PICTURE_HOLDER4("pm_picture_holder4",Widget.TEXT),
+        PM_PICTURE_HOLDER5("pm_picture_holder5",Widget.TEXT),
+        PM_PICTURE_HOLDER6("pm_picture_holder6",Widget.TEXT),
+        PM_PICTURE_HOLDER7("pm_picture_holder7",Widget.TEXT),
+        PM_PICTURE_HOLDER8("pm_picture_holder8",Widget.TEXT),
+        PM_PICTURE_HOLDER9("pm_picture_holder9",Widget.TEXT),
+        PM_PICTURE_HOLDER10("pm_picture_holder10",Widget.TEXT),
+        PM_PICTURE_HOLDER11("pm_picture_holder11",Widget.TEXT),
+        PM_PICTURE_HOLDER12("pm_picture_holder12",Widget.TEXT),
+        PM_PICTURE_HOLDER13("pm_picture_holder13",Widget.TEXT),
+        PM_PICTURE_HOLDER14("pm_picture_holder14",Widget.TEXT),
+        PM_PICTURE_HOLDER15("pm_picture_holder15",Widget.TEXT),
+        PM_PICTURE_HOLDER16("pm_picture_holder16",Widget.TEXT),
+        PM_PICTURE_HOLDER17("pm_picture_holder17",Widget.TEXT),
+        PM_PICTURE_HOLDER18("pm_picture_holder18",Widget.TEXT),
+        PM_PICTURE_HOLDER19("pm_picture_holder19",Widget.TEXT),
+        PM_PICTURE_HOLDER20("pm_picture_holder20",Widget.TEXT),
+        PM_PICTURE_HOLDER21("pm_picture_holder21",Widget.TEXT),
+        PM_PICTURE_HOLDER22("pm_picture_holder22",Widget.TEXT),
+        PM_PICTURE_HOLDER23("pm_picture_holder23",Widget.TEXT),
+        PM_PICTURE_HOLDER24("pm_picture_holder24",Widget.TEXT),
+        PM_PICTURE_HOLDER25("pm_picture_holder25",Widget.TEXT),
+        PM_PICTURE_HOLDER26("pm_picture_holder26",Widget.TEXT),
+        PM_PICTURE_HOLDER27("pm_picture_holder27",Widget.TEXT),
+        PM_PICTURE_HOLDER28("pm_picture_holder28",Widget.TEXT),
+        PM_PICTURE_HOLDER29("pm_picture_holder29",Widget.TEXT),
         PARTS_PICTURE_HOLDER0("parts_picture_holder0",Widget.TEXT),
         PARTS_PICTURE_HOLDER1("parts_picture_holder1",Widget.TEXT),
         PARTS_PICTURE_HOLDER2("parts_picture_holder2",Widget.TEXT),
@@ -272,6 +372,7 @@ public class MaintenanceTemplate {
     public enum Device {
         NAME("name", Widget.TEXT),
         DEPARTMENT("department", Widget.TEXT),
+        Site("site", Widget.TEXT),
         TYPE("type", Widget.TEXT),
         OEM("oem", Widget.TEXT),
         SERIAL("serial", Widget.TEXT),

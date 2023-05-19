@@ -8,7 +8,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +15,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -47,6 +49,10 @@ public class ZkbIntegralService {
     @Autowired
     private TenantInfoRepository tenantInfoDao;
 
+    @Autowired
+    private ZkbKeyBehaviorIndexService zkbKeyBehaviorIndexService;
+
+
     public List<TenantInfo> getSourceTenantInfoList(){
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, 3));
@@ -58,79 +64,100 @@ public class ZkbIntegralService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String kpiScoreHandler(String tenantUID, Integer kpi,String recordType, UserAccount userAccount,String kpiMonth){
-        boolean flag = true;
-        String errorLog = "";
-        if (StringUtils.isEmpty(tenantUID)){
-            flag = false;
-            errorLog += "tenantUID为空 ";
-        }
-        if (kpi == null){
-            flag = false;
-            errorLog += "kpi为空";
-        }
-        if (StringUtils.isEmpty(recordType)){
-            flag = false;
-            errorLog += "recordType为空 ";
-        }
-        if(StringUtils.isNotEmpty(errorLog.trim())){
-            return errorLog;
-        }
-        ZkbIntegral zkbIntegral = zkbIntegralRepository.findFirstByTenantUID(tenantUID);
-        Integer score = scoreCase(kpi);
-        int cof = 1;
-        if(StringUtils.isEmpty(kpiMonth)){
-            kpiMonth = simpleDateFormat.format(new Date());
-        }
-        if(zkbIntegral != null){
-            cof = calcCoefficient(zkbIntegral);
-            score = cof * score;
-            List<String> recordTypes = new ArrayList<>();
-            recordTypes.add(ZkbIntegralRecord.RecordType.KpiAdd.toString());
-            recordTypes.add(ZkbIntegralRecord.RecordType.KpiModify.toString());
-            if(ZkbIntegralRecord.RecordType.KpiAdd.toString().equals(recordType)){
-                zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() + score);
-            }else if(ZkbIntegralRecord.RecordType.KpiModify.toString().equals(recordType)){
-                ZkbIntegralRecord zkbIntegralRecord = zkbIntegralRecordRepository.findFirstByRecord(zkbIntegral.getId(),recordTypes,kpiMonth);
-                Integer oldScore = 0;
-                if(zkbIntegralRecord != null){
-                    oldScore = zkbIntegralRecord.getScore();
-                }
-                zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() + score - oldScore);
-            }else if (ZkbIntegralRecord.RecordType.KpiDelete.toString().equals(recordType)){
-                ZkbIntegralRecord zkbIntegralRecord = zkbIntegralRecordRepository.findFirstByRecord(zkbIntegral.getId(),recordTypes,kpiMonth);
-                Integer oldScore = 0;
-                if(zkbIntegralRecord != null){
-                    oldScore = zkbIntegralRecord.getScore();
-                }
-                zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() - oldScore);
+    public String kpiScoreHandler(String tenantUID, Integer kpi,String recordType, UserAccount userAccount,String kpiMonth)  {
+        try {
+            boolean flag = true;
+            String errorLog = "";
+            if (StringUtils.isEmpty(tenantUID)){
+                flag = false;
+                errorLog += "tenantUID为空 ";
             }
-            zkbIntegral = zkbIntegralRepository.save(zkbIntegral);
-        }else{
-            zkbIntegral = new ZkbIntegral();
-            zkbIntegral.setIntegralTotal(initialScore);
-            zkbIntegral.setTenantUID(tenantUID);
-            zkbIntegral.setCoefficient(initCoefficient);
-            score = initCoefficient * score;
-            if (ZkbIntegralRecord.RecordType.KpiDelete.toString().equals(recordType)){
-                zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() - score);
+            if (kpi == null){
+                flag = false;
+                errorLog += "kpi为空";
+            }
+            if (StringUtils.isEmpty(recordType)){
+                flag = false;
+                errorLog += "recordType为空 ";
+            }
+            if(StringUtils.isNotEmpty(errorLog.trim())){
+                return errorLog;
+            }
+            ZkbIntegral zkbIntegral = zkbIntegralRepository.findFirstByTenantUID(tenantUID);
+            Integer score = scoreCase(kpi);
+            int cof = 1;
+            if(StringUtils.isEmpty(kpiMonth)){
+                kpiMonth = simpleDateFormat.format(new Date());
+            }
+            DateFormat fmt =new SimpleDateFormat("yyyy-MM");
+            Date date = fmt.parse(kpiMonth);
+            List<TenantInfo> tenantInfoList = tenantInfoDao.findTenantInfoListByContractDate(zkbKeyBehaviorIndexService.getFirstDay(date),zkbKeyBehaviorIndexService.getLastDay(date));
+            Set<String> uiDset= tenantInfoList.stream().map(TenantInfo::getUid).collect(Collectors.toSet());
+            if(zkbIntegral != null){
+                cof = calcCoefficient(zkbIntegral);
+                if (uiDset.contains(tenantUID)){
+                    cof = 2;
+                }
+                score = cof * score;
+                List<String> recordTypes = new ArrayList<>();
+                recordTypes.add(ZkbIntegralRecord.RecordType.KpiAdd.toString());
+                recordTypes.add(ZkbIntegralRecord.RecordType.KpiModify.toString());
+                if(ZkbIntegralRecord.RecordType.KpiAdd.toString().equals(recordType)){
+                    zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() + score);
+                }else if(ZkbIntegralRecord.RecordType.KpiModify.toString().equals(recordType)){
+                    ZkbIntegralRecord zkbIntegralRecord = zkbIntegralRecordRepository.findFirstByRecord(zkbIntegral.getId(),recordTypes,kpiMonth);
+                    Integer oldScore = 0;
+                    if(zkbIntegralRecord != null){
+                        oldScore = zkbIntegralRecord.getScore();
+                    }
+                    zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() + score - oldScore);
+                }else if (ZkbIntegralRecord.RecordType.KpiDelete.toString().equals(recordType)){
+                    ZkbIntegralRecord zkbIntegralRecord = zkbIntegralRecordRepository.findFirstByRecord(zkbIntegral.getId(),recordTypes,kpiMonth);
+                    Integer oldScore = 0;
+                    if(zkbIntegralRecord != null){
+                        oldScore = zkbIntegralRecord.getScore();
+                    }
+                    zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() - oldScore);
+                }
+                zkbIntegral = zkbIntegralRepository.save(zkbIntegral);
             }else{
-                zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() + score);
+                zkbIntegral = new ZkbIntegral();
+                zkbIntegral.setIntegralTotal(initialScore);
+                zkbIntegral.setTenantUID(tenantUID);
+                zkbIntegral.setCoefficient(initCoefficient);
+                if (uiDset.contains(tenantUID)){
+                    score = 2 * score;
+                }else{
+                    score = initCoefficient * score;
+                }
+                if (ZkbIntegralRecord.RecordType.KpiDelete.toString().equals(recordType)){
+                    zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() - score);
+                }else{
+                    zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() + score);
+                }
+                zkbIntegral = zkbIntegralRepository.save(zkbIntegral);
             }
-            zkbIntegral = zkbIntegralRepository.save(zkbIntegral);
+            ZkbIntegralRecord zkbIntegralRecord = new ZkbIntegralRecord();
+            zkbIntegralRecord.setRecordType(recordType);
+            zkbIntegralRecord.setScore(score);
+            zkbIntegralRecord.setCurrentKpi(kpi);
+            zkbIntegralRecord.setCurrentCoefficient(cof);
+            zkbIntegralRecord.setKpiMonth(kpiMonth);
+            zkbIntegralRecord.setZkbIntegralId(zkbIntegral.getId());
+            zkbIntegralRecord.setCreatedBy(userAccount.getName());
+            zkbIntegralRecord.setCreatedDate(new Date());
+            if (uiDset.contains(tenantUID)){
+                zkbIntegralRecord.setRemark("合同金额超过一百万，积分系数为2");
+                zkbIntegralRecord.setCurrentCoefficient(2);
+            }
+            zkbIntegralRecordRepository.save(zkbIntegralRecord);
+            return "SUCCESS";
+        }catch (Exception e){
+            WebUtil.addErrorMessage(WebUtil.getMessage("FAILED"));
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+            return "FAILED";
         }
-
-        ZkbIntegralRecord zkbIntegralRecord = new ZkbIntegralRecord();
-        zkbIntegralRecord.setRecordType(recordType);
-        zkbIntegralRecord.setScore(score);
-        zkbIntegralRecord.setCurrentKpi(kpi);
-        zkbIntegralRecord.setCurrentCoefficient(cof);
-        zkbIntegralRecord.setKpiMonth(kpiMonth);
-        zkbIntegralRecord.setZkbIntegralId(zkbIntegral.getId());
-        zkbIntegralRecord.setCreatedBy(userAccount.getName());
-        zkbIntegralRecord.setCreatedDate(new Date());
-        zkbIntegralRecordRepository.save(zkbIntegralRecord);
-        return "";
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -231,7 +258,7 @@ public class ZkbIntegralService {
     }
 
     public List<ZkbIntegralRecord> queryRecordByIntegralId(String integralId){
-        List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findByZkbIntegralIdAndRecordTypeNotOrderByCreatedDateDesc(integralId,ZkbIntegralRecord.RecordType.KpiAdd.toString());
+        List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findByZkbIntegralIdOrderByCreatedDateDesc(integralId);
         return zkbIntegralRecords;
     }
 

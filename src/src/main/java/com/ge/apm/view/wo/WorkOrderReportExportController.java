@@ -1,10 +1,12 @@
 package com.ge.apm.view.wo;
 
-import cn.hutool.core.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
@@ -13,6 +15,8 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.WorkOrderExportService;
 import com.ge.apm.service.wo.WorkOrderExportTemplateService;
 import com.ge.apm.service.wo.WorkOrderPublishRenderService;
+import com.ge.apm.service.wo.WorkflowService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -89,7 +93,8 @@ public class WorkOrderReportExportController implements Serializable {
     private List<Map<String, Object>> workOrderList;
 
     private UaaService uaaService;
-
+    @Setter@Getter
+    private Boolean needTwoSubStatus=false;
     private TreeNode orgTree;
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
@@ -108,13 +113,16 @@ public class WorkOrderReportExportController implements Serializable {
     private String currentStepId;
     @Getter @Setter
     private Map<String,String> filterMap;
-
+    private WorkflowService workflowService;
+    private UserContextService userContextService;
     @PostConstruct
     protected void init() {
+        userContextService = WebUtil.getBean(UserContextService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         workOrderExportService = WebUtil.getBean(WorkOrderExportService.class);
         workOrderPublishRenderService = WebUtil.getBean(WorkOrderPublishRenderService.class);
         workOrderExportTemplateService = WebUtil.getBean(WorkOrderExportTemplateService.class);
+        workflowService = WebUtil.getBean(WorkflowService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         ucService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -141,7 +149,7 @@ public class WorkOrderReportExportController implements Serializable {
         loadClinicalDept();
         currentOwnerList = ucService.getWorkerList(null,"");
         currentOwnerList.addAll(ucService.getExternalWorkerList(currentUser.getTenantUID()).stream().filter(item-> !currentOwnerList.contains(item)).collect(Collectors.toList()));
-        
+        needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
     }
     
     public void onClinicalDeptChange(){
@@ -586,5 +594,16 @@ public class WorkOrderReportExportController implements Serializable {
 
     public void setFilterTotalPrice(String filterTotalPrice) {
         this.filterTotalPrice = filterTotalPrice;
+    }
+
+    public Boolean isConfigNeedTwoSubStatusByUser(UserAccount userAccount) {
+        WorkflowConfig woc = workflowService.getWorkflowByOrg(userAccount.getSiteUID());
+        return woc != null&&woc.getEnableSendRepair()!=null&&woc.getEnableSendRepair();
+    }
+
+    public List<I18nMessage> getWoSteps(String stepIds){
+        List<String> stepIdsList = Arrays.asList(stepIds.split(","));
+        return FieldValueMessageController.doGetFieldValueList("woSteps", -1).stream()
+                .filter(item -> stepIdsList.contains(item.getMsgKey())).collect(Collectors.toList());
     }
 }

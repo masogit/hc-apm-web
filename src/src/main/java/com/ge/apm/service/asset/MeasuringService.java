@@ -1,6 +1,8 @@
 package com.ge.apm.service.asset;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.apm.mq.MqUtils;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ge.apm.dao.*;
@@ -18,6 +20,7 @@ import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import webapp.framework.util.DateUtil;
 
@@ -72,6 +75,10 @@ public class MeasuringService {
     private MeasuringCertificateDetailMapper certificateDetailMapper;
     @Autowired
     private BlobObjectRepository blobDao;
+
+
+    @Autowired
+    private MqUtils mqUtils;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -183,6 +190,7 @@ public class MeasuringService {
             tempAssetInfo.setMeasuringType(needUpdateAssetMcd.getType());
 
             assetInfoDao.save(tempAssetInfo);
+            sendMq(tempAssetInfo);
 
         }
 
@@ -193,7 +201,17 @@ public class MeasuringService {
             return null;
         }
     }
-
+    public void sendMq(AssetInfo assetInfo) {
+        MqContext mqContext = new MqContext();
+        mqContext.setClassName("MeasuringService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("handleExcel- operateMeasuringAndAssetInfo/operateMeasuringAndAssetInfo_For_ShaoYiFu");
+        mqContext.setDescribe("计量导入修改设备信息");
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
+        mqUtils.sendAssetToMQ(assetInfo,currentUserAccount,mqContext);
+    }
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo_For_ShaoYiFu(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -317,6 +335,7 @@ public class MeasuringService {
 
             assetInfoDao.save(tempAssetInfo);
 
+            sendMq(tempAssetInfo);
         }
 
         if(!flag){
@@ -370,7 +389,7 @@ public class MeasuringService {
 
         List<MeasuringCertificateDetail> noFoundList = Lists.newArrayList();
         // 获取压缩文件中的每个子文件
-        ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"));
+        try(ZipInputStream zipInputStream = new ZipInputStream(file.getInputstream(), Charset.forName("GBK"))){
         ZipEntry entry;
         while ((entry = zipInputStream.getNextEntry()) != null) {
             String fileName = entry.getName();
@@ -395,6 +414,10 @@ public class MeasuringService {
                 noFoundDetail.setErrorInfo(errInfo);
                 noFoundList.add(noFoundDetail);
             }
+        }
+        }catch (Exception e){
+            LOGGER.error("handle zip error:{}",e.getMessage());
+            throw  new RuntimeException("handleZip error",e);
         }
         return noFoundList;
     }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dialog id="jmEditDlg" widgetVar="jmEditDialog" width="1000" height="650" modal="true" resizable="true" draggable="true" appendTo="@this" header="报表编辑" closable="false">
+            <h:form id="jmEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup >
+                            <label class ="label">报表名称 </label>
+                            <p:inputText id="name" value="#{jmReportController.selected.name}"  />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">报表描述 </label>
+                            <p:inputText id="description" value="#{jmReportController.selected.description}"  />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">预览地址 </label>
+                            <p:inputText id="reportViewUrl" value="#{jmReportController.selected.reportViewUrl}"  />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">设计地址 </label>
+                            <p:inputText id="reportEditUrl" value="#{jmReportController.selected.reportEditUrl}"  />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">请选择能见范围 </label>
+                            <p:selectOneMenu id="visibleRange" value="#{jmReportController.selected.visibleRange}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="当前租户可见" itemValue="0"/>
+                                <f:selectItem itemLabel="全部租户可见" itemValue="-1"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:commandButton validateClient="true" actionListener="#{jmReportController.save()}" value="#{msg.Save}" update="display,:jmEditForm, :jmReportForm:datalist, :growl, :jmEditForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'jmEditDialog');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{jmReportController.cancel()}" icon="ui-icon-cancel" update=":jmReportForm:datalist" onclick="PF('jmEditDialog').hide()" />
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:composition>
+</html>

@@ -19,7 +19,7 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
                         <h:panelGroup>
-                            <label class="label">#{msg.hospitalId}*</label>
+                            <label class="label">#{userContextService.isYiMaiYangGuangTenant()?'所属机构':msg.hospitalId}</label>
                             <p:inputText id="selectedUserOrgName" value="#{pmOrderRuleController.getOrgFullName(pmOrderRuleController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
                             <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                             <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
@@ -76,11 +76,18 @@
                             <label class ="label">#{msg.feedbackComment}</label>
                             <p:inputText id="remark" value="#{pmOrderRuleController.selected.remark}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup >
+                        <h:panelGroup rendered="#{!pmOrderRuleController.getPmRule()}">
                             <label class ="label">#{msg.ruleLevel}*</label>
                             <p:selectOneMenu value="#{pmOrderRuleController.selected.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{pmOrderRuleController.getPmRule()}">
+                            <label class ="label">#{msg.ruleLevel}*</label>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>

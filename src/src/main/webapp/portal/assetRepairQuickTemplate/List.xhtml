@@ -23,8 +23,6 @@
 
                     <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
                     <p:ajax event="filter" listener="#{assetRepairQuickTemplateController.onFilter}" update="createButton editButton deleteButton"/>
-                   <!-- sortBy="#{item.templateType}" filterBy="#{item.templateType}" filterMatchMode="EQ"
-                    sortBy="#{item.createDate}" filterBy="#{item.createDate}" filterMatchMode="GTE-->
                     <p:column headerText="模板类别" filterBy="#{item.templateType}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('assetRepairQuickTemplateType',item.templateType)}"/>
                         <f:facet name="filter">
@@ -43,9 +41,6 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
-                    <!--<p:column headerText="所属机构">
-                        <h:outputText value="#{assetRepairQuickTemplateController.findHierOrgUid(item.hierOrgUid)}"/>
-                    </p:column>-->
                     <p:column headerText="模板主题" >
                         <h:outputText value="#{item.templateTitle}"/>
                     </p:column>
@@ -75,12 +70,12 @@
                         </h:outputText>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_FAULTS_VIEW')}">
                             <p:dataExporter type="xls" target="datalist" fileName="AssetRepairQuickTemplate_export"/>
                         </p:commandButton>
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetRepairQuickTemplateController.prepareCreate}" update=":AssetRepairQuickTemplateEditDlg" oncomplete="PF('AssetRepairQuickTemplateEditDialog').show()"/>
-                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetRepairQuickTemplateController.prepareEdit}" update=":AssetRepairQuickTemplateEditDlg" oncomplete="PF('AssetRepairQuickTemplateEditDialog').show()" disabled="#{empty assetRepairQuickTemplateController.selected}"/>
-                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetRepairQuickTemplateController.delete}" update="datalist" disabled="#{empty assetRepairQuickTemplateController.selected}">
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetRepairQuickTemplateController.prepareCreate}" update=":AssetRepairQuickTemplateEditDlg" oncomplete="PF('AssetRepairQuickTemplateEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_FAULTS_EDIT')}"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetRepairQuickTemplateController.prepareEdit}" update=":AssetRepairQuickTemplateEditDlg" oncomplete="PF('AssetRepairQuickTemplateEditDialog').show()" disabled="#{empty assetRepairQuickTemplateController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_FAULTS_EDIT')}"/>
+                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetRepairQuickTemplateController.delete}" update="datalist" disabled="#{empty assetRepairQuickTemplateController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_FAULTS_EDIT')}">
                             <p:confirm header="删除" message="确定删除该快捷模板？" icon="ui-icon-alert"/>
                         </p:commandButton>
                     </f:facet>
