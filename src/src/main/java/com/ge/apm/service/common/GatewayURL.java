@@ -104,6 +104,8 @@ public enum GatewayURL {
     LEASE_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/rent/shortcut"),
     RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut"),
     GET_VOUCHER_NUM("/hcapmworkflowservice/api/apm/allocation/voucherNum"),
+    REJECT_APPLY("/hcapmworkflowservice/api/apm/allocation/rent/rejectApply"),
+    REJECT_RETURN("/hcapmworkflowservice/api/apm/allocation/rent/rejectReturn"),
 
     BATCH_FILE_UPLOAD("/hcapmreportservice/api/apm/batchFile/upload"),
 
@@ -143,8 +145,19 @@ public enum GatewayURL {
     REMOVE_USER_FROM_REDIS("/hcapmgateway/api/apm/security/userAccounts/removeUser/{loginName}"),
     USER_SIGNATURE("/hcapmmasterdataservice/api/apm/masterData/userSignature"),
     GET_CONFIG_BY_KEY_AND_SITE("/hcapmmasterdataservice/api/apm/masterData/configItem/getByKeyAndSite"),
-    ;
 
+    //es查询设备修改历史记录分页
+    SEARCH_ASSET_HISTORY("/hcapmelasticservice/assetHistory/searchAssetHistory"),
+    ELASTICSEARCH_QUERY("/hcapmelasticservice/elasticSearch/query"),
+    SEARCH_ASSET_HISTORY_LIST("/hcapmelasticservice/assetHistory/searchAssetHistoryList"),
+    INSERT_ASSET_HISTORY("/hcapmelasticservice/assetHistory/insertAssetHistory"),
+    INSERT_PHYSICAL_DATA_DEL("/hcapmelasticservice/physicalDataDel/insertPhysicalDataDel"),
+    ELASTICSEARCH_INSERT("/hcapmelasticservice/elasticSearch/insert"),
+    INSERT_BUSINESS_ERROR_LOG("/hcapmelasticservice/businessErrorLog/insertBusinessErrorLog"),
+    // jimureport
+    JI_MU_REPORT("/apmReport/jmreport/view"),
+
+    ;
     private final String url;
 
     GatewayURL(String url) {

@@ -33,6 +33,9 @@ public interface PmOrderRuleRepository extends GenericRepository<PmOrderRule> {
 	@Query(value= "select por.uid from pm_order_rule por,rel_rule_asset rra where rra.asset_uid in ?1 and por.uid = rra.rule_uid2" ,nativeQuery = true)
 	List<String> findPmRuleForBatch(Set<String> uidList);
 
+	@Query(value= "select por.* from pm_order_rule por where por.uid in ?1" ,nativeQuery = true)
+	List<PmOrderRule> getPmOrderRulesByUids(List<String> ruleUids);
+
 	@Query(value= "select * from pm_order_rule por where por.tenant_uid = ?1" ,nativeQuery = true)
 	List<PmOrderRule> findPmRuleByTenant(String tenantUid);
 

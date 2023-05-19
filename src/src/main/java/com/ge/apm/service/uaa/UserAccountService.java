@@ -1,6 +1,6 @@
 package com.ge.apm.service.uaa;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.ge.apm.dao.*;
@@ -270,21 +270,31 @@ public class UserAccountService {
 	}
 
 	@Transactional
-	public void updateUserOrg(String userUid, Set<OrgInfo> selectedOrgList,List<String> treeDeleteUrgOidList,int SiteId,List<String> unselectInstitutions,List<String> unselectUidss,boolean selectAllButton,OrgInfo orgInfo46,List<OrgInfo> orgInfoTableData46) {
-		if(46==SiteId){
+	public void updateUserOrg(UserAccount userAccount, Set<OrgInfo> selectedOrgList,List<String> treeDeleteUrgOidList,List<String> unselectInstitutions,List<String> unselectUidss,boolean selectAllButton,OrgInfo orgInfo46,List<OrgInfo> orgInfoTableData46) {
+		String userUid = userAccount.getUid();
+        List<UserOrgInfo> userOrgInfos = new ArrayList();
+        for (OrgInfo selectedOrg : selectedOrgList) {
+            UserOrgInfo userOrg = new UserOrgInfo();
+            userOrg.setOrgType(selectedOrg.getOrgType());
+            userOrg.setOrgUid(selectedOrg.getUid());
+            userOrg.setUserUid(userUid);
+            userOrgInfos.add(userOrg);
+        }
+		if(46==userAccount.getSiteId()){
 			if(selectAllButton){//如果为全选状态
-				userOrgDao.deleteByUserUid(userUid);//清空该用户所有的权限
 				List<UserOrgInfo> userOrgList = new ArrayList();
 				UserOrgInfo userOrg = new UserOrgInfo();
 				userOrg.setOrgType(orgInfo46.getOrgType());
 				userOrg.setOrgUid(orgInfo46.getUid());
 				userOrg.setUserUid(userUid);
 				userOrgList.add(userOrg);
+				userAccount.setListUserOrgInfo(userOrgList);
+				userAccountHistoryService.save(UserAccount.HistoryAction.UPDATE_ORG.name(), userAccount);
+				userOrgDao.deleteByUserUid(userUid);//清空该用户所有的权限
 				userOrgDao.save(userOrgList);
 				return;
 			}else{
 				if(orgInfoTableData46.size()>0){
-					userOrgDao.deleteByUserUid(userUid);
 					List<UserOrgInfo> userOrgList = new ArrayList();
 					for (OrgInfo selectedOrg : orgInfoTableData46) {
 						UserOrgInfo userOrg = new UserOrgInfo();
@@ -293,6 +303,9 @@ public class UserAccountService {
 						userOrg.setUserUid(userUid);
 						userOrgList.add(userOrg);
 					}
+					userAccount.setListUserOrgInfo(userOrgList);
+					userAccountHistoryService.save(UserAccount.HistoryAction.UPDATE_ORG.name(), userAccount);
+					userOrgDao.deleteByUserUid(userUid);
 					userOrgDao.save(userOrgList);
 					return;
 				}else{
@@ -306,6 +319,8 @@ public class UserAccountService {
 					}
 					List<String> institutionUIDList = new ArrayList<String>(institutionUIDs);
 					institutionUIDList.addAll(unselectInstitutions);
+                    userAccount.setListUserOrgInfo(userOrgInfos);
+                    userAccountHistoryService.save(UserAccount.HistoryAction.UPDATE_ORG.name(), userAccount);
 					userOrgDao.deleteByUserUid46(userUid ,institutionUIDList);
 					if(unselectUidss.size()>0){
 						userOrgDao.deleteByUserUids46(userUid ,unselectUidss);
@@ -314,19 +329,12 @@ public class UserAccountService {
 
 			}
 		}else{
+            userAccount.setListUserOrgInfo(userOrgInfos);
+            userAccountHistoryService.save(UserAccount.HistoryAction.UPDATE_ORG.name(), userAccount);
 			userOrgDao.deleteByUserUid(userUid);
 		}
 
-		List<UserOrgInfo> userOrgList = new ArrayList();
-		for (OrgInfo selectedOrg : selectedOrgList) {
-			UserOrgInfo userOrg = new UserOrgInfo();
-			userOrg.setOrgType(selectedOrg.getOrgType());
-			userOrg.setOrgUid(selectedOrg.getUid());
-			userOrg.setUserUid(userUid);
-			userOrgList.add(userOrg);
-		}
-
-		userOrgDao.save(userOrgList);
+		userOrgDao.save(userOrgInfos);
 	}
 
 	public String getUserLanguageByLoginName(String loginName) {
@@ -348,7 +356,7 @@ public class UserAccountService {
 		UserAccount currentUser = UserContextService.getCurrentUserAccount();
 		userAccount.setLastModifiedBy(currentUser.getLoginName());
 		userAccount.setLastModifiedDate(new Date());
-		userAccountHistoryService.save(WebUtil.PersistAction.DELETE, userAccount);
+		userAccountHistoryService.save(UserAccount.HistoryAction.DELETE.name(), userAccount);
 	}
 
 	public boolean whetherTheCallIsRepeated(String telephone,UserAccount userAccount){

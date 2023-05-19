@@ -116,6 +116,12 @@
                 <p:column headerText="#{msg.departNum}">
                     <h:outputText value="#{asset.departNum}"/>
                 </p:column>
+                <p:column headerText="#{msg.serialNum}">
+                    <h:outputText value="#{asset.serialNum}"/>
+                </p:column>
+                <p:column headerText="二维码编号">
+                    <h:outputText value="#{asset.qrCode}"/>
+                </p:column>
             </p:dataTable>
         </p:panelGrid>
 
@@ -150,6 +156,12 @@
                 </p:column>
                 <p:column headerText="#{msg.departNum}">
                     <h:outputText value="#{asset.departNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.serialNum}">
+                    <h:outputText value="#{asset.serialNum}"/>
+                </p:column>
+                <p:column headerText="二维码编号">
+                    <h:outputText value="#{asset.qrCode}"/>
                 </p:column>
             </p:dataTable>
         </p:panelGrid>

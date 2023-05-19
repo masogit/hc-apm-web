@@ -134,7 +134,7 @@
 
                     <h:outputText value="#{item.currentStepName}"/>
                 </p:column>
-                <p:column headerText="#{msg.intExtType}" rendered="#{!userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">
+                <p:column headerText="#{msg.intExtType}" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                 </p:column>
                 <p:column headerText="#{msg.PlannedCompletionTime}"  sortBy="#{item.planTime}" filterBy="#{item.planTime}" filterMatchMode="GTE" >
@@ -146,7 +146,7 @@
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE" rendered="#{v2SupplierPmOrderController.queryIndex==7 or userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">
+                <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE" rendered="#{v2SupplierPmOrderController.queryIndex==7 or userContextService.hasCurrentTenantName('')}">
                     <f:facet name="filter">
                         <p:inputText id="filterActualCompletionTime" widgetVar="varFilterActualCompletionTime" value="#{v2SupplierPmOrderController.actualCompletionTimeFormat}"/>
                     </f:facet>
@@ -181,7 +181,7 @@
                 <p:column style="width: 100px" headerText="#{msg.Operation}" rendered="#{v2SupplierPmOrderController.queryIndex==31}" exportable="false">
                     <p:commandButton  class="finishButton" value="#{msg.Complete}" disabled="#{v2SupplierPmOrderController.isChecked()}" rendered="#{item.simplify}" actionListener="#{v2SupplierPmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
-                    <p:commandButton  class="competeButton" disabled="#{v2SupplierPmOrderController.isChecked()}" value="#{userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())?msg.TakeOrder:msg.Compete }" rendered="#{item.simplify ne true}" actionListener="#{v2SupplierPmOrderController.prepareActTakeGrap(item.id,msg.OrderCompetitionDialog)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
+                    <p:commandButton  class="competeButton" disabled="#{v2SupplierPmOrderController.isChecked()}" value="#{userContextService.hasCurrentTenantName('')?msg.TakeOrder:msg.Compete }" rendered="#{item.simplify ne true}" actionListener="#{v2SupplierPmOrderController.prepareActTakeGrap(item.id,msg.OrderCompetitionDialog)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
                     <p:commandButton value="#{msg.Cancel}" update="pmTab:pmCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2SupplierPmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
                 </p:column>
 
@@ -240,7 +240,7 @@
                         <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchCancel}"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2SupplierPmOrderController.preBatchCancel()}"  rendered="#{ (v2SupplierPmOrderController.queryIndex==0 or v2SupplierPmOrderController.queryIndex==31 or v2SupplierPmOrderController.queryIndex==3 or v2SupplierPmOrderController.queryIndex==2 or v2SupplierPmOrderController.queryIndex==-1)}" disabled="#{v2SupplierPmOrderController.batchCancelShow() or not v2SupplierPmOrderController.isChecked()}" oncomplete="PF('pmBatchCancelDialog').show()">
                         </p:commandButton>
 
-                        <p:commandButton  icon="ui-icon-art-track" actionListener="#{v2SupplierPmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="#{userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())?msg.BatchTake:msg.BatchGrap}"  rendered="#{v2SupplierPmOrderController.queryIndex==31}" disabled="#{not v2SupplierPmOrderController.isBatchRob()}" oncomplete="PF('robOrderDialog').show()">
+                        <p:commandButton  icon="ui-icon-art-track" actionListener="#{v2SupplierPmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="#{userContextService.hasCurrentTenantName('')?msg.BatchTake:msg.BatchGrap}"  rendered="#{v2SupplierPmOrderController.queryIndex==31}" disabled="#{not v2SupplierPmOrderController.isBatchRob()}" oncomplete="PF('robOrderDialog').show()">
                         </p:commandButton>
 
                         <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2SupplierPmOrderController.prepareAct(item.id)}" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchClose}"  rendered="#{v2SupplierPmOrderController.queryIndex==6}" update="@(.closePmDialogClassBatch)" disabled="#{not v2SupplierPmOrderController.isChecked()}" oncomplete="PF('closePmDialogBatch').show()">

@@ -1,6 +1,6 @@
 package com.ge.apm.service.wo;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
@@ -244,6 +244,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("EquipmentName_xlsx"), workOrderExportPojo.getAssetName());
             workOrderMap.put(WebUtil.getMessage("Site"), workOrderExportPojo.getHospitalName());
             workOrderMap.put(WebUtil.getMessage("Department"), workOrderExportPojo.getAssetClinicalDeptName());
+            workOrderMap.put(WebUtil.getMessage("Site"), workOrderExportPojo.getHospitalName());
             workOrderMap.put(WebUtil.getMessage("manufacture"), workOrderExportPojo.getAssetManufacture());
             workOrderMap.put(WebUtil.getMessage("brand"), workOrderExportPojo.getAssetMakerShortName());
             workOrderMap.put(WebUtil.getMessage("MaintenanceSubStatus"), getSubStatus(workOrderExportPojo.getSubStatus()));

@@ -19,14 +19,14 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="风险管理"/>
+                <p:outputLabel class="pageTitle" value="医疗设备风险评估"/>
             </div>
 
             <div class="ui-g-12 card">
 
                 <h:form id="searchForm">
                     <h:panelGrid id="searchPanel" columns="3">
-                        <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
+                        <h:panelGroup>
                             <p:commandButton id="btnOrg" value="#{empty assetRiskAssessmentController.selectSite? msg.AllHospitals:assetRiskAssessmentController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                 <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
@@ -63,7 +63,6 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-<!--                        <p:ajax  event="rowSelect" listener="#{assetRiskAssessmentController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>-->
                         <p:ajax event="filter" listener="#{assetRiskAssessmentController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                         <p:column width="36"  id="checkBoxColumn">
@@ -77,7 +76,7 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="操 作" exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
-                            <p:link target="_new" title="#{msg.Edit}" outcome="#{assetRiskAssessmentController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin') and assetRiskAssessmentController.getIsRiskAssessment(item)}">
+                            <p:link target="_new" title="#{msg.Edit}" outcome="#{assetRiskAssessmentController.getEditPage(item.uid,item.name)}"  rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_EDIT') and assetRiskAssessmentController.getIsRiskAssessment(item)}">
                                 <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                             </p:link>
                             <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetRiskAssessmentController.deleteAsset(item)}" update="datalist">
@@ -135,10 +134,10 @@
                         </p:column>
 
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('assetRiskAssessmentCreate.xhtml?actionName=Create')}"  />
+                            <p:commandButton id="createButton" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_EDIT')}" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('assetRiskAssessmentCreate.xhtml?actionName=Create')}"  />
                             <p:commandButton title="#{msg.exportToDoc}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetRiskAssessmentController.exportWord}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
-                                <p:fileDownload value="#{assetRiskAssessmentController.zipFile}" />
+                                <p:fileDownload value="#{assetRiskAssessmentController.zipFile}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_VIEW')}"  />
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>

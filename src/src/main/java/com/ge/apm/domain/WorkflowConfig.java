@@ -140,6 +140,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "pm_rule_level_four")
     private Boolean pmRuleLevelFour ; // 是否启用四级规则
 
+    @Column(name = "pm_fourth_rule_level_for_asset")
+    private Boolean pmFourthRuleLevelForAsset ; // 是否启用质控绑定多个规则
+
     @Column(name = "wo_direct_reception")
     private Boolean woDirectReception ; // 设备直接验收(接收)
 
@@ -267,6 +270,10 @@ public class WorkflowConfig implements Serializable {
     @Getter
     @Column(name = "enable_asset_preview")
     private Boolean enableAssetPreview;
+    @Setter
+    @Getter
+    @Column(name = "enable_send_repair")
+    private Boolean enableSendRepair;
     //是否启用小型物联网设备(急救类)服务
     @Column(name = "is_io_tenabled")
     private Boolean isiotenabled;
@@ -495,6 +502,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setPmRuleLevelFour(Boolean pmRuleLevelFour) {
         this.pmRuleLevelFour = pmRuleLevelFour;
+    }
+
+    public Boolean getPmFourthRuleLevelForAsset() {
+        return pmFourthRuleLevelForAsset == null? false:pmFourthRuleLevelForAsset;
+    }
+
+    public void setPmFourthRuleLevelForAsset(Boolean pmFourthRuleLevelForAsset) {
+        this.pmFourthRuleLevelForAsset = pmFourthRuleLevelForAsset;
     }
 
     public Integer getClinicalDeptHeadWeight() {
@@ -858,6 +873,13 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "aa_enable_hospital_adjustment")
     private Boolean enableHospitalAdjustment = Boolean.FALSE;//是否开启医院调剂
 
+    @Column(name = "aa_enable_stock_show")
+    private Boolean enableStockShow = Boolean.FALSE;//是否开启库存显示
+    @Column(name = "start_sending_time")
+    private Date startSendingTime;
+    @Column(name = "end_sending_time")
+    private Date endSendingTime;
+
     @Column(name = "aa_default_maintain_man_hour")
     private Double defaultMaintainManHour = 0.0D;
 
@@ -882,6 +904,12 @@ public class WorkflowConfig implements Serializable {
     //注册证到期提醒提前次数
     @Column(name = "registration_certificate_expire_times")
     private Integer registrationCertificateExpireTimes;
+    //授权书到期提醒提前天数
+    @Column(name = "power_of_attorney_expire_days")
+    private Integer powerOfAttorneyExpireDays;
+    //授权书到期提醒提前次数
+    @Column(name = "power_of_attorney_expire_times")
+    private Integer powerOfAttorneyExpireTimes;
 
     public Boolean getMeasurementRepair() {
         return measurementRepair;
@@ -945,6 +973,22 @@ public class WorkflowConfig implements Serializable {
 
     public void setRegistrationCertificateExpireTimes(Integer registrationCertificateExpireTimes) {
         this.registrationCertificateExpireTimes = registrationCertificateExpireTimes;
+    }
+
+    public Integer getPowerOfAttorneyExpireDays() {
+        return powerOfAttorneyExpireDays;
+    }
+
+    public void setPowerOfAttorneyExpireDays(Integer powerOfAttorneyExpireDays) {
+        this.powerOfAttorneyExpireDays = powerOfAttorneyExpireDays;
+    }
+
+    public Integer getPowerOfAttorneyExpireTimes() {
+        return powerOfAttorneyExpireTimes;
+    }
+
+    public void setPowerOfAttorneyExpireTimes(Integer powerOfAttorneyExpireTimes) {
+        this.powerOfAttorneyExpireTimes = powerOfAttorneyExpireTimes;
     }
 
     public Integer getShareAutoConfirm() {
@@ -1553,6 +1597,22 @@ public class WorkflowConfig implements Serializable {
         return  this.isPmSupplierAutoEnabled;
     }
 
+    public Date getStartSendingTime() {
+        return startSendingTime;
+    }
+
+    public void setStartSendingTime(Date startSendingTime) {
+        this.startSendingTime = startSendingTime;
+    }
+
+    public Date getEndSendingTime() {
+        return endSendingTime;
+    }
+
+    public void setEndSendingTime(Date endSendingTime) {
+        this.endSendingTime = endSendingTime;
+    }
+
     public void setIsPmSupplierAutoEnabled(Boolean isPmSupplierTakeOrderEnabled) {
         if(Boolean.TRUE.equals(isPmSupplierTakeOrderEnabled)){
             this.isPmTakeOrderEnabled =false;
@@ -1592,6 +1652,14 @@ public class WorkflowConfig implements Serializable {
             enableHospitalAdjustment=Boolean.FALSE;
         }
         this.enableHospitalAdjustment = enableHospitalAdjustment;
+    }
+
+    public Boolean getEnableStockShow() {
+        return enableStockShow;
+    }
+
+    public void setEnableStockShow(Boolean enableStockShow) {
+        this.enableStockShow = enableStockShow;
     }
 
     @Override

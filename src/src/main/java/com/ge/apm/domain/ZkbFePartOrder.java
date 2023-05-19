@@ -2,9 +2,12 @@ package com.ge.apm.domain;
 
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
+import webapp.framework.util.StringUtil;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -536,6 +539,12 @@ public class ZkbFePartOrder {
     private String geAdminComment;
 
     /**
+     * GE Admin  非ge设备未维修完成备注
+     */
+    @Column(name = "ge_admin_Nge_comment")
+    private String geAdminNgeComment;
+
+    /**
      * 是否已经上传催收函
      */
     @Column(name = "has_upload_letter")
@@ -578,6 +587,17 @@ public class ZkbFePartOrder {
      */
     @Transient
     private String assetType;
+    /**
+     * 设备供应商
+     */
+    @Transient
+    private String manufacture;
+
+    @Transient
+    private String qrCode;//二维码
+
+    @Transient
+    private String departNum;//主机序列号
 
     /**
      * 是否高值探头
@@ -616,6 +636,50 @@ public class ZkbFePartOrder {
      */
     @Column(name = "maintain_flag")
     private String maintainFlag;
+
+    /** * 是否非ge设备  t/f */
+    @Column(name = "not_ge_asset")
+    private String notGeAsset;
+
+    public String getDepartNum() {
+        return departNum;
+    }
+
+    public void setDepartNum(String departNum) {
+        this.departNum = departNum;
+    }
+
+    public String getGeAdminNgeComment() {
+        return geAdminNgeComment;
+    }
+
+    public void setGeAdminNgeComment(String geAdminNgeComment) {
+        this.geAdminNgeComment = geAdminNgeComment;
+    }
+
+    public String getManufacture() {
+        return manufacture;
+    }
+
+    public void setManufacture(String manufacture) {
+        this.manufacture = manufacture;
+    }
+
+    public String getNotGeAsset() {
+        return notGeAsset;
+    }
+
+    public void setNotGeAsset(String notGeAsset) {
+        this.notGeAsset = notGeAsset;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
 
     public String getId() {
         return id;

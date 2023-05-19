@@ -52,13 +52,12 @@
                         </p:column>
 
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{userVacationScheduleController.prepareCreate}" update=":userVacationScheduleEditDlg" oncomplete="PF('userVacationScheduleEditDialog').show()" />
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{userVacationScheduleController.delete}" update=":userVacationScheduleListForm:datalist" disabled="#{empty userVacationScheduleController.selected.id || userVacationScheduleController.selected.auditStatus=='Approved'}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{userVacationScheduleController.prepareCreate}" update=":userVacationScheduleEditDlg" oncomplete="PF('userVacationScheduleEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_VACATION_EDIT')}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{userVacationScheduleController.delete}" update=":userVacationScheduleListForm:datalist" disabled="#{empty userVacationScheduleController.selected.id || userVacationScheduleController.selected.auditStatus=='Approved'}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_VACATION_DELETE')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
-                            <p:commandButton id="approveButton" icon="ui-icon-check" class="btn btn-sm btn-gray" title="#{msg.audit}" actionListener="#{userVacationScheduleController.validateAudit}" disabled="#{empty userVacationScheduleController.selected.id || userVacationScheduleController.selected.auditStatus!='PendingApproval' || !userContextService.hasRole('AssetHead')}" update=":auditVacationDlg" oncomplete="PF('auditVacationDialog').show()"/>
+                            <p:commandButton id="approveButton" icon="ui-icon-check" class="btn btn-sm btn-gray" title="#{msg.audit}" actionListener="#{userVacationScheduleController.validateAudit}" disabled="#{empty userVacationScheduleController.selected.id || userVacationScheduleController.selected.auditStatus!='PendingApproval'}" update=":auditVacationDlg" oncomplete="PF('auditVacationDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_VACATION_APPROVE')}"/>
                         </f:facet>
-
                     </p:dataTable>
 
                 </h:form>

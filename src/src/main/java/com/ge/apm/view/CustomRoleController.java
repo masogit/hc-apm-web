@@ -9,10 +9,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -20,7 +24,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.CustomRoleRepository;
@@ -31,7 +34,6 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.CustomRoleService;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
-
 import lombok.Getter;
 import lombok.Setter;
 import webapp.framework.dao.SearchFilter;
@@ -55,6 +57,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	private JSONArray authJSONArr;
 	private Map<String,String[]> mapAuthCard=new HashMap<String,String[]>();
 	private TenantInfoConfigService tenantConfigService;
+	private UaaService uaaService;
 	@Getter
 	@Setter
 	private List<String> versionLabelKey;
@@ -74,6 +77,19 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		keyRoles.add("系统激活专用");
 	}
 
+	@Getter@Setter
+	private String filterFunctionStr;
+	@Getter@Setter
+	private List<ApmFunction> allFunction;
+	@Getter@Setter
+	private List<ApmFunction> functions;
+	@Getter@Setter
+	private List<ApmFunction> selectedFunctions;
+	@Getter@Setter
+	private List<ApmFunction> customSelectedFunctions;
+	@Getter@Setter
+	private List<ApmFunction> customFunctions;
+
 	@Override
 	protected void init() {
 		filterBySite = false;
@@ -81,11 +97,14 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		dao = WebUtil.getBean(CustomRoleRepository.class);
 		i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
 		service = WebUtil.getBean(CustomRoleService.class);
-//		initMenu();
+		uaaService = WebUtil.getBean(UaaService.class);
 		listI18nMenus = service.getMenusByTenant(user.getTenantUID());
 		listI18nCards=service.getCardI18n();
 		authJSONArr = service.getAuth();
 		service.init();
+		Set<String> apmFunctions = uaaService.getFunctionListByTenantUid(user.getTenantUID());
+		allFunction = Arrays.stream(ApmFunction.values()).filter(f -> apmFunctions.contains(f.name()) && (!f.name().startsWith("PLATFORM_") || !f.name().startsWith("CONFIG_"))).collect(Collectors.toList());
+		functions = allFunction;
 	}
 
 	@Override
@@ -161,6 +180,18 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			if (StringUtils.isNotEmpty(selected.getMenus())) {
 				menus = selected.getMenus().split(",");
 //				tenantConfigService.parseMenuList(selected.getMenus());
+			}
+			try {
+				if (StringUtils.isNotEmpty(selected.getFunctionList())) {
+					List<String> functions = (List<String>) JSONObject.parse(selected.getFunctionList());
+					selectedFunctions = allFunction.stream().filter(f -> functions.contains(f.name())).collect(Collectors.toList());
+					customFunctions = selectedFunctions;
+					customSelectedFunctions = customFunctions;
+				} else {
+					selectedFunctions = new ArrayList<>();
+				}
+			} catch (Exception e) {
+				selectedFunctions = new ArrayList<>();
 			}
 		}
 	}
@@ -293,15 +324,37 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			selected.setGroups(StringUtils.join(group, ","));
 			selected.setAuthoritiesCH(removeComma(sb1));
 			selected.setAuthorities(StringUtils.join(authorities, ","));
-		}
-		else{
+		} else{
 			selected.setGroups("");
 			selected.setAuthoritiesCH("");
 			selected.setAuthorities("");
 		}
-		authChange();
-		selected.setWebAuthoritiesCH(service.parseAuthArray(authJSONArr));
-		selected.setWebAuthorities(authJSONArr.toString());
+		if (isOpenNewMenuRoles()) {
+			if (CollectionUtils.isNotEmpty(customSelectedFunctions)) {
+				Set<ApmFunction> apmFunctions = Arrays.stream(ApmFunction.values()).filter(f -> customSelectedFunctions.contains(f.name())).collect(Collectors.toSet());
+				apmFunctions.forEach(f -> System.out.println(f.getFunctionName()));
+				selected.setWebAuthoritiesCH(JSONObject.toJSONString(apmFunctions.stream().map(ApmFunction::getFunctionName).collect(Collectors.toSet())).replaceAll("[\\[\\]\"]", ""));
+				selected.setFunctionList(JSONObject.toJSONString(customSelectedFunctions));
+			}
+		} else {
+			authChange();
+			selected.setWebAuthoritiesCH(service.parseAuthArray(authJSONArr));
+			selected.setWebAuthorities(authJSONArr.toString());
+		}
+		if (menus.length > 0 && !isOpenNewMenuRoles()) {
+			StringBuilder sb2 = new StringBuilder();
+			for (String card : menus) {
+				if (map.containsKey(card)) {
+					sb2.append(map.get(card).getValue() + ",");
+				}
+			}
+			selected.setMenusCH(removeComma(sb2));
+			selected.setMenus(parseMenus(menus));
+		}
+		else{
+			selected.setMenusCH("");
+			selected.setMenus("");
+		}
 		if (cards.length > 0) {
 			StringBuilder sb2 = new StringBuilder();
 			for (String card : cards) {
@@ -316,22 +369,6 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			selected.setCardsCH("");
 			selected.setCards("");
 		}
-		if (menus.length > 0) {
-			StringBuilder sb2 = new StringBuilder();
-			for (String card : menus) {
-				if (map.containsKey(card)) {
-					sb2.append(map.get(card).getValue() + ",");
-				}
-			}
-			selected.setMenusCH(removeComma(sb2));
-			selected.setMenus(parseMenus(menus));
-		}
-		else{
-			selected.setMenusCH("");
-			selected.setMenus("");
-		}
-//		selected.setMenus(tenantConfigService.toMenusStr());
-//		selected.setMenusCH(tenantConfigService.toMenusLabelStr());
 		dao.save(selected);
 		authorities = new String[200];
 		cards = new String[100];
@@ -359,6 +396,9 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 			cards[i] = listI18nCards.get(i).getMsgKey();
 		}
 		authJSONArr=service.getAuth();
+		selectedFunctions = new ArrayList<>();
+		customSelectedFunctions = new ArrayList<>();
+		customFunctions = new ArrayList<>();
 	}
 
 	public String removeComma(StringBuilder sb) {
@@ -448,5 +488,33 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		this.tenantConfigService = tenantConfigService;
 	}
 
+	public boolean isOpenNewMenuRoles() {
+		if (selected == null) {
+			return false;
+		}
+		UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+		TenantInfo tenantInfo = userContextService.getTenantInfo();
+		return  tenantInfo.getEnablesNewMenu() && StringUtils.isNotEmpty(tenantInfo.getFeatureList());
+	}
+
+	public void filterFunction() {
+		functions = allFunction;
+		if (StringUtils.isEmpty(filterFunctionStr)) {
+			return;
+		} else {
+			functions = functions.stream().filter(item -> item.getFunctionName().toLowerCase().contains(filterFunctionStr.toLowerCase())).collect(Collectors.toList());
+		}
+	}
+
+	public void selectChekBox() {
+		customSelectedFunctions = selectedFunctions;
+		customFunctions.clear();
+
+		customFunctions.addAll(Arrays.stream(ApmFunction.values()).filter(f -> selectedFunctions.contains(f.name())).collect(Collectors.toList()));
+	}
+
+	public void unSelectChekBox() {
+		selectedFunctions = customSelectedFunctions;
+	}
 
 }

@@ -2,7 +2,7 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.AssetHistoryRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -13,17 +13,22 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.I18nMessageService;
+import com.ge.apm.service.remote.ElasticService;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
+import javax.persistence.Column;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
@@ -47,7 +52,7 @@ public class AssetHistoryService {
     public static final String IS_VALID = "isValid";
     public static final String ASSET_DISPOSAL_RESULTS = "assetDisposalResults";
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private AssetHistoryRepository assetHistoryRepository;
@@ -67,6 +72,9 @@ public class AssetHistoryService {
     @Autowired
     private MqUtils mqUtils;
 
+    @Autowired
+    private ElasticService elasticService;
+
     /**
      * @return void
      * @throws
@@ -84,7 +92,13 @@ public class AssetHistoryService {
     }
 
     public List<JSONObject> getAssetChangeHistoryByJSON(String assetUid) {
-        List<AssetHistory> resultList = assetHistoryRepository.findByUidOrderByCreatedDateDescAtMostFive(assetUid);
+//        List<AssetHistory> resultList = assetHistoryRepository.findByUidOrderByCreatedDateDescAtMostFive(assetUid);
+        List<SearchFilter> searchFilters =new ArrayList<> ();
+        searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ,assetUid));
+        List<String> assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
+        searchFilters.add(new SearchFilter("json_data", SearchFilter.Operator.CONTAINS,assetsImportantFieldsAll));
+        Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, UserContextService.getAccessToken(), 0, 5);
+        List<AssetHistory> resultList = assetHistoryPage.getContent();
         CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         resultList = resultList.stream().filter(assetHistory -> {
             List<AssetHistory.AssetHistoryInfo> assetHistoryInfos = JSONArray.parseArray(assetHistory.getJsonData(), AssetHistory.AssetHistoryInfo.class);
@@ -126,6 +140,12 @@ public class AssetHistoryService {
             //multiple column value changed
             objects.stream().forEach(item -> {
                 String columnName = ((JSONObject) item).getString("columnName");
+                if("createdBy".equals(columnName)){
+                    return;
+                }
+                if("createdDate".equals(columnName)){
+                    return;
+                }
                 String oldColumnValue = "";
                 if (((JSONObject) item).containsKey("oldColumnValue")) {
                     oldColumnValue = ((JSONObject) item).getString("oldColumnValue");
@@ -247,6 +267,12 @@ public class AssetHistoryService {
         if (Objects.equals(oldFieldValue, newFieldValue)) {
             return Optional.empty();
         }
+        String oldValue = ObjectUtils.toString(oldFieldValue, "");
+        String newValue = ObjectUtils.toString(newFieldValue, "");
+
+        if(org.apache.commons.lang3.StringUtils.isBlank(oldValue) && org.apache.commons.lang3.StringUtils.isBlank(newValue)){
+            return Optional.empty();
+        }
         if ("purchasePrice".equals(fieldName)) {
             java.text.DecimalFormat df = new java.text.DecimalFormat("########.00");
             if (oldFieldValue != null) {
@@ -256,14 +282,39 @@ public class AssetHistoryService {
                 newFieldValue = df.format(newFieldValue);
             }
         }
+        Temporal temporal = field.getAnnotation(Temporal.class);
         AssetHistory.AssetHistoryInfo assetHistoryInfo = new AssetHistory.AssetHistoryInfo();
         assetHistoryInfo.setColumnName(fieldName);
-        assetHistoryInfo.setOldColumnValue(objToString(fieldName, oldFieldValue));
-        assetHistoryInfo.setNewColumnValue(objToString(fieldName, newFieldValue));
+        if(temporal!=null && temporal.value().equals(TemporalType.DATE)){
+            oldFieldValue= objToString(field, oldFieldValue);
+            newFieldValue = objToString(field, newFieldValue);
+            if (Objects.equals(oldFieldValue, newFieldValue)) {
+                return Optional.empty();
+            }
+            assetHistoryInfo.setOldColumnValue(oldFieldValue==null?null:oldFieldValue.toString());
+            assetHistoryInfo.setNewColumnValue(newFieldValue==null?null:newFieldValue.toString());
+        }else{
+            assetHistoryInfo.setOldColumnValue(objToString(fieldName, oldFieldValue));
+            assetHistoryInfo.setNewColumnValue(objToString(fieldName, newFieldValue));
+        }
+
         assetHistoryInfo.setLabel(WebUtil.getMessage(fieldName));
 
         return Optional.of(assetHistoryInfo);
 
+    }
+    private String objToString(Field field, Object fieldValue) {
+        if (null == fieldValue) {
+            return null;
+        }
+
+        if (fieldValue instanceof Date) {
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+            return  sdf2.format(fieldValue);
+        }
+        String result = fieldValue.toString();
+
+        return result;
     }
 
     private String objToString(String fieldName, Object fieldValue) {
@@ -272,7 +323,6 @@ public class AssetHistoryService {
         }
 
         if (fieldValue instanceof Date) {
-
             return sdf.format(fieldValue);
         }
 
@@ -284,8 +334,20 @@ public class AssetHistoryService {
     public List<AssetHistory.AssetHistoryInfo> getAssetsHistoryModifiedFields(AssetInfo oldAsset, AssetInfo newAsset) {
 
         List<AssetHistory.AssetHistoryInfo> resultList = new ArrayList<>();
+        Field[] declaredFields = newAsset.getClass().getDeclaredFields();
+        List<Field> fields1 = Arrays.asList(declaredFields);
+        List<Field> fields2 = fields1.stream().filter(item -> {
+            Column annotation = item.getAnnotation(Column.class);
+            return annotation!=null;
+        }).collect(Collectors.toList());
 
-        CustomConfigConstant.getAssetsImportantFieldsAll().stream().forEach(fieldName -> {
+        List<String> collect = fields2.stream().map(item -> item.getName()).collect(Collectors.toList());
+        List<String> assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
+        List<String> removeList=Arrays.asList("id","createdDate");
+        collect.addAll(assetsImportantFieldsAll);
+        collect.removeAll(removeList);
+        collect = collect.stream().distinct().collect(Collectors.toList());
+        collect.stream().forEach(fieldName -> {
 
             try {
                 Optional<AssetHistory.AssetHistoryInfo> optionalResult;
@@ -352,28 +414,15 @@ public class AssetHistoryService {
     }
 
     public void saveAssetHistoryIfUpdated(AssetInfo oldAsset, AssetInfo newAsset) {
-        AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(newAsset,assetInfo);
         MqContext mqContext = new MqContext();
-        mqContext.setTime(new Date());
-        mqContext.setType("asset");
-        mqContext.setRoutingKey("asset.update");
-        mqContext.setExChange("assetChange");
+        mqContext.setClassName("AssetHistoryService");
+        mqContext.setServiceName("hc-apm-web");
+        mqContext.setMethodName("saveAssetHistoryIfUpdated");
+        mqContext.setDescribe("批量修改设备院区/调剂等");
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        JSONObject jsonObject =new JSONObject();
-        assetInfo.setHospital(null);
-        assetInfo.setQrCodeLib(null);
-        assetInfo.setAssetTags(null);
-        assetInfo.setBrand(null);
-        assetInfo.setTags(null);
-        //gson序列化只与属性(字段)有关，与get开头的方法无关
-        Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String str = g.toJson(assetInfo);
-        jsonObject.put("assetInfo",str);
-//        jsonObject.put("assetInfo",selected);
-        jsonObject.put("currentUserAccount",currentUserAccount);
-        mqContext.setJsonObject(jsonObject);
-        mqUtils.sendToMq(mqContext);
+        Locale locale = LocaleContextHolder.getLocale();
+        mqContext.setLocale(locale.getLanguage());
+        mqUtils.sendAssetToMQ(newAsset,currentUserAccount,mqContext);
     }
 
     public  <T> T depCopy(T srcList) {

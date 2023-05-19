@@ -1,6 +1,7 @@
 package com.ge.apm.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -50,7 +51,12 @@ public interface RelRuleAssetRepository extends GenericRepositoryUUID<RelRuleAss
 	@Transactional
 	@Query(value = "delete from rel_rule_asset where asset_uid in ?1",nativeQuery = true)
 	public void deleteByAssetUids(List<String> deleteAssetUids);
-
 	@Query(value = "select * from rel_rule_asset where asset_uid in ?1",nativeQuery = true)
 	public List<RelRuleAsset> findByAssetUids(List<String> deleteAssetUids);
+
+	@Query(value = "select * from rel_rule_asset where asset_uid in ?1",nativeQuery = true)
+	public List<RelRuleAsset> findByAssetUids1(Set<String> assetUids);
+
+	@Query(value = "select * from rel_rule_asset where asset_uid = ?1",nativeQuery = true)
+	public RelRuleAsset findByAssetUid(String AssetUids);
 }

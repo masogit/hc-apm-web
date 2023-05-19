@@ -86,7 +86,13 @@
                                 <f:selectItem itemValue="f" itemLabel="否"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">合同金额*</label>
+                            <p:selectOneMenu id="contractAmount" value="#{zkbContractEditController.selected.contractAmount}" required="true" requiredMessage="合同金额 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbcontractAmount')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">是否ZKB 599方案*</label>
                             <p:selectOneMenu  value="#{zkbContractEditController.selected.fiveNineNineFlag}" required="true" requiredMessage="是否ZKB 599合同 #{msg.ValidationRequire}">

@@ -17,8 +17,6 @@ public class RuleParam {
 
     private Boolean afterReminder;
 
-    private Integer pushDateUnit;
-
     private Integer pushDateValue;
 
     private String content;
@@ -31,7 +29,9 @@ public class RuleParam {
 
     private String noticeType;
 
-    private String noticeUser;
+    private List<String> noticeUser;
+
+    private String messageType;
 
     private Integer pushType;
 

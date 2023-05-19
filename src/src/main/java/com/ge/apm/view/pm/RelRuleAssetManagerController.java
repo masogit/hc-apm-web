@@ -25,18 +25,21 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -44,6 +47,8 @@ import java.util.stream.Collectors;
 public class RelRuleAssetManagerController extends GenericCRUDUUIDController<RelRuleAsset> {
 
 	private static final long serialVersionUID = -1L;
+    private PageUtil<RelRuleAsset> pageUtil = new PageUtil();
+
 	private RelRuleAssetRepository dao = null;
 	private UserAccount user;
 	private Map<String, AssetInfo> assetMap;
@@ -144,7 +149,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             searchFilterList.add(new SearchFilter("ruleUID", SearchFilter.Operator.EQ, filterRuleUIDRuleUid));
         }
         if (filterRuleUID4Level!=null && StringUtils.isNotEmpty(filterRuleUID4RuleUid)) {
-            searchFilterList.add(new SearchFilter("ruleUID4", SearchFilter.Operator.EQ, filterRuleUID4RuleUid));
+            String[] ruleUid4s = StringUtils.split(filterRuleUID4RuleUid, "|");
+            searchFilterList.add(new SearchFilter("ruleUID4", SearchFilter.Operator.CONTAINS, Arrays.asList(ruleUid4s)));
         }
         searchFilterList.addAll(searchFilters);
 		if(StringUtils.isNotEmpty(queryCondition)){
@@ -215,30 +221,10 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             relRuleAssetList.addAll(relRuleAssets);
         }
 		currentPageAssets = relRuleAssetList;
-        int size = relRuleAssetList.size();
-        relRuleAssetList= this.pageNum(relRuleAssetList, pageRequest);
-        Page<RelRuleAsset>  assetInfoPage = new PageImpl<RelRuleAsset>(relRuleAssetList, pageRequest, size);
+        Page<RelRuleAsset> assetInfoPage = pageUtil.pageNum(relRuleAssetList, pageRequest);
 		initMap(relRuleAssetList);
 		return assetInfoPage;
 	}
-    private List<RelRuleAsset> pageNum(List<RelRuleAsset> relRuleAssetList,PageRequest pageRequest){
-        int pageNumber = pageRequest.getPageNumber();
-        int pageSize = pageRequest.getPageSize() - 1;
-        int numStart = pageNumber * pageSize;
-        numStart = numStart + pageNumber;
-        int numEnd = numStart + pageSize + 1;
-        int size = relRuleAssetList.size();
-        if(size > numEnd && CollectionUtils.isNotEmpty(relRuleAssetList)){
-            relRuleAssetList = relRuleAssetList.subList(numStart ,numEnd);
-        }else {
-            if (size > numStart) {
-                relRuleAssetList = relRuleAssetList.subList(numStart ,size);
-            } else {
-                relRuleAssetList = new ArrayList<>();
-            }
-        }
-        return relRuleAssetList;
-    }
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
@@ -263,8 +249,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             }
         });
     }
-    public List<String> autoLevelRulePMName(Integer level) {
-	    getRuleList();
+    public List<String> autoLevelRulePMName(String query) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Integer level = Integer.valueOf(UIComponent.getCurrentComponent(context).getAttributes().get("level").toString() == null
+                ? "0" : UIComponent.getCurrentComponent(context).getAttributes().get("level").toString());
+        getRuleList();
         if(level!=null){
             filterRuleLevel=level;
             switch (level) {
@@ -281,7 +270,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                     filterRuleUID4Level = level;
                     break;
             }
-            pmOrderRuleList = pmOrderRuleList.stream().filter(s -> s.getLevel() ==level).collect(Collectors.toList());
+            pmOrderRuleList = pmOrderRuleList.stream().filter(s -> s.getLevel() == level && s.getName().contains(query)).collect(Collectors.toList());
         }
         return pmOrderRuleList.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
@@ -458,11 +447,15 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	}
 
 	public String getRuleName(String ruleUID) {
-		PmOrderRule rule = ruleMap.get(ruleUID);//pmOrderRuleRepository.findByUid(ruleUID);
-		if (rule != null) {
-			return rule.getName();
-		}
-		return null;
+        String[] split = StringUtils.split(ruleUID, '|');
+        List<String> ruleUids = Arrays.asList(split);
+
+        List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findByUidIn(ruleUids);
+         String ruleName = "";
+        if(CollectionUtils.isNotEmpty(pmOrderRules)){
+             ruleName = pmOrderRules.stream().map(PmOrderRule::getName).collect(Collectors.joining("|"));
+        }
+        return ruleName;
 	}
     public boolean getPmRule(){
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
@@ -573,6 +566,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	 */
 	public void exportRelRuleAssets() {
 		try {
+            searchFilters.addAll(getOrgFilter(user.getSiteUID()));
 			List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(this.searchFilters);
 			List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(relRuleAssets.stream().map(relRuleAsset -> {return relRuleAsset.getAssetUID();}).collect(Collectors.toList()));
 			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
@@ -580,6 +574,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+        searchFilters.removeAll(getOrgFilter(user.getSiteUID()));
 	}
 
 	/**

@@ -47,6 +47,15 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query("select t from OrgInfo t where t.name in ?1 and t.orgType=4 and t.siteUID=?2")
     public List<OrgInfo> getDepartmentByName(Set<String> name, String siteUID);
 
+    @Query("select t from OrgInfo t where t.name in ?1 and t.orgType=3 and t.hospitalUID=?2")
+    public List<OrgInfo> getSiteByName(Set<String> name, String hospitalUID);
+
+    @Query("select t from OrgInfo t where t.name in ?1 and t.orgType=2 and t.institutionUID=?2")
+    public List<OrgInfo> getHospitalByName(Set<String> name, String institutionUID);
+
+    @Query("select t from OrgInfo t where t.name in ?1 and t.orgType=1 and t.tenantUID=?2")
+    public List<OrgInfo> getInstitutionByName(Set<String> name, String tenantUID);
+
     @Query(value = "select o.* from org_info o where o.parent_uid=?1", nativeQuery = true)
     public List<OrgInfo> fetchOrgByParentUid(String parentUid);
 
@@ -61,6 +70,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     @Query("select o from OrgInfo o,UserOrgInfo u where o.uid=u.orgUid and u.userUid=?1")
     public List<OrgInfo> getByUser(String userUid);
+
+    @Query("select o from OrgInfo o,ReminderRuleOrg r where o.uid=r.orgUid and r.ruleUid=?1")
+    public List<OrgInfo> getByReminderRule(String userUid);
 
     @Query("select o from OrgInfo o,PermissionGroupOrg p where o.uid=p.orgUid and p.permissionGroupUid in ?1")
     public List<OrgInfo> getOrgListByPermissionGroup(List<String> permissionGroupUidList);
@@ -318,4 +330,10 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
             "    where oi.org_type < 4\n" +
             ") select * from cte_org", nativeQuery = true)
     List<String> getSiteOrgUidsByParentUid(String uid);
+
+    @Query(value = "select o.uid from org_info o where (o.tenant_uid in (?1) or o.institution_uid in (?1) or o.hospital_uid in (?1) or o.site_uid in (?1)) and o.org_type=4",nativeQuery = true)
+    Set<String> findClinicalDeptOrgUidListByOrgUid(Set<String> orgUid);
+
+    @Query(value = "select o.id from org_info o where o.uid in (?1)",nativeQuery = true)
+    Set<Integer> findIdListByUid(Set<String> orgUid);
 }

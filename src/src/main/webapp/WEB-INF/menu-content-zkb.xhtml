@@ -146,6 +146,7 @@
                 <p:menuitem value="合同管理 New" outcome="/portal/zkb/contract/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.contractMgt')}"/>
                 <p:menuitem value="课程管理 New" outcome="/portal/zkb/course/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.courseMgt') and userContextService.zkbAdmin}"/>
                 <p:menuitem value="合同名额日志" outcome="/portal/zkb/contractQuotaLog/List.xhtml" rendered="#{userContextService.geAdmin}"/>
+                <p:menuitem value="备件号维护" outcome="/portal/zkb/highPart/List.xhtml" rendered="#{userContextService.geAdmin}"/>
 <!--                <p:menuitem value="课程计划" outcome="/portal/zkb/courseSchedule/List.xhtml" rendered="#{userContextService.editCourseScheduleAdmin or userContextService.zkbAdmin}"/>-->
 <!--                <p:menuitem value="原厂培训申请" outcome="/portal/zkb/train/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>-->
 <!--                <p:menuitem value="原厂培训报名" outcome="/portal/zkb/train/Sign.xhtml" rendered="#{!userContextService.zkbAdmin}"/>-->
@@ -158,7 +159,7 @@
             <p:submenu label="#{msg.ZKBBasicInfo} New" icon="fa fa-clipboard" rendered="#{userContextService.accessContains('zkbBasicInfo')}">
                 <p:menuitem value="#{msg.ZKBAgentContactPersonMgt} New" outcome="/portal/zkb/contactPerson/List.xhtml" rendered="#{userContextService.accessContains('zkbBasicInfo.agentContactPersonMgt')}"/>
                 <p:menuitem value="#{msg.ZKBEngineerMgt} New" outcome="/portal/zkb/engineer/List.xhtml " rendered="#{userContextService.accessContains('zkbBasicInfo.engineerMgt')}"/>
-                <p:menuitem value="工程师资质查询 New" url="https://training.gehealthcare.cn/index/portal/entrance" target="_blank" />
+                <p:menuitem value="工程师资质查询 New" url="https://dawang.gehealthcare.cn/FE/portal/entrance;jsessionid=E8E58360621165830FB88643EC9504D5" target="_blank" />
             </p:submenu>
             <p:submenu label="维修服务 New" icon="fa fa-wrench">
                 <p:menuitem value="ZKB FE 维修申请" outcome="/portal/zkb/partOrder/List.xhtml" />

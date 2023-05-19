@@ -1,13 +1,18 @@
 package com.ge.apm.view.asset;
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
+import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateTime;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.pm.RelRuleAssetController;
@@ -64,6 +69,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private TenantOptionConfigRepository tenantOptionConfigRepository;
     private AssetHistoryService assetHistoryService;
     private RelRuleAssetRepository relRuleAssetRepository;
+    private UserRoleRepository userRoleRepository;
+    private CustomRoleRepository customRoleRepository;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -105,6 +112,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String installDateFormatTime = null;
     private String arriveDateFormatTime = null;
     private String factoryWarrantyDateFormatTime = null;
+    @Getter @Setter
+    private String mvsContractStartDate = null;
+    @Getter @Setter
+    private String mvsContractEndDate = null;
 
     private Boolean needShowAssetApproval;
 
@@ -173,6 +184,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
+        userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
+        customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
@@ -226,9 +239,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         long l = System.currentTimeMillis();
         logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<SearchFilter>();
-        }
+
         setUserSearchFilters();
         Integer newLifecyle = null;
         for(SearchFilter searchFilter : searchFilters) {
@@ -367,6 +378,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void setUserSearchFilters() {
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
         boolean assetStatus = "-1".equals(filterAssetStatus);
         if(assetStatus){
             this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, true));
@@ -591,12 +606,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             e.printStackTrace();
         }
     }
-    public void exportExcel() throws IOException {
 
-        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-
+    public void export(List<String> exportFields) throws IOException {
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
-//        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
         List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
@@ -604,8 +616,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         List<AssetInfo> assetList = getExportList();
 
-//        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
-//                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
         logger.info("start to export asset list to excel");
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
@@ -616,6 +626,76 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
 
         logger.info("export file: AssetInfo_export.xlsx successful.");
+    }
+
+    public void export1(List<String> exportFields) throws IOException {
+        logger.info("start to export asset list to excel");
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+        writerAsset(template, exportFields);
+
+        logger.info("exported asset list to excel, start to get input stream");
+
+        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+
+        logger.info("export file: AssetInfo_export.xlsx successful.");
+    }
+
+    public void writerAsset(AssetFileDynamicTemplate template, List<String> exportFields) {
+        List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
+
+        List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+        int num = 5000;
+        boolean siteFlag = exportFields.containsAll(ListUtil.newArrayList("医院", "集团"));
+        if (assetUids.isEmpty()) {
+            if(CollectionUtils.isEmpty(searchFilters)){
+                this.setUserSearchFilters();
+            }
+            int count = (int) dao.count(searchFilters);
+            int cycles = count / num;
+            ExcelDocumentStreamingWriter writer = template.initExcelWriter(count, exportFields, orgList);
+            int startRow = AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW;
+            for (int i = 0; i <= cycles; i++) {
+                PageRequest pageRequest = new PageRequest(i, num, lastPageSort);
+                Page<AssetInfo> page = dao.findBySearchFilter(searchFilters, pageRequest);
+                List<AssetInfo> assetList = page.getContent();
+                if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
+                    assetList =  orderByForParentAndChildren(assetList);
+                }
+                startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow);
+            }
+        } else {
+            List<AssetInfo> assetList = dao.findByUidIn(assetUids, lastPageSort);
+            if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
+                assetList =  orderByForParentAndChildren(assetList);
+            }
+            ExcelDocumentStreamingWriter writer = template.initExcelWriter(assetList.size(), exportFields, orgList);
+            template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW);
+        }
+        template.setFormula();
+    }
+
+    public void exportExcel() throws IOException {
+        export1(ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles()));
+    }
+
+    public void exportAssetExcel() throws IOException {
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        insertCrossSiteColumns(exportFields);
+        export1(exportFields);
+    }
+
+    private void insertCrossSiteColumns(List<String> exportFields) {
+        String hospitalColumn = WebUtil.getMessage("hospitalId");
+        int siteIndex = exportFields.indexOf(hospitalColumn);
+        if (siteIndex == -1){
+            return;
+        }
+        // 增加医院列
+        exportFields.add(siteIndex, WebUtil.getMessage("Hospital"));
+        // 增加集团列
+        exportFields.add(exportFields.size(), WebUtil.getMessage("Institution"));
     }
 
     public void batchProcessToBeTerminated() {
@@ -637,8 +717,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
             int originStatus = assetInfo.getStatus();
             assetInfo.setStatus(4);
-            assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo);
             dao.save(assetInfo);
+            assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo);
             aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
             assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         }
@@ -691,11 +771,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<AssetInfo> getExportList() {
-        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+        List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
         List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
-            //PageRequest pageRequest = new PageRequest(0,100,lastPageSort);
-            //Page<AssetInfo> esultList = dao.findBySearchFilter(searchFilters,pageRequest);
+            if(CollectionUtils.isEmpty(searchFilters)){
+                this.setUserSearchFilters();
+            }
             resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
@@ -724,6 +805,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
         List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
+            if(CollectionUtils.isEmpty(searchFilters)){
+                this.setUserSearchFilters();
+            }
             resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
@@ -998,6 +1082,35 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             return user.getName();
         }
         return null;
+    }
+
+    /**
+     *
+     * @param authKey
+     * @param roleName
+     *        a - create
+     *        d - delete
+     *        m - modify
+     *        s - search
+     *        o - export
+     *        i - import
+     * @return
+     */
+    public boolean hasCustomRole(String authKey, String roleName){
+        List<UserRole> userRoleList = userRoleRepository.findByUserIdAndRoleType(UserContextService.getUserID(), ApmConstant.CUSTOME_ROLE_TYPE);
+        for (UserRole userRole : userRoleList) {
+            String webAuthorities = customRoleRepository.findById(userRole.getRoleId()).getWebAuthorities();
+            if(null != webAuthorities){
+                JSONArray authJSONArr= JSONArray.parseArray(webAuthorities);
+                for (int i = 0; i < authJSONArr.size(); i++) {
+                    JSONObject ob = authJSONArr.getJSONObject(i);
+                    if(authKey.equals(ob.get("k")) && (Boolean) ob.get(roleName)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public OrgInfo getSelectSite() {

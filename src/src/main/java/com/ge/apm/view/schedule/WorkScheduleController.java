@@ -1,6 +1,5 @@
 package com.ge.apm.view.schedule;
 
-import cn.hutool.core.date.Week;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.schedule.UserScheduleService;
@@ -134,16 +133,14 @@ public class WorkScheduleController{
         selectOrgInfo = orgInfoDao.findBySearchFilter(searchFilters);
         OrgInfo selectSiteSchedule = userContextService.getSelectSiteSchedule();
         if(selectSiteSchedule == null){
-            Optional<OrgInfo> first = selectOrgInfo.stream().filter(item -> item.getOrgType() == 3).findFirst();
-            if (first.isPresent()) {
-                OrgInfo orgInfo = first.get();
-                userContextService.setSelectSiteSchedule(orgInfo);
-                selectSite=orgInfo;
-            }
+            OrgInfo orgInfo =null;
+            Optional<OrgInfo> first = selectOrgInfo.stream().sorted((item, item2) -> item2.getOrgType() - item.getOrgType()).findFirst();
+            orgInfo=first.get();
+            userContextService.setSelectSiteSchedule(orgInfo);
+            selectSite=orgInfo;
         }else{
             selectSite=selectSiteSchedule;
         }
-
     }
     private void loadScheduleData(){
         eventModel = new DefaultScheduleModel();
@@ -169,6 +166,7 @@ public class WorkScheduleController{
         DefaultScheduleEvent tempEvent = null;
 
         if(event.getId() == null){
+
             //新增记录
             tempUserSchedule = new UserSchedule();
             tempUserSchedule.setTenantUID(selectSite.getTenantUID());
@@ -188,7 +186,10 @@ public class WorkScheduleController{
             //JSF Schedule model
             tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), this.scheduleDate, this.scheduleDate, true);
             tempEvent.setData(tempUserSchedule);
-
+            if(!userScheduleService.getUserVacationList(tempUserSchedule.getScheduleDate(),tempUserSchedule.getUserUID(),tempUserSchedule.getScheduleDateStage(), UserSchedule.AuditStatus.Approved.name()).isEmpty()){
+                WebUtil.addErrorMessage(WebUtil.getMessage("ConfictingWithTheExistingRecords")+"（和休假冲突）");
+                return;
+            }
         }else{
             //更新记录
             if(event.getData() != null){
@@ -730,10 +731,12 @@ public class WorkScheduleController{
         if(org.springframework.util.CollectionUtils.isEmpty(orgList)){
             return null;
         }
+        List<OrgInfo> collect = orgList.stream().sorted((item, item2) ->item2.getOrgType()-item.getOrgType()).collect(Collectors.toList());
+        OrgInfo orgInfo = collect.get(0);
         TreeNode rootNode = new DefaultTreeNode("org", null, null);
         Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> {
             TreeNode org = new DefaultTreeNode("org", item, null);
-            if(item.getOrgType() != 3){
+            if(item.getOrgType() != orgInfo.getOrgType()){
                 org.setSelectable(false);
             }
             return org;

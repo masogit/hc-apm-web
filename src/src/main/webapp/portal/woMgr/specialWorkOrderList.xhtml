@@ -17,19 +17,9 @@
                 <p:tabView class="ui-g-12" id="woTab" dynamic="true" cache="false" activeIndex="#{workOrderTabController.queryTab}" >
 
                     <p:ajax event="tabChange" listener="#{workOrderMgrController.onTabChange}"/>
-                   <!-- <p:ajax event="tabChange"/>-->
                     <p:tab class="ui-g-12" title="#{msg.InternalWorkorder}" id="inWorkOrder" >
                         <ui:include src="specialWoMgrList.xhtml"/>
                     </p:tab>
-<!--                    <p:tab class="ui-g-12" title="MVS工单" id="mvsWorkOrder" rendered="#{userContextService.isYiMaiYangGuangTenant()}">-->
-<!--                        <ui:include src="mvs/woMvsMgrList.xhtml"/>-->
-<!--                    </p:tab>-->
-<!--                    <p:tab class="ui-g-12" title="#{msg.ExternalWorkorder}" id="outWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser()}">-->
-<!--                        <ui:include src="woMgrOutList.xhtml"/>-->
-<!--                    </p:tab>-->
-<!--                    <p:tab class="ui-g-12" title="#{msg.ExternalRemoteWorkorder}"  id="outRemoteWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser()}">-->
-<!--                        <ui:include src="woMgrOutRemoteList.xhtml"/>-->
-<!--                    </p:tab>-->
                 </p:tabView>
             </div>
         </div>

@@ -94,6 +94,22 @@ public class AssetInstallationService {
         return itemDao.findByArrivalListId(arrivalListId);
     }
 
+    public boolean assetIsInvalid(String assetUid) {
+        AssetInfo assetInfo = assetDao.findByUid(assetUid);
+        if (assetInfo == null) {
+            return true;
+        }
+        if (assetInfo != null) {
+            if (assetInfo.getStatus().equals(4)) {
+                return true;
+            }
+            if (assetInfo.getIsDeleted()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void deleteListItem(String arrivalListId, String siteUid) {
         List<ArrivalListItem> listItem = getListItem(arrivalListId);
         if (listItem != null) {
@@ -101,9 +117,34 @@ public class AssetInstallationService {
                 if (StringUtils.isNotEmpty(item.getQrCode())) {
                     deleteQrCode(item.getQrCode(), siteUid);
                 }
+                ContractInfoItem contractItem = contractItemDao.getByArrivalItemId(item.getId());
+                if (null != contractItem) {
+                    contractItemDao.delete(contractItem);
+                }
             }
             itemDao.delete(listItem);
         }
+    }
+
+    public List<AssetInfo> deleteListItemUnLimited(String arrivalListId, String siteUid) {
+        List<AssetInfo> validList = new ArrayList<>();
+        List<ArrivalListItem> listItem = getListItem(arrivalListId);
+        if (listItem != null) {
+            for (ArrivalListItem item : listItem) {
+                if (StringUtils.isNotEmpty(item.getQrCode())) {
+                    List<AssetInfo> result = deleteQrCodeAndAsset(item.getQrCode(), siteUid);
+                    if (result.size() > 0) {
+                        result.forEach(val -> validList.add(val));
+                        continue;
+                    }
+                }
+            }
+            if (validList.size() > 0) {
+                return validList;
+            }
+            itemDao.delete(listItem);
+        }
+        return new ArrayList<>();
     }
 
     public void deleteBlobObject(String arrivalListId) {
@@ -117,6 +158,10 @@ public class AssetInstallationService {
 
     private void deleteQrCode(String qrCode, String siteUid) {
         qrCodeService.deleteQrcode(qrCode, siteUid);
+    }
+
+    private List<AssetInfo> deleteQrCodeAndAsset(String qrCode, String siteUid) {
+        return qrCodeService.deleteQrcodeAndAsset(qrCode, siteUid);
     }
 
     public Boolean submitInstallItem(String itemId, Boolean isFinish, Boolean isGeneratePmOrder) {

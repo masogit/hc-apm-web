@@ -1,6 +1,9 @@
 package com.ge.apm.service.uaa;
 
-import cn.hutool.core.collection.ListUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.PermissionGroupMapper;
 import com.ge.apm.dao.mapper.PermissionGroupUserMapper;
@@ -58,6 +61,9 @@ public class UaaService {
 
     @Autowired
     private UserRoleRepository userRoleRepository;
+
+    @Autowired
+    private UserAccountHistoryService userAccountHistoryService;
 
     @Autowired
     private PermissionGroupMapper permissionGroupMapper;
@@ -276,13 +282,10 @@ public class UaaService {
     }
     
     @Transactional
-    public void setUserRoles(UserAccount userAccount, List<String> newRoleNames){
+    public void setUserRoles(boolean isCreated, UserAccount userAccount, List<String> newRoleNames){
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-        if(userAccount.getId()!=null){
-            userRoleDao.deleteByUserAccount(userAccount.getId());
-        }
         //then set user roles
         SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
         if((!newRoleNames.contains(TEMP_STAFF)) && (userAccount.getUserRoleNames().contains(TEMP_STAFF))){
@@ -298,6 +301,7 @@ public class UaaService {
         if(newRoleNames.isEmpty()){
             newRoleNames.add("临床科室人员");
         }
+        List<UserRole> userRoles = ListUtil.newArrayList();
         for(String newRoleName: newRoleNames){
             SysRole role = sysRoleDao.getByRoleDesc(newRoleName);
             if (role == null){
@@ -309,7 +313,7 @@ public class UaaService {
                     userRole.setUserId(userAccount.getId());
                     userRole.setRoleId(customRole.getId());
                     userRole.setRoleType(1);
-                    userRoleDao.save(userRole);
+                    userRoles.add(userRole);
                 }
             }
             else {
@@ -317,9 +321,20 @@ public class UaaService {
                 userRole.setUserId(userAccount.getId());
                 userRole.setRoleId(role.getId());
                 userRole.setRoleType(0);
-                userRoleDao.save(userRole);
+                userRole.setRole(role);
+                userRoles.add(userRole);
             }
         }
+        if (isCreated) {
+            userAccountHistoryService.updateNewUser(userAccount.getUid(), userAccount.getLoginName());
+        } else {
+            userAccount.setUserRoleList(userRoles);
+            userAccountHistoryService.save(UserAccount.HistoryAction.UPDATE_ROLE.name(), userAccount);
+        }
+        if(userAccount.getId()!=null){
+            userRoleDao.deleteByUserAccount(userAccount.getId());
+        }
+        userRoleDao.save(userRoles);
     }
 
     @Transactional
@@ -522,6 +537,10 @@ public class UaaService {
     //origin user accessible org list
     public List<OrgInfo> getOrgListByUser(String userUid){
         return orgInfoDao.getByUser(userUid);
+    }
+
+    public List<OrgInfo> getOrgListByReminderRule(String ruleUid){
+        return orgInfoDao.getByReminderRule(ruleUid);
     }
 
     public List<OrgInfo> getOrgListByPermissionGroup(List<String> permissionGroupUidList){
@@ -1618,4 +1637,37 @@ public class UaaService {
     public List<String> getPermissionGroupsByUserUid(String uid) {
         return permissionGroupUserMapper.getPermissionGroupsByUserUid(uid);
     }
+
+    public List<String> getFeatureListByTenantUid(String tenantUid) {
+        TenantInfo tenantInfo = tenantInfoDao.findByUid(tenantUid);
+        if (tenantInfo != null && StringUtils.isNotEmpty(tenantInfo.getFeatureList())) {
+            return (List<String>) JSONObject.parse(tenantInfo.getFeatureList());
+        }
+        return new ArrayList<>();
+    }
+
+    public Set<String> getFunctionListByTenantUid(String tenantUid) {
+        Set<String> functionList = new HashSet<>();
+        List<String> featureList = getFeatureListByTenantUid(tenantUid);
+        if (CollectionUtils.isNotEmpty(featureList)) {
+            List<ApmFeature> apmFeatures = Arrays.asList(ApmFeature.values()).stream().filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
+            apmFeatures.forEach(feature -> functionList.addAll(feature.getFunctionList().stream().map(f -> f.name()).collect(Collectors.toSet())));
+        }
+        return functionList;
+    }
+
+    public Set<String> getSysRoleListByTenantUid(String tenantUid) {
+        Set<String> functionList = getFunctionListByTenantUid(tenantUid);
+        Set<ApmFunction> apmFunctions = Arrays.asList(ApmFunction.values()).stream()
+                .filter(function -> functionList.contains(function.name())).collect(Collectors.toSet());
+        Set<String> roles = new HashSet<>();
+        apmFunctions.forEach(f -> roles.addAll(f.getRoleList().stream().map(r -> r.name()).collect(Collectors.toSet())));
+        return roles;
+    }
+
+    public boolean isOpenNewMenuRoles(String tenantUid) {
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUid);
+        return tenantInfo.getEnablesNewMenu() && StringUtils.isNotEmpty(tenantInfo.getFeatureList());
+    }
+
 }

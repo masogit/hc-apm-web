@@ -39,6 +39,9 @@ public class ZkbContract implements ChineseName, Serializable {
     public enum QuotaDeductTypeEnum{
         New,Old,Null
     }
+    public enum ContractAmount{
+        oneMillionMore,oneMillionLess
+    }
 
     public enum YOrNEnum{
         Y,N
@@ -138,6 +141,13 @@ public class ZkbContract implements ChineseName, Serializable {
     @Column(name = "probe_quota_use")
     private Integer probeQuotaUse = 0;
 
+
+    /**
+     * 合同金额	100W/年以下oneMillionLess  ；100W/年以上   oneMillionMore
+     */
+    @Column(name = "contract_amount")
+    private String contractAmount;
+
     @Column(name = "probe_quota_normal")
     private Integer probeQuotaNormal = 0;
     @Column(name = "probe_quota_normal_total")
@@ -165,6 +175,15 @@ public class ZkbContract implements ChineseName, Serializable {
     private Integer probeQuotaHighApply = 0;
     @Column(name = "probe_quota_high_total")
     private Integer probeQuotaHighTotal = 0;
+
+
+    public String getContractAmount() {
+        return contractAmount;
+    }
+
+    public void setContractAmount(String contractAmount) {
+        this.contractAmount = contractAmount;
+    }
 
     /**
      *GE人工支持剩余次数

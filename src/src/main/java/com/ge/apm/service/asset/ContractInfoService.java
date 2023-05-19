@@ -6,11 +6,21 @@
 package com.ge.apm.service.asset;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.aop.SendMQLog;
+import com.ge.apm.callback.DataDelVO;
+import com.ge.healthcare.cn.common.mq.MqContext;
+import com.ge.healthcare.cn.common.mq.RabbitConfig;
 import com.ge.apm.dao.*;
+import com.ge.apm.mq.MqUtils;
+import com.ge.apm.view.sysutil.UserContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +46,7 @@ import javaslang.Tuple2;
  */
 @Component
 public class ContractInfoService {
+    public static final Logger log = LoggerFactory.getLogger(ContractInfoService.class);
 
     @Autowired
     private ContractInfoItemRepository contractItemDao;
@@ -55,6 +66,9 @@ public class ContractInfoService {
     private UserAccountService userAccountService;
     @Autowired
     private AssetInfoRepository assetInfoDao;
+
+    @Autowired
+    private MqUtils mqUtils;
 
     public List<ContractInfoItem> getContractItems(String id) {
         return contractItemDao.findByContractId(id);
@@ -123,11 +137,31 @@ public class ContractInfoService {
 
         contractItemDao.delete(contractItems);
         contractDao.delete(contract);
-
+        sendMq(contract,"contract_info");
+        sendMq(contractItems,"contract_info_item");
         return true;
     }
 
-//    public List<V2_WorkOrder_Detail> getPartsInfo(String contractNum, String tenantUid) {
+    private void sendMq(Object object,String objectType) {
+        try {
+            MqContext mqContext = new MqContext();
+            mqContext.setClassName("ContractInfoController");
+            mqContext.setServiceName("hc-apm-web");
+            mqContext.setMethodName("deleteContract");
+            mqContext.setDescribe("合同列表删除合同");
+
+            mqContext.setTime(new Date());
+            mqContext.setExChange(RabbitConfig.PHYSICAL_DATA_DEL_CHANGE);
+            mqContext.setRoutingKey("");
+            mqContext.setType(RabbitConfig.PHYSICALDATADELETE);
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            mqUtils.sendPhysicalDataDel(object,objectType,userAccount,mqContext);
+        }catch (Exception e){
+            log.error("contract delete send mq error");
+        }
+    }
+
+    //    public List<V2_WorkOrder_Detail> getPartsInfo(String contractNum, String tenantUid) {
 //
 //        return partsDao.findByContractNum(contractNum, tenantUid);
 //    }
@@ -200,6 +234,8 @@ public class ContractInfoService {
         }
 
         contractItemDao.delete(item);
+        sendMq(item,"contract_info_item");
+
     }
 
 }

@@ -19,7 +19,6 @@
 			http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
 			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 
-
 			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
             http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
     <description><![CDATA[
@@ -37,8 +36,16 @@
     </context:component-scan>
     <context:property-placeholder
             location="classpath*:database.properties,classpath*:hibernate.properties,classpath*:risPacs.properties"/>
+    <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
 
     <!-- security -->
+    <bean id="expressionHandler" class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler">
+        <property name="permissionEvaluator" ref="customPermissionEvaluator" />
+    </bean>
+
+    <!-- 配置自定义的权限判断器 -->
+    <bean id="customPermissionEvaluator" class="com.ge.apm.view.sysutil.CustomPermissionEvaluator" />
+
     <security:authentication-manager>
         <security:authentication-provider user-service-ref="userDetailsService"/>
     </security:authentication-manager>

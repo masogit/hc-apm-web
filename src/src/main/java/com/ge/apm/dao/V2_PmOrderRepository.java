@@ -156,4 +156,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 	@Transactional
 	@Query(value = "delete from v2_pm_order where id in ?1",nativeQuery = true)
 	Integer deleteById(List<String> collect);
+
+	@Query(value = "select o.* from v2_pm_order o where o.asset_uid in ?1 and o.is_finished='false' ",nativeQuery = true)
+	List<V2_PmOrder> findByAssets(List<String> assetUids);
 }

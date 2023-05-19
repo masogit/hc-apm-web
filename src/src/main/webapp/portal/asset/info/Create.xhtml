@@ -495,14 +495,6 @@
                                 <label class="label">#{msg.terminateDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.terminateDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
-<!--                            <h:panelGroup rendered="#{empty assetInfoController.selected.uid}">
-                                <label class="label">同时生成保养工单*</label>
-                                <p:selectOneMenu  value="#{assetInfoController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItem itemLabel="是" itemValue="true"/>
-                                    <f:selectItem itemLabel="否" itemValue="false"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>-->
                             <h:panelGroup >
                                 <label class="label">#{msg.isWarrantyNotice}</label>
                                 <p:selectOneRadio value="#{assetInfoController.selected.warranty}">

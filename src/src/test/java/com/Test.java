@@ -1,25 +1,41 @@
 package com;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.callback.MqContext;
+import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.mq.MqUtils;
+import com.ge.apm.service.api.AssetsService;
+import com.ge.apm.service.asset.AssetHistoryService;
+import com.ge.apm.service.remote.ElasticService;
 import com.ge.apm.service.uaa.AdminConsoleService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.DateUtil;
 
-import java.util.Date;
-import java.util.HashMap;
+import javax.xml.crypto.Data;
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath*:config/springmvc-parent.xml")
 public class Test {
+
+    private static final Logger logger = LoggerFactory.getLogger(Test.class);
+
     @Autowired
     private MqUtils mqUtils;
 
@@ -98,4 +114,50 @@ public class Test {
     }
 
 
+    @Autowired
+    private ElasticService elasticService;
+    @Autowired
+    private AssetHistoryService assetHistoryService;
+    @org.junit.Test
+    public void loadData() {
+
+        String s="clinicalDeptName";
+        String s1 = s.toLowerCase();
+        List<SearchFilter> searchFilters=null;
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        String oneSearchStr="55";
+        String[] b=new String[] {"06d1c46be51444fea9f6ace11efc74c6"};
+
+        List<String> orgUidList = Arrays.asList(b);
+        searchFilters.add(new SearchFilter("tenant_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("institution_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospital_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("site_uid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        CustomConfigObject  customConfig = customConfigService.getCurrentCustomConfig(userAccount.getSiteUID());
+        String[] a=new String[] {"clinicalDeptName","qrCode","name","installDate","assetDeptName","departNum","financingNum","locationNotes"};
+        List<String> assetsImportantFields=Arrays.asList(a);
+        searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.CONTAINS, assetsImportantFields,"1*"));
+//        if(!StringUtils.isEmpty(oneSearchStr)) {
+//            searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.LIKE, oneSearchStr));
+//        }
+        String gte="2021-09-29 17:18:22";
+        Date dateByFormatStr = DateUtil.getDateByFormatStr(gte, "yyyy-MM-dd HH:mm:ss");
+
+        searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.GTE, dateByFormatStr,"1*"));
+
+        //convert to json data page
+
+        Page<AssetHistory> assetHistoryPage = elasticService.searchAssetHistory(searchFilters, "123", 0, 20);
+        List<JSONObject> dataLists = assetHistoryService.parseFieldsByJson(assetHistoryPage.getContent());
+        PageRequest pageRequest= new PageRequest(0, 20, null);
+
+        Page<JSONObject> jsonPage = new PageImpl<>(dataLists, pageRequest, assetHistoryPage.getTotalElements());
+        searchFilters = new ArrayList<SearchFilter>();
+        logger.info("assetHistoryPage size:{}",dataLists.size());
+        logger.info("assetHistoryPage :{}",dataLists.toArray());
+        searchFilters = new ArrayList<SearchFilter>();
+    }
 }

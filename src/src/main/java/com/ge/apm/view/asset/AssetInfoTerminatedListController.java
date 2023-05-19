@@ -6,6 +6,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -149,6 +151,10 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         lastPageSort = pageRequest.getSort(); //export excel use
+        if (lastPageSort.getOrderFor("lastModifiedDate")!=null) { // default sort desc
+            lastPageSort = new Sort(new Sort.Order(Sort.Direction.DESC,"lastModifiedDate"));
+            pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),lastPageSort);
+        }
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
@@ -166,9 +172,21 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         Set<String> orgUids = currentPageAssets.stream().filter(item -> item.getClinicalDeptUID() != null).map(item -> item.getClinicalDeptUID()).collect(Collectors.toSet());
         Set<String> orgUids2 = currentPageAssets.stream().filter(item -> item.getAssetDeptUID() != null).map(item -> item.getAssetDeptUID()).collect(Collectors.toSet());
         orgUids.addAll(orgUids2);
-
         if (orgUids.isEmpty()) {
             return;
+        }
+        Set<String> uids = currentPageAssets.stream().filter(item -> item.getUid() != null).map(item -> item.getUid()).collect(Collectors.toSet());
+        if(!CollectionUtils.isEmpty(uids)){
+            List<AssetLifecycle> lifecycles= assetLifecyleService.selectByUidsAndStatus(uids, AssetConstant.ASSET_STATUS_INVALID);
+            Map<String, List<AssetLifecycle>> collect = lifecycles.stream().collect(Collectors.groupingBy(AssetLifecycle::getAssetUid));
+            currentPageAssets.forEach(item -> {
+                List<AssetLifecycle> assetLifecycles = collect.get(item.getUid());
+                if(!CollectionUtils.isEmpty(assetLifecycles)){
+                    List<AssetLifecycle> assetLifecycleSortDesc = assetLifecycles.stream().sorted(Comparator.comparing(AssetLifecycle::getModifyTime).reversed()).collect(Collectors.toList());
+                    item.setTerminateOperation(assetLifecycleSortDesc.get(0).getModifyBy());
+                    item.setTerminateOperationDate(assetLifecycleSortDesc.get(0).getModifyTime());
+                }
+            });
         }
 
         List<OrgInfo> orgInfoList = orgDao.findByUids(orgUids);
@@ -582,6 +600,21 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
             //searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
             //filterWarrantyDate = null;
         }
+    }
+
+    public String getTerminateBy(String assetUid,int status){
+        AssetLifecycle assetLifecycle=assetLifecyleService.selectByAssetUidAndStatusOne(assetUid,status);
+        if(assetLifecycle!=null){
+            return assetLifecycle.getModifyBy();
+        }
+        return null;
+    }
+    public Date  getTerminateDate(String assetUid,int status){
+        AssetLifecycle assetLifecycle=assetLifecyleService.selectByAssetUidAndStatusOne(assetUid,status);
+        if(assetLifecycle!=null){
+            return assetLifecycle.getModifyTime();
+        }
+        return null;
     }
 
     public OrgInfo getSelectSite() {

@@ -66,7 +66,7 @@
                     </h:panelGrid>
 
                     <h:panelGrid id="searchPanel" columns="3">
-                        <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
+                        <h:panelGroup rendered="#{!userContextService.hasAnyRoleByApmRoles('MVSAdmin','MVSFE')}">
                             <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                 <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
@@ -84,7 +84,7 @@
                                 </p:scrollPanel>
                             </p:overlayPanel>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{userContextService.hasAnyRole('MVSAdmin,MVSFE')}">
+                        <h:panelGroup rendered="#{userContextService.hasAnyRoleByApmRoles('MVSAdmin','MVSFE')}">
 .                            <p:commandButton id="btnTenant" value="#{empty assetInfoListController.selectSite? msg.AllTenants:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
                             <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -101,12 +101,12 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <p:inputText id="searchText" value="#{assetInfoListController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}/#{msg.assetTags}" maxlength="100" style="width: 500px">
-                            <p:ajax event="keyup" update=":AssetInfoListForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''} searchButtons " />
+                            <p:ajax event="keyup" update=":AssetInfoListForm #{assetInfoListController.isShowColumn('warrantyDate')?':AssetInfoListForm:idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''} searchButtons " />
                         </p:inputText>
 
                         <h:panelGroup id='searchButtons'>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}"  rendered="#{empty assetInfoListController.oneSearchStr}"/>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" actionListener="#{assetInfoListController.setOneSearchStr('')}" rendered="#{not empty assetInfoListController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':AssetInfoListForm:idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}"  rendered="#{empty assetInfoListController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':AssetInfoListForm:idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" actionListener="#{assetInfoListController.setOneSearchStr('')}" rendered="#{not empty assetInfoListController.oneSearchStr}"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
@@ -134,12 +134,12 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="操 作" exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
+                        <p:column headerText="操 作" exportable="false" width="#{userContextService.hasAnyRoleByApmRoles('AssetHead')?60:30}" id="operatorColumn">
                             <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
-                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}">
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}" >
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
-                                <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
+                                <p:commandLink rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_DELETE')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
                                     <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
@@ -147,12 +147,6 @@
                             <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
                                 <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                             </p:commandButton>
-<!--                            <h:panelGroup rendered="#{assetInfoListController.filterAssetStatus == -1}">-->
-<!--                            <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteForever" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAssetForever(item)}" update="datalist" >-->
-<!--                                <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>-->
-<!--                                <p:confirm header="#{msg.DeleteConformation}" message="您确定要删除选定的记录么? 操作不可逆，设备记录将会丢失!" icon="ui-icon-warning"/>-->
-<!--                            </p:commandLink>-->
-<!--                            </h:panelGroup>-->
                         </p:column>
                         <p:column  headerText="是否已配置保养规则" rendered="#{assetInfoListController.showIsPm()}" filterBy="#{item.isPm}" filterMatchMode="EQ">
                             <h:outputText value="#{assetInfoListController.getRelRuleStatusName(item.uid,item.isPm)}"/>
@@ -227,8 +221,8 @@
                                         <h:outputText value="#{msg.assetDeptName}"/><br/>
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetDeptOrg}" appendTo="@(Body)"
                                                         scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
-                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" oncomplete="afterLoadRender()"/>
-                                            <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" oncomplete="afterLoadRender()"/>
+                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate" oncomplete="afterLoadRender()"/>
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate" oncomplete="afterLoadRender()"/>
                                         </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{item.assetDeptOrg.shortName}"/>
@@ -240,8 +234,8 @@
                                         <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterClinicalDeptOrg}" appendTo="@(Body)"
                                                         scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
-                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" oncomplete="afterLoadRender()" />
-                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>
+                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate" oncomplete="afterLoadRender()" />
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>
                                         </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
@@ -806,6 +800,42 @@
                                     <h:outputText value="#{item.assetQuantity}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'productFamily'}">
+                                <p:column headerText="#{msg.productFamily}" exportable="true" sortBy="#{item.productFamily}" filterBy="#{item.productFamily}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.productFamily}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'productSegment'}">
+                                <p:column headerText="#{msg.productSegment}" exportable="true" sortBy="#{item.productSegment}" filterBy="#{item.productSegment}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('productSegment', item.productSegment)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('productSegment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'mvsContractStartDate'}">
+                                <p:column headerText="#{msg.MVSContractStartDate}" exportable="true" sortBy="#{item.mvsContractStartDate}" filterBy="#{item.mvsContractStartDate}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.mvsContractStartDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterContractStartDate" widgetVar="varFilterContractStartDate" value="#{assetInfoListController.mvsContractStartDate}"/>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'mvsContractEndDate'}">
+                                <p:column headerText="#{msg.MVSContractEndDate}" exportable="true" sortBy="#{item.mvsContractEndDate}" filterBy="#{item.mvsContractEndDate}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.mvsContractEndDate}">
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
+                                    </h:outputText>
+                                    <f:facet name="filter">
+                                        <p:inputText id="filterContractEndDate" widgetVar="varFilterContractEndDate" value="#{assetInfoListController.mvsContractEndDate}"/>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
@@ -818,16 +848,16 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="batchToRelRule" oncomplete="PF('relRuleAssetDialog').show()" actionListener="#{assetInfoListController.setSelectedAssetsUids()}" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="#{msg.SetRulesInBatch}" disabled="#{not assetInfoListController.isChecked()}"/>
-                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}"/>
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportExcel}" update=":growl"
+                            <p:commandButton id="batchToRelRule" oncomplete="PF('relRuleAssetDialog').show()" actionListener="#{assetInfoListController.setSelectedAssetsUids()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_BATCH_PM')}" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="#{msg.SetRulesInBatch}" disabled="#{not assetInfoListController.isChecked()}"/>
+                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportAssetExcel}" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_READ')}"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
                                 <p:fileDownload value="#{assetInfoListController.excelFile}" />
                             </p:commandButton>
-                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
+                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{!assetInfoListController.terminate and userContextService.accessContainsFunctionMenu('ASSET_INFO_READ')}"/>
 
-                            <ui:fragment rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin') and userContextService.hasScrappedAuthority()}">
+                            <ui:fragment rendered="#{!assetInfoListController.terminate and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')}">
                                 <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchToBeTerminated}" actionListener="#{assetInfoListController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
                                     <p:confirm header="#{msg.ConfirmationOfBatchToBeTerminated}" message="#{msg.AreYouSureToConfirmTheRecordOfSelectedItemsToBeTerminated}" icon="ui-icon-warning"/>
                                 </p:commandButton>
@@ -837,88 +867,95 @@
                     </p:dataTable>
 
                     <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
+                    <p:overlayPanel id="idPanelFilterWarrantyDate" widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('warrantyDate')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterWarrantyDate', 'varWarrantyDateFrom', 'varWarrantyDateTo'); PF('panelFilterWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel widgetVar="panelFilterCreatedDate" for=":AssetInfoListForm:datalist:filterCreatedDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('createdDate')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterCreatedDate', 'varCreatedDateFrom', 'varCreatedDateTo'); PF('panelFilterCreatedDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterCreatedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel id="idPanelFilterManufactDate" widgetVar="panelFilterManufactDate" for=":AssetInfoListForm:datalist:filterManufactDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('manufactDate')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterManufactDate', 'varManufactDateFrom', 'varManufactDateTo'); PF('panelFilterManufactDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterManufactDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel id="idPanelFilterInstallDate" widgetVar="panelFilterInstallDate" for=":AssetInfoListForm:datalist:filterInstallDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('installDate')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterInstallDate', 'varInstallDateFrom', 'varInstallDateTo'); PF('panelFilterInstallDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterInstallDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel id="idPanelFilterArriveDate" widgetVar="panelFilterArriveDate" for=":AssetInfoListForm:datalist:filterArriveDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('arriveDate')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArriveDate', 'varArriveDateFrom', 'varArriveDateTo'); PF('panelFilterArriveDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterArriveDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel id="idPanelFilterFactoryWarrantyDate" widgetVar="panelFilterFactoryWarrantyDate" for=":AssetInfoListForm:datalist:filterFactoryWarrantyDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('factoryWarrantyDate')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterFactoryWarrantyDate', 'varFactoryWarrantyDateFrom', 'varFactoryWarrantyDateTo'); PF('panelFilterFactoryWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterFactoryWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel id="idPanelFilterMvsStartDate" widgetVar="panelFilterMvsStartDate" for=":AssetInfoListForm:datalist:filterContractStartDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('mvsContractStartDate')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varMvsStartDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varMvsStartDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterContractStartDate', 'varMvsStartDateFrom', 'varMvsStartDateTo'); PF('panelFilterMvsStartDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterMvsStartDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+                    <p:overlayPanel id="idPanelFilterMvsEndDate" widgetVar="panelFilterMvsEndDate" for=":AssetInfoListForm:datalist:filterContractEndDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('mvsContractEndDate')}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varMvsEndDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varMvsEndDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterContractEndDate', 'varMvsEndDateFrom', 'varMvsEndDateTo'); PF('panelFilterMvsEndDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterMvsEndDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
                 </h:form>
             </div>
         </div>
-
-        <p:overlayPanel id="idPanelFilterWarrantyDate" widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('warrantyDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterWarrantyDate', 'varWarrantyDateFrom', 'varWarrantyDateTo'); PF('panelFilterWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel widgetVar="panelFilterCreatedDate" for=":AssetInfoListForm:datalist:filterCreatedDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('createdDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterCreatedDate', 'varCreatedDateFrom', 'varCreatedDateTo'); PF('panelFilterCreatedDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterCreatedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel id="idPanelFilterManufactDate" widgetVar="panelFilterManufactDate" for=":AssetInfoListForm:datalist:filterManufactDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('manufactDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterManufactDate', 'varManufactDateFrom', 'varManufactDateTo'); PF('panelFilterManufactDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterManufactDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel id="idPanelFilterInstallDate" widgetVar="panelFilterInstallDate" for=":AssetInfoListForm:datalist:filterInstallDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('installDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterInstallDate', 'varInstallDateFrom', 'varInstallDateTo'); PF('panelFilterInstallDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterInstallDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel id="idPanelFilterArriveDate" widgetVar="panelFilterArriveDate" for=":AssetInfoListForm:datalist:filterArriveDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('arriveDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArriveDate', 'varArriveDateFrom', 'varArriveDateTo'); PF('panelFilterArriveDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterArriveDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-        <p:overlayPanel id="idPanelFilterFactoryWarrantyDate" widgetVar="panelFilterFactoryWarrantyDate" for=":AssetInfoListForm:datalist:filterFactoryWarrantyDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('factoryWarrantyDate')}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-                <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
-            </h:panelGrid>
-            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterFactoryWarrantyDate', 'varFactoryWarrantyDateFrom', 'varFactoryWarrantyDateTo'); PF('panelFilterFactoryWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
-            <p:commandButton onclick="PF('panelFilterFactoryWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
-        </p:overlayPanel>
-
-<!--        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;" rendered="#{assetInfoListController.isShowColumn('clinicalDeptName')}">
-            <p:scrollPanel style="height:300px;border: 0" mode="native">
-                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoListController.selectSite==null? '':assetInfoListController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
-                    <p:ajax process="@this" event="select"  listener="#{assetInfoListController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist :idVarPanelDeptOrg :idPanelFilterWarrantyDate" oncomplete="PF('varPanelDeptOrg').hide();"/>
-                    <p:ajax process="@this" event="expand"/>
-                    <p:ajax process="@this" event="collapse"/>
-                    <p:treeNode type="org">
-                        <h:outputText value="#{node.name}"/>
-                    </p:treeNode>
-                </p:tree>
-            </p:scrollPanel>
-        </p:overlayPanel>-->
         <ui:include src="RelRuleAsset.xhtml"/>
         <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ExportQRCode}">
             <h:form id="exportQrCodeForm" >
@@ -935,7 +972,7 @@
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:panelGroup>
-                <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoListController.exportQrCode}" update=":growl" 
+                <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoListController.exportQrCode}" update=":growl"
                                  onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
                     <p:fileDownload value="#{assetInfoListController.zipFile}" />
                 </p:commandButton>
@@ -943,7 +980,7 @@
             </h:form>
         </p:dialog>
 
-        <c:if test="#{assetInfoListController.customedColumns.contains('siteUID')}">
+        <c:if test="#{assetInfoListController.isShowColumn('siteUID')}">
             <h:form id="dataTableFilterByHospital">
             <p:overlayPanel widgetVar="varPanelOrg2" hideEffect="fade" dynamic="false" modal="false" class="dataTableFilterByHospital">
                     <p:inputText id="treeNodeNameFilter2" value="#{orgTreeController.treeNodeNameFilter}"/>
@@ -961,7 +998,7 @@
                     </p:scrollPanel>
             </p:overlayPanel>
         </h:form>
-        </c:if>        
+        </c:if>
 
         <script>
 

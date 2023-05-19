@@ -34,6 +34,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -131,6 +132,14 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
         Page<NurseSiteMaintainConfigJN> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
         return pageResult;
     }
+
+	public List<NurseSiteMaintainConfigJN> getConfigList(String clinicalDeptUid) {
+    	if(clinicalDeptUid==null) return new ArrayList<>();
+		Page<NurseSiteMaintainConfigJN> result = loadData(new PageRequest(0,1000));
+		return result.getContent().stream().filter(
+				nurseSiteMaintainConfigJN -> nurseSiteMaintainConfigJN.getClinicalDeptUID().equals(clinicalDeptUid)
+		).collect(Collectors.toList());
+	}
 
 	public void onSelectSiteTreeNode(NodeSelectEvent event) {
 		if(searchFilters!=null) searchFilters.clear();
@@ -514,11 +523,11 @@ public class MaintainConfigJNController extends GenericCRUDUUIDController<NurseS
 			return true;
 		}
 	}
-	
-//	public void onSelectedCheckItemChange(){
-//		checkSaveDisable();
-//	}
-	
+
+    public void onSelectedCheckItemChange() {
+
+	}
+
 	public void onAssetsTransfer(TransferEvent event) {
 		List<AssetInfo> collection=(List<AssetInfo>) event.getItems();
 		if(collection!=null && collection.size()>0){

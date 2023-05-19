@@ -12,26 +12,30 @@
 
         <h:form id="woMvsMgrListForm">
             <h:panelGrid id="buttonSet2" columns="12" cellpadding="5">
-                <p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(0)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==0}" rendered="#{!userContextService.hasCurrentTenantName('')}" />
-                <p:commandButton value="#{msg.RequestForRepair}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" disabled="true" rendered="false" />
-                <p:commandButton value="#{msg.repaired}" process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(1)}"  disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==1}" rendered="#{!userContextService.hasCurrentTenantName('')}" />
-                <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(10)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==10}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(2)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==2}" rendered="#{(userContextService.isDispatcher() or userContextService.hasRole('AssetHead')) and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(3)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==3}" rendered="#{userContextService.hasRole('AssetStaff') and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(4)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==4}" rendered="#{userContextService.hasRole('AssetStaff') and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitAck}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(5)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==5}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitFeedback}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(6)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==6}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(7)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==7}" rendered="#{userContextService.hasRole('AssetStaff') and !userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(8)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==8}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.canceled}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(9)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==9}" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(11)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==11}" rendered="#{!userContextService.hasCurrentTenantName('')}" />
-            <!--云阜 全部、待接单、维修中、已完成-->
-                <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(11)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==11}" rendered="#{userContextService.hasCurrentTenantName('')}" />
-                <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(3)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==3}" rendered="#{userContextService.hasRole('AssetStaff') and userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(4)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==4}" rendered="#{userContextService.hasRole('AssetStaff') and userContextService.hasCurrentTenantName('')}"/>
-                <p:commandButton value="已完成"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(8)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==8}" rendered="#{userContextService.hasCurrentTenantName('')}"/>
+                <c:choose>
+                    <c:when test="#{!userContextService.hasCurrentTenantName('')}">
+                        <p:commandButton value="#{msg.ToBeDone}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(0)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==0}"/>
+                        <p:commandButton value="#{msg.repaired}" process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(1)}"  disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==1}" />
+                        <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(10)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==10}"/>
+                        <p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(2)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}"/>
+                        <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(3)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==3}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+                        <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(4)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==4}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+                        <p:commandButton value="#{msg.waitAck}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(5)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==5}"/>
+                        <p:commandButton value="#{msg.waitFeedback}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(6)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==6}"/>
+                        <p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(7)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==7}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_CLOSE')}"/>
+                        <p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(8)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==8}"/>
+                        <p:commandButton value="#{msg.canceled}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(9)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==9}"/>
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(11)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==11}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <!--云阜 全部、待接单、维修中、已完成-->
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(11)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==11}"  />
+                        <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(3)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==3}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+                        <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(4)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==4}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_TAKE')}"/>
+                        <p:commandButton value="已完成"  process="@this" update="datalist buttonSet2 woTab:woMvsMgrDetailForm" action="#{workOrderMgrController.updateQueryIndex(8)}" disabled="#{workOrderMgrController.tabTitle eq 'MVS工单' and workOrderMgrController.queryIndex==8}"/>
+                    </c:otherwise>
+                </c:choose>
             </h:panelGrid>
-
             <p:dataTable id="datalist"  var="item" value="#{workOrderMgrController.lazyModel}" widgetVar="varDataList" selectionMode="single"
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"  selection="#{workOrderMgrController.selected}"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.serviceRequest.requestTime}"
@@ -85,7 +89,6 @@
 
                         </p:autoComplete>
                     </f:facet>
-                    <!--<h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>-->
                     <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                 </p:column>
                 <p:column headerText="#{msg.clinicalDeptName}"  width="100" rendered="#{userContextService.hasCurrentTenantName('')}">
@@ -100,7 +103,6 @@
                         </p:autoComplete>
                     </f:facet>
                     <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
-<!--                    <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>-->
                 </p:column>
 
                 <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
@@ -116,42 +118,21 @@
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" filterBy="#{item.serviceRequest.requestorName}" filterMatchMode="LIKE" rendered="#{userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" rendered="#{userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{item.serviceRequest.requestorName}"/>
                 </p:column>
-                <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="GTE" rendered="#{userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" rendered="#{userContextService.hasCurrentTenantName('')}">
                     <f:facet name="filter">
                         <p:inputText id="filterPlannedCompletionTime" widgetVar="varFilterRequestTime" value="#{workOrderMgrController.plannedCompletionTimeFormat}"/>
                     </f:facet>
                     <h:outputText value="#{item.serviceRequest.requestTime}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-<!--                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}"/>-->
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{msg.Assignee}" filterBy="#{item.id}" filterMatchMode="LIKE"  rendered="#{workOrderMgrController.queryIndex==8 and userContextService.hasCurrentTenantName('')}">
+                <p:column headerText="#{msg.Assignee}" rendered="#{workOrderMgrController.queryIndex==8 and userContextService.hasCurrentTenantName('')}">
                     <!--6 表示 step_name 是待关单-->
                     <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,6)}"/>
                 </p:column>
-                <p:column headerText="#{msg.Assignee}"  rendered="#{workOrderMgrController.queryIndex==8 and !userContextService.hasCurrentTenantName('')}">
-                    <!--6 表示 step_name 是待关单-->
-                    <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,6)}"/>
-                </p:column>
-                <!--当前处理步骤--><!--调试作用-->
-                <!-- <p:column headerText="#{msg.currentStep}" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
-                     <f:facet name="filter">
-                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0}">
-                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 2)}" itemValue="#{fieldMsg.fieldValue('woSteps', 2)}"  />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps',
-                             3)}" itemValue="#{fieldMsg.fieldValue('woSteps', 3)}" />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 4)}" itemValue="#{fieldMsg.fieldValue('woSteps', 4)}" />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 5)}" itemValue="#{fieldMsg.fieldValue('woSteps', 5)}" />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 6)}" itemValue="#{fieldMsg.fieldValue('woSteps', 6)}" />
-                         </p:selectOneMenu>
-                     </f:facet>
-                     <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
-                     <h:outputText value="#{item.currentStepId}"/>
-                 </p:column>-->
                 <!--当前处理步骤 for 待办-->
                 <p:column rendered="#{workOrderMgrController.queryIndex eq 0}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
 
@@ -199,11 +180,7 @@
                 <p:column width="90" headerText="#{msg.intExtType}" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                 </p:column>
-
-                <!--                        <p:column headerText="#{msg.currentPersonName}">
-                                        <h:outputText value="#{item.currentPersonName}"/>
-                                    </p:column>-->
-                <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" >
                     <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
                 </p:column>
 
@@ -215,18 +192,6 @@
             </p:dataTable>
         </h:form>
             <ui:include src="woMvsMgrView.xhtml"/>
-        <!--   <ui:include src="srCreate.xhtml"/>
-          <ui:include src="takeOrderDialog.xhtml"/>
-          <ui:include src="transferDialog.xhtml"/>
-          <ui:include src="repairCompleteDlg.xhtml"/>
-          <ui:include src="newOrderDidalog.xhtml"/>
-          <ui:include src="toCloseDlg.xhtml"/>
-          <ui:include src="editCloseDlg.xhtml"/>
-          <ui:include src="approveDlg.xhtml"/>
-          <ui:include src="moreAccDialogPrice.xhtml"/>-->
-
-
-
     </div>
     <p:overlayPanel id="idMvsPanelFilterPlannedCompletionTime" widgetVar="panelMvsFilterPlannedCompletionTime" for="woTab:woMvsMgrListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
         <h:panelGrid columns="2">
@@ -265,12 +230,6 @@
                             <f:selectItems value="#{workOrderMgrController.getWorkerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <!-- <h:panelGroup>
-                         <label class="label">#{msg.intExtType}*</label>
-                         <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.intExtType}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
-                             <f:selectItems value="#{fieldMsg.getFieldValueList('intExtType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                         </p:selectOneMenu>
-                     </h:panelGroup>-->
                 </p:panelGrid>
                 <br/>
                 <h:panelGroup>
@@ -287,7 +246,6 @@
                     <h:panelGroup>
                         <label class="label">#{msg.deviceStatus}*</label>
                         <p:selectOneMenu value="#{workOrderMgrController.assetStatus}" >
-                            <!--<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                             <f:selectItems value="#{assetInfoEditController.assetStatusList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{!item.editable}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
@@ -317,7 +275,6 @@
                         <label class="label">#{msg.status}</label>
                         <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
                             <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
-                            <!--<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(0).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(0).msgKey}" />
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(1).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(1).msgKey}" itemDisabled="false"/>
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(2).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(2).msgKey}" />
