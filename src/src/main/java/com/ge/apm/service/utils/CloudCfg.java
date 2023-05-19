@@ -1,5 +1,6 @@
 package com.ge.apm.service.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigValueFactory;
@@ -25,6 +26,7 @@ public class CloudCfg {
         .withValue("credentials.username", ConfigValueFactory.fromAnyRef("postgres"))
         .withValue("credentials.password", ConfigValueFactory.fromAnyRef("root"))
         .withValue("credentials.jdbc_uri", ConfigValueFactory.fromAnyRef("jdbc:postgresql://localhost:5432/ge_apm"))));
+    log.info("############################################## CloudCfg : "+ JSON.toJSONString(cfg));
     jdbcHost = cfg.getString("credentials.host");
     jdbcPort = cfg.getInt("credentials.port");
     jdbcDatabase = cfg.getString("credentials.database");
