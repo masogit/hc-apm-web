@@ -20,6 +20,7 @@ import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -30,6 +31,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -54,6 +56,8 @@ public class CustomConfigController {
     private UserCommonService userService;
     private ConfigService configService;
     private TenantOptionConfigRepository tenantOptionConfigRepository;
+    private UserContextService userContextService;
+
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
     private Map<String, Boolean> selectedAddFields;
@@ -80,9 +84,17 @@ public class CustomConfigController {
         configService = WebUtil.getBean(ConfigService.class);
         tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
         workflowConfigRepository = WebUtil.getBean(WorkflowConfigRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        UaaService uaaService = WebUtil.getBean(UaaService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
-        configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
+        if (userContextService.isOpenNewMenuRoles()) {
+            configRoles = userContextService.getApmSysRole().stream().collect(Collectors.toMap(ApmSystemRole::name, ApmSystemRole::getRoleName));
+            List<CustomRole> customRoles = WebUtil.getBean(UaaService.class).getTenantCustomRoles(selectSite.getTenantUID());
+            configRoles.putAll(customRoles.stream().collect(Collectors.toMap(CustomRole::getName, CustomRole::getName)));
+        } else {
+            configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
+        }
         selectedAddFields = new HashMap();
         pinYinComparator = new PinYinComparator();
         loadConfigForSite(selectSite.getUid());
