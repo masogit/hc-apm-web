@@ -31,11 +31,13 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
 import org.slf4j.Logger;
@@ -88,12 +90,11 @@ public class CustomConfigController {
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
+        configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
         if (userContextService.isOpenNewMenuRoles()) {
-            configRoles = userContextService.getApmSysRole().stream().collect(Collectors.toMap(ApmSystemRole::name, ApmSystemRole::getRoleName));
             List<CustomRole> customRoles = WebUtil.getBean(UaaService.class).getTenantCustomRoles(selectSite.getTenantUID());
+            customRoles = customRoles.stream().filter(r -> StringUtils.isNotEmpty(r.getFunctionList()) && r.getFunctionList().contains(ApmFunction.ASSET_INFO_READ.name())).collect(Collectors.toList());
             configRoles.putAll(customRoles.stream().collect(Collectors.toMap(CustomRole::getName, CustomRole::getName)));
-        } else {
-            configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
         }
         selectedAddFields = new HashMap();
         pinYinComparator = new PinYinComparator();
