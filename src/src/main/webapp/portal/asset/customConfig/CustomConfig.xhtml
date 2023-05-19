@@ -386,7 +386,7 @@
 
                 </h:form>
 
-                <p:dialog id="AssetFieldsEditDialog" widgetVar="AssetFieldsEditDialog" modal="true" width="950" height="700" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Edit}">
+                <p:dialog id="AssetFieldsEditDialog" widgetVar="AssetFieldsEditDialog" modal="true" width="950" height="450" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Edit}">
                     <h:form id="AssetFieldsEditForm" >
                         <h:panelGroup id="display" rendered="#{not empty customConfigController.currentEditField}">
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -403,7 +403,7 @@
                                     <p:selectBooleanCheckbox value="#{customConfigController.currentEditField.arrivalRequired}" disabled="#{customConfigController.isSystemFields(customConfigController.currentEditField.key)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <p:scrollPanel style="height: 450px; border: 0;" mode="native">
+                                    <p:scrollPanel style="height: 250px; border: 0;" mode="native">
                                         <label class="label">#{msg.ReadableRole}</label>
                                         <p:selectManyCheckbox value="#{customConfigController.currentEditField.readRoles}" layout="pageDirection">
                                             <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}" />
@@ -411,7 +411,7 @@
                                     </p:scrollPanel>
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <p:scrollPanel style="height: 450px; border: 0;" mode="native">
+                                    <p:scrollPanel style="height: 250px; border: 0;" mode="native">
                                         <label class="label">#{msg.ExportableRole}</label>
                                         <p:selectManyCheckbox value="#{customConfigController.currentEditField.exportRoles}" layout="pageDirection">
                                             <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
@@ -419,7 +419,7 @@
                                     </p:scrollPanel>
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <p:scrollPanel style="height: 450px; border: 0;" mode="native">
+                                    <p:scrollPanel style="height: 250px; border: 0;" mode="native">
                                         <label class="label">#{msg.ModifiableRole}</label>
                                         <p:selectManyCheckbox value="#{customConfigController.currentEditField.editRoles}" disabled="#{customConfigController.isReadOnlyFields(customConfigController.currentEditField.key)}" layout="pageDirection">
                                             <f:selectItems value="#{customConfigController.getRolesSelectItems()}" var="item" itemValue="#{item}" itemLabel="#{customConfigController.configRoles[item]}"/>
