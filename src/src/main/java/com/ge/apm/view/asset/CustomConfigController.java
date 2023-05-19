@@ -476,7 +476,7 @@ public class CustomConfigController {
     //角色名称
     public String getAssetFieldsRoles(List<String> roles) {
         StringBuilder res = new StringBuilder();
-        roles.stream().forEach(item -> res.append(configRoles.get(item)).append(" "));
+        roles.stream().forEach(item -> res.append(configRoles.get(item) == null ? "" : configRoles.get(item)).append(" "));
         return res.toString();
     }
 
