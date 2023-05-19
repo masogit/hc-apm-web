@@ -17,6 +17,12 @@
     <http pattern="/login.faces*" security="none"/>
     <http pattern="/error/*" security="none"/>
     <http pattern="/about.html" security="none"/>
+    <http pattern="/portal/asset/info/specialAssetList.xhtml" security="none"/>
+    <http pattern="/portal/woMgr/specialWorkOrderList.xhtml" security="none"/>
+    <http pattern="/portal/pm/specialPmOrderListAll.xhtml" security="none"/>
+    <http pattern="/portal/measuring/specialMeasuringResultMain.xhtml" security="none"/>
+    <http pattern="/portal/asset/riskAssessment/specialAssetRiskAssessmentList.xhtml" security="none"/>
+    <http pattern="/portal/asset/fileAttachment/specialList.xhtml" security="none"/>
 
     <beans:bean name="logoutHandler" class="com.ge.apm.view.sysutil.LogoutHandler" p:logoutSuccessUrl="/login.xhtml"/>
 
@@ -90,11 +96,11 @@
         <intercept-url pattern="/portal/i18n/FieldCodeType.xhtml**" access="hasAnyRole('SuperAdmin','ITAdmin','AssetHead','LocalITAdmin')"/> <!-- 系统编码配置 -->
 
         <!-- 设备档案 -->
-        <intercept-url pattern="/portal/asset/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead','AssetStaff','zkbDealerFE','zkbDealerSales', 'ClinicalStaff','ITAdmin','LocalITAdmin','MVSAdmin','MVSFE','NursingStaff')"/>
+        <intercept-url pattern="/portal/asset/**" access="@customPermissionEvaluator.hasPermission(authentication, request, 'ASSET_') or hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead','AssetStaff','zkbDealerFE','zkbDealerSales', 'ClinicalStaff','ITAdmin','LocalITAdmin','MVSAdmin','MVSFE','NursingStaff')"/>
 
         <!-- 维修管理 -->
-        <intercept-url pattern="/portal/wo/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales','DeptHead')"/> <!-- 维修管理 -->
-        <intercept-url pattern="/portal/sr/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 维修管理 -->
+        <intercept-url pattern="/portal/wo/**" access="@customPermissionEvaluator.hasPermission(authentication, request, 'REPAIR_') or hasAnyRole('SuperAdmin','HospitalHead','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales','DeptHead')"/> <!-- 维修管理 -->
+        <intercept-url pattern="/portal/sr/**" access="@customPermissionEvaluator.hasPermission(authentication, request, 'REPAIR_') or hasAnyRole('SuperAdmin','HospitalHead','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 维修管理 -->
 
         <!-- 设备监控 -->
         <intercept-url pattern="/portal/analysis/assetStatus**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 状态监控 -->
@@ -104,19 +110,19 @@
         <intercept-url pattern="/portal/analysis/staffPerf**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead')"/>
 
         <!-- 预防维护(供应商) -->
-        <intercept-url pattern="/portal/pm/supplier/**" access="hasAnyRole('SupplierFE','SupplierAdmin')"/> <!-- 保养工作台 -->
+        <intercept-url pattern="/portal/pm/supplier/**" access="@customPermissionEvaluator.hasPermission(authentication, request, 'SUPPLIER_') or hasAnyRole('SupplierFE','SupplierAdmin')"/> <!-- 保养工作台 -->
 
         <!-- 预防维护 -->
         <intercept-url pattern="/portal/insp/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 巡检管理 -->
 
-        <intercept-url pattern="/portal/pm/**" access="hasAnyRole('DeptHead','ClinicalStaff','SuperAdmin','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales','HospitalHead')"/> <!-- 保养管理 -->
+        <intercept-url pattern="/portal/pm/**" access="@customPermissionEvaluator.hasPermission(authentication, request, 'MAINTAIN_') or hasAnyRole('DeptHead','ClinicalStaff','SuperAdmin','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales','HospitalHead')"/> <!-- 保养管理 -->
         <intercept-url pattern="/portal/metering/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 计量管理 -->
         <intercept-url pattern="/portal/qc/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 质控管理 -->
         <intercept-url pattern="/portal/adverseEvent/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 不良事件上报 -->
         <intercept-url pattern="/portal/analysis/mt.xhtml**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/><!-- 计量模板 -->
 
         <!-- 知识文档 -->
-        <intercept-url pattern="/portal/asset/fileAttachment/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 文档管理 -->
+        <intercept-url pattern="/portal/asset/fileAttachment/**" access="@customPermissionEvaluator.hasPermission(authentication, request, 'KNOWLEDGE_') or hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 文档管理 -->
 
         <!-- 绩效分析 -->
         <intercept-url pattern="/portal/analysis/assetPerf**" access="hasAnyRole('SuperAdmin','HospitalHead', 'AssetHead', 'DeptHead')"/> <!-- 绩效分析 -->
