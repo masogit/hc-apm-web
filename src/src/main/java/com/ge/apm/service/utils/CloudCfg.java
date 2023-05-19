@@ -34,6 +34,8 @@ public class CloudCfg {
     jdbcPassword = cfg.getString("credentials.password");
     jdbcUrl = cfg.getString("credentials.jdbc_uri");
     log.info("############################################## this : "+ JSON.toJSONString(this));
+    log.info("############################################## defaultGateway : "+System.getenv("defaultGateway"));
+
   }
 
   public String getJdbcHost() {
