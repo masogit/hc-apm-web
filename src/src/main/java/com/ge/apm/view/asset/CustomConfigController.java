@@ -20,6 +20,7 @@ import com.ge.apm.service.common.AllocateCustomConfigConstant;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -30,10 +31,13 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
 import org.slf4j.Logger;
@@ -54,6 +58,8 @@ public class CustomConfigController {
     private UserCommonService userService;
     private ConfigService configService;
     private TenantOptionConfigRepository tenantOptionConfigRepository;
+    private UserContextService userContextService;
+
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
     private Map<String, Boolean> selectedAddFields;
@@ -80,9 +86,16 @@ public class CustomConfigController {
         configService = WebUtil.getBean(ConfigService.class);
         tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
         workflowConfigRepository = WebUtil.getBean(WorkflowConfigRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        UaaService uaaService = WebUtil.getBean(UaaService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = CustomConfigConstant.getAllFields();
         configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
+        if (userContextService.isOpenNewMenuRoles()) {
+            List<CustomRole> customRoles = WebUtil.getBean(UaaService.class).getTenantCustomRoles(selectSite.getTenantUID());
+            customRoles = customRoles.stream().filter(r -> StringUtils.isNotEmpty(r.getFunctionList()) && r.getFunctionList().contains(ApmFunction.ASSET_INFO_READ.name())).collect(Collectors.toList());
+            configRoles.putAll(customRoles.stream().collect(Collectors.toMap(CustomRole::getName, CustomRole::getName)));
+        }
         selectedAddFields = new HashMap();
         pinYinComparator = new PinYinComparator();
         loadConfigForSite(selectSite.getUid());
@@ -463,7 +476,7 @@ public class CustomConfigController {
     //角色名称
     public String getAssetFieldsRoles(List<String> roles) {
         StringBuilder res = new StringBuilder();
-        roles.stream().forEach(item -> res.append(configRoles.get(item)).append(" "));
+        roles.stream().forEach(item -> res.append(configRoles.get(item) == null ? "" : configRoles.get(item)).append(" "));
         return res.toString();
     }
 

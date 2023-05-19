@@ -230,7 +230,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private void loadCustomConfig() {
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-        List<String> readFields = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> roles = UserContextService.getRoles();
+        List<CustomRole> customRoles = userContextService.getListCustomRole(UserContextService.getCurrentUserAccount().getId());
+        if (CollectionUtils.isNotEmpty(customRoles)) {
+            roles.addAll(customRoles.stream().map(CustomRole::getName).collect(Collectors.toSet()));
+        }
+        List<String> readFields = ccService.getReadAssetFieldsByRoles(customConfig, roles);
         customedColumns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
     }
 
