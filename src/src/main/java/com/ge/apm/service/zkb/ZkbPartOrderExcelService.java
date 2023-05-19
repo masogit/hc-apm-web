@@ -206,6 +206,9 @@ public class ZkbPartOrderExcelService {
         if(p.getDirectorAuditDate() != null){
             zkbPartOrderDataMap.put("销售总监审批时间", DateFormatUtils.format(p.getDirectorAuditDate(),"yyyy-MM-dd"));
         }
+        if(p.getOrderedDate() != null){
+            zkbPartOrderDataMap.put("下单时间", DateFormatUtils.format(p.getOrderedDate(),"yyyy-MM-dd HH:mm:ss"));
+        }
         zkbPartOrderDataMap.put("销售总监审批备注", p.getDirectorRemark());
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(p.getOrderType())){
             if("1".equals(p.getArtificialType())){
