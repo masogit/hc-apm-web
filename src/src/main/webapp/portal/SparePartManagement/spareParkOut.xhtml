@@ -57,6 +57,13 @@
                             <f:validateLongRange minimum="1"/>
                         </p:inputText>
                     </h:panelGroup>
+                    <h:panelGroup >
+                        <label class ="label">出库时间* </label>
+                        <p:calendar id="outDate" required="true" value="#{sparePartController.outDate}" requiredMessage="出库时间必填"
+                            pattern="yyyy-MM-dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"
+                            maxdate="#{appContextService.curentDate}" mindate="#{sparePartController.getInStockDate(sparePartController.selected.id)}"
+                            timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"/>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">领取科室* </label>
                         <p:autoComplete dropdown="true" value="#{sparePartController.filterClinicalDeptOrg}"
