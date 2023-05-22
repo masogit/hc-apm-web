@@ -211,7 +211,6 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             gatewayURL = getGatewayURL(GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD_ENCRYPTED);
         else
             gatewayURL = getGatewayURL(GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD);
-        logger.info("################################# gatewayURL: "+gatewayURL);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
 
         if (isOkay(response)) {
