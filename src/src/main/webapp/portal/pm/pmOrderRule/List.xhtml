@@ -40,9 +40,6 @@
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
-<!--                     <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
-                        <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
-                    </p:column> -->
                     <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
                    		<h:outputText value="#{item.manufacture}"/>
                     </p:column>
@@ -100,12 +97,11 @@
                              <h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour',item.level)}"/>
 	                 </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareCreate}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
-                        <!-- <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareView}" update=":PmOrderRuleViewDlg" oncomplete="PF('PmOrderRuleViewDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/> -->
-                        <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
-                        <p:commandButton id="saveAsButton"  title="#{msg.SaveAs}"  icon="ui-icon-save" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.initSaveAs()}" update=":PmOrderRuleSaveAsForm" oncomplete="PF('SaveAsDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
-                        <p:commandButton id="approveButton"  title="#{msg.Approval}"  icon="ui-icon-check" class="btn btn-sm btn-gray" rendered="#{userContextService.hasRole('AssetHead')}" actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleApproveForm" oncomplete="PF('PmOrderRuleApproveDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
-                        <p:commandButton id="deleteButton" title="#{msg.Delete}"  icon="ui-icon-close" class="btn btn-sm btn-gray" rendered="#{userContextService.hasRole('AssetHead')}"  actionListener="#{pmOrderRuleController.delete}"  update=":PmOrderRuleEditDlg,datalist"  disabled="#{empty pmOrderRuleController.selected}">
+                        <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareCreate}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"/>
+                        <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btn btn-sm btn-gray" actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()" disabled="#{empty pmOrderRuleController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"/>
+                        <p:commandButton id="saveAsButton"  title="#{msg.SaveAs}"  icon="ui-icon-save" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.initSaveAs()}" update=":PmOrderRuleSaveAsForm" oncomplete="PF('SaveAsDialog').show()" disabled="#{empty pmOrderRuleController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"/>
+                        <p:commandButton id="approveButton"  title="#{msg.Approval}"  icon="ui-icon-check" class="btn btn-sm btn-gray" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_APPROVE')}" actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleApproveForm" oncomplete="PF('PmOrderRuleApproveDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
+                        <p:commandButton id="deleteButton" title="#{msg.Delete}"  icon="ui-icon-close" class="btn btn-sm btn-gray" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"  actionListener="#{pmOrderRuleController.delete}"  update=":PmOrderRuleEditDlg,datalist"  disabled="#{empty pmOrderRuleController.selected}">
                         	<p:confirm header="#{msg.DeleteConformation}" message="#{msg.ConfirmDeleteRule}" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton title="#{msg.exportToXLS}"  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">

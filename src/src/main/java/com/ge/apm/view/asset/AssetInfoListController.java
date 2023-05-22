@@ -1,5 +1,7 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateTime;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -228,7 +230,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private void loadCustomConfig() {
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-        List<String> readFields = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> roles = UserContextService.getRoles();
+        List<CustomRole> customRoles = userContextService.getListCustomRole(UserContextService.getCurrentUserAccount().getId());
+        if (CollectionUtils.isNotEmpty(customRoles)) {
+            roles.addAll(customRoles.stream().map(CustomRole::getName).collect(Collectors.toSet()));
+        }
+        List<String> readFields = ccService.getReadAssetFieldsByRoles(customConfig, roles);
         customedColumns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
     }
 
@@ -626,14 +633,62 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("export file: AssetInfo_export.xlsx successful.");
     }
 
+    public void export1(List<String> exportFields) throws IOException {
+        logger.info("start to export asset list to excel");
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
+        writerAsset(template, exportFields);
+
+        logger.info("exported asset list to excel, start to get input stream");
+
+        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+
+        logger.info("export file: AssetInfo_export.xlsx successful.");
+    }
+
+    public void writerAsset(AssetFileDynamicTemplate template, List<String> exportFields) {
+        List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
+
+        List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+        int num = 5000;
+        boolean siteFlag = exportFields.containsAll(ListUtil.newArrayList("医院", "集团"));
+        if (assetUids.isEmpty()) {
+            if(CollectionUtils.isEmpty(searchFilters)){
+                this.setUserSearchFilters();
+            }
+            int count = (int) dao.count(searchFilters);
+            int cycles = count / num;
+            ExcelDocumentStreamingWriter writer = template.initExcelWriter(count, exportFields, orgList);
+            int startRow = AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW;
+            for (int i = 0; i <= cycles; i++) {
+                PageRequest pageRequest = new PageRequest(i, num, lastPageSort);
+                Page<AssetInfo> page = dao.findBySearchFilter(searchFilters, pageRequest);
+                List<AssetInfo> assetList = page.getContent();
+                if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
+                    assetList =  orderByForParentAndChildren(assetList);
+                }
+                startRow = template.writeAsset1(writer, assetList, sites, siteFlag, startRow);
+            }
+        } else {
+            List<AssetInfo> assetList = dao.findByUidIn(assetUids, lastPageSort);
+            if(Boolean.TRUE.equals(isOrderByForParentAndChildren)){
+                assetList =  orderByForParentAndChildren(assetList);
+            }
+            ExcelDocumentStreamingWriter writer = template.initExcelWriter(assetList.size(), exportFields, orgList);
+            template.writeAsset1(writer, assetList, sites, siteFlag, AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW);
+        }
+        template.setFormula();
+    }
+
     public void exportExcel() throws IOException {
-        export(ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles()));
+        export1(ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles()));
     }
 
     public void exportAssetExcel() throws IOException {
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         insertCrossSiteColumns(exportFields);
-        export(exportFields);
+        export1(exportFields);
     }
 
     private void insertCrossSiteColumns(List<String> exportFields) {
@@ -721,11 +776,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<AssetInfo> getExportList() {
-        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+        List<String> assetUids = selectedMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
         List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
-            //PageRequest pageRequest = new PageRequest(0,100,lastPageSort);
-            //Page<AssetInfo> esultList = dao.findBySearchFilter(searchFilters,pageRequest);
             if(CollectionUtils.isEmpty(searchFilters)){
                 this.setUserSearchFilters();
             }

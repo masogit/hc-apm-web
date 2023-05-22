@@ -10,7 +10,6 @@
         <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
         <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
-        <!--        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>-->
         <style>
             div.ui-panelgrid-cell>label+div.ui-selectonemenu {
                 min-width: 75px !important;
@@ -221,15 +220,6 @@
                                 </p:panelGrid>
                             </p:fieldset>
 
-                            <p:fieldset legend="设备绩效" style="margin-bottom:20px" rendered="false">
-                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageEquipmentPerformanceFields}" var="fieldItem" >
-                                        <ui:include src="customEditFields.xhtml"/>
-                                    </c:forEach>
-                                </p:panelGrid>
-                            </p:fieldset>
-
-
                             <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{userContextService.isMVSRole()}">
                                 <ui:include src="MvsEditFields.xhtml"/>
                             </p:fieldset>
@@ -323,8 +313,8 @@
                                     <p:commandButton id = "saveButton" value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.checkIfRequireBeforeApplyChange()}" oncomplete="handleComplete(xhr, status, args);" validateClient="true" update="saveButton :growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
                                     <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval()}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3)}"/>
                                     <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-                                    <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.hasScrappedAuthority()}" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
-                                    <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus()}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_INFO_SCRAP')}" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus() and userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_EDIT')}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </h:form>
@@ -369,7 +359,7 @@
                                         <p:ajax process="@this" listener="#{relRuleAssetController.setRuleId()}"/>
                                     </p:autoComplete>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{userContextService.accessContains('nurseSite.config')}">
+                                <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIG_VIEW')}">
                                     <label class="label">日常检查规则(请先选择设备所属科室)</label>
                                     <p:selectManyMenu id="addMaintainConfig" value="#{assetInfoEditController.listSelectedNurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="false"
                                                       filter="true" filterMatchMode="contains" showCheckbox="true" style="width:100%">
@@ -380,7 +370,7 @@
                                         </p:column>
                                     </p:selectManyMenu>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{userContextService.authContains('nurseSite.optRecord') and userContextService.versionContains('nurseSite.useRegistration') and !userContextService.versionContains('nurseSite.optRecord') }">
+                                <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_USING_RECORD_EDIT')}">
                                     <label class="label">使用登记规则(请先选择设备所属科室)</label>
                                     <p:autoComplete id="addMaintainConfigJN" value="#{assetInfoEditController.selectedNurseSiteMaintainConfigJN}" dropdown="true" scrollHeight="300"
                                                     forceSelection="true" completeMethod="#{maintainConfigJNController.getConfigList(assetInfoEditController.selected.clinicalDeptUID)}"

@@ -96,10 +96,13 @@ public class UserContextService implements Serializable {
         userContextService.getTenantInfo();
         userContextService.getListCustomRole(user.getId());
         userContextService.getListSysRole(user.getId());
-        if (userContextService.isOpenNewMenuRoles()) {
+        if (StringUtils.isNotEmpty(userContextService.tenant.getFeatureList())) {
             userContextService.getFunctionListByFeatureAndRoles();
             userContextService.getFeatureList();
             userContextService.getApmSysRole();
+            CustomPermissionEvaluator.apmFeatures = userContextService.apmFeatures;
+            CustomPermissionEvaluator.apmFunctionList = userContextService.apmFunctionList;
+            CustomPermissionEvaluator.apmSystemRoles = userContextService.apmSystemRoles;
         }
     }
 
@@ -519,6 +522,7 @@ public class UserContextService implements Serializable {
     public Set<String> getFeatureList() {
         if (CollectionUtils.isEmpty(apmFeatures)) {
             apmFeatures = ((List<String>)JSON.parse(getTenantInfo().getFeatureList())).stream().collect(Collectors.toSet());
+            CustomPermissionEvaluator.apmFeatures = apmFeatures;
         }
         return apmFeatures;
     }
@@ -536,6 +540,7 @@ public class UserContextService implements Serializable {
                 addRoleIfTrue(user.getMvsRoleType() == 1 || user.getMvsRoleType() == 3, ApmSystemRole.MVSAdmin);
                 addRoleIfTrue(user.getMvsRoleType() == 2, ApmSystemRole.MVSFE);
             }
+            CustomPermissionEvaluator.apmSystemRoles = apmSystemRoles;
         }
         return apmSystemRoles;
     }
@@ -557,6 +562,7 @@ public class UserContextService implements Serializable {
             features.forEach(feature -> apmFunctionList.addAll(feature.getFunctionList().stream()
                     .filter(function -> sysRoles.stream().anyMatch(function.getRoleList()::contains) || CollectionUtils.isEmpty(function.getRoleList()))
                     .map(ApmFunction::name).collect(Collectors.toSet())));
+            CustomPermissionEvaluator.apmFunctionList = apmFunctionList;
         }
         return apmFunctionList;
     }
@@ -1212,11 +1218,6 @@ public class UserContextService implements Serializable {
 
         return tenantOptionConfig.getAllowAssetBatchUpdate();
 
-    }
-
-    public Boolean isYunNanFuWai(String tenantName){
-        logger.warn(tenantName);
-        return this.getTenantInfo().getName().equals("云南省阜外心血管病医院");
     }
 
     public static Boolean isHospitalName(String tenantName){

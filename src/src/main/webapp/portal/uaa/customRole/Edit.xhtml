@@ -5,7 +5,7 @@
 
 <ui:composition>
 
-	<p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" width="950" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)"
+	<p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" width="950" height="#{userContextService.openNewMenuRoles ? '100%' : '450'}" modal="true" resizable="true" draggable="true" appendTo="@(body)"
 		header="#{customRoleController.CRUDActionName} #{msg.CustomRole}">
 		<h:form id="CustomRoleEditForm">
 			<h:panelGroup id="display">
@@ -31,7 +31,7 @@
 							<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 								<h:panelGroup>
 									<p:fieldset id="selected" legend="已选功能项">
-										<p:scrollPanel style="height: 500px; border: 0;" mode="native">
+										<p:scrollPanel style="height: 421px; border: 0;" mode="native">
 											<p:selectManyCheckbox id="selecteds" widgetVar="selecteds" value="#{customRoleController.customSelectedFunctions}"  layout="pageDirection" columns="1" styleClass="grid-checkbox">
 												<p:ajax update="@this:CustomRoleEditForm:functions " listener="#{customRoleController.unSelectChekBox}"/>
 												<f:selectItems value="#{customRoleController.customFunctions}" var="item" itemLabel="#{item.functionName}" itemValue="#{item}"/>
@@ -44,7 +44,7 @@
 										<p:inputText id="filterInput" value="#{customRoleController.filterFunctionStr}" placeholder="输入搜索关键字" >
 											<p:ajax event="keyup" listener="#{customRoleController.filterFunction}" update="functions"/>
 										</p:inputText>
-										<p:scrollPanel style="height: 500px; border: 0;" mode="native">
+										<p:scrollPanel style="height: 400px; border: 0;" mode="native">
 											<p:selectManyCheckbox id="functions" widgetVar="functions" value="#{customRoleController.selectedFunctions}"  layout="pageDirection" columns="1" styleClass="grid-checkbox">
 												<p:ajax update="@this :CustomRoleEditForm:selecteds" listener="#{customRoleController.selectChekBox}"/>
 												<f:selectItems value="#{customRoleController.functions}" var="item" itemLabel="#{item.functionName}" itemValue="#{item}"/>
