@@ -10,6 +10,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
@@ -65,7 +66,11 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         int roleId = roleDao.getIdByName(ApprovalConstant.MULTILEVEL_AUDITOR);
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         List<String> userIds = userRoleDao.findUserUidByRoleId(userAccount.getTenantUID(),roleId);
-        approveUserList = userAccountDao.getUserList(userIds);
+        if (CollectionUtils.isNotEmpty(userIds)) {
+            approveUserList = userAccountDao.getUserList(userIds);
+        } else {
+            approveUserList = new ArrayList<>();
+        }
     }
 
     public void onSelectTreeNode(NodeSelectEvent event){
