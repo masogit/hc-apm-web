@@ -43,7 +43,7 @@
                     <p:column headerText="操作">
                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"
                                          oncomplete="PF('approverInfoDlg').show()"
-                                         disabled="#{'view'.equals(multiLevelApprovalConfigController.operateType)}"
+                                         disabled="#{'view'.equals(auditGroupConfigurationController.operateType)}"
                                          rendered="#{empty item.approveUsers}"
                                          actionListener="#{auditGroupConfigurationController.onAddNode()}"
                                          update="approverInfoDlg"/>
