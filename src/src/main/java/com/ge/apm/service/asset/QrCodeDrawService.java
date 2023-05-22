@@ -228,8 +228,10 @@ public class QrCodeDrawService {
             domain = "http://apm.gehealthcloud.cn";
         }
         String url = domain.concat("/r/").concat(qrCodeLib.getId().toString());
-        String logoPath = this.getClass().getClassLoader().getResource("/image/logo.jpg").getPath(); ;
-        return createImageWithLogo(url, logoPath, true);
+//        String logoPath = this.getClass().getClassLoader().getResource("/image/logo.jpg").getPath(); ;
+//        return createImageWithLogo(url, logoPath, true);
+        //YHAAO-18308:基础互通取消 二维码里的logo
+        return createImageWithLogo(url, null, true);
     }
 
     public static void main(String[] args) throws Exception {
