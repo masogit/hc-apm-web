@@ -13,7 +13,7 @@
 								 selection="#{assetOperationRecordController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
 								 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 								 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-								 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{assetOperationRecordController.customRoleAuth.authSearch}">
+								 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_USING_RECORD_EDIT')}">
 
 						<p:ajax event="filter" listener="#{assetOperationRecordController.onFilter}" />
 						<p:ajax event="rowSelect" disabled="#{assetOperationRecordController.operationFlag}" listener="#{assetOperationRecordController.onSelectAsset}" oncomplete="openOperationListWindow(xhr, status, args)" update=":optRecordListForm"/>
