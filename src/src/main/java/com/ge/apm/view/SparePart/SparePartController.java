@@ -48,6 +48,8 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     @Getter @Setter
     private Integer outQuantity;
     @Getter @Setter
+    private Date outDate;
+    @Getter @Setter
     private String remark;
 
     @Override
@@ -126,6 +128,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     public void outStock(SparePart sparePart) {
         selected = sparePart;
         outQuantity = null;
+        outDate = new Date();
         filterClinicalDeptOrg = null;
         remark = null;
     }
@@ -147,10 +150,14 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     }
 
     private StockRecord buildStockRecord(Integer recordType) {
+        Date recordDate = new Date();
+        if(recordType == 2){
+            recordDate = outDate;
+        }
         return setOutStockRecord(StockRecord.builder()
                 .recordType(recordType)
                 .sparePartId(selected.getId())
-                .recordDate(new Date())
+                .recordDate(recordDate)
                 .warehouseOprPerson(loginUser.getName())
                 .warehouseOprPersonUid(loginUser.getUid())
                 .quantity(selected.getQuantity())
@@ -167,6 +174,16 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
             record.setRemark(remark);
         }
         return record;
+    }
+
+    public Date getInStockDate(String sparePartId){
+        StockRecord stockRecord = stockRecordRepository.findInBySparePartId(sparePartId);
+
+        if(stockRecord != null){
+            return stockRecord.getRecordDate();
+        }
+
+        return null;
     }
 
     public void cancel() {
