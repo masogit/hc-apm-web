@@ -39,7 +39,6 @@
                     <h:panelGroup>
                         <label class="label">#{msg.clinicalDeptName}</label>
                         <p:selectOneMenu id="clinicalDeptName" value="#{assetFileAttachmentController.queryAsset.clinicalDeptId}">
-                            <!--<p:ajax  listener="#{assetFileAttachmentController.getQueryAssetsList()}" update="AssetsPickList"/>-->
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{assetFileAttachmentController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                         </p:selectOneMenu>
@@ -47,7 +46,6 @@
                     <h:panelGroup>
                         <label class="label">#{msg.assetGroup}</label>
                         <p:selectOneMenu id="assetGroup" value="#{assetFileAttachmentController.queryAsset.assetGroup}">
-                            <!--<p:ajax  listener="#{assetFileAttachmentController.getQueryAssetsList()}" update="AssetsPickList"/>-->
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
@@ -83,16 +81,6 @@
                     <p:column style="float: left;width:30%;">
                         <h:outputText value="#{item.functionType}" />
                     </p:column>
-                    <!--<p:column style="float: left;width:40%;">
-                        <h:outputText value="#{item.name}(#{item.functionType})"  rendered="#{not empty item.functionType}" />
-                        <h:outputText value="#{item.name}" rendered="#{empty item.functionType}"/>
-                    </p:column>
-                    <p:column style="float: left;width:30%;">
-                        <h:outputText value="#{assetFileAttachmentController.getOrgName(item.siteUID)}" />
-                    </p:column>
-                    <p:column style="float: left;width:30%;">
-                        <h:outputText value="#{item.clinicalDeptName}" />
-                    </p:column>-->
                 </p:pickList>
             </p:fieldset>
             <p:fieldset  id="editSet" legend="#{msg.relationAttachment}" style="margin-bottom:20px">

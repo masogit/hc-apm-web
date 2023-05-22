@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import webapp.framework.dao.SearchFilter;
 
 import javax.faces.context.FacesContext;
 import java.io.IOException;
@@ -576,6 +577,139 @@ public class OrgInfoService {
         List<OrgInfo> orgInfos = orgInfoMapper.listParentClinicalDeptsWithSelectedClinicalDept(currentOrg.getUid());
 
         return orgInfos.size();
+    }
+
+    public List<OrgInfo> getHospitalList(String orgLevel) {
+        List<OrgInfo> result = null;
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        boolean insulate = UserContextService.isInsulate();
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(orgLevel)) {
+            int level = Integer.parseInt(orgLevel);
+            Integer userLevel = user.getOrgLevel() == null ? 0 : user.getOrgLevel();
+            List<SearchFilter> searchFilters = new ArrayList<>(5);
+            if (!insulate) {
+                if (0 == level) {
+                    searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                    searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+                } else if (1 == level) {
+                    searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                    searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+                } else if (2 == level) {
+                    searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                    searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+                } else if (3 == level) {
+                    searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                    searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+                }
+            } else {
+                switch (userLevel) {
+                    case 0:
+                        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                        if (0 == level) {
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+                        } else if (1 == level) {
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+                        } else if (2 == level) {
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+                        } else if (3 == level) {
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+                        }
+                        break;
+                    case 1:
+                        if (0 == level) {
+                            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+                        } else if (1 == level) {
+                            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+                        } else if (2 == level) {
+                            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+                        } else if (3 == level) {
+                            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+                        }
+                        break;
+                    case 2:
+                        if (0 == level) {
+                            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+                        } else if (1 == level) {
+                            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+                        } else if (2 == level) {
+                            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+                        } else if (3 == level) {
+                            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+                        }
+                        break;
+                    default:
+                        if (0 == level) {
+                            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 0));
+                        } else if (1 == level) {
+                            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 1));
+                        } else if (2 == level) {
+                            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 2));
+                        } else if (3 == level) {
+                            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+                            searchFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 3));
+                        }
+                        break;
+                }
+            }
+            result = orgDao.findBySearchFilter(searchFilters);
+        }
+        return result;
+    }
+
+    public String getOrgNameById(Integer orgId) {
+        OrgInfo oi = orgDao.findById(orgId);
+        if (oi == null) {
+            return null;
+        }
+        return oi.getName();
+    }
+
+    public String getInsNameByUId(String uid) {
+        OrgInfo oi = orgDao.getByUid(uid);
+        if (oi == null) {
+            return null;
+        }
+        if (oi.getOrgLevel() == 1) {
+            return oi.getName();
+        }
+        return null;
+    }
+
+    public String getHospitalNameByUId(String uid) {
+        OrgInfo oi = orgDao.getByUid(uid);
+        if (oi == null) {
+            return null;
+        }
+        if (oi.getOrgLevel() == 2) {
+            return oi.getName();
+        }
+        return null;
+    }
+
+    public String getSiteNameByUId(String uid) {
+        OrgInfo oi = orgDao.getByUid(uid);
+        if (oi == null) {
+            return null;
+        }
+        if (oi.getOrgLevel() == 3) {
+            return oi.getName();
+        }
+        return null;
+    }
+
+    public String getTenantName(String tenantUID) {
+        return tenantInfoDao.findByuid(tenantUID).getName();
     }
 
     public static void main(String[] args) {

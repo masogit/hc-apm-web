@@ -1338,6 +1338,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbFePartOrder.setUrgencyStatus(item.getUrgentOrder());
                 zkbFePartOrder.setQrCode(zkbAssetInfo.getQrCode());
                 zkbFePartOrder.setDepartNum(zkbAssetInfo.getDepartNum());
+                zkbFePartOrder.setAssetId(item.getAssetId());
                 if ("t".equals(item.getUrgentOrder())) {
                     zkbFePartOrder.setUrgencyStatus("1");
                 }
