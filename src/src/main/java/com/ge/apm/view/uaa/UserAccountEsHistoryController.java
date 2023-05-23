@@ -1,0 +1,82 @@
+package com.ge.apm.view.uaa;
+
+import com.alibaba.fastjson.JSON;
+import com.ge.apm.dao.UserAccountHistoryRepository;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserAccountHistory;
+import com.ge.apm.service.remote.ElasticService;
+import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmEsIndex;
+import com.ge.healthcare.cn.common.utils.bean.HistoryInfo;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
+import java.util.List;
+
+@ManagedBean
+@ViewScoped
+public class UserAccountEsHistoryController extends GenericCRUDController<UserAccountHistory> {
+
+    private static final long serialVersionUID = -1;
+
+    private UserAccount currentUser;
+    private UserAccountService userAccountService;
+    private ElasticService elasticService;
+    private UserAccountHistoryRepository dao = null;
+
+    @Override
+    protected void init() {
+        dao = WebUtil.getBean(UserAccountHistoryRepository.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        userAccountService = WebUtil.getBean(UserAccountService.class);
+        elasticService=WebUtil.getBean(ElasticService.class);
+    }
+
+    @Override
+    protected UserAccountHistoryRepository getDAO() {
+        return dao;
+    }
+
+    @Override
+    protected Page<UserAccountHistory> loadData(PageRequest pageRequest) {
+        setSearchFilter();
+        Page<Object> pgData = elasticService.searchHistory(searchFilters, UserContextService.getAccessToken(),
+                pageRequest.getPageNumber(), pageRequest.getPageSize(), ApmEsIndex.USER_HISTORY.getValue());
+        List<UserAccountHistory> list = ListUtil.newArrayList();
+        for (Object obj : pgData.getContent()) {
+            UserAccountHistory userAccountHistory = JSON.parseObject(obj.toString(), UserAccountHistory.class);
+            if (StringUtils.isNotEmpty(userAccountHistory.getOperationType())) {
+                HistoryInfo.TypeAction typeAction = HistoryInfo.TypeAction.valueOf(userAccountHistory.getOperationType());
+                userAccountHistory.setOperationType(typeAction.getValue());
+            }
+            list.add(userAccountHistory);
+        }
+        return new PageImpl<>(list, pageRequest, list.size());
+    }
+
+    @Override
+    public void setSearchFilter() {
+        if (this.searchFilters == null) {
+            searchFilters = new ArrayList<>(1);
+        }
+        String siteUid = currentUser.getSiteUID();
+        List<String> loginNameList = userAccountService.getLoginNameBySiteUid(siteUid);
+        searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNameList));
+    }
+
+    @Override
+    public List<UserAccountHistory> getItemList() {
+        return dao.find();
+    }
+
+}
