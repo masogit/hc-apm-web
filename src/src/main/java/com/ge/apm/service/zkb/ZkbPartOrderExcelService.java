@@ -239,7 +239,9 @@ public class ZkbPartOrderExcelService {
         zkbPartOrderCatDataMap.put("故障描述", p.getPartQualityIssue());
         zkbPartOrderCatDataMap.put("归还数量", p.getReturnQty());
         zkbPartOrderCatDataMap.put("运单号", p.getWaybillNo());
-        zkbPartOrderCatDataMap.put("归还日期", p.getReturnDate());
+        if(p.getReturnDate() != null){
+            zkbPartOrderCatDataMap.put("归还日期", DateFormatUtils.format(p.getReturnDate(),"yyyy-MM-dd HH:mm:ss"));
+        }
         zkbPartOrderCatDataMap.put("新探头SN编号", p.getNewCatSn());
         zkbPartOrderCatDataMap.put("归还备注", p.getReturnRemark());
         return zkbPartOrderCatDataMap;

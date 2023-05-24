@@ -5013,3 +5013,9 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SiteInconsistent', '所选设备的院区信息不一致', 'The campus information of the selected device is inconsistent', NULL, '-1');
 --YHAAO-18322 维修流程-维修工单报表 错误提示问题
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'siteCannotEmpty', '院区不能为空', 'Site cannot be empty', NULL, '-1');
+-- YHAAO-18549 重点医疗设备使用状况报表以年度统计
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','reportType','报表类型','Report type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('keyAssetReportType','1','月度分析','Monthly analysis',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('keyAssetReportType','2','年度分析','Annual analysis',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','checkItemNum','检查项目数','Number of inspection items',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Year','年份','Year',NULL,-1);
