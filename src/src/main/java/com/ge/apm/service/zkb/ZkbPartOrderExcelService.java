@@ -95,7 +95,7 @@ public class ZkbPartOrderExcelService {
             Map<String, Object> zkbPartOrderReturnDataMap = new HashMap<>();
             zkbPartOrderReturnDataMap.put("运单号", r.getWaybillNo());
             if(r.getReturnDate() != null){
-                zkbPartOrderReturnDataMap.put("归还日期", DateFormatUtils.format(r.getReturnDate(),"yyyy-MM-dd"));
+                zkbPartOrderReturnDataMap.put("归还日期", DateFormatUtils.format(r.getReturnDate(),"yyyy-MM-dd  HH:mm:ss"));
             }
             zkbPartOrderReturnDataMap.put("配件号", r.getPartNo());
             if(StringUtils.isNotEmpty(r.getReturnType())){
@@ -163,7 +163,7 @@ public class ZkbPartOrderExcelService {
         zkbPartOrderDataMap.put("订单类型", WebUtil.getFieldValueMessage("zkbPartOrderType", p.getOrderType()));
         zkbPartOrderDataMap.put("申请人", p.getRequestUser());
         zkbPartOrderDataMap.put("申请人电话", p.getRequestPhone());
-        zkbPartOrderDataMap.put("申请时间", DateFormatUtils.format(p.getRequestDate(),"yyyy-MM-dd"));
+        zkbPartOrderDataMap.put("申请时间", DateFormatUtils.format(p.getRequestDate(),"yyyy-MM-dd HH:mm:ss"));
         zkbPartOrderDataMap.put("设备类型（DI）", p.getAssetTypeDi());
         zkbPartOrderDataMap.put("区域", p.getRegion());
         zkbPartOrderDataMap.put("医院名称", p.getHospitalName());
@@ -194,22 +194,22 @@ public class ZkbPartOrderExcelService {
         zkbPartOrderDataMap.put("备注", p.getRemark());
         zkbPartOrderDataMap.put("技术支持审批人", p.getTechAuditer());
         if(p.getTechAuditDate() != null){
-            zkbPartOrderDataMap.put("技术支持审批时间", DateFormatUtils.format(p.getTechAuditDate(),"yyyy-MM-dd"));
+            zkbPartOrderDataMap.put("技术支持审批时间", DateFormatUtils.format(p.getTechAuditDate(),"yyyy-MM-dd HH:mm:ss"));
         }
         zkbPartOrderDataMap.put("技术支持审批备注", p.getTechRemark());
         zkbPartOrderDataMap.put("区域经理审批人", p.getManageAuditer());
         if(p.getManageAuditDate() != null){
-            zkbPartOrderDataMap.put("区域经理审批时间", DateFormatUtils.format(p.getManageAuditDate(),"yyyy-MM-dd"));
+            zkbPartOrderDataMap.put("区域经理审批时间", DateFormatUtils.format(p.getManageAuditDate(),"yyyy-MM-dd HH:mm:ss"));
         }
         zkbPartOrderDataMap.put("区域经理审批备注", p.getManageRemark());
         zkbPartOrderDataMap.put("销售总监审批人", p.getDirectorAuditer());
         if(p.getDirectorAuditDate() != null){
-            zkbPartOrderDataMap.put("销售总监审批时间", DateFormatUtils.format(p.getDirectorAuditDate(),"yyyy-MM-dd"));
+            zkbPartOrderDataMap.put("销售总监审批时间", DateFormatUtils.format(p.getDirectorAuditDate(),"yyyy-MM-dd HH:mm:ss"));
         }
+        zkbPartOrderDataMap.put("销售总监审批备注", p.getDirectorRemark());
         if(p.getOrderedDate() != null){
             zkbPartOrderDataMap.put("下单时间", DateFormatUtils.format(p.getOrderedDate(),"yyyy-MM-dd HH:mm:ss"));
         }
-        zkbPartOrderDataMap.put("销售总监审批备注", p.getDirectorRemark());
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(p.getOrderType())){
             if("1".equals(p.getArtificialType())){
                 zkbPartOrderDataMap.put("是否需要SSA Key", "t".equals(p.getSsaKeyFlag()) ? "是" : "否");
