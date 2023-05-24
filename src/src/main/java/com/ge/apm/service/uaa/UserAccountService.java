@@ -1,5 +1,6 @@
 package com.ge.apm.service.uaa;
 
+import com.ge.apm.service.simpleparts.SimplePartsWarehouseUserService;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -82,6 +83,12 @@ public class UserAccountService {
 	OwnerConfigRepository ownerConfigRepository;
 	@Autowired
 	WorkflowConfigRepository workflowConfigRepository;
+
+
+	@Autowired
+	private SimplePartsWarehouseUserService simplePartsWarehouseUserService;
+
+
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
 	public List<UserAccount> getUserAccount() {
@@ -510,7 +517,12 @@ public class UserAccountService {
 		List<UserRole> userRoleList = selected.getUserRoleList();
 		if(CollectionUtils.isNotEmpty(userRoleList)){
 			boolean anyMatch = userRoleList.stream().map(UserRole::getRole).anyMatch(item -> "SparePartsAdmin".equals(item.getName()));
-			if(anyMatch) result.add("该用户为备件仓库管理员，不能操作！");
+			if(anyMatch) {
+				List<String> simplePartsWarehouses = simplePartsWarehouseUserService.findAllByPartsWarehouseByUserUid(selected.getUid());
+				if(CollectionUtils.isNotEmpty(simplePartsWarehouses)){
+					result.add("该用户为备件仓库管理员，不能操作！");
+				}
+			}
 		}
 	}
 }
