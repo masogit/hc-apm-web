@@ -556,7 +556,11 @@ public class UserContextService implements Serializable {
             apmFunctionList = new HashSet<>();
             List<CustomRole> customRoles = getCustomRole(getUserID());
             Set<ApmSystemRole> sysRoles = getApmSysRole();
-            customRoles.forEach(customRole -> apmFunctionList.addAll((List<String>)JSON.parse(customRole.getFunctionList())));
+            customRoles.forEach(customRole -> {
+                if (StringUtils.isNotEmpty(customRole.getFunctionList())) {
+                    apmFunctionList.addAll((List<String>)JSON.parse(customRole.getFunctionList()));
+                }
+            });
             Set<String> featureList = getFeatureList();
             List<ApmFeature> features = Arrays.asList(ApmFeature.values()).stream().filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
             features.forEach(feature -> apmFunctionList.addAll(feature.getFunctionList().stream()

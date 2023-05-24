@@ -19,6 +19,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -180,7 +182,12 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         StockRecord stockRecord = stockRecordRepository.findInBySparePartId(sparePartId);
 
         if(stockRecord != null){
-            return stockRecord.getRecordDate();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                return sdf.parse(sdf.format(stockRecord.getRecordDate()));
+            } catch (ParseException e) {
+                return null;
+            }
         }
 
         return null;

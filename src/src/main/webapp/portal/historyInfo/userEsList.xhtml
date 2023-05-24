@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value=" #{msg.userModifyRecord}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="userListForm">
+
+                    <p:dataTable id="datalist"
+                                 value="#{userAccountEsHistoryController.lazyModel}"
+                                 var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single"
+                                 selection="#{userAccountEsHistoryController.selected}"
+                                 lazy="true"
+                                 paginator="true"
+                                 paginatorPosition="both"
+                                 paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}"
+                                 sortMode="single"
+                                 sortOrder="descending"
+                                 sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20"
+                                 emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="filter" listener="#{userAccountEsHistoryController.onFilter}"/>
+
+                        <p:column headerText="#{msg.loginName}" sortBy="#{item.loginName}" filterBy="#{item.loginName}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.loginName}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.orgName}" sortBy="#{item.orgName}" filterBy="#{item.orgName}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.orgName}"/>
+                        </p:column>
+
+
+                        <p:column headerText="#{msg.telephone}" sortBy="#{item.telephone}" filterBy="#{item.telephone}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.telephone}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.email}" sortBy="#{item.email}" filterBy="#{item.email}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.email}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.operationType}" sortBy="#{item.operationType}"
+                                  filterBy="#{item.operationType}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.operationType}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.modifiedBy}" sortBy="#{item.createdBy}" filterBy="#{item.createdBy}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.createdBy}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.modifiedTime}" sortBy="#{item.createdDate}"
+                                  filterBy="#{item.createdDate}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="#{msg.comment}" sortBy="#{item.comment}"
+                                  filterBy="#{item.comment}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.comment}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.isActive}" sortBy="#{item.isActive}" filterBy="#{item.isActive}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.isActive}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.isLocked}" sortBy="#{item.isLocked}"
+                                  filterBy="#{item.isLocked}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.isLocked}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                             class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="userHistory_export"/>
+                            </p:commandButton>
+                        </f:facet>
+
+                    </p:dataTable>
+                </h:form>
+
+            </div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>
