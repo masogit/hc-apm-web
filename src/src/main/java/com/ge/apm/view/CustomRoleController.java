@@ -84,6 +84,8 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	@Getter@Setter
 	private List<ApmFunction> customFunctions;
 
+	private String[] filterFunctionNames = new String[]{"PLATFORM_", "CONFIG_", ""};
+
 	@Override
 	protected void init() {
 		filterBySite = false;
@@ -97,7 +99,20 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		authJSONArr = service.getAuth();
 		service.init();
 		Set<String> apmFunctions = uaaService.getFunctionListByTenantUid(user.getTenantUID());
-		allFunction = Arrays.stream(ApmFunction.values()).filter(f -> apmFunctions.contains(f.name()) && (!f.name().startsWith("PLATFORM_") || !f.name().startsWith("CONFIG_"))).collect(Collectors.toList());
+		allFunction = Arrays.stream(ApmFunction.values()).filter(f -> apmFunctions.contains(f.name())
+				&& !f.name().startsWith("PLATFORM_")
+				&& !f.name().startsWith("CONFIG_")
+				&& !f.name().equals("REPAIR_ORDER_DISPATCH")
+				&& !f.name().startsWith("REPAIR_ORDER_TAKE")
+				&& !f.name().startsWith("REPAIR_ORDER_ACCEPT")
+				&& !f.name().equals("REPAIR_ORDER_APPROVE")
+				&& !f.name().startsWith("REPAIR_ORDER_CANCEL")
+				&& !f.name().startsWith("MAINTAIN_ORDER_ACCEPT")
+				&& !f.name().equals("MAINTAIN_ORDER_DISPATCH")
+				&& !f.name().startsWith("MAINTAIN_ORDER_CANCEL")
+				&& !f.name().startsWith("MAINTAIN_ORDER_TAKE")
+				&& !f.name().equals("MAINTAIN_ORDER_APPROVE")
+		).collect(Collectors.toList());
 		functions = allFunction;
 	}
 
@@ -123,17 +138,6 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		return dao.find();
 	}
 
-	/*
-	 * @Override public void onBeforeSave(CustomRole role) {
-	 * role.setTenantUID(user.getTenantUID());
-	 * role.setInstitutionUID(user.getInstitutionUID());
-	 * role.setHospitalUID(user.getHospitalUID());
-	 * role.setSiteUID(user.getSiteUID()); if(role.getCreatedBy() == null){
-	 * role.setCreatedBy(user.getLoginName()); } if(role.getCreatedDate() ==
-	 * null){ role.setCreatedDate(new Date()); }
-	 * role.setLastModifiedBy(user.getLoginName()); role.setLastModifiedDate(new
-	 * Date()); }
-	 */
 	@Override
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		// TODO Auto-generated method stub

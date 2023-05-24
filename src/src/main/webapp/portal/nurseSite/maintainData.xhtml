@@ -74,7 +74,7 @@
 					<p:commandButton id="btnCheckData" value="检查项" update="checkDataDlg" oncomplete="PF('checkDataDlg').show()" />
 					<p:commandButton id="checkRightButton" value="全部勾选(当前页)" actionListener="#{maintainItemController.checkRightAll}" update="maintainDlgTable" />
 					<p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages"
-									 oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CREATE')}"/>
+									 oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
 					<p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" update=":messages"
 									 disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_DELETE')}">
 						<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
