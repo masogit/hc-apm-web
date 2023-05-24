@@ -241,7 +241,7 @@
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==5 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_ACCEPT')}">
                     <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm"  oncomplete="PF('ackDialog').show()"/>
-                    <p:commandButton value="#{msg.Edit}" disabled="#{!userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH')}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:ackEditForm" oncomplete="PF('ackEditDialog').show()"/>
+                    <p:commandButton value="#{msg.Edit}" disabled="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_ACCEPT_EDIT')}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:ackEditForm" oncomplete="PF('ackEditDialog').show()"/>
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6 and userContextService.accessContainsFunctionMenu('REPAIR_ORDER_EVALUATE')}">
                     <p:commandButton value="#{msg.feedback}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:rateDialogForm" oncomplete="PF('rateDialog').show()"  disabled="#{item.feedbackRating gt 0}" />
@@ -252,7 +252,7 @@
                 <p:column headerText="#{msg.maintenanceValue}" style="width: 100px" sortBy="#{item.maintenanceValue}" rendered="#{workOrderMgrController.queryIndex==8 and !userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{item.maintenanceValue}"/>
                 </p:column>
-                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_DISPATCH') and workOrderMgrController.queryIndex==8}"><!--已关单-->
+                <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_ORDER_EDIT') and workOrderMgrController.queryIndex==8}"><!--已关单-->
                     <p:commandButton value="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:EditCloseDialogForm" oncomplete="PF('EditCloseDialog').show()"/>
                 </p:column>
 
