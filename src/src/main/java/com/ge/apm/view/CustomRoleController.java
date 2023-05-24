@@ -84,8 +84,6 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	@Getter@Setter
 	private List<ApmFunction> customFunctions;
 
-	private String[] filterFunctionNames = new String[]{"PLATFORM_", "CONFIG_", ""};
-
 	@Override
 	protected void init() {
 		filterBySite = false;
