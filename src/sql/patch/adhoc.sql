@@ -4,4 +4,4 @@ insert into public.config_item (uid, category, default_value, description, key, 
 update key_asset_report set report_type = 1;
 
 --YHAAO-18594
-update sys_role set home_page='/homeNurse1.xhtml' where   home_page='/homeNurse.xhtml'
+update sys_role set home_page='/portal/homeNurse1.xhtml' where   home_page='/homeNurse.xhtml'
