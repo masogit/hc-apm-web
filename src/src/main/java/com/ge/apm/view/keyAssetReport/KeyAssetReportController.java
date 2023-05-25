@@ -94,6 +94,8 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     private String operationType;
     @Getter @Setter
     private String filterFillTime = null;
+    @Getter @Setter
+    private Integer operationOrder;
 
     private String previewUrl;
     private String previewUrlForYear;
@@ -138,6 +140,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetOperationDetail = null;
         assetOperationForYear = new ArrayList<>();
         initAssetOperation();
+        operationOrder = 1;
     }
 
     @Override
@@ -153,6 +156,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }else if(2 == this.selected.getReportType()){
             initAssetOperation();
             assetOperationForYear = JSON.parseObject(selected.getAssetOperation(), List.class);
+            operationOrder = assetOperationForYear.size() + 1;
         }
         super.prepareEdit();
     }
@@ -198,8 +202,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
                     return;
                 }
             }
-            assetOperationDetail.put("order",assetOperationForYear.size() + 1 + "");
+            assetOperationDetail.put("order",operationOrder + "");
             assetOperationForYear.add(assetOperationDetail);
+            operationOrder += 1;
         }
     }
 
@@ -301,12 +306,22 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
                 return;
             }
         }
-        for (Map<String, String> map : assetOperation) {
-            if((null == map.get("checkPeopleNum") && null != map.get("sumIncome")) ||
-                    (null != map.get("checkPeopleNum") && null == map.get("sumIncome"))){
-                WebUtil.addErrorMessage("设备运营情况数据录入不全,请检查!");
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                return;
+        if(1 == this.selected.getReportType()){
+            for (Map<String, String> map : assetOperation) {
+                if((null == map.get("checkPeopleNum") && null != map.get("sumIncome")) ||
+                        (null != map.get("checkPeopleNum") && null == map.get("sumIncome"))){
+                    WebUtil.addErrorMessage("设备运营情况数据录入不全,请检查!");
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                    return;
+                }
+            }
+        }else if(2 == this.selected.getReportType()){
+            for (Map<String, String> map : assetOperationForYear) {
+                if(null == map.get("month") || null == map.get("checkPeopleNum") || null == map.get("sumIncome")){
+                    WebUtil.addErrorMessage("设备运营情况数据录入不全,请检查!");
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                    return;
+                }
             }
         }
         if("Create".equals(crudActionName)){

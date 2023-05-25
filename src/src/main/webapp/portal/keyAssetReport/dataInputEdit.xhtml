@@ -184,7 +184,7 @@
                                      paginator="true" paginatorPosition="top"
                                      paginatorTemplate="{Toolbar}" rowKey="#{item}" rows="999" emptyMessage="#{msg.noRecordFound}">
                             <p:ajax event="rowSelect" update="editButton deleteButton"/>
-                            <p:column headerText="#{msg.Date}">
+                            <p:column headerText="#{msg.Year}">
                                 <h:outputText value="#{item.month}"/>
                             </p:column>
                             <p:column headerText="#{msg.checkItemNum}">
