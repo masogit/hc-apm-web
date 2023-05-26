@@ -12,7 +12,23 @@
                 </h:outputScript>
         </ui:define>
         <ui:define name="content">
-                <iframe height="915px" width="100%" src="/reports/apm-nurse-home"/>
+                <iframe  id="homeNurse" height="915px" width="100%" src=""/>
+                <script>
+                        function init(){
+                                var time = new Date().getTime();
+                                document.getElementById("homeNurse").src="/reports/apm-nurse-home?"+time;
+                        }
+                        init();
+                </script>
+
+
         </ui:define>
+
+<!--        <script language="JavaScript">-->
+<!--                window.location.reload();-->
+<!--        </script>-->
+
+
+
 
 </ui:composition>
