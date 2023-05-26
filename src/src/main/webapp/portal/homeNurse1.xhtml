@@ -12,23 +12,13 @@
                 </h:outputScript>
         </ui:define>
         <ui:define name="content">
-                <iframe  id="homeNurse" height="915px" width="100%" src=""/>
+                <iframe id="homeNurse" height="915px" width="100%" src=""/>
                 <script>
                         function init(){
-                                var time = new Date().getTime();
-                                document.getElementById("homeNurse").src="/reports/apm-nurse-home?"+time;
+                                var time = new Date().getTime()+''+Math.floor(Math.random()*9999+1000);
+                                document.getElementById("homeNurse").src="/reports/apm-nurse-home?t="+time;
                         }
                         init();
                 </script>
-
-
         </ui:define>
-
-<!--        <script language="JavaScript">-->
-<!--                window.location.reload();-->
-<!--        </script>-->
-
-
-
-
 </ui:composition>
