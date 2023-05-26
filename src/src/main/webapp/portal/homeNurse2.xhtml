@@ -1,0 +1,27 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template-react.xhtml">
+
+    <ui:define name="post-script">
+        <h:outputScript target="body">
+            window.location.hash = '/Nurse';
+        </h:outputScript>
+    </ui:define>
+    <ui:define name="content">
+        <iframe id="homeNurse" height="915px" width="100%" src=""/>
+
+        <script>
+            function init() {
+                var time = new Date().getTime() + '' + Math.floor(Math.random() * 9999 + 1000);
+                document.getElementById("homeNurse").src = "/reports/apm-nurse-home?t=" + time;
+            }
+            init();
+        </script>
+
+
+    </ui:define>
+</ui:composition>
