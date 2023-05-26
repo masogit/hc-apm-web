@@ -566,6 +566,9 @@ public class UserContextService implements Serializable {
             features.forEach(feature -> apmFunctionList.addAll(feature.getFunctionList().stream()
                     .filter(function -> sysRoles.stream().anyMatch(function.getRoleList()::contains) || CollectionUtils.isEmpty(function.getRoleList()))
                     .map(ApmFunction::name).collect(Collectors.toSet())));
+            if (BooleanUtils.isTrue(getUserAccountApprove())) {
+                apmFunctionList.add(ApmFunction.REPAIR_APPROVE_PROCESS_VIEW.name());
+            }
             CustomPermissionEvaluator.apmFunctionList = apmFunctionList;
         }
         return apmFunctionList;
