@@ -6,19 +6,24 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template-react.xhtml">
 
-        <ui:define name="post-script">
-                <h:outputScript target="body">
-                        window.location.hash = '/Nurse';
-                </h:outputScript>
-        </ui:define>
-        <ui:define name="content">
-                <iframe id="homeNurse" height="915px" width="100%" src=""/>
-                <script>
-                        function init(){
-                                var time = new Date().getTime()+''+Math.floor(Math.random()*9999+1000);
-                                document.getElementById("homeNurse").src="/reports/apm-nurse-home?t="+time;
-                        }
-                        init();
-                </script>
-        </ui:define>
+    <ui:define name="post-script">
+        <h:outputScript target="body">
+            window.location.hash = '/Nurse';
+        </h:outputScript>
+    </ui:define>
+    <ui:define name="content">
+        <!--                <iframe id="homeNurse" height="915px" width="100%" src=""/>-->
+        <!--                <script>-->
+        <!--                        function init(){-->
+        <!--                                var time = new Date().getTime()+''+Math.floor(Math.random()*9999+1000);-->
+        <!--                                document.getElementById("homeNurse").src="/reports/apm-nurse-home?t="+time;-->
+        <!--                        }-->
+        <!--                        init();-->
+        <!--                </script>-->
+
+        <script>
+            window.location.href = "/geapm/portal/homeNurse2.xhtml"
+        </script>
+
+    </ui:define>
 </ui:composition>
