@@ -16,6 +16,9 @@
 
         <script>
             function init() {
+                var token = "#{userContextService.getAccessToken()}";
+                localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
+                localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000)
                 var time = new Date().getTime() + '' + Math.floor(Math.random() * 9999 + 1000);
                 document.getElementById("homeNurse").src = "/reports/apm-nurse-home?t=" + time;
             }
