@@ -13,6 +13,7 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.reflect.TypeToken;
@@ -703,6 +704,12 @@ public class AdminConsoleService extends MicroServiceInvoker {
 						requiredEnums.add(e.name());
 						continue;
 					}
+					if (e.name().equals(AssetManagementEnum.REPAIR_APPROVE_PROCESS.name())) {
+						if (tenantInfo.getName().contains("积水潭")) {
+							requiredEnums.add(e.name());
+							continue;
+						}
+					}
 					if (finalEnumNames.contains(e.getOldName())) {
 						if (e.isChekConfig()) {
 							if (chekConfig(e, tenantInfo)) {
@@ -818,6 +825,47 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			}
 		}
 		return functionList;
+	}
+
+	public void batchUpdateAssetApprove() {
+		List<String> allAssetApprove = workflowConfigRepository.findAllAssetApprove();
+		allAssetApprove.forEach(assetApprove -> {
+			if (StringUtils.isNotEmpty(assetApprove)) {
+				UserAccount userAccount = userAccountRepository.getByUid(assetApprove);
+				CustomRole customRole = buildCustomRole(userAccount);
+				UserRole userRole = new UserRole();
+				userRole.setUserId(userAccount.getId());
+				userRole.setRoleId(customRole.getId());
+				userRole.setRoleType(1);
+				userRoleRepository.save(userRole);
+			}
+		});
+	}
+
+	private CustomRole buildCustomRole(UserAccount account) {
+		CustomRole customRole = customRoleRepository.findByTenantUIDAndName(account.getTenantUID(), "资产审核");
+		if (customRole != null) return customRole;
+		customRole = new CustomRole();
+		customRole.setName("资产审核");
+		customRole.setCreatedBy("system");
+		customRole.setCreatedDate(new Date());
+		customRole.setLastModifiedBy("system");
+		customRole.setHospitalUID(account.getHospitalUID());
+		customRole.setInstitutionUID(account.getInstitutionUID());
+		customRole.setLastModifiedDate(new Date());
+		customRole.setRoleDesc("系统同步创建");
+		customRole.setSiteUID(account.getSiteUID());
+		customRole.setTenantUID(account.getTenantUID());
+		List<ApmFunction> customFunction = new ArrayList<>();
+		customFunction.add(ASSET_AUDIT_APPROVE);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (ApmFunction function : customFunction) {
+			stringBuilder.append(function.getFunctionName() + ",");
+		}
+		customRole.setWebAuthoritiesCH(stringBuilder.substring(0, stringBuilder.length()-1));
+		customRole.setFunctionList(JSON.toJSONString(customFunction.stream().map(ApmFunction::name).collect(Collectors.toList())));
+		customRoleRepository.save(customRole);
+		return customRole;
 	}
 
 	private void saveLevelValue(String key){
