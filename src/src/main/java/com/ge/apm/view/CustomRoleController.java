@@ -339,9 +339,11 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		if (isOpenNewMenuRoles()) {
 			if (CollectionUtils.isNotEmpty(customSelectedFunctions)) {
 				Set<ApmFunction> apmFunctions = Arrays.stream(ApmFunction.values()).filter(f -> customSelectedFunctions.contains(f.name())).collect(Collectors.toSet());
-				apmFunctions.forEach(f -> System.out.println(f.getFunctionName()));
 				selected.setWebAuthoritiesCH(JSONObject.toJSONString(apmFunctions.stream().map(ApmFunction::getFunctionName).collect(Collectors.toSet())).replaceAll("[\\[\\]\"]", ""));
 				selected.setFunctionList(JSONObject.toJSONString(customSelectedFunctions));
+			} else {
+				selected.setWebAuthoritiesCH("");
+				selected.setFunctionList("[]");
 			}
 		} else {
 			authChange();
