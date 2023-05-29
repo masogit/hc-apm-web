@@ -75,7 +75,7 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="操 作" exportable="false" width="#{userContextService.hasAnyRoleByApmRoles('AssetHead')?60:30}" id="operatorColumn">
+                        <p:column headerText="操 作" exportable="false" width="60" id="operatorColumn">
                             <p:link target="_new" title="#{msg.Edit}" outcome="#{assetRiskAssessmentController.getEditPage(item.uid,item.name)}"  rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_EDIT') and assetRiskAssessmentController.getIsRiskAssessment(item)}">
                                 <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                             </p:link>
