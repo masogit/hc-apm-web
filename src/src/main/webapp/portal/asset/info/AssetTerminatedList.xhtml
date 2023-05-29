@@ -79,10 +79,10 @@
                 </p:column>
                 <p:column exportable="false" width="#{userContextService.hasAnyRoleByApmRoles('AssetHead')?60:30}" id="operatorColumn">
                     <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
-                        <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}">
+                        <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_EDIT')}">
                             <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                         </p:link>
-                        <p:commandLink rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_DELETE')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
+                        <p:commandLink rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAPED_DELETE')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
                             <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandLink>
