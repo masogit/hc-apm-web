@@ -75,11 +75,11 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="操 作" exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
+                        <p:column headerText="操 作" exportable="false" width="#{userContextService.hasAnyRoleByApmRoles('AssetHead')?60:30}" id="operatorColumn">
                             <p:link target="_new" title="#{msg.Edit}" outcome="#{assetRiskAssessmentController.getEditPage(item.uid,item.name)}"  rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_EDIT') and assetRiskAssessmentController.getIsRiskAssessment(item)}">
                                 <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                             </p:link>
-                            <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetRiskAssessmentController.deleteAsset(item)}" update="datalist">
+                            <p:commandLink rendered="#{userContextService.accessContainsFunctionMenu('ASSET_RISK_EDIT')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetRiskAssessmentController.deleteAsset(item)}" update="datalist">
                                 <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandLink>

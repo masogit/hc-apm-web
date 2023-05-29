@@ -77,7 +77,7 @@
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
-                <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
+                <p:column exportable="false" width="#{userContextService.hasAnyRoleByApmRoles('AssetHead')?60:30}" id="operatorColumn">
                     <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
                         <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}">
                             <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
@@ -592,7 +592,7 @@
                                      actionListener="#{assetInfoToBeTerminatedListController.preEdit()}"
                                      update=":woTab:TerminationCauseEditDlg"
                                      oncomplete="PF('TerminationCauseEditDlg').show()"
-                                     disabled="#{not assetInfoToBeTerminatedListController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EDIT')}"/>
+                                     disabled="#{not assetInfoToBeTerminatedListController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EVALUATE')}"/>
                     <p:commandButton id="toBeTerminatedAppraisalButton" icon="ui-icon-arrow-1-s"
                                      actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile}"
                                      class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}"
@@ -609,7 +609,7 @@
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}">
                         <p:confirm header="#{msg.BatchTerminateConfirmation}" message="#{msg.AreYouSureToConfirmTheRecordOfSelectedItemsScrapped}" icon="ui-icon-warning"/>
                     </p:commandButton>
-                    <p:commandButton id="TerminationByFileButton" icon="ui-icon-delete" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_DELETE')}"
+                    <p:commandButton id="TerminationByFileButton" icon="ui-icon-delete" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAPED')}"
                                      class="btn btn-sm btn-gray batch-terminated" title="#{msg.UploadedFileTransformedToBeTerminated}"
                                      oncomplete="PF('TerminationByFileDlg').show()">
                     </p:commandButton>

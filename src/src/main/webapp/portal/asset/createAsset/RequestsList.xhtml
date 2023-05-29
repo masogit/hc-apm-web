@@ -61,7 +61,7 @@
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.Create2}" >
-                            <p:link target="_new" outcome="/portal/asset/info/AssetCreate"  >#{msg.Create}
+                            <p:link target="_new" outcome="/portal/asset/info/AssetCreate"  rendered="#{userContextService.accessContainsFunctionMenu('ASSET_CREATE_ADD')}">#{msg.Create}
                                 <f:param name="qrCode" value="#{item.qrCode}" />
                                 <f:param name="siteUid" value="#{item.siteUID}" />
                             </p:link >
