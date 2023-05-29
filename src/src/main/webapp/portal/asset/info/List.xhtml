@@ -80,7 +80,7 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column exportable="false" width="#{userContextService.hasAnyRoleByApmRoles('AssetHead')?60:30}">
+                        <p:column exportable="false" width="60">
                             <h:panelGroup rendered="#{empty assetInfoController.filterWarrantyDate}">
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_INFO_EDIT')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
