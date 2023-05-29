@@ -110,6 +110,8 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				&& !f.name().startsWith("MAINTAIN_ORDER_CANCEL")
 				&& !f.name().startsWith("MAINTAIN_ORDER_TAKE")
 				&& !f.name().equals("MAINTAIN_ORDER_APPROVE")
+				&& !f.name().equals("ASSET_LOCATION_VIEW")
+
 		).collect(Collectors.toList());
 		functions = allFunction;
 	}
