@@ -234,22 +234,22 @@
 
                     <ui:fragment rendered="true">
 
-                        <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDispatch}"  update="@(.disClass)" rendered="#{v2PmOrderController.queryIndex==2}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('dispatchDialog').show()">
+                        <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDispatch}"  update="@(.disClass)" rendered="#{v2PmOrderController.queryIndex==2 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_DISPATCH')}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('dispatchDialog').show()">
                         </p:commandButton>
 
-                        <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="#{msg.BatchTake}"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3}" disabled="#{v2PmOrderController.isBatchTakePm()}" oncomplete="PF('takeOrderDialog').show()">
+                        <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="#{msg.BatchTake}"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{v2PmOrderController.isBatchTakePm()}" oncomplete="PF('takeOrderDialog').show()">
                         </p:commandButton>
 
-                        <p:commandButton  icon="ui-icon-arrow-forward" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchReassign}"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.forbidTransfer()}" oncomplete="forbidTransfer(xhr, status, args)">
+                        <p:commandButton  icon="ui-icon-arrow-forward" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchReassign}"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0 and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{not v2PmOrderController.isChecked()}"  actionListener="#{v2PmOrderController.forbidTransfer()}" oncomplete="forbidTransfer(xhr, status, args)">
                         </p:commandButton>
 
                         <p:commandButton  icon="ui-icon-aspect-ratio" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchComplete}"  update="@(.pmCompleteDialogBatch)" actionListener="#{v2PmOrderController.sameType()}" rendered="#{v2PmOrderController.isAllowBatchComplate()}" disabled="#{not v2PmOrderController.isCheckedForBatchComplate()}" oncomplete="forbidBatchComplete(xhr, status, args)">
                         </p:commandButton>
 
-                        <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchCancel}"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2PmOrderController.preBatchCancel()}"  rendered="#{ (v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==-1)}" disabled="#{v2PmOrderController.batchCancelShow() or not v2PmOrderController.isChecked()}" oncomplete="PF('pmBatchCancelDialog').show()">
+                        <p:commandButton  icon="ui-icon-assistant" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchCancel}"  update="@(.pmBatchCancelDialog) @(.pmCancelFormCls)" actionListener="#{v2PmOrderController.preBatchCancel()}"  rendered="#{ (v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==-1) and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_CANCEL')}" disabled="#{v2PmOrderController.batchCancelShow() or not v2PmOrderController.isChecked()}" oncomplete="PF('pmBatchCancelDialog').show()">
                         </p:commandButton>
 
-                        <p:commandButton  icon="ui-icon-art-track" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="#{userContextService.hasCurrentTenantName('')?msg.BatchTake:msg.BatchGrap}"  rendered="#{v2PmOrderController.queryIndex==31}" disabled="#{not v2PmOrderController.isBatchRob()}" oncomplete="PF('robOrderDialog').show()">
+                        <p:commandButton  icon="ui-icon-art-track" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="#{userContextService.hasCurrentTenantName('')?msg.BatchTake:msg.BatchGrap}"  rendered="#{v2PmOrderController.queryIndex==31  and userContextService.accessContainsFunctionMenu('MAINTAIN_ORDER_TAKE')}" disabled="#{not v2PmOrderController.isBatchRob()}" oncomplete="PF('robOrderDialog').show()">
                         </p:commandButton>
 
                         <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2PmOrderController.prepareAct(item.id)}" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchClose}"  rendered="#{v2PmOrderController.queryIndex==6}" update="@(.closePmDialogClassBatch)" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('closePmDialogBatch').show()">
