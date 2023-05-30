@@ -175,7 +175,7 @@
                       &nbsp;&nbsp;
                       <!-- and pmOrderRuleController.selected.id != null -->
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.approve()}" value="#{msg.Approval}" update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl"
-                    icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');" rendered="#{userContextService.hasRole('AssetHead') and pmOrderRuleController.selected.status != 1}"/>
+                    icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_APPROVE') and pmOrderRuleController.selected.status != 1}"/>
                 </h:panelGroup>
             </h:form>
 
