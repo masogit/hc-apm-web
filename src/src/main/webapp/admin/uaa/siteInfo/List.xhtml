@@ -14,7 +14,7 @@
             <div class="ui-g-12 card">
                 
             <h:form id="SiteInfoListForm">
-                <p:dataTable id="datalist" value="#{tenantInfoController.lazyModel}" var="item" widgetVar="varDataList"
+                <p:dataTable id="datalist"  value="#{tenantInfoController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{tenantInfoController.selected}"
                     lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                     rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
