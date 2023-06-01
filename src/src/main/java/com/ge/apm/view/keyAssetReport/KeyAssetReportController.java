@@ -153,6 +153,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         if(1 == this.selected.getReportType()){
             assetOperation = JSON.parseObject(selected.getAssetOperation(), List.class);
             assetOperationForYear = new ArrayList<>();
+            operationOrder = 1;
         }else if(2 == this.selected.getReportType()){
             initAssetOperation();
             assetOperationForYear = JSON.parseObject(selected.getAssetOperation(), List.class);
