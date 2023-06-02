@@ -14,6 +14,8 @@ import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.BaseFormulaEvaluator;
 import org.apache.poi.ss.usermodel.CellType;
@@ -489,8 +491,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map supliers = getAllElement.getSupliers();
 
         Set<String> loginNames = assetList.stream().map(AssetInfo::getCreatedBy).filter(Objects::nonNull).collect(Collectors.toSet());
-        List<Map<String, String>> userAccounts = userAccountMapper.findNameByLoginNames(loginNames);
-        Map<String, String> userMap = userAccounts.stream().collect(Collectors.toMap(map -> map.get("loginname"), map -> map.get("name")));
+        Map<String, String> userMap = MapUtil.newHashMap();
+        if (ObjectUtil.isNotEmpty(loginNames)) {
+            List<Map<String, String>> userAccounts = userAccountMapper.findNameByLoginNames(loginNames);
+            userMap = userAccounts.stream().collect(Collectors.toMap(map -> map.get("loginname"), map -> map.get("name")));
+        }
         for (AssetInfo assetInfo: assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, sites ,this, assetDao, orgDao, supplierDao,userDao,authGroupDao);
