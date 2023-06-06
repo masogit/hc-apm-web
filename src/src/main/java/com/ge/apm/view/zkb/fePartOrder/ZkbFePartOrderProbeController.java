@@ -600,7 +600,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 }
                 if(!this.checkShowSN()){
                     this.selected.setContractCatId(null);
-                    if("f".equals(this.selected.getNotGeAsset())){
+                    if("f".equals(notGeAsset)){
                         this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
                     }
                 }

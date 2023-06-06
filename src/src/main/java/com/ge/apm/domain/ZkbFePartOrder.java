@@ -641,7 +641,7 @@ public class ZkbFePartOrder {
     @Column(name = "not_ge_asset")
     private String notGeAsset;
 
-    @Column(name = "cat_model_nonge")
+    @Column(name = "cat_model_non_ge")
     private String catModelNonGe;
 
     public String getCatModelNonGe() {
