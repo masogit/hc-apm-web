@@ -453,7 +453,7 @@
                             <p:inputText id="catModel" value="#{zkbPartOrderAuditController.selected.catNo}" disabled="true" />
                         </h:panelGroup>
 
-                        <h:panelGroup id="catModelGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" >
+                        <h:panelGroup id="catModelGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" rendered="#{empty zkbPartOrderAuditController.selected.notGeAsset}">
                             <h:panelGroup id="noHighGroup" rendered="#{zkbPartOrderAuditController.showCatListFlag eq '1'}" style="text-align: left">
                                 <label class="label">探头型号*</label>
                                 <p:autoComplete dropdown="true" value="#{zkbPartOrderAuditController.selected.zkbPartOrderCat}" disabled="true" scrollHeight="300" forceSelection="true" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}"
@@ -468,7 +468,10 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.notGeAsset eq 't'}">
+                            <label class="label">探头型号</label>
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.catModelNonGe}" disabled="true"/>
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.showCatListFlag eq '1'}">
                             <label class="label">价值类型</label>
                             <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
@@ -538,7 +541,7 @@
                             <p:commandLink immediate="false" process="@this" id="historyData" update="growl zkbHistoryQueryDlg" action="#{zkbPartOrderAuditController.preHistoryData}" oncomplete="PF('zkbHistoryQueryDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' and zkbPartOrderAuditController.canEditFlag}">
                                 <h:outputText value="历史数据查询" />
                             </p:commandLink>
-                            <p:outputLabel style="color: red;font-weight:bold;margin-left: 20px;font-size: x-large" value="#{zkbPartOrderAuditController.decisionTechAudit()}" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending'}"/>
+                            <!--<p:outputLabel style="color: red;font-weight:bold;margin-left: 20px;font-size: x-large" value="#{zkbPartOrderAuditController.decisionTechAudit()}" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending'}"/>-->
                         </h:panelGroup>
 
                     </p:panelGrid>
