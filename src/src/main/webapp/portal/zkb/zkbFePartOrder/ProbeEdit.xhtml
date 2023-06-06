@@ -252,7 +252,7 @@
                         </c:if>
                         <c:if test="#{(!zkbFePartOrderProbeController.checkShowSN()) and (zkbFePartOrderDetailController.selected.notGeAsset eq 't')}">
                             <label class="label">#{msg.zkbFePartOrder_zkbPartOrderCat}*</label>
-                            <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.catModelNonGe}"  />
+                            <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.catModelNonGe}" required="true" requiredMessage="#{msg.zkbFePartOrder_zkbPartOrderCat} #{msg.ValidationRequire}" />
                         </c:if>
                     </h:panelGroup>
                     <h:panelGroup id="valueTypeGroup" rendered="#{zkbFePartOrderDetailController.selected.notGeAsset eq 'f'}">

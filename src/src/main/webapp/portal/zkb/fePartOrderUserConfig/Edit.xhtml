@@ -59,7 +59,7 @@
                     <h:panelGroup id="responsibleAssetPG">
                         <h:panelGroup  rendered="#{'Supplier'.equals(zkbFePartOrderUserConfigController.selected.configType)}" >
                             <label class="label" style="font-size: medium; font-weight: bold">负责相关设备</label>
-                            <p:selectBooleanCheckbox  id="responsibleAsset" value="#{zkbFePartOrderUserConfigController.selected.responsibleAsset}"  />
+                            <p:selectBooleanCheckbox  id="responsibleAsset" value="#{zkbFePartOrderUserConfigController.selected.responsibleAsset}" disabled="#{!userContextService.zkbAdmin}"  />
                         </h:panelGroup>
                     </h:panelGroup>
                 </p:panelGrid>
