@@ -194,6 +194,9 @@
                                         <p:ajax event="change" update="valueType valueTypeGroup" />
                                         <f:selectItem itemLabel="否" itemValue="f"/>
                                     </p:selectOneMenu>
+                                    <p:selectOneMenu style="display: none" value="#{zkbFePartOrderProbeController.selected.highCatFlag}" required="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
+                                        <f:selectItem itemLabel="否" itemValue="f"/>
+                                    </p:selectOneMenu>
                                 </c:when>
                                 <c:otherwise>
                                     <label class="label">是否高值探头*</label>
