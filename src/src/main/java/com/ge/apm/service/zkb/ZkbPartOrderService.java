@@ -44,6 +44,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Autowired
     private ZkbPartOrderRepository zkbPartOrderRepository;
 
+
     @Autowired
     private ZkbPartOrderItemRepository zkbPartOrderItemRepository;
 
@@ -106,6 +107,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Autowired
     ZkbContractCatQuotaHistoryService zkbContractCatQuotaHistoryService;
+
+    @Autowired
+    ZkbUnrealRepository zkbUnrealRepository;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -729,7 +733,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(zkbPartOrder != null){
             List<ZkbPartOrderItem> zkbPartOrderItems = new ArrayList<>();
             zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
+
             zkbPartOrder.setZkbPartOrderItems(zkbPartOrderItems);
+            getUnrealData(zkbPartOrder);
         }
         if(zkbPartOrder != null && StringUtils.isNotEmpty(zkbPartOrder.getContractId())){
             ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
@@ -986,6 +992,36 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
             subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
         }
+    }
+
+    public void getUnrealData(ZkbPartOrder zkbPartOrder){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        for(ZkbPartOrderItem i : zkbPartOrder.getZkbPartOrderItems()){
+            List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getSrNum(),i.getPartNo());
+            if(zkbUnrealList != null && zkbUnrealList.size() > 0){
+                ZkbUnreal zkbUnreal = zkbUnrealList.get(0);
+                i.setUnrealStatus(format.format(zkbUnreal.getCreatedDate()) + "判定为不真实");
+            }
+        }
+    }
+
+    public void unrealNext(ZkbPartOrder zkbPartOrder,String[] selectedOptions,UserAccount userAccount){
+        List<ZkbUnreal> zkbUnrealList = new ArrayList<>();
+        AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+        for (int i =0; i < selectedOptions.length;i++){
+            ZkbUnreal zkbUnreal = new ZkbUnreal();
+            zkbUnreal.setPartOrderNo(zkbPartOrder.getPartOrderNo());
+            zkbUnreal.setPartOrderId(zkbPartOrder.getId());
+            zkbUnreal.setSrNum(zkbPartOrder.getSrNum());
+            zkbUnreal.setSysId(assetInfo.getSystemId());
+            zkbUnreal.setItemNo(selectedOptions[i]);
+            zkbUnreal.setCreatedBy(userAccount.getName());
+            zkbUnreal.setCreatedDate(new Date());
+            zkbUnrealList.add(zkbUnreal);
+        }
+        zkbUnrealRepository.save(zkbUnrealList);
+        auditNext(zkbPartOrder,false,userAccount);
+
     }
 
     @Transactional(rollbackFor = Exception.class)

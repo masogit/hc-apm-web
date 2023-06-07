@@ -1097,6 +1097,33 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    private String[] selectedOptions;
+    List<ZkbPartOrderItem> unrealItem = new ArrayList<>();
+    public void preUnreal(){
+        unrealItem = new ArrayList<>();
+        for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+            if(StrUtil.isNotEmpty(i.getUnrealStatus())){
+                i.setPartName(i.getPartNo()+ "【" + i.getPartName() + "】         " + i.getUnrealStatus());
+            }else{
+                i.setPartName(i.getPartNo()+ "【" + i.getPartName() + "】");
+            }
+            unrealItem.add(i);
+        }
+    }
+
+    public String saveUnreal(){
+        if(selectedOptions == null || selectedOptions.length == 0){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            WebUtil.addErrorMessage("请选择不真实的备件号!");
+            return "";
+        }else{
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+        }
+
+        zkbPartOrderService.unrealNext(selected, selectedOptions, currentUser);
+        return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
+    }
+
     public String acceptNext(){
         ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
@@ -2442,5 +2469,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowOsscReturn(boolean showOsscReturn) {
         this.showOsscReturn = showOsscReturn;
+    }
+
+    public String[] getSelectedOptions() {
+        return selectedOptions;
+    }
+
+    public void setSelectedOptions(String[] selectedOptions) {
+        this.selectedOptions = selectedOptions;
+    }
+
+    public List<ZkbPartOrderItem> getUnrealItem() {
+        return unrealItem;
+    }
+
+    public void setUnrealItem(List<ZkbPartOrderItem> unrealItem) {
+        this.unrealItem = unrealItem;
     }
 }

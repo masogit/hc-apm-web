@@ -417,6 +417,9 @@
                                  widgetVar="zkbContractCourseDatalist" selectionMode="single"
                                  lazy="false" paginator="true" rowKey="#{item.partNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
                                  paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                        <p:column headerText="判定信息" rendered="#{zkbPartOrderAuditController.canEditFlag and (zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
+                            <h:outputText value="#{item.unrealStatus}" style="color: red"/>
+                        </p:column>
                         <c:choose>
                             <c:when test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
                                 <p:column headerText="配件号">
@@ -1223,6 +1226,7 @@
                 <!--<p:commandButton immediate="false" process="@this" value="退回" action="#{zkbPartOrderAuditController.closedBack}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag}"/>-->
                 <p:commandButton id="accept" validateClient="true" value="审批通过" action="#{zkbPartOrderAuditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.showBtn eq '0') and zkbPartOrderAuditController.canEditFlag}" disabled="#{zkbPartOrderAuditController.selected.repairFlag eq 'f'}"/>
                 <p:commandButton id="reject" validateClient="true" value="审批不通过" action="#{zkbPartOrderAuditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.showBtn eq '0' and zkbPartOrderAuditController.canEditFlag}" disabled="#{zkbPartOrderAuditController.selected.repairFlag eq 't'}"/>
+                <p:commandButton id="unreal" validateClient="true" value="不真实并审批不通过" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" icon="ui-icon-close" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag}" />
                 <p:commandButton immediate="false"  process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderAuditController.backList}" />
 
             </h:form>
@@ -1231,6 +1235,7 @@
             <ui:include src="svclogisticsData.xhtml"/>
             <ui:include src="PartOrderOrderModify.xhtml"/>
             <ui:include src="PartOrderReturnModify.xhtml"/>
+            <ui:include src="UnrealEdit.xhtml"/>
             <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
 
                 <h:form id="zkbConfigForm">

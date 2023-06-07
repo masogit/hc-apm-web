@@ -912,15 +912,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-            boolean onlineEngineFlag= false;
-            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType()) && !ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
-                onlineEngineFlag = true;
-            }
-            if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selectedContract.getQuotaDeductType()) && CopyByInvok.F.equals(selected.getHighCatFlag())){
-                onlineEngineFlag = true;
-            }
-            if(onlineEngineFlag){
-                this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+            if(CopyByInvok.F.equals(notGeAsset)){
+                boolean onlineEngineFlag= false;
+                if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType()) && !ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
+                    onlineEngineFlag = true;
+                }
+                if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selectedContract.getQuotaDeductType()) && CopyByInvok.F.equals(selected.getHighCatFlag())){
+                    onlineEngineFlag = true;
+                }
+                if(onlineEngineFlag){
+                    this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+                }
             }
             if(this.selected.getOnlineEngine() != null){
                 if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
@@ -1128,7 +1130,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(contractCount - selected.getQty() < 0){
                         reLog.append("合同探头任意剩余名额不足，请检查！");
                     }
-                    if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                    if(CopyByInvok.F.equals(notGeAsset) && ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
                         reLog.append("高值探头不能选用任意名额！");
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(selected.getProbeQuotaType())){
@@ -1137,7 +1139,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(contractCount - selected.getQty() < 0){
                         reLog.append("合同探头普通剩余名额不足，请检查！");
                     }
-                    if(!ZkbPartOrderCat.ValueType.NormalValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                    if(CopyByInvok.F.equals(notGeAsset) && !ZkbPartOrderCat.ValueType.NormalValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
                         reLog.append("探头普通剩余名额只能选择普通探头！");
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
@@ -1146,7 +1148,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(contractCount - selected.getQty() < 0){
                         reLog.append("合同探头特殊剩余名额不足，请检查！");
                     }
-                    if(!ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                    if(CopyByInvok.F.equals(notGeAsset) && !ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
                         reLog.append("探头特殊剩余名额只能选择特殊探头！");
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
@@ -1161,7 +1163,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }else if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
                 if(CopyByInvok.F.equals(selected.getHighCatFlag())){
-                    if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                    if(CopyByInvok.F.equals(notGeAsset) && ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
                         reLog.append("不能选择高值探头！");
                     }
                     probeType = ZkbContractCatQuotaHistory.ProbeTypeStatus.OldProbe.toString();
