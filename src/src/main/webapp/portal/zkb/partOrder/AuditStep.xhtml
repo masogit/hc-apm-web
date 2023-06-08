@@ -475,7 +475,7 @@
                             <label class="label">探头型号</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.catModelNonGe}" disabled="true"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.showCatListFlag eq '1'}">
+                        <h:panelGroup rendered="#{empty zkbPartOrderAuditController.selected.notGeAsset and zkbPartOrderAuditController.showCatListFlag eq '1'}">
                             <label class="label">价值类型</label>
                             <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
                             <label style="color: red">#{zkbPartOrderAuditController.valueTypeTips}</label>
