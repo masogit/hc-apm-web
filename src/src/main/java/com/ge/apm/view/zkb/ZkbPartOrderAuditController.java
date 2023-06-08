@@ -1103,9 +1103,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         unrealItem = new ArrayList<>();
         for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
             if(StrUtil.isNotEmpty(i.getUnrealStatus())){
-                i.setPartName(i.getPartNo()+ "【" + i.getPartName() + "】         " + i.getUnrealStatus());
+                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")      " + i.getUnrealStatus());
             }else{
-                i.setPartName(i.getPartNo()+ "【" + i.getPartName() + "】");
+                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
             }
             unrealItem.add(i);
         }
@@ -2486,4 +2486,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void setUnrealItem(List<ZkbPartOrderItem> unrealItem) {
         this.unrealItem = unrealItem;
     }
+
+
 }
