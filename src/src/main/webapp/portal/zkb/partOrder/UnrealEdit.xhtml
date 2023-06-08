@@ -4,14 +4,20 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 <ui:composition>
+
     <p:dialog id="zkbUnrealyDlg" widgetVar="zkbUnrealyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="不真实数据选择" width="30%" height="320">
     <h:form id="zkbUnrealForm">
         <p:selectManyCheckbox  value="#{zkbPartOrderAuditController.selectedOptions}" widgetVar="blub" columns="1" styleClass="grid-checkbox" layout="grid" style="width: 100%">
-            <f:selectItems value="#{zkbPartOrderAuditController.unrealItem}" var="item" itemLabel="#{item.partName}"
+            <f:selectItems value="#{zkbPartOrderAuditController.unrealItem}" var="item" itemLabel="#{item.unrealPartName}"
                            itemValue="#{item.partNo}" itemDisabled="#{!(empty item.unrealStatus)}"/>
         </p:selectManyCheckbox>
+        <!--<style>
+            .ui-selectmanycheckbox.ui-widget td, .ui-selectoneradio.ui-widget label, .ui-selectoneradio.ui-widget td {
+                color: red;
+            }
+        </style>-->
 
         <br/>
         <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.saveUnreal}" oncomplete="handleSubmit(args, 'zkbUnrealyDlg');" update=":growl" icon="ui-icon-check" />
@@ -19,4 +25,6 @@
     </h:form>
     </p:dialog>
 </ui:composition>
+
 </html>
+
