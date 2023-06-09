@@ -52,6 +52,10 @@
                         <p:inputText id="invoiceNumber" value="#{sparePartController.selected.invoiceNumber}" />
                     </h:panelGroup>
                     <h:panelGroup >
+                        <label class ="label">备注 </label>
+                        <p:inputText id="remark" value="#{sparePartController.selected.remark}"  />
+                    </h:panelGroup>
+                    <h:panelGroup >
                         <label class ="label">仓库* </label>
                         <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" disabled="true">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>

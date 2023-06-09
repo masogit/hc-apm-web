@@ -12,6 +12,7 @@ import org.primefaces.event.data.FilterEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
@@ -179,7 +180,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     }
 
     public Date getInStockDate(String sparePartId){
-        StockRecord stockRecord = stockRecordRepository.findInBySparePartId(sparePartId);
+        StockRecord stockRecord = stockRecordRepository.findInBySparePartId(sparePartId, 1);
 
         if(stockRecord != null){
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -193,6 +194,10 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         return null;
     }
 
+    public boolean AreThereNnyOutboundRecords(String sparePartId) {
+        return stockRecordRepository.findInBySparePartId(sparePartId, 2) != null;
+    }
+
     public void cancel() {
         selected = null;
         partsWarehouseId = null;
@@ -200,6 +205,10 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     }
 
     public void delete() {
+        StockRecord stockRecord = stockRecordRepository.findInBySparePartId(selected.getId(), 1);
+        if (ObjectUtils.isEmpty(stockRecord)) {
+            stockRecordRepository.delete(stockRecord);
+        }
         dao.delete(selected);
     }
 
