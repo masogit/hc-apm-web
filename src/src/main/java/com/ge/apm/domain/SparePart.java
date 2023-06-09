@@ -54,9 +54,10 @@ public class SparePart implements Serializable {
     private String siteUID;
     @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;
-
     @Column(name = "invoice_number")
     private String invoiceNumber;
+    @Column(name = "remark")
+    private String remark;
 
     @Override
     public int hashCode() {

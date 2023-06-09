@@ -45,7 +45,7 @@
                         <h:panelGroup >
                             <label class ="label">单价 </label>
                             <p:inputText id="unitPrice" value="#{sparePartController.selected.unitPrice}" >
-                                <f:validateDoubleRange minimum="0.01" />
+                                <f:validateDoubleRange minimum="0" />
                                 <p:ajax event="change" update=":pkInForm:totalPrice"/>
                             </p:inputText>
                         </h:panelGroup>
@@ -56,6 +56,10 @@
                         <h:panelGroup >
                             <label class ="label">发票号 </label>
                             <p:inputText id="invoiceNumber" value="#{sparePartController.selected.invoiceNumber}" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">备注 </label>
+                            <p:inputText id="remark" value="#{sparePartController.selected.remark}"  />
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">仓库* </label>
