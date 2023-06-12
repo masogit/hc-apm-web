@@ -32,8 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.RestTemplate;
-import webapp.framework.web.WebUtil;
-
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -685,55 +683,63 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
 		//find menus by tenant_config
 		for (TenantInfo tenantInfo : tenantInfos) {
-			if (StringUtils.isNotEmpty(tenantInfo.getTenantConfig())) {
-				JSONObject jsonObject = JSON.parseObject(tenantInfo.getTenantConfig());
-				String version = jsonObject.getString("edition");
-				List<String> finalEnumNames = jsonObject.getObject("menuList", List.class);
-				List<String> requiredEnums = new ArrayList<>();
-				for (AssetManagementEnum e : AssetManagementEnum.values()) {
-					if (e.isRequired()) {
-						if (e.getIgnore().contains(version)) {
-							continue;
-						}
-						if (e.isChekConfig()) {
-							if (chekConfig(e, tenantInfo)) {
-								requiredEnums.add(e.name());
-							}
-							continue;
-						}
-						requiredEnums.add(e.name());
-						continue;
-					}
-					if (e.name().equals(AssetManagementEnum.REPAIR_APPROVE_PROCESS.name())) {
-						if (tenantInfo.getName().contains("积水潭")) {
-							requiredEnums.add(e.name());
-							continue;
-						}
-					}
-					if (finalEnumNames.contains(e.getOldName())) {
-						if (e.isChekConfig()) {
-							if (chekConfig(e, tenantInfo)) {
-								requiredEnums.add(e.name());
-							}
-						} else {
-							requiredEnums.add(e.name());
-						}
-						continue;
-					}
-				}
-				tenantInfo.setFeatureList(JSONObject.toJSON(requiredEnums).toString());
-				tenantInfoRepository.save(tenantInfo);
-			}
+			analyseMenu(tenantInfo);
 		}
 		//analyse custom_role
 		List<CustomRole> customRoles = customRoleRepository.find();
 		customRoles.forEach(customRole -> {
-			if (StringUtils.isNotEmpty(customRole.getWebAuthorities())) {
-				List<String> functionList = analyseCustomRole(customRole.getWebAuthorities());
-				customRole.setFunctionList(JSONObject.toJSON(functionList).toString());
-				customRoleRepository.save(customRole);
-			}
+			analyseCustomMenu(customRole);
 		});
+	}
+
+	public void analyseMenu(TenantInfo tenantInfo) {
+		if (StringUtils.isNotEmpty(tenantInfo.getTenantConfig())) {
+			JSONObject jsonObject = JSON.parseObject(tenantInfo.getTenantConfig());
+			String version = jsonObject.getString("edition");
+			List<String> finalEnumNames = jsonObject.getObject("menuList", List.class);
+			List<String> requiredEnums = new ArrayList<>();
+			for (AssetManagementEnum e : AssetManagementEnum.values()) {
+				if (e.isRequired()) {
+					if (e.getIgnore().contains(version)) {
+						continue;
+					}
+					if (e.isChekConfig()) {
+						if (chekConfig(e, tenantInfo)) {
+							requiredEnums.add(e.name());
+						}
+						continue;
+					}
+					requiredEnums.add(e.name());
+					continue;
+				}
+				if (e.name().equals(AssetManagementEnum.REPAIR_APPROVE_PROCESS.name())) {
+					if (tenantInfo.getName().contains("积水潭")) {
+						requiredEnums.add(e.name());
+						continue;
+					}
+				}
+				if (finalEnumNames.contains(e.getOldName())) {
+					if (e.isChekConfig()) {
+						if (chekConfig(e, tenantInfo)) {
+							requiredEnums.add(e.name());
+						}
+					} else {
+						requiredEnums.add(e.name());
+					}
+					continue;
+				}
+			}
+			tenantInfo.setFeatureList(JSONObject.toJSON(requiredEnums).toString());
+			tenantInfoRepository.save(tenantInfo);
+		}
+	}
+
+	public void analyseCustomMenu(CustomRole customRole) {
+		if (StringUtils.isNotEmpty(customRole.getWebAuthorities())) {
+			List<String> functionList = analyseCustomRole(customRole.getWebAuthorities());
+			customRole.setFunctionList(JSONObject.toJSON(functionList).toString());
+			customRoleRepository.save(customRole);
+		}
 	}
 
 	private boolean chekConfig(AssetManagementEnum e, TenantInfo tenantInfo) {
