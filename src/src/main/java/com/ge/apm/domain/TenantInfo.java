@@ -175,7 +175,7 @@ public class TenantInfo implements Serializable {
     @Column(name="is_enables_adverse_events" )
     private Boolean isEnablesAdverseEvents; // 控制不良事件相关微信卡片是否显示 （true/false 默认false不显示）
 
-    @Column(name="is_enables_new_menu", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    @Column(name="is_enables_new_menu", nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
     private Boolean isEnablesNewMenu; // 控制控制租户是否启动新菜单配置 （true/false 默认不显示）
 
     public Boolean getEnablesNewMenu() {
