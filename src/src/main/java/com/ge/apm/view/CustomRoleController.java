@@ -8,6 +8,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.alibaba.fastjson.JSON;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.service.uaa.AdminConsoleService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import org.apache.commons.collections.CollectionUtils;
@@ -385,7 +386,15 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		authorities = new String[200];
 		cards = new String[100];
 		menus = new String[100];
+		if (!isOpenNewMenuRoles()) {
+			analyseMenus(selected);
+		}
 	}
+
+	private void analyseMenus(CustomRole customRole) {
+		WebUtil.getBean(AdminConsoleService.class).analyseCustomMenu(customRole);
+	}
+
 	public void authChange(){
 		if(authJSONArr!=null){
 			for(int i=0;i<authJSONArr.size();++i){
