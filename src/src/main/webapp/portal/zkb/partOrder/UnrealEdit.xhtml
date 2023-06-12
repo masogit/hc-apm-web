@@ -20,7 +20,7 @@
         </style>-->
 
         <br/>
-        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.saveUnreal}" oncomplete="handleSubmit(args, 'zkbUnrealyDlg');" update=":growl" icon="ui-icon-check" />
+        <p:commandButton validateClient="true" value="确定并审批不通过" action="#{zkbPartOrderAuditController.saveUnreal}" oncomplete="handleSubmit(args, 'zkbUnrealyDlg');" update=":growl" icon="ui-icon-check" />
         <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbUnrealyDlg').hide()"/>
     </h:form>
     </p:dialog>
