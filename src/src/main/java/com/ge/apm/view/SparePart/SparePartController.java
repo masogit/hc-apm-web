@@ -206,7 +206,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
 
     public void delete() {
         StockRecord stockRecord = stockRecordRepository.findInBySparePartId(selected.getId(), 1);
-        if (ObjectUtils.isEmpty(stockRecord)) {
+        if (!ObjectUtils.isEmpty(stockRecord)) {
             stockRecordRepository.delete(stockRecord);
         }
         dao.delete(selected);
