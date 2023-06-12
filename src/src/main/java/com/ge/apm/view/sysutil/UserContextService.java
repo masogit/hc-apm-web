@@ -586,8 +586,8 @@ public class UserContextService implements Serializable {
                     functions.addAll((List<String>)JSON.parse(customRole.getFunctionList()));
                 }
             });
-            if (!functions.contains("ASSET_SCRAP_VIEW")) {
-                apmFunctionList.remove("ASSET_SCRAP_VIEW");
+            if (!functions.contains(ApmFunction.ASSET_SCRAP_VIEW.name())) {
+                apmFunctionList.remove(ApmFunction.ASSET_SCRAP_VIEW.name());
             }
         }
     }
