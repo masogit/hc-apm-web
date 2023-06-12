@@ -569,9 +569,27 @@ public class UserContextService implements Serializable {
             if (BooleanUtils.isTrue(getUserAccountApprove())) {
                 apmFunctionList.add(ApmFunction.REPAIR_APPROVE_PROCESS_VIEW.name());
             }
+            //租户额外特殊处理
+            functionSpecial();
+
             CustomPermissionEvaluator.apmFunctionList = apmFunctionList;
         }
         return apmFunctionList;
+    }
+
+    private void functionSpecial() {
+        if (needScrappedControl()) {
+            List<CustomRole> customRoles = getCustomRole(getUserID());
+            Set<String> functions = new HashSet<>();
+            customRoles.forEach(customRole -> {
+                if (StringUtils.isNotEmpty(customRole.getFunctionList())) {
+                    functions.addAll((List<String>)JSON.parse(customRole.getFunctionList()));
+                }
+            });
+            if (!functions.contains("ASSET_SCRAP_VIEW")) {
+                apmFunctionList.remove("ASSET_SCRAP_VIEW");
+            }
+        }
     }
 
     public static UserAuth getCustomRoleAuth(Integer userId, String authKey) {
