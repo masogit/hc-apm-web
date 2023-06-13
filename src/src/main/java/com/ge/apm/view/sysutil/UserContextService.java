@@ -589,6 +589,9 @@ public class UserContextService implements Serializable {
             if (!functions.contains(ApmFunction.ASSET_SCRAP_VIEW.name())) {
                 apmFunctionList.remove(ApmFunction.ASSET_SCRAP_VIEW.name());
             }
+            if (!functions.contains(ApmFunction.ASSET_SCRAPED_VIEW.name())) {
+                apmFunctionList.remove(ApmFunction.ASSET_SCRAPED_VIEW.name());
+            }
         }
     }
 

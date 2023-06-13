@@ -7,6 +7,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.uaa.AdminConsoleService;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
@@ -278,6 +279,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				tenantOrg.setShortName(this.selected.getName());
 				orgInfoDao.save(tenantOrg);
 			}
+		}
+		if (!isOpenNewMenuRoles() && !type.equalsIgnoreCase("create")) {
+			analyseMenus(selected);
 		}
 		log.info("save/update TenantInfo successful, tenantName:{}", this.selected.getName());
 	}
@@ -614,5 +618,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	public void setShowTestTenant(boolean showTestTenant) {
 		isShowTestTenant = showTestTenant;
+	}
+
+	private void analyseMenus(TenantInfo tenantInfo) {
+		WebUtil.getBean(AdminConsoleService.class).analyseMenu(tenantInfo);
 	}
 }
