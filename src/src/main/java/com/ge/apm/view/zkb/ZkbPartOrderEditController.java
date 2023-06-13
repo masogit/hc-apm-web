@@ -981,6 +981,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog.append("订单类型不能为空！");
         }
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(this.orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(this.orderType)){
+            if(StringUtils.isEmpty(this.faultUnClosedSr)){
+                flag=false;
+                errorLog.append("同一故障需继续订购且有未关闭的SR不能为空！");
+            }
+        }
+
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(this.orderType)){
             if(StringUtils.isEmpty(this.maintainFlag)){
                 flag=false;
