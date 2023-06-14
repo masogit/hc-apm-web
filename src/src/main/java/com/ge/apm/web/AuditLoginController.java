@@ -3,6 +3,7 @@ package com.ge.apm.web;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.AesUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class AuditLoginController {
 //                    RequestMethod.GET,
 //                    RequestMethod.POST,
 //                    RequestMethod.DELETE,
-//                    RequestMethod.OPTIONS,
+//                    RequestMethod.OPTIONS, 
 //                    RequestMethod.HEAD,
 //                    RequestMethod.PUT,
 //                    RequestMethod.PATCH},
@@ -91,6 +92,19 @@ public class AuditLoginController {
             securityContextRepository.saveContext(securityContext, holder.getRequest(), holder.getResponse());
         }
     }
+
+
+    @RequestMapping(method = RequestMethod.GET,value = "/login2")
+    @ResponseBody
+    public  ResponseEntity<LinkedHashMap>  doLogin(HttpServletRequest request, HttpServletResponse response,@RequestParam String paramStr ) {
+        String decrypt = AesUtil.decrypt(paramStr);
+        String[] split = decrypt.split(",");
+        UserAccount userAccount = new UserAccount();
+        userAccount.setLoginName(split[0]);
+        userAccount.setPassword(split[1]);
+        return this.doLogin(request,response,userAccount);
+    }
+
     private ResponseEntity<LinkedHashMap> setResultFailed(String message){
         LinkedHashMap<String, Object> result=new LinkedHashMap<>();
         result.put("bizStatusCode","FAILED");
