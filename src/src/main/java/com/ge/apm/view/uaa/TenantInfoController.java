@@ -270,6 +270,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			}
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
+		log.info("save/updating... TenantInfo , tenantName:{},tenantConfig:{}", this.selected.getName(), this.selected.getTenantConfig());
 		this.selected.setLastModifiedDate(new Date());
 		super.save();
 		if (!StringUtils.isEmpty(this.selected.getUid())) {
