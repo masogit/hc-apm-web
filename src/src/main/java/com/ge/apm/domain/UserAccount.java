@@ -306,6 +306,17 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "account_creation_type")
 	private Integer accountCreationType;
 
+	@Column(name = "app_alias", length = 40)
+	private String appAlias;
+
+	public String getAppAlias() {
+		return appAlias;
+	}
+
+	public void setAppAlias(String appAlias) {
+		this.appAlias = appAlias;
+	}
+
 	public Integer getAccountCreationType() {
 		return accountCreationType;
 	}
