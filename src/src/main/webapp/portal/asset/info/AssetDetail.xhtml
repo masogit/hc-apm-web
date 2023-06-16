@@ -213,7 +213,10 @@
                                     </p:commandButton>
                                 </f:facet>
 
-                                <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoDetailController.selected.id, 3)}" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoDetailController.selected.id)}" emptyMessage="#{msg.noRecordFound}"
+                                             paginator="true" paginatorPosition="both" rows="5"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                     <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" >
                                         <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
                                     </p:column>
@@ -233,35 +236,37 @@
 
                             <p:panel  header="#{msg.MetrologyMonitor}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
                                 <f:facet name="actions">
-                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/measuring/measuringResultMain?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                                    <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/measuring/measuringResultMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                 </f:facet>
-
-                                <p:dataTable var="item" value="#{inspectionServiceController.getInspectionOrderList(assetInfoDetailController.selected.id, 2, 3)}" emptyMessage="#{msg.noRecordFound}">
-                                    <p:column headerText="#{msg.createTime}">
-                                        <h:outputText value="#{item.createTime}" />
+                                <p:dataTable var="item" value="#{inspectionServiceController.getMeasureAssetList(assetInfoDetailController.selected.id)}" emptyMessage="#{msg.noRecordFound}"
+                                             paginator="true" paginatorPosition="both" rows="5"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
+                                    <p:column headerText="#{msg.serialNum}">
+                                        <h:outputText value="#{item.serialNum}" />
                                     </p:column>
-                                    <p:column headerText="#{msg.creatorName}">
-                                        <h:outputText value="#{item.creatorName}" />
+                                    <p:column headerText="计量证书编号">
+                                        <h:outputText value="#{item.meteringNO}" />
                                     </p:column>
-                                    <p:column headerText="#{msg.ownerId}">
-                                        <h:outputText value="#{item.ownerName}" />
+                                    <p:column headerText="检定结论">
+                                        <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.verificationConclusion)}" />
                                     </p:column>
-                                    <p:column headerText="#{msg.examStartTime}">
-                                        <h:outputText value="#{item.startTime}" >
-                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    <p:column headerText="计量日期">
+                                        <h:outputText value="#{item.checkDate}">
+                                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="#{msg.endTime}">
-                                        <h:outputText value="#{item.endTime}" />
-                                    </p:column>
-                                </p:dataTable>
+                                </p:dataTable >
                             </p:panel>
                             <!--test-->
                             <p:panel  header="#{msg.InternalMaintenanceRecord}" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
                                 <f:facet name="actions">
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                 </f:facet>
-                                <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoDetailController.selected.uid,3)}" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
+                                             paginator="true" paginatorPosition="both" rows="5"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                     <p:column headerText="#{msg.creatorUID}" >
                                         <h:outputText value="#{item.creatorName}"/>
                                     </p:column>
@@ -358,7 +363,10 @@
                                     <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/nurseSite/maintainMain?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                                     <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl nurseSiteMaintainForm" onclick="PF('nurseSiteMaintainDialog').show()"/>
                                 </f:facet>
-                                <p:dataTable var="item" value="#{maintainController.getMaintainDataList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataTable var="item" value="#{maintainController.getMaintainDataList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
+                                             paginator="true" paginatorPosition="both" rows="5"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                     <p:column styleClass="textCenter"  headerText="计划检查日期" >
                                         <h:outputText value="#{item.scheduleDate}">
                                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -387,7 +395,10 @@
                                     <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl sharedAssetConfigForm" onclick="PF('sharedAssetConfigDialog').show();"/>
                                 </f:facet>
 
-                                <p:dataTable var="item" value="#{assetOptRecordController.getAssetOptRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataTable var="item" value="#{assetOptRecordController.getAssetOptRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
+                                             paginator="true" paginatorPosition="both" rows="5"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                     <p:column headerText="开机时间" >
                                         <h:outputText value="#{item.startDate}">
                                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
