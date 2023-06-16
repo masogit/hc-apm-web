@@ -5,6 +5,8 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.AesUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.cboard.CBoardController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +21,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import webapp.framework.context.WrappedRequest;
+import webapp.framework.util.SessionCache;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 
 @CrossOrigin
 @RestController
@@ -51,7 +54,7 @@ public class AuditLoginController {
 //                    RequestMethod.GET,
 //                    RequestMethod.POST,
 //                    RequestMethod.DELETE,
-//                    RequestMethod.OPTIONS, 
+//                    RequestMethod.OPTIONS,
 //                    RequestMethod.HEAD,
 //                    RequestMethod.PUT,
 //                    RequestMethod.PATCH},
@@ -83,7 +86,7 @@ public class AuditLoginController {
             usernamePasswordAuthenticationFilter.getRememberMeServices().loginSuccess(request, response, authResult);
             long l = System.currentTimeMillis();
             LinkedHashMap<String, Object> responseEntity = doGetAuthenticateByUserPassword(loginName, password, false, userAgent, request);
-            log.info("doLogin end :{}",responseEntity);
+            //log.info("doLogin end :{}",responseEntity);
             return ResponseEntity.ok(responseEntity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,15 +97,26 @@ public class AuditLoginController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET,value = "/login2")
+    @RequestMapping(method = RequestMethod.POST,value = "/login2")
     @ResponseBody
-    public  ResponseEntity<LinkedHashMap>  doLogin(HttpServletRequest request, HttpServletResponse response,@RequestParam String paramStr ) {
+    public  ResponseEntity<LinkedHashMap>  doLogin(HttpServletRequest request, HttpServletResponse response,@RequestParam("paramStr") String paramStr ) {
         String decrypt = AesUtil.decrypt(paramStr);
         String[] split = decrypt.split(",");
         UserAccount userAccount = new UserAccount();
         userAccount.setLoginName(split[0]);
         userAccount.setPassword(split[1]);
-        return this.doLogin(request,response,userAccount);
+        ResponseEntity<LinkedHashMap> linkedHashMapResponseEntity = this.doLogin(request, response, userAccount);
+        String token = ((HashMap) (((HashMap) (linkedHashMapResponseEntity.getBody().get("data"))).get("jwtToken"))).get("id_token").toString();
+        request.getSession().setAttribute("ACCESS_TOKEN", token);
+        UserAccount  user = userAccountDao.getByLoginName(userAccount.getLoginName());
+        //make sure microservice works before apm web
+        HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
+        SecurityContext securityContext = securityContextRepository.loadContext(holder);
+      //  UserContextService.setLoginUser(user);
+        request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, user.getLoginName());
+        response.setHeader("JSESSIONID",request.getSession().getId());
+        SessionCache.putSession(request.getSession());
+        return linkedHashMapResponseEntity;
     }
 
     private ResponseEntity<LinkedHashMap> setResultFailed(String message){
