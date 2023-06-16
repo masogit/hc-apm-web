@@ -395,7 +395,10 @@
                                     <p:commandButton  value="#{msg.ExportAllReports}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl sharedAssetConfigForm" onclick="PF('sharedAssetConfigDialog').show();"/>
                                 </f:facet>
 
-                                <p:dataTable var="item" value="#{assetOptRecordController.getAssetOptRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}">
+                                <p:dataTable var="item" value="#{assetOptRecordController.getAssetOptRecordList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}"
+                                             paginator="true" paginatorPosition="both" rows="5"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}">
                                     <p:column headerText="开机时间" >
                                         <h:outputText value="#{item.startDate}">
                                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
