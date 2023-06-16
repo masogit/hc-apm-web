@@ -29,16 +29,16 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-
                         <p:ajax event="rowSelect" update="createButton editButton editSupplierUserButton"/>
                         <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                         <p:column width="36" id="checkBox">
                             <p:selectBooleanCheckbox value="#{supplierController.selectedMap[item.id]}" class="selectCheckBox">
-                                <p:ajax update=" @(.selectCheckBoxHeader) SupplierListForm:datalist" listener="#{supplierController.onItemSelected}"/>
+                                <p:ajax update=" @(.selectCheckBoxHeader) @(.batchDelete)" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
-                                <p:selectBooleanCheckbox class="selectCheckBoxHeader" value="#{supplierController.isSelectedCurrentPage}">
-                                    <p:ajax listener="#{supplierController.onSelectAllOfPage}" update="@(.selectCheckBox) deleteButton"/>
+                                <p:selectBooleanCheckbox class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{supplierController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batchDelete)" oncomplete="updateSelectAllCheckBox();"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
@@ -73,7 +73,7 @@
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update=":SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EDIT')}"/>
                             <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update=":supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()}"/>
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="批量删除" actionListener="#{supplierController.batchDeleteSupplier}" update="datalist" disabled="#{not supplierController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_DELETE')}">
+                            <p:commandButton id="deleteButton" class="batchDelete" process="@this" icon="ui-icon-close" title="批量删除" actionListener="#{supplierController.batchDeleteSupplier}" update="datalist" disabled="#{not supplierController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_DELETE')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
@@ -117,6 +117,20 @@
                     $(".selectCheckBoxHeaderApproved")[0].children[1].classList.add("ui-state-active");
                 } else {
                     $(".selectCheckBoxHeaderApproved")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#SupplierListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
                 }
             }
             //]]>
