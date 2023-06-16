@@ -199,7 +199,6 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         if (multiLevel != null) {
                             // 发送短信
                             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                            logger.info("send message param is " + JSON.toJSONString(paramList));
                             this.sendWxMsg(paramList,message,"待审批");
                         }
                         return multiLevel;
@@ -597,6 +596,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         if (CollectionUtils.isEmpty(paramList)) {
             return;
         }
+        logger.info("send message param is " + JSON.toJSONString(paramList));
         String token = UserContextService.getAccessToken();
         Map<String,Object> map = new HashMap<>();
         map.put("paramList", paramList);
