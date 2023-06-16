@@ -596,6 +596,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         if (CollectionUtils.isEmpty(paramList)) {
             return;
         }
+
         logger.info("send message param is " + JSON.toJSONString(paramList));
         String token = UserContextService.getAccessToken();
         Map<String,Object> map = new HashMap<>();
