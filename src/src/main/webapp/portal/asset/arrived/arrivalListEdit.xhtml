@@ -423,16 +423,16 @@
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId" name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
-                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />444444444
                                                     </h:panelGroup>
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
                                                         <img id="#{fileitem.objectStorageId}" class="objectStorageId"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
-                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />5555555555
                                                     </h:panelGroup>
                                                 </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
@@ -449,9 +449,9 @@
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
@@ -475,9 +475,9 @@
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
@@ -510,7 +510,7 @@
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"   name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
@@ -539,7 +539,7 @@
                                                     <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                     <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                         <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                            <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                            <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                                  src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                                  style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                         </h:panelGroup>
@@ -575,9 +575,9 @@
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
@@ -601,13 +601,13 @@
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
-                                                    <h:panelGroup rendered="#{fileitem.compressObjectId eq null}">
+                                                    <h:panelGroup rendered="#{fileitem.compressObjectId eq null}" >
                                                         <img id="#{fileitem.objectStorageId}" class="objectStorageId"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
@@ -627,9 +627,9 @@
                                                 <p:ajax event="page" oncomplete="loadPreImg()"/>
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
-                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
@@ -662,7 +662,7 @@
                                                 <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG|.PDF')}">
                                                     <h:panelGroup rendered="#{fileitem.compressObjectId ne null}">
-                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"
+                                                        <img id="#{fileitem.objectStorageId}" class="compressObjectId"  name="#{fileitem.compressObjectId}+#{fileitem.objectName}"
                                                              src="#{fileDownloadService.getImgBase64(fileitem.compressObjectId)}"
                                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                     </h:panelGroup>
@@ -821,11 +821,18 @@
                 let imgList = $("[id='AssetArrivalEditForm']").find('img');
                 $.each(imgList, function(i) {
                     if($(imgList[i]).attr("data-original") == null){
+                        var name=imgList[i].name;
                         if(imgList[i].class == 'objectStorageId'){
                             $(imgList[i]).attr("data-original",imgList[i].src);
                             arrivalListImg.update();
                         }else{
-                            getImgBase64([{name: 'objectId',value:imgList[i].id}])
+                            if(name.match('.pdf')){
+                                $(imgList[i]).attr("data-original",imgList[i].src);
+                                arrivalListImg.update();
+                            }else{
+                                getImgBase64([{name: 'objectId',value:imgList[i].id}])
+                            }
+
                         }
                     }
                 });
