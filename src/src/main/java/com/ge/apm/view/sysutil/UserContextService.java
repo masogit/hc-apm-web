@@ -14,6 +14,7 @@ import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.web.cboard.CBoardController;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.SessionCache;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
 
@@ -39,6 +41,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URLEncoder;
@@ -389,7 +392,8 @@ public class UserContextService implements Serializable {
             String userName = getUserLoginName();
             if ("".equals(userName)) {
                 HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-                userName = UserContext.getUsername(request);
+                final Object attribute = request.getSession().getAttribute(CBoardController.LOGIN_NAME_KEY);
+                userName = Optional.ofNullable(UserContext.getUsername(request)).orElse(String.valueOf(attribute));
                 if(UserContext.ANONYMOUS_USER.equals(userName))
                     userName = null;
             }
