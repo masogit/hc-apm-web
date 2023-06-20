@@ -86,7 +86,7 @@ public class AuditLoginController {
             usernamePasswordAuthenticationFilter.getRememberMeServices().loginSuccess(request, response, authResult);
             long l = System.currentTimeMillis();
             LinkedHashMap<String, Object> responseEntity = doGetAuthenticateByUserPassword(loginName, password, false, userAgent, request);
-            //log.info("doLogin end :{}",responseEntity);
+            log.info("doLogin end :{}",responseEntity);
             return ResponseEntity.ok(responseEntity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,7 +97,8 @@ public class AuditLoginController {
     }
 
 
-    @RequestMapping(method = RequestMethod.POST,value = "/login2")
+    /*外部免登接口*/
+    @RequestMapping(method = RequestMethod.POST,value = "/bypassLogin")
     @ResponseBody
     public  ResponseEntity<LinkedHashMap>  doLogin(HttpServletRequest request, HttpServletResponse response,@RequestParam("paramStr") String paramStr ) {
         String decrypt = AesUtil.decrypt(paramStr);
@@ -105,18 +106,13 @@ public class AuditLoginController {
         UserAccount userAccount = new UserAccount();
         userAccount.setLoginName(split[0]);
         userAccount.setPassword(split[1]);
-        ResponseEntity<LinkedHashMap> linkedHashMapResponseEntity = this.doLogin(request, response, userAccount);
-        String token = ((HashMap) (((HashMap) (linkedHashMapResponseEntity.getBody().get("data"))).get("jwtToken"))).get("id_token").toString();
-        request.getSession().setAttribute("ACCESS_TOKEN", token);
-        UserAccount  user = userAccountDao.getByLoginName(userAccount.getLoginName());
-        //make sure microservice works before apm web
-        HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
-        SecurityContext securityContext = securityContextRepository.loadContext(holder);
-      //  UserContextService.setLoginUser(user);
-        request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, user.getLoginName());
-        response.setHeader("JSESSIONID",request.getSession().getId());
-        SessionCache.putSession(request.getSession());
-        return linkedHashMapResponseEntity;
+        ResponseEntity<LinkedHashMap> responseEntity = this.doLogin(request, response, userAccount);
+        if(isOkay(responseEntity)){
+            request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, userAccount.getLoginName());
+            response.setHeader("JSESSIONID",request.getSession().getId());
+            SessionCache.putSession(request.getSession());
+        }
+        return responseEntity;
     }
 
     private ResponseEntity<LinkedHashMap> setResultFailed(String message){

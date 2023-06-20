@@ -102,12 +102,6 @@ public class AesUtil {
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        String encrypt = AesUtil.encrypt("wy-02,RzEyNUBlaGM=");
-        System.out.println(encrypt);
-
-    }
 }
 
 
