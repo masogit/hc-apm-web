@@ -159,20 +159,19 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
             }
         }
 
-        System.out.println("======");
         List<ZkbIbCrossUserStatus> zkbIbCrossUserStatusList = zkbIbCrossUserStatusRepository.find();
         for(ZkbIbCrossUserStatus s : zkbIbCrossUserStatusList){
             if(StringUtils.isEmpty(s.getLoginName())){
                 continue;
             }
             if(userHashMap.containsKey("ZKB."+s.getLoginName())){
-                ZkbIbCrossUser u = userHashMap.get(s.getLoginName());
+                ZkbIbCrossUser u = userHashMap.get("ZKB."+s.getLoginName());
                 if("D".equals(s.getStatus())){
-                    if(u.getDeleted() == null || !u.getDeleted()){
+                    if(u != null && u.getDeleted() == null || !u.getDeleted()){
                         u.setDeleted(true);
                     }
                 }else {
-                    if(u.getDeleted()){
+                    if(u != null && u.getDeleted()){
                         //如果发现数据库已经存在一条状态为删除的数据则不进行任何操作
                     }
                 }

@@ -1121,7 +1121,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
 
         zkbPartOrderService.unrealNext(selected, selectedOptions, currentUser);
-        return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
+        zkbPartOrderService.getUnrealData(selected);
+        selectedOptions = new String[]{};
+        return "";
+        //return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
     }
 
     public String acceptNext(){
