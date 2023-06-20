@@ -1010,18 +1010,27 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         List<ZkbUnreal> zkbUnrealList = new ArrayList<>();
         AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
         for (int i =0; i < selectedOptions.length;i++){
-            ZkbUnreal zkbUnreal = new ZkbUnreal();
-            zkbUnreal.setPartOrderNo(zkbPartOrder.getPartOrderNo());
-            zkbUnreal.setPartOrderId(zkbPartOrder.getId());
-            zkbUnreal.setSrNum(zkbPartOrder.getSrNum());
-            zkbUnreal.setSysId(assetInfo.getSystemId());
-            zkbUnreal.setItemNo(selectedOptions[i]);
-            zkbUnreal.setCreatedBy(userAccount.getName());
-            zkbUnreal.setCreatedDate(new Date());
-            zkbUnrealList.add(zkbUnreal);
+            //判断数据库是否存在如果存在进行更新操作，不存在则进行insert
+            List<ZkbUnreal> existList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getSrNum(), selectedOptions[i]);
+            if(existList!= null && existList.size() > 0){
+                ZkbUnreal zkbUnreal = existList.get(0);
+                zkbUnreal.setCreatedDate(new Date());
+                zkbUnreal.setCreatedBy(userAccount.getName());
+                zkbUnrealList.add(zkbUnreal);
+            }else{
+                ZkbUnreal zkbUnreal = new ZkbUnreal();
+                zkbUnreal.setPartOrderNo(zkbPartOrder.getPartOrderNo());
+                zkbUnreal.setPartOrderId(zkbPartOrder.getId());
+                zkbUnreal.setSrNum(zkbPartOrder.getSrNum());
+                zkbUnreal.setSysId(assetInfo.getSystemId());
+                zkbUnreal.setItemNo(selectedOptions[i]);
+                zkbUnreal.setCreatedBy(userAccount.getName());
+                zkbUnreal.setCreatedDate(new Date());
+                zkbUnrealList.add(zkbUnreal);
+            }
         }
         zkbUnrealRepository.save(zkbUnrealList);
-        auditNext(zkbPartOrder,false,userAccount);
+        //auditNext(zkbPartOrder,false,userAccount);
 
     }
 
