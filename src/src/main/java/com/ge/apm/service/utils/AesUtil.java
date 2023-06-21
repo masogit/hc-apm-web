@@ -166,10 +166,7 @@ public class AesUtil {
 
     }
 
-    public static void main(String[] args) {
-        String lsfjlsjflasjdflsjflsf123XSDF3453 = AesUtil.decryptForCryptoJSaesdefault("=VTJGc2RHVmtYMStsOCtGN3NGYWJoNFV5b0tnNmFmZlZqaG5JUGNVbmV0NHRsV3RhcWlPNTRPdXhOdi8veW9LZQ==", "lsfjlsjflasjdflsjflsf123XSDF3453");
-        System.out.println(lsfjlsjflasjdflsjflsf123XSDF3453);
-    }
+
 
 
 }
