@@ -22,6 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 import javax.imageio.ImageIO;
+import javax.tools.FileObject;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -133,6 +134,22 @@ public class MicroServiceUtil extends MicroServiceInvoker {
 
         return null;
     }
+
+
+    public Map<String, Object> compressByObjectId(String objectId){
+        HttpEntity<String> requestEntity = new HttpEntity<>(objectId);
+        String gatewayURL = getGatewayURL(GatewayURL.COMPRESS_IMAGE);
+        String url = gatewayURL.replace("{objectId}", objectId);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
+            return data;
+        } else {
+            return null;
+        }
+    }
+
 
     public Map<String, Object> uploadSingleFileByUrl(String token, String url, String fileName) {
         HttpHeaders headers = new HttpHeaders();
