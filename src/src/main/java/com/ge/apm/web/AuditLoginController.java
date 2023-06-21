@@ -3,6 +3,7 @@ package com.ge.apm.web;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.A2BB2A;
 import com.ge.apm.service.utils.AesUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.web.cboard.CBoardController;
@@ -70,7 +71,7 @@ public class AuditLoginController {
         String userAgent = request.getHeader("User-Agent");
         try {
             String loginName = reqUser.getLoginName();
-            String password = atob(reqUser.getPassword());
+            String password = A2BB2A.atob(reqUser.getPassword());
             UserAccount  user = userAccountDao.getByLoginName(loginName);
             if(user == null){
                 return setResultFailed("用户名或密码有误");
@@ -102,11 +103,11 @@ public class AuditLoginController {
     @RequestMapping(method = RequestMethod.POST,value = "/bypassLogin")
     @ResponseBody
     public  ResponseEntity<LinkedHashMap>  doLogin(HttpServletRequest request, HttpServletResponse response,@RequestParam("paramStr") String paramStr ) {
-        String decrypt = AesUtil.decryptForCryptoJSaesdefault(AuditLoginController.atob(paramStr),aesKey);
+        String decrypt = AesUtil.decryptForCryptoJSaesdefault(A2BB2A.atob(paramStr),aesKey);
         String[] split = decrypt.split("\\&PASS=123");
         UserAccount userAccount = new UserAccount();
         userAccount.setLoginName(split[0]);
-        userAccount.setPassword(split[1]);
+        userAccount.setPassword(A2BB2A.btoa(split[1]));
         ResponseEntity<LinkedHashMap> responseEntity = this.doLogin(request, response, userAccount);
         if(isOkay(responseEntity)){
             request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, userAccount.getLoginName());
@@ -171,38 +172,5 @@ public class AuditLoginController {
 
         return body.containsKey("bizStatusCode") && body.get("bizStatusCode").equals("OK");
     }
-    private static String base64hash = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-    public static String atob(String inStr) {
-        if (inStr == null)
-            return null;
-        inStr = inStr.replaceAll("\\s|=", "");
-        StringBuilder result = new StringBuilder();
-        int cur;
-        int prev = -1;
-        int mod;
-        int i = 0;
-        while (i < inStr.length()) {
-            cur = base64hash.indexOf(inStr.charAt(i));
-            mod = i % 4;
-            switch (mod) {
-                case 0:
-                    break;
-                case 1:
-                    result.append(String.valueOf((char) (prev << 2 | cur >> 4)));
-                    break;
-                case 2:
-
-                    result.append(String.valueOf((char) ((prev & 0x0f) << 4 | cur >> 2)));
-                    break;
-                case 3:
-
-                    result.append(String.valueOf((char) ((prev & 3) << 6 | cur)));
-                    break;
-            }
-            prev = cur;
-            i++;
-        }
-        return result.toString();
-    }
 }
