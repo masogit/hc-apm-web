@@ -23,6 +23,9 @@ public enum GatewayURL {
     DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/download"),
     AUTH_DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/auth/download"),
     SEARCH_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
+
+    COMPRESS_IMAGE("/hcapmobjecthubservice/api/apm/objectHub/objects/compress/{objectId}"),
+
     // Service Request Service
     SERVICE_REQUEST_CREATE("/hcapmassetservice/api/apm/asset/serviceRequests"),
     WORK_ORDER_ACTION("/hcapmassetservice/api/apm/asset/workOrders/{workOrderId}/action"),
