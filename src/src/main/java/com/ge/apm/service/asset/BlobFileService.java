@@ -32,6 +32,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
 
+import javax.tools.FileObject;
+
 /**
  *
  * @author 212579464
@@ -321,6 +323,23 @@ public class BlobFileService {
 
     public StreamedContent getBlobObjectByStorageId(String storageId){
         return microService.downloadSingleFile(storageId);
+    }
+
+
+    public V2_BlobObject compressByObjectId( String objectStorageId ) {
+        Map<String, Object> fileObject = microService.compressByObjectId(objectStorageId);
+        if (null != fileObject) {
+            V2_BlobObject blobObject = new V2_BlobObject();
+            blobObject.setObjectName((String) fileObject.get("objectName"));
+            blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
+            blobObject.setObjectStorageId((String) fileObject.get("objectId"));
+            blobObject.setObjectType((String) fileObject.get("objectType"));
+            blobObject.setCreatedDate(new Date());
+            blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            return blobObject;
+        } else {
+            return null;
+        }
     }
 
     public V2_BlobObject uploadCompressFile(UploadedFile file) {
