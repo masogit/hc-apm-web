@@ -5,11 +5,11 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.AesUtil;
 import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.cboard.CBoardController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 import webapp.framework.context.WrappedRequest;
 import webapp.framework.util.SessionCache;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -44,6 +43,8 @@ public class AuditLoginController {
     private MicroServiceUtil microServiceUtil;
     @Autowired
     private UserAccountRepository userAccountDao;
+    @Value("#{wxProperties.largeScreenFrontAesKey}")
+    private String aesKey;
 
     @Autowired
     private RestTemplate template;
@@ -101,8 +102,8 @@ public class AuditLoginController {
     @RequestMapping(method = RequestMethod.POST,value = "/bypassLogin")
     @ResponseBody
     public  ResponseEntity<LinkedHashMap>  doLogin(HttpServletRequest request, HttpServletResponse response,@RequestParam("paramStr") String paramStr ) {
-        String decrypt = AesUtil.decrypt(paramStr);
-        String[] split = decrypt.split(",");
+        String decrypt = AesUtil.decryptForCryptoJSaesdefault(AuditLoginController.atob(paramStr),aesKey);
+        String[] split = decrypt.split("\\&PASS=123");
         UserAccount userAccount = new UserAccount();
         userAccount.setLoginName(split[0]);
         userAccount.setPassword(split[1]);
