@@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -117,6 +118,13 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
         headers.setContentType(type);
         headers.add("Authorization", token);
+        String name = file.getName();
+        try {
+            headers.add("Content-disposition","attachment;filename="+ URLEncoder.encode(name,"UTF-8"));
+        }catch (Exception e){
+            throw new RuntimeException("文件名加密异常");
+        }
+
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         FileSystemResource resource = new FileSystemResource(file);
         body.add("file", resource);

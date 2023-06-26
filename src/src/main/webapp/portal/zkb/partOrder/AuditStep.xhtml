@@ -531,10 +531,8 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.showTech}">
                         <h:panelGroup>
                             <p:commandButton id="unreal" validateClient="true" value="备件不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag and zkbPartOrderAuditController.orderType eq 'Parts'}" />
-
                         </h:panelGroup>
                         <h:panelGroup>
-
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
                             <label class="label">技术支持审批人</label>
@@ -553,9 +551,13 @@
                             </p:commandLink>
                             <!--<p:outputLabel style="color: red;font-weight:bold;margin-left: 20px;font-size: x-large" value="#{zkbPartOrderAuditController.decisionTechAudit()}" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending'}"/>-->
                         </h:panelGroup>
-
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.showTse}">
+                        <h:panelGroup>
+                            <p:commandButton validateClient="true" value="备件不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag and zkbPartOrderAuditController.orderType eq 'Parts'}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
                             <label class="label">TSE审批人</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.tseAuditer}" disabled="true" />

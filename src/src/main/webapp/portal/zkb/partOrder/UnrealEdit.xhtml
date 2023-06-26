@@ -23,9 +23,9 @@
         </style>
 
         <br/>
-        <div style="position: absolute;bottom: 10px;left: 100px;">
+        <div style="position: absolute;bottom: 10px;left: 150px;">
             <p:commandButton validateClient="true" value="确定" action="#{zkbPartOrderAuditController.saveUnreal}" oncomplete="handleSubmit(args, 'zkbUnrealyDlg');" update=":growl zkbPartOrderEditForm:zkbDetailDatalist" icon="ui-icon-check" />
-            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbUnrealyDlg').hide()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbUnrealyDlg').hide()" style="left: 20px;"/>
         </div>
 
     </h:form>
