@@ -1002,7 +1002,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(zkbUnrealList != null && zkbUnrealList.size() > 0){
                 StringBuilder sb = new StringBuilder();
                 for(ZkbUnreal u : zkbUnrealList){
-                    sb.append(format.format(u.getCreatedDate()) + "判定为不真实;");
+                    sb.append(format.format(u.getCreatedDate()) + "判定为不真实；");
                 }
                 i.setUnrealStatus(sb.toString());
             }
