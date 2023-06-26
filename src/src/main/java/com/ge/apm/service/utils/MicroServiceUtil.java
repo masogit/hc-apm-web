@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -119,8 +120,10 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         headers.setContentType(type);
         headers.add("Authorization", token);
         String name = file.getName();
+        logger.info("file name :{}",name);
         try {
-            headers.add("Content-disposition","attachment;filename="+ URLEncoder.encode(name,"UTF-8"));
+            name = new String(name.getBytes("ISO-8859-1"), StandardCharsets.UTF_8);
+            headers.add("Content-disposition","attachment;filename="+ URLEncoder.encode(name));
         }catch (Exception e){
             throw new RuntimeException("文件名加密异常");
         }
