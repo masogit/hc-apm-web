@@ -1000,10 +1000,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         for(ZkbPartOrderItem i : zkbPartOrder.getZkbPartOrderItems()){
             List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getSrNum(),i.getPartNo());
             if(zkbUnrealList != null && zkbUnrealList.size() > 0){
-                //i.setUnrealStatus(format.format(zkbUnreal.getCreatedDate()) + "判定为不真实");
                 StringBuilder sb = new StringBuilder();
                 for(ZkbUnreal u : zkbUnrealList){
-                    sb.append(format.format(u.getCreatedDate()) + u.getCreatedBy()+ "判定为不真实;");
+                    sb.append(format.format(u.getCreatedDate()) + "判定为不真实;");
                 }
                 i.setUnrealStatus(sb.toString());
             }
@@ -1016,7 +1015,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findByPartOrderIdAndItemNo(partOrderId, i.getPartNo());
             if(zkbUnrealList != null && zkbUnrealList.size() > 0){
                 ZkbUnreal u = zkbUnrealList.get(0);
-                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")       已被"+u.getCreatedBy()+"判定为不真实;");
+                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
                 i.setCbStatus(CopyByInvok.F);
             }else{
                 i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
