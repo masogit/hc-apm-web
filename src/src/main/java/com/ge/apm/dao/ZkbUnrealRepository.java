@@ -13,4 +13,6 @@ import java.util.List;
 public interface ZkbUnrealRepository extends GenericRepositoryUUID<ZkbUnreal> {
 
     List<ZkbUnreal> findBySrNumAndItemNo(String srNum, String itemNo);
+
+    List<ZkbUnreal> findByPartOrderIdAndItemNo(String partOrderId, String itemNo);
 }

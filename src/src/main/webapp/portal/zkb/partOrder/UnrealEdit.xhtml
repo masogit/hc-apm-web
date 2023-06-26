@@ -11,7 +11,7 @@
     <h:form id="zkbUnrealForm">
         <p:selectManyCheckbox  value="#{zkbPartOrderAuditController.selectedOptions}" widgetVar="blub" columns="1" styleClass="grid-checkbox" layout="grid" style="width: 100%">
             <f:selectItems value="#{zkbPartOrderAuditController.unrealItem}" var="item" itemLabel="#{item.unrealPartName}"
-                           itemValue="#{item.partNo}" itemDisabled="#{!(empty item.unrealStatus)}"/>
+                           itemValue="#{item.partNo}" itemDisabled="#{item.cbStatus eq 'f'}" />
         </p:selectManyCheckbox>
         <style>
             /*.ui-selectmanycheckbox.ui-widget td, .ui-selectoneradio.ui-widget label, .ui-selectoneradio.ui-widget td {

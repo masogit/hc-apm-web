@@ -1000,10 +1000,32 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         for(ZkbPartOrderItem i : zkbPartOrder.getZkbPartOrderItems()){
             List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getSrNum(),i.getPartNo());
             if(zkbUnrealList != null && zkbUnrealList.size() > 0){
-                ZkbUnreal zkbUnreal = zkbUnrealList.get(0);
-                i.setUnrealStatus(format.format(zkbUnreal.getCreatedDate()) + "判定为不真实");
+                //i.setUnrealStatus(format.format(zkbUnreal.getCreatedDate()) + "判定为不真实");
+                StringBuilder sb = new StringBuilder();
+                for(ZkbUnreal u : zkbUnrealList){
+                    sb.append(format.format(u.getCreatedDate()) + u.getCreatedBy()+ "判定为不真实;");
+                }
+                i.setUnrealStatus(sb.toString());
             }
         }
+    }
+
+    public List<ZkbPartOrderItem> getUnrealCheckBoxList(List<ZkbPartOrderItem> zkbPartOrderItems,String partOrderId){
+        List<ZkbPartOrderItem> unrealList = new ArrayList<>();
+        for(ZkbPartOrderItem i : zkbPartOrderItems){
+            List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findByPartOrderIdAndItemNo(partOrderId, i.getPartNo());
+            if(zkbUnrealList != null && zkbUnrealList.size() > 0){
+                ZkbUnreal u = zkbUnrealList.get(0);
+                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")       已被"+u.getCreatedBy()+"判定为不真实;");
+                i.setCbStatus(CopyByInvok.F);
+            }else{
+                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
+                i.setCbStatus(CopyByInvok.T);
+            }
+            unrealList.add(i);
+        }
+
+        return unrealList;
     }
 
     public void unrealNext(ZkbPartOrder zkbPartOrder,String[] selectedOptions,UserAccount userAccount){
@@ -1011,7 +1033,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
         for (int i =0; i < selectedOptions.length;i++){
             //判断数据库是否存在如果存在进行更新操作，不存在则进行insert
-            List<ZkbUnreal> existList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getSrNum(), selectedOptions[i]);
+            List<ZkbUnreal> existList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getId(), selectedOptions[i]);
             if(existList!= null && existList.size() > 0){
                 ZkbUnreal zkbUnreal = existList.get(0);
                 zkbUnreal.setCreatedDate(new Date());
@@ -1030,8 +1052,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
         zkbUnrealRepository.save(zkbUnrealList);
-        //auditNext(zkbPartOrder,false,userAccount);
-
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -73,6 +73,17 @@ public class ZkbPartOrderItem implements Serializable {
     @Transient
     private String unrealPartName;
 
+    @Transient
+    private String cbStatus;
+
+    public String getCbStatus() {
+        return cbStatus;
+    }
+
+    public void setCbStatus(String cbStatus) {
+        this.cbStatus = cbStatus;
+    }
+
     public String getUnrealPartName() {
         return unrealPartName;
     }

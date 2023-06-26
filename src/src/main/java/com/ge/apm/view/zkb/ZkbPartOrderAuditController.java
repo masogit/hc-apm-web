@@ -1100,15 +1100,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String[] selectedOptions;
     List<ZkbPartOrderItem> unrealItem = new ArrayList<>();
     public void preUnreal(){
-        unrealItem = new ArrayList<>();
-        for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
-            if(StrUtil.isNotEmpty(i.getUnrealStatus())){
-                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")      " + i.getUnrealStatus());
-            }else{
-                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
-            }
-            unrealItem.add(i);
-        }
+        unrealItem = zkbPartOrderService.getUnrealCheckBoxList(selected.getZkbPartOrderItems(),selected.getId());
     }
 
     public String saveUnreal(){
