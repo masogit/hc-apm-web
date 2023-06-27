@@ -85,13 +85,13 @@ public class BlobFileService {
             V2_BlobObject blobObject = new V2_BlobObject();
             String objectName = (String) fileObject.get("objectName");
             blobObject.setObjectName((String) fileObject.get("objectName"));
-            try {
-                String name = new String(objectName.getBytes("ISO-8859-1"), StandardCharsets.UTF_8);
-                log.info("objectName:{}",name);
-                blobObject.setObjectName(name);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                String name = new String(objectName.getBytes("ISO-8859-1"), StandardCharsets.UTF_8);
+//                log.info("objectName:{}",name);
+//                blobObject.setObjectName(name);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
             blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
             blobObject.setObjectStorageId((String) fileObject.get("objectId"));
             blobObject.setObjectType((String) fileObject.get("objectType"));
