@@ -122,7 +122,6 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         String name = file.getName();
         logger.info("file name :{}",name);
         try {
-            name = new String(name.getBytes("ISO-8859-1"), StandardCharsets.UTF_8);
             headers.add("Content-disposition","attachment;filename="+ URLEncoder.encode(name));
         }catch (Exception e){
             throw new RuntimeException("文件名加密异常");

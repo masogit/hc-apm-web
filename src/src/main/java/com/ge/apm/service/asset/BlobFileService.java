@@ -7,6 +7,8 @@ package com.ge.apm.service.asset;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +22,7 @@ import com.ge.apm.mq.MqUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +43,7 @@ import javax.tools.FileObject;
  */
 @Component
 public class BlobFileService {
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(AssetFaultTypeService.class);
 
     @Autowired
     BlobObjectRepository blobDao;
@@ -79,7 +83,15 @@ public class BlobFileService {
 
         if (null != fileObject) {
             V2_BlobObject blobObject = new V2_BlobObject();
+            String objectName = (String) fileObject.get("objectName");
             blobObject.setObjectName((String) fileObject.get("objectName"));
+            try {
+                String name = new String(objectName.getBytes("ISO-8859-1"), StandardCharsets.UTF_8);
+                log.info("objectName:{}",name);
+                blobObject.setObjectName(name);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
             blobObject.setObjectStorageId((String) fileObject.get("objectId"));
             blobObject.setObjectType((String) fileObject.get("objectType"));
