@@ -186,14 +186,14 @@
                             </p:selectManyCheckbox>
                         </p:fieldset>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <p:fieldset legend="质控评审配置">
-                            <p:selectManyCheckbox id="auditConfig" widgetVar="auditConfig" value="#{tenantInfoController.selectedMenuFeaturesAuditConfig}" layout="grid" columns="5" styleClass="grid-checkbox" >
-                                <p:ajax update="@this"/>
-                                <f:selectItem itemLabel="质控评审配置" itemValue="AUDIT_CONFIG"/>
-                            </p:selectManyCheckbox>
-                        </p:fieldset>
-                    </h:panelGroup>
+<!--                    <h:panelGroup>-->
+<!--                        <p:fieldset legend="质控评审配置">-->
+<!--                            <p:selectManyCheckbox id="auditConfig" widgetVar="auditConfig" value="#{tenantInfoController.selectedMenuFeaturesAuditConfig}" layout="grid" columns="5" styleClass="grid-checkbox" >-->
+<!--                                <p:ajax update="@this"/>-->
+<!--                                <f:selectItem itemLabel="质控评审配置" itemValue="AUDIT_CONFIG"/>-->
+<!--                            </p:selectManyCheckbox>-->
+<!--                        </p:fieldset>-->
+<!--                    </h:panelGroup>-->
                     <h:panelGroup>
                         <p:fieldset legend="MVS设备管理">
                             <p:selectManyCheckbox id="mvsAsset" widgetVar="mvsAsset" value="#{tenantInfoController.selectedMenuFeaturesMvsAsset}" layout="grid" columns="5" styleClass="grid-checkbox" >
