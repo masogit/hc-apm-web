@@ -83,6 +83,7 @@
                             <p:selectManyCheckbox id="repair" widgetVar="repair" value="#{tenantInfoController.selectedMenuFeaturesRepair}" layout="grid" columns="5" styleClass="grid-checkbox" >
                                 <p:ajax update="@this"/>
                                 <f:selectItem itemLabel="维修" itemValue="REPAIR"/>
+                                <f:selectItem itemLabel="常用故障及分类" itemValue="REPAIR_FAULTS"/>
                                 <f:selectItem itemLabel="排班管理" itemValue="REPAIR_ARRANGE"/>
                                 <f:selectItem itemLabel="核心组审核进度查看" itemValue="REPAIR_APPROVE_PROCESS"/>
                                 <f:selectItem itemLabel="休假管理" itemValue="REPAIR_VACATION"/>
@@ -186,14 +187,14 @@
                             </p:selectManyCheckbox>
                         </p:fieldset>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <p:fieldset legend="质控评审配置">
-                            <p:selectManyCheckbox id="auditConfig" widgetVar="auditConfig" value="#{tenantInfoController.selectedMenuFeaturesAuditConfig}" layout="grid" columns="5" styleClass="grid-checkbox" >
-                                <p:ajax update="@this"/>
-                                <f:selectItem itemLabel="质控评审配置" itemValue="AUDIT_CONFIG"/>
-                            </p:selectManyCheckbox>
-                        </p:fieldset>
-                    </h:panelGroup>
+<!--                    <h:panelGroup>-->
+<!--                        <p:fieldset legend="质控评审配置">-->
+<!--                            <p:selectManyCheckbox id="auditConfig" widgetVar="auditConfig" value="#{tenantInfoController.selectedMenuFeaturesAuditConfig}" layout="grid" columns="5" styleClass="grid-checkbox" >-->
+<!--                                <p:ajax update="@this"/>-->
+<!--                                <f:selectItem itemLabel="质控评审配置" itemValue="AUDIT_CONFIG"/>-->
+<!--                            </p:selectManyCheckbox>-->
+<!--                        </p:fieldset>-->
+<!--                    </h:panelGroup>-->
                     <h:panelGroup>
                         <p:fieldset legend="MVS设备管理">
                             <p:selectManyCheckbox id="mvsAsset" widgetVar="mvsAsset" value="#{tenantInfoController.selectedMenuFeaturesMvsAsset}" layout="grid" columns="5" styleClass="grid-checkbox" >
