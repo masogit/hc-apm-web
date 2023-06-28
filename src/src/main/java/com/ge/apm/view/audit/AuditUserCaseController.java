@@ -210,7 +210,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
             if(jsonObject != null){
                 JSONArray jsonArray = jsonObject.getJSONArray("menuList");
                 List<String> menuList = jsonArray != null ? jsonArray.toJavaList(String.class) : null;
-                if (menuList != null && menuList.size() > 0 && menuList.contains("audit")) {
+                if (menuList != null && menuList.size() > 0 && (menuList.contains("audit") || item.getFeatureList().startsWith("AUDIT"))) {
                     return true;
                 }
             }
