@@ -220,6 +220,23 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         return userAccountRepository.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
     }
 
+    public String getPeriodUnit(String periodUnit){
+        if (StringUtils.isNotEmpty(periodUnit)) {
+            switch (periodUnit) {
+                case "y":
+                    return "年";
+                case "m":
+                    return "月";
+                case "w":
+                    return "周";
+                case "d":
+                    return "日";
+                default:
+                    break;
+            }
+        }
+        return null;
+    }
 
     /***
      * 获取勾选项
@@ -318,7 +335,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         por.setStatus(0);
         por.setCreatedDate(new Date());
         por.setOwnerId(user.getId());
-        por.setPeriod(1);//默认一个月
+        por.setPeriod(1);
+        por.setPeriodUnit("m");//默认一个月
     }
 
     public void resetNewObject() {

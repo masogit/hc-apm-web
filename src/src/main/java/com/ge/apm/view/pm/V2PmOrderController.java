@@ -2038,13 +2038,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<SearchFilter> filters = new ArrayList<>();
 
         List<String> orderIds = getVisableMvsAssetSystemId();
-        if (org.springframework.util.CollectionUtils.isEmpty(orderIds)) {
+        if (CollectionUtils.isEmpty(orderIds)) {
             orderIds = new ArrayList<>();
             orderIds.add("0");
-            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
-        } else {
-            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
         }
+        filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
 
         for (SearchFilter searchFilter : filterArrayList) {
             if (("clinicalDeptId,siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
@@ -3551,6 +3549,24 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             SimplePartsItem simplePartsItem = partsItemService.getPartsItem(v2WorkOrderDetail.getPartsItemId(),v2WorkOrderDetail.getParts());
             if(simplePartsItem != null){
                 return simplePartsItem.getItemCode();
+            }
+        }
+        return null;
+    }
+
+    public String getPeriodUnit(String periodUnit){
+        if (StringUtils.isNotEmpty(periodUnit)) {
+            switch (periodUnit) {
+                case "y":
+                    return "年";
+                case "m":
+                    return "月";
+                case "w":
+                    return "周";
+                case "d":
+                    return "日";
+                default:
+                    break;
             }
         }
         return null;
