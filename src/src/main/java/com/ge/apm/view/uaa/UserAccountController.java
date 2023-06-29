@@ -771,6 +771,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             return;
         }
         if (canDelete()) {
+            String oldLoginName = selected.getLoginName();//Zkb获取旧的LoginName，以用于插入Zkb穿越用户状态表
             selected.setIsDeleted(true);
             selected.setLoginName(selected.getLoginName() + "-" + ZipUtil.makeRandomPassword(5));
             selected.setLastModifiedBy(loginUser.getLoginName());
@@ -781,21 +782,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             dao.save(selected);
             supplierUserRepository.deleteUserWxApp(selected.getId());
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
-            /* 物理删除
-            log.info("start delete user, uid: {}",this.selected.getUid());
-            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
 
             TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
             if(ti.getType() != null && ti.getType().equals(3)){
                 try{
-                    uaaService.deleteZkbIbCrossUserStatus(selected);
+                    uaaService.deleteZkbIbCrossUserStatus(selected, oldLoginName);
                 }catch (Exception e){
                     e.printStackTrace();
                 }
             }
+            /* 物理删除
+            log.info("start delete user, uid: {}",this.selected.getUid());
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
             userAccountService.deleteUserAccount(this.selected);
             userApi.removeUser(selected.getLoginName());*/
-
         }
     }
 
