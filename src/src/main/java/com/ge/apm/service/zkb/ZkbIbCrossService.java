@@ -169,6 +169,22 @@ public class ZkbIbCrossService extends MicroServiceInvoker {
                 if("D".equals(s.getStatus())){
                     if(u != null && u.getDeleted() == null || !u.getDeleted()){
                         u.setDeleted(true);
+                        List<ZkbIbCrossRelationShip> removeList = new ArrayList<>();
+                        for(ZkbIbCrossRelationShip rs : zkbIbCrossRelationShipList){
+                            removeList.add(rs);
+                        }
+                        if(removeList != null && removeList.size() > 0){
+                            zkbIbCrossRelationShipList.removeAll(removeList);
+                        }
+
+                        List<ZkbIbCrossRelationShipLog> removeLogList = new ArrayList<>();
+                        for(ZkbIbCrossRelationShipLog rl : zkbIbCrossRelationShipLogList){
+                            removeLogList.add(rl);
+                        }
+                        if(removeList != null && removeList.size() > 0){
+                            zkbIbCrossRelationShipList.removeAll(removeList);
+                            zkbIbCrossRelationShipLogList.removeAll(removeLogList);
+                        }
                     }
                 }else {
                     if(u != null && u.getDeleted()){
