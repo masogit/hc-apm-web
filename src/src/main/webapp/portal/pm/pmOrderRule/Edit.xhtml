@@ -74,10 +74,19 @@
                             <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="false" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">#{msg.period}(#{msg.Month})</label>
+                            <label class ="label">#{msg.period}</label>
                             <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="0" maxValue="120" decimalPlaces="0" 
                             required="false" requiredMessage="#{msg.OutOfRange}"  />
                            <!--  <p: id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/> -->
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">循环周期单位 *</label>
+                            <p:selectOneMenu  value="#{pmOrderRuleController.selected.periodUnit}" required="true" style="max-width: 150px;" >
+                                <f:selectItem itemLabel="年" itemValue="y"/>
+                                <f:selectItem itemLabel="月" itemValue="m"/>
+                                <f:selectItem itemLabel="周" itemValue="w"/>
+                                <f:selectItem itemLabel="日" itemValue="d"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.feedbackComment}</label>
