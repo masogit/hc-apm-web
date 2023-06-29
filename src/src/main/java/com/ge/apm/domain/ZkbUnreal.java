@@ -21,6 +21,12 @@ public class ZkbUnreal  implements Serializable {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
+    /**
+     * 类型 Parts Probe
+     */
+    @Column(name = "order_type")
+    private String orderType;
+
     @Column(name = "part_order_no")
     private String partOrderNo;
 
@@ -41,6 +47,14 @@ public class ZkbUnreal  implements Serializable {
 
     @Column(name = "created_date")
     private Date createdDate;
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
 
     public String getId() {
         return id;

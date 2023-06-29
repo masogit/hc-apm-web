@@ -64,7 +64,7 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
                         <label class="label">同一故障需继续订购且有未关闭的SR*</label>
                         <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.faultUnClosedSr}" disabled="true">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -450,6 +450,7 @@
                     </p:dataTable>
                 </p:fieldset>
                 <p:fieldset id="zkbPartOrderProbeFieldset" legend="探头明细" rendered="#{zkbPartOrderAuditController.orderType eq 'Probe'}" >
+                    <label  style="color: red;margin-left: 15px;">#{zkbPartOrderAuditController.unrealTips}</label>
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">探头号*</label>
@@ -475,6 +476,7 @@
                             <label class="label">探头型号</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.catModelNonGe}" disabled="true"/>
                         </h:panelGroup>
+
                         <h:panelGroup rendered="#{empty zkbPartOrderAuditController.selected.notGeAsset and zkbPartOrderAuditController.showCatListFlag eq '1'}">
                             <label class="label">价值类型</label>
                             <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
@@ -502,7 +504,7 @@
                     <p:dataTable value="#{zkbPartOrderAuditController.zkbPartOrderItemVoList}" var="item"
                                  widgetVar="zkbPartOrderItemVoList" selectionMode="single"
                                  lazy="false" paginator="true" rowKey="#{item.partNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.partOrderNo}"
-                                 paginatorTemplate="" rows="20" emptyMessage="#{msg.noRecordFound}" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and !(empty zkbPartOrderAuditController.selected.assetTypeDi) and zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending'}">
+                                 paginatorTemplate="" emptyMessage="#{msg.noRecordFound}" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and !(empty zkbPartOrderAuditController.selected.assetTypeDi) and zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending'}">
                         <p:column headerText="申请编号" >
                             <h:outputText value="#{item.partOrderNo}"/>
                         </p:column>
@@ -529,10 +531,15 @@
                         </p:column>
                     </p:dataTable>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.showTech}">
-                        <h:panelGroup>
-                            <p:commandButton id="unreal" validateClient="true" value="备件不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag and zkbPartOrderAuditController.orderType eq 'Parts'}" />
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.canEditFlag and (zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderAuditController.orderType eq 'Probe')}">
+                            <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
+                                <p:commandButton validateClient="true" value="备件不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" />
+                            </c:if>
+                            <c:if test="#{zkbPartOrderAuditController.orderType eq 'Probe'}">
+                                <p:commandButton validateClient="true" value="探头不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" disabled="#{zkbPartOrderAuditController.probeUnrealCheck()}" />
+                            </c:if>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.canEditFlag and (zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderAuditController.orderType eq 'Probe')}">
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
                             <label class="label">技术支持审批人</label>

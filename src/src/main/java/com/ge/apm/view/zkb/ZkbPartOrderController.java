@@ -303,7 +303,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     mm.put("status", ZkbPartOrder.PartOrderStatus.PartReturned.toString());
                 }
                 pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
-            }else{
+            }else if(zkbPartOrderUserConfigList.size() == 2){
                 boolean is4ooRole = true;
                 boolean isCommercialRole = false;
                 for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList) {
@@ -329,6 +329,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 if(is4ooRole || isCommercialRole){
                     pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
                 }
+            }else if(zkbPartOrderUserConfigList.size() == 3){
+                mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
             }
         }
     }
@@ -600,6 +603,18 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             searchFilters.add(new SearchFilter("directorAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.NE, ZkbPartOrderStep.PartOrderStep.Complete.toString(), "1+"));
                         }
+                    }
+                }
+            }else if(zkbPartOrderUserConfigList.size() == 3) {
+                if (StringUtils.isEmpty(queryStatus)) {
+                    searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString()));
+                } else if ("all".equals(queryStatus)){
+                    if(searchFilters.size() > 0) {
+                        searchFilters.add(new SearchFilter("tseAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString(), "1*2+"));
+                    }else{
+                        searchFilters.add(new SearchFilter("tseAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString(), "1+"));
                     }
                 }
             }
