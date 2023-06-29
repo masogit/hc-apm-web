@@ -87,6 +87,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String valueTypeTips = "";
     private String showOrderedFieldsetText = "";
     private String trainTips="";
+    private String unrealTips = "";
     private String queryStatus;
     private String nt = "";
     private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
@@ -383,6 +384,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showCatListFlag = "2";
                 }else{
                     showCatListFlag = "1";
+                }
+                if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(selected.getCurrentStep())){
+                    unrealTips = zkbPartOrderService.getProbeUnrealData(selected, showCatListFlag);
                 }
             }
             if(canEditFlag && CopyByInvok.T.equals(selected.getSupplementFlag())){
@@ -756,7 +760,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(StrUtil.isNotEmpty(selected.getManageAuditerUid())){
                     showManage = true;
                 }
-                showManage = true;
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
@@ -1098,22 +1101,36 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     private String[] selectedOptions;
-    List<ZkbPartOrderItem> unrealItem = new ArrayList<>();
+    List<ZkbUnrealVo> unrealItem = new ArrayList<>();
     public void preUnreal(){
-        unrealItem = zkbPartOrderService.getUnrealCheckBoxList(selected.getZkbPartOrderItems(),selected.getId());
+        unrealItem = zkbPartOrderService.getUnrealCheckBoxList(selected.getZkbPartOrderItems(),selected.getId(),selected);
+    }
+
+
+    public boolean probeUnrealCheck(){
+        return zkbPartOrderService.probeUnrealCheck(selected, showCatListFlag);
     }
 
     public String saveUnreal(){
         if(selectedOptions == null || selectedOptions.length == 0){
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            WebUtil.addErrorMessage("请选择不真实的备件号!");
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                WebUtil.addErrorMessage("请选择不真实的备件号!");
+            }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                WebUtil.addErrorMessage("请选择不真实的探头号!");
+            }
             return "";
         }else{
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
         }
 
         zkbPartOrderService.unrealNext(selected, selectedOptions, currentUser);
-        zkbPartOrderService.getUnrealData(selected);
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            zkbPartOrderService.getUnrealData(selected);
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            unrealTips = zkbPartOrderService.getProbeUnrealData(selected, showCatListFlag);
+        }
+
         selectedOptions = new String[]{};
         return "";
         //return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
@@ -2474,13 +2491,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         this.selectedOptions = selectedOptions;
     }
 
-    public List<ZkbPartOrderItem> getUnrealItem() {
+    public List<ZkbUnrealVo> getUnrealItem() {
         return unrealItem;
     }
 
-    public void setUnrealItem(List<ZkbPartOrderItem> unrealItem) {
+    public void setUnrealItem(List<ZkbUnrealVo> unrealItem) {
         this.unrealItem = unrealItem;
     }
 
+    public String getUnrealTips() {
+        return unrealTips;
+    }
 
+    public void setUnrealTips(String unrealTips) {
+        this.unrealTips = unrealTips;
+    }
 }
