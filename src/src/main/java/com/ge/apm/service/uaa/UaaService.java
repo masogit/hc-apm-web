@@ -408,7 +408,7 @@ public class UaaService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteZkbIbCrossUserStatus(UserAccount userAccount){
+    public void deleteZkbIbCrossUserStatus(UserAccount userAccount,String oldLoginName){
         List<UserRole> roles = userRoleRepository.findByUserId(userAccount.getId());
         boolean isExist = false;
         for(UserRole r: roles){
@@ -418,9 +418,9 @@ public class UaaService {
             }
         }
         if(isExist){
-            zkbIbCrossUserStatusRepository.deleteByLoginName(userAccount.getLoginName());
+            zkbIbCrossUserStatusRepository.deleteByLoginName(oldLoginName);
             ZkbIbCrossUserStatus zkbIbCrossUserStatus = new ZkbIbCrossUserStatus();
-            zkbIbCrossUserStatus.setLoginName(userAccount.getLoginName());
+            zkbIbCrossUserStatus.setLoginName(oldLoginName);
             zkbIbCrossUserStatus.setStatus("D");
             zkbIbCrossUserStatusRepository.save(zkbIbCrossUserStatus);
         }
