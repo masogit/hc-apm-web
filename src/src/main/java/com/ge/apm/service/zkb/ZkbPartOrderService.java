@@ -734,8 +734,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             List<ZkbPartOrderItem> zkbPartOrderItems = new ArrayList<>();
             zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
             zkbPartOrder.setZkbPartOrderItems(zkbPartOrderItems);
-            if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrder.getCurrentStep())){
-                getUnrealData(zkbPartOrder);
+            if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrder.getCurrentStep())){
+                if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+                    getUnrealData(zkbPartOrder);
+                }
             }
         }
         if(zkbPartOrder != null && StringUtils.isNotEmpty(zkbPartOrder.getContractId())){
@@ -1009,24 +1011,51 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
-    public List<ZkbPartOrderItem> getUnrealCheckBoxList(List<ZkbPartOrderItem> zkbPartOrderItems,String partOrderId){
-        List<ZkbPartOrderItem> unrealList = new ArrayList<>();
-        for(ZkbPartOrderItem i : zkbPartOrderItems){
-            List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findByPartOrderIdAndItemNo(partOrderId, i.getPartNo());
-            if(zkbUnrealList != null && zkbUnrealList.size() > 0){
-                ZkbUnreal u = zkbUnrealList.get(0);
-                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
-                i.setCbStatus(CopyByInvok.F);
-            }else{
-                i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
-                i.setCbStatus(CopyByInvok.T);
-            }
-            unrealList.add(i);
+    public String getProbeUnrealData(ZkbPartOrder zkbPartOrder, String showCatListFlag){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getSrNum(),zkbPartOrder.getCatNo());
+        StringBuilder sb = new StringBuilder();
+        for(ZkbUnreal u : zkbUnrealList){
+            sb.append(format.format(u.getCreatedDate()) + "判定为不真实；");
         }
-
-        return unrealList;
+        return sb.toString();
     }
 
+    public List<ZkbUnrealVo> getUnrealCheckBoxList(List<ZkbPartOrderItem> zkbPartOrderItems,String partOrderId,ZkbPartOrder zkbPartOrder){
+        List<ZkbUnrealVo> zkbUnrealVos = new ArrayList<>();
+
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+            for(ZkbPartOrderItem i : zkbPartOrderItems){
+                List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findByPartOrderIdAndItemNo(partOrderId, i.getPartNo());
+                ZkbUnrealVo v = new ZkbUnrealVo();
+                v.setItemNo(i.getPartNo());
+                if(zkbUnrealList != null && zkbUnrealList.size() > 0){
+                    ZkbUnreal u = zkbUnrealList.get(0);
+                    v.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
+                    v.setCbStatus(CopyByInvok.F);
+                }else{
+                    i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
+                    i.setCbStatus(CopyByInvok.T);
+                }
+                zkbUnrealVos.add(v);
+            }
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+            ZkbUnrealVo u = new ZkbUnrealVo();
+            u.setItemNo(zkbPartOrder.getCatNo());
+            List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findByPartOrderIdAndItemNo(partOrderId, zkbPartOrder.getCatNo());
+            if(zkbUnrealList != null && zkbUnrealList.size() > 0){
+                u.setUnrealPartName(zkbPartOrder.getCatNo());
+                u.setCbStatus(CopyByInvok.F);
+            }else{
+                u.setUnrealPartName(zkbPartOrder.getCatNo());
+                u.setCbStatus(CopyByInvok.T);
+            }
+            zkbUnrealVos.add(u);
+        }
+        return zkbUnrealVos;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public void unrealNext(ZkbPartOrder zkbPartOrder,String[] selectedOptions,UserAccount userAccount){
         List<ZkbUnreal> zkbUnrealList = new ArrayList<>();
         AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
@@ -1040,6 +1069,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbUnrealList.add(zkbUnreal);
             }else{
                 ZkbUnreal zkbUnreal = new ZkbUnreal();
+                zkbUnreal.setOrderType(zkbPartOrder.getOrderType());
                 zkbUnreal.setPartOrderNo(zkbPartOrder.getPartOrderNo());
                 zkbUnreal.setPartOrderId(zkbPartOrder.getId());
                 zkbUnreal.setSrNum(zkbPartOrder.getSrNum());
@@ -1051,6 +1081,16 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
         zkbUnrealRepository.save(zkbUnrealList);
+    }
+
+
+    public boolean probeUnrealCheck(ZkbPartOrder zkbPartOrder, String showCatListFlag){
+        List<ZkbUnreal> existList = zkbUnrealRepository.findByPartOrderIdAndItemNo(zkbPartOrder.getId(), zkbPartOrder.getCatNo());
+        if(existList!= null && existList.size() > 0){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
