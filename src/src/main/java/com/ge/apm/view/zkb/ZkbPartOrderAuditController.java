@@ -137,6 +137,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             Optional.ofNullable(selected.getTenantUID()).ifPresent(t -> tenantInfo = tenantInfoRepository.findByuid(selected.getTenantUID()));
             Optional.ofNullable(this.selected.getOrderType()).ifPresent(t -> orderType = this.selected.getOrderType());
             Optional.ofNullable(this.selected.getArtificialType()).ifPresent(t -> artificialType = this.selected.getArtificialType());
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && this.getUnrealStatusRender()){
+                zkbPartOrderService.getUnrealData(selected);
+            }
 
             zkbContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
             if(zkbContract == null){
@@ -1009,6 +1012,30 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }
         }
         return false;
+    }
+
+    public boolean getUnrealStatusRender(){
+        if(userContextService.isZkbUser()){
+            return false;
+        }else {
+            List<String> configs = new ArrayList<>();
+            configs.add(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+            configs.add(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+            configs.add(ZkbPartOrderStep.PartOrderStep.ProductPending.toString());
+            configs.add(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+            configs.add(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+            configs.add(ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+            configs.add(ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
+            configs.add(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+            configs.add(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+            configs.add(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.queryForUnrealRoles(currentUser.getLoginName(), configs);
+            if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
+                return true;
+            }else {
+                return false;
+            }
+        }
     }
 
     public String decisionTechAudit(){

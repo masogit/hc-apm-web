@@ -734,11 +734,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             List<ZkbPartOrderItem> zkbPartOrderItems = new ArrayList<>();
             zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
             zkbPartOrder.setZkbPartOrderItems(zkbPartOrderItems);
-            if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrder.getCurrentStep())){
-                if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
-                    getUnrealData(zkbPartOrder);
-                }
-            }
         }
         if(zkbPartOrder != null && StringUtils.isNotEmpty(zkbPartOrder.getContractId())){
             ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
