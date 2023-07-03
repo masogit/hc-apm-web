@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="Cross关系管理"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="zkbCrossListForm">
+                   <p:dataTable id="datalist" value="#{zkbCrossRelationShipController.lazyModel}" var="item" widgetVar="varDataList"
+                                selectionMode="single" selection="#{zkbCrossRelationShipController.selected}"
+                                lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                rows="20" emptyMessage="#{msg.noRecordFound}"
+                                rowsPerPageTemplate="20,50,100,500">
+                       <p:ajax event="filter" listener="#{zkbCrossRelationShipController.onFilter}" />
+                       <p:column headerText="loginName" >
+                           <h:outputText value="#{item.loginName}"/>
+                       </p:column>
+                       <p:column headerText="systemId" >
+                           <h:outputText value="#{item.systemId}"/>
+                       </p:column>
+                       <p:column headerText="qrCode">
+                           <h:outputText value="#{item.qrCode}"/>
+                       </p:column>
+                    </p:dataTable>
+
+
+                </h:form>
+
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>
