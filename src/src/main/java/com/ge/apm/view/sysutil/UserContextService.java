@@ -392,8 +392,7 @@ public class UserContextService implements Serializable {
             String userName = getUserLoginName();
             if ("".equals(userName)) {
                 HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-                final Object attribute = request.getSession().getAttribute(CBoardController.LOGIN_NAME_KEY);
-                userName = Optional.ofNullable(UserContext.getUsername(request)).orElse(String.valueOf(attribute));
+                userName = UserContext.getUsername(request);
                 if(UserContext.ANONYMOUS_USER.equals(userName))
                     userName = null;
             }
