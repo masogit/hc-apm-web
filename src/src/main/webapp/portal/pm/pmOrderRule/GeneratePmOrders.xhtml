@@ -270,9 +270,9 @@
                     <p:fieldset id="config" legend="#{msg.ConfigureWorkorder}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">#{msg.EstimatedCompletionTime}</label>
+                                <label class="label">#{msg.EstimatedCompletionTime} *</label>
                                 <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generatePmOrdersController.planTime}"
-											showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+											showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="计划完成时间必输">
 									<p:ajax event="close" process="@this" listener="#{generatePmOrdersController.updatePMPlanTime()}" update="@this GeneratePmOrderForm:dataTable1"></p:ajax>
 								</p:calendar>
                             </h:panelGroup>
