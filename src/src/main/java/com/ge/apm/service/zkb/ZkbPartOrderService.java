@@ -1029,8 +1029,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     v.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
                     v.setCbStatus(CopyByInvok.F);
                 }else{
-                    i.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
-                    i.setCbStatus(CopyByInvok.T);
+                    v.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
+                    v.setCbStatus(CopyByInvok.T);
                 }
                 zkbUnrealVos.add(v);
             }
