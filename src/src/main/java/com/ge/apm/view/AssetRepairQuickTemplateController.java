@@ -12,11 +12,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,10 +45,11 @@ public class AssetRepairQuickTemplateController extends GenericCRUDUUIDControlle
     @Override
     protected Page<AssetRepairQuickTemplate> loadData(PageRequest pageRequest) {
         if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
-        } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+            searchFilters = new ArrayList<>();
         }
+        searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
     @Override
