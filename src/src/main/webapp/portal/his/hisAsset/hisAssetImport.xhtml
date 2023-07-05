@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+
+<div class="ui-g-12 card">
+
+    <h:form id="importForm">
+
+        <p:fieldset  legend="#{msg.ImportAssetDataFile}" id="crossSiteUploaderContainer">
+
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+
+            <h:panelGroup>
+            <p:fileUpload  id="crossSiteFileUpload" fileUploadListener="#{hisAssetMatchController.uploadDataFile}" value="#{hisAssetMatchController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                           multiple="false" sizeLimit="10000000" update="HisTab:importForm HisTab:errorDataListForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"  />
+
+            <p:fieldset  legend="#{mag.ContractImport}" id="uploaderContainer">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <h:panelGroup>
+                        <div style="white-space:pre">#{msg.Description}   1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('HIS_EQUIPMENT_CONNECT')}" styleClass="p-mr-2"/>        2. #{msg.FileNeedHisAssetData}        3. #{msg.UpFileImport}</div>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+            </h:panelGroup>
+            </p:panelGrid>
+
+<!--            <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/asset/contract/ContractList?faces-redirect=true" immediate="true" />-->
+
+        </p:fieldset>
+
+
+
+    </h:form>
+
+
+
+
+</div>
+<div>
+
+    <div class="ui-g-12 card">
+        <h:form id="errorDataListForm">
+            <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
+            <p:fieldset  legend="#{msg.ImportFailureData}">
+                <p:dataTable id="errorDatalist" rendered="#{not empty hisAssetMatchController.errorContractList}" value="#{hisAssetMatchController.errorContractList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:column headerText="#{msg.EXCELRowNumber}">
+                        <h:outputText value="#{item.get('hisEquipmentConnect').lineNum}" />
+                    </p:column>
+                    <p:column headerText="#{msg.EqId}">
+                        <h:outputText value="#{item.get('hisEquipmentConnect').eqId}" />
+                    </p:column>
+                    <p:column headerText="#{msg.EquipmentName}">
+                        <h:outputText value="#{item.get('hisEquipmentConnect').eqName}" />
+                    </p:column>
+                    <p:column headerText="#{msg.PresetValue}">
+                        <h:outputText value="#{item.get('hisEquipmentConnect').eqLb}" />
+                    </p:column>
+                    <p:column headerText="#{msg.HospitalCode}">
+                        <h:outputText value="#{item.get('hisEquipmentConnect').eqHosid}" />
+                    </p:column>
+                    <p:column headerText="#{msg.FailureInformation}" >
+                        <!--<h:outputText value="#{fieldMsg.fieldValue('importStatus',item.get('status'))}"/><br/>-->
+                        <h:outputText value="#{item.get('errmsg')}"/>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton ajax="false" actionListener="#{contractImportController.downloadImportFailureData}"
+                                         icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" update=":growl">
+                            <p:fileDownload value="#{contractImportController.exportFile}"/>
+                        </p:commandButton>
+                    </f:facet>
+
+                </p:dataTable>
+            </p:fieldset>
+        </h:form>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+</html>
