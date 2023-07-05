@@ -56,6 +56,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private String  contactPerson;
     private String  contactPhone;
     private Integer failureType;
+    private String orgCode;
     private UserCommonService userCommonService;
 
     private OrgInfo currentOrg;
@@ -332,6 +333,19 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return false;
     }
 
+    public boolean checkOrgCode() {
+        if (StringUtils.isEmpty(orgCode)) {
+            return false;
+        }
+        OrgInfo orgInfo = dao
+                .findFirstByTenantUIDAndOrgCode(selected.getTenantUID(), orgCode);
+        if (orgInfo != null&&!orgCode.equals(selected.getOrgCode())) {
+            WebUtil.addErrorMessage(orgCode + "已经存在");
+            return true;
+        }
+        return false;
+    }
+
     public void saveSelectedOrg() {
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)) {
@@ -344,7 +358,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         if (selected.getOrgType() == 2 && checkHospitalUcmid()) {
             return;
         }
-
+        if (selected.getOrgType() == 2 && checkOrgCode()) {
+            return;
+        }
         boolean isNew = selected.getId() == null;
 
         selected.setShortName(orgName);
@@ -352,6 +368,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         selected.setName(name);
         selected.setNameEn(orgNameEn);
         selected.setHospitalUcmid(hospitalUcmid);
+        selected.setOrgCode(orgCode);
         selected.setStatus(status);
         selected.setAddress(address);
         selected.setContactPerson(contactPerson);
@@ -394,6 +411,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode = null;
     }
 
     public void buildOrdTree46AfterSave(String institutionUID) {
@@ -625,6 +643,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgName = selected.getShortName();
         orgNameEn = selected.getNameEn();
         hospitalUcmid = selected.getHospitalUcmid();
+        orgCode = selected.getOrgCode();
         status = selected.getStatus();
         address = selected.getAddress();
         contactPerson = selected.getContactPerson();
@@ -686,6 +705,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         this.hospitalUcmid = hospitalUcmid;
     }
 
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
     public boolean getIsCreateInstitutionDisabled() {
         return UserContextService.isOnlyLocalITAdmin();
     }
