@@ -336,4 +336,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     @Query(value = "select o.id from org_info o where o.uid in (?1)",nativeQuery = true)
     Set<Integer> findIdListByUid(Set<String> orgUid);
+
+    public OrgInfo findFirstByTenantUIDAndOrgCode(String tenantUID, String orgCode);
+
 }
