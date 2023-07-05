@@ -1038,10 +1038,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
-    public String decisionTechAudit(){
-        return zkbPartOrderService.decisionTechAudit(selected,selected.getZkbPartOrderItems());
-    }
-
     public String techFieldsetName(){
         if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
             return "TSE审批";
