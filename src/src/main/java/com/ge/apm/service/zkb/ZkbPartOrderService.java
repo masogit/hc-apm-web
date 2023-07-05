@@ -3167,32 +3167,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
     //endregion
 
-    //region 备件探头技术审批不真实判定
-    public String decisionTechAudit(ZkbPartOrder zkbPartOrder,List<ZkbPartOrderItem> zkbPartOrderItemList){
-        String result = "";
-        ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findByAssetIdTopOne(zkbPartOrder.getAssetId(), zkbPartOrder.getId());
-        if(oldZkbPartOrder != null){
-            if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(oldZkbPartOrder.getStatus())){
-                List<ZkbPartOrderItem> oldItems = zkbPartOrderItemRepository.findByPartOrderId(oldZkbPartOrder.getId());
-                if(zkbPartOrderItemList.size() == oldItems.size()){
-                    Map<String,String> map =  oldItems.stream().collect(Collectors.toMap(ZkbPartOrderItem::getPartNo,ZkbPartOrderItem::getPartNo,(value1, value2) -> value1));
-                    boolean f = true;
-                    for(ZkbPartOrderItem i : zkbPartOrderItemList){
-                        if(!map.containsKey(i.getPartNo())){
-                            f = false;
-                            break;
-                        }
-                    }
-                    if(f){
-                        result = "上次申请被拒绝并被判定为不真实";
-                    }
-                }
-            }
-        }
-        return result;
-    }
-    //endregion
-
     public boolean checkDeductMaintain(ZkbContractAsset zkbContractAsset,Date requestTime){
         if(zkbContractAsset.getMaintainStartDate() == null && zkbContractAsset.getMaintainEndDate() == null){
             return false;
