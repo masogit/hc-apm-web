@@ -5019,3 +5019,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('keyAssetReportType','2','年度分析','Annual analysis',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','checkItemNum','检查项目数','Number of inspection items',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Year','年份','Year',NULL,-1);
+--YHAAO-18932
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','FileNeedHisAssetData','文件中填写要导入的联机设备数据','Fill in the file with the online device data to be imported',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','HospitalCode','医院机构代码','hospitalCode',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','PresetValue','预置值','eq_lb',NULL,	-1	);
