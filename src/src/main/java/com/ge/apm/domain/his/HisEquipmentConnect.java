@@ -42,6 +42,11 @@ public class HisEquipmentConnect implements Serializable {
     @Column(name = "is_matched")//是否匹配过,默认是false
     private Boolean isMatched;
 
+
+    //excel行数
+    @Transient
+    private int lineNum;
+
     public HisEquipmentConnect() {
     }
 
@@ -62,5 +67,37 @@ public class HisEquipmentConnect implements Serializable {
 
     public void setMatched(Boolean matched) {
         isMatched = matched;
+    }
+
+    public int getLineNum() {
+        return lineNum;
+    }
+
+    public void setLineNum(int lineNum) {
+        this.lineNum = lineNum;
+    }
+
+
+    public enum EqLb {
+        LIS("0","LIS"),
+        RIS("1","RIS/PACS"),
+        ;
+        private String key;
+        private String value;
+
+        EqLb(String key, String value) {
+            this.key=key;
+            this.value=value;
+        }
+
+
+        public static EqLb getLis(String key) {
+            for (EqLb value : values()) {
+                if(value.key.equals(key)){
+                    return value;
+                }
+            }
+            return null;
+        }
     }
 }
