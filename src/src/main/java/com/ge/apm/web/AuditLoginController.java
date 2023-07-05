@@ -111,6 +111,7 @@ public class AuditLoginController {
         ResponseEntity<LinkedHashMap> responseEntity = this.doLogin(request, response, userAccount);
         if(isOkay(responseEntity)){
             request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, userAccount.getLoginName());
+            request.getSession().setMaxInactiveInterval(30);
             response.setHeader("JSESSIONID",request.getSession().getId());
             SessionCache.putSession(request.getSession());
         }
