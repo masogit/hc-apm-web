@@ -27,4 +27,6 @@ public interface HisAdministrativeOfficesRepository extends GenericRepositoryUUI
     @Query(value="delete from his_administrative_offices o where o.id = ?1 ",nativeQuery = true)
     public void deleteById(String id);
 
+
+    HisAdministrativeOffices findByHisKsid(String hisKsid);
 }

@@ -10,7 +10,7 @@
 
     <h:form id="importForm">
 
-        <p:fieldset  legend="#{msg.ImportAssetDataFile}" id="crossSiteUploaderContainer">
+        <p:fieldset   legend="导入联机设备数据" id="crossSiteUploaderContainer">
 
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
@@ -19,7 +19,7 @@
             <p:fileUpload  id="crossSiteFileUpload" fileUploadListener="#{hisAssetMatchController.uploadDataFile}" value="#{hisAssetMatchController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                            multiple="false" sizeLimit="10000000" update="HisTab:importForm HisTab:errorDataListForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"  />
 
-            <p:fieldset  legend="#{mag.ContractImport}" id="uploaderContainer">
+            <p:fieldset  legend="设备导入" id="uploaderContainer">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                     <h:panelGroup>
                         <div style="white-space:pre">#{msg.Description}   1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('HIS_EQUIPMENT_CONNECT')}" styleClass="p-mr-2"/>        2. #{msg.FileNeedHisAssetData}        3. #{msg.UpFileImport}</div>
@@ -73,9 +73,9 @@
                     </p:column>
 
                     <f:facet name="{Toolbar}">
-                        <p:commandButton ajax="false" actionListener="#{contractImportController.downloadImportFailureData}"
+                        <p:commandButton ajax="false" actionListener="#{hisAssetMatchController.downloadImportFailureData}"
                                          icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" update=":growl">
-                            <p:fileDownload value="#{contractImportController.exportFile}"/>
+                            <p:fileDownload value="#{hisAssetMatchController.exportFile}"/>
                         </p:commandButton>
                     </f:facet>
 
