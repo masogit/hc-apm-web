@@ -1,4 +1,4 @@
-package com.ge.apm.service;
+package com.ge.apm.service.his;
 
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.domain.AssetInfo;
