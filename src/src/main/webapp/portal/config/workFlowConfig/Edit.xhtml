@@ -134,12 +134,12 @@
                                 <p:ajax process="@this" />
                             </p:inputNumber>
                         </h:panelGroup>
-                        <h:panelGroup rendered="true">
-                            <label class = "label">#{msg.SystemAutomaticAcceptance}</label>
-                            <p:inputNumber id="autoAckDays" value="#{workflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0">
-                                <p:ajax process="@this" />
-                            </p:inputNumber>
-                        </h:panelGroup >
+<!--                        <h:panelGroup rendered="true">-->
+<!--                            <label class = "label">#{msg.SystemAutomaticAcceptance}</label>-->
+<!--                            <p:inputNumber id="autoAckDays" value="#{workflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0">-->
+<!--                                <p:ajax process="@this" />-->
+<!--                            </p:inputNumber>-->
+<!--                        </h:panelGroup >-->
                         <h:panelGroup rendered="true">
                             <label class = "label">供应商自动派工?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isWoSupplierAutoEnabled}">
@@ -164,30 +164,30 @@
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <h:panelGroup >
-                            <label class = "label">#{msg.NoAcceptanceRequired}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.autoAck}">
-                                <p:ajax process="@this" />
-                            </p:selectBooleanCheckbox>
-                        </h:panelGroup >
-                        <h:panelGroup >
-                            <label class = "label">#{msg.AutomaticallyClosed}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.autoClose}">
-                                <p:ajax process="@this" />
-                            </p:selectBooleanCheckbox>
-                        </h:panelGroup >
+<!--                        <h:panelGroup >-->
+<!--                            <label class = "label">#{msg.NoAcceptanceRequired}?</label>-->
+<!--                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.autoAck}">-->
+<!--                                <p:ajax process="@this" />-->
+<!--                            </p:selectBooleanCheckbox>-->
+<!--                        </h:panelGroup >-->
+<!--                        <h:panelGroup >-->
+<!--                            <label class = "label">#{msg.AutomaticallyClosed}?</label>-->
+<!--                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.autoClose}">-->
+<!--                                <p:ajax process="@this" />-->
+<!--                            </p:selectBooleanCheckbox>-->
+<!--                        </h:panelGroup >-->
                         <h:panelGroup >
                             <label class = "label">#{msg.RatingRequired}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.ratingRequired}">
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <h:panelGroup rendered="true">
-                            <label class = "label">#{msg.AutomaticallyClosedForNoPart}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.closeWithoutParts}">
-                                <p:ajax process="@this" />
-                            </p:selectBooleanCheckbox>
-                        </h:panelGroup >
+<!--                        <h:panelGroup rendered="true">-->
+<!--                            <label class = "label">#{msg.AutomaticallyClosedForNoPart}?</label>-->
+<!--                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.closeWithoutParts}">-->
+<!--                                <p:ajax process="@this" />-->
+<!--                            </p:selectBooleanCheckbox>-->
+<!--                        </h:panelGroup >-->
                         <h:panelGroup >
                             <label class = "label">#{msg.ManhoursRequired}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.hourRequired}">
