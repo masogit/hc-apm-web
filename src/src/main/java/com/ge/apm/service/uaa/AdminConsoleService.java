@@ -12,6 +12,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.SparePart.OrderNumberGenerator;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -128,6 +129,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private ReminderRuleRepository reminderRuleRepository;
+
+	@Autowired
+	private StockRecordRepository stockRecordRepository;
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -1011,6 +1015,31 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			list.add(reminderRule);
 		}
 		reminderRuleRepository.save(list);
+	}
+
+	public void batchUpdateSparPart() {
+		stockRecordRepository.findByType(1).forEach(v -> {
+			if (v.getInboundNumber() == null) {
+				v.setInboundNumber(OrderNumberGenerator.generateOrderNumber("RT", v.getRecordDate()));
+				stockRecordRepository.save(v);
+				try {
+					Thread.sleep(1/10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		stockRecordRepository.findByType(2).forEach(v -> {
+			if (v.getInboundNumber() == null) {
+				v.setOutboundNumber(OrderNumberGenerator.generateOrderNumber("CT", v.getRecordDate()));
+				stockRecordRepository.save(v);
+				try {
+					Thread.sleep(1/10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 }

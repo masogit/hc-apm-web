@@ -102,6 +102,9 @@
 <!--				<p:fieldset legend="批量更新租户或院区的资产审核用户并赋予自定义角色，（只用点击一次即可，请勿重复点击）">-->
 <!--					<p:commandButton actionListener="#{adminConsoleController.batchUpdateAssetApprove()}" value="批量更新" update=":growl"></p:commandButton>-->
 <!--				</p:fieldset>-->
+					<p:fieldset legend="批量补录简易备件出入库单号，（只用点击一次即可，请勿重复点击）">
+						<p:commandButton actionListener="#{adminConsoleController.batchUpdateSparPart()}" value="批量更新" update=":growl"></p:commandButton>
+					</p:fieldset>
 			</h:panelGroup>
 		</h:form>
 	</ui:define>
