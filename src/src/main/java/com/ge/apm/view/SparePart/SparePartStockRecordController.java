@@ -1,6 +1,7 @@
 package com.ge.apm.view.SparePart;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SparePartRepository;
 import com.ge.apm.dao.StockRecordRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
@@ -18,8 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
@@ -43,6 +46,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     private SimplePartsWarehouseService warehouseService;
     private SparePartStockRecordService stockRecordService;
     private StockRecordRepository dao;
+    private SparePartRepository sparePartRepository;
 
     @Getter @Setter
     private UserAccount loginUser;
@@ -52,21 +56,24 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     private List<SimplePartsWarehouse> warehouses = new ArrayList<>();
     @Getter @Setter
     private String partsWarehouseId;
-    @Getter@Setter
+    @Getter @Setter
     private String filterClinicalDeptOrg;
-    @Getter@Setter
+    @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
-    @Getter@Setter
+    @Getter @Setter
     private Integer filterRecordType = 1;
-    @Getter@Setter
+    @Getter @Setter
     private Date startTime;
-    @Getter@Setter
+    @Getter @Setter
     private Date endTime;
-
-    @Getter@Setter
+    @Getter @Setter
     private List<StockRecord> selectedItems;
-    @Getter@Setter
+    @Getter @Setter
     private StreamedContent exportDocx;
+    @Getter @Setter
+    private Integer rtQuantity;
+
+
 
 
     @Override
@@ -77,6 +84,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         stockRecordRepository =  WebUtil.getBean(StockRecordRepository.class);
         warehouseService = WebUtil.getBean(SimplePartsWarehouseService.class);
         dao = WebUtil.getBean(StockRecordRepository.class);
+        sparePartRepository = WebUtil.getBean(SparePartRepository.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
         currentOrg = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -213,5 +221,74 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
             }
         }
         return true;
+    }
+
+    public void rtStock(StockRecord record) {
+        this.selected = record;
+    }
+
+    public String getTitle(Integer type) {
+        switch (type) {
+            case 1:
+                return "入库时间";
+            case 2:
+                return "出库时间";
+        }
+        return "退库时间";
+    }
+
+    public String getQuantityTitle(Integer type) {
+        switch (type) {
+            case 1:
+                return "入库数量";
+            case 2:
+                return "出库数量";
+        }
+        return "退库数量";
+    }
+
+
+    public boolean canRtStock(StockRecord record) {
+        if (record.getRecordType() == 1) {
+
+            return record.getSparePart().getQuantity() <= 0;
+        }
+        return getValidQuantity(record) <= 0;
+    }
+
+    public Integer getValidQuantity(StockRecord record) {
+        Integer quantity = record.getQuantity();
+        List<StockRecord> stockRecords = dao.findListByOutboundNumber(record.getOutboundNumber());
+        return stockRecords.stream().mapToInt(StockRecord::getQuantity).reduce(quantity, (o, n) -> o - n);
+    }
+
+    @Transactional
+    public void saveRtStock() {
+        StockRecord record = new StockRecord();
+        BeanUtils.copyProperties(selected, record);
+        record.setId(null);
+        record.setRecordDate(new Date());
+        SparePart sparePart = selected.getSparePart();
+        if (selected.getRecordType() == 1) {
+            record.setReturnNumber(OrderNumberGenerator.generateOrderNumber("RT"));
+            record.setRecordType(3);
+            if (sparePart.getQuantity() < rtQuantity) {
+                WebUtil.addErrorMessage("退货数量不得大于可用数量");
+                return;
+            }
+            sparePart.setQuantity(sparePart.getQuantity() - rtQuantity);
+        }
+        if (selected.getRecordType() == 2) {
+            record.setReturnNumber(OrderNumberGenerator.generateOrderNumber("CT"));
+            record.setRecordType(4);
+            if (selected.getQuantity() < rtQuantity) {
+                WebUtil.addErrorMessage("退货数量不得大于可退数量");
+                return;
+            }
+            sparePart.setQuantity(sparePart.getQuantity() + rtQuantity);
+        }
+        sparePartRepository.save(sparePart);
+        record.setQuantity(rtQuantity);
+        dao.save(record);
     }
 }
