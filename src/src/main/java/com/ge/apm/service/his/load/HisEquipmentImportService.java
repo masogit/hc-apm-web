@@ -3,7 +3,7 @@ package com.ge.apm.service.his.load;
 import com.ge.apm.dao.HisEquipmentConnectRepository;
 
 import com.ge.apm.domain.his.HisEquipmentConnect;
-import com.ge.apm.service.HisEquipmentRow;
+import com.ge.apm.service.his.HisEquipmentRow;
 import com.ge.apm.service.asset.ContractImportService;
 import com.ge.apm.service.asset.ContractRow;
 import com.ge.apm.service.utils.ExcelDocument;
