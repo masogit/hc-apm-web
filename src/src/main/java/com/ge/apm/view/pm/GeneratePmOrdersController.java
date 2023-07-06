@@ -666,7 +666,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			model.setPmType(pmType);
 			model.setUid(ai.getUid());
 			model.setLevel(level);
-			model.setPlanTime(planTime);
+			model.setPlanTime(planTime == null ? new Date():planTime);
 			model.setPmRuleUid(rule.getUid());
 			models.add(model);
 		}else {
