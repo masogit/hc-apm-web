@@ -39,7 +39,7 @@
 										 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
 										 rows="20" emptyMessage="#{msg.noRecordFound}"
 										 rowsPerPageTemplate="20,50,100,500">
-								<p:column exportable="false" selectionMode="multiple" style="width:50px;text-align:center"/>
+								<p:column exportable="false" selectionMode="multiple" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2}" style="width:50px;text-align:center"/>
 								<p:ajax event="filter" listener="#{sparePartStockRecordController.onFilter}"/>
 								<p:column headerText="入库单号" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 3}" filterBy="#{item.inboundNumber}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.inboundNumber}"/>
@@ -113,8 +113,12 @@
 									<p:commandButton id="rtButton" value="退库" actionListener="#{sparePartStockRecordController.rtStock(item)}" disabled="#{sparePartStockRecordController.canRtStock(item)}" oncomplete="PF('pkRtDialog').show()"/>
 								</p:column>
 								<f:facet name="{Toolbar}">
-									<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
-										<p:dataExporter type="xls" target="datalist" fileName="#{sparePartStockRecordController.filterRecordType eq 1?'备件入库记录':'备件出库记录'}" />
+									<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
+													 class="btn btn-sm btn-gray" ajax="false">
+										<p:dataExporter type="xls" target="datalist"
+														fileName="#{sparePartStockRecordController.filterRecordType eq 1?'备件入库记录':
+														sparePartStockRecordController.filterRecordType eq 2?'备件出库记录':
+														sparePartStockRecordController.filterRecordType eq 3?'备件入库退库记录':'备件出库退库记录'}"/>
 									</p:commandButton>
 									<p:commandButton title="导出到word" ajax="false" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2}"
 													 actionListener="#{sparePartStockRecordController.exportToDocx()}"
