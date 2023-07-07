@@ -1020,7 +1020,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 	public void batchUpdateSparPart() {
 		stockRecordRepository.findByType(1).forEach(v -> {
 			if (v.getInboundNumber() == null) {
-				v.setInboundNumber(OrderNumberGenerator.generateOrderNumber("RT", v.getRecordDate()));
+				v.setInboundNumber(OrderNumberGenerator.generateOrderNumber("R", v.getRecordDate()));
 				stockRecordRepository.save(v);
 				try {
 					Thread.sleep(1/10);
@@ -1031,7 +1031,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		});
 		stockRecordRepository.findByType(2).forEach(v -> {
 			if (v.getInboundNumber() == null) {
-				v.setOutboundNumber(OrderNumberGenerator.generateOrderNumber("CT", v.getRecordDate()));
+				v.setOutboundNumber(OrderNumberGenerator.generateOrderNumber("C", v.getRecordDate()));
 				stockRecordRepository.save(v);
 				try {
 					Thread.sleep(1/10);
