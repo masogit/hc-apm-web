@@ -1,6 +1,7 @@
 package com.ge.apm.view.SparePart;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SparePartRepository;
 import com.ge.apm.dao.StockRecordRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
@@ -18,8 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
@@ -43,6 +46,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     private SimplePartsWarehouseService warehouseService;
     private SparePartStockRecordService stockRecordService;
     private StockRecordRepository dao;
+    private SparePartRepository sparePartRepository;
 
     @Getter @Setter
     private UserAccount loginUser;
@@ -52,21 +56,24 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     private List<SimplePartsWarehouse> warehouses = new ArrayList<>();
     @Getter @Setter
     private String partsWarehouseId;
-    @Getter@Setter
+    @Getter @Setter
     private String filterClinicalDeptOrg;
-    @Getter@Setter
+    @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
-    @Getter@Setter
+    @Getter @Setter
     private Integer filterRecordType = 1;
-    @Getter@Setter
+    @Getter @Setter
     private Date startTime;
-    @Getter@Setter
+    @Getter @Setter
     private Date endTime;
-
-    @Getter@Setter
+    @Getter @Setter
     private List<StockRecord> selectedItems;
-    @Getter@Setter
+    @Getter @Setter
     private StreamedContent exportDocx;
+    @Getter @Setter
+    private Integer rtQuantity;
+
+
 
 
     @Override
@@ -77,6 +84,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         stockRecordRepository =  WebUtil.getBean(StockRecordRepository.class);
         warehouseService = WebUtil.getBean(SimplePartsWarehouseService.class);
         dao = WebUtil.getBean(StockRecordRepository.class);
+        sparePartRepository = WebUtil.getBean(SparePartRepository.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
         currentOrg = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -131,6 +139,10 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
 
     }
 
+    public void onSelectChange() {
+        this.searchFilters.clear();
+    }
+
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
@@ -147,6 +159,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
 
     public void cancel() {
         selected = null;
+        rtQuantity = 0;
     }
 
     public void delete() {
@@ -166,22 +179,22 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
     }
 
-    public void exportToDocx(){
+    public void exportToDocx() {
         exportDocx = null;
         if (CollectionUtils.isEmpty(this.selectedItems)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("NotSelectTheRecordsThatNeedToBeExported"));
             return;
         }
-        if(checkSelectedItems()){
+        if (checkSelectedItems()) {
             String fileName = "";
-            if(1 == filterRecordType){
+            if (1 == filterRecordType) {
                 fileName = "设备配件入库单.docx";
-            }else if(2 == filterRecordType){
+            } else if (2 == filterRecordType) {
                 fileName = "设备配件出库单.docx";
             }
             try {
                 byte[] templateBytes = stockRecordService.getTemplate(fileName);
-                SparePartStockRecordService.RenderResult renderResult = stockRecordService.renderDocx(selectedItems, templateBytes,fileName,filterRecordType);
+                SparePartStockRecordService.RenderResult renderResult = stockRecordService.renderDocx(selectedItems, templateBytes, fileName, filterRecordType);
                 exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
             } catch (IOException e) {
                 logger.error("Fail to export part stock record", e);
@@ -190,28 +203,83 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         }
     }
 
-    private boolean checkSelectedItems(){
-        if(1 == filterRecordType){
+    private boolean checkSelectedItems() {
+        if (1 == filterRecordType || 3 == filterRecordType) {
             String supplier = null;
             for (StockRecord selectedItem : selectedItems) {
-                if(StringUtils.isNotEmpty(supplier) && !supplier.equals(selectedItem.getSparePart().getSupplier())){
+                if (StringUtils.isNotEmpty(supplier) && !supplier.equals(selectedItem.getSparePart().getSupplier())) {
                     WebUtil.addErrorMessage("选中的数据中供应商不同，无法导出！");
                     return false;
-                }else if(StringUtils.isEmpty(supplier)){
+                } else if (StringUtils.isEmpty(supplier)) {
                     supplier = selectedItem.getSparePart().getSupplier();
                 }
             }
-        }else if(2 == filterRecordType){
+        } else if (2 == filterRecordType || 4 == filterRecordType) {
             String dept = null;
             for (StockRecord selectedItem : selectedItems) {
-                if(StringUtils.isNotEmpty(dept) && !dept.equals(selectedItem.getReceivingDepartmentUid())){
+                if (StringUtils.isNotEmpty(dept) && !dept.equals(selectedItem.getReceivingDepartmentUid())) {
                     WebUtil.addErrorMessage("选中的数据中领取科室不同，无法导出！");
                     return false;
-                }else if(StringUtils.isEmpty(dept)){
+                } else if (StringUtils.isEmpty(dept)) {
                     dept = selectedItem.getReceivingDepartmentUid();
                 }
             }
         }
         return true;
+    }
+
+    public void rtStock(StockRecord record) {
+        this.selected = record;
+        rtQuantity = 0;
+    }
+
+    public String getTitle(Integer type, String str) {
+        switch (type) {
+            case 1:
+                return "入库" + str;
+            case 2:
+                return "出库" + str;
+        }
+        return "退库"  + str;
+    }
+
+    public boolean canRtStock(StockRecord record) {
+        return record.getRecordType() == 1 ? record.getSparePart().getQuantity() <= 0 : getValidQuantity(record) <= 0;
+    }
+
+    public Integer getValidQuantity(StockRecord record) {
+        Integer quantity = record.getQuantity();
+        List<StockRecord> stockRecords = dao.findListByOutboundNumber(record.getOutboundNumber());
+        return stockRecords.stream().mapToInt(StockRecord::getQuantity).reduce(quantity, (o, n) -> o - n);
+    }
+
+    @Transactional
+    public void saveRtStock() {
+        StockRecord record = new StockRecord();
+        BeanUtils.copyProperties(selected, record);
+        record.setId(null);
+        record.setRecordDate(new Date());
+        SparePart sparePart = selected.getSparePart();
+        if (selected.getRecordType() == 1) {
+            record.setReturnNumber(OrderNumberGenerator.generateOrderNumber("RT"));
+            record.setRecordType(3);
+            if (sparePart.getQuantity() < rtQuantity) {
+                WebUtil.addErrorMessage("退货数量不得大于可用数量");
+                return;
+            }
+            sparePart.setQuantity(sparePart.getQuantity() - rtQuantity);
+        }
+        if (selected.getRecordType() == 2) {
+            record.setReturnNumber(OrderNumberGenerator.generateOrderNumber("CT"));
+            record.setRecordType(4);
+            if (selected.getQuantity() < rtQuantity) {
+                WebUtil.addErrorMessage("退货数量不得大于可退数量");
+                return;
+            }
+            sparePart.setQuantity(sparePart.getQuantity() + rtQuantity);
+        }
+        sparePartRepository.save(sparePart);
+        record.setQuantity(rtQuantity);
+        dao.save(record);
     }
 }

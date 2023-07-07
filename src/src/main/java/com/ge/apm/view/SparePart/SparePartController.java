@@ -175,6 +175,10 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
             record.setReceivingDepartmentUid(orgInfo.getUid());
             record.setQuantity(outQuantity);
             record.setRemark(remark);
+            record.setOutboundNumber(OrderNumberGenerator.generateOrderNumber("C"));
+        }
+        if (record.getRecordType() == 1) {
+            record.setInboundNumber(OrderNumberGenerator.generateOrderNumber("R"));
         }
         return record;
     }
