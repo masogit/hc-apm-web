@@ -132,12 +132,15 @@
 				</h:form>
 				<p:dialog id="pkRtDialog" widgetVar="pkRtDialog" width="400" height="150" modal="true" resizable="true" draggable="true" appendTo="@this" header="备件退库" closable="false">
 					<h:form id="RtForm">
-						<h:panelGroup >
-							<label class ="label">数量* </label>
-							<p:inputText id="quantity" value="#{sparePartStockRecordController.rtQuantity}"  required="true" requiredMessage="数量必填">
-								<f:validateLongRange minimum="1" />
-							</p:inputText>
-						</h:panelGroup>
+						<p:panelGrid columns="1" layout="grid">
+							<h:panelGroup>
+								<label class ="label">数量* </label>
+								<p:inputText id="quantity" value="#{sparePartStockRecordController.rtQuantity}"  required="true" requiredMessage="数量必填">
+									<f:validateLongRange minimum="1" />
+								</p:inputText>
+							</h:panelGroup>
+						</p:panelGrid>
+						<br/>
 						<p:commandButton validateClient="true" actionListener="#{sparePartStockRecordController.saveRtStock()}" value="#{msg.Confirm}" update=":recordPartForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pkRtDialog');"/>
 						<p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{sparePartStockRecordController.cancel()}" icon="ui-icon-cancel" update=":recordPartForm:datalist" onclick="PF('pkRtDialog').hide()" />
 					</h:form>

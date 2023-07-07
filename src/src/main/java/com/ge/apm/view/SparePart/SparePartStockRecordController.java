@@ -155,6 +155,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
 
     public void cancel() {
         selected = null;
+        rtQuantity = 0;
     }
 
     public void delete() {
@@ -225,6 +226,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
 
     public void rtStock(StockRecord record) {
         this.selected = record;
+        rtQuantity = 0;
     }
 
     public String getTitle(Integer type, String str) {
