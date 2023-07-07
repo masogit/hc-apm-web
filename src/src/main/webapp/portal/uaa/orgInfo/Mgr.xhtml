@@ -128,6 +128,12 @@
                                             <p:ajax listener="#{orgInfoController.checkHospitalUcmid()}" process="@this"  update=":growl" ></p:ajax>
                                         </p:inputText>
                                     </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.orgCode}</label>
+                                        <p:inputText id="orgCode" value="#{orgInfoController.orgCode}" required="false" requiredMessage="#{msg.orgCode} #{msg.ValidationRequire}">
+                                            <p:ajax listener="#{orgInfoController.checkOrgCode()}" process="@this"  update=":growl" ></p:ajax>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <h:panelGroup rendered="#{orgInfoController.countyArea}">
                                         <label class="label">#{msg.address}</label>
                                         <p:inputText id="address" value="#{orgInfoController.address}" />

@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @EnableScheduling
+@Deprecated
 public class NurseSiteMaintainJob {
     public static final Logger LOGGER = LoggerFactory.getLogger(NurseSiteMaintainJob.class);
 

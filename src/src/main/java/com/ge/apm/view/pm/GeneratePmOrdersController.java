@@ -484,6 +484,11 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		batchCreateModels.addAll(selectedNotOnlyOneModels);
 		batchCreateModels.addAll(onlyOneModels);
 		models = batchCreateModels;
+		models.forEach(m -> {
+			if (m.getPlanTime() == null) {
+				m.setPlanTime(new Date());
+			}
+		});
 		AssetRuleModelList model = new AssetRuleModelList();
 		model.setModels(models);
 		String token = UserContextService.getAccessToken();
@@ -666,7 +671,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			model.setPmType(pmType);
 			model.setUid(ai.getUid());
 			model.setLevel(level);
-			model.setPlanTime(planTime);
+			model.setPlanTime(planTime == null ? new Date():planTime);
 			model.setPmRuleUid(rule.getUid());
 			models.add(model);
 		}else {
@@ -701,7 +706,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				model.setPmType(pmType);
 				model.setUid(ai.getUid());
 				model.setLevel(level);
-				model.setPlanTime(planTime);
+				model.setPlanTime(planTime == null ? new Date():planTime);
 				model.setPmRuleUid(rule.getUid());
 				models.add(model);
 			}

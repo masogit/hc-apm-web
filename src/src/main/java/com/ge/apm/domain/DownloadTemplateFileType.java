@@ -19,6 +19,7 @@ public enum DownloadTemplateFileType {
     MVS_CONTRACT("APM_mvs_contract.xlsx", "APM_mvs_contract.xlsx"),
     MVS_SITE("APM_mvs_site.xlsx", "APM_mvs_site.xlsx"),
     HIS_EQUIPMENT_CONNECT("His_equipment_connect.xlsx", "His_equipment_connect.xlsx"),
+    HIS_CLINICAL("His_clinical.xlsx", "His_clinical.xlsx"),
     ;
 
     private final String templateFileZh;
