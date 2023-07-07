@@ -486,6 +486,11 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		models = batchCreateModels;
 		AssetRuleModelList model = new AssetRuleModelList();
 		model.setModels(models);
+		models.forEach(m -> {
+			if (m.getPlanTime() == null) {
+				m.setPlanTime(new Date());
+			}
+		});
 		String token = UserContextService.getAccessToken();
 		String request = JSON.toJSONString(model);
 		LOGGER.info("token is {}",token);
