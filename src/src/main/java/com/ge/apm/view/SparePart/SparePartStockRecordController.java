@@ -139,6 +139,10 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
 
     }
 
+    public void onSelectChange() {
+        this.searchFilters.clear();
+    }
+
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();

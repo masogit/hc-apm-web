@@ -15,7 +15,7 @@
 				<h:form id="searchForm">
 					<h:panelGrid id="searchPanel" columns="10">
 						<p:selectOneMenu id="filterRecordType" value="#{sparePartStockRecordController.filterRecordType}" style="margin-right: 20px">
-							<p:ajax update=":recordPartForm:datalist" />
+							<p:ajax listener="#{sparePartStockRecordController.onSelectChange}" update=":recordPartForm:datalist" />
 							<f:selectItem itemValue='1' itemLabel="入库 "/>
 							<f:selectItem itemValue='2' itemLabel="出库 "/>
 							<f:selectItem itemValue='3' itemLabel="入库退库 "/>
@@ -110,7 +110,7 @@
 									<h:outputText value="#{item.remark}" />
 								</p:column>
 								<p:column  headerText="操作" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2}">
-									<p:commandButton id="rtButton" value="退库" actionListener="#{sparePartStockRecordController.rtStock(item)}" disabled="#{sparePartStockRecordController.canRtStock(item)}" oncomplete="PF('pkRtDialog').show()"/>
+									<p:commandButton id="rtButton" value="退库" actionListener="#{sparePartStockRecordController.rtStock(item)}" update="pkRtDialog" disabled="#{sparePartStockRecordController.canRtStock(item)}" oncomplete="PF('pkRtDialog').show()"/>
 								</p:column>
 								<f:facet name="{Toolbar}">
 									<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
