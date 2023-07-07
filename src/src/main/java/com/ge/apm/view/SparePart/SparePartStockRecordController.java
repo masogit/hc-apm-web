@@ -174,22 +174,22 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
     }
 
-    public void exportToDocx(){
+    public void exportToDocx() {
         exportDocx = null;
         if (CollectionUtils.isEmpty(this.selectedItems)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("NotSelectTheRecordsThatNeedToBeExported"));
             return;
         }
-        if(checkSelectedItems()){
+        if (checkSelectedItems()) {
             String fileName = "";
-            if(1 == filterRecordType){
+            if (1 == filterRecordType) {
                 fileName = "设备配件入库单.docx";
-            }else if(2 == filterRecordType){
+            } else if (2 == filterRecordType) {
                 fileName = "设备配件出库单.docx";
             }
             try {
                 byte[] templateBytes = stockRecordService.getTemplate(fileName);
-                SparePartStockRecordService.RenderResult renderResult = stockRecordService.renderDocx(selectedItems, templateBytes,fileName,filterRecordType);
+                SparePartStockRecordService.RenderResult renderResult = stockRecordService.renderDocx(selectedItems, templateBytes, fileName, filterRecordType);
                 exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
             } catch (IOException e) {
                 logger.error("Fail to export part stock record", e);
@@ -198,24 +198,24 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         }
     }
 
-    private boolean checkSelectedItems(){
-        if(1 == filterRecordType){
+    private boolean checkSelectedItems() {
+        if (1 == filterRecordType || 3 == filterRecordType) {
             String supplier = null;
             for (StockRecord selectedItem : selectedItems) {
-                if(StringUtils.isNotEmpty(supplier) && !supplier.equals(selectedItem.getSparePart().getSupplier())){
+                if (StringUtils.isNotEmpty(supplier) && !supplier.equals(selectedItem.getSparePart().getSupplier())) {
                     WebUtil.addErrorMessage("选中的数据中供应商不同，无法导出！");
                     return false;
-                }else if(StringUtils.isEmpty(supplier)){
+                } else if (StringUtils.isEmpty(supplier)) {
                     supplier = selectedItem.getSparePart().getSupplier();
                 }
             }
-        }else if(2 == filterRecordType){
+        } else if (2 == filterRecordType || 4 == filterRecordType) {
             String dept = null;
             for (StockRecord selectedItem : selectedItems) {
-                if(StringUtils.isNotEmpty(dept) && !dept.equals(selectedItem.getReceivingDepartmentUid())){
+                if (StringUtils.isNotEmpty(dept) && !dept.equals(selectedItem.getReceivingDepartmentUid())) {
                     WebUtil.addErrorMessage("选中的数据中领取科室不同，无法导出！");
                     return false;
-                }else if(StringUtils.isEmpty(dept)){
+                } else if (StringUtils.isEmpty(dept)) {
                     dept = selectedItem.getReceivingDepartmentUid();
                 }
             }
@@ -227,33 +227,18 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         this.selected = record;
     }
 
-    public String getTitle(Integer type) {
+    public String getTitle(Integer type, String str) {
         switch (type) {
             case 1:
-                return "入库时间";
+                return "入库" + str;
             case 2:
-                return "出库时间";
+                return "出库" + str;
         }
-        return "退库时间";
+        return "退库"  + str;
     }
-
-    public String getQuantityTitle(Integer type) {
-        switch (type) {
-            case 1:
-                return "入库数量";
-            case 2:
-                return "出库数量";
-        }
-        return "退库数量";
-    }
-
 
     public boolean canRtStock(StockRecord record) {
-        if (record.getRecordType() == 1) {
-
-            return record.getSparePart().getQuantity() <= 0;
-        }
-        return getValidQuantity(record) <= 0;
+        return record.getRecordType() == 1 ? record.getSparePart().getQuantity() <= 0 : getValidQuantity(record) <= 0;
     }
 
     public Integer getValidQuantity(StockRecord record) {

@@ -71,7 +71,7 @@
 								<p:column headerText="单位">
 									<h:outputText value="#{item.sparePart.unit}" />
 								</p:column>
-								<p:column headerText="#{sparePartStockRecordController.getQuantityTitle(sparePartStockRecordController.filterRecordType) }">
+								<p:column headerText="#{sparePartStockRecordController.getTitle(sparePartStockRecordController.filterRecordType, '数量') }">
 									<h:outputText value="#{item.quantity}" />
 								</p:column>
 								<p:column headerText="可用数量" rendered="#{sparePartStockRecordController.filterRecordType eq 1 }">
@@ -95,7 +95,7 @@
 								<p:column headerText="入库人" rendered="#{sparePartStockRecordController.filterRecordType eq 1}">
 									<h:outputText value="#{item.warehouseOprPerson}" />
 								</p:column>
-								<p:column headerText="#{sparePartStockRecordController.getTitle(sparePartStockRecordController.filterRecordType)}" rendered="#{sparePartStockRecordController.filterRecordType eq 1}" sortBy="#{item.recordDate}">
+								<p:column headerText="#{sparePartStockRecordController.getTitle(sparePartStockRecordController.filterRecordType, '时间')}" sortBy="#{item.recordDate}">
 									<h:outputText value="#{item.recordDate}">
 										<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 									</h:outputText>
@@ -116,7 +116,7 @@
 									<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
 										<p:dataExporter type="xls" target="datalist" fileName="#{sparePartStockRecordController.filterRecordType eq 1?'备件入库记录':'备件出库记录'}" />
 									</p:commandButton>
-									<p:commandButton title="导出到word" ajax="false"
+									<p:commandButton title="导出到word" ajax="false" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2}"
 													 actionListener="#{sparePartStockRecordController.exportToDocx()}"
 													 icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
 										<p:fileDownload value="#{sparePartStockRecordController.exportDocx}"/>
