@@ -2,20 +2,26 @@ package com.ge.apm.service.his.load;
 
 import com.ge.apm.dao.HisEquipmentConnectRepository;
 
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.his.HisEquipmentConnect;
 import com.ge.apm.service.his.HisEquipmentRow;
 import com.ge.apm.service.asset.ContractImportService;
 import com.ge.apm.service.asset.ContractRow;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import java.time.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HisEquipmentImportService {
@@ -29,6 +35,8 @@ public class HisEquipmentImportService {
 
     @Autowired
     HisEquipmentConnectRepository hisEquipmentConnectRepository;
+    @Autowired
+    private OrgInfoRepository orgInfoDao;
 
     public List<HisEquipmentConnect> parse(ExcelDocument doc){
 
@@ -130,12 +138,16 @@ public class HisEquipmentImportService {
 
     public void importData(List<Map<String, Object>> importMapList) {
 
-
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        orgInfoFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.IsNotNull,null));
+        List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
+        List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
         int row = 0;
         try {
             for (Map<String, Object> item : importMapList) {
                 ++row;
-                if(checkData(item, importMapList)) {
+                if(checkData(item, importMapList,orgCodeList)) {
                     importOneHisEquipment(item);
                 }
 
@@ -151,41 +163,53 @@ public class HisEquipmentImportService {
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
     }
 
-    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList) {
+    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList,List<String> orgCodeList ) {
+
+
         boolean isValidateData = true;
         HisEquipmentConnect hisEquipmentConnect = (HisEquipmentConnect)item.get("hisEquipmentConnect");
         ContractRow.clearErrMessage(item);
 
         if(hisEquipmentConnect.getEqHosid() == null){
-            item.put("status", ContractImportService.ImportStatus.Failure);
+            item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "医院机构代码不能为空");
             isValidateData = false;
         }
         if(hisEquipmentConnect.getEqId() == null){
-            item.put("status", ContractImportService.ImportStatus.Failure);
+            item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "设备唯一编号不能为空");
             isValidateData = false;
         }
         if(hisEquipmentConnect.getEqName() == null){
-            item.put("status", ContractImportService.ImportStatus.Failure);
+            item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "设备名称不能为空");
             isValidateData = false;
         }
         if(hisEquipmentConnect.getEqLb() == null){
-            item.put("status", ContractImportService.ImportStatus.Failure);
+            item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "预置值不能为空");
             isValidateData = false;
         }
         if(hisEquipmentConnect.getEqLb() != null && HisEquipmentConnect.EqLb.getLis(hisEquipmentConnect.getEqLb())==null){
-            item.put("status", ContractImportService.ImportStatus.Failure);
+            item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "预置值输入值有误");
             isValidateData = false;
         }
-        HisEquipmentConnect byEqId = hisEquipmentConnectRepository.findByEqId(hisEquipmentConnect.getEqId());
-        if(byEqId != null){
-            item.put("status", ContractImportService.ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "设备编号已存在,不允许导入");
-            isValidateData = false;
+        if(StringUtils.isNotBlank(hisEquipmentConnect.getEqHosid())){
+            if(!orgCodeList.contains(hisEquipmentConnect.getEqHosid())){
+                item.put("status", ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "租户下面不存在该医院机构代码");
+                isValidateData = false;
+            }
+        }
+
+        if(isValidateData && StringUtils.isNotBlank(hisEquipmentConnect.getEqId()) && StringUtils.isNotBlank(hisEquipmentConnect.getEqHosid())){
+            HisEquipmentConnect byEqId = hisEquipmentConnectRepository.findByEqIdAndEqHosid(hisEquipmentConnect.getEqId(),hisEquipmentConnect.getEqHosid());
+            if(byEqId != null){
+                item.put("status", ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "设备编号已存在,不允许导入");
+                isValidateData = false;
+            }
         }
         return isValidateData;
 

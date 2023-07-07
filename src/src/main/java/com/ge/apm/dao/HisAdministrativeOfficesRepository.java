@@ -29,4 +29,6 @@ public interface HisAdministrativeOfficesRepository extends GenericRepositoryUUI
 
 
     HisAdministrativeOffices findByHisKsid(String hisKsid);
+
+    HisAdministrativeOffices findByHisKsidAndHosId(String hisKsid, String hosId);
 }

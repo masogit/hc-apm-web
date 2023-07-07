@@ -41,4 +41,6 @@ public interface HisEquipmentConnectRepository extends GenericRepositoryUUID<His
     public List<HisEquipmentConnect> findHisEquipmentConnectByIds(List<String> ids);
 
     HisEquipmentConnect findByEqId(String eqId);
+
+    HisEquipmentConnect findByEqIdAndEqHosid(String eqId, String eqHosid);
 }

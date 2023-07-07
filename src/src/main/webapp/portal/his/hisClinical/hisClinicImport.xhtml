@@ -22,7 +22,7 @@
             <p:fieldset  legend="科室导入" id="uploaderContainer">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                     <h:panelGroup>
-                        <div style="white-space:pre">#{msg.Description}   1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('HIS_CLINICAL')}" styleClass="p-mr-2"/>        2. #{msg.FileNeedHisAssetData}        3. #{msg.UpFileImport}</div>
+                        <div style="white-space:pre">#{msg.Description}   1. <p:commandLink value="#{msg.downloadTemplateFile}" ajax="false" actionListener="#{fileDownloadService.exportTemplateFile('HIS_CLINICAL')}" styleClass="p-mr-2"/>        2. #{msg.FileNeedHisDepartmentData}        3. #{msg.UpFileImport}</div>
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
@@ -53,19 +53,19 @@
                              rowsPerPageTemplate="20,50,100,500">
 
                     <p:column headerText="#{msg.EXCELRowNumber}">
-                        <h:outputText value="#{item.get('hisEquipmentConnect').lineNum}" />
+                        <h:outputText value="#{item.get('hisClinical').lineNum}" />
                     </p:column>
-                    <p:column headerText="#{msg.EqId}">
-                        <h:outputText value="#{item.get('hisEquipmentConnect').eqId}" />
+                    <p:column headerText="#{msg.HisDepartmentCode}">
+                        <h:outputText value="#{item.get('hisClinical').hisKsid}" />
                     </p:column>
-                    <p:column headerText="#{msg.EquipmentName}">
-                        <h:outputText value="#{item.get('hisEquipmentConnect').eqName}" />
+                    <p:column headerText="#{msg.HisDepartmentName}">
+                        <h:outputText value="#{item.get('hisClinical').hisKsname}" />
                     </p:column>
-                    <p:column headerText="#{msg.PresetValue}">
-                        <h:outputText value="#{item.get('hisEquipmentConnect').eqLb}" />
+                    <p:column headerText="#{msg.TyBz}">
+                        <h:outputText value="#{item.get('hisClinical').tyBz}" />
                     </p:column>
                     <p:column headerText="#{msg.HospitalCode}">
-                        <h:outputText value="#{item.get('hisEquipmentConnect').eqHosid}" />
+                        <h:outputText value="#{item.get('hisClinical').hosId}" />
                     </p:column>
                     <p:column headerText="#{msg.FailureInformation}" >
                         <!--<h:outputText value="#{fieldMsg.fieldValue('importStatus',item.get('status'))}"/><br/>-->
@@ -73,9 +73,9 @@
                     </p:column>
 
                     <f:facet name="{Toolbar}">
-                        <p:commandButton ajax="false" actionListener="#{contractImportController.downloadImportFailureData}"
+                        <p:commandButton ajax="false" actionListener="#{hisClinicalMatchController.downloadImportFailureData}"
                                          icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" update=":growl">
-                            <p:fileDownload value="#{contractImportController.exportFile}"/>
+                            <p:fileDownload value="#{hisClinicalMatchController.exportFile}"/>
                         </p:commandButton>
                     </f:facet>
 
