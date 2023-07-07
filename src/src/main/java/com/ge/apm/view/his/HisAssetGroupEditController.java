@@ -194,7 +194,7 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
 
-        if (UserSiteOrgTreeComponentController.EDIT_SITE_ORG_CHANGE.equals(eventName)) {
+        if (UserSiteOrgTreeComponentController.ORG_CHANGE.equals(eventName)) {
             //his org code changes
             this.selectedOrg = (OrgInfo)eventObject;
 
