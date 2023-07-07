@@ -1,21 +1,28 @@
 package com.ge.apm.service.his.load;
 
 import com.ge.apm.dao.HisAdministrativeOfficesRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.his.HisAdministrativeOffices;
 import com.ge.apm.domain.his.HisEquipmentConnect;
 import com.ge.apm.service.asset.ContractImportService;
 import com.ge.apm.service.asset.ContractRow;
 import com.ge.apm.service.his.HisClinicalRow;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HisAdministrativeOfficeImportService {
@@ -24,7 +31,8 @@ public class HisAdministrativeOfficeImportService {
     @Autowired
     HisAdministrativeOfficesRepository hisAdministrativeOfficesRepository;
 
-
+    @Autowired
+    private OrgInfoRepository orgInfoDao;
     public static final String SHEET_SERVICE_CONTRACT = "HisClinical List";
     public static final int EXCEL_CONTRACT_HEADER_ROW = 1;
     public static final int EXCEL_CONTRACT_DATA_ROW = 2;
@@ -79,14 +87,10 @@ public class HisAdministrativeOfficeImportService {
             HisAdministrativeOffices hisAdministrativeOffices = new HisAdministrativeOffices();
             hisAdministrativeOffices.setLineNum(i);
             HisClinicalRow hisClinicalRow = new HisClinicalRow(hisAdministrativeOffices, rowMap);
-            hisClinicalRow.setFieldStringValue("His科室代码", "setHisKsid");
-            hisClinicalRow.setFieldStringValue("His科室名称", "setHisKsname");
-            hisClinicalRow.setFieldStringValue("是否停用", "setTyBz");
-            hisClinicalRow.setFieldStringValue("医院机构代码", "setHosId");
-//            hisEquipmentRow.setFieldStringValue(WebUtil.getMessage("EqId"), "setEqId");
-//            hisEquipmentRow.setFieldStringValue(WebUtil.getMessage("EquipmentName"), "setEqName");
-//            hisEquipmentRow.setFieldStringValue(WebUtil.getMessage("PresetValue"), "setEqLb");
-//            hisEquipmentRow.setFieldStringValue(WebUtil.getMessage("HospitalCode"), "setEqHosid");
+            hisClinicalRow.setFieldStringValue(WebUtil.getMessage("HisDepartmentCode"), "setHisKsid");
+            hisClinicalRow.setFieldStringValue(WebUtil.getMessage("HisDepartmentName"), "setHisKsname");
+            hisClinicalRow.setFieldStringValue(WebUtil.getMessage("TyBz"), "setTyBz");
+            hisClinicalRow.setFieldStringValue(WebUtil.getMessage("HospitalCode"), "setHosId");
             map.put("hisClinical", hisAdministrativeOffices);
             map.put("rowData", rowMap);
             map.put("status",  HisEquipmentImportService.ImportStatus.New.name());
@@ -103,11 +107,16 @@ public class HisAdministrativeOfficeImportService {
     }
 
     public void importData(List<Map<String, Object>> importMapList) {
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        orgInfoFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.IsNotNull,null));
+        List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
+        List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
         int row = 0;
         try {
             for (Map<String, Object> item : importMapList) {
                 ++row;
-                if(checkData(item, importMapList)) {
+                if(checkData(item, importMapList,orgCodeList)) {
                     importOneHisClinical(item);
                 }
 
@@ -134,7 +143,7 @@ public class HisAdministrativeOfficeImportService {
         hisAdministrativeOfficesRepository.save(hisAdministrativeOffices);
     }
 
-    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList) {
+    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList , List<String> orgCodeList) {
 
         boolean isValidateData = true;
         HisAdministrativeOffices hisAdministrativeOffices = (HisAdministrativeOffices)item.get("hisClinical");
@@ -165,11 +174,22 @@ public class HisAdministrativeOfficeImportService {
             ContractRow.addErrMessage(item, "是否停用输入有误");
             isValidateData = false;
         }
-        HisAdministrativeOffices hisKsid = hisAdministrativeOfficesRepository.findByHisKsid(hisAdministrativeOffices.getHisKsid());
-        if(hisKsid != null){
-            item.put("status", ContractImportService.ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "科室编号已存在,不允许导入");
-            isValidateData = false;
+
+        if(StringUtils.isNotBlank(hisAdministrativeOffices.getHosId())){
+            if(!orgCodeList.contains(hisAdministrativeOffices.getHosId())){
+                item.put("status", HisEquipmentImportService.ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "租户下面不存在该医院机构代码");
+                isValidateData = false;
+            }
+        }
+
+        if(isValidateData && StringUtils.isNotBlank(hisAdministrativeOffices.getHisKsid()) && StringUtils.isNotBlank(hisAdministrativeOffices.getHosId())) {
+            HisAdministrativeOffices hisKsid = hisAdministrativeOfficesRepository.findByHisKsidAndHosId(hisAdministrativeOffices.getHisKsid(),hisAdministrativeOffices.getHosId());
+            if(hisKsid != null){
+                item.put("status", ContractImportService.ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "科室编号已存在,不允许导入");
+                isValidateData = false;
+            }
         }
         return isValidateData;
 
