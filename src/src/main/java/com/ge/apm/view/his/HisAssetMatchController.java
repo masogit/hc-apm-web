@@ -288,7 +288,7 @@ public class HisAssetMatchController extends GenericCRUDUUIDController<HisEquipm
 
     }
 
-    public List<Map<String, Object>> getErrorContractList() {
+    public List<Map<String, Object>> getErrorList() {
         return errorList;
     }
     public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.4";
