@@ -1056,7 +1056,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
         for (int i =0; i < selectedOptions.length;i++){
             //判断数据库是否存在如果存在进行更新操作，不存在则进行insert
-            List<ZkbUnreal> existList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getId(), selectedOptions[i]);
+            List<ZkbUnreal> existList = zkbUnrealRepository.findByPartOrderIdAndItemNo(zkbPartOrder.getId(), selectedOptions[i]);
             if(existList!= null && existList.size() > 0){
                 ZkbUnreal zkbUnreal = existList.get(0);
                 zkbUnreal.setCreatedDate(new Date());

@@ -538,7 +538,7 @@
                                 <p:commandButton validateClient="true" value="备件不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" />
                             </c:if>
                             <c:if test="#{zkbPartOrderAuditController.orderType eq 'Probe'}">
-                                <p:commandButton validateClient="true" value="探头不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" disabled="#{zkbPartOrderAuditController.probeUnrealCheck()}" />
+                                <p:commandButton validateClient="true" value="探头不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()"  /><!--disabled="#{zkbPartOrderAuditController.probeUnrealCheck()}"-->
                             </c:if>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag and (zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderAuditController.orderType eq 'Probe')}">
