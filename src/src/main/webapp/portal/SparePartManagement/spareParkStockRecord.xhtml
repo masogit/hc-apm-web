@@ -109,7 +109,7 @@
 								<p:column headerText="说明" rendered="#{sparePartStockRecordController.filterRecordType eq 2}">
 									<h:outputText value="#{item.remark}" />
 								</p:column>
-								<p:column  headerText="操作" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2}">
+								<p:column  headerText="操作" rendered="#{sparePartStockRecordController.filterRecordType eq 1 or sparePartStockRecordController.filterRecordType eq 2}" exportable="false">
 									<p:commandButton id="rtButton" value="退库" actionListener="#{sparePartStockRecordController.rtStock(item)}" update="pkRtDialog" disabled="#{sparePartStockRecordController.canRtStock(item)}" oncomplete="PF('pkRtDialog').show()"/>
 								</p:column>
 								<f:facet name="{Toolbar}">
