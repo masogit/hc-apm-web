@@ -54,4 +54,15 @@ public class HisEquipmentSfxmImportService {
 
         return Lists.newArrayList(iterable);
     }
+
+    public List<Map<String, Object>> getMapFromTemplate(ExcelDocument doc) {
+        return null;
+    }
+
+    public void importData(List<Map<String, Object>> importMapList) {
+    }
+
+    public List<Map<String, Object>> filterErrorRecords(List<Map<String, Object>> importMapList) {
+        return null;
+    }
 }
