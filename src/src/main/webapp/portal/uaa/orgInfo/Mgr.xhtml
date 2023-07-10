@@ -129,7 +129,7 @@
                                         </p:inputText>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.orgCode}</label>
+                                        <label class="label">#{msg.HospitalCode}</label>
                                         <p:inputText id="orgCode" value="#{orgInfoController.orgCode}" required="false" requiredMessage="#{msg.orgCode} #{msg.ValidationRequire}">
                                             <p:ajax listener="#{orgInfoController.checkOrgCode()}" process="@this"  update=":growl" ></p:ajax>
                                         </p:inputText>
