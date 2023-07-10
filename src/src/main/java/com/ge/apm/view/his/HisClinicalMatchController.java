@@ -251,7 +251,7 @@ public class HisClinicalMatchController extends GenericCRUDUUIDController<HisAdm
 
     }
 
-    public List<Map<String, Object>> getErrorContractList() {
+    public List<Map<String, Object>> getErrorList() {
         return errorList;
     }
 }

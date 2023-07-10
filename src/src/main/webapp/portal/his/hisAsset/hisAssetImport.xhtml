@@ -47,7 +47,7 @@
         <h:form id="errorDataListForm">
             <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
             <p:fieldset  legend="#{msg.ImportFailureData}">
-                <p:dataTable id="errorDatalist" rendered="#{not empty hisAssetMatchController.errorContractList}" value="#{hisAssetMatchController.errorContractList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                <p:dataTable id="errorDatalist" rendered="#{not empty hisAssetMatchController.errorList}" value="#{hisAssetMatchController.errorList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
                              rowsPerPageTemplate="20,50,100,500">
