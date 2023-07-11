@@ -388,7 +388,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }else{
                     showCatListFlag = "1";
                 }
-                if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(selected.getCurrentStep())){
+                if(getUnrealStatusRender()){
                     unrealTips = zkbPartOrderService.getProbeUnrealData(selected, showCatListFlag);
                 }
             }
