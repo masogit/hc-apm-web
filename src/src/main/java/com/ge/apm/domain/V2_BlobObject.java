@@ -27,6 +27,14 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ServiceRequest = "ServiceRequest";
     public static final String BO_TYPE_PCCReport = "PccReport";
     public static final String BO_TYPE_PmRequest = "PmRequest";
+
+    public static final String BO_TYPE_PrePmOrder = "PrePmOrder"; //保养前照片
+    public static final String BO_TYPE_PmOrder = "PmOrder"; //保养后照片
+    public static final String BO_TYPE_PmReport = "PmReport"; //保养报告
+    public static final String BO_TYPE_MeReport = "MeReport"; //计量报告
+    public static final String BO_TYPE_AuReport = "AuReport"; //质控报告
+    public static final String BO_TYPE_PIReport = "PIReport"; //巡检报告
+
     public static final String BO_TYPE_WorkOrder = "WorkOrder";
     public static final String BO_TYPE_WorkOrderStep = "WorkOrderStep";
     public static final String BO_TYPE_WorkOrderDetail = "WorkOrderDetail";
@@ -37,7 +45,6 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_Supply = "supplier";
     public static final String BO_TYPE_AssetContract = "AssetContract";
     public static final String BO_TYPE_QRCodeLib = "QRCodeLib";
-    public static final String BO_TYPE_PmOrder = "PmOrder";
     public static final String BO_TYPE_ArrivalListItem = "ArrivalListItem";
     public static final String BO_TYPE_ArrivalList = "ArrivalList";
     public static final String BO_TYPE_TableDefinition = "TableDefinition";
