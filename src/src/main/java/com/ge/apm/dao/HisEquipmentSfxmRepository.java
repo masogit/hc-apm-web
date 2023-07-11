@@ -34,6 +34,8 @@ public interface HisEquipmentSfxmRepository extends GenericRepositoryUUID<HisEqu
     @Query("update HisEquipmentSfxm set isMatched = ?1 where id = ?2 ")
     public void updateIsMatched(boolean is_matched, String id);
 
+    HisEquipmentSfxm findBySfxmIdAndHosId(String sfxmId, String hosId);
+
 //    @Modifying
 //    @Transactional
 //    @Query(value = "update AssetInfo set nationalStandardCode=?1 where uid=?2")
