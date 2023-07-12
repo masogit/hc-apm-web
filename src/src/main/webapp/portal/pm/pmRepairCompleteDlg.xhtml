@@ -130,13 +130,34 @@
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
                                     <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false"  styleClass="p-mr-2"/>
+
+                                    <!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
                                     <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </h:panelGrid>
                             </p:panel>
                         </p:dataGrid>
-                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                        <p:panelGrid>
+                            <h:panelGroup>
+                                <label class="label">附件类型</label>
+<!--                                <p:autoComplete id="taskNameSearch" dropdown="true" inputStyle="width: 160px"-->
+<!--                                                readonly="false" forceSelection="true"-->
+<!--                                                value="#{v2PmOrderController.fileTypeName}"-->
+<!--                                                completeMethod="#{v2PmOrderController.getTypeList()}"-->
+<!--                                                var="it" itemLabel="#{it}" itemValue="#{it}" >-->
+<!--                                </p:autoComplete>-->
+                                <p:selectOneMenu value="#{v2PmOrderController.fileTypeName}"  required="true" >
+                                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                                    <f:selectItems value="#{v2PmOrderController.typeList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                    <p:ajax  update="@this" />
+                                </p:selectOneMenu>
+                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList"              auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+
+                            </h:panelGroup>
+
+                        </p:panelGrid>
                     </p:fieldset>
 
                     <p:fieldset legend="保养前后照片" >

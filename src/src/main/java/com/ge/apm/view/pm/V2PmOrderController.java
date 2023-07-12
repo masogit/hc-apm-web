@@ -92,6 +92,9 @@ import java.util.stream.Collectors;
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements ServerEventInterface {
     protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(V2PmOrderController.class);
     V2_WorkOrderDetailRepository v2_workOrderDetailRepository;
+
+    private String fileTypeName;
+
     @Setter @Getter
     private List<PmOrderRule> ruleList;
     @Getter @Setter
@@ -1340,11 +1343,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         cancel();
     }
 
+
+
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             picList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
+            String keyByValue = V2_BlobObject.AttachmentType.getKeyByValue(fileTypeName);
+//            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
+            blobObject.setBoType(keyByValue);
+            String fileType=blobObject.getObjectName().split("\\.")[blobObject.getObjectName().split("\\.").length-1];
+            String name=fileTypeName+"."+fileType;
+            blobObject.setObjectName(name);
             blobObject.setBoUuid(selectedPmOrder.getId());
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
@@ -2419,7 +2429,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 });
 
         }
-        picList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmRequest);
+//        picList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmRequest);
+        picList = blobDao.findByBoUuid(selectedPmOrder.getId());
+        picList = picList.stream().filter(item -> !item.getObjectType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  !item.getObjectType().equals(V2_BlobObject.BO_TYPE_PmOrder)    ).collect(Collectors.toList());
         picBeforeList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PrePmOrder);
         picAfterList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmOrder);
         if( CollectionUtils.isEmpty(picList)){
@@ -3121,6 +3133,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
 
+    public List<String> getTypeList(){
+
+        List<String> attachmentTypeList = V2_BlobObject.AttachmentType.getAttachmentTypeList();
+        return attachmentTypeList;
+    }
+
+
     public V2_WorkOrder_Detail getItemDetail() {
         return itemDetail;
     }
@@ -3663,5 +3682,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setPmRuleUid(String pmRuleUid) {
         this.pmRuleUid = pmRuleUid;
+    }
+
+
+    public String getFileTypeName() {
+        return fileTypeName;
+    }
+
+    public void setFileTypeName(String fileTypeName) {
+        this.fileTypeName = fileTypeName;
     }
 }
