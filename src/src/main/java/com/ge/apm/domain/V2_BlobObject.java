@@ -25,10 +25,11 @@ public class V2_BlobObject implements Serializable {
     }
     public enum  AttachmentType{
 
-        PM_REPORT("PM_REPORT","保养报告"),
-        MEASUREMENT_REPORT("MEASUREMENT_REPORT","计量报告"),
-        AUDIT_REPORT("AUDIT_REPORT","质控报告"),
-        INSPECTION_REPORT ("INSPECTION_REPORT","巡检报告"),
+        PM_REPORT("PmReport","保养报告"),
+        MEASUREMENT_REPORT("MeReport","计量报告"),
+        AUDIT_REPORT("AuReport","质控报告"),
+        INSPECTION_REPORT ("PIReport","巡检报告"),
+        OTHER ("Other","其他"),
 //        PMBE("PMBE","保养前照片"),
 //        PMAF("PMAF","保养后照片"),
         ;

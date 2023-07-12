@@ -1353,7 +1353,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
             blobObject.setBoType(keyByValue);
             String fileType=blobObject.getObjectName().split("\\.")[blobObject.getObjectName().split("\\.").length-1];
-            String name=fileTypeName+"."+fileType;
+            String name=fileTypeName+"_"+blobObject.getObjectName();
             blobObject.setObjectName(name);
             blobObject.setBoUuid(selectedPmOrder.getId());
             blobService.saveBlobObject(blobObject);
@@ -1607,6 +1607,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList = null;
         picAfterList = null;
         picBeforeList = null;
+        fileTypeName = null;
     }
     public void onSupplierChange() {
         Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
@@ -2431,7 +2432,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 //        picList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmRequest);
         picList = blobDao.findByBoUuid(selectedPmOrder.getId());
-        picList = picList.stream().filter(item -> !item.getObjectType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  !item.getObjectType().equals(V2_BlobObject.BO_TYPE_PmOrder)    ).collect(Collectors.toList());
+        picList = picList.stream().filter(item -> !(item.getBoType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder) )   ).collect(Collectors.toList());
         picBeforeList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PrePmOrder);
         picAfterList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmOrder);
         if( CollectionUtils.isEmpty(picList)){
