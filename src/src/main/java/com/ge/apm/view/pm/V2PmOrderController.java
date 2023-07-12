@@ -92,6 +92,9 @@ import java.util.stream.Collectors;
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements ServerEventInterface {
     protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(V2PmOrderController.class);
     V2_WorkOrderDetailRepository v2_workOrderDetailRepository;
+
+    private String fileTypeName;
+
     @Setter @Getter
     private List<PmOrderRule> ruleList;
     @Getter @Setter
@@ -217,6 +220,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date takeTime;
     private String approvaler;
     private List<V2_BlobObject> picList;
+
+    @Getter @Setter
+    private List<V2_BlobObject> picBeforeList;
+    @Getter @Setter
+    private List<V2_BlobObject> picAfterList;
+
     private List<V2_BlobObject> picListForRP;
     private List<V2_BlobObject> audioList;
     private V2_WorkOrderService woService;
@@ -1291,6 +1300,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
+    public void removeAttachmentByIdandType(String blobId, String type) {
+        blobService.deleteBlobFileById(blobId);
+        if (type.equals("after")) {
+            picAfterList.removeAll(picAfterList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+        } else if (type.equals("before")) {
+            picBeforeList.removeAll(picBeforeList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+        }
+    }
+
     public List<UserAccount> findRepairPerson() {
         if (this.selectedPmOrder != null) {
             return woService.getWorkerList(this.selectedPmOrder.getAssetId());
@@ -1325,11 +1343,45 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         cancel();
     }
 
+
+
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             picList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
+            String keyByValue = V2_BlobObject.AttachmentType.getKeyByValue(fileTypeName);
+//            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
+            blobObject.setBoType(keyByValue);
+            String fileType=blobObject.getObjectName().split("\\.")[blobObject.getObjectName().split("\\.").length-1];
+            String name=fileTypeName+"."+fileType;
+            blobObject.setObjectName(name);
+            blobObject.setBoUuid(selectedPmOrder.getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void handleFileUploadAfter(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picAfterList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmOrder);
+            blobObject.setBoUuid(selectedPmOrder.getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void handleFileUploadBefore(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picBeforeList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PrePmOrder);
+            blobObject.setBoUuid(selectedPmOrder.getId());
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
@@ -1553,6 +1605,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         equipmentTaker = null;
         takeTime = null;
         picList = null;
+        picAfterList = null;
+        picBeforeList = null;
     }
     public void onSupplierChange() {
         Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
@@ -2134,6 +2188,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList = getWorkOrderCoworker(selected.getId());
         // 获取picList
         picList = blobDao.findByBoUuid(selected.getId());
+
         reportList = pmOrderService.getReportList(selected.getId());
 
         loadHmCheck(selected);
@@ -2374,10 +2429,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 });
 
         }
+//        picList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmRequest);
         picList = blobDao.findByBoUuid(selectedPmOrder.getId());
-       if( CollectionUtils.isEmpty(picList)){
+        picList = picList.stream().filter(item -> !item.getObjectType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  !item.getObjectType().equals(V2_BlobObject.BO_TYPE_PmOrder)    ).collect(Collectors.toList());
+        picBeforeList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PrePmOrder);
+        picAfterList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmOrder);
+        if( CollectionUtils.isEmpty(picList)){
            picList = new ArrayList<V2_BlobObject>();
        }
+        if( CollectionUtils.isEmpty(picBeforeList)){
+            picBeforeList = new ArrayList<V2_BlobObject>();
+        }
+        if( CollectionUtils.isEmpty(picAfterList)){
+            picAfterList = new ArrayList<V2_BlobObject>();
+        }
         picListForRP = new ArrayList<V2_BlobObject>();
     }
 
@@ -3068,6 +3133,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
 
+    public List<String> getTypeList(){
+
+        List<String> attachmentTypeList = V2_BlobObject.AttachmentType.getAttachmentTypeList();
+        return attachmentTypeList;
+    }
+
+
     public V2_WorkOrder_Detail getItemDetail() {
         return itemDetail;
     }
@@ -3610,5 +3682,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setPmRuleUid(String pmRuleUid) {
         this.pmRuleUid = pmRuleUid;
+    }
+
+
+    public String getFileTypeName() {
+        return fileTypeName;
+    }
+
+    public void setFileTypeName(String fileTypeName) {
+        this.fileTypeName = fileTypeName;
     }
 }

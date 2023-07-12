@@ -573,7 +573,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
         formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         formData.setStepId(selectedPmOrder.getCurrentStepId());
-        formData.setAttachments(attachment);
+        //formData.setAttachments(attachment);
         if(endTime!=null)
             formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
         formData.setManHours(selectedPmOrder.getManHours());
@@ -655,7 +655,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
     public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
-        formData.setAttachments(attachment);
+        //formData.setAttachments(attachment);
         formData.setActionType("tempRepair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         if(endTime !=null)

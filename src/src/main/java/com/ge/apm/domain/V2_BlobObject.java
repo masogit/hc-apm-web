@@ -7,9 +7,9 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 @Entity
 @Table(name = "v2_blob_object")
 public class V2_BlobObject implements Serializable {
@@ -23,10 +23,54 @@ public class V2_BlobObject implements Serializable {
     public enum ZkbOperationType {
         A, C
     }
+    public enum  AttachmentType{
+
+        PM_REPORT("PM_REPORT","保养报告"),
+        MEASUREMENT_REPORT("MEASUREMENT_REPORT","计量报告"),
+        AUDIT_REPORT("AUDIT_REPORT","质控报告"),
+        INSPECTION_REPORT ("INSPECTION_REPORT","巡检报告"),
+//        PMBE("PMBE","保养前照片"),
+//        PMAF("PMAF","保养后照片"),
+        ;
+        private String key;
+        private String value;
+
+        AttachmentType(String key, String value) {
+            this.key=key;
+            this.value=value;
+        }
+
+
+        public static List<String> getAttachmentTypeList(){
+            ArrayList<String> attList = new ArrayList<>();
+
+            for (AttachmentType attachmentType : values()) {
+                attList.add(attachmentType.value);
+            }
+            return  attList;
+
+        }
+        public  static String  getKeyByValue(String value){
+            for (AttachmentType attachmentType : values()) {
+                if(attachmentType.value.equals(value)){
+                    return attachmentType.key;
+                }
+            }
+            return null;
+        }
+    }
 
     public static final String BO_TYPE_ServiceRequest = "ServiceRequest";
     public static final String BO_TYPE_PCCReport = "PccReport";
     public static final String BO_TYPE_PmRequest = "PmRequest";
+
+    public static final String BO_TYPE_PrePmOrder = "PrePmOrder"; //保养前照片
+    public static final String BO_TYPE_PmOrder = "PmOrder"; //保养后照片
+    public static final String BO_TYPE_PmReport = "PmReport"; //保养报告
+    public static final String BO_TYPE_MeReport = "MeReport"; //计量报告
+    public static final String BO_TYPE_AuReport = "AuReport"; //质控报告
+    public static final String BO_TYPE_PIReport = "PIReport"; //巡检报告
+
     public static final String BO_TYPE_WorkOrder = "WorkOrder";
     public static final String BO_TYPE_WorkOrderStep = "WorkOrderStep";
     public static final String BO_TYPE_WorkOrderDetail = "WorkOrderDetail";
@@ -37,7 +81,6 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_Supply = "supplier";
     public static final String BO_TYPE_AssetContract = "AssetContract";
     public static final String BO_TYPE_QRCodeLib = "QRCodeLib";
-    public static final String BO_TYPE_PmOrder = "PmOrder";
     public static final String BO_TYPE_ArrivalListItem = "ArrivalListItem";
     public static final String BO_TYPE_ArrivalList = "ArrivalList";
     public static final String BO_TYPE_TableDefinition = "TableDefinition";
