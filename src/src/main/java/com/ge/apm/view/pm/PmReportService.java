@@ -482,9 +482,18 @@ public class PmReportService {
                         V2_PmOrder pmOrder = pmOrderService.findById(id);
                         byte[] bytes = generate(pmOrder, activeTemplateBytes);
                         if (bytes != null) {
+
+                            List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(id);
+                            byBoUuid = byBoUuid.stream().filter(item -> !(item.getBoType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder) )   ).collect(Collectors.toList());
                             String name = pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
+                            for (V2_BlobObject v2BlobObject : byBoUuid) {
+                                String vname = pmOrder.getAssetName() + "-" +v2BlobObject.getObjectName();
+                                zout.putNextEntry(new ZipEntry(vname));
+                                byte[] bytess  = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(v2BlobObject.getObjectStorageId()).getStream());
+                                IOUtils.write(bytess, zout);
+                            }
                             zout.closeEntry();
                             ids.add(id);
                         }
@@ -492,8 +501,9 @@ public class PmReportService {
                         if (count == 1) {
                             throw e;
                         }
-                    } catch (IOException e) {
-                        throw new BusinessException("报告下载失败", e);
+                    } catch (Exception e) {
+                        logger.error("报告下载失败 e :",e);
+//                        throw new BusinessException("报告下载失败", e);
                     }
                 }
             });
