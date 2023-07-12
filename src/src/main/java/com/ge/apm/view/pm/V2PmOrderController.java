@@ -2432,7 +2432,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 //        picList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmRequest);
         picList = blobDao.findByBoUuid(selectedPmOrder.getId());
-        picList = picList.stream().filter(item -> !(item.getBoType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder) )   ).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(picList)){
+            picList = picList.stream().filter(item -> !(item.getBoType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder) )   ).collect(Collectors.toList());
+        }
         picBeforeList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PrePmOrder);
         picAfterList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmOrder);
         if( CollectionUtils.isEmpty(picList)){
@@ -3140,6 +3142,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return attachmentTypeList;
     }
 
+
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+
+        if(fileName.contains(fileSuffixName)){
+            return true;
+        }
+        return false;
+    }
 
     public V2_WorkOrder_Detail getItemDetail() {
         return itemDetail;
