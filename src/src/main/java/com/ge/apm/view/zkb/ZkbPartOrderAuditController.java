@@ -1015,27 +1015,32 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public boolean getUnrealStatusRender(){
-        if(userContextService.isZkbUser()){
-            return false;
-        }else {
-            List<String> configs = new ArrayList<>();
-            configs.add(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
-            configs.add(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
-            configs.add(ZkbPartOrderStep.PartOrderStep.ProductPending.toString());
-            configs.add(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
-            configs.add(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
-            configs.add(ZkbPartOrderStep.PartOrderStep.TsePending.toString());
-            configs.add(ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
-            configs.add(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
-            configs.add(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
-            configs.add(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
-            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.queryForUnrealRoles(currentUser.getLoginName(), configs);
-            if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
-                return true;
-            }else {
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(userContextService.isZkbUser()){
                 return false;
+            }else {
+                List<String> configs = new ArrayList<>();
+                configs.add(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.ProductPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.queryForUnrealRoles(currentUser.getLoginName(), configs);
+                if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
+                    return true;
+                }else {
+                    return false;
+                }
             }
+        }else{
+            return false;
         }
+
     }
 
     public String techFieldsetName(){
