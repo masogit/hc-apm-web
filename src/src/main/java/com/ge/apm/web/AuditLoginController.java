@@ -112,7 +112,7 @@ public class AuditLoginController {
         if(isOkay(responseEntity)){
             request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, userAccount.getLoginName());
             request.getSession().setAttribute("PHONE_SMSCODE_VALID",true);
-            request.getSession().setMaxInactiveInterval(30);//1月
+            request.getSession().setMaxInactiveInterval(60*60*24*30);//1月
             response.setHeader("JSESSIONID",request.getSession().getId());
             SessionCache.putSession(request.getSession());
         }
