@@ -1309,6 +1309,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
+    public boolean disableUploadButton(String type) {
+        if (type.equals("after")) {
+            return picAfterList.size() > 4;
+        } else if (type.equals("before")) {
+            return picBeforeList.size() > 4;
+        }
+        return false;
+    }
+
     public List<UserAccount> findRepairPerson() {
         if (this.selectedPmOrder != null) {
             return woService.getWorkerList(this.selectedPmOrder.getAssetId());

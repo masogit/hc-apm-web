@@ -153,6 +153,18 @@ public class PmReportService {
                             }
                         }
                         break;
+                    case Picture:
+                        if (item.getKey() != null) {
+                            try {
+                                String val = (String) tableValue.getOrDefault(item.getKey(), emptyStr);
+                                byte[] pictureBytes = this.pmOrderReportTemplateService.getSignatureBytes(val);
+                                content.put(wrap(prefix, item.getKey()), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                            } catch (Exception e) {
+                                logger.info("自定义照片渲染出错:", e);
+                                content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                            }
+                        }
+                        break;
                     case Select:
                     case Text:
                     case TextArea:
