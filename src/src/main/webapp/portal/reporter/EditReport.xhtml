@@ -76,15 +76,15 @@
                                         </h:panelGroup>
                                     </c:if>
                                     <c:if test="#{fieldItem.component eq 'Picture'}" >
-                                        <h:panelGroup id="picture">
+                                        <h:panelGroup id="picture_#{fieldItem.key}">
                                             <label class="label">#{fieldItem.label}</label>
                                             <h:panelGrid columns="1" style="width:100%" rendered="#{null != editReportController.tableValue[fieldItem.key] and not empty editReportController.tableValue[fieldItem.key]}">
                                                 <p:graphicImage id="g_#{fieldItem.key}" value="#{fileDownloadService.getFile(editReportController.tableValue[fieldItem.key])}" height="80" width="100" stream="false"/>
-                                                <p:commandButton actionListener="#{editReportController.removeAttachmentByIdAndKey(editReportController.tableValue[fieldItem.key], fieldItem.key)}" update="picture" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:commandButton actionListener="#{editReportController.removeAttachmentByIdAndKey(editReportController.tableValue[fieldItem.key], fieldItem.key)}" update="picture_#{fieldItem.key}" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </h:panelGrid>
-                                            <p:fileUpload id="file_#{fieldItem.key}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{editReportController.handleFileUploadBefore}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="picture" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                            <p:fileUpload id="file_#{fieldItem.key}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{editReportController.handleFileUploadBefore}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="picture_#{fieldItem.key}" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                     </c:if>
                                 </c:forEach>

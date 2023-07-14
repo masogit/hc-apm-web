@@ -66,6 +66,14 @@
                                             <h:outputText value="#{editReportController.tableValue[fieldItem.key]}"  />
                                         </h:panelGroup>
                                     </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Picture'}" >
+                                        <h:panelGroup id="picture">
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <h:panelGrid columns="1" style="width:100%" rendered="#{null != editReportController.tableValue[fieldItem.key] and not empty editReportController.tableValue[fieldItem.key]}">
+                                                <p:graphicImage id="g_#{fieldItem.key}" value="#{fileDownloadService.getFile(editReportController.tableValue[fieldItem.key])}" height="80" width="100" stream="false"/>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                    </c:if>
                                 </c:forEach>
 
                             </p:panelGrid>
