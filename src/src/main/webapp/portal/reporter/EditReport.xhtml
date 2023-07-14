@@ -84,7 +84,7 @@
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </h:panelGrid>
-                                            <p:fileUpload id="file_#{fieldItem.key}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{editReportController.handleFileUploadBefore}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="picture_#{fieldItem.key}" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                            <p:fileUpload id="file_#{fieldItem.key}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{editReportController.handleFileUploadBefore}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="picture_#{fieldItem.key}" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                     </c:if>
                                 </c:forEach>
