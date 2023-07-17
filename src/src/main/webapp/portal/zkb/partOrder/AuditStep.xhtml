@@ -562,15 +562,15 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.showTse}">
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag and (zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderAuditController.orderType eq 'Probe')}">
                             <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                                <p:commandButton validateClient="true" value="备件不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag }" />
+                                <p:commandButton validateClient="true" value="备件不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" />
                             </c:if>
                             <c:if test="#{zkbPartOrderAuditController.orderType eq 'Probe'}">
-                                <p:commandButton validateClient="true" value="探头不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" disabled="#{zkbPartOrderAuditController.probeUnrealCheck()}" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag }"/>
+                                <p:commandButton validateClient="true" value="探头不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" disabled="false" /><!--disabled="#{zkbPartOrderAuditController.probeUnrealCheck()}"-->
                             </c:if>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag and (zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderAuditController.orderType eq 'Probe')}">
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
                             <label class="label">TSE审批人</label>
