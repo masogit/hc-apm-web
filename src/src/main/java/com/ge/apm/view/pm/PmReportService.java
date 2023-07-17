@@ -25,6 +25,7 @@ import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.service.wo.WorkOrderPublishRenderService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.google.common.base.Strings;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -148,6 +149,18 @@ public class PmReportService {
                                 Date dt = (Date) tableValue.getOrDefault(item.getKey(), null);
                                 content.put(wrap(prefix, item.getKey()), dt == null ? "" : DEFAULT_DAY.print(dt.getTime()));
                             } catch (RuntimeException e) {
+                                content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                            }
+                        }
+                        break;
+                    case Picture:
+                        if (item.getKey() != null) {
+                            try {
+                                String val = (String) tableValue.getOrDefault(item.getKey(), emptyStr);
+                                byte[] pictureBytes = this.pmOrderReportTemplateService.getSignatureBytes(val);
+                                content.put(wrap(prefix, item.getKey()), new PictureRenderData(100, 80, "signature.png", pictureBytes));
+                            } catch (Exception e) {
+                                logger.info("自定义照片渲染出错:", e);
                                 content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
                             }
                         }
@@ -482,9 +495,19 @@ public class PmReportService {
                         V2_PmOrder pmOrder = pmOrderService.findById(id);
                         byte[] bytes = generate(pmOrder, activeTemplateBytes);
                         if (bytes != null) {
+                            List<V2_BlobObject> byBoUuid = blobObjectRepository.findByBoUuid(id);
+                            if(CollectionUtils.isNotEmpty(byBoUuid)){
+                                byBoUuid = byBoUuid.stream().filter(item -> !(item.getBoType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder) )   ).collect(Collectors.toList());
+                            }
                             String name = pmOrder.getAssetName() + "-" + pmOrder.getPmNum() + ".docx";
                             zout.putNextEntry(new ZipEntry(name));
                             IOUtils.write(bytes, zout);
+                            for (V2_BlobObject v2BlobObject : byBoUuid) {
+                                String vname = pmOrder.getAssetName() + "-"+pmOrder.getPmNum()+v2BlobObject.getObjectName();
+                                zout.putNextEntry(new ZipEntry(vname));
+                                byte[] bytess  = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(v2BlobObject.getObjectStorageId()).getStream());
+                                IOUtils.write(bytess, zout);
+                            }
                             zout.closeEntry();
                             ids.add(id);
                         }
@@ -492,8 +515,9 @@ public class PmReportService {
                         if (count == 1) {
                             throw e;
                         }
-                    } catch (IOException e) {
-                        throw new BusinessException("报告下载失败", e);
+                    } catch (Exception e) {
+                        logger.error("报告下载失败 e :",e);
+//                        throw new BusinessException("报告下载失败", e);
                     }
                 }
             });

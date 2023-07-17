@@ -59,7 +59,9 @@
                                 <h:outputText value="#{item.functionType}" />
                             </p:column>
                             <p:column style="width:20%;">
-                                <h:outputText value="#{item.purchasePrice}" />
+                                <h:outputText value="#{item.purchasePrice}"   readonly="true">
+                                    <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                </h:outputText>
                             </p:column>
                         </p:pickList>
 
