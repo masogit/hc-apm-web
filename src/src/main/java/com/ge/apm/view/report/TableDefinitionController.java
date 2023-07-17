@@ -113,7 +113,9 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
                 for(ZkbDirectoryTableDefine zkbDirectoryN:zkbDirectorys){
                     if(zkbDirectoryW.getName().equals(zkbDirectoryN.getName())){
                         stringBuilderSecond.append(zkbDirectoryN.getSecondDirectory()+",");
-                        stringBuilderThree.append(zkbDirectoryN.getMainDirectory()+",");
+                        if(stringBuilderThree.indexOf(zkbDirectoryN.getMainDirectory())==-1){
+                            stringBuilderThree.append(zkbDirectoryN.getMainDirectory()+",");
+                        }
                     }
                 }
                 zkbDirectoryTableDefineVo.setMainDirectory(stringBuilderThree.toString().length()>0?(stringBuilderThree.toString().substring(0,stringBuilderThree.toString().length()-1)):"");
