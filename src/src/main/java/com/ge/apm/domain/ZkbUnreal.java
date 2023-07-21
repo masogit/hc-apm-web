@@ -48,6 +48,17 @@ public class ZkbUnreal  implements Serializable {
     @Column(name = "created_date")
     private Date createdDate;
 
+    @Column(name = "reason")
+    private String reason;
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     public String getOrderType() {
         return orderType;
     }
