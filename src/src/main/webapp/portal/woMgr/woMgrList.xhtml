@@ -376,7 +376,7 @@
                     </h:panelGroup>
                     <h:panelGroup id="assetstatus">
                         <label class="label">#{msg.status}</label>
-                        <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
+                        <p:selectOneRadio id="status" value="#{workOrderMgrController.currentStatus}" disabled="true" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
                             <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
                             <!--<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(0).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(0).msgKey}" />
