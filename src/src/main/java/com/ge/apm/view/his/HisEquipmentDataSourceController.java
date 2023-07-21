@@ -1,6 +1,7 @@
 
 package com.ge.apm.view.his;
 
+import com.ge.apm.dao.ExcelImportRecordRepository;
 import com.ge.apm.dao.HisAssetGroupAssetMatchRepository;
 import com.ge.apm.dao.HisEquipmentDataSourceRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -8,17 +9,23 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.HisRequestParamsDto;
 import com.ge.apm.domain.his.*;
+import com.ge.apm.service.his.load.HisEquipmentDataSourceImportService;
+import com.ge.apm.service.his.load.HisEquipmentImportService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.view.asset.ContractImportController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
+import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -26,12 +33,13 @@ import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.faces.context.FacesContext;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author
@@ -70,6 +78,12 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
     @Setter
     private HisRequestParamsDto hisRequestParamsDto;
 
+    private HisEquipmentDataSourceImportService hisEquipmentDataSourceImportService;
+    private ExcelImportRecordRepository excelImportRecordRepository;
+
+
+    private List<ExcelImportRecord> excelImportRecords;
+
     @Override
     protected void init() {
         sourceDao =  WebUtil.getBean(HisEquipmentDataSourceRepository.class);
@@ -80,6 +94,18 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
         selectedOrg = orgInfoRepository.getByUid(loginUser.getOrgInfoUID());
         rebuildOrgTree(loginUser.getTenantUID());
         hisRequestParamsDto = new HisRequestParamsDto();
+        hisEquipmentDataSourceImportService = WebUtil.getBean(HisEquipmentDataSourceImportService.class);
+        excelImportRecordRepository = WebUtil.getBean(ExcelImportRecordRepository.class);
+        initExcelImportRecords();
+    }
+
+    public void initExcelImportRecords() {
+
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        excelImportRecords=excelImportRecordRepository.findByModuleAndTenantUid("HisEquipmentDataSource",user.getTenantUID());
+
+
+
     }
 
 
@@ -192,6 +218,66 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
             startList.addAll(results);
         }
     }
+
+    private UploadedFile file;
+
+    private List<Map<String, Object>> importMapList;
+    private List<Map<String, Object>> errorList;
+    public void uploadDataFile(FileUploadEvent event) {
+        ExcelDocument doc = null;
+
+        this.file = event.getFile();
+        try {
+            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+            //检查导入模板版本
+//            if(!checkDocVersion(doc)){
+//                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--"+WebUtil.getMessage("TemplateVersionIncorrect"));
+//                return;
+//            }
+
+            int maxRowNum = HisEquipmentDataSourceImportService.EXCEL_CONTRACT_HEADER_ROW + 15000;
+            if(doc.exceedMaxRowNum(HisEquipmentDataSourceImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
+                return;
+            }
+            importMapList = hisEquipmentDataSourceImportService.getMapFromTemplate(doc);
+            hisEquipmentDataSourceImportService.importData(importMapList);
+            errorList = hisEquipmentDataSourceImportService.filterErrorRecords(importMapList);
+
+            ExcelImportRecord excelImportRecord = new ExcelImportRecord();
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            excelImportRecord.setImportName(user.getLoginName());
+            excelImportRecord.setCreatedDate(new Date());
+            excelImportRecord.setFileName(file.getFileName());
+            excelImportRecord.setModule("HisEquipmentDataSource");
+            excelImportRecord.setTenantUid(user.getTenantUID());
+            excelImportRecordRepository.save(excelImportRecord);
+            if(!errorList.isEmpty()){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorList.size()+WebUtil.getMessage("RecordsOfFailure"));
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }else {
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
+            }
+        } catch (Exception e) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
+            Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (doc != null) {
+                doc.release();
+            }
+        }
+
+    }
+
+    public List<Map<String, Object>> getErrorList() {
+        return errorList;
+    }
+
+
+
+
+
+
 
     public void cancel() {
         this.selected = null;
@@ -331,6 +417,13 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
     }
 
 
+    public List<ExcelImportRecord> getExcelImportRecords() {
+        return excelImportRecords;
+    }
+
+    public void setExcelImportRecords(List<ExcelImportRecord> excelImportRecords) {
+        this.excelImportRecords = excelImportRecords;
+    }
 }
 
 

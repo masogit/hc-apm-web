@@ -171,7 +171,10 @@
                      	<h:outputText value="#{relRuleAssetManagerController.getQrCode(item.assetUID)}"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings" class="btn btn-sm btn-gray"  title="#{msg.SetRulesInBatch}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_SETTING')}"/>
+<!--
+                        <p:commandButton id="zkbBatch" action="/portal/pm/pmOrderRule/ZKBRelRuleAsset.xhtml?faces-redirect=true &amp; zkbBatch=1" icon="fa fa-cogs" class="btn btn-sm btn-gray"  title="ZKB#{msg.SetRulesInBatch}" rendered="#{userContextService.zkbAccount}"/>
+-->
+                        <p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings" class="btn btn-sm btn-gray"  title="#{msg.SetRulesInBatch}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_SETTING')}"/>
                     	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-collections" class="btn btn-sm btn-gray"  title="#{msg.GenerateMaintenanceWorkordersInBatch}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_CREATE')}"/>
 
                         <p:commandButton title="已配置规则设备导出" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.exportRelRuleAssets}" update=":growl" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_ASSET_VIEW')}"

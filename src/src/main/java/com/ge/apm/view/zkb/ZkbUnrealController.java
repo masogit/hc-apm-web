@@ -2,10 +2,13 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbUnrealRepository;
 import com.ge.apm.domain.ZkbUnreal;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.PageUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -13,6 +16,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -24,6 +28,7 @@ import java.util.List;
 public class ZkbUnrealController extends GenericCRUDUUIDController<ZkbUnreal> {
 
     private ZkbUnrealRepository zkbUnrealRepository;
+    private PageUtil<ZkbUnreal> pageUtil = new PageUtil<>();
 
     @Override
     protected void init() {
@@ -39,12 +44,18 @@ public class ZkbUnrealController extends GenericCRUDUUIDController<ZkbUnreal> {
     @Override
     protected Page<ZkbUnreal> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = this.searchFilters;
-
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
+        Page<ZkbUnreal> resultPage = zkbUnrealRepository.findBySearchFilter(searchFilters, pageRequest);
+        List<ZkbUnreal> resultList = new ArrayList<ZkbUnreal>();
+        if(CollectionUtils.isNotEmpty(resultPage.getContent())){
+            resultList = resultPage.getContent().stream().filter(zkbUnreal ->
+                    (StringUtils.isNotBlank(zkbUnreal.getCreatedBy())&& !zkbUnreal.getCreatedBy().startsWith("test."))).collect(Collectors.toList());
+            resultPage = pageUtil.pageNum(resultList, pageRequest);
+        }
+        return resultPage;
 
-        return zkbUnrealRepository.findBySearchFilter(searchFilters, pageRequest);
     }
 
 
