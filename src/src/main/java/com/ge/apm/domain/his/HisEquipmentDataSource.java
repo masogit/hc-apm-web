@@ -95,6 +95,10 @@ public class HisEquipmentDataSource implements Serializable {
     @Column(name = "is_matched")//是否匹配过,默认是false
     private Boolean isMatched;
 
+    //excel行数
+    @Transient
+    private int lineNum;
+
     public Boolean getMatched() {
         return isMatched;
     }

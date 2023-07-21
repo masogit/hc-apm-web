@@ -71,6 +71,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_MeReport = "MeReport"; //计量报告
     public static final String BO_TYPE_AuReport = "AuReport"; //质控报告
     public static final String BO_TYPE_PIReport = "PIReport"; //巡检报告
+    public static final String BO_TYPE_Other = "Other"; //其他
 
     public static final String BO_TYPE_WorkOrder = "WorkOrder";
     public static final String BO_TYPE_WorkOrderStep = "WorkOrderStep";
