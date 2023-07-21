@@ -34,7 +34,7 @@
                              widgetVar="zkbHistoryDataList" selectionMode="single" paginatorPosition="both" paginatorAlwaysVisible="true"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowsPerPageTemplate="20,50,100,500"
-                             lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" rows="20" emptyMessage="#{msg.noRecordFound}">
+                             lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" emptyMessage="#{msg.noRecordFound}">
                     <p:column headerText="申请单号">
                         <h:outputText value="#{item.partOrderNo}"/>
                     </p:column>
@@ -44,9 +44,6 @@
                     <p:column headerText="工单编号">
                         <h:outputText value="#{item.srNum}"/>
                     </p:column>
-                    <!--<p:column headerText="设备名称">
-                        <h:outputText value="#{item.name}"/>
-                    </p:column>-->
                     <p:column headerText="备件号">
                         <h:outputText value="#{item.partNo}"/>
                     </p:column>
@@ -64,6 +61,12 @@
                     </p:column>
                     <p:column headerText="申请状态">
                         <h:outputText value="#{fieldMsg.fieldValue('zkbPoStatus',item.status)}"/>
+                    </p:column>
+                    <p:column headerText="是否不真实判定">
+                        <h:outputText value="#{item.unrealStatus}"/>
+                    </p:column>
+                    <p:column headerText="不真实判定原因">
+                        <h:outputText value="#{item.reason}"/>
                     </p:column>
                 </p:dataTable>
             </p:fieldset>

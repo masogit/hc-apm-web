@@ -18,6 +18,25 @@ public class ZkbPoHistoryQueryVo {
     private String partRemark;
     private String partName;
 
+    private String unrealStatus;
+    private String reason;
+
+    public String getUnrealStatus() {
+        return unrealStatus;
+    }
+
+    public void setUnrealStatus(String unrealStatus) {
+        this.unrealStatus = unrealStatus;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     public String getPartName() {
         return partName;
     }

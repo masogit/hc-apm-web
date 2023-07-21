@@ -44,6 +44,9 @@
                         <p:column headerText="工单号" filterBy="#{item.srNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.srNum}"/>
                         </p:column>
+                        <p:column headerText="Sys ID" filterBy="#{item.sysId}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.sysId}"/>
+                        </p:column>
                         <p:column headerText="备件号/探头号" filterBy="#{item.itemNo}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.itemNo}"/>
                         </p:column>
@@ -55,7 +58,9 @@
                         <p:column headerText="判定人" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.createdBy}"/>
                         </p:column>
-
+                        <p:column headerText="不真实判定原因" filterBy="#{item.reason}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.reason}"/>
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="ZKB_Unreal_Export"/>

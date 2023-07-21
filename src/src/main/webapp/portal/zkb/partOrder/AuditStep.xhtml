@@ -562,15 +562,15 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.showTse}">
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag and (zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderAuditController.orderType eq 'Probe')}">
                             <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                                <p:commandButton validateClient="true" value="备件不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag }" />
+                                <p:commandButton validateClient="true" value="备件不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" />
                             </c:if>
                             <c:if test="#{zkbPartOrderAuditController.orderType eq 'Probe'}">
-                                <p:commandButton validateClient="true" value="探头不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" disabled="#{zkbPartOrderAuditController.probeUnrealCheck()}" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag }"/>
+                                <p:commandButton validateClient="true" value="探头不真实选择" actionListener="#{zkbPartOrderAuditController.preUnreal}" update=":growl :zkbUnrealyDlg" oncomplete="PF('zkbUnrealyDlg').show()" disabled="false" /><!--disabled="#{zkbPartOrderAuditController.probeUnrealCheck()}"-->
                             </c:if>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' or zkbPartOrderAuditController.selected.currentStep eq 'TsePending') and zkbPartOrderAuditController.canEditFlag and (zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderAuditController.orderType eq 'Probe')}">
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TsePending')}">
                             <label class="label">TSE审批人</label>
@@ -838,15 +838,14 @@
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.geEngineerPhone}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_geEngineerPhone} #{msg.ValidationRequire}" />
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{(!(zkbPartOrderAuditController.selected.artificialType eq '2') or zkbPartOrderAuditController.selected.maintainFlag eq 't')}">
-                                    <!--<c:choose>
+                                    <c:choose>
                                         <c:when test="#{zkbPartOrderAuditController.selected.scoreFlag eq 't'}">
                                             <label class="label">是否扣除积分*</label>
                                         </c:when>
                                         <c:otherwise>
                                             <label class="label">是否扣除名额*</label>
                                         </c:otherwise>
-                                    </c:choose>-->
-                                    <label class="label">是否扣除名额*</label>
+                                    </c:choose>
                                     <p:selectOneMenu id="whetherDeduct" value="#{zkbPartOrderAuditController.selected.whetherDeduct}" disabled="#{zkbPartOrderAuditController.whetherDeductEdit or !(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_whetherDeduct} #{msg.ValidationRequire}" >
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>

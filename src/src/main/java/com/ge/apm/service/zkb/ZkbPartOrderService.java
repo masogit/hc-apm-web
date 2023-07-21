@@ -1051,7 +1051,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void unrealNext(ZkbPartOrder zkbPartOrder,String[] selectedOptions,UserAccount userAccount){
+    public void unrealNext(ZkbPartOrder zkbPartOrder,String[] selectedOptions,UserAccount userAccount,String reason){
         List<ZkbUnreal> zkbUnrealList = new ArrayList<>();
         AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
         for (int i =0; i < selectedOptions.length;i++){
@@ -1061,6 +1061,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 ZkbUnreal zkbUnreal = existList.get(0);
                 zkbUnreal.setCreatedDate(new Date());
                 zkbUnreal.setCreatedBy(userAccount.getName());
+                zkbUnreal.setReason(reason);
                 zkbUnrealList.add(zkbUnreal);
             }else{
                 ZkbUnreal zkbUnreal = new ZkbUnreal();
@@ -1072,6 +1073,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbUnreal.setItemNo(selectedOptions[i]);
                 zkbUnreal.setCreatedBy(userAccount.getName());
                 zkbUnreal.setCreatedDate(new Date());
+                zkbUnreal.setReason(reason);
                 zkbUnrealList.add(zkbUnreal);
             }
         }

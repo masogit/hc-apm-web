@@ -9,10 +9,21 @@
 
     <p:dialog id="zkbUnrealyDlg" widgetVar="zkbUnrealyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="不真实数据选择" width="25%" height="320">
     <h:form id="zkbUnrealForm">
-        <p:selectManyCheckbox  value="#{zkbPartOrderAuditController.selectedOptions}" widgetVar="blub" columns="1" styleClass="grid-checkbox" layout="grid" style="width: 100%">
-            <f:selectItems value="#{zkbPartOrderAuditController.unrealItem}" var="item" itemLabel="#{item.unrealPartName}"
-                           itemValue="#{item.itemNo}" itemDisabled="#{item.cbStatus eq 'f'}" />
-        </p:selectManyCheckbox>
+        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup >
+                <p:selectManyCheckbox  value="#{zkbPartOrderAuditController.selectedOptions}" widgetVar="blub" columns="1" required="true" requiredMessage="不真实选择#{msg.ValidationRequire}"
+                                       styleClass="grid-checkbox" layout="grid" style="width: 100%">
+                    <f:selectItems value="#{zkbPartOrderAuditController.unrealItem}" var="item" itemLabel="#{item.unrealPartName}"
+                                   itemValue="#{item.itemNo}" itemDisabled="#{item.cbStatus eq 'f'}" />
+                </p:selectManyCheckbox>
+            </h:panelGroup>
+            <h:panelGroup >
+                <label class="label">不真实判定原因*</label>
+                <p:inputTextarea  value="#{zkbPartOrderAuditController.unrealReason}" required="true" requiredMessage="不真实判定原因#{msg.ValidationRequire}" rows="3" cols="40" style="width: 50%">
+                </p:inputTextarea>
+            </h:panelGroup>
+        </p:panelGrid>
+
         <style>
             /*.ui-selectmanycheckbox.ui-widget td, .ui-selectoneradio.ui-widget label, .ui-selectoneradio.ui-widget td {
                 color: red;
