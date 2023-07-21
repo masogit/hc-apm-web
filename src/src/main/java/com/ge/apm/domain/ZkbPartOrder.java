@@ -26,7 +26,8 @@ public class ZkbPartOrder implements Serializable {
     /**
      * Pending：申请 TechAccept：技术审批通过 TechReject：技术审批不通过 ManageAccept：区域经理审批通过
      * ManageReject：区域经理审批不通过 Ordered：发货 OrderedReject:发货取消 FourHundredCancel:400取消
-     * Returned：归还  Closed：关单
+     * Returned：归还  Closed：已完成
+     * 已归还之后
      */
     public enum PartOrderStatus {
         Requested,TechnicalAccept,TechnicalReject,ProductAccept,ProductReject,

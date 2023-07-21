@@ -1129,6 +1129,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     private String[] selectedOptions;
+    private String unrealReason;
     List<ZkbUnrealVo> unrealItem = new ArrayList<>();
     public void preUnreal(){
         unrealItem = zkbPartOrderService.getUnrealCheckBoxList(selected.getZkbPartOrderItems(),selected.getId(),selected);
@@ -1152,7 +1153,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
         }
 
-        zkbPartOrderService.unrealNext(selected, selectedOptions, currentUser);
+        zkbPartOrderService.unrealNext(selected, selectedOptions, currentUser,unrealReason);
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
             zkbPartOrderService.getUnrealData(selected);
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
@@ -1160,6 +1161,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
 
         selectedOptions = new String[]{};
+        unrealReason = "";
         return "";
         //return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
     }
@@ -2533,5 +2535,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setUnrealTips(String unrealTips) {
         this.unrealTips = unrealTips;
+    }
+
+    public String getUnrealReason() {
+        return unrealReason;
+    }
+
+    public void setUnrealReason(String unrealReason) {
+        this.unrealReason = unrealReason;
     }
 }

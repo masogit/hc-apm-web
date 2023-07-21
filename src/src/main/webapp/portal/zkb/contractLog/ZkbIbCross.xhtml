@@ -1,0 +1,94 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="Cross用户管理"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="zkbCrossListForm">
+                    <p:dataTable id="datalist" value="#{zkbIbCrossController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbIbCrossController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="filter" listener="#{zkbIbCrossController.onFilter}" />
+                        <p:column headerText="loginName" filterBy="#{item.loginName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.loginName}"/>
+                        </p:column>
+                        <p:column headerText="systemId"  filterBy="#{item.systemId}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.systemId}"/>
+                        </p:column>
+                        <p:column headerText="qrCode" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+                        <p:column headerText="操作时间" >
+                            <h:outputText value="#{item.createDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:fieldset legend="Cross User"  >
+                        <p:dataTable value="#{zkbIbCrossController.zkbIbCrossUserList}" var="item" widgetVar="varDataList"
+                                     selectionMode="single" selection="#{zkbIbCrossController.selected}" lazy="false"
+                                     rowKey="#{item.id}" sortMode="single"
+                                     emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="loginName" >
+                                <h:outputText value="#{item.loginName}"/>
+                            </p:column>
+                            <p:column headerText="name">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column headerText="telephone">
+                                <h:outputText value="#{item.telephone}"/>
+                            </p:column>
+                            <p:column headerText="tenantUid">
+                                <h:outputText value="#{zkbIbCrossController.getTenantInfo(item.tenantUid).name}"/>
+                            </p:column>
+                            <p:column headerText="isDeleted">
+                                <h:outputText value="#{item.deleted}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+
+                    <p:fieldset legend="Cross User Status"  >
+                        <p:dataTable value="#{zkbIbCrossController.zkbIbCrossUserStatusList}" var="item"
+                                     widgetVar="varDataList" rowKey="#{item.id}" sortMode="single" lazy="false">
+                            <p:column headerText="loginName" >
+                                <h:outputText value="#{item.loginName}"/>
+                            </p:column>
+                            <p:column headerText="status">
+                                <h:outputText value="#{item.status}"/>
+                            </p:column>
+                        </p:dataTable>
+                        </p:fieldset>
+                    <p:fieldset legend="Cross User RelationShip"  >
+                        <p:dataTable value="#{zkbIbCrossController.zkbIbCrossRelationShipList}" var="item" widgetVar="varDataList"
+                                     rowKey="#{item.id}"  lazy="false">
+                            <p:column headerText="loginName" >
+                                <h:outputText value="#{item.loginName}"/>
+                            </p:column>
+                            <p:column headerText="systemId" >
+                                <h:outputText value="#{item.systemId}"/>
+                            </p:column>
+                            <p:column headerText="qrCode">
+                                <h:outputText value="#{item.qrCode}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>
