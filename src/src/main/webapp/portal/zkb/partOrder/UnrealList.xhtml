@@ -44,6 +44,9 @@
                         <p:column headerText="工单号" filterBy="#{item.srNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.srNum}"/>
                         </p:column>
+                        <p:column headerText="Sys ID" filterBy="#{item.sysId}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.sysId}"/>
+                        </p:column>
                         <p:column headerText="备件号/探头号" filterBy="#{item.itemNo}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.itemNo}"/>
                         </p:column>
