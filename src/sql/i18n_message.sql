@@ -5029,3 +5029,10 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','HisDepartmentName','His科室名称','DepartmentName',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','TyBz','是否停用','TyBz',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','FileNeedHisDepartmentData','文件中填写要导入的科室数据','Fill in the department data to be imported in the file',NULL,	-1	);
+
+-- 保养附件类型
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','PmReport','保养报告','PmReport',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','MeReport','计量报告','MeReport',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','AuReport','质控报告','AuReport',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','PIReport','巡检报告','PIReport',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','Other','其他','Other',NULL,	-1	);
