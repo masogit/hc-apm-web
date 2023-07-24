@@ -235,7 +235,7 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
 //                return;
 //            }
 
-            int maxRowNum = HisEquipmentDataSourceImportService.EXCEL_CONTRACT_HEADER_ROW + 15000;
+            int maxRowNum = HisEquipmentDataSourceImportService.EXCEL_CONTRACT_HEADER_ROW + 30000;
             if(doc.exceedMaxRowNum(HisEquipmentDataSourceImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;

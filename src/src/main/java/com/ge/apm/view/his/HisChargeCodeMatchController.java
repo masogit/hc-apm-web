@@ -356,7 +356,7 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
 //                return;
 //            }
 
-            int maxRowNum = HisEquipmentSfxmImportService.EXCEL_CONTRACT_HEADER_ROW + 5000;
+            int maxRowNum = HisEquipmentSfxmImportService.EXCEL_CONTRACT_HEADER_ROW + 30000;
             if(doc.exceedMaxRowNum(HisEquipmentSfxmImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;
