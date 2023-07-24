@@ -47,15 +47,13 @@ public class ZkbUnrealController extends GenericCRUDUUIDController<ZkbUnreal> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        Page<ZkbUnreal> resultPage = zkbUnrealRepository.findBySearchFilter(searchFilters, pageRequest);
+        List<ZkbUnreal> resultPage = zkbUnrealRepository.findBySearchFilter(searchFilters);
         List<ZkbUnreal> resultList = new ArrayList<ZkbUnreal>();
-        if(CollectionUtils.isNotEmpty(resultPage.getContent())){
-            resultList = resultPage.getContent().stream().filter(zkbUnreal ->
+        if(CollectionUtils.isNotEmpty(resultPage)){
+            resultList = resultPage.stream().filter(zkbUnreal ->
                     (StringUtils.isNotBlank(zkbUnreal.getCreatedBy())&& !zkbUnreal.getCreatedBy().startsWith("test."))).collect(Collectors.toList());
-            resultPage = pageUtil.pageNum(resultList, pageRequest);
         }
-        return resultPage;
-
+        return pageUtil.pageNum(resultList, pageRequest);
     }
 
 
