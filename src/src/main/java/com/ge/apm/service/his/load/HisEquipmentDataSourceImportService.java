@@ -120,7 +120,12 @@ public class HisEquipmentDataSourceImportService {
         List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
         List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
 
-        HisEquipmentDataSource hisEquipmentDataSource=hisEquipmentDataSourceRepository.selectOneDateDesc();
+        String orgCode = UserContextService.getCurrentUserAccount().getOrgInfo().getOrgCode();
+        HisEquipmentDataSource hisEquipmentDataSource=null;
+        if(orgCode!=null){
+             hisEquipmentDataSource=hisEquipmentDataSourceRepository.selectByOrgCodeOneDateDesc(orgCode);
+        }
+
         int row = 0;
         try {
             for (Map<String, Object> item : importMapList) {
@@ -158,11 +163,11 @@ public class HisEquipmentDataSourceImportService {
             ContractRow.addErrMessage(item, "病人住院号或门诊号不能为空");
             isValidateData = false;
         }
-        if(hisEquipmentDataSource.getPrescriptionNum() == null){
-            item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "医嘱号、处方号、申请单号不能为空");
-            isValidateData = false;
-        }
+//        if(hisEquipmentDataSource.getPrescriptionNum() == null){
+//            item.put("status", ImportStatus.Failure);
+//            ContractRow.addErrMessage(item, "医嘱号、处方号、申请单号不能为空");
+//            isValidateData = false;
+//        }
         if(hisEquipmentDataSource.getDeviceDeptCode() == null){
             item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "收费项目代码不能为空");
@@ -174,16 +179,16 @@ public class HisEquipmentDataSourceImportService {
             ContractRow.addErrMessage(item, "收费数量不能为空");
             isValidateData = false;
         }
-        if(hisEquipmentDataSource.getUnit() == null){
-            item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "单位不能为空");
-            isValidateData = false;
-        }
-        if(hisEquipmentDataSource.getUnitPrice() == null){
-            item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "单价不能为空");
-            isValidateData = false;
-        }
+//        if(hisEquipmentDataSource.getUnit() == null){
+//            item.put("status", ImportStatus.Failure);
+//            ContractRow.addErrMessage(item, "单位不能为空");
+//            isValidateData = false;
+//        }
+//        if(hisEquipmentDataSource.getUnitPrice() == null){
+//            item.put("status", ImportStatus.Failure);
+//            ContractRow.addErrMessage(item, "单价不能为空");
+//            isValidateData = false;
+//        }
         if(hisEquipmentDataSource.getTotalAmount() == null){
             item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "总金额不能为空");
@@ -209,7 +214,7 @@ public class HisEquipmentDataSourceImportService {
             ContractRow.addErrMessage(item, "系统来源不能为空");
             isValidateData = false;
         }
-        if(hisEquipmentDataSource.getExecTime().before(hisDataSource.getExecTime())){
+        if(hisDataSource!=null && hisEquipmentDataSource.getExecTime().before(hisDataSource.getExecTime())){
             item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "已经导入此时间段数据");
             isValidateData = false;

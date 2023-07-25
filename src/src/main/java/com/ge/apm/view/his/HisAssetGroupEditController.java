@@ -7,6 +7,7 @@ import com.ge.apm.dao.HisAssetGroupRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.his.HisAssetGroup;
 import com.ge.apm.domain.his.HisAssetGroupAssetMatch;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
@@ -107,7 +108,10 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
 
     public List<HisAssetGroup> getHisAssetGroups() {
         if (null == hisAssetGroups || hisAssetGroups.isEmpty()) {
-            hisAssetGroups = hisAssetGroupRepository.findAll();
+
+            UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+            hisAssetGroups = hisAssetGroupRepository.findByTenantUid(loginUser.getTenantUID());
         }
         return hisAssetGroups;
     }
@@ -164,8 +168,10 @@ public class HisAssetGroupEditController extends JpaCRUDController<HisAssetGroup
     public void save(){
 
         List<AssetInfo> targetAssets = availableAssets.getTarget();
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
-        HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByName(selected.getAssetGroupName());
+
+        HisAssetGroup hisAssetGroup = hisAssetGroupRepository.findByNameAndTenantUid(selected.getAssetGroupName(),loginUser.getTenantUID());
         for(AssetInfo assetInfo : targetAssets){
             List<HisAssetGroupClinicalMatch> hisAssetGroupClinicalMatchList = hisAssetGroupClinicalMatchDao.findByAssetUid(assetInfo.getUid());
             List<String> assetGroupUIds = hisAssetGroupClinicalMatchList.stream().map(HisAssetGroupClinicalMatch::getHisAssetGroupUId).collect(Collectors.toList());
