@@ -4,6 +4,8 @@ import com.ge.apm.domain.his.HisAssetGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface HisAssetGroupRepository extends JpaRepository<HisAssetGroup,String> {
 
     @Query(value = "select * from his_asset_group where name = ?1", nativeQuery = true)
@@ -11,4 +13,8 @@ public interface HisAssetGroupRepository extends JpaRepository<HisAssetGroup,Str
 
     @Query(value = "select name from his_asset_group where uuid = ?1", nativeQuery = true)
     String findNameByUuid(String uuid);
+
+    List<HisAssetGroup> findByTenantUid(String tenantUID);
+
+    HisAssetGroup findByNameAndTenantUid(String name, String tenantUID);
 }
