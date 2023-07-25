@@ -3,6 +3,7 @@ package com.ge.apm.service.his.load;
 import com.ge.apm.dao.HisEquipmentConnectRepository;
 import com.ge.apm.dao.HisEquipmentDataSourceRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.mapper.HisEquipmentDataSourceMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.his.HisEquipmentConnect;
 import com.ge.apm.domain.his.HisEquipmentDataSource;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -37,6 +39,9 @@ public class HisEquipmentDataSourceImportService {
 
     @Autowired
     HisEquipmentDataSourceRepository hisEquipmentDataSourceRepository;
+
+    @Autowired
+    private HisEquipmentDataSourceMapper hisEquipmentDataSourceMapper;
     @Autowired
     private OrgInfoRepository orgInfoDao;
     
@@ -114,23 +119,20 @@ public class HisEquipmentDataSourceImportService {
 
     public void importData(List<Map<String, Object>> importMapList) {
 
-        List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
-        orgInfoFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.IsNotNull,null));
-        List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
-        List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
+//        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+//        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+//        orgInfoFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.IsNotNull,null));
+//        List<OrgInfo> orgInfoList = orgInfoDao.findBySearchFilter(orgInfoFilters);
+//        List<String> orgCodeList = orgInfoList.stream().map(OrgInfo::getOrgCode).collect(Collectors.toList());
 
-        String orgCode = UserContextService.getCurrentUserAccount().getOrgInfo().getOrgCode();
-        HisEquipmentDataSource hisEquipmentDataSource=null;
-        if(orgCode!=null){
-             hisEquipmentDataSource=hisEquipmentDataSourceRepository.selectByOrgCodeOneDateDesc(orgCode);
-        }
-
+        List<String> orgCodeList =null;
+        List<HisEquipmentDataSource>  hisEquipmentDataSource=hisEquipmentDataSourceMapper.selectByOrgCodeAndExecTime();
+        Map<String, List<HisEquipmentDataSource>> collect = hisEquipmentDataSource.stream().collect(Collectors.groupingBy(HisEquipmentDataSource::getOrgCode));
         int row = 0;
         try {
             for (Map<String, Object> item : importMapList) {
                 ++row;
-                if(checkData(item, importMapList,orgCodeList,hisEquipmentDataSource)) {
+                if(checkData(item, importMapList,orgCodeList,collect)) {
                     importOneHisEquipment(item);
                 }
 
@@ -146,7 +148,7 @@ public class HisEquipmentDataSourceImportService {
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
     }
 
-    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList,List<String> orgCodeList ,HisEquipmentDataSource hisDataSource) {
+    private boolean checkData(Map<String, Object> item, List<Map<String, Object>> importMapList,List<String> orgCodeList , Map<String, List<HisEquipmentDataSource>> collect) {
 
 
         boolean isValidateData = true;
@@ -214,10 +216,13 @@ public class HisEquipmentDataSourceImportService {
             ContractRow.addErrMessage(item, "系统来源不能为空");
             isValidateData = false;
         }
-        if(hisDataSource!=null && hisEquipmentDataSource.getExecTime().before(hisDataSource.getExecTime())){
-            item.put("status", ImportStatus.Failure);
-            ContractRow.addErrMessage(item, "已经导入此时间段数据");
-            isValidateData = false;
+        if(!CollectionUtils.isEmpty(collect.get(hisEquipmentDataSource.getOrgCode()))){
+            List<HisEquipmentDataSource> hisEquipmentDataSources = collect.get(hisEquipmentDataSource.getOrgCode());
+            if( hisEquipmentDataSource.getExecTime().before(hisEquipmentDataSources.get(0).getExecTime())){
+                item.put("status", ImportStatus.Failure);
+                ContractRow.addErrMessage(item, "已经导入此时间段数据");
+                isValidateData = false;
+            }
         }
         return isValidateData;
 
