@@ -7,6 +7,7 @@ package com.ge.apm.service.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.codec.binary.Base64;
@@ -16,10 +17,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Base64Utils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
+import org.springframework.util.*;
 
 import javax.imageio.ImageIO;
 import javax.tools.FileObject;
@@ -75,6 +73,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             byteIn.read(bytes);
             res += encoder.encodeToString(bytes);*/
         } catch (Exception e) {
+            logger.error("encode image base64 error:{}",e);
             e.printStackTrace();
         }
         return res;
@@ -92,7 +91,12 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         List<String> dispositions = responseHeader.get("content-disposition");
         String disposition = dispositions.get(0);
         String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
-        fileStream.setName(fileName);
+        List<V2_BlobObject> allByObjectStorageId = blobObjectRepository.findAllByObjectStorageId(fileId);
+        if(!CollectionUtils.isEmpty(allByObjectStorageId)){
+            fileStream.setName(allByObjectStorageId.get(0).getObjectName());
+        }else{
+            fileStream.setName(fileName);
+        }
         return fileStream;
     }
 
