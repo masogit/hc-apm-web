@@ -22,10 +22,7 @@ import org.springframework.util.*;
 import javax.imageio.ImageIO;
 import javax.tools.FileObject;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -58,8 +55,8 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             HttpHeaders responseHeader = response.getHeaders();
             List<String> dispositions = responseHeader.get("content-disposition");
             String disposition = dispositions.get(0);
-            String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
-            String suffix = Arrays.asList(fileName.substring(1, fileName.length() - 1).split("\\.")).get(1);
+            //String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
+            //String suffix = Arrays.asList(fileName.substring(1, fileName.length() - 1).split("\\.")).get(1);
             byte[] result = response.getBody();
 
             res += Base64Utils.encodeToString(result);
@@ -93,7 +90,11 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
         List<V2_BlobObject> allByObjectStorageId = blobObjectRepository.findAllByObjectStorageId(fileId);
         if(!CollectionUtils.isEmpty(allByObjectStorageId)){
-            fileStream.setName(allByObjectStorageId.get(0).getObjectName());
+            try {
+                fileStream.setName(new String(allByObjectStorageId.get(0).getObjectName().getBytes("UTF-8"), "ISO-8859-1"));
+            } catch (UnsupportedEncodingException e) {
+                logger.error("download file with  transforming chinese filename chart set error:{}",e);
+            }
         }else{
             fileStream.setName(fileName);
         }
