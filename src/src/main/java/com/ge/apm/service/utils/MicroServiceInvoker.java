@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.utils;
 
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.service.common.GatewayURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,9 @@ public class MicroServiceInvoker {
 
     @Value("#{systemEnvironment['DOCXTOPDF_URL'] ?: urlProperties.docxtopdf}")
     protected String docxToPdfUrl;
+
+    @Autowired
+    protected BlobObjectRepository blobObjectRepository;
 
 
     @PostConstruct
