@@ -2,6 +2,7 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbUnrealRepository;
 import com.ge.apm.domain.ZkbUnreal;
+import com.ge.apm.service.zkb.ZkbPartOrderService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -27,13 +28,17 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class ZkbUnrealController extends GenericCRUDUUIDController<ZkbUnreal> {
 
+    private ZkbPartOrderService zkbPartOrderService;
     private ZkbUnrealRepository zkbUnrealRepository;
     private PageUtil<ZkbUnreal> pageUtil = new PageUtil<>();
+    private List<String> testName ;
 
     @Override
     protected void init() {
         super.init();
         zkbUnrealRepository = WebUtil.getBean(ZkbUnrealRepository.class);
+        zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
+        testName = zkbPartOrderService.getZkbTestName();
     }
 
     @Override
@@ -51,7 +56,7 @@ public class ZkbUnrealController extends GenericCRUDUUIDController<ZkbUnreal> {
         List<ZkbUnreal> resultList = new ArrayList<ZkbUnreal>();
         if(CollectionUtils.isNotEmpty(resultPage)){
             resultList = resultPage.stream().filter(zkbUnreal ->
-                    (StringUtils.isNotBlank(zkbUnreal.getCreatedBy())&& !zkbUnreal.getCreatedBy().startsWith("test."))).collect(Collectors.toList());
+                    (StringUtils.isNotBlank(zkbUnreal.getCreatedBy())&& !testName.contains(zkbUnreal.getCreatedBy()))).collect(Collectors.toList());
         }
         return pageUtil.pageNum(resultList, pageRequest);
     }

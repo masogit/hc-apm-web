@@ -9,6 +9,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.primefaces.event.FileUploadEvent;
@@ -3305,6 +3306,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
         List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
         return zkbPartOrderItems;
+    }
+
+    public List<String> getZkbTestName(){
+        List<String> names = zkbPartOrderRepository.getZkbTestName();
+        return CollectionUtils.isNotEmpty(names)?names:new ArrayList<String>();
     }
 
     public List<ZkbPartOrderCat> queryPartOrderCat(Date contractDate){
