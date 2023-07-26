@@ -4,7 +4,9 @@ import com.ge.apm.dao.HisAssetGroupClinicalMatchRepository;
 import com.ge.apm.dao.HisAssetGroupRepository;
 import com.ge.apm.domain.his.HisAssetGroup;
 import com.ge.apm.domain.his.HisAssetGroupClinicalMatch;
+import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -30,7 +32,11 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
     }
 
     public List<HisAssetGroup> getAllHisAssetGroup() {
-        return hisAssetGroupDao.findAll();
+
+        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+
+
+        return hisAssetGroupDao.findByTenantUid(tenantUID);
     }
 
     @Override
@@ -39,7 +45,10 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
     }
 
     public void saveHisList(){
-        boolean hasName = checkName(selected.getName());
+
+        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+        selected.setTenantUid(tenantUID);
+        boolean hasName = checkName(selected.getName(),tenantUID);
         if(hasName){
             return;
         }
@@ -69,8 +78,8 @@ public class HisGlobalAssetGroupController extends GenericCRUDUUIDController<His
         editController.clearAssetGroups();
     }
 
-    private boolean checkName(String name) {
-        HisAssetGroup hisAssetGroup = hisAssetGroupDao.findByName(name);
+    private boolean checkName(String name, String tenantUID) {
+        HisAssetGroup hisAssetGroup = hisAssetGroupDao.findByNameAndTenantUid(name,tenantUID);
         return hisAssetGroup != null ? Boolean.TRUE : Boolean.FALSE;
     }
 

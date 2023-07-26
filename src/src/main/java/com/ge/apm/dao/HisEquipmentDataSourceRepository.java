@@ -38,4 +38,12 @@ public interface HisEquipmentDataSourceRepository extends GenericRepositoryUUID<
 
     @Query(value = "select * from his_equipment_data_source order by exec_time desc limit 1",nativeQuery = true)
     HisEquipmentDataSource selectOneDateDesc();
+
+
+    @Query(value = "select * from his_equipment_data_source  where org_code =?1  order by exec_time desc limit 1",nativeQuery = true)
+    HisEquipmentDataSource selectByOrgCodeOneDateDesc(String orgCode);
+
+
+    @Query(value = "select max(id) as id,org_code,max(exec_time) as exec_time from his_equipment_data_source group by org_code",nativeQuery = true)
+    List<HisEquipmentDataSource> selectByOrgCodeAndExecTime();
 }
