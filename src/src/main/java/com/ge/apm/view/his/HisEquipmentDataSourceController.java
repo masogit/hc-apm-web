@@ -244,14 +244,17 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
             hisEquipmentDataSourceImportService.importData(importMapList);
             errorList = hisEquipmentDataSourceImportService.filterErrorRecords(importMapList);
 
-            ExcelImportRecord excelImportRecord = new ExcelImportRecord();
-            UserAccount user = UserContextService.getCurrentUserAccount();
-            excelImportRecord.setImportName(user.getLoginName());
-            excelImportRecord.setCreatedDate(new Date());
-            excelImportRecord.setFileName(file.getFileName());
-            excelImportRecord.setModule("HisEquipmentDataSource");
-            excelImportRecord.setTenantUid(user.getTenantUID());
-            excelImportRecordRepository.save(excelImportRecord);
+            if(errorList.size()<importMapList.size()){
+                ExcelImportRecord excelImportRecord = new ExcelImportRecord();
+                UserAccount user = UserContextService.getCurrentUserAccount();
+                excelImportRecord.setImportName(user.getLoginName());
+                excelImportRecord.setCreatedDate(new Date());
+                excelImportRecord.setFileName(file.getFileName());
+                excelImportRecord.setModule("HisEquipmentDataSource");
+                excelImportRecord.setTenantUid(user.getTenantUID());
+                excelImportRecordRepository.save(excelImportRecord);
+            }
+
             if(!errorList.isEmpty()){
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorList.size()+WebUtil.getMessage("RecordsOfFailure"));
                 FacesContext.getCurrentInstance().addMessage(null, message);
