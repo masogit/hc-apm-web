@@ -220,6 +220,9 @@ public class UserContextService implements Serializable {
     public TenantInfo getTenantInfo() {
         if (tenant != null) return tenant;
         TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        if(getLoginUser() == null){
+            return new TenantInfo();
+        }
         tenant = tenantInfoRepository.findByuid(getLoginUser().getTenantUID());
         if (tenant.getCpmURL() == null) {
             String configStr = tenant.getTenantConfig();
