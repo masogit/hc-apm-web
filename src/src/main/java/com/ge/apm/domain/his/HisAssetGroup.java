@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
@@ -22,5 +23,10 @@ public class HisAssetGroup implements Serializable {
     //设备分组名称
     @Column(name = "name")
     private String name;
+
+
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    @Size(max = 32)
+    private String tenantUid;
 
 }
