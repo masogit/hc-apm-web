@@ -1,8 +1,11 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbUnrealRepository;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.ZkbPartOrder;
 import com.ge.apm.domain.ZkbUnreal;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -30,6 +33,7 @@ public class ZkbUnrealController extends GenericCRUDUUIDController<ZkbUnreal> {
 
     private ZkbPartOrderService zkbPartOrderService;
     private ZkbUnrealRepository zkbUnrealRepository;
+    private UserAccount currentUser;
     private PageUtil<ZkbUnreal> pageUtil = new PageUtil<>();
     private List<String> testName ;
 
@@ -39,6 +43,7 @@ public class ZkbUnrealController extends GenericCRUDUUIDController<ZkbUnreal> {
         zkbUnrealRepository = WebUtil.getBean(ZkbUnrealRepository.class);
         zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
         testName = zkbPartOrderService.getZkbTestName();
+        currentUser = UserContextService.getCurrentUserAccount();
     }
 
     @Override
@@ -58,7 +63,8 @@ public class ZkbUnrealController extends GenericCRUDUUIDController<ZkbUnreal> {
             resultList = resultPage.stream().filter(zkbUnreal ->
                     (StringUtils.isNotBlank(zkbUnreal.getCreatedBy())&& !testName.contains(zkbUnreal.getCreatedBy()))).collect(Collectors.toList());
         }
-        return pageUtil.pageNum(resultList, pageRequest);
+        return (currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1) ?
+                pageUtil.pageNum(resultPage, pageRequest): pageUtil.pageNum(resultList, pageRequest);
     }
 
 
