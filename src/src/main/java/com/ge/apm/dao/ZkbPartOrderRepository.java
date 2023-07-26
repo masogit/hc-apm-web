@@ -131,5 +131,8 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
 
     @Query(value = "SELECT * from zkb_part_order where asset_id = ?1 and id != ?2 order by created_date desc LIMIT 1 ", nativeQuery = true)
     ZkbPartOrder findByAssetIdTopOne(String assetId, String id);
+
+    @Query(value = "select  t.name from user_account t inner join tenant_info tt ON t.tenant_uid=tt.uid where tt.type='3' and t.login_name like 'test.%' ", nativeQuery = true)
+    List<String> getZkbTestName();
 }
 
