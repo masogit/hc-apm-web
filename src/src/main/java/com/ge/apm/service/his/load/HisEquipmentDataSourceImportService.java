@@ -80,6 +80,7 @@ public class HisEquipmentDataSourceImportService {
             hisEquipmentDataSourceRow.setFieldDoubleValue("总金额", "setTotalAmount");
             hisEquipmentDataSourceRow.setFieldDateValue("执行时间", "setExecTime");
             hisEquipmentDataSourceRow.setFieldStringValue("执行科室", "setExecDept");
+            hisEquipmentDataSourceRow.setFieldStringValue("执行科室代码", "setExecDeptCode");
             hisEquipmentDataSourceRow.setFieldStringValue("检查部位", "setExamBodyPart");
             hisEquipmentDataSourceRow.setFieldStringValue("来源", "setPatientType");
             hisEquipmentDataSourceRow.setFieldStringValue("系统来源", "setSourceCode");
@@ -214,6 +215,11 @@ public class HisEquipmentDataSourceImportService {
         if(hisEquipmentDataSource.getSourceCode() == null){
             item.put("status", ImportStatus.Failure);
             ContractRow.addErrMessage(item, "系统来源不能为空");
+            isValidateData = false;
+        }
+        if(hisEquipmentDataSource.getSourceCode() != null &&  "HIS".equals(hisEquipmentDataSource.getSourceCode()) && hisEquipmentDataSource.getExecDeptCode()==null ){
+            item.put("status", ImportStatus.Failure);
+            ContractRow.addErrMessage(item, "HIS数据执行科室代码不能为空");
             isValidateData = false;
         }
         if(!CollectionUtils.isEmpty(collect.get(hisEquipmentDataSource.getOrgCode()))){
