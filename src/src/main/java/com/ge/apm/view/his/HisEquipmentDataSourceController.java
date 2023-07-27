@@ -80,7 +80,7 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
 
     private HisEquipmentDataSourceImportService hisEquipmentDataSourceImportService;
     private ExcelImportRecordRepository excelImportRecordRepository;
-
+    private HisOrgComponentController orgComponentController;
 
     private List<ExcelImportRecord> excelImportRecords;
 
@@ -96,6 +96,9 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
         hisRequestParamsDto = new HisRequestParamsDto();
         hisEquipmentDataSourceImportService = WebUtil.getBean(HisEquipmentDataSourceImportService.class);
         excelImportRecordRepository = WebUtil.getBean(ExcelImportRecordRepository.class);
+
+        orgComponentController = WebUtil.getBean(HisOrgComponentController.class);
+        orgComponentController.registerController(this);
         initExcelImportRecords();
     }
 
@@ -118,6 +121,12 @@ public class HisEquipmentDataSourceController extends GenericCRUDUUIDController<
     protected Page<HisEquipmentDataSource> loadData(PageRequest pageRequest) {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
+        }
+        removeFilterOnField("orgCode");
+
+        OrgInfo selectedOrg = orgComponentController.getSelectedOrg();
+        if (selectedOrg != null) {
+            searchFilters.add(new SearchFilter("orgCode", SearchFilter.Operator.EQ, selectedOrg.getOrgCode()));
         }
         if (hisRequestParamsDto.getStartDate() != null) {
             searchFilters.add(new SearchFilter("execTime", SearchFilter.Operator.GTE, hisRequestParamsDto.getStartDate()));
