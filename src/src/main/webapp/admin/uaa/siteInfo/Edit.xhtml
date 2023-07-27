@@ -65,6 +65,7 @@
                                 <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
 
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('tenantType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                <p:ajax listener="#{tenantInfoController.changeType}" update="@this :SiteInfoEditForm:enablesNewMenu"></p:ajax>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -105,7 +106,7 @@
                                 <f:selectItem itemLabel="已注销" itemValue="3" itemDisabled="true" />
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup id="enablesNewMenu">
                             <p:selectBooleanCheckbox itemLabel="是否使用新版菜单角色" value="#{tenantInfoController.selected.enablesNewMenu}"/>
                         </h:panelGroup>
                     </p:panelGrid>

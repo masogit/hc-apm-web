@@ -215,6 +215,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
 		selected.setHaveIbDevice(true);
+		selected.setEnablesNewMenu(true);
 		tenantConfigService.init();
 		this.type = type;
         this.isTestTenant = Boolean.FALSE;
@@ -587,6 +588,14 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void changeListener() {
 		Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst();
 		buildFeature(JSON.toJSONString(features.get().getFeatureList()));
+	}
+
+	public void changeType() {
+		if (selected == null || selected.getType() == 0) {
+			selected.setEnablesNewMenu(Boolean.TRUE);
+		} else {
+			selected.setEnablesNewMenu(Boolean.FALSE);
+		}
 	}
 
 	public String getType() {
