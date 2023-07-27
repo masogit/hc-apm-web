@@ -10,6 +10,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.PageUtil;
@@ -57,7 +58,7 @@ public class ZkbUnrealController extends GenericCRUDUUIDController<ZkbUnreal> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        List<ZkbUnreal> resultPage = zkbUnrealRepository.findBySearchFilter(searchFilters);
+        List<ZkbUnreal> resultPage = zkbUnrealRepository.findBySearchFilter(searchFilters,new Sort(Sort.Direction.DESC, "partOrderNo"));
         List<ZkbUnreal> resultList = new ArrayList<ZkbUnreal>();
         if(CollectionUtils.isNotEmpty(resultPage)){
             resultList = resultPage.stream().filter(zkbUnreal ->
