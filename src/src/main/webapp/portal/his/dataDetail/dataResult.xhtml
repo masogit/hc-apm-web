@@ -39,9 +39,9 @@
 
                         <p:ajax event="filter" listener="#{jobController.onFilter}"/>
 
-                        <p:column headerText="所属医院" sortBy="#{item.orgName}" filterBy="#{item.orgName}"
+                        <p:column headerText="所属医院" sortBy="#{item.orgCode}" filterBy="#{item.orgCode}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.orgName}"/>
+                            <h:outputText value="#{item.orgCode}"/>
                         </p:column>
                         <p:column headerText="设备UID" sortBy="#{item.assetUid}" filterBy="#{item.assetUid}"
                                   filterMatchMode="LIKE">
