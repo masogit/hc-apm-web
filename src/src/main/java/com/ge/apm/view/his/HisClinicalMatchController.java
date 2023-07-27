@@ -254,6 +254,11 @@ public class HisClinicalMatchController extends GenericCRUDUUIDController<HisAdm
     public List<Map<String, Object>> getErrorList() {
         return errorList;
     }
+
+    public String selectSiteName(String siteUID) {
+        OrgInfo byUid = orgInfoDao.findByUid(siteUID);
+        return byUid.getName();
+    }
 }
 
 
