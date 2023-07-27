@@ -3,7 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+                template="/WEB-INF/template.xhtml"
+                xmlns:his="http://www.ge.com/tags/his">
     <ui:define name="preRenderView">
         <h:outputScript name="js/main.js"/>
     </ui:define>
@@ -13,6 +14,11 @@
                 <div class="ui-g-12 card cardTitle">
                     <p:outputLabel class="pageTitle" value="#{msg.chargeDetailSource}"/>
                 </div>
+                <h:form id="HisOrgForm">
+                    <div style="border: 0px solid;margin: 10px 10px 15px 0px">
+                        <his:selectOrg update="@(form)"></his:selectOrg>
+                    </div>
+                </h:form>
                 <div class="ui-g-12 card ">
                     <p:tabView id="HisDataSourceTab" class="tabs">
                         <p:tab title="收费结果数据" id="showList">
