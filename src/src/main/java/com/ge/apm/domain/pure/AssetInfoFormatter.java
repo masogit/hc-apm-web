@@ -1005,6 +1005,9 @@ public class AssetInfoFormatter {
         map.put(getMessage("functionType"), this.getFunctionType());
         map.put(getMessage("serialNum"), this.getSerialNum());
         map.put(getMessage("systemId"), this.getSystemId());
+        map.put(getMessage("systemNum1"), this.getSystemNum1());
+        map.put(getMessage("systemNum2"), this.getSystemNum2());
+        map.put(getMessage("systemNum3"), this.getSystemNum3());
         map.put(getMessage("barcode"), this.getBarcode());
         map.put(getMessage("nationalStandardCode"), this.getNationalStandardCode());
         map.put(getMessage("modalityId"), this.getModalityId());
