@@ -579,7 +579,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'systemNum1'}">
-                                <p:column headerText="#{msg.systemNum1}" sortBy="#{item.systemNum1}" filterBy="#{item.systemNum1}" filterMatchMode="LIKE">
+                                <p:column headerText="#{msg.systemNum1}" exportable="true" sortBy="#{item.systemNum1}" filterBy="#{item.systemNum1}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.systemNum1}"/>
                                 </p:column>
                             </c:if>
