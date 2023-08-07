@@ -165,7 +165,9 @@
                 <p:menuitem value="ZKB FE 维修申请" outcome="/portal/zkb/partOrder/List.xhtml" />
                 <p:menuitem value="GEFE 维修申请" outcome="/portal/zkb/zkbFePartOrder/List.xhtml" />
                 <p:menuitem  value="FE USER CONFIG 配置" outcome="/portal/zkb/fePartOrderUserConfig/List.xhtml" />
+<!--
                 <p:menuitem  value="不真实列表" outcome="/portal/zkb/partOrder/UnrealList.xhtml" rendered="#{userContextService.zkbAdmin}"/>
+-->
                 <p:menuitem value="历史申请数据 New" outcome="/portal/zkb/orderHistory/List.xhtml"  rendered="#{!userContextService.zkbUser}"/>
                 <p:menuitem value="二维码实施统计表" outcome="/portal/zkb/assetStatistic/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"/>
                 <p:menuitem  value="探头信息维护" outcome="/portal/zkb/probe/List.xhtml"  rendered="#{ userContextService.geAdmin}"/>
