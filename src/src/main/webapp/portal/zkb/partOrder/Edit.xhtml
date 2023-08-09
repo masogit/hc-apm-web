@@ -230,9 +230,8 @@
                             <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderEditController.selected.requestDate}" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
 
-                       <!-- <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">-->
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts'}">
-                            <h:panelGroup rendered="#{zkbPartOrderEditController.assetInfo.assetGroup eq 1}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 1}">
+                            <!--<h:panelGroup rendered="#{zkbPartOrderEditController.assetInfo.assetGroup eq 1}">-->
                                 <label class="label">设备类型（DI）*</label>
                                 <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderEditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -240,7 +239,7 @@
                                     <f:selectItem itemLabel="XR" itemValue="XR"/>
                                     <p:ajax event="change" update="zkbPartOrderEditForm:warmMessageCT"/>
                                 </p:selectOneMenu>
-                            </h:panelGroup>
+                            <!--</h:panelGroup>-->
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.radiationQuotaTypeFlag}">
                             <label class="label">放射名额扣除类型*</label>
@@ -252,7 +251,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
 
-                        <h:panelGroup id="partsHighTypeGroup" >
+                        <h:panelGroup id="partsHighTypeGroup"  rendered="#{zkbPartOrderEditController.radiationQuotaTypeFlag}">
                             <h:panelGroup  rendered="#{zkbPartOrderEditController.selected.radiationQuotaType eq 'PartsHigh'}">
                                 <label class="label">备件类型*</label>
                                 <p:selectOneMenu value="#{zkbPartOrderEditController.selected.partsHighType}" required="true" requiredMessage="备件类型 #{msg.ValidationRequire}">
