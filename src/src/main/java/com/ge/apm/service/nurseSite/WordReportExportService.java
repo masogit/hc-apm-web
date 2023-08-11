@@ -6,6 +6,8 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
+import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -46,6 +48,7 @@ public class WordReportExportService {
         Map<String,Map<Integer,List<byte[]>>> reportMapMap = new LinkedHashMap<>();
         List<byte[]> reports= null;
         Map<String,List<NurseSiteMaintain>>listMap = new LinkedHashMap<>();
+        Map<String, Integer> nameSuffix = MapUtil.newHashMap();
         for (NurseSiteMaintain maintain : listMaintain) {
             String name;
             Integer sequence = maintain.getSequence();
@@ -55,21 +58,26 @@ public class WordReportExportService {
             }else {
                  name = maintain.getName()+"-"+sequence;
             }
-            name = name  + " " + year;
-            if(listMap.containsKey(name)){
-                listMap.get(name).add(maintain);
-                listMap.put(name,listMap.get(name));
-            }else {
-                nurseSiteMaintains = new ArrayList<>();
-                nurseSiteMaintains.add(maintain);
-                listMap.put(name,nurseSiteMaintains);
+            if(listMap.containsKey(name + " " + year)){
+                Integer suffix = nameSuffix.get(name);
+                if (ObjectUtil.isNotEmpty(suffix)) {
+                    ++suffix;
+                    nameSuffix.put(name, suffix);
+                    name = name + "(" + suffix+ ")";
+                    nameSuffix.put(name, suffix);
+                } else {
+                    nameSuffix.put(name, 1);
+                    name = name + "(1)";
+                }
             }
-
+            name = name  + " " + year;
+            nurseSiteMaintains = new ArrayList<>();
+            nurseSiteMaintains.add(maintain);
+            listMap.put(name,nurseSiteMaintains);
         }
-        String name=null;
         for (Map.Entry<String, List<NurseSiteMaintain>> a : listMap.entrySet()) {
+            String name = a.getKey();
             reportMap = new LinkedHashMap<>();
-            name = a.getKey();
             TreeMap<Date, List<NurseSiteMaintainItem>> map = new TreeMap<>();
             Map<Date,Map<String,List<String>>> stringMap = new HashMap<>();
             Map<Date,Map<String,String>> commentMapMap = new HashMap<>();
