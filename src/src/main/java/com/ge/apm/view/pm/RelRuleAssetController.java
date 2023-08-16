@@ -359,8 +359,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                     secondDirectorySets.add(zkbDirectory.getSecondDirectory());
                 }
             });
-            assetFilters.add(new SearchFilter("mainDirectory", SearchFilter.Operator.IN, CollectionUtils.isNotEmpty(mainDirectorySets)?mainDirectorySets:null));
-            assetFilters.add(new SearchFilter("secondDirectory", SearchFilter.Operator.IN,CollectionUtils.isNotEmpty(secondDirectorySets)?secondDirectorySets:null));
+            if(CollectionUtils.isNotEmpty(mainDirectorySets)){
+                assetFilters.add(new SearchFilter("mainDirectory", SearchFilter.Operator.IN, mainDirectorySets));
+            }
+            if(CollectionUtils.isNotEmpty(secondDirectorySets)){
+                assetFilters.add(new SearchFilter("secondDirectory", SearchFilter.Operator.IN,secondDirectorySets));
+            }
         }
 /*        if (null != queryAsset.getManufactureId()) {
             assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
