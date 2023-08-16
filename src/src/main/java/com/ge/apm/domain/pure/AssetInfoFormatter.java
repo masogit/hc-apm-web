@@ -257,7 +257,7 @@ public class AssetInfoFormatter {
     public String getSiteName() {
 
         OrgInfo orgInfo = findDeptOrg(this.getSiteUID());
-        if (orgInfo == null) return null;
+        if (orgInfo == null || orgInfo.getOrgType() != 3) return null;
 
         return orgInfo.getName();
     }
@@ -265,7 +265,7 @@ public class AssetInfoFormatter {
     public String getHospitalName() {
 
         OrgInfo orgInfo = findDeptOrg(this.getHospitalUID());
-        if (orgInfo == null) return null;
+        if (orgInfo == null || orgInfo.getOrgType() != 2) return null;
 
         return orgInfo.getName();
     }
@@ -273,7 +273,7 @@ public class AssetInfoFormatter {
     public String getInstitutionName() {
 
         OrgInfo orgInfo = findDeptOrg(this.getInstitutionUID());
-        if (orgInfo == null) return null;
+        if (orgInfo == null || orgInfo.getOrgType() != 1) return null;
 
         return orgInfo.getName();
     }
