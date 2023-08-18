@@ -194,15 +194,13 @@
                             <label class="label">申请时间*</label>
                             <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.requestDate}" readonly="true" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.orderType eq 'Artificial')}">
-                            <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 1}">
-                                <label class="label">设备类型（DI）*</label>
-                                <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderAuditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}" disabled="true">
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItem itemLabel="CT" itemValue="CT"/>
-                                    <f:selectItem itemLabel="XR" itemValue="XR"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 1}">
+                            <label class="label">设备类型（DI）*</label>
+                            <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderAuditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}" disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="CT" itemValue="CT"/>
+                                <f:selectItem itemLabel="XR" itemValue="XR"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 1 and (zkbPartOrderAuditController.zkbContract.contractType eq 'DI' or zkbPartOrderAuditController.zkbContract.contractType eq 'PCB')}">
                             <label class="label">放射名额扣除类型*</label>
@@ -284,10 +282,6 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                      <!--  <h:panelGroup>
-                            <label class="label">订单日期*</label>
-                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" readonly="true" value="#{zkbPartOrderAuditController.selected.partOrderDate}" required="true" requiredMessage="#{msg.zkbPartOrder_partOrderDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
-                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">医院名称*</label>
                             <p:inputTextarea id="hospitalName" value="#{zkbPartOrderAuditController.selected.hospitalName}" disabled="true" />
@@ -314,19 +308,16 @@
                         <h:panelGroup>
                             <label class="label">是否为紧急订单*</label>
                             <p:selectOneMenu id="urgentOrder" value="#{zkbPartOrderAuditController.selected.urgentOrder}" disabled="true" >
-                                <p:ajax event="change" update="urgencyReasons" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbUrgentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup id="urgencyReasonsGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" >
-                            <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.urgentOrder eq 't'}">
-                                <label class="label">订单紧急的原因*</label>
-                                <p:selectOneMenu id="urgencyReasons" value="#{zkbPartOrderAuditController.selected.urgencyReasons}" disabled="true" >
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbUrgentReasonType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.urgentOrder eq 't'}">
+                            <label class="label">订单紧急的原因*</label>
+                            <p:selectOneMenu id="urgencyReasons" value="#{zkbPartOrderAuditController.selected.urgencyReasons}" disabled="true" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbUrgentReasonType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.notGeAsset eq 't' and zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
                             <c:choose>

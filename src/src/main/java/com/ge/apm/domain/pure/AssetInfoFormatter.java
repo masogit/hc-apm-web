@@ -257,7 +257,7 @@ public class AssetInfoFormatter {
     public String getSiteName() {
 
         OrgInfo orgInfo = findDeptOrg(this.getSiteUID());
-        if (orgInfo == null) return null;
+        if (orgInfo == null || orgInfo.getOrgType() != 3) return null;
 
         return orgInfo.getName();
     }
@@ -265,7 +265,7 @@ public class AssetInfoFormatter {
     public String getHospitalName() {
 
         OrgInfo orgInfo = findDeptOrg(this.getHospitalUID());
-        if (orgInfo == null) return null;
+        if (orgInfo == null || orgInfo.getOrgType() != 2) return null;
 
         return orgInfo.getName();
     }
@@ -273,7 +273,7 @@ public class AssetInfoFormatter {
     public String getInstitutionName() {
 
         OrgInfo orgInfo = findDeptOrg(this.getInstitutionUID());
-        if (orgInfo == null) return null;
+        if (orgInfo == null || orgInfo.getOrgType() != 1) return null;
 
         return orgInfo.getName();
     }
@@ -1005,6 +1005,11 @@ public class AssetInfoFormatter {
         map.put(getMessage("functionType"), this.getFunctionType());
         map.put(getMessage("serialNum"), this.getSerialNum());
         map.put(getMessage("systemId"), this.getSystemId());
+        map.put(getMessage("systemNum1"), this.getSystemNum1());
+        map.put(getMessage("systemNum2"), this.getSystemNum2());
+        map.put(getMessage("systemNum3"), this.getSystemNum3());
+        map.put(getMessage("systemNum4"), this.getSystemNum4());
+        map.put(getMessage("systemNum5"), this.getSystemNum5());
         map.put(getMessage("barcode"), this.getBarcode());
         map.put(getMessage("nationalStandardCode"), this.getNationalStandardCode());
         map.put(getMessage("modalityId"), this.getModalityId());
