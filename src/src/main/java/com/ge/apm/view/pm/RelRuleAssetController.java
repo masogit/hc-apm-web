@@ -345,6 +345,9 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             Set<String> mainDirectorySets = new HashSet<String>();
             Set<String> secondDirectorySets = new HashSet<String>();
             PmOrderRule pmOrderRule = this.pmOrderRuleRepository.findByUid(this.getPmOrderRule().getUid());
+            if(StringUtils.isBlank(pmOrderRule.getPerformanceReport())){
+                return new ArrayList<>();
+            }
             TableDefinition tableDefinition = tableDao.findById(pmOrderRule.getPerformanceReport());
             List<SearchFilter> filter = new ArrayList<>();
             filter.add(new SearchFilter("name", SearchFilter.Operator.EQ, tableDefinition.getName()));
@@ -356,8 +359,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                     secondDirectorySets.add(zkbDirectory.getSecondDirectory());
                 }
             });
-            assetFilters.add(new SearchFilter("mainDirectory", SearchFilter.Operator.IN, CollectionUtils.isNotEmpty(mainDirectorySets)?mainDirectorySets:null));
-            assetFilters.add(new SearchFilter("secondDirectory", SearchFilter.Operator.IN,CollectionUtils.isNotEmpty(secondDirectorySets)?secondDirectorySets:null));
+            assetFilters.add(new SearchFilter("mainDirectory", SearchFilter.Operator.IN,mainDirectorySets));
+            assetFilters.add(new SearchFilter("secondDirectory", SearchFilter.Operator.IN,secondDirectorySets));
         }
 /*        if (null != queryAsset.getManufactureId()) {
             assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
