@@ -216,6 +216,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode=null;
         if (selected == null) {
             return;
         }
