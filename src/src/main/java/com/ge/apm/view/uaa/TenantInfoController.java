@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
@@ -30,7 +31,6 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.event.ValueChangeEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +55,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	boolean tempAlready = false;
 	String type = "";
 
+	@Getter@Setter
+	List<UserAccount> activePersons;
 	@Getter@Setter
 	private List<ApmFeature> allFeatures;
 	@Getter@Setter
@@ -252,11 +254,37 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		}else{
 			this.isTestTenant = Boolean.FALSE;
 		}
+		initActivePersons();
+	}
+
+	private void initActivePersons() {
+		activePersons = null;
+		if (StringUtils.isNotEmpty(selected.getActiveUsers())) {
+			activePersons = new ArrayList<>();
+			activePersons.addAll(userAccountRepository.getByIds(Arrays.stream(selected.getActiveUsers().split(","))
+							.map(Integer::parseInt)
+							.collect(Collectors.toSet())).stream().filter(u -> BooleanUtils.isFalse(u.getIsDeleted()) && BooleanUtils.isFalse(u.getIsDisable())).collect(Collectors.toList()));
+			if (null != selected.getActiveUserId()) {
+				Optional<UserAccount> userAccount = activePersons.stream()
+						.filter(obj -> obj.getId().compareTo(selected.getActiveUserId()) == 0)
+						.findFirst();
+				if (!userAccount.isPresent()) {
+					UserAccount account = userAccountRepository.findById(selected.getActiveUserId());
+					if (BooleanUtils.isFalse(account.getIsDeleted()) && BooleanUtils.isFalse(account.getIsDisable())) {
+						activePersons.add(account);
+					}
+				}
+			}
+		}
 	}
 
 	@Transactional
 	@Override
 	public void save() {
+		if (CollectionUtils.isNotEmpty(activePersons)) {
+			selected.setActiveUsers(activePersons.stream().map(obj -> String.valueOf(obj.getId()))
+					.collect(Collectors.joining(",")));
+		}
 		if (type.equalsIgnoreCase("create")) {// 如果租户已经创建过则退出
 			List<TenantInfo> byName = dao.getByName(this.selected.getName());
 			if (byName.size() > 0) {
@@ -632,5 +660,30 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	private void analyseMenus(TenantInfo tenantInfo) {
 		WebUtil.getBean(AdminConsoleService.class).analyseMenu(tenantInfo);
+	}
+
+	public List<UserAccount> getUserAccounts() {
+		List<UserAccount> userAccounts = userAccountRepository.findByTenantUID(selected.getUid());
+		userAccounts = userAccounts.stream().filter(u -> BooleanUtils.isFalse(u.getIsDeleted()) && BooleanUtils.isFalse(u.getIsDisable())).collect(Collectors.toList());
+		if (selected != null && selected.getActiveUserId() != null) {
+			Optional<UserAccount> userAccount = userAccounts.stream()
+					.filter(obj -> obj.getId().compareTo(selected.getActiveUserId()) == 0)
+					.findFirst();
+			if (!userAccount.isPresent()) {
+				UserAccount account = userAccountRepository.findById(selected.getActiveUserId());
+				if (BooleanUtils.isFalse(account.getIsDeleted()) && BooleanUtils.isFalse(account.getIsDisable())) {
+					userAccounts.add(account);
+				}
+			}
+		}
+		return userAccounts;
+	}
+
+	public String getNameWithOrgName(UserAccount user) {
+		OrgInfo org = orgInfoDao.getByUid(user.getOrgInfoUID());
+		if(4 == org.getOrgType()){
+			return user.getName() + "-" + org.getParentOrg().getName() + "-" + org.getName();
+		}
+		return user.getName() + "-" + org.getName();
 	}
 }

@@ -112,6 +112,9 @@ public class TenantInfo implements Serializable {
     @Column(name = "active_user_id")
     private Integer activeUserId;
 
+    @Column(name = "active_users")
+    private String activeUsers;
+
     //0 means super admin ,1 means by tenant user, 2 ready to inactive , 3 freeze
     @Column(name = "active_type")
     private Integer activeType;
@@ -620,5 +623,13 @@ public class TenantInfo implements Serializable {
 
     public void setHaveIbDevice(Boolean haveIbDevice) {
         this.haveIbDevice = haveIbDevice;
+    }
+
+    public String getActiveUsers() {
+        return activeUsers;
+    }
+
+    public void setActiveUsers(String activeUsers) {
+        this.activeUsers = activeUsers;
     }
 }

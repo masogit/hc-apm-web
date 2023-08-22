@@ -109,6 +109,18 @@
                         <h:panelGroup id="enablesNewMenu">
                             <p:selectBooleanCheckbox itemLabel="是否使用新版菜单角色" value="#{tenantInfoController.selected.enablesNewMenu}"/>
                         </h:panelGroup>
+                        <h:panelGroup id="activePerson" rendered="#{'edit'.equals(tenantInfoController.type)}">
+                            <label class="label"> 激活人选择 </label>
+                            <p:selectCheckboxMenu
+                                    value="#{tenantInfoController.activePersons}"
+                                    panelStyle="width:280px" style="width:100%"
+                                    converter="userAccountConverter" multiple="true" filter="true"
+                                    filterMatchMode="contains" >
+                                <f:selectItems value="#{tenantInfoController.userAccounts}" var="item"
+                                               itemLabel="#{tenantInfoController.getNameWithOrgName(item)}" itemValue="#{item}"/>
+                                <p:ajax process="@this"/>
+                            </p:selectCheckboxMenu>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <br/>
                     <p:fieldset legend="#{msg.WorkOrderConfig}" rendered="false">
