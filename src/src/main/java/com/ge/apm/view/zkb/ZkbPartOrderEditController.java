@@ -480,12 +480,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         }else if(ZkbContractAsset.AssetTypeEnum.empty.toString().equals(zkbContractAsset.getAssetType())){
                             selected.setArtificialType(CopyByInvok.NORMAL_THREE);
                         }
-                    }else if(assetInfo.getAssetGroup() == 1 && StrUtil.isNotEmpty(assetInfo.getModalityType())){
+                    }else if(assetInfo.getAssetGroup() == 1 && StrUtil.isNotEmpty(assetInfo.getMainDirectory())){
                         String[] xrs = {"WIX MAMMO","WIX SURGEY","WIX RF","WIX DXR","WIX BMD"};
                         List<String> xrList = Arrays.asList(xrs);;
-                        if("CT".equals(assetInfo.getModalityType())){
+                        if("CT".equals(assetInfo.getMainDirectory())){
                             selected.setAssetTypeDi("CT");
-                        }else if(xrList.contains(assetInfo.getModalityType())){
+                        }else if(xrList.contains(assetInfo.getMainDirectory())){
                             selected.setAssetTypeDi("XR");
                         }else {
                             selected.setAssetTypeDi("");
