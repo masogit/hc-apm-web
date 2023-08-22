@@ -245,6 +245,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 result.add(map);
 
             }catch(Exception e){
+                e.printStackTrace();
                 logger.error(e.getMessage(), e);
                 throw new Exception(WebUtil.getMessage("RowStart")+dataRow+WebUtil.getMessage("DataError") + e.getMessage());
             }

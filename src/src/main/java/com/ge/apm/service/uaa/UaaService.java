@@ -94,7 +94,9 @@ public class UaaService {
             url="/portal/zkbTenantHome.xhtml";
             return url;
         }
-        if(userContextService.hasRole("NursingStaff"))
+        if (userContextService.isActive().equals("1"))
+            url = "/home.xhtml";
+        else if(userContextService.hasRole("NursingStaff"))
             url = getDefautHomePage("NursingStaff");
         else if(userContextService.hasRole("HospitalHead"))
             url = getDefautHomePage("HospitalHead");

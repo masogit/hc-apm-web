@@ -1498,19 +1498,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser.setIsActive(true);
         loginUser.setActiveTime(new Date());
         dao.save(loginUser);
-        List<UserRole> roles = loginUser.getUserRoleList();
-        SysRole sysRole = sysRoleRepository.getByName(SYSTEM_ACTIVE);
-        if (sysRole != null) {
-            roles = roles.stream().filter(role -> role.getRoleId() == sysRole.getId()).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(roles)) {
-                TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-                tenant.setIsEnabled(true);
-                tenant.setActiveTime(new Date());
-                tenant.setActiveUserId(loginUser.getId());
-                tenant.setActiveType(1);
-                tenantInfoRepository.save(tenant);
-                dao.updateMembersStatus(loginUser.getTenantUID());
-            }
+        if (hasAuthority()) {
+            TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+            tenant.setIsEnabled(true);
+            tenant.setActiveTime(new Date());
+            tenant.setActiveUserId(loginUser.getId());
+            tenant.setActiveType(1);
+            tenantInfoRepository.save(tenant);
+            dao.updateMembersStatus(loginUser.getTenantUID());
             WebUtil.addSuccessMessage(WebUtil.getMessage("ActivateSuccess"));
         } else {
             logger.info("not active person !");
@@ -1539,7 +1534,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public boolean hasAuthority() {
-        return loginUser.getUserRoleNames().contains("系统激活专用") ? true : false;
+        if (loginUser.getUserRoleNames().contains("系统激活专用")) {
+            return true;
+        }
+        TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+        if (StringUtils.hasText(tenant.getActiveUsers())) {
+            String[] userIds = tenant.getActiveUsers().split(",");
+            return Arrays.stream(userIds).anyMatch(String.valueOf(loginUser.getId())::equals);
+        }
+        return false;
     }
 
     public void logout() {
