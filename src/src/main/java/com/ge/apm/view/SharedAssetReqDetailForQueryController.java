@@ -213,9 +213,9 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         }
 
 
-//        if (queryIndex == 1){
-//            this.updateSearchFilter(new SearchFilter("charging_end_time", SearchFilter.Operator.IsNull,null));
-//        }
+        if (queryIndex == 1){
+            this.updateSearchFilter(new SearchFilter("charging_end_time", SearchFilter.Operator.IsNull,null));
+        }
         if (filterBeginTime != null){
             this.updateSearchFilter(new SearchFilter("charging_begin_time", SearchFilter.Operator.GTE,filterBeginTime));
         }
