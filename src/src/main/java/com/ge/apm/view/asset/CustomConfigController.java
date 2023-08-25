@@ -9,9 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.TenantOptionConfigRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
@@ -32,10 +30,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.healthcare.cn.common.cons.ApmFunction;
-import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
@@ -71,7 +67,6 @@ public class CustomConfigController {
     private String addFieldsType;
     private Map<String, String> configInfo = new HashMap();
     private PinYinComparator pinYinComparator;
-    private WorkflowConfigRepository workflowConfigRepository;
     private Map<String,Boolean> importantFieldsCheckedStatus = new HashMap();
 
     @Setter
@@ -85,7 +80,6 @@ public class CustomConfigController {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
         tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
-        workflowConfigRepository = WebUtil.getBean(WorkflowConfigRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -734,10 +728,7 @@ public class CustomConfigController {
         return AllocateCustomConfigConstant.ASSET_ALLOCATE.getAllAllocateFields();
     }
     public boolean enabledWhethertoenableunattended(){
-        if(selectSite == null) return false;
-        List<WorkflowConfig> bySiteUID = workflowConfigRepository.findBySiteUID(selectSite.getUid());
-        if(CollectionUtils.isEmpty(bySiteUID)) return false;
-        WorkflowConfig workflowConfig = bySiteUID.get(0);
+        WorkflowConfig workflowConfig = configService.findConfigBySite(selectSite.getUid());
         if(workflowConfig == null ) return false;
         return Boolean.TRUE.equals(workflowConfig.getWhethertoenableunattended());
     }

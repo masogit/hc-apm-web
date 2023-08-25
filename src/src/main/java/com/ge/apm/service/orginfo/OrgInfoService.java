@@ -2,11 +2,11 @@ package com.ge.apm.service.orginfo;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.mapper.OrgInfoMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.DefaultTreeNode;
@@ -40,7 +40,7 @@ public class OrgInfoService {
     private AssetInfoRepository assetInfoDao;
 
     @Autowired
-    private TenantInfoRepository tenantInfoDao;
+    private ConfigCacheService configCacheService;
 
     public List<OrgInfo> flattenOrgTree(List<OrgInfo> orgInfoList) {
 
@@ -103,7 +103,7 @@ public class OrgInfoService {
 
 //        try {
 
-            TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+            TenantInfo tenantInfo = configCacheService.getTenantByUid(user.getTenantUID());
             OrgInfo tenantOrgInfo = orgDao.findByUid(tenantInfo.getUid());
 
             ExcelDocument doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
@@ -709,7 +709,7 @@ public class OrgInfoService {
     }
 
     public String getTenantName(String tenantUID) {
-        return tenantInfoDao.findByuid(tenantUID).getName();
+        return configCacheService.getTenantByUid(tenantUID).getName();
     }
 
     public static void main(String[] args) {
