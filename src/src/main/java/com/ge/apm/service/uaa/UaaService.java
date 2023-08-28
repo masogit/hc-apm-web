@@ -1,6 +1,7 @@
 package com.ge.apm.service.uaa;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -51,7 +52,7 @@ public class UaaService {
     WorkflowConfigRepository wfcfigDao;
 
     @Autowired
-    private TenantInfoRepository tenantInfoDao;
+    private ConfigCacheService configService;
 
     @Autowired
     private CustomRoleRepository customRoleRepository;
@@ -177,7 +178,7 @@ public class UaaService {
 
     public List<SysRoleVO> getSysRoleVO(String tenantUID){
         loadSysRoles();
-        TenantInfo ti = tenantInfoDao.findByuid(tenantUID);
+        TenantInfo ti = configService.getTenantByUid(tenantUID);
         List<SysRoleVO> sysRoleList = new ArrayList<>();
         for (SysRole tempSysRole : sysRoles.values()){
             SysRoleVO srVO = new SysRoleVO();
@@ -561,7 +562,6 @@ public class UaaService {
 
     //get tree for user to access
     public TreeNode getOrgAccessTreeByUser(UserAccount user){
-        OrgInfo rootOrg = orgInfoDao.getByUid(user.getSiteUID());
         TreeNode root = new DefaultTreeNode("root", null, null);
         List<OrgInfo> userScopeList = getOrgListByUser(user.getUid());
         for (OrgInfo item : userScopeList) {
@@ -1641,7 +1641,7 @@ public class UaaService {
     }
 
     public List<String> getFeatureListByTenantUid(String tenantUid) {
-        TenantInfo tenantInfo = tenantInfoDao.findByUid(tenantUid);
+        TenantInfo tenantInfo = configService.getTenantByUid(tenantUid);
         if (tenantInfo != null && StringUtils.isNotEmpty(tenantInfo.getFeatureList())) {
             return (List<String>) JSONObject.parse(tenantInfo.getFeatureList());
         }
@@ -1668,7 +1668,7 @@ public class UaaService {
     }
 
     public boolean isOpenNewMenuRoles(String tenantUid) {
-        TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUid);
+        TenantInfo tenantInfo = configService.getTenantByUid(tenantUid);
         return tenantInfo.getEnablesNewMenu() && StringUtils.isNotEmpty(tenantInfo.getFeatureList());
     }
 
