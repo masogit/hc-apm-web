@@ -134,17 +134,17 @@ public class I18nMessageService {
     }
 
     public void resetCustomFieldName(CustomConfigFields fields, Integer siteId){
-        I18nMessage byMsgTypeAndSiteIdAndMsgKey = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(fields.getMsgType().msgTypeValue,  fields.getMsgKey(), siteId);
+        I18nMessage byMsgTypeAndSiteIdAndMsgKey = i18nMessageDao.findFirstByMsgKeyAndSiteId(fields.getMsgKey(), siteId);
         if (null!= byMsgTypeAndSiteIdAndMsgKey){
             i18nMessageDao.delete(byMsgTypeAndSiteIdAndMsgKey);
         }
     }
 
     public void changeCustomFieldName(CustomConfigFields fields, Integer siteId, String newName){
-        I18nMessage byMsgTypeAndSiteIdAndMsgKey = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(fields.getMsgType().msgTypeValue,  fields.getMsgKey(), siteId);
+        I18nMessage byMsgTypeAndSiteIdAndMsgKey = i18nMessageDao.findFirstByMsgKeyAndSiteId(fields.getMsgKey(), siteId);
 
         if(null == byMsgTypeAndSiteIdAndMsgKey ){
-            I18nMessage defaultField = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(fields.getMsgType().msgTypeValue,  fields.getMsgKey(), -1);
+            I18nMessage defaultField = i18nMessageDao.findFirstByMsgKeyAndSiteId(fields.getMsgKey(), -1);
             byMsgTypeAndSiteIdAndMsgKey = new I18nMessage();
             byMsgTypeAndSiteIdAndMsgKey.setMsgKey(defaultField.getMsgKey());
             byMsgTypeAndSiteIdAndMsgKey.setMsgType(defaultField.getMsgType());
@@ -156,7 +156,8 @@ public class I18nMessageService {
     }
 
     public String getSystemFieldName(CustomConfigFields fields){
-        I18nMessage byMsgTypeAndSiteIdAndMsgKey = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(fields.getMsgType().msgTypeValue,  fields.getMsgKey(), -1);
-        return Optional.ofNullable(byMsgTypeAndSiteIdAndMsgKey).map(i-> i.getValueZh()).orElse(fields.getMsgKey());
+        I18nMessage defaultMsg = i18nMessageDao.findFirstByMsgKeyAndSiteId(fields.getMsgKey(), -1);
+
+        return Optional.ofNullable(defaultMsg).map(i-> i.getValueZh()).orElse(fields.getMsgKey());
     }
 }
