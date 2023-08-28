@@ -49,7 +49,7 @@ public class CustomConfigConstant {
 
     static public List<CustomConfigFields> getRenameFields() {
         return Arrays.asList(capitalSource2, accountingCategory, assetValueCategory, subjectProject, proprietaryClass
-                ,systemNum2,systemNum3,systemNum4,systemNum5);
+                ,systemNum2,systemNum3,systemNum4,systemNum5,mvsContractStartDate, mvsContractEndDate);
     }
 
 
