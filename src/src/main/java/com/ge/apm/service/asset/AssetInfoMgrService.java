@@ -11,6 +11,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -41,7 +42,7 @@ public class AssetInfoMgrService {
     @Autowired
     private AssetLifecycleEventRepository eventDao;
     @Autowired
-    private TenantInfoRepository tenantDao;
+    private ConfigCacheService configCacheService;
     @Autowired
     private ServiceRequestRepository srDao;
     @Autowired
@@ -237,7 +238,7 @@ public class AssetInfoMgrService {
 
     public String getMaintanceType(AssetInfo selected) {
         
-        TenantInfo tenant = tenantDao.findByuid(selected.getTenantUID());
+        TenantInfo tenant = configCacheService.getTenantByUid(selected.getTenantUID());
         if(tenant.getId() == 46){
             return "external";
         }

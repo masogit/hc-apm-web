@@ -7,6 +7,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.uaa.AdminConsoleService;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -51,6 +52,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	AssetInfoRepository assetInfoRepository;
 	TableDefinitionRepository tbDao;
 	OrgInfoRepository orgInfoDao;
+	private ConfigCacheService configCacheService;
 
 	boolean tempAlready = false;
 	String type = "";
@@ -135,6 +137,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		loginUser = UserContextService.getCurrentUserAccount();
 		dao = WebUtil.getBean(TenantInfoRepository.class);
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+		configCacheService = WebUtil.getBean(ConfigCacheService.class);
 		tenantConfigService = WebUtil.getBean(TenantInfoConfigService.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		tbDao = WebUtil.getBean(TableDefinitionRepository.class);
@@ -355,6 +358,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		jsonObject.put("edition", tenantConfigService.getEdition());
 		selected.setTenantConfig(jsonObject.toJSONString());
 		dao.save(selected);
+		configCacheService.cleanTenantCacheByUid(selected.getUid());
 	}
 
 	List<TableDefinition> tbList = new ArrayList<TableDefinition>();
@@ -427,6 +431,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void markDeleted() {
 		selected.setIsDeleted(true);
 		dao.save(selected);
+		configCacheService.cleanTenantCacheByUid(selected.getUid());
 	}
 
 	@Override
