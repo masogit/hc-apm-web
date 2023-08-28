@@ -9,6 +9,8 @@ import webapp.framework.web.WebUtil;
 
 import java.util.*;
 
+import static com.ge.apm.service.common.CustomConfigFields.*;
+
 /**
  *
  * @author 212579464
@@ -44,6 +46,12 @@ public class CustomConfigConstant {
     static public List<String> getConfigRolesName() {
         return Arrays.asList("HospitalHead", "AssetHead", "DeptHead", "AssetStaff", "ClinicalStaff");
     }
+
+    static public List<CustomConfigFields> getRenameFields() {
+        return Arrays.asList(capitalSource2, accountingCategory, assetValueCategory, subjectProject, proprietaryClass
+                ,systemNum2,systemNum3,systemNum4,systemNum5);
+    }
+
 
     //默认可修改角色
     static public List<String> getConfigEditRolesName() {
@@ -83,122 +91,11 @@ public class CustomConfigConstant {
     }
 
     public static synchronized LinkedHashMap<String, String> getAllFields() {
+
         LinkedHashMap<String,String> allFields = new LinkedHashMap();
-        allFields.put("serialNum", WebUtil.getMessage("serialNum"));
-        allFields.put("departNum", WebUtil.getMessage("departNum"));
-        allFields.put("name", WebUtil.getMessage("EquipmentName"));
-        allFields.put("aliasName", WebUtil.getMessage("aliasName"));
-        allFields.put("assetGroup", WebUtil.getMessage("assetGroup"));
-        allFields.put("assetGroupSecondary", WebUtil.getMessage("assetGroupSecondary"));
-        allFields.put("assetOwnerName", WebUtil.getMessage("assetOwnerName"));
-        allFields.put("assetOwnerTel", WebUtil.getMessage("assetOwnerTel"));
-        allFields.put("assetOwnerName2", WebUtil.getMessage("assetOwnerName2"));
-        allFields.put("assetOwnerTel2", WebUtil.getMessage("assetOwnerTel2"));
-        allFields.put("assetOwnerName3", WebUtil.getMessage("assetOwnerName3"));
-        allFields.put("assetOwnerTel3", WebUtil.getMessage("assetOwnerTel3"));
-        allFields.put("siteUID", WebUtil.getMessage("hospitalId"));
-        allFields.put("clinicalDeptName", WebUtil.getMessage("clinicalDeptName"));
-        allFields.put("assetDeptName", WebUtil.getMessage("assetDeptName"));
-        allFields.put("accountingDeptName", WebUtil.getMessage("accountingDeptName"));
-        allFields.put("modalityType", WebUtil.getMessage("设备modality"));
-        allFields.put("monitorRate", WebUtil.getMessage("monitorRate"));
-        allFields.put("otherPower", WebUtil.getMessage("otherPower"));
-        allFields.put("unitPriceElectricity", WebUtil.getMessage("unitPriceElectricity"));
-        allFields.put("clinicalOwnerName", WebUtil.getMessage("clinicalOwnerName"));
-        allFields.put("clinicalOwnerTel", WebUtil.getMessage("clinicalOwnerTel"));
-        allFields.put("manufacture", WebUtil.getMessage("manufacture"));
-        allFields.put("makerShortName", WebUtil.getMessage("makerShortName"));
-        allFields.put("vendor", WebUtil.getMessage("vendor"));
-        allFields.put("vendorTel", WebUtil.getMessage("vendorTel"));
-        allFields.put("maitanance", WebUtil.getMessage("maitanance"));
-        allFields.put("maitananceTel", WebUtil.getMessage("maitananceTel"));
-        allFields.put("nationalStandardCode", WebUtil.getMessage("nationalStandardCode"));
-        allFields.put("parentAssetId", WebUtil.getMessage("parentAsset"));
-        allFields.put("deviceName", WebUtil.getMessage("deviceName"));
-        allFields.put("systemId", WebUtil.getMessage("systemId"));
-        allFields.put("financingNum", WebUtil.getMessage("financingNum"));
-        allFields.put("barcode", WebUtil.getMessage("barcode"));
-        allFields.put("registrationNo", WebUtil.getMessage("registrationNo"));
-        allFields.put("modalityId", WebUtil.getMessage("modalityId"));
-        allFields.put("qrCode", WebUtil.getMessage("qrCode"));
-        allFields.put("functionType", WebUtil.getMessage("functionType"));
-        allFields.put("functionGroup", WebUtil.getMessage("functionGroup"));
-        allFields.put("assetCode68", WebUtil.getMessage("assetCode68"));
-        allFields.put("medicalApparatusClassification", WebUtil.getMessage("medicalApparatusClassification"));
-        allFields.put("functionGrade", WebUtil.getMessage("functionGrade"));
-        allFields.put("repairForm", WebUtil.getMessage("repairForm"));
-        allFields.put("locationCode", WebUtil.getMessage("locationCode"));
-        allFields.put("locationName", WebUtil.getMessage("locationName"));
-        allFields.put("status", WebUtil.getMessage("status"));
-        allFields.put("isValid",WebUtil.getMessage("isValid"));
-        allFields.put("deviceStatus", WebUtil.getMessage("deviceStatus"));
-        allFields.put("comments", WebUtil.getMessage("comments"));
-        allFields.put("locationNotes", WebUtil.getMessage("locationNotes"));
-        allFields.put("assetUsage", WebUtil.getMessage("assetUsage"));
-        allFields.put("capitalSource", WebUtil.getMessage("capitalSource"));
-        allFields.put("capitalSource2", WebUtil.getMessage("capitalSource2"));
-        allFields.put("measureGrade", WebUtil.getMessage("measureGrade"));
-        allFields.put("riskGrade", WebUtil.getMessage("riskGrade"));
-        allFields.put("emergencyEquipment", WebUtil.getMessage("emergencyEquipment"));
-        allFields.put("importEquipment", WebUtil.getMessage("importEquipment"));
-        allFields.put("measuringItemCategory", WebUtil.getMessage("measuringItemCategory"));
-        allFields.put("accountingCategory", WebUtil.getMessage("accountingCategory"));
-        allFields.put("manufactDate", WebUtil.getMessage("manufactDate"));
-        allFields.put("purchaseDate", WebUtil.getMessage("purchaseDate"));
-        allFields.put("arriveDate", WebUtil.getMessage("arriveDate"));
-        allFields.put("installDate", WebUtil.getMessage("installDate"));
-        allFields.put("factoryWarrantyDate", WebUtil.getMessage("factoryWarrantyDate"));
-        allFields.put("warrantyDate", WebUtil.getMessage("warrantyDate"));
-        allFields.put("terminateDate", WebUtil.getMessage("terminateDate"));
-        allFields.put("purchasePrice", WebUtil.getMessage("purchasePrice"));
-        allFields.put("salvageValue", WebUtil.getMessage("salvageValue"));
-        allFields.put("lifecycle", WebUtil.getMessage("lifecycle"));
-        allFields.put("depreciationMethod", WebUtil.getMessage("depreciationMethod"));
-        allFields.put("isPm", WebUtil.getMessage("isAssetPMed"));
-        allFields.put("isFixed", WebUtil.getMessage("isFixed"));
-        allFields.put("isChecked", WebUtil.getMessage("isAssetChecked"));
-        allFields.put("lastPmDate", WebUtil.getMessage("lastPmDate"));
-        allFields.put("lastQaDate", WebUtil.getMessage("lastQaDate"));
-        allFields.put("lastMeteringDate", WebUtil.getMessage("lastMeteringDate"));
-        allFields.put("warranty", WebUtil.getMessage("isWarrantyNotice"));
-        allFields.put("assetValueCategory", WebUtil.getMessage("assetValueCategory"));
-        allFields.put("pmOwnerName", WebUtil.getMessage("pmOwnerName"));
-        allFields.put("pmOwnerTel", WebUtil.getMessage("pmOwnerTel"));
-        allFields.put("acceptDate", WebUtil.getMessage("acceptDate"));
-        allFields.put("warrantyMonth", WebUtil.getMessage("warrantyMonth"));
-        allFields.put("subjectProject", WebUtil.getMessage("subjectProject"));
-        allFields.put("createdDate", WebUtil.getMessage("createdDate"));
-        allFields.put("proprietaryClass", WebUtil.getMessage("proprietaryClass"));
-        allFields.put("measuringOwner", WebUtil.getMessage("measuringOwner"));
-        allFields.put("orgPath", WebUtil.getMessage("orgPath"));
-        allFields.put("assetLocation", WebUtil.getMessage("assetLocation"));
-        allFields.put("UCMID", WebUtil.getMessage("UCMID"));
-        allFields.put("assetTags", WebUtil.getMessage("assetTags"));
-        allFields.put("createdBy", WebUtil.getMessage("createdBy"));
-        allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
-        allFields.put("assetClass", WebUtil.getMessage("assetClass"));
-        allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
-        allFields.put("installStatus", WebUtil.getMessage("installStatus"));
-        allFields.put("geibTable_installedTime", WebUtil.getMessage("geibTable_installedTime"));
-        allFields.put("powerOnThreshold", WebUtil.getMessage("powerOnThreshold"));
-        allFields.put("rfId", WebUtil.getMessage("rfId"));
-        allFields.put("rfGroup", WebUtil.getMessage("rfGroup"));
-        allFields.put("currentId", WebUtil.getMessage("currentId"));
-        allFields.put("assetQuality", WebUtil.getMessage("assetQuality"));
-        allFields.put("assetDisposalResults", WebUtil.getMessage("assetDisposalResults"));
-        allFields.put("isUseRegistration", WebUtil.getMessage("isUseRegistration"));
-        allFields.put("networkingStatus", WebUtil.getMessage("networkingStatus"));
-        allFields.put("systemNum1", WebUtil.getMessage("systemNum1"));
-        allFields.put("systemNum2", WebUtil.getMessage("systemNum2"));
-        allFields.put("systemNum3", WebUtil.getMessage("systemNum3"));
-        allFields.put("systemNum4", WebUtil.getMessage("systemNum4"));
-        allFields.put("systemNum5", WebUtil.getMessage("systemNum5"));
-        allFields.put("assetUsedLifecycle", WebUtil.getMessage("assetUsedLifecycle"));
-        allFields.put("assetQuantity", WebUtil.getMessage("assetQuantity"));
-        allFields.put("productFamily", WebUtil.getMessage("productFamily"));
-        allFields.put("productSegment", WebUtil.getMessage("productSegment"));
-        allFields.put("mvsContractStartDate", WebUtil.getMessage("mvsContractStartDate"));
-        allFields.put("mvsContractEndDate", WebUtil.getMessage("mvsContractEndDate"));
+        Arrays.stream(CustomConfigFields.values()).forEach(i->
+            allFields.put(i.name(), WebUtil.getMessage(i.getMsgKey()))
+        );
         return allFields;
     }
 

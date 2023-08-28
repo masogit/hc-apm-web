@@ -82,7 +82,7 @@ public class CustomConfigService {
         return defaultConfig;
     }
 
-    @CacheEvict(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#siteUid")
+    @CacheEvict(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#selectSite.siteUID")
     public void saveConfig(OrgInfo selectSite, CustomConfigObject customConfigObject) {
         CustomConfig config = getCustomConfigBySite(selectSite.getSiteUID());
         if (config == null) {
@@ -102,7 +102,7 @@ public class CustomConfigService {
         customConfigDao.save(config);
     }
 
-    @CacheEvict(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#siteUid")
+    @CacheEvict(cacheNames = "springCache", key = "'CustomConfigObject_SiteUid.'+#selectSite.siteUID")
     public void removeConfig(OrgInfo selectSite) {
         CustomConfig config = getCustomConfigBySite(selectSite.getSiteUID());
         if (null != config) {

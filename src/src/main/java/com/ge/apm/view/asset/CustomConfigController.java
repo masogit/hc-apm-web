@@ -14,10 +14,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.common.AllocateCustomConfigConstant;
-import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.common.CustomConfigConstant;
-import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.common.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -39,6 +36,7 @@ import org.primefaces.event.ReorderEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.service.DbMessageSource;
 
 /**
  *
@@ -55,6 +53,7 @@ public class CustomConfigController {
     private ConfigService configService;
     private TenantOptionConfigRepository tenantOptionConfigRepository;
     private UserContextService userContextService;
+    private I18nMessageService i18nMessageService;
 
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
@@ -71,6 +70,10 @@ public class CustomConfigController {
 
     @Setter
     @Getter
+    private String newName;
+
+    @Setter
+    @Getter
     private List<String> assetsImportantFieldsAll;
 
     @PostConstruct
@@ -79,6 +82,7 @@ public class CustomConfigController {
         userService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
+        i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -534,6 +538,27 @@ public class CustomConfigController {
         return CustomConfigConstant.getSystemFields().contains(key);
     }
 
+
+    public String getSystemShowName(){
+         return   i18nMessageService.getSystemFieldName(CustomConfigFields.valueOf(currentEditField.getKey()));
+    }
+
+    public void resetField(){
+        i18nMessageService.resetCustomFieldName(CustomConfigFields.valueOf(currentEditField.getKey()) , selectSite.getSiteId());
+        DbMessageSource.reLoadMessages();
+    }
+
+    public void renameField(){
+        allFields.put(currentEditField.getKey(), newName);
+        i18nMessageService.changeCustomFieldName(CustomConfigFields.valueOf(currentEditField.getKey()) , selectSite.getSiteId(),newName);
+        DbMessageSource.reLoadMessages();
+        newName = "";
+    }
+
+    public boolean isRenameFields(String key) {
+        return CustomConfigConstant.getRenameFields().contains(CustomConfigFields.valueOf(key));
+    }
+
     public boolean isReadOnlyFields(String key) {
         return CustomConfigConstant.getReadOnlyFields().contains(key);
     }
@@ -550,6 +575,7 @@ public class CustomConfigController {
     }
     public void prepareEditAssetField(String fieldKey) {
         currentEditField = customConfigObject.getAssetFields().get(fieldKey);
+        this.newName =allFields.get(fieldKey);
     }
 
     public List<String> getRolesSelectItems() {
