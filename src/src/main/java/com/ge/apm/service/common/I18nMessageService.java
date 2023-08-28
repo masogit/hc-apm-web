@@ -3,16 +3,12 @@ package com.ge.apm.service.common;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.listener.UserAccountThreadLocal;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import webapp.framework.web.service.DbMessageSource;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class I18nMessageService {
@@ -135,5 +131,32 @@ public class I18nMessageService {
         }
 
         return foundMsgList;
+    }
+
+    public void resetCustomFieldName(CustomConfigFields fields, Integer siteId){
+        I18nMessage byMsgTypeAndSiteIdAndMsgKey = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(fields.getMsgType().msgTypeValue,  fields.getMsgKey(), siteId);
+        if (null!= byMsgTypeAndSiteIdAndMsgKey){
+            i18nMessageDao.delete(byMsgTypeAndSiteIdAndMsgKey);
+        }
+    }
+
+    public void changeCustomFieldName(CustomConfigFields fields, Integer siteId, String newName){
+        I18nMessage byMsgTypeAndSiteIdAndMsgKey = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(fields.getMsgType().msgTypeValue,  fields.getMsgKey(), siteId);
+
+        if(null == byMsgTypeAndSiteIdAndMsgKey ){
+            I18nMessage defaultField = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(fields.getMsgType().msgTypeValue,  fields.getMsgKey(), -1);
+            byMsgTypeAndSiteIdAndMsgKey = new I18nMessage();
+            byMsgTypeAndSiteIdAndMsgKey.setMsgKey(defaultField.getMsgKey());
+            byMsgTypeAndSiteIdAndMsgKey.setMsgType(defaultField.getMsgType());
+            byMsgTypeAndSiteIdAndMsgKey.setSiteId(siteId);
+        }
+        byMsgTypeAndSiteIdAndMsgKey.setValueZh(newName);
+        i18nMessageDao.save(byMsgTypeAndSiteIdAndMsgKey);
+
+    }
+
+    public String getSystemFieldName(CustomConfigFields fields){
+        I18nMessage byMsgTypeAndSiteIdAndMsgKey = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(fields.getMsgType().msgTypeValue,  fields.getMsgKey(), -1);
+        return Optional.ofNullable(byMsgTypeAndSiteIdAndMsgKey).map(i-> i.getValueZh()).orElse(fields.getMsgKey());
     }
 }
