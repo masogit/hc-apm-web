@@ -49,7 +49,7 @@ public class WordReportExportService {
         List<byte[]> reports;
         Map<String,List<NurseSiteMaintain>>listMap = new LinkedHashMap<>();
         Map<String, Integer> nameSuffixMap = MapUtil.newHashMap();
-        Map<String, List<String>> nameKeyMap = MapUtil.newHashMap();
+        Map<String, Map<String, String>> nameKeyMap = MapUtil.newHashMap();
         for (NurseSiteMaintain maintain : listMaintain) {
             String name;
             Integer sequence = maintain.getSequence();
@@ -63,24 +63,23 @@ public class WordReportExportService {
             name += " " + year + "-" + month + "月";
             String nameKey = name + "#" + maintain.getConfigId();
             if (listMap.containsKey(name)) {
-                List<String> nameKeyList = nameKeyMap.get(name);
-                if (nameKeyList.contains(nameKey)) {
-                    listMap.get(name).add(maintain);
-                    listMap.put(name,listMap.get(name));
+                Map<String, String> nameKeys = nameKeyMap.get(name);
+                if (nameKeys.containsKey(nameKey)) {
+                    listMap.get(nameKeys.get(nameKey)).add(maintain);
                 } else {
-                    nurseSiteMaintains = new ArrayList<>();
-                    nurseSiteMaintains.add(maintain);
+                    nurseSiteMaintains = ListUtil.newArrayList(maintain);
                     Integer suffix = nameSuffixMap.get(name);
-                    nameKeyList.add(nameKey);
-                    nameSuffixMap.put(name, ++suffix);
+                    ++suffix;
                     name += "(" + suffix + ")";
+                    nameKeys.put(nameKey, name);
+                    nameSuffixMap.put(name, suffix);
                     listMap.put(name, nurseSiteMaintains);
                 }
             } else {
                 nurseSiteMaintains = new ArrayList<>();
                 nurseSiteMaintains.add(maintain);
                 listMap.put(name, nurseSiteMaintains);
-                nameKeyMap.put(name, ListUtil.newArrayList(nameKey));
+                nameKeyMap.put(name, MapUtil.newHashMap(nameKey, name));
                 nameSuffixMap.put(name, 0);
             }
         }
@@ -135,7 +134,7 @@ public class WordReportExportService {
             int num =0;
             int month=0;
             Map<Integer ,Date> dataMap = new LinkedHashMap<>();
-            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap();
+            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap<>();
             for (Map.Entry<Date, List<NurseSiteMaintainItem>> i : map.entrySet()) {
                 int secondCount =0;
                 nurseSiteMaintainItemList = i.getValue();
@@ -195,31 +194,30 @@ public class WordReportExportService {
         List<byte[]> reports;
         Map<String,List<NurseSiteMaintainHistory>>listMap = new LinkedHashMap<>();
         Map<String, Integer> nameSuffixMap = MapUtil.newHashMap();
-        Map<String, List<String>> nameKeyMap = MapUtil.newHashMap();
+        Map<String, Map<String, String>> nameKeyMap = MapUtil.newHashMap();
         for (NurseSiteMaintainHistory maintain : listMaintain) {
             String year = DateFormatUtils.format(maintain.getScheduleDate(), "yyyy");
             String month = DateFormatUtils.format(maintain.getScheduleDate(), "MM");
             String name = maintain.getName() + " " + year + "-" + month + "月";
             String nameKey = name + "#" + maintain.getConfigId();
             if (listMap.containsKey(name)) {
-                List<String> nameKeyList = nameKeyMap.get(name);
-                if (nameKeyList.contains(nameKey)) {
-                    listMap.get(name).add(maintain);
-                    listMap.put(name,listMap.get(name));
+                Map<String, String> nameKeys = nameKeyMap.get(name);
+                if (nameKeys.containsKey(nameKey)) {
+                    listMap.get(nameKeys.get(nameKey)).add(maintain);
                 } else {
-                    nurseSiteMaintains = new ArrayList<>();
-                    nurseSiteMaintains.add(maintain);
+                    nurseSiteMaintains = ListUtil.newArrayList(maintain);
                     Integer suffix = nameSuffixMap.get(name);
-                    nameKeyList.add(nameKey);
-                    nameSuffixMap.put(name, ++suffix);
+                    ++suffix;
                     name += "(" + suffix + ")";
+                    nameKeys.put(nameKey, name);
+                    nameSuffixMap.put(name, suffix);
                     listMap.put(name, nurseSiteMaintains);
                 }
             } else {
                 nurseSiteMaintains = new ArrayList<>();
                 nurseSiteMaintains.add(maintain);
                 listMap.put(name, nurseSiteMaintains);
-                nameKeyMap.put(name, ListUtil.newArrayList(nameKey));
+                nameKeyMap.put(name, MapUtil.newHashMap(nameKey, name));
                 nameSuffixMap.put(name, 0);
             }
         }
@@ -275,7 +273,7 @@ public class WordReportExportService {
             int num =0;
             int month=0;
             Map<Integer ,Date> dataMap = new LinkedHashMap<>();
-            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap();
+            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap<>();
             for (Map.Entry<Date, List<NurseSiteMaintainItemHistory>> i : map.entrySet()) {
                 int secondCount =0;
                 nurseSiteMaintainItemList = i.getValue();
