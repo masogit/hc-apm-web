@@ -5,16 +5,15 @@ import com.ge.apm.dao.SparePartRepository;
 import com.ge.apm.dao.StockRecordRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
 import com.ge.apm.service.sparepart.SparePartStockRecordService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.service.wo.WorkOrderPublishRenderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -29,7 +28,6 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
@@ -47,6 +45,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     private SparePartStockRecordService stockRecordService;
     private StockRecordRepository dao;
     private SparePartRepository sparePartRepository;
+    private BlobFileService blobService;
 
     @Getter @Setter
     private UserAccount loginUser;
@@ -72,8 +71,8 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
     private StreamedContent exportDocx;
     @Getter @Setter
     private Integer rtQuantity;
-
-
+    @Getter @Setter
+    private List<V2_BlobObject> picList;
 
 
     @Override
@@ -85,9 +84,11 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         warehouseService = WebUtil.getBean(SimplePartsWarehouseService.class);
         dao = WebUtil.getBean(StockRecordRepository.class);
         sparePartRepository = WebUtil.getBean(SparePartRepository.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
         currentOrg = orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+        picList = new ArrayList<>();
 
         this.filterBySite = false;
         this.filterByHospital = false;
@@ -192,6 +193,9 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
             } else if (2 == filterRecordType) {
                 fileName = "设备配件出库单.docx";
             }
+            if (UserContextService.hasCurrentTenantName("")) {
+                fileName = "云阜" + fileName;
+            }
             try {
                 byte[] templateBytes = stockRecordService.getTemplate(fileName);
                 SparePartStockRecordService.RenderResult renderResult = stockRecordService.renderDocx(selectedItems, templateBytes, fileName, filterRecordType);
@@ -282,4 +286,24 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
         record.setQuantity(rtQuantity);
         dao.save(record);
     }
+
+    public void clickSelectAttach(StockRecord record) {
+        selected = record;
+    }
+
+    public boolean hasBlob(String id) {
+        if (org.springframework.util.StringUtils.hasText(id)) {
+            List<V2_BlobObject> blobObjects =  blobService.fetchBlobObject(id, V2_BlobObject.BO_TYPE_PART_PIC);
+            return !org.springframework.util.CollectionUtils.isEmpty(blobObjects);
+        }
+        return false;
+    }
+
+    public List<V2_BlobObject> getPicList() {
+        if (selected != null && StringUtils.isNotEmpty(selected.getSparePart().getId())) {
+            picList = blobService.fetchBlobObject(selected.getSparePart().getId(), V2_BlobObject.BO_TYPE_PART_PIC);
+        }
+        return picList;
+    }
+
 }

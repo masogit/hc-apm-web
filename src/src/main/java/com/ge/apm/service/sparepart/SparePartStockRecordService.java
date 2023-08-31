@@ -1,10 +1,13 @@
 package com.ge.apm.service.sparepart;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.ge.apm.dao.StockRecordRepository;
 import com.ge.apm.domain.StockRecord;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,9 @@ import java.util.Map;
 public class SparePartStockRecordService {
 
     private Logger logger = LoggerFactory.getLogger(SparePartStockRecordService.class);
+
+    @Autowired
+    private StockRecordRepository stockRecordRepository;
 
     public byte[] getTemplate(String fileName){
         byte[] templateBytes = null;
@@ -83,14 +89,18 @@ public class SparePartStockRecordService {
             map.put("model", stockRecord.getSparePart().getModel());
             map.put("manufacturer", stockRecord.getSparePart().getManufacturer());
             map.put("unitPrice", stockRecord.getSparePart().getUnitPrice());
-            map.put("quantity", stockRecord.getQuantity());
+            Integer quantity = getValidQuantity(stockRecord);
+            map.put("quantity", quantity);
             map.put("unit", stockRecord.getSparePart().getUnit());
-            map.put("invoiceNumber", stockRecord.getSparePart().getInvoiceNumber());
 
-            BigDecimal bigDecimal = calcTotalPrice(stockRecord.getSparePart().getUnitPrice(), stockRecord.getQuantity());
+            BigDecimal bigDecimal = calcTotalPrice(stockRecord.getSparePart().getUnitPrice(), quantity);
 
             map.put("totalPrice", null == bigDecimal ? "" : bigDecimal.toString());
-
+            map.put("invoiceNumber", stockRecord.getSparePart().getInvoiceNumber());
+            if (UserContextService.hasCurrentTenantName("")) {
+                map.put("adaptingDevices", stockRecord.getSparePart().getAdaptingDevices());
+                map.put("effectiveDate", stockRecord.getSparePart().getEffectiveDate());
+            }
             totalPrice = totalPrice.add(bigDecimal);
 
             tableData.add(map);
@@ -121,5 +131,17 @@ public class SparePartStockRecordService {
         public byte[] result;
         public String contentType;
         public String fileName;
+    }
+
+    public Integer getValidQuantity(StockRecord record) {
+        Integer quantity = record.getQuantity();
+        List<StockRecord> stockRecords = new ArrayList<>();
+        if (record.getRecordType() == 1) {
+            stockRecords = stockRecordRepository.findListByInboundNumber(record.getInboundNumber());
+        }
+        if (record.getRecordType() == 2) {
+            stockRecords = stockRecordRepository.findListByOutboundNumber(record.getOutboundNumber());
+        }
+        return stockRecords.stream().mapToInt(StockRecord::getQuantity).reduce(quantity, (o, n) -> o - n);
     }
 }
