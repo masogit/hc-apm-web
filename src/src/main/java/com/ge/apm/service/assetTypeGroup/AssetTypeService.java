@@ -231,10 +231,10 @@ public class AssetTypeService {
             rowNameList.clear();
         }
 
-        Integer maxId = assetTypeGroupDao.getMaxId();
-        if (null == maxId) {
-            maxId = 0;
-        }
+//        Integer maxId = assetTypeGroupDao.getMaxId();
+//        if (null == maxId) {
+//            maxId = 0;
+//        }
 
         for(List lis1: dataList){
 
@@ -259,11 +259,11 @@ public class AssetTypeService {
                     }
                     if(sysAuthGroup==null && parentUid==null){
                         sysAuthGroup= new AssetTypeGroup();
-                        sysAuthGroup.setId(++maxId);
+//                        sysAuthGroup.setId(++maxId);
                         sysAuthGroup.setName(name);
                         sysAuthGroup.setClassificationCode(classificationCode);
                         sysAuthGroup.setEncoded(encoded);
-                        sysAuthGroup.onSave();
+//                        sysAuthGroup.onSave();
                         sysAuthGroup.setTenantUid(user.getTenantUID());
                         assetTypeGroupDao.save(sysAuthGroup);
                         result = new HashMap<>();
@@ -271,14 +271,14 @@ public class AssetTypeService {
                         resultList.add(result);
                     }else if(sysAuthGroup==null && parentUid!=null){
                         sysAuthGroup= new AssetTypeGroup();
-                        sysAuthGroup.setId(++maxId);
+//                        sysAuthGroup.setId(++maxId);
                         sysAuthGroup.setName(name);
                         sysAuthGroup.setClassificationCode(classificationCode);
                         sysAuthGroup.setEncoded(encoded);
                         AssetTypeGroup parent = assetTypeGroupDao.findByUid(parentUid);
                         sysAuthGroup.setParentAuthGroup(parent);
                         sysAuthGroup.setParentUid(parentUid);
-                        sysAuthGroup.onSave();
+//                        sysAuthGroup.onSave();
                         sysAuthGroup.setTenantUid(user.getTenantUID());
                         assetTypeGroupDao.save(sysAuthGroup);
                         result = new HashMap<>();
