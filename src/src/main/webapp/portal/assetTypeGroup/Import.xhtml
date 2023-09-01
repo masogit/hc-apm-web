@@ -1,0 +1,72 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <div class="ui-g">
+        <div class="ui-g-12 card">
+            <h:form enctype="multipart/form-data">
+                <p:fieldset legend="#{msg.ImportGroupingInBatch}" id="uploaderContainer">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <p:fileUpload fileUploadListener="#{authImportController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
+                                      invalidFileMessage="#{msg.OnlySupportsXlsOrXlsxFormat}" invalidSizeMessage="#{msg.FileSizeMustNotExceedFiveM}" update="@(form) :tabview:authGroupEditForm:authGroupTree"
+                                      sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.ImportFromExcel}" cancelLabel="#{msg.Cancel}" uploadLabel="#{msg.ConfirmUpload}" />
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p>#{msg.description}</p>
+                        <p>
+                            1. <a href="APM_Auth_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
+                        </p>
+                        <p>2. #{msg.FillInTheFileToBeImported},sheet名称开头两位为0-9的数字</p>
+                        <p>3. #{msg.upFileImport}</p>
+                    </h:panelGroup>
+                </p:fieldset>
+            </h:form>
+        </div>
+
+        <div class="ui-g-12 card">
+            <h:form id="dataListForm">
+                <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false">
+                </p:messages>
+                <p:fieldset legend="#{msg.ImportedData}">
+                    <p:dataTable id="datalist2" rendered="#{not empty authImportController.importFailedDataList}"
+                                 value="#{authImportController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+
+                        <p:column headerText="#{msg.EXCELRowNumber}" rendered="#{not empty item.index}"><!--rendered="false"-->
+                            <h:outputText value="#{item.index}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Institution}" rendered="#{not empty item.data}"> <!--rendered="not empty item.data"-->
+                            <h:outputText value="#{item.data}" />
+                        </p:column>
+                        <!--<p:column headerText="#{msg.Hospital}">
+                            <h:outputText value="#{item.hospitalName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.Site}">
+                            <h:outputText value="#{item.siteName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.Department}">
+                            <h:outputText value="#{item.departName}" />
+                        </p:column>
+                        &lt;!&ndash;<p:column headerText="UUID">&ndash;&gt;
+                            &lt;!&ndash;<h:outputText value="#{item.uuid}" />&ndash;&gt;
+                        &lt;!&ndash;</p:column>&ndash;&gt;
+                        <p:column headerText="#{msg.Remark}">
+                            <h:outputText value="#{item.status}" />
+                        </p:column>-->
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist2" fileName="OrgImportFailed_export" />
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </p:fieldset>
+            </h:form>
+
+        </div>
+    </div>
+
+</ui:composition>

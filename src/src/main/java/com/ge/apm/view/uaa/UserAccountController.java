@@ -10,10 +10,7 @@ import com.ge.apm.service.api.UserApiService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.security.UserDetailsServiceImpl;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.uaa.UserAccountExportService;
-import com.ge.apm.service.uaa.UserAccountHistoryService;
-import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.uaa.*;
 import com.ge.apm.service.utils.*;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
@@ -237,7 +234,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private Boolean confirmDestroy = false;
 
+    private AssetTypeGroupService assetTypeGroupService;
 
+    private UserAssetTypeGroupMapper userAssetTypeGroupMapper;
+
+    private UserAssetGroupRepository userAssetGroupDao;
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<>();
@@ -266,6 +267,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         supplierUserRepository = WebUtil.getBean(SupplierUserRepository.class);
         userAccountHistoryService = WebUtil.getBean(UserAccountHistoryService.class);
+        assetTypeGroupService= WebUtil.getBean(AssetTypeGroupService.class);
+
+        userAssetTypeGroupMapper = WebUtil.getBean(UserAssetTypeGroupMapper.class);
+        userAssetGroupDao = WebUtil.getBean(UserAssetGroupRepository.class);
 
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
@@ -672,6 +677,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         updateUserScope();
         userApi.resetUser(selected.getLoginName());
         selected.getUserRoleList().clear();
+        userAssetTypeUpdate();
         selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("UserRole") + WebUtil.getMessage("Updated"));
         treeDeleteUrgOidList = new ArrayList();//初始化操作
@@ -684,6 +690,44 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectAllButton = false;
         accessOrgTree = new DefaultTreeNode("root", null, null);
     }
+
+    private void userAssetTypeUpdate() {
+        Set<AssetTypeGroup> selectedSysAuthGroups = gatherUserAuthGroup();
+        updateUserAuthGroup(selected, selectedSysAuthGroups);
+
+    }
+    public Set<AssetTypeGroup> gatherUserAuthGroup() {
+        Set<AssetTypeGroup> selectedSysAuthGroups = new HashSet<>();
+        readSelectedNodesInSysAuthGroupTree(sysAuthGroupTree, selectedSysAuthGroups);
+
+        return selectedSysAuthGroups;
+    }
+    private void readSelectedNodesInSysAuthGroupTree(TreeNode node, Set<AssetTypeGroup> selectedTreeNodeList) {
+        if (node.isSelected()) {
+            if (node.getParent() != null && node.getParent().isSelected()) {
+                return;
+            } else {
+                selectedTreeNodeList.add((AssetTypeGroup)node.getData());
+            }
+        } else {
+            for (TreeNode item : node.getChildren()) {
+                readSelectedNodesInSysAuthGroupTree(item, selectedTreeNodeList);
+            }
+        }
+    }
+    private void updateUserAuthGroup(UserAccount userAccount, Set<AssetTypeGroup> selectedSysAuthGroups) {
+        userAssetTypeGroupMapper.removeAuthGroupByUser(userAccount.getUid());
+
+
+        selectedSysAuthGroups.stream().forEach(item -> {
+            UserAssetGroup userAuthGroup = new UserAssetGroup();
+            userAuthGroup.setUserUid(userAccount.getUid());
+            userAuthGroup.setAssetGroupUid(item.getUid());
+            userAuthGroup.setClassificationPath(item.getClassificationPath());
+            userAssetGroupDao.save(userAuthGroup);
+        });
+    }
+
 
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
@@ -791,6 +835,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                     e.printStackTrace();
                 }
             }
+            userAssetGroupDao.deleteByUserUid(selected.getUid());
+
             /* 物理删除
             log.info("start delete user, uid: {}",this.selected.getUid());
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
@@ -1187,7 +1233,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             setSelectedOrgTree(accessOrgTree, orgList);
             TreeNodeUtil.expandTreeNode(accessOrgTree);
         }
-
+        loadAssetTypeGroup();
     }
 
     List<UserOrgInfo> userOrgInfoList;
@@ -1828,5 +1874,57 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setConfirmDestroy(Boolean confirmDestroy) {
         this.confirmDestroy = confirmDestroy;
+    }
+
+
+    private TreeNode sysAuthGroupTree;
+    private TreeNode[] selectedSysAuthGroupNodes;
+
+
+    public TreeNode getSysAuthGroupTree() {
+        return sysAuthGroupTree;
+    }
+    public TreeNode[] getSelectedSysAuthGroupNodes() {
+        return selectedSysAuthGroupNodes;
+    }
+    public void setSelectedSysAuthGroupNodes(TreeNode[] selectedSysAuthGroupNodes) {
+        this.selectedSysAuthGroupNodes = selectedSysAuthGroupNodes;
+    }
+    public void onSelectAssetTypeGroupTreeNode(NodeSelectEvent event) {
+        setTreeNodes(event.getTreeNode(), true);
+    }
+
+
+
+    public void onUnselectAssetTypeGroupTreeNode(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+    }
+
+    private void loadAssetTypeGroup() {
+        sysAuthGroupTree = assetTypeGroupService.buildSysAuthGroupInTree();
+
+        List<String> userAssetGroups = userAssetTypeGroupMapper.findAssetGroupByUser(this.selected.getUid());
+
+        setSelectedSysAuthGroupTree(sysAuthGroupTree, userAssetGroups);
+
+    }
+    private void setSelectedSysAuthGroupTree(TreeNode node, List<String> userAuthGroupUids) {
+        if (node.getData() instanceof AssetTypeGroup) {
+            AssetTypeGroup assetTypeGroup = (AssetTypeGroup) node.getData();
+            if (userAuthGroupUids.contains(assetTypeGroup.getUid())) {
+                node.setSelected(true);
+            } else if (node.getParent() != null && node.getParent().isSelected()) {
+                node.setSelected(true);
+            }
+        }
+
+        for (TreeNode item : node.getChildren()) {
+            setSelectedSysAuthGroupTree(item, userAuthGroupUids);
+        }
     }
 }
