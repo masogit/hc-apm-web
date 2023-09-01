@@ -723,7 +723,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             UserAssetGroup userAuthGroup = new UserAssetGroup();
             userAuthGroup.setUserUid(userAccount.getUid());
             userAuthGroup.setAssetGroupUid(item.getUid());
-            userAuthGroup.setClassificationPath(item.getClassificationPath());
+//            userAuthGroup.setClassificationPath(item.getClassificationPath());
             userAssetGroupDao.save(userAuthGroup);
         });
     }

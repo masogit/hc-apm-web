@@ -62,11 +62,11 @@
                                 </p:inputText>
                             </h:panelGroup>
 
-                            <h:panelGroup rendered="#{not assetTypeGroupController.create}" >
-                                <label class="label">分类层级（BI使用）</label>
-                                <p:inputText id="classificationPath" value="#{assetTypeGroupController.selected.classificationPath}" readonly="true">
-                                </p:inputText>
-                            </h:panelGroup>
+<!--                            <h:panelGroup rendered="false" >-->
+<!--                                <label class="label">分类层级（BI使用）</label>-->
+<!--                                <p:inputText id="classificationPath" value="#{assetTypeGroupController.selected.classificationPath}" readonly="true">-->
+<!--                                </p:inputText>-->
+<!--                            </h:panelGroup>-->
 
                             <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{assetTypeGroupController.saveSelectedAuthGrouping}" value="#{msg.Save}" update="authGroupTree :growl"/>
                         </p:panelGrid>
