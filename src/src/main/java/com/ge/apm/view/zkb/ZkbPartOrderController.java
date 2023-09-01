@@ -756,7 +756,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         HashMap<String, Object> dataMap = zkbPartOrderExcelService.createZkbPartOrderData(zkbPartOrders);
 
         try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/partOrder/excel/APM_ZKB_PartOrder_Exp_Template.xlsx");
+            String impFileName= "";
+            if(StringUtils.isEmpty(notGeAsset) ){
+                impFileName = "APM_ZKB_PartOrder_Exp_Template.xlsx";
+            }else {
+                impFileName = "APM_ZKB_PartOrder_Exp_Non_Template.xlsx";
+            }
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/partOrder/excel/" + impFileName);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             zkbPartOrderExcelService.exportData(doc, dataMap);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbPartOrderExcel_Export.xlsx");
