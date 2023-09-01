@@ -297,9 +297,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			}
 			Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst();
 			selected.setFeatureList(JSON.toJSONString(features.get().getFeatureList()));
-			if (selected.getType() == 0) {
-				selected.setEnablesNewMenu(true);
-			}
+			selected.setEnablesNewMenu(true);
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
 		log.info("save/updating... TenantInfo , tenantName:{},tenantConfig:{}", this.selected.getName(), this.selected.getTenantConfig());
@@ -621,14 +619,6 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void changeListener() {
 		Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst();
 		buildFeature(JSON.toJSONString(features.get().getFeatureList()));
-	}
-
-	public void changeType() {
-		if (selected == null || selected.getType() == 0) {
-			selected.setEnablesNewMenu(Boolean.TRUE);
-		} else {
-			selected.setEnablesNewMenu(Boolean.FALSE);
-		}
 	}
 
 	public String getType() {
