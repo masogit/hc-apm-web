@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <div class="ui-g-12">
+
+        <h:form id="authGroupEditForm">
+
+            <div class="ui-g-12 ui-lg-4">
+                <div class="card" style="height:400px;">
+                    <h:panelGroup>
+                        <p:inputText id="retrieval" value="#{assetTypeGroupController.retrieval}">
+                        </p:inputText>
+                        <p:commandButton icon="ui-icon-location-searching" validateClient="true" actionListener="#{assetTypeGroupController.filterNode()}" update="authGroupTree editPanel :growl"/>
+                    </h:panelGroup>
+                    <p:scrollPanel style="height:98%;border: 0" mode="native">
+                        <p:tree id="authGroupTree" class="tree" style="width:98%;border:0;" value="#{assetTypeGroupController.assetTypeGroupTree}" var="node" selectionMode="single" selection="#{assetTypeGroupController.selectedAssetTypeGroupNodes}" highlight="true">
+                            <p:ajax process="@this" event="select" listener="#{assetTypeGroupController.onSelectTreeNode}" update="@form:editPanel"/>
+
+                            <p:treeNode type="sysAuthGroup">
+                                <h:outputText value="#{node.name}"/>
+                            </p:treeNode>
+                            <p:treeNode type="hidden" rendered="false"/>
+                        </p:tree>
+                    </p:scrollPanel>
+                </div>
+            </div>
+
+            <div class="ui-g-12 ui-lg-8">
+                <div class="card" style="height:400px;">
+                    <h:panelGroup id="editPanel">
+                        <h:panelGrid columns="8">
+                            <p:commandButton id="CreateTopLevelNode" process="@this" icon="ui-icon-plus" value="#{msg.CreateTopLevelNode}" actionListener="#{assetTypeGroupController.prepareCreateTopLevelNode}" update="@form:editPanel" />
+                            <p:commandButton id="createInstution" process="@this" icon="ui-icon-plus" value="#{msg.CreatePrivilegeGrouping}" actionListener="#{assetTypeGroupController.prepareCreateNextNode}" update="@form:editPanel" disabled="#{orgInfoController.isCreateInstitutionDisabled}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{assetTypeGroupController.deleteSelectedAuthGroup}" update="@form" disabled="#{empty assetTypeGroupController.selected or empty assetTypeGroupController.selected.uid}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </h:panelGrid>
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 70%" rendered="#{assetTypeGroupController.selected ne null}">
+
+                            <h:panelGroup>
+                                <label class="label" style="width: 300px">#{msg.namePath}</label>
+                                <p:inputText id="nameEn" readonly="true" value="#{assetTypeGroupController.namePath}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.name}*</label>
+                                <p:inputText id="name" value="#{assetTypeGroupController.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"></p:inputText>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label" style="width: 300px">#{msg.classificationCode}</label>
+                                <p:inputText id="classificationCode" value="#{assetTypeGroupController.classificationCode}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.I18nCode}</label>
+                                <p:inputText id="encoded" value="#{assetTypeGroupController.encoded}" readonly="#{assetTypeGroupController.isReadOnly eq null}" required="true" requiredMessage="#{msg.I18nCode} #{msg.ValidationRequire}">
+                                </p:inputText>
+                            </h:panelGroup>
+
+                            <h:panelGroup rendered="#{not assetTypeGroupController.create}" >
+                                <label class="label">分类层级（BI使用）</label>
+                                <p:inputText id="classificationPath" value="#{assetTypeGroupController.selected.classificationPath}" readonly="true">
+                                </p:inputText>
+                            </h:panelGroup>
+
+                            <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{assetTypeGroupController.saveSelectedAuthGrouping}" value="#{msg.Save}" update="authGroupTree :growl"/>
+                        </p:panelGrid>
+                    </h:panelGroup>
+                </div>
+            </div>
+        </h:form>
+    </div>
+
+</ui:composition>
