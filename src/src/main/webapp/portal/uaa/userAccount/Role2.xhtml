@@ -90,6 +90,19 @@
                                 </p:tab>
                             </c:otherwise>
                         </c:choose>
+                        <p:tab title="#{msg.authGroup}" class="ui-g-12" >
+                            <p:scrollPanel style="height: 300px; border: 0;" mode="native">
+
+                                <p:tree id="authGroupTree" class="tree" style="border:0;height:362px" value="#{userAccountController.sysAuthGroupTree}" selection="#{userAccountController.selectedSysAuthGroupNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
+                                    <p:ajax event="select" listener="#{userAccountController.onSelectAssetTypeGroupTreeNode}" />
+                                    <p:ajax event="unselect" listener="#{userAccountController.onUnselectAssetTypeGroupTreeNode}" />
+
+                                    <p:treeNode type="sysAuthGroup">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:tab>
 <!--                        <p:tab title="#{msg.PermissionGroupSetting}" class="ui-g-12" >-->
 <!--                            <p:selectManyCheckbox id="permissionGroups" value="#{userAccountController.assignedPermissionGroupUidList}" layout="pageDirection">-->
 <!--                                <p:ajax update=":userAccountTab:UserRoleEditForm2:tabview2:permissionGroups"/>-->

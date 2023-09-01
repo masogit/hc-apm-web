@@ -88,6 +88,8 @@ public class UserAccountService {
 	@Autowired
 	private SimplePartsWarehouseUserService simplePartsWarehouseUserService;
 
+	@Autowired
+	UserAssetGroupRepository userAssetGroupDao;
 
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
@@ -359,6 +361,8 @@ public class UserAccountService {
         userRoleRepository.deleteByUserAccount(userAccount.getId());
         userAccountRepository.deleteByUid(userUid);
 		log.info("delete userAccount , uid: {}",userAccount.getUid());
+		userAssetGroupDao.deleteByUserUid(userAccount.getUid());
+
 
 		UserAccount currentUser = UserContextService.getCurrentUserAccount();
 		userAccount.setLastModifiedBy(currentUser.getLoginName());
