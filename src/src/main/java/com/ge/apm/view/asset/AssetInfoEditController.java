@@ -1125,9 +1125,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public Boolean needAssetApproval(String siteUid) {
-        if (null != config && config.getNeedInstorageCheck() != null && config.getNeedInstorageCheck()) {
-            return false;
-        }
+//        if (null != config && config.getNeedInstorageCheck() != null && config.getNeedInstorageCheck()) {
+//            return false;
+//        }
         return acService.needAssetApproval(siteUid);
     }
 

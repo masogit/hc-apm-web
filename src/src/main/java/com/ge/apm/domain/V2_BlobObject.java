@@ -106,6 +106,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_PROBE_RECOMMEND = "ProbeRecommend";
     public static final String BO_TYPE_AUDIT_CONFIG_ITEM = "auditConfigItem";
     public static final String BO_TYPE_AUDIT_TEMPLATE = "auditTemplate";
+    public static final String BO_TYPE_PART_PIC = "sparePart";
     /**
      * 工程师信息
      */

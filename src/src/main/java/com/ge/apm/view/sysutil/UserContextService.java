@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.SessionCache;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
 
@@ -41,7 +40,6 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URLEncoder;
@@ -181,36 +179,33 @@ public class UserContextService implements Serializable {
      * @return boolean
      */
     public boolean accessContain() {
-        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (CollectionUtils.isNotEmpty(bySiteUID)) {
-            return BooleanUtils.isTrue(bySiteUID.get(0).getWhethertoenableunattended()) && BooleanUtils.isTrue(bySiteUID.get(0).getIsiotenabled());
+        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(getCurrentUserAccount().getSiteUID());
+        if (null != config) {
+            return BooleanUtils.isTrue(config.getWhethertoenableunattended()) && BooleanUtils.isTrue(config.getIsiotenabled());
         }
         return false;
     }
 
     public boolean enableSiteToSiteAllocation() {
-        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (bySiteUID == null || bySiteUID.isEmpty()) {
+        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(getCurrentUserAccount().getSiteUID());
+        if  (null == config ) {
             return false;
         }
-        WorkflowConfig workflowConfig = bySiteUID.get(0);
-        return workflowConfig.getEnableSiteToSiteAllocation() != null && workflowConfig.getEnableSiteToSiteAllocation();
+        return config.getEnableSiteToSiteAllocation() != null && config.getEnableSiteToSiteAllocation();
     }
     public boolean enableAssetPreview() {
-        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (bySiteUID == null || bySiteUID.isEmpty()) {
+        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(getCurrentUserAccount().getSiteUID());
+        if  (null == config ) {
             return false;
         }
-        WorkflowConfig workflowConfig = bySiteUID.get(0);
-        return workflowConfig.getEnableAssetPreview() != null && workflowConfig.getEnableAssetPreview();
+        return config.getEnableAssetPreview() != null && config.getEnableAssetPreview();
     }
     public boolean enableSendRepair() {
-        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (bySiteUID == null || bySiteUID.isEmpty()) {
+        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(getCurrentUserAccount().getSiteUID());
+        if (null == config ) {
             return false;
         }
-        WorkflowConfig workflowConfig = bySiteUID.get(0);
-        return workflowConfig.getEnableSendRepair() != null && workflowConfig.getEnableSendRepair();
+        return config.getEnableSendRepair() != null && config.getEnableSendRepair();
     }
 
     public boolean hasNotAnyRole(String roleList) {
@@ -1318,18 +1313,9 @@ public class UserContextService implements Serializable {
         if(activeSupplierFlag == null){
             activeSupplierFlag = Boolean.FALSE;
             UserAccount user = getCurrentUserAccount();
-            WorkflowConfigRepository workflowConfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
-            List<WorkflowConfig> workflowConfigList = workflowConfigDao.findBySiteUID(user.getSiteUID());
-            if(CollectionUtils.isEmpty(workflowConfigList)){
-                workflowConfigList = workflowConfigDao.findBySiteUID(user.getHospitalUID());
-            }
-            if(CollectionUtils.isEmpty(workflowConfigList)){
-                workflowConfigList = workflowConfigDao.findBySiteUID(user.getInstitutionUID());
-            }
-            if(CollectionUtils.isEmpty(workflowConfigList)){
-                workflowConfigList = workflowConfigDao.findBySiteUID(user.getTenantUID());
-            }
-            if (CollectionUtils.isNotEmpty(workflowConfigList) && BooleanUtils.isTrue(workflowConfigList.get(0).getActiveSupplier())) {
+            ConfigService configService = WebUtil.getBean(ConfigService.class);
+            WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
+            if (BooleanUtils.isTrue(configBySite.getActiveSupplier())) {
                 activeSupplierFlag = Boolean.TRUE;
             }
         }

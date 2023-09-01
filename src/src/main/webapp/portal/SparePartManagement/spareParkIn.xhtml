@@ -61,6 +61,14 @@
                             <label class ="label">备注 </label>
                             <p:inputText id="remark" value="#{sparePartController.selected.remark}"  />
                         </h:panelGroup>
+                        <h:panelGroup rendered="${userContextService.hasCurrentTenantName('')}">
+                            <label class ="label">适用设备 </label>
+                            <p:inputText id="adaptingDevices" value="#{sparePartController.selected.adaptingDevices}"  />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="${userContextService.hasCurrentTenantName('')}">
+                            <label class ="label">有效期 </label>
+                            <p:calendar id="effectiveDate" timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{sparePartController.selected.effectiveDate}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">仓库* </label>
                             <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" required="true" requiredMessage="仓库必填">
@@ -68,6 +76,19 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
+                    <p:fieldset legend="备件照片" rendered="${userContextService.hasCurrentTenantName('')}">
+                        <p:dataGrid id="pictureList" var="fileitem" value="#{sparePartController.tempFile}" columns="5" layout="grid">
+                            <p:panel  style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%" >
+                                    <p:graphicImage value="#{sparePartController.getStreamedContent(fileitem)}" height="80" width="100" stream="false"/>
+                                    <p:commandButton actionListener="#{sparePartController.removeTempAttachment(fileitem)}" update="pictureList pkInForm:pic" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:dataGrid>
+                        <p:fileUpload id="pic" disabled="#{sparePartController.disableUploadButton_temp()}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{sparePartController.tempFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="10000000" update="@this pictureList" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    </p:fieldset>
                     <p:commandButton validateClient="true" actionListener="#{sparePartController.save()}" value="#{msg.Save}" update="display,:pkInForm, :sparePartForm:datalist, :growl, :pkInForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pkInDialog');"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{sparePartController.cancel()}" icon="ui-icon-cancel" update=":sparePartForm:datalist" onclick="PF('pkInDialog').hide()" />
                 </h:panelGroup>

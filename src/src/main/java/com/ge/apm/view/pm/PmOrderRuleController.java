@@ -11,6 +11,7 @@ import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
@@ -78,6 +79,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private List<String> deletedCheckListIds = new ArrayList<>();
     private UserContextService userContextService;
     private String ruleLevelTip;
+    private Map<String, Boolean> selectedMap;
+    private List<PmOrderRule> currentPageAssets;
 
     @Override
     protected void init() {
@@ -103,8 +106,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
-        //initTree(user.getTenantUID());
-//        BeanUtils.copyProperties(selected,pmOrderRule);
+        this.selectedMap = new HashMap<>();
+        this.currentPageAssets = new ArrayList<>();
         initOrgTree();
     }
 
@@ -213,7 +216,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         }
         Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
-        return dao.findBySearchFilter(searchFilters, pageRequest);
+        Page<PmOrderRule> pmOrderRulePage = dao.findBySearchFilter(searchFilters, pageRequest);
+        currentPageAssets = pmOrderRulePage.getContent();
+        return pmOrderRulePage;
     }
 
     public List<UserAccount> getOwnerList(){
@@ -464,8 +469,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     @Override
     @Transactional
     public void delete() {
-        String uid = selected.getUid();
-        //int level = selected.getLevel();
+        deleteRule(selected.getUid());
+    }
+    public void deleteRule(String uid) {
         pmOrderRuleCheckListRepository.deleteExistsRecord(uid);
         List<RelRuleAsset> relRuleAssets = relRuleAssetRepository.findRelRuleAssets(uid);
         List<RelRuleAsset> updateList = new ArrayList<>(relRuleAssets.size());
@@ -806,6 +812,31 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         }
     }
 
+    public void onSelectAllOfPage() {
+        boolean isSelectedAll = currentPageAssets.stream().noneMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+        for (PmOrderRule item : currentPageAssets) {
+            selectedMap.put(item.getUid(), !isSelectedAll);
+        }
+    }
+
+    public void batchDelete(){
+        Map<String, Boolean> map = this.selectedMap;
+        List<String> deleteUids = Lists.newArrayList();
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (Boolean.FALSE.equals(entry.getValue())) {
+                continue;
+            }
+            deleteRule(entry.getKey());
+            deleteUids.add(entry.getKey());
+        }
+        dao.deleteById(deleteUids);
+        this.selectedMap.clear();
+    }
+
+    public boolean isChecked() {
+        return selectedMap.containsValue(true);
+    }
+
     public Integer getManufactureId() {
         return manufactureId;
     }
@@ -920,5 +951,13 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void setRuleLevelTip(String ruleLevelTip) {
         this.ruleLevelTip = ruleLevelTip;
+    }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
     }
 }
