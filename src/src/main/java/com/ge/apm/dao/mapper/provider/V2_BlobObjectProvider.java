@@ -35,20 +35,17 @@ public class V2_BlobObjectProvider {
                 " bo.second_directory" +
                 " FROM" +
                 " v2_blob_object bo" +
-                " INNER JOIN (SELECT" +
-                " main_directory," +
-                " second_directory" +
-                " FROM" +
-                " asset_info" +
-                " WHERE" +
-                " tenant_uid = '"+tenantUid+"'" +
-                " AND main_directory IS NOT NULL" +
-                " AND second_directory IS NOT NULL" +
-                " GROUP BY" +
-                " main_directory," +
-                " second_directory) ai ON bo.main_directory = ai.main_directory" +
-                " AND bo.second_directory = ai.second_directory" +
-                " WHERE bo.bo_type ='"+boType+"'"+
+                " WHERE exists(select main_directory, second_directory" +
+                " FROM ( (SELECT main_directory, second_directory" +
+                " FROM asset_info WHERE tenant_uid = '"+tenantUid+"'" +
+                " AND main_directory IS NOT NULL AND second_directory IS NOT NULL" +
+                " GROUP BY main_directory, second_directory)" +
+                " union all" +
+                " (SELECT 'AW' as main_directory, 'AW' as second_directory from asset_info" +
+                " where asset_group = '1' and tenant_uid = '"+tenantUid+"' limit 1)) directory" +
+                " where directory.main_directory = bo.main_directory " +
+                " and directory.second_directory = bo.second_directory)" +
+                " and bo.bo_type ='"+boType+"'"+
                 " UNION" +
                         " SELECT" +
                         " bo. ID," +

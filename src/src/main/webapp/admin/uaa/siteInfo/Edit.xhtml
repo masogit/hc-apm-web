@@ -56,16 +56,12 @@
                             <p:selectOneMenu value="#{tenantInfoController.selected.defaultLang}">
                                 <f:selectItem itemLabel="zh" itemValue="zh"/>
                                 <f:selectItem itemLabel="en" itemValue="en"/>
-                                <!--<f:selectItem itemLabel="tw" itemValue="tw"/>-->
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.tenantType}</label>
                             <p:selectOneMenu value="#{tenantInfoController.selected.type}">
-                                <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
-
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('tenantType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-                                <p:ajax listener="#{tenantInfoController.changeType}" update="@this :SiteInfoEditForm:enablesNewMenu"></p:ajax>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -80,10 +76,6 @@
                             <label class="label">&nbsp;</label>
                             <p:selectBooleanCheckbox itemLabel="#{msg.isEnabled}" value="#{tenantInfoController.selected.isEnabled}"/>
                         </h:panelGroup>
-                        <!--<h:panelGroup>
-                            <label class="label">&nbsp;</label>
-                            <p:selectBooleanCheckbox itemLabel="院区隔离" value="#{tenantInfoController.selected.insulate}"/>
-                        </h:panelGroup>-->
                         <h:panelGroup rendered="#{tenantInfoController.showTestTenant}">
                             <label class="label">&nbsp;</label>
                             <p:selectBooleanCheckbox itemLabel="运营管理租户" value="#{tenantInfoController.testTenant}"/>
@@ -94,7 +86,6 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">&nbsp;</label>
-<!--                            isEnablesAdverseEvents-->
                             <p:selectBooleanCheckbox itemLabel="是否开启不良事件上报" value="#{tenantInfoController.selected.isEnablesAdverseEvents}"/>
                         </h:panelGroup>
 

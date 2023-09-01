@@ -3361,6 +3361,7 @@
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','ServiceManual','维修手册','ServiceManual',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','OperationManual','运营手册','OperationManual',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','OperationVideo','运营视频','OperationVideo',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','MaintenanceList','保养清单','MaintenanceList',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','Others','其他','Others',NULL,-1);
 

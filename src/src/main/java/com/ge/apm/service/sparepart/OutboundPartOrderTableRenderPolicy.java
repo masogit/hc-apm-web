@@ -1,6 +1,7 @@
 package com.ge.apm.service.sparepart;
 
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
@@ -22,6 +23,10 @@ public class OutboundPartOrderTableRenderPolicy extends AbstractWoTableRenderPol
                 addCell(row, extractValue(part, "quantity"));
                 addCell(row, extractValue(part, "unit"));
                 addCell(row, extractValue(part, "totalPrice"));
+                if (UserContextService.hasCurrentTenantName("")) {
+                    addCell(row, extractValue(part, "adaptingDevices"));
+                    addCell(row, extractValue(part, "effectiveDate"));
+                }
             }
         }
         table.removeRow(1);

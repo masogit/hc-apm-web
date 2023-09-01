@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.common.WechatSendMsgService;
@@ -18,12 +19,10 @@ import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
-import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +41,7 @@ public class AssetCreateService {
     @Autowired
     I18nMessageRepository i18nDao;
     @Autowired
-    private TenantInfoRepository tenantDao;
+    private ConfigCacheService configCacheService;
     @Autowired
     protected BlobFileService blobService;
     @Autowired
@@ -79,7 +78,7 @@ public class AssetCreateService {
     private V2_PmOrderService pmService;
 
     public String getTenantName(String uid) {
-        TenantInfo si = tenantDao.findByuid(uid);
+        TenantInfo si = configCacheService.getTenantByUid(uid);
         if (si != null) {
             return si.getName();
         } else {
