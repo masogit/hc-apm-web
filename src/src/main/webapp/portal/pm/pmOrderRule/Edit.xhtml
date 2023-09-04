@@ -75,7 +75,7 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.period}</label>
-                            <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="0" maxValue="120" decimalPlaces="0" 
+                            <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="1" maxValue="120" decimalPlaces="0"
                             required="false" requiredMessage="#{msg.OutOfRange}"  />
                            <!--  <p: id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/> -->
                         </h:panelGroup>
