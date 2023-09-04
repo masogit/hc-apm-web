@@ -66,7 +66,7 @@ public class V2_BlobObjectProvider {
                         " bo.main_directory, " +
                         " bo.second_directory " +
                         "FROM" +
-                        " v2_blob_object bo WHERE bo.bo_type = '"+boType+"' AND (bo.main_directory='ALL' AND bo.second_directory='ALL')) as bo where 1=1");
+                        " v2_blob_object bo WHERE bo.bo_type = '"+boType+"' AND (bo.main_directory='ALL' AND bo.second_directory='ALL')) as bo where 1=1 order by  bo.operation_type desc");
         String filter = buildFilter_V2_BlobObjectDetail(searchFilterList);
         sb.append(filter);
         return sb.toString();
