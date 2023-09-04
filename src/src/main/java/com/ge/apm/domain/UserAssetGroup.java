@@ -35,8 +35,8 @@ public class UserAssetGroup implements Serializable {
     @Column(name = "asset_group_uid", nullable = false)
     private String assetGroupUid;
 
-    @Column(name = "classification_path", columnDefinition="ltree")
-    private String classificationPath;
+//    @Column(name = "classification_path", columnDefinition="ltree")
+//    private String classificationPath;
 
 //    @PrePersist
 //    public void initializeUid() {
