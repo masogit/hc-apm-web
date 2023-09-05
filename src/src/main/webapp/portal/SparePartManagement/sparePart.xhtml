@@ -105,7 +105,7 @@
 								</p:panel>
 							</p:dataGrid>
 							<h:form id="uploadPicForm">
-								<p:fileUpload id="uploadPic" disabled="#{sparePartController.disableUploadButton()}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{sparePartController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="10000000" update="@this pic" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+								<p:fileUpload id="uploadPic" disabled="#{sparePartController.disableUploadButton()}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{sparePartController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="10000000" update="@this :sparePartForm pic" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 							</h:form>
 						</p:sidebar>
 					</h:panelGroup>
