@@ -523,9 +523,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void updatePMRuleFilterChange(){
        if(ruleNameObj != null || periodObj != null) {
            Set<String> pmRuleUids = getPMRuleUids(ruleNameObj, periodObj);
-           if (CollectionUtils.isNotEmpty(pmRuleUids)) {
-               filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN, pmRuleUids));
+           if (CollectionUtils.isEmpty(pmRuleUids)) {
+               pmRuleUids.add("-1");
            }
+           filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN, pmRuleUids));
        }
     }
 
