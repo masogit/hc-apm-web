@@ -66,7 +66,7 @@ public class V2_BlobObjectProvider {
                         " bo.main_directory, " +
                         " bo.second_directory " +
                         "FROM" +
-                        " v2_blob_object bo WHERE bo.bo_type = '"+boType+"' AND (bo.main_directory='ALL' AND bo.second_directory='ALL')) as bo where 1=1 order by  bo.operation_type desc");
+                        " v2_blob_object bo WHERE bo.bo_type = '"+boType+"' AND (bo.main_directory='ALL' AND bo.second_directory='ALL')) as bo where 1=1 ");
         String filter = buildFilter_V2_BlobObjectDetail(searchFilterList);
         sb.append(filter);
         return sb.toString();
@@ -77,31 +77,23 @@ public class V2_BlobObjectProvider {
         for (SearchFilter searchFilter : searchFilterList) {
             String tempColumn = searchFilter.fieldName;
             Object value = searchFilter.value;
-            if("mainDirectory".equals(tempColumn))
-            {
+            if("mainDirectory".equals(tempColumn)) {
                 sb.append(" and bo.main_directory like '%"+value.toString()+"%'");
             }
-            if("secondDirectory".equals(tempColumn))
-            {
+            if("secondDirectory".equals(tempColumn)) {
                 sb.append(" and bo.second_directory like '%"+value.toString()+"%'");
             }
-            if("objectName".equals(tempColumn))
-            {
+            if("objectName".equals(tempColumn)) {
                 sb.append(" and bo.object_name like '%"+value.toString()+"%'");
             }
-            if("boSubType".equals(tempColumn))
-            {
+            if("boSubType".equals(tempColumn)) {
                 sb.append(" and bo.bo_sub_type = '"+value.toString()+"'");
             }
-            if("operationType".equals(tempColumn))
-            {
+            if("operationType".equals(tempColumn)) {
                 sb.append(" and bo.operation_type = '"+value.toString()+"'");
             }
-//            if("tenantUid".equals(tempColumn))
-//            {
-//                sb.append(" and ai.tenant_uid = '"+value.toString()+"'");
-//            }
         }
+        sb.append(" order by  bo.operation_type desc");
         return sb.toString();
     }
 }
