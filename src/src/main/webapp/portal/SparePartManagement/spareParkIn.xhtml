@@ -80,7 +80,7 @@
                         <p:dataGrid id="pictureList" var="fileitem" value="#{sparePartController.tempFile}" columns="5" layout="grid">
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
-                                    <p:graphicImage value="#{sparePartController.getStreamedContent(fileitem)}" height="80" width="100" stream="false"/>
+                                    <p:graphicImage value="#{fileitem.getStreamedContent()}" height="80" width="100" stream="false"/>
                                     <p:commandButton actionListener="#{sparePartController.removeTempAttachment(fileitem)}" update="pictureList pkInForm:pic" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>

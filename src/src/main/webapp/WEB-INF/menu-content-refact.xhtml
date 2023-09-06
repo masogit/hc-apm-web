@@ -208,7 +208,7 @@
                 <p:menuitem id="um523" value="#{msg.ConfigItemManage}" outcome="/portal/config/sysConfig/configItemList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_CONFIG_ITEM_EDIT')}"/>
                 <p:menuitem id="um525" value="#{msg.ReminderConfiguration}" outcome="/portal/config/reminder/reminderRuleList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_REMINDER_EDIT')}"/>
                 <p:menuitem id="um526" value="#{msg.BuildManagement}" outcome="/portal/config/buildManagement/Main.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_BUILDING_EDIT')}"/>
-                <p:menuitem id="um527" value="设备分类" outcome="/portal/assetTypeGroup/Main.xhtml"/>
+                <p:menuitem id="um527" value="#{msg.EquipmentClassification}" outcome="/portal/assetTypeGroup/Main.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_GROUP')}"/>
 
             </p:submenu>
 
@@ -249,7 +249,7 @@
                 <p:menuitem id="item001" value="#{msg.userModifyRecord}" outcome="/portal/historyInfo/userList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER')}"/>
                 <p:menuitem id="item002" value="#{msg.assetModifyRecord}" outcome="/portal/historyInfo/assetList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_ASSET')}"/>
                 <p:menuitem id="item003" value="#{msg.loginHistoryRecord}" outcome="/portal/historyInfo/loginList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_LOGIN')}"/>
-                <p:menuitem id="item004" value="#{msg.userModifyRecord}-ES" outcome="/portal/historyInfo/userEsList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin,ITAdmin')}"/>
+                <p:menuitem id="item004" value="#{msg.userModifyRecord}-ES" outcome="/portal/historyInfo/userEsList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('LOG_AUDIT_USER_ES')}"/>
             </p:submenu>
 
             <!-- 设备数据概览 -->

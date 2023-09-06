@@ -1004,24 +1004,24 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'mvsContractStartDate')}">
         <h:panelGroup>
-            <label class="label">#{msg.mvsContractStartDate}</label>
+            <label class="label">#{msg.MVSContractStartDate}</label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"
                         id="mvsContractStartDate" pattern="#{userContextService.timeFormat()}"
                         value="#{assetInfoEditController.selected.mvsContractStartDate}" showOn="button"
                         required="#{assetInfoEditController.customConfig.assetFields['mvsContractStartDate'].required}"
-                        requiredMessage="#{msg.mvsContractStartDate} #{msg.ValidationRequire}"
+                        requiredMessage="#{msg.MVSContractStartDate} #{msg.ValidationRequire}"
                         readonly="#{!assetInfoEditController.needEdit('mvsContractStartDate')}"
                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'mvsContractEndDate')}">
         <h:panelGroup>
-            <label class="label">#{msg.mvsContractEndDate}</label>
+            <label class="label">#{msg.MVSContractEndDate}</label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"
                         id="mvsContractEndDate" pattern="#{userContextService.timeFormat()}"
                         value="#{assetInfoEditController.selected.mvsContractEndDate}" showOn="button"
                         required="#{assetInfoEditController.customConfig.assetFields['mvsContractEndDate'].required}"
-                        requiredMessage="#{msg.mvsContractEndDate} #{msg.ValidationRequire}"
+                        requiredMessage="#{msg.MVSContractEndDate} #{msg.ValidationRequire}"
                         readonly="#{!assetInfoEditController.needEdit('mvsContractEndDate')}"
                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>

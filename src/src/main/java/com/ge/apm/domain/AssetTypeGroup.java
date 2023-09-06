@@ -20,8 +20,8 @@ import java.util.UUID;
 @Table(name = "asset_type_group",
         indexes = {
                 @Index(name = "asset_type_group_id_uk", columnList = "id"),
-                @Index(name = "asset_type_group_classification_path_uk",  columnList = "classification_path"),
-                @Index(name = "asset_type_group_classification_code_uk", columnList = "classification_code"),
+//                @Index(name = "asset_type_group_classification_path_uk",  columnList = "classification_path"),
+//                @Index(name = "asset_type_group_classification_code_uk", columnList = "classification_code"),
                 @Index(name = "asset_type_group_encoded_uk",  columnList = "encoded")
         })
 @Data
@@ -46,8 +46,8 @@ public class AssetTypeGroup implements Serializable {
     @Column(columnDefinition = "CHAR(32)")
     private String uid;
 
-    @Column(name = "id")
-    private Integer id;
+//    @Column(name = "id")
+//    private Integer id;
 
     @Size(max = 32)
     @Column(name = "name")
@@ -59,8 +59,8 @@ public class AssetTypeGroup implements Serializable {
     @Column(name = "classification_code")
     private String classificationCode;
 
-    @Column(name = "classification_path", columnDefinition="ltree")
-    private String classificationPath;
+//    @Column(name = "classification_path", columnDefinition="ltree")
+//    private String classificationPath;
 
     @Column(name = "parent_uid", columnDefinition = "CHAR(32)")
     private String parentUid;
@@ -93,14 +93,14 @@ public class AssetTypeGroup implements Serializable {
 
     }
 
-    @PostPersist
-    public void onSave(){
-        if (null == parentAuthGroup) {
-            this.classificationPath = String.valueOf(this.getId());
-        } else {
-            this.classificationPath = parentAuthGroup.getClassificationPath() + PATH_SEPARATOR + this.getId();
-        }
-    }
+//    @PostPersist
+//    public void onSave(){
+//        if (null == parentAuthGroup) {
+//            this.classificationPath = String.valueOf(this.getId());
+//        } else {
+//            this.classificationPath = parentAuthGroup.getClassificationPath() + PATH_SEPARATOR + this.getId();
+//        }
+//    }
 
 
     public AssetTypeGroup(String name) {

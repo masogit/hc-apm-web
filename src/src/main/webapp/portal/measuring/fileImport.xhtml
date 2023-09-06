@@ -13,8 +13,8 @@
                         <p:fileUpload fileUploadListener="#{measureFromZipController.handleZipFileUpload}" mode="advanced"
                                       dragDropSupport="false" multiple="false" auto="true"
                                       invalidFileMessage="只支持zip格式的文件"
-                                      invalidSizeMessage="文件大小不得超过1G"
-                                      update=":measuringTab:zipErrListForm, :measuringTab:measuringResultForm" sizeLimit="5242880" allowTypes="/(\.|\/)(zip)$/"
+                                      invalidSizeMessage="文件大小不得超过500M"
+                                      update=":measuringTab:zipErrListForm, :measuringTab:measuringResultForm" sizeLimit="524288000" allowTypes="/(\.|\/)(zip)$/"
                                       label="从zip导入" cancelLabel="取消" uploadLabel="确认上传"/>
                         <p:growl id="messages" showDetail="true"/>
                     </p:panelGrid>

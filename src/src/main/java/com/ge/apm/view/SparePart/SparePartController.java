@@ -6,13 +6,12 @@ import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TempFileUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.data.FilterEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +26,6 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -66,7 +64,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     @Getter @Setter
     private List<V2_BlobObject> picList;
     @Getter @Setter
-    private List<UploadedFile> tempFile;
+    private List<TempFileUtil> tempFile;
 
     @Override
     protected void init() {
@@ -279,8 +277,8 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         return picList.size() > 4;
     }
 
-    public void saveTempFile(UploadedFile file) {
-        V2_BlobObject blobObject = blobService.uploadFile(file);
+    public void saveTempFile(TempFileUtil tempFile) {
+        V2_BlobObject blobObject = blobService.uploadFile(tempFile.getInputStream(), tempFile.getFileName());
             blobObject.setBoType(V2_BlobObject.BO_TYPE_PART_PIC);
             blobObject.setBoUuid(selected.getId());
             blobService.saveBlobObject(blobObject);
@@ -300,12 +298,12 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
     }
 
     public void tempFileUpload(FileUploadEvent event) {
-        tempFile.add(event.getFile());
-    }
-
-    public StreamedContent getStreamedContent(UploadedFile file) throws IOException {
-        StreamedContent streamedContent = new DefaultStreamedContent(file.getInputstream(), file.getContentType(), file.getFileName());
-        return streamedContent;
+        UploadedFile file = event.getFile();
+        tempFile.add(TempFileUtil.builder()
+                .fileName(file.getFileName())
+                .contentType(file.getContentType())
+                .contents(file.getContents())
+                .build());
     }
 
     public void removeAttachmentById(String blobId) {
@@ -313,9 +311,8 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
         picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
-    public void removeTempAttachment(UploadedFile file) {
+    public void removeTempAttachment(TempFileUtil file) {
         tempFile.remove(file);
     }
-
 
 }
