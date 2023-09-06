@@ -122,8 +122,8 @@ public enum CustomConfigFields {
     assetQuantity(label, "assetQuantity" ,Text),   //数量
     productFamily(label, "productFamily" ,Text),  //产品系列
     productSegment(label, "productSegment" ,Text),  //产品细分
-    mvsContractStartDate(fieldName, "mvsContractStartDate" ,Text),
-    mvsContractEndDate(fieldName, "mvsContractEndDate" ,Text),
+    mvsContractStartDate(fieldName, "MVSContractStartDate" ,Text),
+    mvsContractEndDate(fieldName, "MVSContractEndDate" ,Text),
 
 
     ;
