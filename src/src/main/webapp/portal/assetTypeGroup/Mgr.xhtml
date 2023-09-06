@@ -34,7 +34,7 @@
                     <h:panelGroup id="editPanel">
                         <h:panelGrid columns="8">
                             <p:commandButton id="CreateTopLevelNode" process="@this" icon="ui-icon-plus" value="#{msg.CreateTopLevelNode}" actionListener="#{assetTypeGroupController.prepareCreateTopLevelNode}" update="@form:editPanel" />
-                            <p:commandButton id="createInstution" process="@this" icon="ui-icon-plus" value="#{msg.CreatePrivilegeGrouping}" actionListener="#{assetTypeGroupController.prepareCreateNextNode}" update="@form:editPanel" disabled="#{orgInfoController.isCreateInstitutionDisabled}"/>
+                            <p:commandButton id="createInstution" process="@this" icon="ui-icon-plus" value="#{msg.CreateAssetClassification}" actionListener="#{assetTypeGroupController.prepareCreateNextNode}" update="@form:editPanel" disabled="#{orgInfoController.isCreateInstitutionDisabled}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{assetTypeGroupController.deleteSelectedAuthGroup}" update="@form" disabled="#{empty assetTypeGroupController.selected or empty assetTypeGroupController.selected.uid}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
