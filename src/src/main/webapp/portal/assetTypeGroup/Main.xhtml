@@ -18,18 +18,18 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="#{msg.PrivilegeGrouping}"/>
+                <p:outputLabel class="pageTitle" value="#{msg.AssetClassificationManagement}"/>
             </div>
 
             <div class="ui-g-12 card ">
                 <p:tabView id="tabview" >
                     <p:ajax event="tabChange"/>
-                    <p:tab title="#{msg.PrivilegeGroupingEdit}">
+                    <p:tab title="#{msg.AssetClassificationEdit}">
                         <div class="card" style="height:500px;">
                         <ui:include src="Mgr.xhtml"/>
                         </div>
                     </p:tab>
-                    <p:tab title="#{msg.PrivilegeGroupingImport}">
+                    <p:tab title="#{msg.AssetClassificationImport}">
                         <ui:include src="Import.xhtml"/>
                     </p:tab>
                 </p:tabView>

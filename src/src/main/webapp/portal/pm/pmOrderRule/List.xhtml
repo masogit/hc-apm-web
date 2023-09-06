@@ -133,7 +133,7 @@
                         <ui:fragment >
                             <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" rendered="#{userContextService.accessContainsFunctionMenu('MAINTAIN_RULE_EDIT')}"
                                              actionListener="#{pmOrderRuleController.batchDelete}" update=":PmOrderRuleListForm" disabled="#{not pmOrderRuleController.isChecked()}">
-                                <p:confirm header="#{msg.BatchDeleRuleConfig}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
+                                <p:confirm header="#{msg.BatchDeleRuleConfig}" message="#{msg.ConfirmDeleteRule}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </ui:fragment>
                     </f:facet>

@@ -157,13 +157,13 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
         boolean isDuplicate = checkName();
         if (isDuplicate) return;
 
-        Integer maxId = authGroupDao.getMaxId();
-        if (null == maxId) {
-            maxId = 0;
-        }
+//        Integer maxId = authGroupDao.getMaxId();
+//        if (null == maxId) {
+//            maxId = 0;
+//        }
 
         selected.setTenantUid(loginUser.getTenantUID());
-        selected.setId(++maxId);
+//        selected.setId(++maxId);
         selected.setName(name);
         selected.setEncoded(encoded);
         selected.setClassificationCode(classificationCode);
@@ -178,7 +178,7 @@ public class AssetTypeGroupController extends GenericCRUDController<AssetTypeGro
 
         if(authGroup==null && encoded.contains(parentEncoded) && authGroupDao.findEncodedByUidAndTenantUid(encoded,loginUser.getTenantUID())==null){
             //super.save();
-            selected.onSave();
+//            selected.onSave();
             authGroupDao.save(selected);
             isCreate=false;
             buildOrdTree();

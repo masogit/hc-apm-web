@@ -6,6 +6,27 @@
 				template="/WEB-INF/template.xhtml">
 
 	<ui:define name="content">
+		<style>
+			.warrantyExpireSoon {
+				background-color: #fca752!important;
+				color: #000000!important;
+			}
+			.warrantyExpired {
+				background-color: #f04134!important;
+				color: #000000!important;
+			}
+			.btn+.btn { margin-left: 0 }
+			.ui-column-resizer:before {content: none!important;}
+			th{font-size: 12px!important;}
+			td{font-size: 12px!important;padding: 0px!important;}
+			table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+			.bottom-label {
+				position: absolute;
+				bottom: 0;
+				font-size:15px;
+				color: red;
+			}
+		</style>
 		<div class="ui-g">
 			<div class="ui-g-12 card cardTitle">
 				<p:outputLabel class="pageTitle" value="备件出入库记录"/>
@@ -167,6 +188,7 @@
 									</h:panelGrid>
 								</p:panel>
 							</p:dataGrid>
+							<h:outputLabel value="*tip:点击任意空白处即可关闭该显示框!" styleClass="bottom-label" />
 						</p:sidebar>
 					</h:panelGroup>
 				</p:panelGrid>
