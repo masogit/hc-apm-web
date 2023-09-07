@@ -241,6 +241,19 @@
                                     <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'assetTypeGroup'}">
+                                <p:column headerText="#{msg.assetTypeGroup}" width="100" exportable="true">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.assetTypeGroup}"/><br/>
+                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetTypeGroup}" appendTo="@(Body)"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteAssetTypeGroupName}" size="5">
+                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetTypeGroupNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate"/>
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onAssetTypeGroupNameFilterChange}" update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate" />
+                                        </p:autoComplete>
+                                    </f:facet>
+                                    <h:outputText value="#{assetInfoListController.convertAssetTypeGroupEncodedToName(item.assetType)}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'nationalStandardCode'}">
                                 <p:column headerText="#{msg.nationalStandardCode}"  >
                                     <h:outputText value="#{item.nationalStandardCode}"/>
@@ -272,9 +285,6 @@
                                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-<!--                                            <c:if test="#{userContextService.hasRole('AssetHead')}">-->
-<!--                                                <f:selectItem itemLabel="待删除" itemValue="-1" noSelectionOption="true" />-->
-<!--                                            </c:if>-->
                                         </p:selectOneMenu>
                                     </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>

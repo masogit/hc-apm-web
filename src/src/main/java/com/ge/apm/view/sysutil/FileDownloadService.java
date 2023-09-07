@@ -35,7 +35,11 @@ public class FileDownloadService {
     }
 
     public StreamedContent getFile(String fileId) {
-        return msService.downloadSingleFile(fileId);
+        try {
+            return msService.downloadSingleFile(fileId);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public void downloadFile(String fileId) {

@@ -63,6 +63,7 @@ public class AssetInfoDetailController {
     private UserAccountRepository userDao;
     private AssetHistoryService assetHistoryService;
     private SysAuthGroupRepository sysAuthGroupDao;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
     private UserAccountRepository userAccountRepository;
     private Boolean terminate;
     private AssetInfo selected;
@@ -82,6 +83,7 @@ public class AssetInfoDetailController {
     @Getter
     private List<JSONObject> changeHistoryList = Collections.emptyList();
     private SysAuthGroup selectedAuthGroup;
+    private AssetTypeGroup selectedAssetTypeGroup;
     @Getter
     private boolean countyArea = false;
 
@@ -109,6 +111,7 @@ public class AssetInfoDetailController {
         userDao = WebUtil.getBean(UserAccountRepository.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
@@ -137,6 +140,9 @@ public class AssetInfoDetailController {
 
             if (null != selected.getMedicalApparatusClassification()) {
                 selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
+            }
+            if (null != selected.getAssetType()) {
+                selectedAssetTypeGroup = assetTypeGroupRepository.findByEncoded(selected.getAssetType());
             }
 
             //ge mvc data
@@ -427,6 +433,13 @@ public class AssetInfoDetailController {
             return null;
         } else {
             return selectedAuthGroup.getDisplayName();
+        }
+    }
+    public String getSelectedAssetTypeGroupName() {
+        if (null == selectedAssetTypeGroup) {
+            return null;
+        } else {
+            return selectedAssetTypeGroup.getDisplayName();
         }
     }
 
