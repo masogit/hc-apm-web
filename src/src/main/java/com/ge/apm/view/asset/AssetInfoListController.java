@@ -31,10 +31,10 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
@@ -252,6 +252,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
 
+        if (userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP")) {
+            if (ObjectUtil.isEmpty(assetTypeGroupList)) {
+                return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+            }
+        }
         setUserSearchFilters();
         Integer newLifecyle = null;
         for(SearchFilter searchFilter : searchFilters) {
@@ -291,7 +296,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 value = (String)searchFilter.value;
             }
         }
-        Page<AssetInfo> res;
+
         if(createdByBoolean) {
             searchFilters.removeIf(e -> e.fieldName.equals("createdBy"));
             List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
@@ -311,7 +316,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.LTE, new Date(parse.getTime())));
             this.removeFilterOnField("assetUsedLifecycle");
         }
-        res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
 
         currentPageAssets = res.getContent();
 
@@ -495,10 +500,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole()) {
             this.updateSearchFilter(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
         }
-        if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(assetTypeGroupEncodedSet), "1*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+
+        if (userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP")) {
+            if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
+                this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(assetTypeGroupEncodedSet), "1*"));
+            } else {
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            }
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }
     }
 
