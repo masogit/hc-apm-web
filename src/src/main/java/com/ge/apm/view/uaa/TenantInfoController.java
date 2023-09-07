@@ -608,7 +608,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			selectedMenuFeaturesLogAudit = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("LOG_AUDIT")).collect(Collectors.toList());
 			selectedMenuFeaturesSupplierTenant = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("SUPPLIER_TENANT")).collect(Collectors.toList());
 			selectedMenuFeaturesDeviceDataReview = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("DEVICEDATAPREVIEW")).collect(Collectors.toList());
-			selectedMenuFeaturesConfig = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("CONFIG")).collect(Collectors.toList());
+			selectedMenuFeaturesConfig = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("CONFIG") && !f.equals("CONFIG_ASSET_TYPE_GROUP") ).collect(Collectors.toList());
 			selectedMenuFeaturesConfigAssetGroup = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("CONFIG_ASSET_TYPE_GROUP")).collect(Collectors.toList());
 			selectedMenuFeaturesPlatform = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PLATFORM")).collect(Collectors.toList());
 		}
