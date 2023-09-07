@@ -252,10 +252,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
 
-        if (userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP")) {
-            if (ObjectUtil.isEmpty(assetTypeGroupList)) {
-                return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
-            }
+        if (userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
         setUserSearchFilters();
         Integer newLifecyle = null;
@@ -501,12 +499,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
         }
 
+        if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(assetTypeGroupEncodedSet), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
         if (userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP")) {
-            if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
-                this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(assetTypeGroupEncodedSet), "1*"));
-            } else {
-                searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-            }
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }
