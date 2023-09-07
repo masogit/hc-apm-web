@@ -111,6 +111,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	private List<String> selectedMenuFeaturesSupplierTenant;
 	@Getter@Setter
 	private List<String> selectedMenuFeaturesConfig;
+
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesConfigAssetGroup;
 	@Getter@Setter
 	private List<String> selectedMenuFeaturesPlatform;
 
@@ -344,6 +347,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesSupplierTenant);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesDeviceDataReview);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesConfig);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesConfigAssetGroup);
 		allSelectedMenuFeatures.addAll(selectedMenuFeaturesPlatform);
 		if (CollectionUtils.isNotEmpty(allSelectedMenuFeatures)) {
 			selected.setFeatureList(JSON.toJSONString(allSelectedMenuFeatures));
@@ -605,6 +609,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			selectedMenuFeaturesSupplierTenant = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("SUPPLIER_TENANT")).collect(Collectors.toList());
 			selectedMenuFeaturesDeviceDataReview = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("DEVICEDATAPREVIEW")).collect(Collectors.toList());
 			selectedMenuFeaturesConfig = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("CONFIG")).collect(Collectors.toList());
+			selectedMenuFeaturesConfigAssetGroup = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("CONFIG_ASSET_TYPE_GROUP")).collect(Collectors.toList());
 			selectedMenuFeaturesPlatform = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PLATFORM")).collect(Collectors.toList());
 		}
 	}
