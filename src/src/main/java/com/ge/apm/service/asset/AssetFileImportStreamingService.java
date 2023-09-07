@@ -230,6 +230,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetQuality")), "setAssetQuality", assetQualityList, map, null);
                 assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("assetQuantity")), "setAssetQuantity");
 
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("assetTypeGroupEncoded")), "setAssetType", true);
+
                 if (crossSite) {
                     SiteOrgWithDeptOrg siteOrgWithDeptOrg = supportingService.findSiteOrgInAssetExcelRow(rowMap, orgNamesUriCache);
                     supportingService.markDefautValue(siteOrgWithDeptOrg.getSiteOrg(), asset, now, false);

@@ -879,4 +879,14 @@
             <p:autoComplete id="createdBy" value="#{assetInfoBulkEditController.selectCreatedBy(assetInfoBulkEditController.selected.createdBy)}"  readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <!--  资产分类  -->
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetTypeGroup')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetTypeGroup}<span style="color:red">*</span></label>
+            <apm:selectAssetTypeGroup readonly="true" required="true"
+                                 updateAfterClinicalDeptChange="clinicalDeptNameChange"
+                                 disabled="#{!assetInfoBulkEditController.needEdit('assetTypeGroup')}"/>
+
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

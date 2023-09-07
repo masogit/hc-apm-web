@@ -5038,6 +5038,9 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','PIReport','巡检报告','PIReport',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','Other','其他','Other',NULL,	-1	);
 
+-- YHAAO-19442 资产分类
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetTypeGroup', '资产分类', 'Asset Type Group', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetTypeGroupEncoded', '资产分类编码', 'Asset Type Group Encoding', NULL, '-1');
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetClassificationEdit', '资产分类编辑', 'Asset classification editing', NULL, '-1');
