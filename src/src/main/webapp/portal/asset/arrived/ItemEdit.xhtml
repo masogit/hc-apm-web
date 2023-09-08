@@ -4,7 +4,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:apm="http://www.ge.com/tags/apm">
 
 
     <ui:define name="content">
@@ -457,6 +458,13 @@
                                                      requiredMessage="#{msg.comments} #{msg.ValidationRequire}">
                                         <p:ajax process="@this" update="@this"/>
                                     </p:inputTextarea>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{not empty assetInstallationController.customConfig.assetFields['assetTypeGroup']}">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.assetTypeGroup}<span style="color:red">*</span></label>
+                                    <apm:selectAssetTypeGroup readonly="true" required="true"
+                                                              updateAfterClinicalDeptChange="clinicalDeptNameChange"/>
                                 </h:panelGroup>
                             </c:if>
                         </p:panelGrid>

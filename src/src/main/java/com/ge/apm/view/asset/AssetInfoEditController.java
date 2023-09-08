@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
@@ -79,6 +80,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
     private NurseSiteMaintainConfigJNRepository nurseSiteMaintainConfigJNRepository;
     private NurseSiteMaintainConfigJNItemRepository nurseSiteMaintainConfigJNItemRepository;
+    private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -252,8 +255,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         nurseSiteMaintainConfigItemRepository = WebUtil.getBean(NurseSiteMaintainConfigItemRepository.class);
         nurseSiteMaintainConfigJNRepository = WebUtil.getBean(NurseSiteMaintainConfigJNRepository.class);
         nurseSiteMaintainConfigJNItemRepository = WebUtil.getBean(NurseSiteMaintainConfigJNItemRepository.class);
+        assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
 
         countyArea = userContextService.isCountyArea();
+        assetTypeGroupTreeComponentController.registerController(this);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -298,7 +304,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(dao.findByUid(selectedId));
             String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
-            terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
+            terminate = Boolean.parseBoolean(terminateStr);
             prepareEdit();
             beforeEdit();
             assetLifecyleStatus = selected.getStatus();
@@ -306,9 +312,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
             this.selected.setTags(existingTags);
 
-            changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
-            uploadFlag = getAttachList(selected.getUid(), "1").size() ==0;
+//            changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
+            uploadFlag = getAttachList(selected.getUid(), "1").isEmpty();
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
+            assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType());
         }
         if(selected ==null){
             try {
@@ -497,11 +504,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("manufacturer", selected.getManufactureId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getManufactureId())));
         selectedObjectMap.put("parentAsset", selected.getParentAssetId() == null ? null : dao.findById(selected.getParentAssetId()));
         selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
+
+        if (null != selected.getAssetType()) {
+            AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncoded(selected.getAssetType());
+            if (null != selectedAssetTypeGroup) {
+                selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
+            }
+        }
+
         qrCode = selected.getQrCode();
 
         medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, this.selected.getMedicalApparatusClassification());
 
-        //parentAssetList = aimService.getParentsAssetsList(this.selected);
         getClinicalOwnerList();
 
         if (selected.getSupplierId() != null) {
@@ -786,6 +800,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
 
             selected.setNationalStandardCode(selectedGb.getCode());
+        }
+
+        // 资产分类
+        if (null != selectedObjectMap.get("selectedAssetTypeGroup")) {
+            AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) selectedObjectMap.get("selectedAssetTypeGroup");
+            selected.setAssetType(selectedAssetTypeGroup.getEncoded());
         }
 
         if (null != selectedObjectMap.get("selectedAuthGroup")) {
@@ -1635,7 +1655,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void filterTreeNode(){
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
-        TreeNode treeNode = buildTree(orgList,loginUser.getSiteId());
     }
 
     public boolean getUploadFlag() {
@@ -1644,9 +1663,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
-            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
-            selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+        switch (eventName) {
+            case MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE:
+                SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
+                selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+                break;
+            case AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE:
+                AssetTypeGroup assetTypeGroup = (AssetTypeGroup) eventObject;
+                selectedObjectMap.put("selectedAssetTypeGroup", assetTypeGroup);
+                break;
+            default:
+                break;
         }
     }
     public boolean secondment(){

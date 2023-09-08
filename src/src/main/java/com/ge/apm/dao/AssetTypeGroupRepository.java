@@ -25,7 +25,7 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
 
     @Query(value = "with recursive cte_child_auth_group as (\n" +
             "    select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid\n" +
-            "    from asset_type_group sag join user_auth_group uag on uag.auth_group_uid = sag.uid\n" +
+            "    from asset_type_group sag join user_asset_group uag on uag.asset_group_uid = sag.uid\n" +
             "    where uag.user_uid = :userUid \n" +
             "    union all\n" +
             "    select sag.uid,  sag.name, sag.encoded, sag.classification_code,  sag.parent_uid,sag.tenant_uid\n" +
@@ -37,13 +37,14 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
     List<AssetTypeGroup> listAssetTypeGroupInHierarchyByUser(@Param("userUid") String userUid);
 
     @Query(value = "    select sag.uid,  sag.name, sag.encoded, sag.classification_code, sag.parent_uid,sag.tenant_uid\n" +
-            "    from asset_type_group sag join user_auth_group uag on uag.auth_group_uid = sag.uid\n" +
+            "    from asset_type_group sag join user_asset_group uag on uag.asset_group_uid = sag.uid\n" +
             "    where uag.user_uid = :userUid \n", nativeQuery = true)
     List<AssetTypeGroup> listAssetTypeGroupByUser(@Param("userUid") String userUid);
 
     AssetTypeGroup findByUid(String uid);
 
     AssetTypeGroup findByEncoded(String encoded);
+    List<AssetTypeGroup> findByEncodedIn(List<String> encoded);
     AssetTypeGroup findByEncodedAndTenantUid(String encoded,String tenantUid);
 
     AssetTypeGroup findFirstByName(String name);

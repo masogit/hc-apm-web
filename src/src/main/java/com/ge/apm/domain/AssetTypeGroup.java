@@ -113,4 +113,20 @@ public class AssetTypeGroup implements Serializable {
     public String getEncoded() {
         return encoded;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (uid != null ? uid.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof AssetTypeGroup)) {
+            return false;
+        }
+        AssetTypeGroup other = (AssetTypeGroup) object;
+        return (this.uid != null || other.uid == null) && (this.uid == null || this.uid.equals(other.uid));
+    }
 }
