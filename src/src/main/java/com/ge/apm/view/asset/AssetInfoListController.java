@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateTime;
@@ -18,6 +19,7 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +34,7 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.SearchFilter;
@@ -71,6 +74,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private RelRuleAssetRepository relRuleAssetRepository;
     private UserRoleRepository userRoleRepository;
     private CustomRoleRepository customRoleRepository;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -177,7 +181,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-        terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+        terminate = Boolean.parseBoolean(WebUtil.getRequestParameter("terminate"));
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
@@ -186,6 +190,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
+        assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
@@ -245,6 +252,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
 
+        if (userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         setUserSearchFilters();
         Integer newLifecyle = null;
         for(SearchFilter searchFilter : searchFilters) {
@@ -284,7 +294,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 value = (String)searchFilter.value;
             }
         }
-        Page<AssetInfo> res;
+
         if(createdByBoolean) {
             searchFilters.removeIf(e -> e.fieldName.equals("createdBy"));
             List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
@@ -304,7 +314,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("installDate", SearchFilter.Operator.LTE, new Date(parse.getTime())));
             this.removeFilterOnField("assetUsedLifecycle");
         }
-        res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
 
         currentPageAssets = res.getContent();
 
@@ -321,6 +331,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setWarrantyAlerts(currentPageAssets);
 
         setSupplier(currentPageAssets);
+
+        List<String> encodes = currentPageAssets.stream().map(AssetInfo::getAssetType).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
+        List<AssetTypeGroup> currentPageAssetTypeGroupList = assetTypeGroupRepository.findByEncodedIn(encodes);
+        currentPageAssetTypeGroupMap = currentPageAssetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, ast -> ast));
         logger.info("AssetInfoListController.loadData end time cost:{}ms",(System.currentTimeMillis()-l));
         return res;
     }
@@ -337,7 +351,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         if (exists) {
             return pageRequest;
         } else {
-            Sort sortWithId = new Sort(Sort.DEFAULT_DIRECTION.ASC, "id");
+            Sort sortWithId = new Sort(Sort.Direction.ASC, "id");
             pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortWithId));
         }
         return pageRequest;
@@ -485,6 +499,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
         }
 
+        if (assetTypeGroupEncodedSet != null && !assetTypeGroupEncodedSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(assetTypeGroupEncodedSet), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+        if (userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP")) {
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
+        }
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
@@ -1116,6 +1139,74 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
         }
         return false;
+    }
+
+    private String filterAssetTypeGroup;
+    private List<AssetTypeGroup> assetTypeGroupList;
+    private AssetTypeGroupService assetTypeGroupService;
+    private Set<String> assetTypeGroupEncodedSet;
+    private Map<String, AssetTypeGroup> currentPageAssetTypeGroupMap;
+
+    public void onAssetTypeGroupNameFilterChange(AjaxBehaviorEvent event) {
+
+        if (event instanceof SelectEvent) {
+            filterAssetTypeGroup = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterAssetTypeGroup) && !assetTypeGroupList.stream().anyMatch(item -> filterAssetTypeGroup.equals(item.getName()))) {
+            filterAssetTypeGroup = null;
+        }
+
+        if (filterAssetTypeGroup != null) {
+            List<AssetTypeGroup> assetTypeGroupsMatchingByName = this.assetTypeGroupList.stream().filter(item -> item.getName().equals(filterAssetTypeGroup)).collect(Collectors.toList());
+            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByName, assetTypeGroupList);
+            assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+        } else {
+            assetTypeGroupEncodedSet = Collections.emptySet();
+        }
+    }
+
+    public List<String> autoCompleteAssetTypeGroupName(String query) {
+        if (assetTypeGroupList == null) {
+            return Collections.emptyList();
+        }
+        List<AssetTypeGroup> res = this.assetTypeGroupList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query))
+                .collect(Collectors.toList());
+        return res.stream().map(AssetTypeGroup::getName).distinct().collect(Collectors.toList());
+    }
+
+    public String convertAssetTypeGroupEncodedToName(String encoded) {
+        if (null == encoded) {
+            return null;
+        }
+
+        AssetTypeGroup assetTypeGroup = currentPageAssetTypeGroupMap.get(encoded);
+        if (null == assetTypeGroup) {
+            return null;
+        }
+
+        return assetTypeGroup.getDisplayName();
+    }
+    public String convertUidToName(String uid) {
+        if (null == uid) {
+            return null;
+        }
+
+        OrgInfo orgInfo = getOrgInfoByUid(uid);
+        if (null == orgInfo) {
+            return null;
+        }
+
+        return orgInfo.getName();
+    }
+
+    public String getFilterAssetTypeGroup() {
+        return filterAssetTypeGroup;
+    }
+
+    public void setFilterAssetTypeGroup(String filterAssetTypeGroup) {
+        this.filterAssetTypeGroup = filterAssetTypeGroup;
     }
 
     public OrgInfo getSelectSite() {

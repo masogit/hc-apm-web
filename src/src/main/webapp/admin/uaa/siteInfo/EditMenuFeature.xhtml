@@ -41,7 +41,7 @@
                                 <f:selectItem itemLabel="供应商负责人赋权" itemValue="ASSET_SUPPLIER_EMPOWERMENT"/>
                                 <f:selectItem itemLabel="重点医疗设备报表" itemValue="ASSET_KEYASSETDATAINPUT"/>
                                 <f:selectItem itemLabel="MVS设备信息导入" itemValue="ASSET_MVS_DATA"/>
-                                <f:selectItem itemLabel="设备分组" itemValue="ASSET_TYPE_GROUP"/>
+<!--                                <f:selectItem itemLabel="设备分类" itemValue="ASSET_TYPEGROUP"/>-->
                             </p:selectManyCheckbox>
                         </p:fieldset>
                     </h:panelGroup>
@@ -209,6 +209,15 @@
                             <p:selectManyCheckbox id="logAudit" widgetVar="logAudit" value="#{tenantInfoController.selectedMenuFeaturesLogAudit}" layout="grid" columns="5" styleClass="grid-checkbox" >
                                 <p:ajax update="@this"/>
                                 <f:selectItem itemLabel="日志审计" itemValue="LOG_AUDIT"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <p:fieldset legend="系统配置">
+                            <p:selectManyCheckbox id="config" widgetVar="config" value="#{tenantInfoController.selectedMenuFeaturesConfigAssetGroup}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="资产分类" itemValue="CONFIG_ASSET_TYPE_GROUP"/>
                             </p:selectManyCheckbox>
                         </p:fieldset>
                     </h:panelGroup>
