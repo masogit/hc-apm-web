@@ -195,7 +195,7 @@ public class ZkbPartOrderExcelService {
         if(StringUtils.isNotEmpty(p.getTechAuditerUid())){
             if(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString().equals(p.getStatus())){
                 zkbPartOrderDataMap.put("技术支持审批状态", "技术支持审批通过");
-            }else if(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString().equals(p.getStatus())){
+            }else if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(p.getStatus())){
                 zkbPartOrderDataMap.put("技术支持审批状态", "技术支持审批不通过");
             }else{
                 zkbPartOrderDataMap.put("技术支持审批状态", "技术支持审批通过");
