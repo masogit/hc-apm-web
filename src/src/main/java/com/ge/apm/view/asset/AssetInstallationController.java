@@ -188,6 +188,7 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         arrivalListItem.setIsChecked(arrivalListItem.getIsChecked() == null || arrivalListItem.getIsChecked());
         oldQrCode = arrivalListItem.getQrCode();
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetTypeGroupTreeComponentController.registerController(this);
 
         String assetTypeGroup = arrivalListItem.getEncoded();
