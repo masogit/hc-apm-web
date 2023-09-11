@@ -171,7 +171,7 @@ public class ZkbAssetStatisticService {
 
     public void regenerateZkbAssetQrCodeInfo(List<SearchFilter> searchFilter){
         //先清除已过期的合同中关联的设备、已修改system_id和已失效的设备数据
-        zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo(new Date());
+        zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo(getDateStr());
         // TODO 查出所有合同有效内关联设备的贴码数据，兼顾历史数据的更新。只限于WEB端，Schedule微服务那边只查询为"NULL"、"N"的数据
         List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(null);
         if(zkbAssetQrCodeInfoList == null || zkbAssetQrCodeInfoList.size() == 0){
@@ -181,6 +181,12 @@ public class ZkbAssetStatisticService {
         for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList){
             handleQRCodeInfo(zkbAssetQrCodeInfo);
         }
+    }
+
+    private String getDateStr()
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyymmdd");
+        return formatter.format(new Date());
     }
 
     @Transactional(rollbackFor = Exception.class)
