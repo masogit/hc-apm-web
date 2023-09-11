@@ -185,7 +185,7 @@ public class ZkbAssetStatisticService {
 
     private String getDateStr()
     {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyymmdd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
         return formatter.format(new Date());
     }
 
