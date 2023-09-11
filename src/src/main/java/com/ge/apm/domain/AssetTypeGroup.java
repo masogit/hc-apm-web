@@ -19,9 +19,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "asset_type_group",
         indexes = {
-                @Index(name = "asset_type_group_id_uk", columnList = "id"),
-//                @Index(name = "asset_type_group_classification_path_uk",  columnList = "classification_path"),
-//                @Index(name = "asset_type_group_classification_code_uk", columnList = "classification_code"),
                 @Index(name = "asset_type_group_encoded_uk",  columnList = "encoded")
         })
 @Data

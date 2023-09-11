@@ -200,7 +200,9 @@ public class AssetTypeService {
                         rowNameList.set(k,getCellValue(doc,i,j,k));
                     }else if(getCellValue(doc,i,j,k).equals("")){
                         names=rowNameList.get(k);
-                        list.add(names);
+                        if(org.apache.commons.lang3.StringUtils.isNotBlank(names)){
+                            list.add(names);
+                        }
                     }
                     String names2=getCellValue(doc,i,j,k);
                     if(!names2.equals("")){
