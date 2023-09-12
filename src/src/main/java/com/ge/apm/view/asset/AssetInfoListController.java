@@ -2,6 +2,7 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
+import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateTime;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
@@ -252,7 +253,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
 
-        if (userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
         setUserSearchFilters();
@@ -504,7 +505,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
-        if (userContextService.accessContainsFunctionMenu("CONFIG_ASSET_GROUP")) {
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_GROUP")) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }
