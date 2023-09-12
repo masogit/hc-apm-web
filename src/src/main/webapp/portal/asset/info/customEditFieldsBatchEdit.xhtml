@@ -882,8 +882,8 @@
     <!--  资产分类  -->
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetTypeGroup')}">
         <h:panelGroup>
-            <label class="label">#{msg.assetTypeGroup}<span style="color:red">*</span></label>
-            <apm:selectAssetTypeGroup readonly="true" required="true"
+            <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetTypeGroup'].required? '*':''}</span></label>
+            <apm:selectAssetTypeGroup readonly="true" required="#{assetInfoEditController.customConfig.assetFields['assetTypeGroup'].required}"
                                  updateAfterClinicalDeptChange="clinicalDeptNameChange"
                                  disabled="#{!assetInfoBulkEditController.needEdit('assetTypeGroup')}"/>
 

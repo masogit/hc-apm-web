@@ -115,16 +115,6 @@
                             <p:commandButton icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetArrivedItemsController.selected.qrCode}" class="popupIconButton" style="zoom:0.8"/>
 <!--                            style="height: 32px; width: 32px; top: -5.1875px; left: 6px; pointer-events: none;"-->
                         </h:panelGroup>
-
-
-<!--                        <h:panelGroup >-->
-<!--                            <label class="label">#{msg.medicalInstrumentClassification}</label>-->
-<!--                            <p:inputText  value="#{fieldMsg.fieldValue('assetFunctionType', assetArrivedItemsController.selected.functionGroup)}" readonly="true"/>-->
-<!--                        </h:panelGroup>-->
-<!--                        <h:panelGroup >-->
-<!--                            <label class="label">#{msg.medicalInstrumentSubclassification}</label>-->
-<!--                            <p:inputText  value="#{fieldMsg.fieldValue(assetArrivedItemsController.selected.functionGroup, assetArrivedItemsController.selected.assetCode68)}" readonly="true"/>-->
-<!--                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.medicalApparatusClassification}</label>
                             <p:inputText  value="#{medicalInstrumentsClassificationCompCtrl.selectedAuthGroupName}" readonly="true"/>
@@ -142,7 +132,10 @@
                             <label class="label">#{msg.comments}</label>
                             <p:inputTextarea value="#{assetArrivedItemsController.selected.comments}"  maxlength="256" readonly="true"/>
                         </h:panelGroup>
-
+                        <h:panelGroup >
+                            <label class="label">#{msg.assetTypeGroup}</label>
+                            <p:inputText  value="#{assetTypeGroupTreeComponentController.selectedAssetTypeGroupName}" readonly="true"/>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>

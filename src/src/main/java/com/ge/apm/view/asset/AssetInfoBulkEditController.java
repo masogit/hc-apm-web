@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -82,6 +83,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private AssetHistoryService assetHistoryService;
     private SupplierController supplierController;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+    private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
     private MqUtils mqUtils;
 
     private QrCodeLib createRequest;
@@ -211,8 +213,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
+        assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
 
         medicalInstrumentsClassificationCompCtrl.registerController(this);
+        assetTypeGroupTreeComponentController.registerController(this);
 
         selected = new AssetInfo();
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -428,6 +432,12 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             if (selected.getAcceptDate() != null && selected.getWarrantyMonth() != null) {
                 selected.setFactoryWarrantyDate(TimeUtil.toJodaDate(selected.getAcceptDate()).plusMonths(selected.getWarrantyMonth()).toDate());
             }
+        }
+
+        // 资产分类
+        if (null != selectedObjectMap.get("selectedAssetTypeGroup")) {
+            AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) selectedObjectMap.get("selectedAssetTypeGroup");
+            selected.setAssetType(selectedAssetTypeGroup.getEncoded());
         }
 
         if (null != gbCodeName) {
@@ -1595,9 +1605,17 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
-            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
-            selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+        switch (eventName) {
+            case MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE:
+                SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
+                selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+                break;
+            case AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE:
+                AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) eventObject;
+                selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
+                break;
+            default:
+                break;
         }
     }
 

@@ -462,8 +462,8 @@
                             </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['assetTypeGroup']}">
                                 <h:panelGroup >
-                                    <label class="label">#{msg.assetTypeGroup}<span style="color:red">*</span></label>
-                                    <apm:selectAssetTypeGroup readonly="true" required="true"
+                                    <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired? '*':''}</span></label>
+                                    <apm:selectAssetTypeGroup readonly="true" required="#{assetInstallationController.customConfig.assetFields['assetTypeGroup'].arrivalRequired}"
                                                               updateAfterClinicalDeptChange="clinicalDeptNameChange"/>
                                 </h:panelGroup>
                             </c:if>
