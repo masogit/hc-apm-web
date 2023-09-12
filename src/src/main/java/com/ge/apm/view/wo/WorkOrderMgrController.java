@@ -29,9 +29,12 @@ import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -131,6 +134,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private WorkOrderDetailReturnRepository detailReturnDao;
     private V2_WorkOrderCoworkerRepository coWorkerDao;
     private V2_WorkOrderRepository woDao;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
     private String locationName;
     private String assigneeId;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
@@ -266,6 +270,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private List<OrgInfo> orgList;
     @Getter @Setter
     private boolean hospitalShow = false;
+    private List<AssetTypeGroup> assetTypeGroupList;
 
     @Override
     protected void init() {
@@ -310,10 +315,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
             detailReturnDao = WebUtil.getBean(WorkOrderDetailReturnRepository.class);
             manHoursDao = WebUtil.getBean(V2_WorkOrderManHoursRepository.class);
+            assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
             needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
+
+            // 用户可见资产分类
+            assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
             String query = WebUtil.getRequestParameter("query");
             String enCodeParameters = WebUtil.getRequestParameter("str");
             String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
@@ -768,6 +777,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         Page<V2_WorkOrder> pageResult = null;
         try {
+            if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
+                return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+            }
             this.setSearchFilter();
             String[] fields = new String[]{"status", "currentStepId", "currentStepName", "currentPersonId", "dispatchMode"
                     , "srId", "feedbackRating", "assetId", "approvalStatus", "assetInfo.assetOwnerId", "assetInfo.assetOwnerId2"
@@ -1108,6 +1120,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                 updateSearchFilter(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
                 searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             }
+        }
+
+        // 资产分类权限
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }
     }
 

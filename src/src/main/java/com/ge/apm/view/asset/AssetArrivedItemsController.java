@@ -10,6 +10,7 @@ import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.TreeNode;
@@ -62,6 +63,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
 
+    private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
+
     @Override
     protected void init() {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
@@ -75,6 +78,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         getSavedArrivalContractNum();
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
         medicalInstrumentsClassificationCompCtrl.registerController(this);
+        assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
+        assetTypeGroupTreeComponentController.registerController(this);
     }
 
     @Override
@@ -120,6 +125,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     public void onRowSelect(SelectEvent event) {
         this.selected = (ArrivalListItem) event.getObject();
         medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, selected.getMedicalApparatusClassification());
+        assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, selected.getEncoded());
         picList = aiService.getPicList(selected.getId());
     }
 

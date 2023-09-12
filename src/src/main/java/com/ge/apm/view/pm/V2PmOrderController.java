@@ -31,10 +31,13 @@ import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -56,6 +59,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import sun.misc.BASE64Decoder;
@@ -142,6 +146,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private ServiceRequestApiService serviceRequestApiService;
     private PmOrderRuleRepository pmOrderRuleRepository;
     private RelRuleAssetRepository relRuleAssetRepository;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
     private String token;
     private List<UnstructuredDataCollection> unDataCollection;
     private UnstructuredDataCollection unCollection;
@@ -220,6 +225,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date takeTime;
     private String approvaler;
     private List<V2_BlobObject> picList;
+    private List<AssetTypeGroup> assetTypeGroupList;
 
     @Getter @Setter
     private List<V2_BlobObject> picBeforeList;
@@ -1674,6 +1680,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         multiLevelApprovalService= WebUtil.getBean(MultiLevelApprovalService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+
+        // 用户可见资产分类
+        assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1896,6 +1906,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
 
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         this.setSearchFilter();
 
         if(queryIndex == 20){
@@ -2518,7 +2531,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             filterArrayList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//所属科室
             filterArrayList.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//使用科室
+        }
 
+        // 资产分类权限
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }
     }
 
