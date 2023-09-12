@@ -253,6 +253,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
 
+        logger.info("AssetInfoListController.loadData apmFeatures : {}, assetTypeGroupList : {}", CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_GROUP"), assetTypeGroupList);
         if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
