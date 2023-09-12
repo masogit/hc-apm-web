@@ -253,8 +253,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
 
-        logger.info("AssetInfoListController.loadData apmFeatures : {}, assetTypeGroupList : {}", CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_GROUP"), assetTypeGroupList);
-        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
         setUserSearchFilters();
@@ -506,7 +505,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
-        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_GROUP")) {
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }
