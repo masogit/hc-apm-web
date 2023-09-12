@@ -62,6 +62,8 @@ public class UserAccountImportService {
     private static final String HEADER_TAGS = "标签";
     private static final String HEADER_PASSWORD = getEncryptedPass();
     private static final String HEADER_UUID = "UUID";
+    private static final String HEADER_ASSET_CLASSIFICATION="资产分类";
+
     private static final String ROLE_GUEST = "仅报修权限账号";
     private static Map<String, SysRole> sysRoleMap;
     private Map<String, OrgInfo> mapOrgInfo = new HashMap<>();
@@ -110,6 +112,12 @@ public class UserAccountImportService {
     @Autowired
     UserAccountHistoryService userAccountHistoryService;
 
+    @Autowired
+    AssetTypeGroupRepository assetTypeGroupDao;
+
+    @Autowired
+    UserAssetGroupRepository userAssetGroupDao;
+
     EmailValidator emailValidator = EmailValidator.getInstance();
 
     private static String getEncryptedPass() {
@@ -124,12 +132,15 @@ public class UserAccountImportService {
         return !StringUtils.isNotEmpty(newUser.getStatus());
     }
 
-    private boolean handleNewUser(UserAccount newUser, String institution, String hospital, String site, String department, String department2, String department3, TenantInfo tenantInfo) throws NoSuchAlgorithmException {
+    private boolean handleNewUser(UserAccount newUser, String institution, String hospital, String site, String department, String department2, String department3, TenantInfo tenantInfo,String assetClassification) throws NoSuchAlgorithmException {
         //get all user
         checkNewUser(newUser, tenantInfo);
         if (!supplementUserRole(newUser)) {
             return false;
         }
+        checkAssetClassification(newUser,assetClassification);
+
+
         if (checkData(newUser)) {
             setUIDs(newUser, institution, hospital, site, department, department2, department3);
             supplementAccessScope(newUser);
@@ -878,6 +889,8 @@ public class UserAccountImportService {
         String tagsJoined;
         String password;
         String UUID;
+        String assetClassification;
+
 
         int institutionIndex = header.get(HEADER_INSTITUTION);
         int hospitalIndex = header.get(HEADER_HOSPITAL);
@@ -898,6 +911,8 @@ public class UserAccountImportService {
         int tagsIndex = header.get(HEADER_TAGS);
         Integer passwordIndex = header.get(HEADER_PASSWORD);
         Integer uuidIndex = header.get(HEADER_UUID);
+        int assetClassificationIndex=header.get(HEADER_ASSET_CLASSIFICATION);
+
 
         List<String> telephoneList = new ArrayList<>();
         List<String> loginNameList = new ArrayList<>();
@@ -917,6 +932,8 @@ public class UserAccountImportService {
                 department2 = ExcelParser.getCellStringValue(row, departmentIndex2);
                 department3 = ExcelParser.getCellStringValue(row, departmentIndex3);
                 loginName = ExcelParser.getCellStringValue(row, loginnameIndex);
+                assetClassification=ExcelParser.getCellStringValue(row, assetClassificationIndex);
+
                 if (loginName != null && loginName.length() > 0) {
                     boolean canParseDouble;
                     try {
@@ -1025,8 +1042,11 @@ public class UserAccountImportService {
                 if (StringUtils.isEmpty(roleName)) {
                     newUser.setStatusDisplay(UploadFileErrorTypeEnum.ROLE, "角色不能为空;");
                 }
+                if(StringUtils.isEmpty(assetClassification)){
+                    newUser.setStatusDisplay(UploadFileErrorTypeEnum.LOGINNAME,"资产分类不能为空;");
+                }
 
-                if (!handleNewUser(newUser, institution, hospital, site, department, department2, department3, tenantInfo)) {
+                if (!handleNewUser(newUser, institution, hospital, site, department, department2, department3, tenantInfo,assetClassification)) {
                     importFailedDataList.add(newUser);
                     failedCount++;
                 } else {
@@ -1083,6 +1103,8 @@ public class UserAccountImportService {
 
             // need user uid to save
             saveOrUpdateTags(user);
+            saveUserAuthGroup(assetClassificationUIds,user,true);
+
 
         } catch (Exception e) {
             logger.error("create user error : {}", e.getMessage());
@@ -1171,11 +1193,47 @@ public class UserAccountImportService {
 
             // need user uid to save tags
             saveOrUpdateTags(user);
+            saveUserAuthGroup(assetClassificationUIds,user,false);
 
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("update user error : {}", e.getMessage());
         }
+    }
+
+
+    private void saveUserAuthGroup(List<String> assetClassificationUIds,UserAccount user,boolean isCreate) {
+        if(!isCreate){
+            //update
+            userAssetGroupDao.deleteByUserUid(user.getUid());
+        }
+        if(assetClassificationUIds!=null && !assetClassificationUIds.isEmpty()){
+            for(int i=0;i<assetClassificationUIds.size();++i){
+                String authGroupUid = assetClassificationUIds.get(i);
+                AssetTypeGroup sysAuthGroup = assetTypeGroupDao.findByUid(authGroupUid);
+                UserAssetGroup userAuthGroup = new UserAssetGroup();
+                userAuthGroup.setUserUid(user.getUid());
+                userAuthGroup.setAssetGroupUid(sysAuthGroup.getUid());
+                userAssetGroupDao.save(userAuthGroup);
+            }
+        }
+    }
+    private List<String> assetClassificationUIds = new ArrayList<>();
+
+    private UserAccount checkAssetClassification(UserAccount newUser,String assetClassification) {
+        String[] checkAssetClassificationUIds = assetClassification.trim().split(",");
+        String uuid=newUser.getUid();
+        List<AssetTypeGroup> assetTypeGroups = assetTypeGroupDao.findByClassificationCodeAndTenantUid(Arrays.asList(checkAssetClassificationUIds),newUser.getTenantUID());
+        if(StringUtils.isEmpty(uuid)){
+            //create
+            isCreate=true;
+        }else{
+            isCreate=false;
+        }
+        if(assetTypeGroups!=null && !assetTypeGroups.isEmpty()){
+            assetClassificationUIds = assetTypeGroups.stream().map(AssetTypeGroup::getUid).collect(Collectors.toList());
+        }
+        return null;
     }
 
 }
