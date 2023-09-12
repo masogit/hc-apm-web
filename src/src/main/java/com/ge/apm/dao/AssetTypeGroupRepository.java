@@ -111,6 +111,9 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
     @Query(value = "select * from asset_type_group where classification_code in ?1", nativeQuery = true)
     List<AssetTypeGroup> findByClassificationCode(List<String> codedList);
 
+    @Query(value = "select * from asset_type_group where encoded in ?1 and tenant_uid =?2", nativeQuery = true)
+    List<AssetTypeGroup> findByClassificationCodeAndTenantUid(List<String> codedList,String tenantUid);
+
     @Query(value = "select max(id) from asset_type_group", nativeQuery = true)
     Integer getMaxId();
 }
