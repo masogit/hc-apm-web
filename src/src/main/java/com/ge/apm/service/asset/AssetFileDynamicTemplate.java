@@ -439,11 +439,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         Map<String, List<String>> assetMap = getAllElement.getAssetMap();
         Map parentAssets = getAllElement.getParentAssets();
         Map supliers = getAllElement.getSupliers();
+        Map encodedToAssetTypeGroupPath = getAllElement.getEncodedToAssetTypeGroupPath();
 
         for (AssetInfo assetInfo: assetList) {
             assetInfo.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(assetInfo.getInstallDate(), assetInfo.getLifecycle()));
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, supplierDao,userDao,authGroupDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(flag,assetMap,parentAssets, supliers);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(flag,assetMap,parentAssets, supliers, encodedToAssetTypeGroupPath);
 
             writer.writeRowData(startRow, rowMap);
 
