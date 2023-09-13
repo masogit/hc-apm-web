@@ -190,11 +190,11 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetTypeGroupTreeComponentController.registerController(this);
-        assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, arrivalListItem.getEncoded());
+        assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, arrivalListItem.getEncoded() + "#" + arrivalListItem.getArrivalList().getTenantUID());
 
         String assetTypeGroup = arrivalListItem.getEncoded();
         if (assetTypeGroup!=null){
-            AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncoded(assetTypeGroup);
+            AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(assetTypeGroup, arrivalListItem.getTenantUid());
             if (null != selectedAssetTypeGroup) {
                 selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
             }

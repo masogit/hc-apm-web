@@ -34,6 +34,7 @@ import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import webapp.framework.web.WebUtil;
 
 @Service
 public class UserAccountImportService {
@@ -1216,6 +1217,12 @@ public class UserAccountImportService {
                 userAuthGroup.setAssetGroupUid(sysAuthGroup.getUid());
                 userAssetGroupDao.save(userAuthGroup);
             }
+        }
+
+        if (UserContextService.getCurrentUserAccount().getLoginName().equals(user.getLoginName())) {
+            // 如果修改的用户为当前登录用户，重新设置当前登录用户的资产分类
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            userContextService.setAssetTypeGroup();
         }
     }
     private List<String> assetClassificationUIds = new ArrayList<>();

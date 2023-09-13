@@ -125,7 +125,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     public void onRowSelect(SelectEvent event) {
         this.selected = (ArrivalListItem) event.getObject();
         medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, selected.getMedicalApparatusClassification());
-        assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, selected.getEncoded());
+        assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, selected.getEncoded() + "#" + selected.getTenantUid());
         picList = aiService.getPicList(selected.getId());
     }
 

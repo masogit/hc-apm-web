@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @ManagedBean
@@ -80,10 +81,11 @@ public class AssetTypeGroupTreeComponentController implements ServerEventInterfa
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-        String sysAuthGroupUid = (String) eventObject;
-        if (StringUtils.isEmpty(sysAuthGroupUid)) {
+        String str = (String) eventObject;
+        List<String> list = Arrays.asList(str.split("#"));
+        if (StringUtils.isEmpty(list.get(0))) {
             selectedAssetTypeGroup = null;
         }
-        selectedAssetTypeGroup = assetTypeGroupRepository.findByEncoded(sysAuthGroupUid);
+        selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(list.get(0), list.get(1));
     }
 }

@@ -315,7 +315,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 //            changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
             uploadFlag = getAttachList(selected.getUid(), "1").isEmpty();
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
-            assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType());
+            assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" +this.selected.getTenantUID());
         }
         if(selected ==null){
             try {
@@ -506,7 +506,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
 
         if (null != selected.getAssetType()) {
-            AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncoded(selected.getAssetType());
+            AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(selected.getAssetType(), selected.getTenantUID());
             if (null != selectedAssetTypeGroup) {
                 selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
             }
