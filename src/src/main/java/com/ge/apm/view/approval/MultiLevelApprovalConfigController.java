@@ -369,7 +369,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //配置信息是否展示
     public void setConfigEnable(){
-        List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR, ApprovalConstant.APPROVAL_ASSET_MAINTAIN, ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT);//设备维修/设备保养/预算管理
+        List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR, ApprovalConstant.APPROVAL_ASSET_MAINTAIN, ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT,ApprovalConstant.APPROVAL_ASSET_SCRAP);//设备维修/设备保养/预算管理
         configEnable = list.contains(selected.getBusinessType());
     }
 

@@ -97,6 +97,7 @@ public interface ApprovalConstant {
     String APPROVAL_ASSET_TRANSFER = "assetTransfer";//设备转移
     String APPROVAL_ADVERSE_EVENTS = "adverseEvents"; // 不良事件上报
     String APPROVAL_BUDGET_MANAGEMENT = "budgetManagement"; // 预算管理
+    String APPROVAL_ASSET_SCRAP = "assetScrap"; // 资产报废流程
 
 
     int BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT = 1;//备件申领单
