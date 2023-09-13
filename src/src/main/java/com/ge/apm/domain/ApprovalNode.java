@@ -34,6 +34,14 @@ public class ApprovalNode implements Serializable {
 
     private boolean selectByOrg; //是否通过机构筛选user
 
+    private boolean clinicalDepartmentDirector;
+
+    @JSONField(serialize = false)
+    private List<UserAccount> multiLevelApprovalUsers; //多级审核人
+    private List<String> multiLevelApprovalUids; //审核人
+    @JSONField(serialize = false)
+    private List<UserAccount> clinicalDepartmentDirectorUsers; //临床科室主任
+
     public boolean getSelectByOrg() {
         return selectByOrg;
     }
