@@ -192,6 +192,16 @@
                     </h:panelGroup>
                     <h:panelGroup id="approveuser">
                         <label class="label"> 审核人选择 </label>
+                        <br></br>
+
+                        <h:panelGroup>
+
+                            <p:selectBooleanCheckbox value="#{multiLevelApprovalConfigController.approvalNode.clinicalDepartmentDirector}"
+                                                     itemLabel="临床科室主任" >
+<!--                                <p:ajax process="@this" update="approverInfoEditForm:byOrg approverInfoEditForm:approveuser" listener="#{multiLevelApprovalConfigController.ifSelectbyOrg}"/>-->
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <br></br>
                         <p:selectCheckboxMenu
                                 value="#{multiLevelApprovalConfigController.approvalNode.approveUsers}"
                                 panelStyle="width:280px" style="width:100%"
