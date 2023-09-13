@@ -313,7 +313,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
             this.selected.setTags(existingTags);
 
-//            changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
+            changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
             uploadFlag = getAttachList(selected.getUid(), "1").isEmpty();
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
             assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" +this.selected.getTenantUID());
