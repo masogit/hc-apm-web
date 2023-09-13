@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGroup> {
@@ -33,7 +34,7 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
             "    inner join cte_child_auth_group cte_child\n" +
             "    on sag.parent_uid = cte_child.uid\n" +
             ") \n" +
-            "select * from cte_child_auth_group\n", nativeQuery = true)
+            "select * from cte_child_auth_group order by encoded\n", nativeQuery = true)
     List<AssetTypeGroup> listAssetTypeGroupInHierarchyByUser(@Param("userUid") String userUid);
 
     @Query(value = "    select sag.uid,  sag.name, sag.encoded, sag.classification_code, sag.parent_uid,sag.tenant_uid\n" +
@@ -113,6 +114,8 @@ public interface AssetTypeGroupRepository extends GenericRepository<AssetTypeGro
 
     @Query(value = "select * from asset_type_group where encoded in ?1 and tenant_uid =?2", nativeQuery = true)
     List<AssetTypeGroup> findByClassificationCodeAndTenantUid(List<String> codedList,String tenantUid);
+
+    List<AssetTypeGroup> findByEncodedInAndTenantUid(Collection<String> codedList, String tenantUid);
 
     @Query(value = "select max(id) from asset_type_group", nativeQuery = true)
     Integer getMaxId();

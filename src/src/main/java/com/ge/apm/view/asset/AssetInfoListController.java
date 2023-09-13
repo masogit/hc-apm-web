@@ -333,8 +333,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         setSupplier(currentPageAssets);
 
-        List<String> encodes = currentPageAssets.stream().map(AssetInfo::getAssetType).filter(ObjectUtil::isNotEmpty).collect(Collectors.toList());
-        List<AssetTypeGroup> currentPageAssetTypeGroupList = assetTypeGroupRepository.findByEncodedIn(encodes);
+        Set<String> encodes = currentPageAssets.stream().map(AssetInfo::getAssetType).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        List<AssetTypeGroup> currentPageAssetTypeGroupList = assetTypeGroupRepository.findByEncodedInAndTenantUid(encodes, user.getTenantUID());
         currentPageAssetTypeGroupMap = currentPageAssetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, ast -> ast));
         logger.info("AssetInfoListController.loadData end time cost:{}ms",(System.currentTimeMillis()-l));
         return res;
