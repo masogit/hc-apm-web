@@ -163,6 +163,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private UserAccountRepository userDao;
     private String oneQrCodeStatus;
     private boolean countyArea = false;
+    private UserAccount user;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -193,7 +194,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
-        assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
+        user = UserContextService.getCurrentUserAccount();
+        assetTypeGroupList = user.getAssetTypeGroupList();
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
@@ -206,7 +208,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
     
     private Integer getWarrantyAlertDaysConfig(){
-        UserAccount user = UserContextService.getCurrentUserAccount();
         WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
         List<WorkflowConfig> wfConfigList = wfDao.findByTenantUID(user.getTenantUID());
         
@@ -253,7 +254,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("AssetInfoListController.loadData start time:{}",l);
         isOrderByForParentAndChildren = false;
 
-        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
+        if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(user.getAssetTypeGroupList())) {
             return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
         }
         setUserSearchFilters();
@@ -286,7 +287,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             pageRequest =addRequiredSortById(pageRequest);
 
         lastPageSort = pageRequest.getSort(); //export excel use
-        UserAccount user = UserContextService.getCurrentUserAccount();
         boolean createdByBoolean = false;
         String value = null;
         for (SearchFilter searchFilter :searchFilters) {
@@ -433,7 +433,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         if (!UserContextService.isMVSRole()) {
             if (!this.hasFilterOnField("siteUID")) {
-                UserAccount user = UserContextService.getCurrentUserAccount();
                 List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -506,8 +505,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
-            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
+            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
         }
     }
 

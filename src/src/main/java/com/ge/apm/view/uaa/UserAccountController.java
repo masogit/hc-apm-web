@@ -726,6 +726,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 //            userAuthGroup.setClassificationPath(item.getClassificationPath());
             userAssetGroupDao.save(userAuthGroup);
         });
+        if (loginUser.getLoginName().equals(userAccount.getLoginName())) {
+            // 如果修改的用户为当前登录用户，重新设置当前登录用户的资产分类
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            userContextService.setAssetTypeGroup();
+        }
     }
 
 

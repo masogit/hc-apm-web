@@ -9,6 +9,8 @@ import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.Digests;
 import com.ge.apm.service.utils.PinyinUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
@@ -366,6 +368,18 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Transient
 	private boolean isGeSSO=false;
+
+	@Transient
+	@Getter @Setter
+	private List<AssetTypeGroup> assetTypeGroupList;
+
+	@Transient
+	@Getter @Setter
+	private Map<String, AssetTypeGroup> assetTypeGroupMap;
+
+	@Transient
+	@Getter @Setter
+	private boolean enableAssetTypeGroup = false;
 
 	public String getUserTagsView(){
 		String userTagsView = "";

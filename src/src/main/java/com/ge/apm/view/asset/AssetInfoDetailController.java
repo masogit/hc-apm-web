@@ -142,7 +142,7 @@ public class AssetInfoDetailController {
                 selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
             }
             if (null != selected.getAssetType()) {
-                selectedAssetTypeGroup = assetTypeGroupRepository.findByEncoded(selected.getAssetType());
+                selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(selected.getAssetType(), selected.getTenantUID());
             }
 
             //ge mvc data
