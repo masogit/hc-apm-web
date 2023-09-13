@@ -212,6 +212,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.treeNodeNameFilter = treeNodeNameFilter;
     }
 
+    private boolean approval=false;
+
     @Override
     protected void init() {
         isStatus = false;
@@ -260,10 +262,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
-
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
-
+        approval = Boolean.parseBoolean((String) UrlEncryptController.getValueFromMap(encodeStr, "approval"));
         qr_Code = WebUtil.getRequestParameter("qrCode");
         siteUid = WebUtil.getRequestParameter("siteUid");
         createRequest = acService.getCreateRequest(qr_Code, siteUid);
@@ -1359,11 +1360,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public String submitApproval() {
-        selected.setUsageStatus(UsageStatusConstant.UNDER_REVIEW);
+    public String submitApproval(Integer usageStatusconstant) {
+        //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
+        selected.setUsageStatus(usageStatusconstant);
         return applyChange();
     }
-
+    public String submitApprovalExtend(Integer usageStatusconstant) {
+        //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
+        String redirectUrl = submitApproval(usageStatusconstant);
+        if(StringUtils.isNotBlank(redirectUrl)){
+            redirectUrl="ApprovalList?faces-redirect=true";
+        }
+        return redirectUrl;
+    }
     @Override
     public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
@@ -1681,5 +1690,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return false;
         }
         return dao.secondment(selected.getUid())>0;
+    }
+
+    public boolean isApproval() {
+        return approval;
+    }
+
+    public void setApproval(boolean approval) {
+        this.approval = approval;
     }
 }
