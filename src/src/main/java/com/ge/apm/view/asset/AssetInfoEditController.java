@@ -418,6 +418,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setAssetGroup(createRequest.getAssetGroup());//设备分类
         selected.setLocationName(createRequest.getLocationName());//安装位置
         selected.setComments(createRequest.getComments());//备注
+        selected.setAssetType(createRequest.getAssetType());// 资产分类
 
         if(null != createRequest.getManufactureId()){
             Supplier supplier = supplierDao.getById(Integer.valueOf(createRequest.getManufactureId()));
