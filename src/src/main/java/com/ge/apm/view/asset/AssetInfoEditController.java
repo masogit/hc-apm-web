@@ -272,6 +272,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             qrCode = qr_Code;
             isStatus = true;
             createAssetInfo();
+            assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
             rejectTextHistory = new ArrayList();
             if (null != createRequest.getFeedback()) {
                 Collections.addAll(rejectTextHistory, createRequest.getFeedback().split("//"));
@@ -316,7 +317,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
             uploadFlag = getAttachList(selected.getUid(), "1").isEmpty();
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
-            assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" +this.selected.getTenantUID());
+            assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
         }
         if(selected ==null){
             try {
