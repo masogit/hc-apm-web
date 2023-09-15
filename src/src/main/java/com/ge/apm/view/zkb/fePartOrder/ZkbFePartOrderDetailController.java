@@ -463,6 +463,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         String dateStr = DateUtil.getFormatStrByDate(this.selected.getReportDate(), format);
         Date reportDate = DateUtil.getDateByFormatStr(dateStr, format);
         //GE FE合同到期后400下单前增加Commercial角色进行审批  且不是599合同
+        //人工叫报修时间  备件探头叫申请时间  申请时间如果小于开始时间，大于结束时间需要commercial
         if (((reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0)&&!"Y".equals(zkbContract.getFiveNineNineFlag()))&&!"t".equals(this.selected.getNotGeAsset())){
             workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString();
         }
@@ -623,6 +624,16 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         }
         return subtractTotalStatusDisabled;
     }
+
+    public void handSubtractStatus(ValueChangeEvent event){
+        if("highMachine".equals(this.selected.getAssetType())){
+            this.selected.setSubtractTotalStatus("false");
+            if("t".equals(event.getNewValue())){
+                this.selected.setSubtractTotalStatus("true");
+            }
+        }
+    }
+
     public void setSubtractTotalStatusDisabled(Boolean subtractTotalStatusDisabled) {
         this.subtractTotalStatusDisabled = subtractTotalStatusDisabled;
     }
