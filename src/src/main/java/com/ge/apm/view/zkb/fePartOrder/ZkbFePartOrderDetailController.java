@@ -626,7 +626,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     }
 
     public void handSubtractStatus(ValueChangeEvent event){
-        if("highMachine".equals(this.selected.getAssetType())){
+        if("highMachine".equals(this.selected.getAssetType())&&"f".equals(this.selected.getNotGeAsset())){
             this.selected.setSubtractTotalStatus("false");
             if("t".equals(event.getNewValue())){
                 this.selected.setSubtractTotalStatus("true");
