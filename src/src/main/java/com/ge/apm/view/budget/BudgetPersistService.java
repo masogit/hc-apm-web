@@ -192,7 +192,7 @@ public class BudgetPersistService {
             // 发送消息
             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2
                     + application.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-            approvalService.sendWxMsg(paramList, message, "待审批");
+            approvalService.sendWxMsg(paramList, message, "待审批","");
         });
     }
 
