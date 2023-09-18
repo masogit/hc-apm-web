@@ -47,8 +47,7 @@ import java.util.*;
 public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     protected static final Logger logger = Logger.getLogger(MultiLevelApprovalService.class);
-    @Value("#{wxProperties.web_context_url}")
-    private String webContextUrl;
+
     @Autowired
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
     @Autowired
@@ -201,7 +200,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         if (multiLevel != null) {
                             // 发送短信
                             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                            String linkUrl=webContextUrl+ "/wx/approvals/" + multiLevel.getId()+"?showType=0";
+                            String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
                             this.sendWxMsg(paramList,message,"待审批",linkUrl);
                         }
                         return multiLevel;
@@ -587,7 +586,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             }
                             //审批同意时 给审批人发送微信
                             String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1+ApprovalConstant.WX_MESSAGE_APPROVAL_2+date.getBusinessNumber()+ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                            String linkUrl=webContextUrl+ "/wx/approvals/" + multiLevel.getId()+"?showType=0";
+                            String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
                             this.sendWxMsg(paramList, message,"待审批",linkUrl);
                         }
                     }
