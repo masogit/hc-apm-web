@@ -180,16 +180,15 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //保存审批节点
     public void saveNode() {
-        approvalNode.setMultiLevelApprovalUsers(approvalNode.getApproveUsers());
+//        approvalNode.setMultiLevelApprovalUsers(approvalNode.getApproveUsers());
 
         if (null != approvalNode.getNodeId()) {
-
-            if(approvalNode.isClinicalDepartmentDirector()){
-                List<UserAccount> deptHeadList = buildRoleApproveUserList("DeptHead");
-                if(CollectionUtils.isNotEmpty(deptHeadList)  && CollectionUtils.isNotEmpty(approvalNode.getApproveUsers())){
-                    approvalNode.setClinicalDepartmentDirectorUsers(deptHeadList);
-                }
-            }
+//            if(approvalNode.isClinicalDepartmentDirector()){
+//                List<UserAccount> deptHeadList = buildRoleApproveUserList("DeptHead");
+//                if(CollectionUtils.isNotEmpty(deptHeadList)  && CollectionUtils.isNotEmpty(approvalNode.getApproveUsers())){
+//                    approvalNode.setClinicalDepartmentDirectorUsers(deptHeadList);
+//                }
+//            }
             return;
         }
         ApprovalNode node = new ApprovalNode();
@@ -202,13 +201,13 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         } else {
             node.setApproveUsers(approvalNode.getApproveUsers());
         }
-        if(approvalNode.isClinicalDepartmentDirector()){
-            List<UserAccount> deptHeadList = buildRoleApproveUserList("DeptHead");
-            if(CollectionUtils.isNotEmpty(deptHeadList)  && CollectionUtils.isNotEmpty(node.getApproveUsers())){
-//                node.getApproveUsers().addAll(deptHeadList);
-                node.setClinicalDepartmentDirectorUsers(deptHeadList);
-            }
-        }
+//        if(approvalNode.isClinicalDepartmentDirector()){
+//            List<UserAccount> deptHeadList = buildRoleApproveUserList("DeptHead");
+//            if(CollectionUtils.isNotEmpty(deptHeadList)  && CollectionUtils.isNotEmpty(node.getApproveUsers())){
+////                node.getApproveUsers().addAll(deptHeadList);
+//                node.setClinicalDepartmentDirectorUsers(deptHeadList);
+//            }
+//        }
         nodesList.add(node);
     }
 
@@ -254,13 +253,13 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 item.setUserUids(null);
             } else {
                 item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
-                item.setMultiLevelApprovalUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
-
-                if(item.isClinicalDepartmentDirector()){
-                    List<String> clinicalDepartmentDirectorUids = item.getClinicalDepartmentDirectorUsers().stream().map(a -> a.getUid()).collect(Collectors.toList());
-                    item.getUserUids().addAll(clinicalDepartmentDirectorUids);
-                    item.setUserUids(item.getUserUids().stream().distinct().collect(Collectors.toList()));
-                }
+//                item.setMultiLevelApprovalUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
+//
+//                if(item.isClinicalDepartmentDirector()){
+//                    List<String> clinicalDepartmentDirectorUids = item.getClinicalDepartmentDirectorUsers().stream().map(a -> a.getUid()).collect(Collectors.toList());
+//                    item.getUserUids().addAll(clinicalDepartmentDirectorUids);
+//                    item.setUserUids(item.getUserUids().stream().distinct().collect(Collectors.toList()));
+//                }
                 item.setRoleUids(null);
             }
         });
