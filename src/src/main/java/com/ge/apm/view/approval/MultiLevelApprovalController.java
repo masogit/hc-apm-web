@@ -1,9 +1,6 @@
 package com.ge.apm.view.approval;
 
-import com.ge.apm.dao.BudgetApplicationRepository;
-import com.ge.apm.dao.MultiLevelApprovalRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
@@ -48,6 +45,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private BudgetApplicationRepository budgetDao;
     private WorkflowService workflowService;
     private BlobFileService blobService;
+
+
+    private AssetScrapRepository assetScrapDao;
 
     @Setter
     @Getter
@@ -98,6 +98,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         budgetDao = WebUtil.getBean(BudgetApplicationRepository.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        assetScrapDao = WebUtil.getBean(AssetScrapRepository.class);
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -142,6 +143,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 BudgetApplication budgetApplication = budgetDao.findById(multiLevelApproval.getBusinessUid());
                 primaryApprovalData = budgetApplication;
                 secondaryApprovalData = budgetApplication.getBudgetAssets();
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
+                AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+                List<AssetScrap> assetScraps = new ArrayList<>();
+                assetScraps.add(assetScrap);
+                primaryApprovalData = assetScrap;
+                secondaryApprovalData =assetScraps;
                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
@@ -254,6 +262,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }else if(this.businessTypeFlag == 8){
             V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
             siteUid = v2PmOrder.getSiteUID();
+        }else if(this.businessTypeFlag == 15){
+            AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
+            siteUid = assetScrap.getSiteUid();
         }
 
         if(StringUtils.isNotEmpty(siteUid)){
@@ -282,6 +293,26 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }
 
     }
+
+    public void returnApprove() throws Exception {
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
+            return;
+        }
+        this.isAgree = false;
+
+        if(this.needSignature){
+            multiLevelApproval.setAuditSignature(this.signatureId);
+        }
+        multiLevelApprovalService.getMultiLevelApprovalReturn(multiLevelApproval,approvalOpinion);
+        selected = null;
+        this.needSignature = false;
+        this.resetSignature();
+    }
+
+
 
     public void getSignature() {
         this.signatureContent = null;

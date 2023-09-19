@@ -49,6 +49,8 @@ public class MultiLevelApprovalGlobalController {
                 return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE_NAME;
             case 3:
                 return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_DIS_AGREE_NAME;
+            case 4:
+                return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_RETURN_NAME;
         }
         return null;
     }
@@ -76,6 +78,8 @@ public class MultiLevelApprovalGlobalController {
                 return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE_NAME;
             case 3:
                 return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_DIS_AGREE_NAME;
+            case 4:
+                return ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_RETURN_NAME;
         }
         return null;
     }

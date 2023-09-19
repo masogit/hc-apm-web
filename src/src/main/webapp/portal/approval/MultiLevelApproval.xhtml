@@ -122,7 +122,7 @@
                                          value="#{multiLevelApprovalController.approvalOpinion}"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 7 and multiLevelApprovalController.businessTypeFlag != 8 and multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14}">
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 7 and multiLevelApprovalController.businessTypeFlag != 8 and multiLevelApprovalController.businessTypeFlag != 13 and multiLevelApprovalController.businessTypeFlag != 14 and multiLevelApprovalController.businessTypeFlag != 15}">
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                     </h:panelGroup>
@@ -130,6 +130,7 @@
                     <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 7 or multiLevelApprovalController.businessTypeFlag == 8}">
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(1)}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(2)}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton rendered="#{multiLevelApprovalController.businessTypeFlag == 7}" validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.returnApprove()}" value="退回上一节点" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
                         <p:commandButton style="display: none" id="openSignature" actionListener="#{multiLevelApprovalController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
                     </h:panelGroup>
                     <!--不良事件审批-->
@@ -147,6 +148,13 @@
                                          actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}"
                                          value="#{msg.NotApproved}" update="approvalList ItemDetailViewForm"
                                          oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 15}">
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(1)}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(2)}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.returnApprove()}" value="退回上一节点" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton style="display: none"   id="openSignature2" actionListener="#{multiLevelApprovalController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
                     </h:panelGroup>
                 </h:form>
 
@@ -168,6 +176,13 @@
                     function handleComplete(xhr, status, args) {
                         if(xhr.status===205){
                             document.getElementById('approvalDialogForm:openSignature').click();
+                        }else{
+                            PF('MultiLevelApprovalClaimDialog').hide();
+                        }
+                    }
+                    function handleComplete(xhr, status, args) {
+                        if(xhr.status===205){
+                            document.getElementById('approvalDialogForm:openSignature2').click();
                         }else{
                             PF('MultiLevelApprovalClaimDialog').hide();
                         }
