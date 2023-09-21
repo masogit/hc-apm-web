@@ -504,7 +504,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetType".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
-        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+        if (user.isEnableAssetTypeGroup()) {
             searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
         }
     }
