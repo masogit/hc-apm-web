@@ -696,6 +696,20 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "fault_un_closed_sr")
     private String faultUnClosedSr;
 
+    /**
+     * 是否工作站  t f
+     */
+    @Column(name = "work_station_flag")
+    private String workStationFlag;
+
+    public String getWorkStationFlag() {
+        return workStationFlag;
+    }
+
+    public void setWorkStationFlag(String workStationFlag) {
+        this.workStationFlag = workStationFlag;
+    }
+
     public String getFaultUnClosedSr() {
         return faultUnClosedSr;
     }
