@@ -5,8 +5,11 @@ import javax.faces.bean.ManagedBean;
 import com.ge.apm.dao.ZkbContractAssetRepository;
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.domain.*;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.AssetInfoRepository;
@@ -14,7 +17,6 @@ import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -42,6 +43,9 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     private ZkbContractAssetRepository zkbContractAssetRepository;
     private ZkbContractRepository zkbContractRepository;
     private UserContextService userContextService;
+
+    private UserAccount user;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -52,6 +56,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         this.filterBySite = false;
         this.filterByHospital = false;
         userContextService = WebUtil.getBean(UserContextService.class);
+        user = UserContextService.getCurrentUserAccount();
     }
 
 
@@ -77,10 +82,12 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
+        if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(user.getAssetTypeGroupList())) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         if (!this.hasFilterOnField("siteUID")) {
 
             searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-            UserAccount user = UserContextService.getCurrentUserAccount();
             List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -89,6 +96,9 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        }
+        if (user.isEnableAssetTypeGroup()) {
+            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
         }
         return super.loadData(pageRequest);
     }
@@ -267,6 +277,9 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     }
 
     private void addAssetToOrgNode(TreeNode orgNode) {
+        if (user.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(user.getAssetTypeGroupList())) {
+            return;
+        }
         if (orgNode.getChildren().stream().filter(item -> item.getType().equals("asset")).count() == 0) {
 
             OrgInfo orgInfo = (OrgInfo) orgNode.getData();
@@ -279,12 +292,10 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
                 orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
                 orgFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IsNull, null));
             }
-            List<AssetInfo> assetList = dao.findBySearchFilter(orgFilters);
 
-            assetList.forEach(item -> {
-                TreeNode assetNode = new DefaultTreeNode("asset", item, orgNode);
-//             assetNode.setRowKey(item.getUid());
-            });
+            if (user.isEnableAssetTypeGroup()) {
+                orgFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
+            }
         }
     }
     
