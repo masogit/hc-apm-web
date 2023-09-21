@@ -19,9 +19,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "asset_type_group",
         indexes = {
-                @Index(name = "asset_type_group_id_uk", columnList = "id"),
-//                @Index(name = "asset_type_group_classification_path_uk",  columnList = "classification_path"),
-//                @Index(name = "asset_type_group_classification_code_uk", columnList = "classification_code"),
                 @Index(name = "asset_type_group_encoded_uk",  columnList = "encoded")
         })
 @Data
@@ -112,5 +109,21 @@ public class AssetTypeGroup implements Serializable {
 
     public String getEncoded() {
         return encoded;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (uid != null ? uid.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof AssetTypeGroup)) {
+            return false;
+        }
+        AssetTypeGroup other = (AssetTypeGroup) object;
+        return (this.uid != null || other.uid == null) && (this.uid == null || this.uid.equals(other.uid));
     }
 }

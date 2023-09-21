@@ -402,6 +402,17 @@ public class UserContextService implements Serializable {
         return userAccount;
     }
 
+    public void setAssetTypeGroup() {
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+            userAccount.setEnableAssetTypeGroup(true);
+            AssetTypeGroupRepository assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+            List<AssetTypeGroup> assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(userAccount.getUid());
+            Map<String, AssetTypeGroup> assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, t -> t));
+            userAccount.setAssetTypeGroupList(assetTypeGroupList);
+            userAccount.setAssetTypeGroupMap(assetTypeGroupMap);
+        }
+    }
+
     public boolean isIBTenant() {
         UserAccount currentUser = getLoginUser();
         int siteId = currentUser.getSiteId();
@@ -523,6 +534,8 @@ public class UserContextService implements Serializable {
             apmFeatures = ((List<String>)JSON.parse(getTenantInfo().getFeatureList())).stream().collect(Collectors.toSet());
             CustomPermissionEvaluator.apmFeatures = apmFeatures;
         }
+        // 设置资产分类
+        setAssetTypeGroup();
         return apmFeatures;
     }
 

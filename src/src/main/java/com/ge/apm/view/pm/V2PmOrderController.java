@@ -31,10 +31,13 @@ import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -56,6 +59,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import sun.misc.BASE64Decoder;
@@ -142,6 +146,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private ServiceRequestApiService serviceRequestApiService;
     private PmOrderRuleRepository pmOrderRuleRepository;
     private RelRuleAssetRepository relRuleAssetRepository;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
     private String token;
     private List<UnstructuredDataCollection> unDataCollection;
     private UnstructuredDataCollection unCollection;
@@ -220,6 +225,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date takeTime;
     private String approvaler;
     private List<V2_BlobObject> picList;
+    private List<AssetTypeGroup> assetTypeGroupList;
 
     @Getter @Setter
     private List<V2_BlobObject> picBeforeList;
@@ -246,7 +252,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String head;
     // cache for maintenance report
     private StreamedContent maintenanceReport;
-    private UserAccount user;
+    private UserAccount loginUser;
     private TenantInfoRepository tenantInfoRepository;
     Boolean isInsulate;
     private String reportUid; //selected table base uid
@@ -368,22 +374,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
            List<Object> list =  dao.getAllPmOrder(orgUidList);
            long search = System.currentTimeMillis();
-           logger.info("cost time :"+ (search - start)/1000);
-/*
-           for (int i = 0; i <list.size() ; i++) {
-               Object[] cells = (Object[]) list.get(i);
-               cells[6] = FieldValueMessageController.fieldValue("pmType",cells[6].toString());
-               cells[14] = FieldValueMessageController.fieldValue("intExtType",cells[14].toString());
-               *//*try {
-                   if(null != cells[15] && StringUtils.isNotEmpty(cells[15].toString())) {
-                       cells[15] = new DateTime(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(cells[15].toString())).toString("MM/dd/yyyy");
-                   }
-               } catch (Exception e) {
-                   e.printStackTrace();
-               }*//*
-           }*/
+           logger.info("cost time :" + (search - start)/1000);
 
-           String path = new DateTime().toString("yyyyMMddHHmm")+ File.separator+user.getLoginName();
+           String path = new DateTime().toString("yyyyMMddHHmm") + File.separator + loginUser.getLoginName();
            String filePath = fileScanService.getUploadFileFullPath(path);
            File dest = new File(filePath + File.separator+"pm.xlsx");
           FileUtils.forceMkdir(new File(filePath));
@@ -1018,7 +1011,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void doExportMaintenanceReport() {
         maintenanceReport = null;
         try {
-            maintenanceReport = pmReportService.generate(selectedMap, isInsulate, user);
+            maintenanceReport = pmReportService.generate(selectedMap, isInsulate, loginUser);
         } catch (BusinessException e) {
             logger.error("downLoad pm_word BusinessException ",e);
             WebUtil.addErrorMessage(e.getMessage());
@@ -1130,7 +1123,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(null == pmIdList || pmIdList.size() == 0){
             return false;
         }
-        WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
+        WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
         boolean autoAck = null == wfc || null == wfc.getAutoAckMaintenance() ? true : wfc.getAutoAckMaintenance();
         boolean match = dao.getBatchPmOrderList(this.pmIdList).stream().anyMatch(item -> autoAck != item.getAutoAckMaintenance());
         if(match){
@@ -1674,6 +1667,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         multiLevelApprovalService= WebUtil.getBean(MultiLevelApprovalService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+
+        // 用户可见资产分类
+        assetTypeGroupList = loginUser.getAssetTypeGroupList();
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1733,10 +1730,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.filterBySite = false;
         this.filterByHospital = false;
         hmCheck = new HashMap<String, UnstructuredData>();
-        user = UserContextService.getCurrentUserAccount();
-        isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+        loginUser = UserContextService.getCurrentUserAccount();
+        isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
-        WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
+        WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
         if(wfc !=null)
             isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
@@ -1749,7 +1746,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         ruleList = pmOrderRuleRepository.findPmRuleByTenant(tenantUID);
     }
     public void saveNewSupplier() {
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
         this.newSupplier.setSiteId(loginUser.getSiteId());
         this.newSupplier.setHospitalId(loginUser.getHospitalId());
         this.newSupplier.setTenantUID(loginUser.getTenantUID());
@@ -1896,6 +1892,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
 
+        /*if (loginUser.isEnableAssetTypeGroup() && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }*/
         this.setSearchFilter();
 
         if(queryIndex == 20){
@@ -2125,8 +2124,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
         String tenantUid = tenantInfo.get().getUid();
 
-//        UserAccount user = UserContextService.getCurrentUserAccount();
-//        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         /*根据登录进来的租户获取到该租户绑定的设备的uid*/
         String token = UserContextService.getAccessToken();
 //        String to = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ5bXlnQWRtaW4iLCJhdXRoIjoieW15Z0FkbWluIiwidWlkIjoiYmI5MDQ5NDYxMWIxNDllYzk0MWMzZTUyMTUwZDQ0YjQiLCJ1c2VySWQiOjE4Mjg4LCJleHAiOjE2MzgzNDYzOTB9.S6s0ow5Ab9RUO5Efo9XG-lAQmQxbxrf6aDsuUsnApStJ3iCdE7bjJHLs6hKJAQK-QYY4i9w8VmTlps7WZk0-iA";
@@ -2518,8 +2515,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             filterArrayList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//所属科室
             filterArrayList.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//使用科室
-
         }
+
+        // 资产分类权限
+        /*if (loginUser.isEnableAssetTypeGroup()) {
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            filterArrayList.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
+        }*/
     }
 
     public void searchList(Integer buttonIndex) {
@@ -2941,7 +2943,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     //流程配置项勾选批量保养完成 已计划显示批量保养完成按钮，同时勾选简化保养 待接单和待抢单才能显示批量保养完成按钮，其他情况均不显示。
     public boolean isAllowBatchComplate() {
-        WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
+        WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
         if(wfc==null || wfc.getPmIsSupportBatchFinish() == null){
             return false;
         }

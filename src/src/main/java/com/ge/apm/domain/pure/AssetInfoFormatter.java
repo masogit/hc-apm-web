@@ -829,7 +829,7 @@ public class AssetInfoFormatter {
         return null;
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap(boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers) {
+    public Map<String, Object> buildExcelColumnKeyValueMap(boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers, Map encodedToAssetTypeGroupPath) {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -951,11 +951,13 @@ public class AssetInfoFormatter {
         map.put(getMessage("currentId"), assetInfo.getCurrentId());
         map.put(getMessage("assetUsedLifecycle"), assetInfo.getAssetUsedLifecycle());
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
+        map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
+        map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
         return map;
 
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap1(Map<String, String> userMap, boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers) {
+    public Map<String, Object> buildExcelColumnKeyValueMap1(Map<String, String> userMap, boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers, Map encodedToAssetTypeGroupPath) {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -1082,6 +1084,8 @@ public class AssetInfoFormatter {
         map.put(getMessage("currentId"), assetInfo.getCurrentId());
         map.put(getMessage("assetUsedLifecycle"), assetInfo.getAssetUsedLifecycle());
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
+        map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
+        map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
         return map;
 
     }

@@ -6,6 +6,7 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.mapper.UserAccountMapper;
+import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
@@ -18,6 +19,7 @@ import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ import webapp.framework.web.WebUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -103,6 +106,9 @@ public class AssetFileImportBaseService {
     protected SysAuthGroupRepository authGroupDao;
 
     @Autowired
+    protected AssetTypeGroupRepository assetTypeGroupRepository;
+
+    @Autowired
     protected AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     @Autowired
@@ -148,6 +154,8 @@ public class AssetFileImportBaseService {
 
     protected Map<String, AssetInfo> parentAssetsMap = new HashMap<>();
 
+    protected List<AssetTypeGroup> assetTypeGroupList = new ArrayList<>();
+    protected Map<String, AssetTypeGroup> assetTypeGroupMap = new HashMap<>();
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport, boolean crossSite) {
         this.selectedOrgToImport = selectedOrgToImport;
@@ -206,7 +214,6 @@ public class AssetFileImportBaseService {
         int row = 0;
 
         try {
-
             if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
 
                 //locate parent assets first for later use
@@ -505,6 +512,16 @@ public class AssetFileImportBaseService {
             isCreate=true;
         }
 
+        // 如果租户开启资产分类，导入资产分类为空，则默认赋值第一个分类
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(newAsset.getAssetType())) {
+            if (assetTypeGroupList.isEmpty()) {
+                item.put("assetType", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "错误: 资产分类为空！");
+                return;
+            }
+            newAsset.setAssetType(assetTypeGroupList.get(0).getEncoded());
+        }
+
         assetDao.save(newAsset);
         AssetInfo assetInfo = new AssetInfo();
         BeanUtils.copyProperties(newAsset,assetInfo);
@@ -546,7 +563,8 @@ public class AssetFileImportBaseService {
 
     public Map checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,List<AssetInfo> unCheckNurseSiteMaintainList) {
         LocalDateTime startTime = LocalDateTime.now();
-
+        assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
+        assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, t -> t));
         if (!crossSite) {
             //only selected site can import clinical dept, otherwise clinical dept excel sheet is meaningless.
             importOrgMap.forEach(item -> {
@@ -852,6 +870,16 @@ public class AssetFileImportBaseService {
                     item.put("status", ImportStatus.CheckFail);
                     result.put("canBeImport",Boolean.FALSE);
                     AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("medicalApparatusClassification") + "编码不存在");
+                    continue;
+                }
+            }
+            // 资产分类校验
+            if(StringUtils.hasLength(newAsset.getAssetType())){
+                AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupMap.get(newAsset.getAssetType());
+                if (selectedAssetTypeGroup == null) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.put("canBeImport",Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetTypeGroup") + "编码不存在");
                     continue;
                 }
             }
