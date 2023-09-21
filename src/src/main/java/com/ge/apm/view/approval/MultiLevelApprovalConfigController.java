@@ -37,6 +37,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     private SysRoleRepository roleDao;
     @Setter@Getter
     private ApprovalNode approvalNode;
+    private RoleApproveCondition roleApproveCondition=new RoleApproveCondition();
     @Setter
     private List<ApprovalNode> nodesList;
     private List<UserAccount> approveUserList;
@@ -161,12 +162,8 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                     });
                     node.setApproveRoles(roles);
                 } else {
+                    List<String> userUids = node.getUserUids();
                     List<UserAccount> users = new ArrayList();
-
-                    List<String> userUids=node.getUserUids();
-                    if(node.isClinicalDepartmentDirector()){
-                        userUids= node.getMultiLevelApprovalUids();
-                    }
                     userUids.stream().forEach(useruid -> {
                         users.add(userAccountDao.getByUid(useruid));
                     });
@@ -201,6 +198,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         } else {
             node.setApproveUsers(approvalNode.getApproveUsers());
         }
+        node.setRoleApproveCondition(roleApproveCondition);
 //        if(approvalNode.isClinicalDepartmentDirector()){
 //            List<UserAccount> deptHeadList = buildRoleApproveUserList("DeptHead");
 //            if(CollectionUtils.isNotEmpty(deptHeadList)  && CollectionUtils.isNotEmpty(node.getApproveUsers())){
@@ -341,6 +339,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     public void onAddNode() {
         approvalNode = new ApprovalNode();
+        roleApproveCondition = new RoleApproveCondition();
         selectedUserOrg = null;
     }
 
@@ -348,6 +347,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         for (ApprovalNode node : nodesList) {
             if (null != node.getNodeId() && nodeId == node.getNodeId()) {
                 approvalNode = node;
+                roleApproveCondition=node.getRoleApproveCondition();
             }
         }
     }
@@ -416,5 +416,16 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     @Override
     protected GenericRepositoryUUID<MultiLevelApprovalConfig> getDAO() {
         return configDao;
+    }
+
+
+
+
+    public RoleApproveCondition getRoleApproveCondition(){
+        return roleApproveCondition;
+    }
+
+    public void setRoleApproveCondition(RoleApproveCondition roleApproveCondition){
+        this.roleApproveCondition= roleApproveCondition;
     }
 }

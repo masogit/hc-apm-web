@@ -151,9 +151,9 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 15}">
-                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(1)}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
-                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(2)}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
-                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.returnApprove()}" value="退回上一节点" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(1)}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete2(xhr, status, args);"/>
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.preApproveCheck(2)}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete2(xhr, status, args);"/>
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.returnApprove()}" value="退回上一节点" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleComplete2(xhr, status, args);"/>
                         <p:commandButton style="display: none"   id="openSignature2" actionListener="#{multiLevelApprovalController.getSignature()}" value="查看签名" update="signatureDlg" oncomplete="PF('signatureDlg').show();" />
                     </h:panelGroup>
                 </h:form>
@@ -180,7 +180,7 @@
                             PF('MultiLevelApprovalClaimDialog').hide();
                         }
                     }
-                    function handleComplete(xhr, status, args) {
+                    function handleComplete2(xhr, status, args) {
                         if(xhr.status===205){
                             document.getElementById('approvalDialogForm:openSignature2').click();
                         }else{
