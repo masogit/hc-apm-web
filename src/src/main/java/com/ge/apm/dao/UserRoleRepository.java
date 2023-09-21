@@ -34,4 +34,12 @@ public interface UserRoleRepository extends GenericRepository<UserRole> {
 
     @Query(value="select ua.uid from user_role ur inner join user_account ua on ur.user_id = ua.id where  ua.tenant_uid = ?1 and ur.role_id = ?2",nativeQuery=true)
     public List<String> findUserUidByRoleId(String tenantUid ,int roleId);
+
+
+    @Query(value="select ua.uid from user_role ur inner join user_account ua on ur.user_id = ua.id where  ua.site_uid = ?1 and ur.role_id = ?2",nativeQuery=true)
+    public List<String> findUserUidBySiteUidAndRoleId(String siteUid ,int roleId);
+
+
+    @Query(value="select ua.uid from user_role ur inner join user_account ua on ur.user_id = ua.id where  ua.org_uid = ?1 and ur.role_id = ?2",nativeQuery=true)
+    public List<String> findOrgUidByRoleId(String tenantUid ,int roleId);
 }
