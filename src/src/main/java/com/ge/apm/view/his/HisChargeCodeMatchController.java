@@ -202,12 +202,21 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
             WebUtil.addErrorMessageKey("未添加收费项目！");
             return;
         }
-
-        Double rate = startList.stream().mapToDouble(HisAssetGroupAssetMatch::getGroupRate).sum();
-        if(rate != 100.0){
-            WebUtil.addErrorMessageKey("分摊必须是100%！");
-            return;
+        Map<String,List<HisAssetGroupAssetMatch>> map = startList.stream().collect(Collectors.groupingBy(HisAssetGroupAssetMatch::getAssetGroupName));
+        if(map.size()>1){
+            Double rate = startList.stream().mapToDouble(HisAssetGroupAssetMatch::getGroupRate).sum();
+            if(rate != 100.0){
+                WebUtil.addErrorMessageKey("分摊必须是100%！");
+                return;
+            }
+        }else{
+            List<HisAssetGroupAssetMatch> collect = startList.stream().filter(item -> item.getGroupRate() != 100.0).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(collect)){
+                WebUtil.addErrorMessageKey("多设备分组必须都是100%！");
+                return;
+            }
         }
+
         Set<String> sfxmIdList = targetAssets.stream().filter(item -> StringUtils.isNotEmpty(item.getSfxmId())).map(HisEquipmentSfxm::getSfxmId).collect(Collectors.toSet());
         if(sfxmIdList.isEmpty()){
             WebUtil.addErrorMessageKey("收费项目的收费代码不存在！");
@@ -383,6 +392,25 @@ public class HisChargeCodeMatchController extends GenericCRUDUUIDController<HisA
 
     public List<Map<String, Object>> getErrorList() {
         return errorList;
+    }
+
+
+    @Getter @Setter
+    private List<HisAssetGroupAssetMatch> assetGroupByGroupName=new ArrayList<>();
+
+    public void hisGroupByName() {
+        assetGroupByGroupName.clear();
+        if(CollectionUtils.isNotEmpty(startList)){
+            HisAssetGroupAssetMatch hisAssetGroupAssetMatch = startList.get(0);
+            String assetGroupName = hisAssetGroupAssetMatch.getAssetGroupName();
+            List<SearchFilter> searchFilters=new ArrayList<>();
+            searchFilters.add(new SearchFilter("assetGroupName", SearchFilter.Operator.EQ,assetGroupName));
+            List<HisAssetGroupAssetMatch> bySearchFilter = groupAssetMatchRepository.findBySearchFilter(searchFilters);
+            if(CollectionUtils.isNotEmpty(bySearchFilter)){
+                assetGroupByGroupName.addAll(bySearchFilter);
+
+            }
+        }
     }
 }
 
