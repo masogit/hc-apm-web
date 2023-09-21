@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MultiLevelApprovalService extends MicroServiceInvoker {
@@ -182,22 +183,17 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             }
                         } else {//用户审批
                             List<String> userUids = approvalNode.getUserUids();
+                            List<String> uids=  getRoleApproveCondition(approvalNode,approvableTarget.getBusinessUid());
+                            if(CollectionUtils.isNotEmpty(uids)){
+                                userUids.addAll(uids);
+                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                            }
+
                             List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUids);
                             for (UserAccount user : userAccounts) {
                                 if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
                                     paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
                                 }
-                            }
-                            if(ApprovalConstant.APPROVAL_ASSET_REPAIR.equals(approvableTarget.getBusinessType()) && approvalNode.isClinicalDepartmentDirector()){
-                                V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(approvableTarget.getBusinessUid());
-                                AssetInfo assetInfo = v2WorkOrder.getAssetInfo();
-                                String clinicalDeptUID = assetInfo.getClinicalDeptUID();
-                                int roleId = roleDao.getIdByName("DeptHead");
-                                List<String> orgUidByRoleId = userRoleDao.findOrgUidByRoleId(clinicalDeptUID, roleId);
-                                if(CollectionUtils.isNotEmpty(orgUidByRoleId)){
-                                    userUids.addAll(orgUidByRoleId);
-                                }
-
                             }
                             multiLevelApproval.setApprovalType(ApprovalConstant.USER_APPROVAL_TYPE);
                             Object[] objects = userUids.toArray();
@@ -234,6 +230,24 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             }
         }
         return null;
+    }
+
+    private List<String> getRoleApproveCondition(ApprovalNode approvalNode,String  businessUid) {
+
+        RoleApproveCondition roleApproveCondition = approvalNode.getRoleApproveCondition();
+        List<String> uids=null;
+        if(roleApproveCondition!=null){
+            String clinicalDeptUID=null;
+            if(roleApproveCondition.getCondition()==1) {
+                V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(businessUid);
+                clinicalDeptUID=v2WorkOrder.getAssetInfo().getClinicalDeptUID();
+            }
+            if(org.apache.commons.lang3.StringUtils.isNotBlank(roleApproveCondition.getApproveRole())  && org.apache.commons.lang3.StringUtils.isNotBlank(clinicalDeptUID)) {
+                int roleId = roleDao.getIdByName(roleApproveCondition.getApproveRole());
+                uids = userRoleDao.findOrgUidByRoleId(clinicalDeptUID, roleId);
+            }
+        }
+        return uids;
     }
 
     /**
@@ -590,6 +604,11 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 }
                             } else {//用户审批
                                 List<String> userUids = node.getUserUids();
+                                List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid());
+                                if(CollectionUtils.isNotEmpty(uids)){
+                                    userUids.addAll(uids);
+                                    userUids = userUids.stream().distinct().collect(Collectors.toList());
+                                }
                                 List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUids);
                                 for (UserAccount user : userAccounts) {
                                     if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
@@ -835,6 +854,11 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             }
                         } else {//用户审批
                             List<String> userUids = node.getUserUids();
+                            List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid());
+                            if(CollectionUtils.isNotEmpty(uids)){
+                                userUids.addAll(uids);
+                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                            }
                             List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUids);
                             for (UserAccount user : userAccounts) {
                                 if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
