@@ -163,6 +163,11 @@ public class CustomConfigService {
         List<String> localizedExportFields = exportFields.stream()
                 .map(item -> CustomConfigConstant.getExportOrImportFields().get(item)).collect(Collectors.toList());
 
+        if (localizedExportFields.contains(WebUtil.getMessage("assetTypeGroup"))
+                && !localizedExportFields.contains(WebUtil.getMessage("assetTypeGroupEncoded"))) {
+            localizedExportFields.add(WebUtil.getMessage("assetTypeGroupEncoded"));
+        }
+
         //uuid is required to export, but not in custom config fields, so include it here.
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         boolean zkbAccountBoolean = userContextService.isZkbAccount();

@@ -698,11 +698,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     public Set<AssetTypeGroup> gatherUserAuthGroup() {
         Set<AssetTypeGroup> selectedSysAuthGroups = new HashSet<>();
-        readSelectedNodesInSysAuthGroupTree(sysAuthGroupTree, selectedSysAuthGroups);
+        readSelectedNodesInAssetTypeGroupTree(assetTypeGroupTree, selectedSysAuthGroups);
 
         return selectedSysAuthGroups;
     }
-    private void readSelectedNodesInSysAuthGroupTree(TreeNode node, Set<AssetTypeGroup> selectedTreeNodeList) {
+    private void readSelectedNodesInAssetTypeGroupTree(TreeNode node, Set<AssetTypeGroup> selectedTreeNodeList) {
         if (node.isSelected()) {
             if (node.getParent() != null && node.getParent().isSelected()) {
                 return;
@@ -711,7 +711,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         } else {
             for (TreeNode item : node.getChildren()) {
-                readSelectedNodesInSysAuthGroupTree(item, selectedTreeNodeList);
+                readSelectedNodesInAssetTypeGroupTree(item, selectedTreeNodeList);
             }
         }
     }
@@ -726,6 +726,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 //            userAuthGroup.setClassificationPath(item.getClassificationPath());
             userAssetGroupDao.save(userAuthGroup);
         });
+        if (loginUser.getLoginName().equals(userAccount.getLoginName())) {
+            // 如果修改的用户为当前登录用户，重新设置当前登录用户的资产分类
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            userContextService.setAssetTypeGroup();
+        }
     }
 
 
@@ -1877,19 +1882,22 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
 
-    private TreeNode sysAuthGroupTree;
-    private TreeNode[] selectedSysAuthGroupNodes;
+    private TreeNode assetTypeGroupTree;
+    private TreeNode[] selectedAssetTypeGroupNodes;
 
 
-    public TreeNode getSysAuthGroupTree() {
-        return sysAuthGroupTree;
+    public TreeNode getAssetTypeGroupTree() {
+        return assetTypeGroupTree;
     }
-    public TreeNode[] getSelectedSysAuthGroupNodes() {
-        return selectedSysAuthGroupNodes;
+
+    public TreeNode[] getSelectedAssetTypeGroupNodes() {
+        return selectedAssetTypeGroupNodes;
     }
-    public void setSelectedSysAuthGroupNodes(TreeNode[] selectedSysAuthGroupNodes) {
-        this.selectedSysAuthGroupNodes = selectedSysAuthGroupNodes;
+
+    public void setSelectedAssetTypeGroupNodes(TreeNode[] selectedAssetTypeGroupNodes) {
+        this.selectedAssetTypeGroupNodes = selectedAssetTypeGroupNodes;
     }
+
     public void onSelectAssetTypeGroupTreeNode(NodeSelectEvent event) {
         setTreeNodes(event.getTreeNode(), true);
     }
@@ -1906,11 +1914,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     private void loadAssetTypeGroup() {
-        sysAuthGroupTree = assetTypeGroupService.buildSysAuthGroupInTree();
+        assetTypeGroupTree = assetTypeGroupService.buildAssetTypeGroupInTree();
 
         List<String> userAssetGroups = userAssetTypeGroupMapper.findAssetGroupByUser(this.selected.getUid());
 
-        setSelectedSysAuthGroupTree(sysAuthGroupTree, userAssetGroups);
+        setSelectedSysAuthGroupTree(assetTypeGroupTree, userAssetGroups);
 
     }
     private void setSelectedSysAuthGroupTree(TreeNode node, List<String> userAuthGroupUids) {

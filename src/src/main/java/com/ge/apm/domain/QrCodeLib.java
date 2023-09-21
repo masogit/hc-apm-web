@@ -123,6 +123,8 @@ public class QrCodeLib implements Serializable {
     @Size( max = 256)
     private String comments;
 
+    @Column(name = "asset_type")
+    private String assetType;
 
     public String getDepartNum() {
         return departNum;
@@ -409,4 +411,12 @@ public class QrCodeLib implements Serializable {
     public Integer getAssetClass() { return assetClass; }
 
     public void setAssetClass(Integer assetClass) { this.assetClass = assetClass; }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
 }

@@ -1,6 +1,7 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
@@ -79,6 +80,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
     private NurseSiteMaintainConfigJNRepository nurseSiteMaintainConfigJNRepository;
     private NurseSiteMaintainConfigJNItemRepository nurseSiteMaintainConfigJNItemRepository;
+    private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -209,6 +212,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.treeNodeNameFilter = treeNodeNameFilter;
     }
 
+    private boolean approval=false;
+
     @Override
     protected void init() {
         isStatus = false;
@@ -252,12 +257,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         nurseSiteMaintainConfigItemRepository = WebUtil.getBean(NurseSiteMaintainConfigItemRepository.class);
         nurseSiteMaintainConfigJNRepository = WebUtil.getBean(NurseSiteMaintainConfigJNRepository.class);
         nurseSiteMaintainConfigJNItemRepository = WebUtil.getBean(NurseSiteMaintainConfigJNItemRepository.class);
+        assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
 
         countyArea = userContextService.isCountyArea();
-
+        assetTypeGroupTreeComponentController.registerController(this);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
-
+        approval = Boolean.parseBoolean((String) UrlEncryptController.getValueFromMap(encodeStr, "approval"));
         qr_Code = WebUtil.getRequestParameter("qrCode");
         siteUid = WebUtil.getRequestParameter("siteUid");
         createRequest = acService.getCreateRequest(qr_Code, siteUid);
@@ -265,6 +272,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             qrCode = qr_Code;
             isStatus = true;
             createAssetInfo();
+            assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
             rejectTextHistory = new ArrayList();
             if (null != createRequest.getFeedback()) {
                 Collections.addAll(rejectTextHistory, createRequest.getFeedback().split("//"));
@@ -298,7 +306,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(dao.findByUid(selectedId));
             String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
-            terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
+            terminate = Boolean.parseBoolean(terminateStr);
             prepareEdit();
             beforeEdit();
             assetLifecyleStatus = selected.getStatus();
@@ -307,8 +315,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             this.selected.setTags(existingTags);
 
             changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
-            uploadFlag = getAttachList(selected.getUid(), "1").size() ==0;
+            uploadFlag = getAttachList(selected.getUid(), "1").isEmpty();
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
+            assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
         }
         if(selected ==null){
             try {
@@ -410,6 +419,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setAssetGroup(createRequest.getAssetGroup());//设备分类
         selected.setLocationName(createRequest.getLocationName());//安装位置
         selected.setComments(createRequest.getComments());//备注
+        selected.setAssetType(createRequest.getAssetType());// 资产分类
 
         if(null != createRequest.getManufactureId()){
             Supplier supplier = supplierDao.getById(Integer.valueOf(createRequest.getManufactureId()));
@@ -497,11 +507,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("manufacturer", selected.getManufactureId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getManufactureId())));
         selectedObjectMap.put("parentAsset", selected.getParentAssetId() == null ? null : dao.findById(selected.getParentAssetId()));
         selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
+
+        if (null != selected.getAssetType()) {
+            AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(selected.getAssetType(), selected.getTenantUID());
+            if (null != selectedAssetTypeGroup) {
+                selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
+            }
+        }
+
         qrCode = selected.getQrCode();
 
         medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, this.selected.getMedicalApparatusClassification());
 
-        //parentAssetList = aimService.getParentsAssetsList(this.selected);
         getClinicalOwnerList();
 
         if (selected.getSupplierId() != null) {
@@ -786,6 +803,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
 
             selected.setNationalStandardCode(selectedGb.getCode());
+        }
+
+        // 资产分类
+        if (null != selectedObjectMap.get("selectedAssetTypeGroup")) {
+            AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) selectedObjectMap.get("selectedAssetTypeGroup");
+            selected.setAssetType(selectedAssetTypeGroup.getEncoded());
         }
 
         if (null != selectedObjectMap.get("selectedAuthGroup")) {
@@ -1339,11 +1362,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public String submitApproval() {
-        selected.setUsageStatus(UsageStatusConstant.UNDER_REVIEW);
+    public String submitApproval(Integer usageStatusconstant) {
+        //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
+        selected.setUsageStatus(usageStatusconstant);
         return applyChange();
     }
-
+    public String submitApprovalExtend(Integer usageStatusconstant) {
+        //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
+        String redirectUrl = submitApproval(usageStatusconstant);
+        if(StringUtils.isNotBlank(redirectUrl)){
+            redirectUrl="ApprovalList?faces-redirect=true";
+        }
+        return redirectUrl;
+    }
     @Override
     public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
@@ -1635,7 +1666,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void filterTreeNode(){
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
-        TreeNode treeNode = buildTree(orgList,loginUser.getSiteId());
     }
 
     public boolean getUploadFlag() {
@@ -1644,9 +1674,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
-        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
-            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
-            selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+        switch (eventName) {
+            case MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE:
+                SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
+                selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+                break;
+            case AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE:
+                AssetTypeGroup assetTypeGroup = (AssetTypeGroup) eventObject;
+                selectedObjectMap.put("selectedAssetTypeGroup", assetTypeGroup);
+                break;
+            default:
+                break;
         }
     }
     public boolean secondment(){
@@ -1654,5 +1692,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return false;
         }
         return dao.secondment(selected.getUid())>0;
+    }
+
+    public boolean isApproval() {
+        return approval;
+    }
+
+    public void setApproval(boolean approval) {
+        this.approval = approval;
     }
 }

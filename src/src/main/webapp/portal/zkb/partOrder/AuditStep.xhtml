@@ -920,7 +920,7 @@
                         </p:column>
                     </p:dataTable>
                 </p:fieldset>
-                <p:fieldset id="orderedCancelFieldset" legend="订货信息" rendered="#{zkbPartOrderAuditController.showRejectOrder}">
+                <p:fieldset id="orderedCancelFieldset" legend="#{zkbPartOrderAuditController.showOrderedFieldsetText}" rendered="#{zkbPartOrderAuditController.showRejectOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <c:choose>
                             <c:when test="#{zkbPartOrderAuditController.selected.status eq 'OrderedReject'}">

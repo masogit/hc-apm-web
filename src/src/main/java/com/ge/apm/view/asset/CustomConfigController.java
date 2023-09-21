@@ -556,7 +556,15 @@ public class CustomConfigController {
     }
 
     public boolean isRenameFields(String key) {
-        return CustomConfigConstant.getRenameFields().contains(CustomConfigFields.valueOf(key));
+        try {
+            return CustomConfigConstant.getRenameFields().contains(CustomConfigFields.valueOf(key));
+        }catch (IllegalArgumentException e){
+            logger.error("CustomConfigFields is not key:{}",key);
+            return  false;
+        }catch (Exception e){
+            logger.error("CustomConfigController isRenameFields key:{}, error :{}",key,e);
+            return false;
+        }
     }
 
     public boolean isReadOnlyFields(String key) {
