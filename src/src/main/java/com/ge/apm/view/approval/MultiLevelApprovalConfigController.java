@@ -37,6 +37,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     private SysRoleRepository roleDao;
     @Setter@Getter
     private ApprovalNode approvalNode;
+    private RoleApproveCondition roleApproveCondition=new RoleApproveCondition();
     @Setter
     private List<ApprovalNode> nodesList;
     private List<UserAccount> approveUserList;
@@ -176,7 +177,15 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //保存审批节点
     public void saveNode() {
+//        approvalNode.setMultiLevelApprovalUsers(approvalNode.getApproveUsers());
+
         if (null != approvalNode.getNodeId()) {
+//            if(approvalNode.isClinicalDepartmentDirector()){
+//                List<UserAccount> deptHeadList = buildRoleApproveUserList("DeptHead");
+//                if(CollectionUtils.isNotEmpty(deptHeadList)  && CollectionUtils.isNotEmpty(approvalNode.getApproveUsers())){
+//                    approvalNode.setClinicalDepartmentDirectorUsers(deptHeadList);
+//                }
+//            }
             return;
         }
         ApprovalNode node = new ApprovalNode();
@@ -189,7 +198,27 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         } else {
             node.setApproveUsers(approvalNode.getApproveUsers());
         }
+        node.setRoleApproveCondition(roleApproveCondition);
+//        if(approvalNode.isClinicalDepartmentDirector()){
+//            List<UserAccount> deptHeadList = buildRoleApproveUserList("DeptHead");
+//            if(CollectionUtils.isNotEmpty(deptHeadList)  && CollectionUtils.isNotEmpty(node.getApproveUsers())){
+////                node.getApproveUsers().addAll(deptHeadList);
+//                node.setClinicalDepartmentDirectorUsers(deptHeadList);
+//            }
+//        }
         nodesList.add(node);
+    }
+
+    //获取角色用户审核人员
+    public List<UserAccount> buildRoleApproveUserList(String roleName) {
+        List<UserAccount> userList = new ArrayList<>();
+        int roleId = roleDao.getIdByName(roleName);
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        List<String> userIds = userRoleDao.findUserUidByRoleId(userAccount.getTenantUID(),roleId);
+        if (CollectionUtils.isNotEmpty(userIds)) {
+             userList = userAccountDao.getUserList(userIds);
+        }
+        return userList;
     }
 
     //保存配置
@@ -222,6 +251,13 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
                 item.setUserUids(null);
             } else {
                 item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
+//                item.setMultiLevelApprovalUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
+//
+//                if(item.isClinicalDepartmentDirector()){
+//                    List<String> clinicalDepartmentDirectorUids = item.getClinicalDepartmentDirectorUsers().stream().map(a -> a.getUid()).collect(Collectors.toList());
+//                    item.getUserUids().addAll(clinicalDepartmentDirectorUids);
+//                    item.setUserUids(item.getUserUids().stream().distinct().collect(Collectors.toList()));
+//                }
                 item.setRoleUids(null);
             }
         });
@@ -303,6 +339,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     public void onAddNode() {
         approvalNode = new ApprovalNode();
+        roleApproveCondition = new RoleApproveCondition();
         selectedUserOrg = null;
     }
 
@@ -310,6 +347,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         for (ApprovalNode node : nodesList) {
             if (null != node.getNodeId() && nodeId == node.getNodeId()) {
                 approvalNode = node;
+                roleApproveCondition=node.getRoleApproveCondition();
             }
         }
     }
@@ -330,7 +368,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
 
     //配置信息是否展示
     public void setConfigEnable(){
-        List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR, ApprovalConstant.APPROVAL_ASSET_MAINTAIN, ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT);//设备维修/设备保养/预算管理
+        List<String> list = Arrays.asList(ApprovalConstant.APPROVAL_ASSET_REPAIR, ApprovalConstant.APPROVAL_ASSET_MAINTAIN, ApprovalConstant.APPROVAL_BUDGET_MANAGEMENT,ApprovalConstant.APPROVAL_ASSET_SCRAP);//设备维修/设备保养/预算管理
         configEnable = list.contains(selected.getBusinessType());
     }
 
@@ -378,5 +416,16 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     @Override
     protected GenericRepositoryUUID<MultiLevelApprovalConfig> getDAO() {
         return configDao;
+    }
+
+
+
+
+    public RoleApproveCondition getRoleApproveCondition(){
+        return roleApproveCondition;
+    }
+
+    public void setRoleApproveCondition(RoleApproveCondition roleApproveCondition){
+        this.roleApproveCondition= roleApproveCondition;
     }
 }
