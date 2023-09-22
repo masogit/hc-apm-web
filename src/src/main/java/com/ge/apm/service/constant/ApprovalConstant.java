@@ -39,6 +39,16 @@ public interface ApprovalConstant {
     public static final String APPROVAL_NAME = "级审批人待审批中";
 
     /**
+     *
+     * 审批状态--审批退回
+     */
+    public static final int MULTI_LEVEL_STATUS_APPROVAL_RETURN= 4;
+    public static final String MULTI_LEVEL_STATUS_APPROVAL_RETURN_NAME = "审批退回";
+
+
+
+
+    /**
      * 当前所在审批级别 完全通过时
      */
     public static final Integer APPROVAL_NOW_AGREE = 0;
@@ -97,6 +107,7 @@ public interface ApprovalConstant {
     String APPROVAL_ASSET_TRANSFER = "assetTransfer";//设备转移
     String APPROVAL_ADVERSE_EVENTS = "adverseEvents"; // 不良事件上报
     String APPROVAL_BUDGET_MANAGEMENT = "budgetManagement"; // 预算管理
+    String APPROVAL_ASSET_SCRAP = "assetScrap"; // 资产报废流程
 
 
     int BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT = 1;//备件申领单
@@ -113,10 +124,13 @@ public interface ApprovalConstant {
     int BUSINESS_TYPE_SPARE_PARTS_RETURN_INT = 12; //备件申退单
     int BUSINESS_TYPE_ADVERSE_EVENTS = 13; // 不良事件上报
     int BUSINESS_TYPE_BUDGET_MANAGEMENT = 14; // 预算管理
+    int BUSINESS_TYPE_ASSET_SCRAP = 15; // 设备报废流程
+
     String BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME = "预算管理"; // 预算管理
 
 
     String BUSINESS_TYPE_ADVERSE_EVENTS_NAME = "不良事件上报"; // 不良事件上报
+    String BUSINESS_TYPE_ASSET_SCRAP_NAME = "资产报废"; // 资产报废
     /**
      * 档案信息修改 是否需要审批标识
      * 1.资产维修审批中 2.资产维修不需要审批
@@ -147,4 +161,12 @@ public interface ApprovalConstant {
     //维修保养工单审批备件,同意状态
     Integer WORK_DETAIL_STATUS_DISAGREE = 0;//不同意
     Integer WORK_DETAIL_STATUS_AGREE = 1;//同意
+
+
+
+    Integer SCRAP_STATUS_APPLY=1 ;//申请中
+    Integer SCRAP_STATUS_UNDER_REVIEW=2 ;//审核中
+    Integer SCRAP_STATUS_SUCCESS=3;//完成
+    Integer SCRAP_STATUS_APPLY_REFUSE=4;//申请拒绝
+    Integer SCRAP_STATUS_REVIEW_REFUSE=5;//审核拒绝
 }

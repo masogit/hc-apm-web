@@ -124,6 +124,8 @@
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
                                 <p:dataExporter type="xlsx" target="datalist" fileName="Asset_Statistic_Template"/>
                             </p:commandButton>
+                            <p:commandButton id="importButton" rendered="#{userContextService.zkbAdmin}" ajax="false" title="批量更新无法贴码信息" action="Import.xhtml" icon="ui-icon-arrowstop-1-n">
+                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>
