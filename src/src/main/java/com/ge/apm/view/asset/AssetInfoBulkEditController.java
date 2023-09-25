@@ -219,6 +219,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetTypeGroupTreeComponentController.registerController(this);
 
         selected = new AssetInfo();
+        selected.clearDefaultValue();
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
@@ -298,7 +299,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public String applyChange() throws Exception {
-        clearDefaultValues();
         assetInfos = new HashSet<>();
         if (!isValidParentAsset()) {
             WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
@@ -521,13 +521,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
         return "AssetList.xhtml?faces-redirect=true";
     }
-    private void clearDefaultValues(){
-        selected.setIsChecked(null);
-        selected.setIsFixed(null);
-        selected.setIsPm(null);
-        selected.setIsUseRegistration(null);
-        selected.setWarranty(null);
-    }
+
     public void onAfterNewObject(AssetInfo object) {
         if(attachements !=null){
             attachements.forEach(item -> {
