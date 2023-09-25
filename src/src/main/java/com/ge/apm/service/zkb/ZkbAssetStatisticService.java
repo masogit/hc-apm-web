@@ -292,7 +292,7 @@ public class ZkbAssetStatisticService {
             }else{
                 if("Y".equals(qssetQrCodeInfo.getCanNotPastQrCode())){
                     if(StringUtils.isBlank(qssetQrCodeInfo.getReason())||StringUtils.isBlank(qssetQrCodeInfo.getReasonCategorize())){
-                        qssetQrCodeInfo.setErrorInfo("[无法粘贴二维码为Y时，无法贴码原因和原因归类为必填！]");
+                        qssetQrCodeInfo.setErrorInfo("[是否设备无法粘贴二维码为Y时，无法贴码原因和原因归类为必填！]");
                         tempQrCodeInfoList.add(qssetQrCodeInfo);
                         continue;
                     }
