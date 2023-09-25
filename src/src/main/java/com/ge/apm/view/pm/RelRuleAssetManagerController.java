@@ -568,7 +568,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		try {
             searchFilters.addAll(getOrgFilter(user.getSiteUID()));
 			List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(this.searchFilters);
-			List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(relRuleAssets.stream().map(relRuleAsset -> {return relRuleAsset.getAssetUID();}).collect(Collectors.toList()));
+            List<String> collect = relRuleAssets.stream().map(relRuleAsset -> {
+                return relRuleAsset.getAssetUID();
+            }).collect(Collectors.toList());
+            List<SearchFilter> assetSearchFilters=new ArrayList<>();
+            assetSearchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN,collect));
+            addFilterAssetTypeGroup(assetSearchFilters);
+            List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(assetSearchFilters);
 			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
 			excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);
 		} catch (IOException ioException) {
@@ -610,11 +616,20 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		} else {
 			searchFilters.add(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
 		}
-		List<AssetInfo> allAssets =  assetInfoRepository.findBySearchFilter(searchFilters);
+        addFilterAssetTypeGroup(searchFilters);
+        List<AssetInfo> allAssets =  assetInfoRepository.findBySearchFilter(searchFilters);
 		return allAssets;
 	}
 
-	public List<SearchFilter> getFilter(String siteUID) {
+    private void addFilterAssetTypeGroup(List<SearchFilter> searchFilters) {
+        List<AssetTypeGroup> assetTypeGroupList = null;
+        if(user != null && user.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList=user.getAssetTypeGroupList())) {
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
+        }
+    }
+
+    public List<SearchFilter> getFilter(String siteUID) {
 		List<SearchFilter> filter = getOrgFilter(siteUID);
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
