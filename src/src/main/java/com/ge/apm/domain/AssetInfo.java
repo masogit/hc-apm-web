@@ -3027,14 +3027,12 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setBoUuid(String boUuid) { this.boUuid = boUuid; }
 
     public Integer getNetworkingStatus() {
-        if(networkingStatus == null) return 0;
         return networkingStatus;
     }
 
     public void setNetworkingStatus(Integer networkingStatus) { this.networkingStatus = networkingStatus; }
 
     public Boolean getIsUseRegistration() {
-        if(isUseRegistration==null) return true;
         return isUseRegistration;
     }
 
@@ -3055,4 +3053,14 @@ public class AssetInfo implements ChineseName,Serializable {
     public Date getLastPmDateFour() { return lastPmDateFour; }
 
     public void setLastPmDateFour(Date lastPmDateFour) { this.lastPmDateFour = lastPmDateFour; }
+
+    public void clearDefaultValue(){
+        this.isChecked=null;
+        this.isFixed=null;
+        this.isWarranty=null;
+        this.isCleaned=null;
+        this.isPm=null;
+        this.isUseRegistration=null;
+        this.networkingStatus=null;
+    }
 }
