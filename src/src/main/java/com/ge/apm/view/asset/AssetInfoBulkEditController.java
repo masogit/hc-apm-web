@@ -219,6 +219,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetTypeGroupTreeComponentController.registerController(this);
 
         selected = new AssetInfo();
+        selected.clearDefaultValue();
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());

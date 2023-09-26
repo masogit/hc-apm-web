@@ -1668,7 +1668,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
-
+        loginUser = UserContextService.getCurrentUserAccount();
         // 用户可见资产分类
         assetTypeGroupList = loginUser.getAssetTypeGroupList();
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
@@ -1730,7 +1730,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.filterBySite = false;
         this.filterByHospital = false;
         hmCheck = new HashMap<String, UnstructuredData>();
-        loginUser = UserContextService.getCurrentUserAccount();
         isInsulate = tenantInfoRepository.findByuid(loginUser.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
         WorkflowConfig wfc = configService.findConfigBySite(loginUser.getSiteUID());
@@ -2518,10 +2517,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 
         // 资产分类权限
-        /*if (loginUser.isEnableAssetTypeGroup()) {
+        if (loginUser.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList)) {
             List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
             filterArrayList.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
-        }*/
+        }
     }
 
     public void searchList(Integer buttonIndex) {

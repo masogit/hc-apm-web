@@ -418,9 +418,17 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             }
             List<SearchFilter> userFilter = getAssetFilter();
             assetFilters.addAll(userFilter);
+            addFilterAssetTypeGroup(assetFilters);
             return assetInfoRepository.findBySearchFilter(assetFilters);
         }
         return new ArrayList<>();
+    }
+    private void addFilterAssetTypeGroup(List<SearchFilter> assetFilters){
+        List<AssetTypeGroup> assetTypeGroupList = null;
+        if(user != null && user.isEnableAssetTypeGroup() && !CollectionUtils.isEmpty(assetTypeGroupList=user.getAssetTypeGroupList())) {
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            assetFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
+        }
     }
     /**
      * 获取所有主目录信息
