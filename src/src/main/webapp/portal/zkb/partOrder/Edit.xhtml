@@ -348,6 +348,14 @@
                             <label class="label">订单日期*</label>
                             <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.partOrderDate}" required="true" requiredMessage="#{msg.zkbPartOrder_partOrderDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>-->
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' or zkbPartOrderEditController.orderType eq 'Artificial'}">
+                            <label class="label">是否工作站*</label>
+                            <p:selectOneMenu  value="#{zkbPartOrderEditController.selected.workStationFlag}" required="true" requiredMessage="是否工作站 #{msg.ValidationRequire}" >
+                                <p:ajax event="change" update="productNumber" listener="#{zkbPartOrderEditController.workStationFlagSelect}"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCommonYOrN')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医院名称*</label>
                             <p:inputTextarea id="hospitalName" value="#{zkbPartOrderEditController.selected.hospitalName}"  required="true" requiredMessage="#{msg.zkbPartOrder_hospitalName} #{msg.ValidationRequire}" disabled="true"/>

@@ -404,6 +404,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     WebUtil.addErrorMessage("该申请为补单申请，请勿重复下单。","");
                 }
             }
+            if(!currentUser.getTenantUID().equals(selected.getTenantUID())){
+                if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
+                    if(CopyByInvok.T.equals(selected.getWorkStationFlag())){
+                        WebUtil.addErrorMessage("当前申请是工作站。","");
+                    }
+                }
+            }
         }
     }
 
@@ -1294,6 +1301,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }
         }
         return errorLog.toString();
+    }
+
+    public String normalNextText(){
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(selected.getCurrentStep()) && canEditFlag){
+                return "审批通过";
+            }
+        }
+        return "提交";
     }
 
     public String normalNext(){
