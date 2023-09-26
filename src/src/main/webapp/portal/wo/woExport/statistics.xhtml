@@ -91,6 +91,12 @@
             <p:column headerText="#{msg.Workload}" rendered="#{workOrderStatisticsController.statisticsType == 'staff' || workOrderStatisticsController.statisticsType == 'caseload'}">
                 <h:outputText value="#{item.totalManHour}" />
             </p:column>
+            <p:column headerText="被协作工作量" rendered="#{workOrderStatisticsController.statisticsType == 'staff' || workOrderStatisticsController.statisticsType == 'caseload'}">
+                <h:outputText value="#{item.collaboratedManHour}" />
+            </p:column>
+            <p:column headerText="协作工作量" rendered="#{workOrderStatisticsController.statisticsType == 'staff' || workOrderStatisticsController.statisticsType == 'caseload'}">
+                <h:outputText value="#{item.collaborateManHour}" />
+            </p:column>
             <!--<p:column headerText="总报修次数">
                 <h:outputText value="#{item.totalCount}" />
             </p:column>

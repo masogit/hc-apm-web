@@ -205,7 +205,25 @@ public class WorkOrderReportProvider {
         String endDate = param.get("endDate");
 
         StringBuilder sb = new StringBuilder();
-        sb.append("select wo.current_person_id as staffId,ua.name as staffName,count(wo.id) as totalCount,SUM(CASE WHEN wo.status = 1 THEN 1 ELSE 0 END) as openCount,SUM(CASE WHEN wo.status = 2 THEN 1 ELSE 0 END) as closeCount,SUM(CASE WHEN wo.status = 3 THEN 1 ELSE 0 END) as cleanCount,sum(wo.total_man_hour) as totalManHour,SUM(CASE WHEN wo.status = 2 THEN date(wo.close_time)-date(wo.created_date) ELSE 0 END) as totalSpendTime from v2_work_order wo,user_account ua where wo.current_person_id=ua.id");
+        sb.append("select " +
+                "wo.current_person_id as staffId" +
+                ",ua.name as staffName,count(wo.id) as totalCount" +
+                ",SUM(CASE WHEN wo.status = 1 THEN 1 ELSE 0 END) as openCount" +
+                ",SUM(CASE WHEN wo.status = 2 THEN 1 ELSE 0 END) as closeCount" +
+                ",SUM(CASE WHEN wo.status = 3 THEN 1 ELSE 0 END) as cleanCount" +
+                ",SUM ( wo.total_man_hour) AS totalManHour" +
+                ",SUM ( COALESCE(cow.man_hours, 0) ) AS collaboratedManHour" +
+                ",COALESCE(AVG ( uawco.man_hours) , 0) AS collaborateManHour" +
+                ",SUM(CASE WHEN wo.status = 2 THEN date(wo.close_time)-date(wo.created_date) ELSE 0 END) as totalSpendTime " +
+                " from" +
+                " v2_work_order wo" +
+                " JOIN user_account ua ON wo.current_person_id = ua.ID " +
+                " LEFT JOIN ( SELECT wo_id, SUM(man_hours) AS man_hours FROM V2_Work_Order_Coworker GROUP BY wo_id ) cow ON wo.ID = cow.wo_id " +
+                " LEFT JOIN ( SELECT sum(wc.man_hours) man_hours, wc.cowoker_user_id FROM V2_Work_Order_Coworker wc WHERE wc.wo_id in ( select wo.id from v2_work_order wo where " +
+                " wo.site_uid = '"+siteUID+"' " +
+                " AND wo.created_date >= '" + startDate + "' " +
+                " AND wo.created_date <= '" + endDate + "' ) GROUP BY wc.cowoker_user_id  ) uawco ON wo.current_person_id = uawco.cowoker_user_id  " +
+                " where wo.current_person_id=ua.id");
 
         if(tenantUID != null){
             sb.append(" and wo.tenant_uid='"+tenantUID+"'");
