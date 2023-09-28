@@ -44,6 +44,13 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     @JsonIgnore
     private Date createdDate;
 
+    @Column(name = "request_user_uid")
+    private String requestUserUid;
+
+
+    @Column(name = "request_type")
+    private Integer requestType; //请求类型   1 临床申请  2工程师申请
+
     @Column(name = "last_modified_by", length = 50)
     @JsonIgnore
     private String lastModifiedBy;
@@ -238,5 +245,22 @@ public class AssetScrap implements Serializable , ApprovableTarget {
 
     public void setSiteUid(String siteUid) {
         this.siteUid = siteUid;
+    }
+
+
+    public String getRequestUserUid() {
+        return requestUserUid;
+    }
+
+    public void setRequestUserUid(String requestUserUid) {
+        this.requestUserUid = requestUserUid;
+    }
+
+    public Integer getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(Integer requestType) {
+        this.requestType = requestType;
     }
 }

@@ -160,6 +160,8 @@ public enum GatewayURL {
     // jimureport
     JI_MU_REPORT("/apmReport/jmreport/view"),
 
+    ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply")
+
     ;
     private final String url;
 
