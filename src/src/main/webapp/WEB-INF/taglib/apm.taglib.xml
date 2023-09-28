@@ -40,5 +40,19 @@
             <type>java.lang.String</type>
         </attribute>
     </tag>
+    <tag>
+        <tag-name>selectAssetTypeGroup</tag-name>
+        <source>../tags/edit.asset.type.group.xhtml</source>
+        <attribute>
+            <description>update jsf area</description>
+            <name>update</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>whether show all asset type group</description>
+            <name>showAllAssetGroup</name>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
 
 </facelet-taglib>

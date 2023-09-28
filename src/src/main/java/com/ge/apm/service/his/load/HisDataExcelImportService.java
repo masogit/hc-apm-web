@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class HisDataExcelImportService {
@@ -57,4 +58,8 @@ public class HisDataExcelImportService {
         return result;
     }
 
+    public List<Map<String, Object>> getMapFromTemplate(ExcelDocument doc) {
+
+        return null;
+    }
 }

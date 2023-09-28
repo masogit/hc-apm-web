@@ -12,7 +12,9 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.SparePart.OrderNumberGenerator;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.reflect.TypeToken;
@@ -31,8 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.RestTemplate;
-import webapp.framework.web.WebUtil;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -127,6 +129,9 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	@Autowired
 	private ReminderRuleRepository reminderRuleRepository;
+
+	@Autowired
+	private StockRecordRepository stockRecordRepository;
 	
 	@Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
@@ -674,9 +679,14 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		}
 	}
 	public void batchSynchronizationConfig() {
-		String key = "shareAutoConfirm";
-		saveDefaultValue( key);
-		saveLevelValue(key);
+		saveDefaultValue("autoAck",4,"false",3,"工单完工不需要验收","工单完工不需要验收");
+		saveDefaultValue("autoAckDays",4,"3",2,"系统自动验收(天)","系统自动验收(天)");
+		saveDefaultValue("autoClose",4,"false",3,"工单完工自动关单","工单完工自动关单");
+		saveDefaultValue("closeWithoutParts",4,"false",3,"无备件自动关单","无备件自动关单");
+		saveLevelValue("autoAck","autoAck");
+		saveLevelValue("autoAckDays","autoAckDays");
+		saveLevelValue("autoClose","autoClose");
+		saveLevelValue("closeWithoutParts","closeWithoutParts");
 	}
 
 	public void analyseMenus() {
@@ -684,49 +694,63 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		Iterable<TenantInfo> tenantInfos = tenantInfoRepository.findAll();
 		//find menus by tenant_config
 		for (TenantInfo tenantInfo : tenantInfos) {
-			if (StringUtils.isNotEmpty(tenantInfo.getTenantConfig())) {
-				JSONObject jsonObject = JSON.parseObject(tenantInfo.getTenantConfig());
-				String version = jsonObject.getString("edition");
-				List<String> finalEnumNames = jsonObject.getObject("menuList", List.class);
-				List<String> requiredEnums = new ArrayList<>();
-				for (AssetManagementEnum e : AssetManagementEnum.values()) {
-					if (e.isRequired()) {
-						if (e.getIgnore().contains(version)) {
-							continue;
-						}
-						if (e.isChekConfig()) {
-							if (chekConfig(e, tenantInfo)) {
-								requiredEnums.add(e.name());
-							}
-							continue;
-						}
-						requiredEnums.add(e.name());
-						continue;
-					}
-					if (finalEnumNames.contains(e.getOldName())) {
-						if (e.isChekConfig()) {
-							if (chekConfig(e, tenantInfo)) {
-								requiredEnums.add(e.name());
-							}
-						} else {
-							requiredEnums.add(e.name());
-						}
-						continue;
-					}
-				}
-				tenantInfo.setFeatureList(JSONObject.toJSON(requiredEnums).toString());
-				tenantInfoRepository.save(tenantInfo);
-			}
+			analyseMenu(tenantInfo);
 		}
 		//analyse custom_role
 		List<CustomRole> customRoles = customRoleRepository.find();
 		customRoles.forEach(customRole -> {
-			if (StringUtils.isNotEmpty(customRole.getWebAuthorities())) {
-				List<String> functionList = analyseCustomRole(customRole.getWebAuthorities());
-				customRole.setFunctionList(JSONObject.toJSON(functionList).toString());
-				customRoleRepository.save(customRole);
-			}
+			analyseCustomMenu(customRole);
 		});
+	}
+
+	public void analyseMenu(TenantInfo tenantInfo) {
+		if (StringUtils.isNotEmpty(tenantInfo.getTenantConfig())) {
+			JSONObject jsonObject = JSON.parseObject(tenantInfo.getTenantConfig());
+			String version = jsonObject.getString("edition");
+			List<String> finalEnumNames = jsonObject.getObject("menuList", List.class);
+			List<String> requiredEnums = new ArrayList<>();
+			for (AssetManagementEnum e : AssetManagementEnum.values()) {
+				if (e.isRequired()) {
+					if (e.getIgnore().contains(version)) {
+						continue;
+					}
+					if (e.isChekConfig()) {
+						if (chekConfig(e, tenantInfo)) {
+							requiredEnums.add(e.name());
+						}
+						continue;
+					}
+					requiredEnums.add(e.name());
+					continue;
+				}
+				if (e.name().equals(AssetManagementEnum.REPAIR_APPROVE_PROCESS.name())) {
+					if (tenantInfo.getName().contains("积水潭")) {
+						requiredEnums.add(e.name());
+						continue;
+					}
+				}
+				if (finalEnumNames.contains(e.getOldName())) {
+					if (e.isChekConfig()) {
+						if (chekConfig(e, tenantInfo)) {
+							requiredEnums.add(e.name());
+						}
+					} else {
+						requiredEnums.add(e.name());
+					}
+					continue;
+				}
+			}
+			tenantInfo.setFeatureList(JSONObject.toJSON(requiredEnums).toString());
+			tenantInfoRepository.save(tenantInfo);
+		}
+	}
+
+	public void analyseCustomMenu(CustomRole customRole) {
+		if (StringUtils.isNotEmpty(customRole.getWebAuthorities())) {
+			List<String> functionList = analyseCustomRole(customRole.getWebAuthorities());
+			customRole.setFunctionList(JSONObject.toJSON(functionList).toString());
+			customRoleRepository.save(customRole);
+		}
 	}
 
 	private boolean chekConfig(AssetManagementEnum e, TenantInfo tenantInfo) {
@@ -820,24 +844,91 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		return functionList;
 	}
 
-	private void saveLevelValue(String key){
+	public void batchUpdateAssetApprove() {
+		List<String> allAssetApprove = workflowConfigRepository.findAllAssetApprove();
+		allAssetApprove.forEach(assetApprove -> {
+			if (StringUtils.isNotEmpty(assetApprove)) {
+				UserAccount userAccount = userAccountRepository.getByUid(assetApprove);
+				CustomRole customRole = buildCustomRole(userAccount);
+				UserRole userRole = new UserRole();
+				userRole.setUserId(userAccount.getId());
+				userRole.setRoleId(customRole.getId());
+				userRole.setRoleType(1);
+				userRoleRepository.save(userRole);
+			}
+		});
+	}
+
+	private CustomRole buildCustomRole(UserAccount account) {
+		CustomRole customRole = customRoleRepository.findByTenantUIDAndName(account.getTenantUID(), "资产审核");
+		if (customRole != null) return customRole;
+		customRole = new CustomRole();
+		customRole.setName("资产审核");
+		customRole.setCreatedBy("system");
+		customRole.setCreatedDate(new Date());
+		customRole.setLastModifiedBy("system");
+		customRole.setHospitalUID(account.getHospitalUID());
+		customRole.setInstitutionUID(account.getInstitutionUID());
+		customRole.setLastModifiedDate(new Date());
+		customRole.setRoleDesc("系统同步创建");
+		customRole.setSiteUID(account.getSiteUID());
+		customRole.setTenantUID(account.getTenantUID());
+		List<ApmFunction> customFunction = new ArrayList<>();
+		customFunction.add(ASSET_AUDIT_APPROVE);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (ApmFunction function : customFunction) {
+			stringBuilder.append(function.getFunctionName() + ",");
+		}
+		customRole.setWebAuthoritiesCH(stringBuilder.substring(0, stringBuilder.length()-1));
+		customRole.setFunctionList(JSON.toJSONString(customFunction.stream().map(ApmFunction::name).collect(Collectors.toList())));
+		customRoleRepository.save(customRole);
+		return customRole;
+	}
+
+	private void saveLevelValue(String key,String fieldName){
+		Class<WorkflowConfig> workflowConfigClass = WorkflowConfig.class;
+		Field[] declaredFields = workflowConfigClass.getDeclaredFields();
+		Map<String, Field> collect = Arrays.asList(declaredFields).stream().collect(Collectors.toMap(item -> item.getName(), item -> item));
 		List<WorkflowConfig> workflowConfigs = getWorkflowConfig();
 		if(CollectionUtils.isEmpty(workflowConfigs)) return;
 		List<ConfigItemValue> byKey = configItemValueRepository.findByKey(key);
 		List<ConfigItemValue> result=new ArrayList<>();
 		if(CollectionUtils.isEmpty(byKey)) {
-			result = workflowConfigs.stream().filter(item -> {
-				Integer shareAutoConfirm = item.getShareAutoConfirm();
-				return shareAutoConfirm !=null && shareAutoConfirm.intValue() > 0;
-			}).map(item -> initConfigItemValue(item,key)).filter(item ->item != null).collect(Collectors.toList());
+			result = workflowConfigs.stream()
+					.map(item -> {
+						try {
+							Field field = collect.get(fieldName);
+							field.setAccessible(true);
+							Object o = field.get(item);
+							if(o != null){
+								return initConfigItemValue(item,key,o);
+							}else{
+								return null;
+							}
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+							return null;
+						}
+					}).filter(item ->item != null).collect(Collectors.toList());
 		}else{
 			Map<String, ConfigItemValue> configItemValueMap = byKey.stream().filter(item->StringUtils.isNotEmpty(item.getSiteUid())).collect(Collectors.toMap(ConfigItemValue::getSiteUid, item -> item));
 			result=workflowConfigs.stream()
 					.filter(item-> item.getSiteUID() !=null && !configItemValueMap.containsKey(item.getSiteUID()))
-					.filter(item -> {
-						Integer shareAutoConfirm = item.getShareAutoConfirm();
-						return shareAutoConfirm !=null && shareAutoConfirm.intValue() > 0;
-					}).map(item->initConfigItemValue(item,key)).filter(item ->item != null).collect(Collectors.toList());
+					.map(item->{
+						try {
+							Field field = collect.get(fieldName);
+							field.setAccessible(true);
+							Object o = field.get(item);
+							if(o != null){
+								return initConfigItemValue(item,key,o);
+							}else{
+								return null;
+							}
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+							return null;
+						}
+					}).filter(item ->item != null).collect(Collectors.toList());
 		}
 		configItemValueRepository.save(result);
 	}
@@ -855,33 +946,32 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		return workflowConfigMap.entrySet().stream().map(item->item.getValue()).collect(Collectors.toList());
 
 	}
-	private ConfigItemValue initConfigItemValue(WorkflowConfig item,String key){
+	private ConfigItemValue initConfigItemValue(WorkflowConfig item,String key,Object val){
 		String siteUID = item.getSiteUID();
 		if(StringUtils.isEmpty(siteUID)){
 			return null;
 		}
 		ConfigItemValue value = new ConfigItemValue();
-		Integer shareAutoConfirm = item.getShareAutoConfirm();
 		value.setTenantUid(item.getTenantUID());
 		value.setInstitutionUid(item.getInstitutionUID());
 		value.setHospitalUid(item.getHospitalUID());
 		value.setSiteUid(siteUID);
 		value.setKey(key);
-		value.setValue(String.valueOf(shareAutoConfirm));
+		value.setValue(String.valueOf(val));
 		return value;
 	}
-	private ConfigItem saveDefaultValue(String key){
+	private ConfigItem saveDefaultValue(String key,Integer category,String defaultValue,Integer valueType,String name,String description){
 		ConfigItem configItemDefault = configItemRepository.findByDefaultValueForKey(key);
 		if(configItemDefault == null){
 			configItemDefault = new ConfigItem();
 			configItemDefault.setKey(key);
-			configItemDefault.setCategory(2);
-			configItemDefault.setDefaultValue("0");
+			configItemDefault.setCategory(category);
+			configItemDefault.setDefaultValue(defaultValue);
 			configItemDefault.setUserParentConfig(true);
 			configItemDefault.setSuperAdminEdit(false);
-			configItemDefault.setValueType(2);
-			configItemDefault.setName("自动确认时间（分钟）");
-			configItemDefault.setDescription("自动确认时间（分钟）");
+			configItemDefault.setValueType(valueType);
+			configItemDefault.setName(name);
+			configItemDefault.setDescription(description);
 			configItemRepository.save(configItemDefault);
 		}
 		return configItemDefault;
@@ -927,4 +1017,49 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		reminderRuleRepository.save(list);
 	}
 
+	public void batchUpdateSparPart() {
+		stockRecordRepository.findByType(1).forEach(v -> {
+			if (v.getInboundNumber() == null) {
+				v.setInboundNumber(OrderNumberGenerator.generateOrderNumber("R", v.getRecordDate()));
+				stockRecordRepository.save(v);
+				try {
+					Thread.sleep(1/10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		stockRecordRepository.findByType(2).forEach(v -> {
+			if (v.getInboundNumber() == null) {
+				v.setOutboundNumber(OrderNumberGenerator.generateOrderNumber("C", v.getRecordDate()));
+				stockRecordRepository.save(v);
+				try {
+					Thread.sleep(1/10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public void batchUpdateAssetDeptId() {
+		List<AssetInfo> assetInfos = assetInfoRepository.notEqualAssetDeptId();
+		logger.info("update asset_dept_id data size:{}",assetInfos.size());
+		for (AssetInfo assetInfo : assetInfos) {
+			String uid=assetInfo.getUid();
+			Integer assetDeptId=assetInfo.getAssetDeptId();
+			String  assetDeptUid=assetInfo.getAssetDeptUID();
+			try {
+				logger.info("update asset_dept_id data before assetUid:{},assetDeptId:{},assetDeptUid:{}",uid,assetDeptId,assetDeptUid);
+				OrgInfo byUid = orgInfoRepository.findByUid(assetDeptUid);
+				assetInfo.setAssetDeptId(byUid.getId());
+				assetInfoRepository.save(assetInfo);
+				logger.info("update asset_dept_id data after assetUid:{},assetDeptId:{},assetDeptUid:{}",uid,byUid.getId(),assetDeptUid);
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("update asset_dept_id data error assetUid:{},assetDeptId:{},assetDeptUid:{}",uid,assetDeptId,assetDeptUid);
+
+			}
+		}
+	}
 }

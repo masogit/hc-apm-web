@@ -6,6 +6,27 @@
 				template="/WEB-INF/template.xhtml">
 
 	<ui:define name="content">
+		<style>
+			.warrantyExpireSoon {
+				background-color: #fca752!important;
+				color: #000000!important;
+			}
+			.warrantyExpired {
+				background-color: #f04134!important;
+				color: #000000!important;
+			}
+			.btn+.btn { margin-left: 0 }
+			.ui-column-resizer:before {content: none!important;}
+			th{font-size: 12px!important;}
+			td{font-size: 12px!important;padding: 0px!important;}
+			table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+			.bottom-label {
+				position: absolute;
+				bottom: 0;
+				font-size:15px;
+				color: red;
+			}
+		</style>
 		<div class="ui-g">
 			<div class="ui-g-12">
 				<div class="ui-g-12 card cardTitle">
@@ -23,8 +44,8 @@
 										 rows="20" emptyMessage="#{msg.noRecordFound}"
 										 rowsPerPageTemplate="20,50,100,500">
 
-								<p:ajax event="rowSelect" listener="#{sparePartController.onSelect}" update="addButton editButton  "/>
-								<p:ajax event="filter" listener="#{sparePartController.onFilter}" update="addButton editButton  "/>
+								<p:ajax event="rowSelect" listener="#{sparePartController.onSelect}" update="addButton editButton  deleteButton"/>
+								<p:ajax event="filter" listener="#{sparePartController.onFilter}" update="addButton editButton  deleteButton"/>
 								<p:column headerText="备件名称" filterBy="#{item.name}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.name}"/>
 								</p:column>
@@ -55,10 +76,24 @@
 								<p:column headerText="发票号">
 									<h:outputText value="#{item.invoiceNumber}" />
 								</p:column>
+								<p:column headerText="适用设备" rendered="${userContextService.hasCurrentTenantName('')}">
+									<h:outputText value="#{item.adaptingDevices}" />
+								</p:column>
+								<p:column headerText="有效期" rendered="${userContextService.hasCurrentTenantName('')}">
+									<h:outputText value="#{item.effectiveDate}" >
+										<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd"/>
+									</h:outputText>
+								</p:column>
+								<p:column headerText="备注">
+									<h:outputText value="#{item.remark}" />
+								</p:column>
 								<p:column headerText="仓库" filterBy="#{item.partsWarehouse.name}" filterMatchMode="LIKE">
 									<h:outputText value="#{item.partsWarehouse.name}" />
 								</p:column>
-								<p:column  headerText="操作" >
+								<p:column headerText="附件" rendered="#{userContextService.hasCurrentTenantName('')}">
+									<p:commandButton id="findAttach" value="#{sparePartController.hasBlob(item.id)? '查看':'新增'}" actionListener="#{sparePartController.clickSelectAttach(item)}" update="@(.updateTrCls) sidebar" oncomplete="PF('sidebar').show()"/>
+								</p:column>
+								<p:column headerText="操作" >
 									<p:commandButton id="outButton" value="出库" actionListener="#{sparePartController.outStock(item)}" update="@(.updateTrCls) :pkOutDlg :pkOutForm:outQuantity" oncomplete="PF('pkOutDialog').show()"/>
 								</p:column>
 								<f:facet name="{Toolbar}">
@@ -66,16 +101,37 @@
 
 									<p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btnEdit" actionListener="#{sparePartController.prepareEdit}" update="@(.updateTrCls) :pkEditDlg" disabled="#{empty sparePartController.selected.id}" oncomplete="PF('pkEditDialog').show()"/>
 									
-<!--									<p:commandButton id="deleteButton" disabled="#{empty sparePartController.selected.id}" title="#{msg.Delete}" process="@this" actionListener="#{sparePartController.delete}" update=":sparePartForm:datalist, :growl"  icon="ui-icon-close" class="delBtn" >-->
-<!--										<p:confirm header="#{msg.DeleteConformation}"-->
-<!--												   message="确定删除该备件？"-->
-<!--												   icon="ui-icon-warning"/>-->
-<!--									</p:commandButton>-->
+									<p:commandButton id="deleteButton" disabled="#{empty sparePartController.selected.id or sparePartController.AreThereNnyOutboundRecords(sparePartController.selected.id)}" title="#{msg.Delete}" process="@this" actionListener="#{sparePartController.delete}" update=":sparePartForm:datalist, :growl"  icon="ui-icon-close" class="delBtn" >
+										<p:confirm header="#{msg.DeleteConformation}"
+												   message="确定删除该备件？"
+												   icon="ui-icon-warning"/>
+									</p:commandButton>
 								</f:facet>
 							</p:dataTable>
 						</h:panelGroup>
 					</p:panelGrid>
 				</h:form>
+				<p:panelGrid columns="1" layout="grid" rendered="${userContextService.hasCurrentTenantName('')}">
+					<h:panelGroup>
+						<p:sidebar id="sidebar" widgetVar="sidebar" position="left" style="width: 100%;height: 70%; " >
+							<h3>附件列表</h3>
+							<p:dataGrid id="pic" var="fileitem" value="#{sparePartController.picList}" columns="5" layout="grid">
+								<p:panel  style="text-align:center">
+									<h:panelGrid columns="1" style="width:100%" >
+										<p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="180" width="200" stream="false"/>
+										<p:commandButton actionListener="#{sparePartController.removeAttachmentById(fileitem.id)}" update="pic :sparePartForm :uploadPicForm:uploadPic" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+											<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+										</p:commandButton>
+									</h:panelGrid>
+								</p:panel>
+							</p:dataGrid>
+							<h:form id="uploadPicForm">
+								<p:fileUpload id="uploadPic" disabled="#{sparePartController.disableUploadButton()}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{sparePartController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="10000000" update="@this :sparePartForm pic" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+							</h:form>
+							<h:outputLabel value="*tip:点击任意空白处即可关闭该显示框!" styleClass="bottom-label" />
+						</p:sidebar>
+					</h:panelGroup>
+				</p:panelGrid>
 				<ui:include src="spareParkEdit.xhtml"/>
 				<ui:include src="spareParkIn.xhtml"/>
 				<ui:include src="spareParkOut.xhtml"/>

@@ -87,6 +87,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String valueTypeTips = "";
     private String showOrderedFieldsetText = "";
     private String trainTips="";
+    private String unrealTips = "";
     private String queryStatus;
     private String nt = "";
     private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
@@ -136,6 +137,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             Optional.ofNullable(selected.getTenantUID()).ifPresent(t -> tenantInfo = tenantInfoRepository.findByuid(selected.getTenantUID()));
             Optional.ofNullable(this.selected.getOrderType()).ifPresent(t -> orderType = this.selected.getOrderType());
             Optional.ofNullable(this.selected.getArtificialType()).ifPresent(t -> artificialType = this.selected.getArtificialType());
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && this.getUnrealStatusRender()){
+                zkbPartOrderService.getUnrealData(selected);
+            }
 
             zkbContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
             if(zkbContract == null){
@@ -383,6 +387,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showCatListFlag = "2";
                 }else{
                     showCatListFlag = "1";
+                }
+                if(getUnrealStatusRender()){
+                    unrealTips = zkbPartOrderService.getProbeUnrealData(selected, showCatListFlag);
                 }
             }
             if(canEditFlag && CopyByInvok.T.equals(selected.getSupplementFlag())){
@@ -756,7 +763,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(StrUtil.isNotEmpty(selected.getManageAuditerUid())){
                     showManage = true;
                 }
-                showManage = true;
                 if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                     showDirector = true;
                 }
@@ -1008,6 +1014,35 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return false;
     }
 
+    public boolean getUnrealStatusRender(){
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(userContextService.isZkbUser()){
+                return false;
+            }else {
+                List<String> configs = new ArrayList<>();
+                configs.add(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.ProductPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.OsscPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+                configs.add(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.queryForUnrealRoles(currentUser.getLoginName(), configs);
+                if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+        }else{
+            return false;
+        }
+
+    }
+
     public String techFieldsetName(){
         if(StrUtil.isNotEmpty(selected.getNotGeAsset()) && CopyByInvok.T.equals(selected.getNotGeAsset())){
             return "TSE审批";
@@ -1091,6 +1126,44 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 returnTypeList.removeAll(removeI18);
             }
         }
+    }
+
+    private String[] selectedOptions;
+    private String unrealReason;
+    List<ZkbUnrealVo> unrealItem = new ArrayList<>();
+    public void preUnreal(){
+        unrealItem = zkbPartOrderService.getUnrealCheckBoxList(selected.getZkbPartOrderItems(),selected.getId(),selected);
+    }
+
+
+    public boolean probeUnrealCheck(){
+        return zkbPartOrderService.probeUnrealCheck(selected, showCatListFlag);
+    }
+
+    public String saveUnreal(){
+        if(selectedOptions == null || selectedOptions.length == 0){
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                WebUtil.addErrorMessage("请选择不真实的备件号!");
+            }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                WebUtil.addErrorMessage("请选择不真实的探头号!");
+            }
+            return "";
+        }else{
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+        }
+
+        zkbPartOrderService.unrealNext(selected, selectedOptions, currentUser,unrealReason);
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            zkbPartOrderService.getUnrealData(selected);
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            unrealTips = zkbPartOrderService.getProbeUnrealData(selected, showCatListFlag);
+        }
+
+        selectedOptions = new String[]{};
+        unrealReason = "";
+        return "";
+        //return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
     }
 
     public String acceptNext(){
@@ -1942,7 +2015,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String probeCloseReject() throws InterruptedException {
         zkbPartOrderService.probeCloseReject(selected, currentUser);
-        WebUtil.addErrorMessage("操作成功！","操作成功w2");
+        WebUtil.addErrorMessage("操作成功！","操作成功");
         return "List?faces-redirect=true&queryStatus="+queryStatus+"&notGeAsset="+(StrUtil.isEmpty(nt) ? "" : nt);
     }
 
@@ -2438,5 +2511,37 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowOsscReturn(boolean showOsscReturn) {
         this.showOsscReturn = showOsscReturn;
+    }
+
+    public String[] getSelectedOptions() {
+        return selectedOptions;
+    }
+
+    public void setSelectedOptions(String[] selectedOptions) {
+        this.selectedOptions = selectedOptions;
+    }
+
+    public List<ZkbUnrealVo> getUnrealItem() {
+        return unrealItem;
+    }
+
+    public void setUnrealItem(List<ZkbUnrealVo> unrealItem) {
+        this.unrealItem = unrealItem;
+    }
+
+    public String getUnrealTips() {
+        return unrealTips;
+    }
+
+    public void setUnrealTips(String unrealTips) {
+        this.unrealTips = unrealTips;
+    }
+
+    public String getUnrealReason() {
+        return unrealReason;
+    }
+
+    public void setUnrealReason(String unrealReason) {
+        this.unrealReason = unrealReason;
     }
 }

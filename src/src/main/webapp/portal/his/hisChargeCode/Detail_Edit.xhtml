@@ -23,11 +23,11 @@
                         <p:inputText id="sfxmId" rows="1" cols="10" minQueryLength="4"
                                      value="#{hisChargeCodeMatchController.sfxmId}"/>
                     </h:panelGroup>
-                    <h:panelGroup >
-                        <label class = "label">是否子设备</label>
-                        <p:selectBooleanCheckbox id="subEquipmentButton" value="#{hisChargeCodeMatchController.subEquipment}" required="false">
-                        </p:selectBooleanCheckbox>
-                    </h:panelGroup >
+<!--                    <h:panelGroup >-->
+<!--                        <label class = "label">是否子设备</label>-->
+<!--                        <p:selectBooleanCheckbox id="subEquipmentButton" value="#{hisChargeCodeMatchController.subEquipment}" required="false">-->
+<!--                        </p:selectBooleanCheckbox>-->
+<!--                    </h:panelGroup >-->
                     <h:panelGroup>
                         <p:commandButton validateClient="true" value="检索" update="SharedAssetReqTypeEditForm:datalist"/>
                     </h:panelGroup>
@@ -63,9 +63,9 @@
                     <p:column headerText="使用科室" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
-                    <p:column headerText="是否子设备" sortBy="#{item.isSubEquipment}" filterBy="#{item.isSubEquipment}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.isSubEquipment eq false ? '否' : '是'}"/>
-                    </p:column>
+<!--                    <p:column headerText="是否子设备" sortBy="#{item.isSubEquipment}" filterBy="#{item.isSubEquipment}" filterMatchMode="LIKE">-->
+<!--                        <h:outputText value="#{item.isSubEquipment eq false ? '否' : '是'}"/>-->
+<!--                    </p:column>-->
                 </p:dataTable>
             <br/>
             <h:panelGroup>

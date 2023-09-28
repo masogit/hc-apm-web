@@ -73,12 +73,10 @@
 					<p:commandButton actionListener="#{maintainItemController.next()}" value="下一页" update="maintainDlgTable" disabled="#{!maintainItemController.blnNext}"></p:commandButton>
 					<p:commandButton id="btnCheckData" value="检查项" update="checkDataDlg" oncomplete="PF('checkDataDlg').show()" />
 					<p:commandButton id="checkRightButton" value="全部勾选(当前页)" actionListener="#{maintainItemController.checkRightAll}" update="maintainDlgTable" />
-					<!-- <p:commandButton id="checkAllRightButton" value="全部通过(保存)" actionListener="#{maintainItemController.completeMaintain()}" update=":messages"
-                        oncomplete="PF('maintain').update();PF('maintainDialog').hide();" /> -->
 					<p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages"
-									 oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{maintainController.customRoleAuth.authModify}"/>
+									 oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
 					<p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" update=":messages"
-									 disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{maintainController.customRoleAuth.authDelete}">
+									 disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_DELETE')}">
 						<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 					</p:commandButton>
 					<p:commandButton id="openSignature"
@@ -120,7 +118,7 @@
 							</tr>
 						</p:repeat>
 				</table>
-			<p:commandButton value="批量通过" actionListener="#{maintainItemController.saveCheckData()}" oncomplete="PF('checkDataDlg').hide();PF('maintainDialog').hide();PF('maintain').update();" rendered="#{maintainController.customRoleAuth.authModify}"/>
+			<p:commandButton value="批量通过" actionListener="#{maintainItemController.saveCheckData()}" oncomplete="PF('checkDataDlg').hide();PF('maintainDialog').hide();PF('maintain').update();" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
 			<p:commandButton value="全选" actionListener="#{maintainItemController.resetCheckData()}" update=":checkDataForm" />
 			<p:commandButton value="全不选" actionListener="#{maintainItemController.resetCheckData2()}" update=":checkDataForm"  />
 		</h:form>

@@ -10,10 +10,7 @@ import com.ge.apm.service.api.UserApiService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.security.UserDetailsServiceImpl;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.uaa.UserAccountExportService;
-import com.ge.apm.service.uaa.UserAccountHistoryService;
-import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.uaa.*;
 import com.ge.apm.service.utils.*;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
@@ -237,7 +234,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private Boolean confirmDestroy = false;
 
+    private AssetTypeGroupService assetTypeGroupService;
 
+    private UserAssetTypeGroupMapper userAssetTypeGroupMapper;
+
+    private UserAssetGroupRepository userAssetGroupDao;
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<>();
@@ -266,6 +267,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
         supplierUserRepository = WebUtil.getBean(SupplierUserRepository.class);
         userAccountHistoryService = WebUtil.getBean(UserAccountHistoryService.class);
+        assetTypeGroupService= WebUtil.getBean(AssetTypeGroupService.class);
+
+        userAssetTypeGroupMapper = WebUtil.getBean(UserAssetTypeGroupMapper.class);
+        userAssetGroupDao = WebUtil.getBean(UserAssetGroupRepository.class);
 
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
@@ -672,6 +677,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         updateUserScope();
         userApi.resetUser(selected.getLoginName());
         selected.getUserRoleList().clear();
+        userAssetTypeUpdate();
         selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("UserRole") + WebUtil.getMessage("Updated"));
         treeDeleteUrgOidList = new ArrayList();//初始化操作
@@ -684,6 +690,49 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectAllButton = false;
         accessOrgTree = new DefaultTreeNode("root", null, null);
     }
+
+    private void userAssetTypeUpdate() {
+        Set<AssetTypeGroup> selectedSysAuthGroups = gatherUserAuthGroup();
+        updateUserAuthGroup(selected, selectedSysAuthGroups);
+
+    }
+    public Set<AssetTypeGroup> gatherUserAuthGroup() {
+        Set<AssetTypeGroup> selectedSysAuthGroups = new HashSet<>();
+        readSelectedNodesInAssetTypeGroupTree(assetTypeGroupTree, selectedSysAuthGroups);
+
+        return selectedSysAuthGroups;
+    }
+    private void readSelectedNodesInAssetTypeGroupTree(TreeNode node, Set<AssetTypeGroup> selectedTreeNodeList) {
+        if (node.isSelected()) {
+            if (node.getParent() != null && node.getParent().isSelected()) {
+                return;
+            } else {
+                selectedTreeNodeList.add((AssetTypeGroup)node.getData());
+            }
+        } else {
+            for (TreeNode item : node.getChildren()) {
+                readSelectedNodesInAssetTypeGroupTree(item, selectedTreeNodeList);
+            }
+        }
+    }
+    private void updateUserAuthGroup(UserAccount userAccount, Set<AssetTypeGroup> selectedSysAuthGroups) {
+        userAssetTypeGroupMapper.removeAuthGroupByUser(userAccount.getUid());
+
+
+        selectedSysAuthGroups.stream().forEach(item -> {
+            UserAssetGroup userAuthGroup = new UserAssetGroup();
+            userAuthGroup.setUserUid(userAccount.getUid());
+            userAuthGroup.setAssetGroupUid(item.getUid());
+//            userAuthGroup.setClassificationPath(item.getClassificationPath());
+            userAssetGroupDao.save(userAuthGroup);
+        });
+        if (loginUser.getLoginName().equals(userAccount.getLoginName())) {
+            // 如果修改的用户为当前登录用户，重新设置当前登录用户的资产分类
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            userContextService.setAssetTypeGroup();
+        }
+    }
+
 
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
@@ -771,6 +820,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             return;
         }
         if (canDelete()) {
+            String oldLoginName = selected.getLoginName();//Zkb获取旧的LoginName，以用于插入Zkb穿越用户状态表
             selected.setIsDeleted(true);
             selected.setLoginName(selected.getLoginName() + "-" + ZipUtil.makeRandomPassword(5));
             selected.setLastModifiedBy(loginUser.getLoginName());
@@ -781,21 +831,22 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             dao.save(selected);
             supplierUserRepository.deleteUserWxApp(selected.getId());
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
-            /* 物理删除
-            log.info("start delete user, uid: {}",this.selected.getUid());
-            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
 
             TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
             if(ti.getType() != null && ti.getType().equals(3)){
                 try{
-                    uaaService.deleteZkbIbCrossUserStatus(selected);
+                    uaaService.deleteZkbIbCrossUserStatus(selected, oldLoginName);
                 }catch (Exception e){
                     e.printStackTrace();
                 }
             }
+            userAssetGroupDao.deleteByUserUid(selected.getUid());
+
+            /* 物理删除
+            log.info("start delete user, uid: {}",this.selected.getUid());
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
             userAccountService.deleteUserAccount(this.selected);
             userApi.removeUser(selected.getLoginName());*/
-
         }
     }
 
@@ -1187,7 +1238,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             setSelectedOrgTree(accessOrgTree, orgList);
             TreeNodeUtil.expandTreeNode(accessOrgTree);
         }
-
+        loadAssetTypeGroup();
     }
 
     List<UserOrgInfo> userOrgInfoList;
@@ -1498,19 +1549,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser.setIsActive(true);
         loginUser.setActiveTime(new Date());
         dao.save(loginUser);
-        List<UserRole> roles = loginUser.getUserRoleList();
-        SysRole sysRole = sysRoleRepository.getByName(SYSTEM_ACTIVE);
-        if (sysRole != null) {
-            roles = roles.stream().filter(role -> role.getRoleId() == sysRole.getId()).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(roles)) {
-                TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-                tenant.setIsEnabled(true);
-                tenant.setActiveTime(new Date());
-                tenant.setActiveUserId(loginUser.getId());
-                tenant.setActiveType(1);
-                tenantInfoRepository.save(tenant);
-                dao.updateMembersStatus(loginUser.getTenantUID());
-            }
+        if (hasAuthority()) {
+            TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+            tenant.setIsEnabled(true);
+            tenant.setActiveTime(new Date());
+            tenant.setActiveUserId(loginUser.getId());
+            tenant.setActiveType(1);
+            tenantInfoRepository.save(tenant);
+            dao.updateMembersStatus(loginUser.getTenantUID());
             WebUtil.addSuccessMessage(WebUtil.getMessage("ActivateSuccess"));
         } else {
             logger.info("not active person !");
@@ -1539,7 +1585,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public boolean hasAuthority() {
-        return loginUser.getUserRoleNames().contains("系统激活专用") ? true : false;
+        if (loginUser.getUserRoleNames().contains("系统激活专用")) {
+            return true;
+        }
+        TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+        if (StringUtils.hasText(tenant.getActiveUsers())) {
+            String[] userIds = tenant.getActiveUsers().split(",");
+            return Arrays.stream(userIds).anyMatch(String.valueOf(loginUser.getId())::equals);
+        }
+        return false;
     }
 
     public void logout() {
@@ -1825,5 +1879,60 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setConfirmDestroy(Boolean confirmDestroy) {
         this.confirmDestroy = confirmDestroy;
+    }
+
+
+    private TreeNode assetTypeGroupTree;
+    private TreeNode[] selectedAssetTypeGroupNodes;
+
+
+    public TreeNode getAssetTypeGroupTree() {
+        return assetTypeGroupTree;
+    }
+
+    public TreeNode[] getSelectedAssetTypeGroupNodes() {
+        return selectedAssetTypeGroupNodes;
+    }
+
+    public void setSelectedAssetTypeGroupNodes(TreeNode[] selectedAssetTypeGroupNodes) {
+        this.selectedAssetTypeGroupNodes = selectedAssetTypeGroupNodes;
+    }
+
+    public void onSelectAssetTypeGroupTreeNode(NodeSelectEvent event) {
+        setTreeNodes(event.getTreeNode(), true);
+    }
+
+
+
+    public void onUnselectAssetTypeGroupTreeNode(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+    }
+
+    private void loadAssetTypeGroup() {
+        assetTypeGroupTree = assetTypeGroupService.buildAssetTypeGroupInTree();
+
+        List<String> userAssetGroups = userAssetTypeGroupMapper.findAssetGroupByUser(this.selected.getUid());
+
+        setSelectedSysAuthGroupTree(assetTypeGroupTree, userAssetGroups);
+
+    }
+    private void setSelectedSysAuthGroupTree(TreeNode node, List<String> userAuthGroupUids) {
+        if (node.getData() instanceof AssetTypeGroup) {
+            AssetTypeGroup assetTypeGroup = (AssetTypeGroup) node.getData();
+            if (userAuthGroupUids.contains(assetTypeGroup.getUid())) {
+                node.setSelected(true);
+            } else if (node.getParent() != null && node.getParent().isSelected()) {
+                node.setSelected(true);
+            }
+        }
+
+        for (TreeNode item : node.getChildren()) {
+            setSelectedSysAuthGroupTree(item, userAuthGroupUids);
+        }
     }
 }

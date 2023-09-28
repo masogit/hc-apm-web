@@ -91,6 +91,6 @@ public interface ZkbAssetQrCodeInfoRepository extends GenericRepositoryUUID<ZkbA
 
     @Transactional
     @Modifying
-    @Query(value = "delete from zkb_asset_qr_code_info qr where not exists(select 'Y' from asset_info ai,zkb_contract_asset zca,zkb_contract ac where ai.uid= zca.asset_id and zca.contract_id=ac.id AND ai.uid=qr.asset_uid AND ai.is_deleted=false AND ai.is_valid=true AND ac.start_date<=?1 and ac.end_date>=?1)", nativeQuery = true)
-    void deleteZkbAssetQrCodeInfo(Date currentDate);
+    @Query(value = "delete from zkb_asset_qr_code_info qr where not exists(select 'Y' from asset_info ai,zkb_contract_asset zca,zkb_contract ac where ai.uid= zca.asset_id and zca.contract_id=ac.id AND ai.uid=qr.asset_uid AND ai.is_deleted=false AND ai.is_valid=true AND ac.start_date<= to_date(?1,'yyyyMMdd') and ac.end_date>=to_date(?1,'yyyyMMdd'))", nativeQuery = true)
+    void deleteZkbAssetQrCodeInfo(String currentDate);
 }

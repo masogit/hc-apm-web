@@ -67,6 +67,13 @@ public class KeyAssetReport implements Serializable {
     private Integer reportYear;
 
     /**
+     * 报表类型
+     * 1-月度分析 2-年度分析
+     */
+    @Column(name = "report_type")
+    private Integer reportType;
+
+    /**
      * 设备明细 json 型号、品牌、数量、价格、启用日期、折旧、维修支出、维保支出、耗材支出、历史收益
      */
     @Column(name = "asset_detail",columnDefinition = "text")

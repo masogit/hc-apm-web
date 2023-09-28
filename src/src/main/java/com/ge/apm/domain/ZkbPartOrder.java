@@ -26,7 +26,8 @@ public class ZkbPartOrder implements Serializable {
     /**
      * Pending：申请 TechAccept：技术审批通过 TechReject：技术审批不通过 ManageAccept：区域经理审批通过
      * ManageReject：区域经理审批不通过 Ordered：发货 OrderedReject:发货取消 FourHundredCancel:400取消
-     * Returned：归还  Closed：关单
+     * Returned：归还  Closed：已完成
+     * 已归还之后
      */
     public enum PartOrderStatus {
         Requested,TechnicalAccept,TechnicalReject,ProductAccept,ProductReject,
@@ -540,6 +541,9 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "cat_num")
     private Integer catNum;
 
+    @Column(name = "cat_model_non_ge")
+    private String catModelNonGe;
+
     @Column(name = "contract_cat_id")
     private String contractCatId;
 
@@ -688,6 +692,25 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "un_repair_reason")
     private String unRepairReason;
+
+    @Column(name = "fault_un_closed_sr")
+    private String faultUnClosedSr;
+
+    public String getFaultUnClosedSr() {
+        return faultUnClosedSr;
+    }
+
+    public void setFaultUnClosedSr(String faultUnClosedSr) {
+        this.faultUnClosedSr = faultUnClosedSr;
+    }
+
+    public String getCatModelNonGe() {
+        return catModelNonGe;
+    }
+
+    public void setCatModelNonGe(String catModelNonGe) {
+        this.catModelNonGe = catModelNonGe;
+    }
 
     public String getTakeFlag() {
         return takeFlag;

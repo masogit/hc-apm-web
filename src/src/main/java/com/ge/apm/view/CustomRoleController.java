@@ -1,23 +1,18 @@
 package com.ge.apm.view;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.service.uaa.AdminConsoleService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
@@ -103,7 +98,25 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		authJSONArr = service.getAuth();
 		service.init();
 		Set<String> apmFunctions = uaaService.getFunctionListByTenantUid(user.getTenantUID());
-		allFunction = Arrays.stream(ApmFunction.values()).filter(f -> apmFunctions.contains(f.name()) && (!f.name().startsWith("PLATFORM_") || !f.name().startsWith("CONFIG_"))).collect(Collectors.toList());
+		allFunction = Arrays.stream(ApmFunction.values()).filter(f -> apmFunctions.contains(f.name())
+				&& !f.name().startsWith("PLATFORM_")
+				&& !f.name().startsWith("CONFIG_")
+				&& !f.name().equals("REPAIR_ORDER_DISPATCH")
+				&& !f.name().startsWith("REPAIR_ORDER_TAKE")
+				&& !f.name().startsWith("REPAIR_ORDER_ACCEPT")
+				&& !f.name().equals("REPAIR_ORDER_APPROVE")
+				&& !f.name().startsWith("REPAIR_ORDER_CANCEL")
+				&& !f.name().startsWith("MAINTAIN_ORDER_ACCEPT")
+				&& !f.name().equals("MAINTAIN_ORDER_DISPATCH")
+				&& !f.name().startsWith("MAINTAIN_ORDER_CANCEL")
+				&& !f.name().startsWith("MAINTAIN_ORDER_TAKE")
+				&& !f.name().equals("MAINTAIN_ORDER_APPROVE")
+				&& !f.name().equals("MAINTAIN_ORDER_VIEW_CLOSED")
+				&& !f.name().equals("MULTILEVEL_APPROVE_APPROVE")
+				&& !f.name().startsWith("AUDIT_CONFIG")
+				&& !f.name().startsWith("ASSET_LOCATION_")
+
+		).collect(Collectors.toList());
 		functions = allFunction;
 	}
 
@@ -129,17 +142,6 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		return dao.find();
 	}
 
-	/*
-	 * @Override public void onBeforeSave(CustomRole role) {
-	 * role.setTenantUID(user.getTenantUID());
-	 * role.setInstitutionUID(user.getInstitutionUID());
-	 * role.setHospitalUID(user.getHospitalUID());
-	 * role.setSiteUID(user.getSiteUID()); if(role.getCreatedBy() == null){
-	 * role.setCreatedBy(user.getLoginName()); } if(role.getCreatedDate() ==
-	 * null){ role.setCreatedDate(new Date()); }
-	 * role.setLastModifiedBy(user.getLoginName()); role.setLastModifiedDate(new
-	 * Date()); }
-	 */
 	@Override
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		// TODO Auto-generated method stub
@@ -271,6 +273,15 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		return str;
 	}
 
+	public static boolean isAllNull(String[] array) {
+		for (String element : array) {
+			if (element != null) {
+				return false;  // 如果有一个元素不为 null，则返回 false
+			}
+		}
+		return true;  // 如果所有元素都为 null，则返回 true
+	}
+
 	@Transactional
 	public void save() {
 		authorities=parseAuthMap();
@@ -298,7 +309,7 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		selected.setLastModifiedDate(new Date());
 		List<I18nMessage> messages;
 		Map<String, I18nMessage> map = new HashMap<>();
-		if (authorities.length > 0 || cards.length > 0 || menus.length > 0) {
+		if (authorities.length > 0 || cards.length > 0 || BooleanUtils.isFalse(isAllNull(menus))) {
 			List<String> param = new ArrayList<>(500);
 			param.addAll(Arrays.asList(authorities));
 			param.addAll(Arrays.asList(cards));
@@ -312,49 +323,50 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 				}
 			}
 		}
+		if (authorities.length > 0) {
+			StringBuilder sb1 = new StringBuilder();
+			Set<String> group = new HashSet<>();
+			for (String authority : authorities) {
+				if (map.containsKey(authority)) {
+					group.add(authority.split("\\.")[0]);
+					sb1.append(map.get(authority).getValue() + ",");
+				}
+			}
+			selected.setGroups(StringUtils.join(group, ","));
+			selected.setAuthoritiesCH(removeComma(sb1));
+			selected.setAuthorities(StringUtils.join(authorities, ","));
+		} else{
+			selected.setGroups("");
+			selected.setAuthoritiesCH("");
+			selected.setAuthorities("");
+		}
 		if (isOpenNewMenuRoles()) {
 			if (CollectionUtils.isNotEmpty(customSelectedFunctions)) {
 				Set<ApmFunction> apmFunctions = Arrays.stream(ApmFunction.values()).filter(f -> customSelectedFunctions.contains(f.name())).collect(Collectors.toSet());
-				apmFunctions.forEach(f -> System.out.println(f.getFunctionName()));
 				selected.setWebAuthoritiesCH(JSONObject.toJSONString(apmFunctions.stream().map(ApmFunction::getFunctionName).collect(Collectors.toSet())).replaceAll("[\\[\\]\"]", ""));
 				selected.setFunctionList(JSONObject.toJSONString(customSelectedFunctions));
+			} else {
+				selected.setWebAuthoritiesCH("");
+				selected.setFunctionList("[]");
 			}
 		} else {
-			if (authorities.length > 0) {
-				StringBuilder sb1 = new StringBuilder();
-				Set<String> group = new HashSet<>();
-				for (String authority : authorities) {
-					if (map.containsKey(authority)) {
-						group.add(authority.split("\\.")[0]);
-						sb1.append(map.get(authority).getValue() + ",");
-					}
-				}
-				selected.setGroups(StringUtils.join(group, ","));
-				selected.setAuthoritiesCH(removeComma(sb1));
-				selected.setAuthorities(StringUtils.join(authorities, ","));
-			}
-			else{
-				selected.setGroups("");
-				selected.setAuthoritiesCH("");
-				selected.setAuthorities("");
-			}
 			authChange();
 			selected.setWebAuthoritiesCH(service.parseAuthArray(authJSONArr));
 			selected.setWebAuthorities(authJSONArr.toString());
-			if (menus.length > 0) {
-				StringBuilder sb2 = new StringBuilder();
-				for (String card : menus) {
-					if (map.containsKey(card)) {
-						sb2.append(map.get(card).getValue() + ",");
-					}
+		}
+		if (BooleanUtils.isFalse(isAllNull(menus)) && !isOpenNewMenuRoles()) {
+			StringBuilder sb2 = new StringBuilder();
+			for (String card : menus) {
+				if (map.containsKey(card)) {
+					sb2.append(map.get(card).getValue() + ",");
 				}
-				selected.setMenusCH(removeComma(sb2));
-				selected.setMenus(parseMenus(menus));
 			}
-			else{
-				selected.setMenusCH("");
-				selected.setMenus("");
-			}
+			selected.setMenusCH(removeComma(sb2));
+			selected.setMenus(parseMenus(menus));
+		}
+		else{
+			selected.setMenusCH("");
+			selected.setMenus("");
 		}
 		if (cards.length > 0) {
 			StringBuilder sb2 = new StringBuilder();
@@ -374,7 +386,15 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		authorities = new String[200];
 		cards = new String[100];
 		menus = new String[100];
+		if (!isOpenNewMenuRoles()) {
+			analyseMenus(selected);
+		}
 	}
+
+	private void analyseMenus(CustomRole customRole) {
+		WebUtil.getBean(AdminConsoleService.class).analyseCustomMenu(customRole);
+	}
+
 	public void authChange(){
 		if(authJSONArr!=null){
 			for(int i=0;i<authJSONArr.size();++i){
@@ -499,18 +519,23 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	}
 
 	public void filterFunction() {
-		functions = allFunction;
 		if (StringUtils.isEmpty(filterFunctionStr)) {
+			functions = allFunction;
 			return;
 		} else {
-			functions = functions.stream().filter(item -> item.getFunctionName().toLowerCase().contains(filterFunctionStr.toLowerCase())).collect(Collectors.toList());
+			functions = new ArrayList<>();
+			if (selectedFunctions.size() > 0) {
+				List<String> filterFunctions = (List<String>) JSON.parse(JSON.toJSONString(selectedFunctions));
+				functions.addAll(allFunction.stream().filter(f -> filterFunctions.contains(f.name())).collect(Collectors.toList()));
+			}
+			functions.addAll(allFunction.stream().filter(item -> item.getFunctionName().toLowerCase().contains(filterFunctionStr.toLowerCase())).collect(Collectors.toList()));
+			functions = functions.stream().distinct().collect(Collectors.toList());
 		}
 	}
 
 	public void selectChekBox() {
 		customSelectedFunctions = selectedFunctions;
 		customFunctions.clear();
-
 		customFunctions.addAll(Arrays.stream(ApmFunction.values()).filter(f -> selectedFunctions.contains(f.name())).collect(Collectors.toList()));
 	}
 

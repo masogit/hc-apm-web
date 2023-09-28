@@ -121,6 +121,9 @@
                         <p:column headerText="保养周期">
                             <h:outputText value="#{v2PmOrderController.getRulePm(item).period}"/>
                         </p:column>
+                        <p:column headerText="保养周期单位">
+                            <h:outputText value="#{v2PmOrderController.getPeriodUnit(v2PmOrderController.getRulePm(item).periodUnit)}"/>
+                        </p:column>
 
                 <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.creatorName}"/>

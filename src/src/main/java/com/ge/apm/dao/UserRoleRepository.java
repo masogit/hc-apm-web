@@ -29,7 +29,7 @@ public interface UserRoleRepository extends GenericRepository<UserRole> {
     //0 means sys role 1 means custom role
     List<UserRole> findByUserIdAndRoleType(Integer userId, Integer roleType);
 
-    @Query(value="select ur.user_id from user_role ur inner join user_account ua on ur.user_id = ua.id  where ua.tenant_uid = ?1 and ur.role_id in ?2",nativeQuery=true)
+    @Query(value="select ur.user_id from user_role ur inner join user_account ua on ur.user_id = ua.id  where ua.tenant_uid = ?1   and (ua.is_deleted =false or ua.is_deleted is null )  and ur.role_id in ?2",nativeQuery=true)
     public Set<String> findUserIdByRoleIds(String tenantUid ,Set<Integer> roleIds);
 
     @Query(value="select ua.uid from user_role ur inner join user_account ua on ur.user_id = ua.id where  ua.tenant_uid = ?1 and ur.role_id = ?2",nativeQuery=true)

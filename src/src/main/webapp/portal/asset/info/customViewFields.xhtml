@@ -710,10 +710,17 @@
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'mvsContractEndDate')}">
         <h:panelGroup >
-            <label class="label">#{msg.mvsContractEndDate}</label>
+            <label class="label">#{msg.MVSContractEndDate}</label>
             <p:inputText id="contractEndDate" value="#{assetInfoDetailController.selected.mvsContractEndDate}" readonly="true">
                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
             </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <!--  资产分类  -->
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetTypeGroup')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetTypeGroup}<span style="color:red">#{assetInfoDetailController.customConfig.assetFields['assetTypeGroup'].required? '*':''}</span></label>
+            <p:inputText id="assetTypeGroup" value="#{assetInfoDetailController.selectedAssetTypeGroupName}" readonly="true" />
         </h:panelGroup>
     </c:if>
 </ui:composition>

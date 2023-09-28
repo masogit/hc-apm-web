@@ -41,6 +41,7 @@
                                 <f:selectItem itemLabel="供应商负责人赋权" itemValue="ASSET_SUPPLIER_EMPOWERMENT"/>
                                 <f:selectItem itemLabel="重点医疗设备报表" itemValue="ASSET_KEYASSETDATAINPUT"/>
                                 <f:selectItem itemLabel="MVS设备信息导入" itemValue="ASSET_MVS_DATA"/>
+<!--                                <f:selectItem itemLabel="设备分类" itemValue="ASSET_TYPEGROUP"/>-->
                             </p:selectManyCheckbox>
                         </p:fieldset>
                     </h:panelGroup>
@@ -83,6 +84,7 @@
                             <p:selectManyCheckbox id="repair" widgetVar="repair" value="#{tenantInfoController.selectedMenuFeaturesRepair}" layout="grid" columns="5" styleClass="grid-checkbox" >
                                 <p:ajax update="@this"/>
                                 <f:selectItem itemLabel="维修" itemValue="REPAIR"/>
+                                <f:selectItem itemLabel="常用故障及分类" itemValue="REPAIR_FAULTS"/>
                                 <f:selectItem itemLabel="排班管理" itemValue="REPAIR_ARRANGE"/>
                                 <f:selectItem itemLabel="核心组审核进度查看" itemValue="REPAIR_APPROVE_PROCESS"/>
                                 <f:selectItem itemLabel="休假管理" itemValue="REPAIR_VACATION"/>
@@ -186,14 +188,14 @@
                             </p:selectManyCheckbox>
                         </p:fieldset>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <p:fieldset legend="质控评审配置">
-                            <p:selectManyCheckbox id="auditConfig" widgetVar="auditConfig" value="#{tenantInfoController.selectedMenuFeaturesAuditConfig}" layout="grid" columns="5" styleClass="grid-checkbox" >
-                                <p:ajax update="@this"/>
-                                <f:selectItem itemLabel="质控评审配置" itemValue="AUDIT_CONFIG"/>
-                            </p:selectManyCheckbox>
-                        </p:fieldset>
-                    </h:panelGroup>
+<!--                    <h:panelGroup>-->
+<!--                        <p:fieldset legend="质控评审配置">-->
+<!--                            <p:selectManyCheckbox id="auditConfig" widgetVar="auditConfig" value="#{tenantInfoController.selectedMenuFeaturesAuditConfig}" layout="grid" columns="5" styleClass="grid-checkbox" >-->
+<!--                                <p:ajax update="@this"/>-->
+<!--                                <f:selectItem itemLabel="质控评审配置" itemValue="AUDIT_CONFIG"/>-->
+<!--                            </p:selectManyCheckbox>-->
+<!--                        </p:fieldset>-->
+<!--                    </h:panelGroup>-->
                     <h:panelGroup>
                         <p:fieldset legend="MVS设备管理">
                             <p:selectManyCheckbox id="mvsAsset" widgetVar="mvsAsset" value="#{tenantInfoController.selectedMenuFeaturesMvsAsset}" layout="grid" columns="5" styleClass="grid-checkbox" >
@@ -207,6 +209,15 @@
                             <p:selectManyCheckbox id="logAudit" widgetVar="logAudit" value="#{tenantInfoController.selectedMenuFeaturesLogAudit}" layout="grid" columns="5" styleClass="grid-checkbox" >
                                 <p:ajax update="@this"/>
                                 <f:selectItem itemLabel="日志审计" itemValue="LOG_AUDIT"/>
+                            </p:selectManyCheckbox>
+                        </p:fieldset>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <p:fieldset legend="系统配置">
+                            <p:selectManyCheckbox id="config" widgetVar="config" value="#{tenantInfoController.selectedMenuFeaturesConfigAssetGroup}" layout="grid" columns="5" styleClass="grid-checkbox" >
+                                <p:ajax update="@this"/>
+                                <f:selectItem itemLabel="资产分类" itemValue="CONFIG_ASSET_TYPE_GROUP"/>
                             </p:selectManyCheckbox>
                         </p:fieldset>
                     </h:panelGroup>

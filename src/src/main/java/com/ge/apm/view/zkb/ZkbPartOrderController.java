@@ -117,9 +117,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
                     ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.TsePending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.OsscPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
+                    ZkbPartOrderStep.PartOrderStep.ProductPending.toString().equals(zkbPartOrderUserConfig.getConfigType())
                 ){
                     showStatusBtn =false;
                 }
@@ -305,7 +303,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     mm.put("status", ZkbPartOrder.PartOrderStatus.PartReturned.toString());
                 }
                 pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
-            }else{
+            }else if(zkbPartOrderUserConfigList.size() == 2){
                 boolean is4ooRole = true;
                 boolean isCommercialRole = false;
                 for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList) {
@@ -331,6 +329,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 if(is4ooRole || isCommercialRole){
                     pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
                 }
+            }else if(zkbPartOrderUserConfigList.size() == 3){
+                mm.put("currentStep", ZkbPartOrderStep.PartOrderStep.TsePending.toString());
+                pendingQty = zkbPartOrderMapper.queryPendCountByUserConfig(mm);
             }
         }
     }
@@ -604,6 +605,18 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }
                     }
                 }
+            }else if(zkbPartOrderUserConfigList.size() == 3) {
+                if (StringUtils.isEmpty(queryStatus)) {
+                    searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString()));
+                } else if ("all".equals(queryStatus)){
+                    if(searchFilters.size() > 0) {
+                        searchFilters.add(new SearchFilter("tseAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1*2+"));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString(), "1*2+"));
+                    }else{
+                        searchFilters.add(new SearchFilter("tseAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TsePending.toString(), "1+"));
+                    }
+                }
             }
         }
         return searchFilters;
@@ -743,7 +756,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         HashMap<String, Object> dataMap = zkbPartOrderExcelService.createZkbPartOrderData(zkbPartOrders);
 
         try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/partOrder/excel/APM_ZKB_PartOrder_Exp_Template.xlsx");
+            String impFileName= "";
+            if(StringUtils.isEmpty(notGeAsset) ){
+                impFileName = "APM_ZKB_PartOrder_Exp_Template.xlsx";
+            }else {
+                impFileName = "APM_ZKB_PartOrder_Exp_Non_Template.xlsx";
+            }
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/partOrder/excel/" + impFileName);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             zkbPartOrderExcelService.exportData(doc, dataMap);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbPartOrderExcel_Export.xlsx");

@@ -158,7 +158,7 @@ public class TableCreateController extends TieWebSheetBean {
         selectedOrgList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
         if (!selectedOrgList.contains(selectedOrg)) {
             selectedOrgList.add(selectedOrg);
-            isReadOnly = true;
+            //isReadOnly = true;
         }
 
     }

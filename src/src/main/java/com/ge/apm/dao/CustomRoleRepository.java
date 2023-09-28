@@ -18,4 +18,6 @@ public interface CustomRoleRepository extends GenericRepository<CustomRole> {
 
     CustomRole findById(int id);
 
+    @Query(value = "select * from custom_role where site_uid in (?1) and function_list LIKE concat('%',?2,'%') ",nativeQuery = true)
+    List<CustomRole> findCustomRolesBySiteUIdsAndFunction(List<String> SiteUIds, String functionName);
 }

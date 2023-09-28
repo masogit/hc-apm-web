@@ -23,6 +23,43 @@
 
 						<p:ajax event="rowSelect" update="editButton deleteButton ruleSettingButton"/>
 						<p:ajax event="filter" listener="#{reminderRuleController.onFilter}"/>
+						<p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUid}" filterBy="#{item.tenantUid}" filterMatchMode="EQ">
+							<h:outputText value="#{reminderRuleController.getTenantName(item.tenantUid)}"/>
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+									<f:selectItems value="#{reminderRuleController.getHospitalList('0')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
+
+						<p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUid}" filterBy="#{item.institutionUid}" filterMatchMode="EQ">
+							<h:outputText value="#{reminderRuleController.getInsNameByUId(item.institutionUid)}"/>
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+									<f:selectItems value="#{reminderRuleController.getHospitalList('1')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
+						<p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalUid}" filterBy="#{item.hospitalUid}" filterMatchMode="EQ">
+							<h:outputText value="#{reminderRuleController.getHospitalNameByUId(item.hospitalUid)}"/>
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+									<f:selectItems value="#{reminderRuleController.getHospitalList('2')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
+						<p:column headerText="#{msg.Site}" sortBy="#{item.siteUid}" filterBy="#{item.siteUid}" filterMatchMode="EQ" >
+							<h:outputText value="#{reminderRuleController.getSiteNameByUId(item.siteUid)}" />
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
+									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+									<f:selectItems value="#{reminderRuleController.getHospitalList('3')}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:column>
 						<p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.name}"/>
 						</p:column>

@@ -7,21 +7,32 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.his.HisAdministrativeOffices;
 import com.ge.apm.domain.his.HisAdministrativeOfficesMatch;
 import com.ge.apm.service.his.HisClinicalService;
+import com.ge.apm.service.his.load.HisAdministrativeOfficeImportService;
+import com.ge.apm.service.his.load.HisEquipmentImportService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.asset.ContractImportController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.UploadedFile;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 @ManagedBean
@@ -56,6 +67,8 @@ public class HisClinicalMatchController extends GenericCRUDUUIDController<HisAdm
     @Setter @Getter
     private String namePyCode2;
 
+    private HisAdministrativeOfficeImportService  hisAdministrativeOfficeImportService;
+
     @Override
     protected void init() {
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -63,7 +76,7 @@ public class HisClinicalMatchController extends GenericCRUDUUIDController<HisAdm
         connDao = WebUtil.getBean(HisAdministrativeOfficesRepository.class);
         hisClinicalService = WebUtil.getBean(HisClinicalService.class);
         orgComponentController = WebUtil.getBean(HisOrgComponentController.class);
-
+        hisAdministrativeOfficeImportService= WebUtil.getBean(HisAdministrativeOfficeImportService.class);
         orgComponentController.registerController(this);
     }
 
@@ -196,6 +209,55 @@ public class HisClinicalMatchController extends GenericCRUDUUIDController<HisAdm
         clearSelectedInPickList();
 
         refreshAfterOrgChange();
+    }
+
+    private UploadedFile file;
+    private List<Map<String, Object>> importMapList;
+    private List<Map<String, Object>> errorList;
+    public void uploadDataFile(FileUploadEvent event) {
+        ExcelDocument doc = null;
+
+        this.file = event.getFile();
+        try {
+            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+            //检查导入模板版本
+//            if(!checkDocVersion(doc)){
+//                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--"+WebUtil.getMessage("TemplateVersionIncorrect"));
+//                return;
+//            }
+
+            int maxRowNum = HisAdministrativeOfficeImportService.EXCEL_CONTRACT_HEADER_ROW + 5000;
+            if(doc.exceedMaxRowNum(HisAdministrativeOfficeImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
+                return;
+            }
+            importMapList = hisAdministrativeOfficeImportService.getMapFromTemplate(doc);
+            hisAdministrativeOfficeImportService.importData(importMapList);
+            errorList = hisAdministrativeOfficeImportService.filterErrorRecords(importMapList);
+            if(!errorList.isEmpty()){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorList.size()+WebUtil.getMessage("RecordsOfFailure"));
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }else {
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
+            }
+        } catch (Exception e) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
+            Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (doc != null) {
+                doc.release();
+            }
+        }
+
+    }
+
+    public List<Map<String, Object>> getErrorList() {
+        return errorList;
+    }
+
+    public String selectSiteName(String siteUID) {
+        OrgInfo byUid = orgInfoDao.findByUid(siteUID);
+        return byUid.getName();
     }
 }
 

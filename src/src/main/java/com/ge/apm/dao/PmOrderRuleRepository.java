@@ -1,7 +1,9 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.PmOrderRule;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
 
 import java.util.List;
@@ -44,5 +46,10 @@ public interface PmOrderRuleRepository extends GenericRepository<PmOrderRule> {
 
 	@Query(value= "select por.* from v2_pm_order vpo inner join rel_rule_asset rra on vpo.pm_num in (?1) and vpo.tenant_uid=?2 and vpo.asset_uid = rra.asset_uid inner join pm_order_rule por on por.uid in (rra.rule_uid,rra.rule_uid1,rra.rule_uid2,rra.rule_uid4) and vpo.rule_level = por.level" ,nativeQuery = true)
 	List<PmOrderRule> findPmRuleByPmNumBatch(List<String> pmNums,String TenantUID);
+
+	@Modifying
+	@Transactional
+	@Query(value = "delete from pm_order_rule where uid in ?1",nativeQuery = true)
+	Integer deleteById(List<String> collect);
 
 }

@@ -23,6 +23,9 @@ public enum GatewayURL {
     DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/download"),
     AUTH_DOWNLOAD_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects/auth/download"),
     SEARCH_FILE("/hcapmobjecthubservice/api/apm/objectHub/objects"),
+
+    COMPRESS_IMAGE("/hcapmobjecthubservice/api/apm/objectHub/objects/compress/{objectId}"),
+
     // Service Request Service
     SERVICE_REQUEST_CREATE("/hcapmassetservice/api/apm/asset/serviceRequests"),
     WORK_ORDER_ACTION("/hcapmassetservice/api/apm/asset/workOrders/{workOrderId}/action"),
@@ -148,9 +151,11 @@ public enum GatewayURL {
 
     //es查询设备修改历史记录分页
     SEARCH_ASSET_HISTORY("/hcapmelasticservice/assetHistory/searchAssetHistory"),
+    ELASTICSEARCH_QUERY("/hcapmelasticservice/elasticSearch/query"),
     SEARCH_ASSET_HISTORY_LIST("/hcapmelasticservice/assetHistory/searchAssetHistoryList"),
     INSERT_ASSET_HISTORY("/hcapmelasticservice/assetHistory/insertAssetHistory"),
     INSERT_PHYSICAL_DATA_DEL("/hcapmelasticservice/physicalDataDel/insertPhysicalDataDel"),
+    ELASTICSEARCH_INSERT("/hcapmelasticservice/elasticSearch/insert"),
     INSERT_BUSINESS_ERROR_LOG("/hcapmelasticservice/businessErrorLog/insertBusinessErrorLog"),
     // jimureport
     JI_MU_REPORT("/apmReport/jmreport/view"),

@@ -91,7 +91,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private OrgInfo clinicalOrgInfo;
     private boolean isYmyg = false;
     private OrgInfo userOrgInfo;
-
+    private String zkbBatch;
     @Override
     protected void init() {
         this.filterByHospital = false;
@@ -111,6 +111,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         queryAsset.setTenantUID(user.getTenantUID());
         siteUid = user.getSiteUID();
         initAssets();
+        this.zkbBatch = WebUtil.getRequestParameter("zkbBatch");
         userCommonService = WebUtil.getBean(UserCommonService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         supplierService = WebUtil.getBean(SupplierService.class);
@@ -340,6 +341,27 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (StringUtils.isNotEmpty(queryAsset.getSecondDirectory())) {
             assetFilters.add(new SearchFilter("secondDirectory", SearchFilter.Operator.EQ, queryAsset.getSecondDirectory()));
         }
+        if(this.pmOrderRule != null && "1".equals(this.zkbBatch)){
+            Set<String> mainDirectorySets = new HashSet<String>();
+            Set<String> secondDirectorySets = new HashSet<String>();
+            PmOrderRule pmOrderRule = this.pmOrderRuleRepository.findByUid(this.getPmOrderRule().getUid());
+            if(StringUtils.isBlank(pmOrderRule.getPerformanceReport())){
+                return new ArrayList<>();
+            }
+            TableDefinition tableDefinition = tableDao.findById(pmOrderRule.getPerformanceReport());
+            List<SearchFilter> filter = new ArrayList<>();
+            filter.add(new SearchFilter("name", SearchFilter.Operator.EQ, tableDefinition.getName()));
+            filter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "0"));
+            List<ZkbDirectoryTableDefine> zkbDirectoryTableDefineList = zkbDirectoryRepository.findBySearchFilter(filter);
+            zkbDirectoryTableDefineList.stream().forEach(zkbDirectory -> {
+                if(StringUtils.isNotBlank(zkbDirectory.getMainDirectory())&&StringUtils.isNotBlank(zkbDirectory.getSecondDirectory())){
+                    mainDirectorySets.add(zkbDirectory.getMainDirectory());
+                    secondDirectorySets.add(zkbDirectory.getSecondDirectory());
+                }
+            });
+            assetFilters.add(new SearchFilter("mainDirectory", SearchFilter.Operator.IN,mainDirectorySets));
+            assetFilters.add(new SearchFilter("secondDirectory", SearchFilter.Operator.IN,secondDirectorySets));
+        }
 /*        if (null != queryAsset.getManufactureId()) {
             assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId().toString()));
         }*/
@@ -422,11 +444,16 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     public List<SearchFilter> getAssetFilter() {
         List<SearchFilter> filter = new ArrayList<>();
-        if(CollectionUtils.isNotEmpty(selectedUserOrg)){
-            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedUserOrg.stream().map(OrgInfo::getSiteUID).collect(Collectors.toList())));
+        if("1".equals(this.zkbBatch)) {
+            List<OrgInfo> zkbBatchUserOrgInfo = orgInfoRepository.getSitesByTenantUID(user.getTenantUID());
+            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, zkbBatchUserOrgInfo.stream().map(OrgInfo::getSiteUID).collect(Collectors.toSet())));
         }else{
-            filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-            //filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
+            if(CollectionUtils.isNotEmpty(selectedUserOrg)){
+                filter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, selectedUserOrg.stream().map(OrgInfo::getSiteUID).collect(Collectors.toList())));
+            }else{
+                filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+                //filter.addAll(userCommonService.getUserLogicFilters(loginUserOrgType, user));
+            }
         }
         filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
@@ -522,11 +549,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             if (targetAssets.isEmpty()) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
             } else {
-                //只有智康保的走这段逻辑
+               /* //只有智康保的走这段逻辑
                 UserContextService userContextService = WebUtil.getBean(UserContextService.class);
                 boolean zkbAccountBoolean = userContextService.isZkbAccount();
-                Set<String> directorySets = new HashSet<String>();
-                if (zkbAccountBoolean){
+                Set<String> directorySets = new HashSet<String>();*/
+                /*if (zkbAccountBoolean){
                     PmOrderRule pmOrderRule = this.pmOrderRuleRepository.findByUid(this.getPmOrderRule().getUid());
                     TableDefinition tableDefinition = tableDao.findById(pmOrderRule.getPerformanceReport());
                     List<SearchFilter> filter = new ArrayList<>();
@@ -538,17 +565,17 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                             directorySets.add(zkbDirectory.getMainDirectory()+zkbDirectory.getSecondDirectory());
                         }
                     });
-                }
+                }*/
                 List<RelRuleAsset> rels = new ArrayList<>(targetAssets.size());
                 targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
                 for (AssetInfo ai : targetAssets) {
                     //只有智康保的走这段逻辑
-                    if(zkbAccountBoolean){
+                    /*if(zkbAccountBoolean){
                         if(!directorySets.contains(ai.getMainDirectory()+ai.getSecondDirectory())){
                             WebUtil.addErrorMessage(WebUtil.getMessage("设备"+ai.getName()+"不适用当前规则，请检查设备[modality，product]是否匹配"));
                             return;
                         };
-                    }
+                    }*/
 
                     RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
                     if (rel == null) {
@@ -876,5 +903,13 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     public void setEndInstallDate(Date endInstallDate) {
         this.endInstallDate = endInstallDate;
+    }
+
+    public String getZkbBatch() {
+        return zkbBatch;
+    }
+
+    public void setZkbBatch(String zkbBatch) {
+        this.zkbBatch = zkbBatch;
     }
 }
