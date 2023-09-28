@@ -22,7 +22,11 @@ public class ZkbPartOrderProvider {
         List<SearchFilter> filters = (List<SearchFilter>) params.get("filters");
         String tenantUID = (String) params.get("tenantUID");
         StringBuilder sb = new StringBuilder();
-        sb.append("select p.id, p.part_order_no partOrderNo,a.system_id as systemId,p.sr_num srNum, i.part_no partNo,i.part_name partName,i.part_qty partQty,i.remark partRemark,p.status,p.current_step currentStep from zkb_part_order p inner join asset_info a on a.uid = p.asset_id inner join zkb_part_order_item i on i.part_order_id = p.id ");
+        sb.append("select p.id, p.part_order_no partOrderNo,a.system_id as systemId,p.sr_num srNum, " );
+        sb.append("i.part_no partNo,i.part_name partName,i.part_qty partQty,i.remark partRemark,p.status,p.current_step currentStep, " );
+        sb.append(" case when u.id is not null then to_char(u.created_date,'yyyy-MM-dd') || '判定不真实' else '' end as unrealStatus, u.reason ");
+        sb.append("from zkb_part_order p inner join asset_info a on a.uid = p.asset_id inner join zkb_part_order_item i on i.part_order_id = p.id ");
+        sb.append(" left join zkb_unreal u on u.part_order_id = p.id and u.item_no = i.part_no ");
         sb.append(" where p.tenant_uid = '"+tenantUID+"' and p.order_type = 'Parts' ");
         String filter = buildFilter_zkbOrderHistoryDetail(filters);
         sb.append(filter);
@@ -194,7 +198,7 @@ public class ZkbPartOrderProvider {
         }
         String ordersRole = param.get("ordersRole") == null ? "" : (String)param.get("ordersRole");
         if(StrUtil.isNotEmpty(ordersRole)){
-            sql.append(" and (current_step = 'OrderExtraPending' or (current_step = 'OrderPending' and order_type = 'Probe')) ");
+            sql.append(" and (current_step = 'OrderExtraPending' or (current_step = 'OrderPending' and order_type != 'Probe')) ");
         }
         return sql.toString();
     }

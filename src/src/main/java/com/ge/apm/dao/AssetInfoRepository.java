@@ -333,4 +333,11 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value="select * from asset_info where site_uid = ?1 and shared_asset_type = ?2 and is_valid=true and is_deleted=false ", nativeQuery = true)
     List<AssetInfo> findSharedAssetTypeIdCount(String siteUid, String sharedAssetTypeId);
+
+    public List<AssetInfo> findByAuthGroupUid(String authGroupUid);
+
+    public List<AssetInfo> findByAssetType(String assetTypeUid);
+
+    @Query(value="select  ai.*  from  asset_info ai  left join org_info  oi  on ai.asset_dept_uid = oi.uid  where  ai.asset_dept_uid != '' and ai.asset_dept_uid is not null and  oi.uid is not null and (ai.asset_dept_id is null or ai.asset_dept_id != oi.id)", nativeQuery = true)
+    List<AssetInfo> notEqualAssetDeptId();
 }

@@ -52,6 +52,18 @@
                         <p:inputText id="invoiceNumber" value="#{sparePartController.selected.invoiceNumber}" />
                     </h:panelGroup>
                     <h:panelGroup >
+                        <label class ="label">备注 </label>
+                        <p:inputText id="remark" value="#{sparePartController.selected.remark}"  />
+                    </h:panelGroup>
+                    <h:panelGroup rendered="${userContextService.hasCurrentTenantName('')}">
+                        <label class ="label">适用设备 </label>
+                        <p:inputText id="adaptingDevices" value="#{sparePartController.selected.adaptingDevices}"  />
+                    </h:panelGroup>
+                    <h:panelGroup rendered="${userContextService.hasCurrentTenantName('')}">
+                        <label class ="label">有效期 </label>
+                        <p:calendar id="effectiveDate" timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" locale = "#{userContextService.getCalendarLocale()}" value="#{sparePartController.selected.effectiveDate}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true" />
+                    </h:panelGroup>
+                    <h:panelGroup >
                         <label class ="label">仓库* </label>
                         <p:selectOneMenu id="partsWarehouseId" value="#{sparePartController.partsWarehouseId}" disabled="true">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>

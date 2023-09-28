@@ -249,4 +249,19 @@ public class AdminConsoleController {
 		new Thread(() -> adminConsoleService.batchUpdateReminderRule()).start();
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
+
+	public void  batchUpdateAssetApprove(){
+		new Thread(() -> adminConsoleService.batchUpdateAssetApprove()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void  batchUpdateSparPart(){
+		new Thread(() -> adminConsoleService.batchUpdateSparPart()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void  batchUpdateAssetDeptId(){
+		new Thread(() -> adminConsoleService.batchUpdateAssetDeptId()).start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
 }

@@ -87,9 +87,18 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
     @Getter @Setter
     private List<Map<String, String>> assetOperation;
     @Getter @Setter
+    private List<Map<String, String>> assetOperationForYear;
+    @Getter @Setter
+    private Map<String, String> assetOperationDetail;
+    @Getter @Setter
+    private String operationType;
+    @Getter @Setter
     private String filterFillTime = null;
+    @Getter @Setter
+    private Integer operationOrder;
 
     private String previewUrl;
+    private String previewUrlForYear;
 
     @Override
     protected void init() {
@@ -110,6 +119,9 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         previewUrl = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
                 "/793725327773011968?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
+
+        previewUrlForYear = request.getScheme()+"://"+request.getServerName() + "/apmReport/jmreport/view" +
+                "/820864465417695232?token=" + UserContextService.getAccessToken().replace("Bearer ", "") + "&id=";
     }
 
     @Override
@@ -119,14 +131,40 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
 
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
-        crudActionName = "Create";
         selectedDept = null;
         super.prepareCreate();
         this.selected.setFormFillTime(new Date());
+        this.selected.setReportType(1);
         this.selected.setFormFiller(UserContextService.getCurrentUserAccount().getName());
         assetDetail = null;
+        assetOperationDetail = null;
+        assetOperationForYear = new ArrayList<>();
+        initAssetOperation();
+        operationOrder = 1;
+    }
+
+    @Override
+    public void prepareEdit() {
+        initAssetOperation();
+        selectedDept = selected.getClinicalDept();
+        assetDetail = JSON.parseObject(selected.getAssetDetail(), Set.class);
+        assetOperationDetail = null;
+
+        if(1 == this.selected.getReportType()){
+            assetOperation = JSON.parseObject(selected.getAssetOperation(), List.class);
+            assetOperationForYear = new ArrayList<>();
+            operationOrder = 1;
+        }else if(2 == this.selected.getReportType()){
+            initAssetOperation();
+            assetOperationForYear = JSON.parseObject(selected.getAssetOperation(), List.class);
+            operationOrder = assetOperationForYear.size() + 1;
+        }
+        super.prepareEdit();
+    }
+
+    public void initAssetOperation(){
         assetOperation = new ArrayList<>();
-        for (int i = 1; i< 13; i++){
+        for (int i = 1; i< 13; i++) {
             Map<String, String> map = new HashMap<>();
             map.put("month", i + "月");
             map.put("order", i + "");
@@ -134,13 +172,41 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         }
     }
 
-    @Override
-    public void prepareEdit() {
-        crudActionName = "Edit";
-        selectedDept = selected.getClinicalDept();
-        assetDetail = JSON.parseObject(selected.getAssetDetail(), Set.class);
-        assetOperation = JSON.parseObject(selected.getAssetOperation(), List.class);
-        super.prepareEdit();
+    public void preCreateOperation(){
+        operationType = "Create";
+        assetOperationDetail = new HashMap<>();
+    }
+
+    public void preEditOperation(){
+        operationType = "Edit";
+    }
+
+    public void deleteOperation(){
+        Iterator<Map<String, String>> iterator = assetOperationForYear.iterator();
+
+        while (iterator.hasNext()){
+            Map<String, String> next = iterator.next();
+            if(next.get("month").equals(assetOperationDetail.get("month"))){
+                iterator.remove();
+                break;
+            }
+        }
+        assetOperationDetail = null;
+    }
+
+    public void saveAssetOperation(){
+        if("Create".equals(operationType)){
+            for (Map<String, String> map : assetOperationForYear) {
+                if(map.get("month").equals(assetOperationDetail.get("month"))){
+                    WebUtil.addErrorMessage("年份不能重复！");
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                    return;
+                }
+            }
+            assetOperationDetail.put("order",operationOrder + "");
+            assetOperationForYear.add(assetOperationDetail);
+            operationOrder += 1;
+        }
     }
 
     @Override
@@ -234,12 +300,29 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
                 }
             }
         }
-        for (Map<String, String> map : assetOperation) {
-            if((null == map.get("checkPeopleNum") && null != map.get("sumIncome")) ||
-                    (null != map.get("checkPeopleNum") && null == map.get("sumIncome"))){
-                WebUtil.addErrorMessage("设备运营情况数据录入不全,请检查!");
+        if(2 == this.selected.getReportType()){
+            if(CollectionUtils.isEmpty(assetOperation)){
+                WebUtil.addErrorMessage("请录入设备运营情况数据!");
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
+            }
+        }
+        if(1 == this.selected.getReportType()){
+            for (Map<String, String> map : assetOperation) {
+                if((null == map.get("checkPeopleNum") && null != map.get("sumIncome")) ||
+                        (null != map.get("checkPeopleNum") && null == map.get("sumIncome"))){
+                    WebUtil.addErrorMessage("设备运营情况数据录入不全,请检查!");
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                    return;
+                }
+            }
+        }else if(2 == this.selected.getReportType()){
+            for (Map<String, String> map : assetOperationForYear) {
+                if(null == map.get("month") || null == map.get("checkPeopleNum") || null == map.get("sumIncome")){
+                    WebUtil.addErrorMessage("设备运营情况数据录入不全,请检查!");
+                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                    return;
+                }
             }
         }
         if("Create".equals(crudActionName)){
@@ -252,7 +335,11 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
             this.selected.setCreateTime(new Date());
         }
         this.selected.setAssetDetail(JSON.toJSONStringWithDateFormat(assetDetail, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat));
-        this.selected.setAssetOperation(JSON.toJSONString(assetOperation));
+        if(1 == this.selected.getReportType()){
+            this.selected.setAssetOperation(JSON.toJSONString(assetOperation));
+        }else if(2 == this.selected.getReportType()){
+            this.selected.setAssetOperation(JSON.toJSONString(assetOperationForYear));
+        }
         dao.save(this.selected);
     }
 
@@ -409,7 +496,11 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         addedSelectAssetList.clear();
     }
 
-    public String preview(String id){
-        return previewUrl + id;
+    public String preview(String id, Integer type){
+        if(1 == type){
+            return previewUrl + id;
+        }else{
+            return previewUrlForYear + id;
+        }
     }
 }

@@ -10,7 +10,7 @@
     <div class="ui-g-12 card">
         <h:form id="searchForm1">
             <h:panelGrid id="searchPanel" columns="3">
-                <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
+                <h:panelGroup rendered="#{!userContextService.hasAnyRoleByApmRoles('MVSAdmin', 'MVSFE')}">
                     <p:commandButton id="btnOrg" value="#{empty assetInfoToBeTerminatedListController.selectSite? msg.AllHospitals:assetInfoToBeTerminatedListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                         <p:inputText id="treeNodeNameFilter" value="#{orgTreeController.treeNodeNameFilter}"/>
@@ -28,7 +28,7 @@
                         </p:scrollPanel>
                     </p:overlayPanel>
                 </h:panelGroup>
-                <h:panelGroup rendered="#{userContextService.hasAnyRole('MVSAdmin,MVSFE')}">
+                <h:panelGroup rendered="#{userContextService.hasAnyRoleByApmRoles('MVSAdmin', 'MVSFE')}">
                     <p:commandButton id="btnTenant" value="#{empty assetInfoToBeTerminatedListController.selectSite? msg.AllTenants:assetInfoToBeTerminatedListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />
                     <p:overlayPanel widgetVar="varPanelTenant" for="btnTenant" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -77,12 +77,12 @@
                         </p:selectBooleanCheckbox>
                     </f:facet>
                 </p:column>
-                <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
+                <p:column exportable="false" width="60" id="operatorColumn">
                     <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
-                        <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}">
+                        <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.uid,item.name)}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EDIT')}">
                             <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                         </p:link>
-                        <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
+                        <p:commandLink rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_DELETE')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
                             <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandLink>
@@ -572,15 +572,11 @@
                     </f:facet>
                 </p:column>
                 <p:column headerText="#{msg.terminateDate}">
-<!--                    <h:outputText value="#{assetInfoTerminatedListController.getTerminateDate(item.uid,4)}">-->
-<!--                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />-->
-<!--                    </h:outputText>-->
                     <h:outputText value="#{item.terminateOperationDate}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
                 </p:column>
                 <p:column headerText="报废操作人">
-<!--                    <h:outputText value="#{assetInfoTerminatedListController.getTerminateBy(item.uid,4)}"/>-->
                     <h:outputText value="#{item.terminateOperation}"/>
                 </p:column>
                 <f:facet name="{Toolbar}">
@@ -596,23 +592,24 @@
                                      actionListener="#{assetInfoToBeTerminatedListController.preEdit()}"
                                      update=":woTab:TerminationCauseEditDlg"
                                      oncomplete="PF('TerminationCauseEditDlg').show()"
-                                     disabled="#{not assetInfoToBeTerminatedListController.isChecked()}"/>
+                                     disabled="#{not assetInfoToBeTerminatedListController.isChecked()}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EVALUATE')}"/>
                     <p:commandButton id="toBeTerminatedAppraisalButton" icon="ui-icon-arrow-1-s"
                                      actionListener="#{assetInfoToBeTerminatedListController.exportToBeTerminatedAppraisalFile}"
                                      class="btn btn-sm btn-gray batch-terminated" title="#{msg.toBeTerminatedAppraisal}"
                                      onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
-                                     disabled="#{not assetInfoToBeTerminatedListController.isChecked()}">
+                                     disabled="#{not assetInfoToBeTerminatedListController.isChecked()}"
+                                     rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAP_EVALUATE')}">
                         <p:fileDownload value="#{assetInfoToBeTerminatedListController.toBeTerminatedAppraisalFile}"/>
                     </p:commandButton>
 
-                    <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever"
+                    <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAPED')}"
                                      class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchTerminate}"
                                      actionListener="#{assetInfoToBeTerminatedListController.batchProcessToTerminated}"
                                      update=":woTab:AssetInfoListForm1"
                                      disabled="#{not assetInfoToBeTerminatedListController.isChecked()}">
                         <p:confirm header="#{msg.BatchTerminateConfirmation}" message="#{msg.AreYouSureToConfirmTheRecordOfSelectedItemsScrapped}" icon="ui-icon-warning"/>
                     </p:commandButton>
-                    <p:commandButton id="TerminationByFileButton" icon="ui-icon-delete"
+                    <p:commandButton id="TerminationByFileButton" icon="ui-icon-delete" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SCRAPED')}"
                                      class="btn btn-sm btn-gray batch-terminated" title="#{msg.UploadedFileTransformedToBeTerminated}"
                                      oncomplete="PF('TerminationByFileDlg').show()">
                     </p:commandButton>

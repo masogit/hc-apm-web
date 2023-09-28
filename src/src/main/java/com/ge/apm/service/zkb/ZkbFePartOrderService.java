@@ -508,6 +508,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         zkbFePartOrder.setAssetId(assetInfo.getUid());
         if (assetTypeHighMachineValue.equals(zkbFePartOrder.getAssetType())) {
             zkbFePartOrder.setSubtractTotalStatus("false");
+            if("t".equals(zkbFePartOrder.getMaintainFlag())&&"f".equals(zkbFePartOrder.getNotGeAsset())){
+                zkbFePartOrder.setSubtractTotalStatus("true");
+            }
         }
         return list;
     }
@@ -1338,6 +1341,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbFePartOrder.setUrgencyStatus(item.getUrgentOrder());
                 zkbFePartOrder.setQrCode(zkbAssetInfo.getQrCode());
                 zkbFePartOrder.setDepartNum(zkbAssetInfo.getDepartNum());
+                zkbFePartOrder.setAssetId(item.getAssetId());
                 if ("t".equals(item.getUrgentOrder())) {
                     zkbFePartOrder.setUrgencyStatus("1");
                 }

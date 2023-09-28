@@ -29,7 +29,7 @@ public enum AssetManagementEnum {
     PARTS_APPLY("备件管理(申请流程)", true, false, "parts", false, null, null, false),
     REPAIR("维修", true, true, "repair", false, null, null, false, "audit", "swapCenter", "supplierVersion"),
     REPAIR_ARRANGE("排班管理", true, false, "repair.workSchedule", false, null, null, false),
-    REPAIR_APPROVE_PROCESS("核心组审核进度查看", false, true,  "repair.approve.process", false, null, null, false, "audit", "swapCenter", "supplierVersion"),
+    REPAIR_APPROVE_PROCESS("核心组审核进度查看", false, false,  "repair.approve.process", false, null, null, false, "audit", "swapCenter", "supplierVersion"),
     REPAIR_VACATION("休假管理", true, false, "repair.vacationMgt", false, null, null, false),
     REPAIR_ADVERSE("不良事件", true, false, "repair.adverseEvents", false, null, null, false),
     REPAIR_TEMPLATE("报告模版管理", true, false, "repair.reportMgt", false, null, null, false),

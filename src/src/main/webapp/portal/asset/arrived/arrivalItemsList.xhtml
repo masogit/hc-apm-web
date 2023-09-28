@@ -109,7 +109,7 @@
                         </p:column>
                         <p:column headerText="操作" exportable="false">
                             
-                            <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.activeSupplier()}"  update=":AssetArrivalItemListForm:datalist" >接单
+                            <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.activeSupplier() and userContextService.accessContainsFunctionMenu('INSTALL_STORE_EDIT')}"  update=":AssetArrivalItemListForm:datalist" >接单
                                 <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
                             </p:commandLink>
                             <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedItemsController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.activeSupplier()}"  update=":AssetArrivalItemListForm:datalist" >接单

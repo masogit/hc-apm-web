@@ -641,6 +641,17 @@ public class ZkbFePartOrder {
     @Column(name = "not_ge_asset")
     private String notGeAsset;
 
+    @Column(name = "cat_model_non_ge")
+    private String catModelNonGe;
+
+    public String getCatModelNonGe() {
+        return catModelNonGe;
+    }
+
+    public void setCatModelNonGe(String catModelNonGe) {
+        this.catModelNonGe = catModelNonGe;
+    }
+
     public String getDepartNum() {
         return departNum;
     }

@@ -230,6 +230,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetQuality")), "setAssetQuality", assetQualityList, map, null);
                 assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("assetQuantity")), "setAssetQuantity");
 
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("assetTypeGroupEncoded")), "setAssetType", true);
+
                 if (crossSite) {
                     SiteOrgWithDeptOrg siteOrgWithDeptOrg = supportingService.findSiteOrgInAssetExcelRow(rowMap, orgNamesUriCache);
                     supportingService.markDefautValue(siteOrgWithDeptOrg.getSiteOrg(), asset, now, false);
@@ -245,6 +247,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 result.add(map);
 
             }catch(Exception e){
+                e.printStackTrace();
                 logger.error(e.getMessage(), e);
                 throw new Exception(WebUtil.getMessage("RowStart")+dataRow+WebUtil.getMessage("DataError") + e.getMessage());
             }

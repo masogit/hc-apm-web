@@ -12,15 +12,11 @@
                 border-color: #bdbdbd !important;
             }
             #keyAssetReportEditDlg .ui-state-active, #keyAssetReportEditDlg .ui-state-highlight {
-                background-color: #e3f2fd !important;
+                background-color: #7c9ee0 !important;
                 color: #000000 !important;
             }
             #keyAssetReportEditDlg .ui-state-active .ui-icon, #keyAssetReportEditDlg .ui-state-highlight .ui-icon {
-                color: #757575 !important;
-            }
-            #keyAssetSelectDlg .ui-state-active, body .ui-state-highlight {
-                background-color: #5180ce !important;
-                color: #ffffff !important;
+                color: #000000 !important;
             }
         </style>
         <div class="ui-g">
@@ -40,12 +36,19 @@
 
                         <p:ajax event="rowSelect" update="editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{keyAssetReportController.onFilter}" />
-
-                        <!--<p:column headerText="#{msg.formTitle}" filterBy="#{item.formTitle}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.formTitle}"/>
-                        </p:column>-->
                         <p:column headerText="#{msg.reportYear}" filterBy="#{item.reportYear}" filterMatchMode="EQ">
                             <h:outputText value="#{item.reportYear}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.reportType}" filterBy="#{item.reportType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('keyAssetReportType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('keyAssetReportType', item.reportType)}"/>
                         </p:column>
                         <p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
@@ -65,7 +68,7 @@
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.preview}" style="width: 80px">
-                            <h:outputLink id="viewReportButton" title="#{msg.preview}" target="_blank" value="#{keyAssetReportController.preview(item.id)}" onblur="reload()">
+                            <h:outputLink id="viewReportButton" title="#{msg.preview}" target="_blank" value="#{keyAssetReportController.preview(item.id,item.reportType)}" onblur="reload()">
                                 <p:graphicImage name="icons/find.png" style="width: 30px; height: 25px;"/>
                             </h:outputLink>
                         </p:column>
@@ -80,6 +83,7 @@
                 </h:form>
                 <ui:include src="dataInputEdit.xhtml"/>
                 <ui:include src="selectAsset.xhtml"/>
+                <ui:include src="assetOperationEdit.xhtml"/>
             </div>
         </div>
     </ui:define>

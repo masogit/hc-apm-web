@@ -42,7 +42,7 @@
         <result column="function_type" property="functionType"/>
         <result column="brand_name" property="brandName"/>
         <result column="swap_name" property="swapName"/>
-        <result column="remark" property="remark"/>
+        <result column="qr_code" property="qrCode"/>
     </resultMap>
 
     <select id="getTotalRowCount" resultType="int">
@@ -77,6 +77,7 @@
                 sard.compensation_amount,
                 sard.patient_num,
                 sard.patient_bed_num,
+                sard.qr_code,
                 sasi.swap_index,
                 sasi.remark,
                 (case
@@ -131,6 +132,7 @@
             sard.compensation_amount,
             sard.patient_num,
             sard.patient_bed_num,
+            sard.qr_code,
             sasi.swap_index,
             sasi.remark,
             (case

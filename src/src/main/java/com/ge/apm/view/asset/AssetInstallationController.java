@@ -18,6 +18,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.pm.RelRuleAssetController;
 import org.apache.commons.lang.StringUtils;
@@ -67,6 +68,8 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
     private CustomConfigService ccService;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+    private AssetTypeGroupTreeComponentController assetTypeGroupTreeComponentController;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
 
     private List<V2_BlobObject> attachList;
     @Getter
@@ -145,6 +148,10 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
 
     private ArrivalList arrivalList;
 
+    @Getter
+    @Setter
+    private String assetTypeGroup;
+
     @Override
     protected GenericRepositoryUUID<ArrivalList> getDAO() {
         return arrivalListDao;
@@ -180,6 +187,18 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         arrivalListItem.setIsPm(arrivalListItem.getIsPm() == null || arrivalListItem.getIsPm());
         arrivalListItem.setIsChecked(arrivalListItem.getIsChecked() == null || arrivalListItem.getIsChecked());
         oldQrCode = arrivalListItem.getQrCode();
+        assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        assetTypeGroupTreeComponentController.registerController(this);
+        assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, arrivalListItem.getEncoded() + "#" + arrivalListItem.getArrivalList().getTenantUID());
+
+        String assetTypeGroup = arrivalListItem.getEncoded();
+        if (assetTypeGroup!=null){
+            AssetTypeGroup selectedAssetTypeGroup = assetTypeGroupRepository.findByEncodedAndTenantUid(assetTypeGroup, arrivalListItem.getTenantUid());
+            if (null != selectedAssetTypeGroup) {
+                selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
+            }
+        }
 
         if (null == arrivalListItem.getInstallDate()) {
             arrivalListItem.setInstallDate(new Date());
@@ -373,6 +392,11 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             arrivalListItem.setUsageStatus(2);
         } else {
             arrivalListItem.setUsageStatus(3);
+        }
+
+        AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup)selectedObjectMap.get("selectedAssetTypeGroup");
+        if (null != selectedAssetTypeGroup){
+            arrivalListItem.setEncoded(selectedAssetTypeGroup.getEncoded());
         }
 
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
@@ -639,6 +663,11 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
         }
         if (!valid) {
             return false;
+        }
+
+        AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup)selectedObjectMap.get("selectedAssetTypeGroup");
+        if (null != selectedAssetTypeGroup){
+            arrivalListItem.setEncoded(selectedAssetTypeGroup.getEncoded());
         }
 
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
@@ -950,6 +979,15 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
             this.arrivalListItem.setParentAssetId(this.parentAssetInfo.getId());
         } else {
             this.arrivalListItem.setParentAssetId(null);
+        }
+    }
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        if (eventName.equals(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE)) {
+            AssetTypeGroup selectedAssetTypeGroup = (AssetTypeGroup) eventObject;
+            selectedObjectMap.put("selectedAssetTypeGroup", selectedAssetTypeGroup);
+            assetTypeGroup = selectedAssetTypeGroup.getEncoded();
         }
     }
 

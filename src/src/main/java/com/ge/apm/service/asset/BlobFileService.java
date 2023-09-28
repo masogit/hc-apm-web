@@ -7,6 +7,8 @@ package com.ge.apm.service.asset;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +22,7 @@ import com.ge.apm.mq.MqUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,12 +35,15 @@ import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.web.WebUtil;
 
+import javax.tools.FileObject;
+
 /**
  *
  * @author 212579464
  */
 @Component
 public class BlobFileService {
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(AssetFaultTypeService.class);
 
     @Autowired
     BlobObjectRepository blobDao;
@@ -77,7 +83,15 @@ public class BlobFileService {
 
         if (null != fileObject) {
             V2_BlobObject blobObject = new V2_BlobObject();
+            String objectName = (String) fileObject.get("objectName");
             blobObject.setObjectName((String) fileObject.get("objectName"));
+//            try {
+//                String name = new String(objectName.getBytes("ISO-8859-1"), StandardCharsets.UTF_8);
+//                log.info("objectName:{}",name);
+//                blobObject.setObjectName(name);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
             blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
             blobObject.setObjectStorageId((String) fileObject.get("objectId"));
             blobObject.setObjectType((String) fileObject.get("objectType"));
@@ -321,6 +335,23 @@ public class BlobFileService {
 
     public StreamedContent getBlobObjectByStorageId(String storageId){
         return microService.downloadSingleFile(storageId);
+    }
+
+
+    public V2_BlobObject compressByObjectId( String objectStorageId ) {
+        Map<String, Object> fileObject = microService.compressByObjectId(objectStorageId);
+        if (null != fileObject) {
+            V2_BlobObject blobObject = new V2_BlobObject();
+            blobObject.setObjectName((String) fileObject.get("objectName"));
+            blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
+            blobObject.setObjectStorageId((String) fileObject.get("objectId"));
+            blobObject.setObjectType((String) fileObject.get("objectType"));
+            blobObject.setCreatedDate(new Date());
+            blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            return blobObject;
+        } else {
+            return null;
+        }
     }
 
     public V2_BlobObject uploadCompressFile(UploadedFile file) {

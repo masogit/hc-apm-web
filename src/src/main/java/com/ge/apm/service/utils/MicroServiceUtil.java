@@ -7,6 +7,7 @@ package com.ge.apm.service.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.codec.binary.Base64;
@@ -16,17 +17,14 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Base64Utils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
+import org.springframework.util.*;
 
 import javax.imageio.ImageIO;
+import javax.tools.FileObject;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -57,8 +55,8 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             HttpHeaders responseHeader = response.getHeaders();
             List<String> dispositions = responseHeader.get("content-disposition");
             String disposition = dispositions.get(0);
-            String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
-            String suffix = Arrays.asList(fileName.substring(1, fileName.length() - 1).split("\\.")).get(1);
+            //String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
+            //String suffix = Arrays.asList(fileName.substring(1, fileName.length() - 1).split("\\.")).get(1);
             byte[] result = response.getBody();
 
             res += Base64Utils.encodeToString(result);
@@ -72,6 +70,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             byteIn.read(bytes);
             res += encoder.encodeToString(bytes);*/
         } catch (Exception e) {
+            logger.error("encode image base64 error:{}",e);
             e.printStackTrace();
         }
         return res;
@@ -89,7 +88,16 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         List<String> dispositions = responseHeader.get("content-disposition");
         String disposition = dispositions.get(0);
         String fileName = disposition.substring(disposition.lastIndexOf("name=") + 5);
-        fileStream.setName(fileName);
+        List<V2_BlobObject> allByObjectStorageId = blobObjectRepository.findAllByObjectStorageId(fileId);
+        if(!CollectionUtils.isEmpty(allByObjectStorageId)){
+            try {
+                fileStream.setName(new String(allByObjectStorageId.get(0).getObjectName().getBytes("UTF-8"), "ISO-8859-1"));
+            } catch (UnsupportedEncodingException e) {
+                logger.error("download file with  transforming chinese filename chart set error:{}",e);
+            }
+        }else{
+            fileStream.setName(fileName);
+        }
         return fileStream;
     }
 
@@ -116,6 +124,14 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         MediaType type = MediaType.parseMediaType("multipart/form-data; charset=UTF-8");
         headers.setContentType(type);
         headers.add("Authorization", token);
+        String name = file.getName();
+        logger.info("file name :{}",name);
+        try {
+            headers.add("Content-disposition","attachment;filename="+ URLEncoder.encode(name));
+        }catch (Exception e){
+            throw new RuntimeException("文件名加密异常");
+        }
+
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         FileSystemResource resource = new FileSystemResource(file);
         body.add("file", resource);
@@ -133,6 +149,22 @@ public class MicroServiceUtil extends MicroServiceInvoker {
 
         return null;
     }
+
+
+    public Map<String, Object> compressByObjectId(String objectId){
+        HttpEntity<String> requestEntity = new HttpEntity<>(objectId);
+        String gatewayURL = getGatewayURL(GatewayURL.COMPRESS_IMAGE);
+        String url = gatewayURL.replace("{objectId}", objectId);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
+            return data;
+        } else {
+            return null;
+        }
+    }
+
 
     public Map<String, Object> uploadSingleFileByUrl(String token, String url, String fileName) {
         HttpHeaders headers = new HttpHeaders();
@@ -211,7 +243,6 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             gatewayURL = getGatewayURL(GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD_ENCRYPTED);
         else
             gatewayURL = getGatewayURL(GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD);
-
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
 
         if (isOkay(response)) {

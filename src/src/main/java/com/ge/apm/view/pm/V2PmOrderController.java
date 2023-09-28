@@ -31,10 +31,13 @@ import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -56,6 +59,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import sun.misc.BASE64Decoder;
@@ -92,6 +96,9 @@ import java.util.stream.Collectors;
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements ServerEventInterface {
     protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(V2PmOrderController.class);
     V2_WorkOrderDetailRepository v2_workOrderDetailRepository;
+
+    private String fileTypeName;
+
     @Setter @Getter
     private List<PmOrderRule> ruleList;
     @Getter @Setter
@@ -139,6 +146,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private ServiceRequestApiService serviceRequestApiService;
     private PmOrderRuleRepository pmOrderRuleRepository;
     private RelRuleAssetRepository relRuleAssetRepository;
+    private AssetTypeGroupRepository assetTypeGroupRepository;
     private String token;
     private List<UnstructuredDataCollection> unDataCollection;
     private UnstructuredDataCollection unCollection;
@@ -217,6 +225,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date takeTime;
     private String approvaler;
     private List<V2_BlobObject> picList;
+    private List<AssetTypeGroup> assetTypeGroupList;
+
+    @Getter @Setter
+    private List<V2_BlobObject> picBeforeList;
+    @Getter @Setter
+    private List<V2_BlobObject> picAfterList;
+
     private List<V2_BlobObject> picListForRP;
     private List<V2_BlobObject> audioList;
     private V2_WorkOrderService woService;
@@ -514,9 +529,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void updatePMRuleFilterChange(){
        if(ruleNameObj != null || periodObj != null) {
            Set<String> pmRuleUids = getPMRuleUids(ruleNameObj, periodObj);
-           if (CollectionUtils.isNotEmpty(pmRuleUids)) {
-               filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN, pmRuleUids));
+           if (CollectionUtils.isEmpty(pmRuleUids)) {
+               pmRuleUids.add("-1");
            }
+           filterArrayList.add(new SearchFilter("pmRuleUid", SearchFilter.Operator.IN, pmRuleUids));
        }
     }
 
@@ -1291,6 +1307,24 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
+    public void removeAttachmentByIdandType(String blobId, String type) {
+        blobService.deleteBlobFileById(blobId);
+        if (type.equals("after")) {
+            picAfterList.removeAll(picAfterList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+        } else if (type.equals("before")) {
+            picBeforeList.removeAll(picBeforeList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+        }
+    }
+
+    public boolean disableUploadButton(String type) {
+        if (type.equals("after")) {
+            return picAfterList.size() > 4;
+        } else if (type.equals("before")) {
+            return picBeforeList.size() > 4;
+        }
+        return false;
+    }
+
     public List<UserAccount> findRepairPerson() {
         if (this.selectedPmOrder != null) {
             return woService.getWorkerList(this.selectedPmOrder.getAssetId());
@@ -1325,11 +1359,45 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         cancel();
     }
 
+
+
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             picList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
+            String keyByValue = V2_BlobObject.AttachmentType.getKeyByValue(fileTypeName);
+//            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
+            blobObject.setBoType(keyByValue);
+            String fileType=blobObject.getObjectName().split("\\.")[blobObject.getObjectName().split("\\.").length-1];
+            String name=fileTypeName+"_"+blobObject.getObjectName();
+            blobObject.setObjectName(name);
+            blobObject.setBoUuid(selectedPmOrder.getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void handleFileUploadAfter(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picAfterList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmOrder);
+            blobObject.setBoUuid(selectedPmOrder.getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void handleFileUploadBefore(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picBeforeList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PrePmOrder);
+            blobObject.setBoUuid(selectedPmOrder.getId());
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
@@ -1553,6 +1621,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         equipmentTaker = null;
         takeTime = null;
         picList = null;
+        picAfterList = null;
+        picBeforeList = null;
+        fileTypeName = null;
     }
     public void onSupplierChange() {
         Supplier supplier = (Supplier) selectedObjectMap.get("supplier");
@@ -1609,6 +1680,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         multiLevelApprovalService= WebUtil.getBean(MultiLevelApprovalService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+
+        // 用户可见资产分类
+        assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(UserContextService.getCurrentUserAccount().getUid());
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -1627,7 +1702,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
         }else {
             if (Strings.isNullOrEmpty(query)) {
-                if(userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())){
+                if(userContextService.hasCurrentTenantName("")){
                     queryIndex = 10;
                 }else{
                     queryIndex = -1;
@@ -1831,6 +1906,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
 
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP") && ObjectUtil.isEmpty(assetTypeGroupList)) {
+            return new PageImpl<>(ListUtil.empty(), pageRequest, 0);
+        }
         this.setSearchFilter();
 
         if(queryIndex == 20){
@@ -2038,13 +2116,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<SearchFilter> filters = new ArrayList<>();
 
         List<String> orderIds = getVisableMvsAssetSystemId();
-        if (org.springframework.util.CollectionUtils.isEmpty(orderIds)) {
+        if (CollectionUtils.isEmpty(orderIds)) {
             orderIds = new ArrayList<>();
             orderIds.add("0");
-            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
-        } else {
-            filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
         }
+        filters.add(new SearchFilter("id", SearchFilter.Operator.IN, orderIds));
 
         for (SearchFilter searchFilter : filterArrayList) {
             if (("clinicalDeptId,siteUID,currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName" +
@@ -2136,6 +2212,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList = getWorkOrderCoworker(selected.getId());
         // 获取picList
         picList = blobDao.findByBoUuid(selected.getId());
+
         reportList = pmOrderService.getReportList(selected.getId());
 
         loadHmCheck(selected);
@@ -2376,10 +2453,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 });
 
         }
+//        picList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmRequest);
         picList = blobDao.findByBoUuid(selectedPmOrder.getId());
-       if( CollectionUtils.isEmpty(picList)){
+        if(CollectionUtils.isNotEmpty(picList)){
+            picList = picList.stream().filter(item -> !(item.getBoType().equals(V2_BlobObject.BO_TYPE_PrePmOrder)  ||  item.getBoType().equals(V2_BlobObject.BO_TYPE_PmOrder) )   ).collect(Collectors.toList());
+        }
+        picBeforeList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PrePmOrder);
+        picAfterList = blobDao.fetchBlobObjectByUuidAndType(selectedPmOrder.getId(), V2_BlobObject.BO_TYPE_PmOrder);
+        if( CollectionUtils.isEmpty(picList)){
            picList = new ArrayList<V2_BlobObject>();
        }
+        if( CollectionUtils.isEmpty(picBeforeList)){
+            picBeforeList = new ArrayList<V2_BlobObject>();
+        }
+        if( CollectionUtils.isEmpty(picAfterList)){
+            picAfterList = new ArrayList<V2_BlobObject>();
+        }
         picListForRP = new ArrayList<V2_BlobObject>();
     }
 
@@ -2442,7 +2531,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             filterArrayList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             filterArrayList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//所属科室
             filterArrayList.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));//使用科室
+        }
 
+        // 资产分类权限
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+            List<String> encodedList = assetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, new ArrayList<>(encodedList), "1*"));
         }
     }
 
@@ -3070,6 +3164,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
 
+    public List<String> getTypeList(){
+
+        List<String> attachmentTypeList = V2_BlobObject.AttachmentType.getAttachmentTypeList();
+        return attachmentTypeList;
+    }
+
+
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+
+        if(fileName.contains(fileSuffixName)){
+            return true;
+        }
+        return false;
+    }
+
     public V2_WorkOrder_Detail getItemDetail() {
         return itemDetail;
     }
@@ -3556,6 +3665,24 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return null;
     }
 
+    public String getPeriodUnit(String periodUnit){
+        if (StringUtils.isNotEmpty(periodUnit)) {
+            switch (periodUnit) {
+                case "y":
+                    return "年";
+                case "m":
+                    return "月";
+                case "w":
+                    return "周";
+                case "d":
+                    return "日";
+                default:
+                    break;
+            }
+        }
+        return null;
+    }
+
     public String getSignatureContent() {
         return signatureContent;
     }
@@ -3594,5 +3721,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setPmRuleUid(String pmRuleUid) {
         this.pmRuleUid = pmRuleUid;
+    }
+
+
+    public String getFileTypeName() {
+        return fileTypeName;
+    }
+
+    public void setFileTypeName(String fileTypeName) {
+        this.fileTypeName = fileTypeName;
     }
 }

@@ -24,11 +24,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -49,11 +47,9 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
      * 目录关系service
      */
     private ZkbFileDirectoryService zkbFileDirectoryService;
-
     private List<V2_BlobObject> attachements;
     private String actionName;
     private UserAccount currentUser;
-
     //复选的附件数据
     private Map<String, Boolean> selectedMap;
     private List<V2_BlobObject> currentPageBlobObject;
@@ -64,7 +60,8 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
     private Map<String, List<String>> zkbSecondDirectoryData;
 
     private List<Map<String, Object>> errorDirectoryList;
-
+    private String vlink;
+    private String vlinkTitle;
     /**
      * 主目录
      */
@@ -82,7 +79,6 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         zkbFileAttachmentService = WebUtil.getBean(ZkbFileAttachmentService.class);
         zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
-
         currentUser = UserContextService.getCurrentUserAccount();
         this.selectedMap = new HashMap();
         this.attachements = new ArrayList<>();
@@ -104,9 +100,7 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-
         searchFilters.add(new SearchFilter("boType", SearchFilter.Operator.EQ, V2_BlobObject.BO_TYPE_ZKB));
-
         Page<V2_BlobObject> blobObjectPage = dao.findBySearchFilter(searchFilters, pageRequest);
 
         currentPageBlobObject = blobObjectPage.getContent();
@@ -115,6 +109,15 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
 
     }
 
+    public void onSelectChange(ValueChangeEvent event) {
+        this.selected.setMainDirectory(null);
+        this.selected.setSecondDirectory(null);
+        if(event.getNewValue()!=null &&
+                ("OperationVideo".equals(event.getNewValue().toString()) || "OperationManual".equals(event.getNewValue().toString()))){
+            this.selected.setMainDirectory("ALL");
+            this.selected.setSecondDirectory("ALL");
+        }
+    }
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
@@ -136,9 +139,10 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
                 blobObjectID = tempData.getKey();
             }
         }
-
         if(blobObjectID != null){
             this.selected = dao.findById(blobObjectID);
+            this.setVlink(this.selected.getExtLink());
+            this.setVlinkTitle(this.selected.getObjectName());
             this.selectedTenantInfoList = zkbFileAttachmentService.getTargetTenantInfo(this.selected);
         }
     }
@@ -168,17 +172,24 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
     }
 
     public void saveZkbFileAttachment(){
-
+        if ("OperationVideo".equals(selected.getBoSubType())) {
+            if (org.apache.commons.lang.StringUtils.isEmpty(vlinkTitle)) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("name") + WebUtil.getMessage("ValidationRequire"));
+                return;
+            } else if (org.apache.commons.lang.StringUtils.isEmpty(vlink)) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("ValidationRequire"));
+                return;
+            }
+        }
         if(this.actionName.equals("Create")){
-            if(attachements.isEmpty()){
+            if(attachements.isEmpty() && !"OperationVideo".equals(this.selected.getBoSubType())){
                 WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
                 return;
             }
-            zkbFileAttachmentService.saveZkbFileAttachment(this.selected, this.attachements, this.selectedTenantInfoList);
+            zkbFileAttachmentService.saveZkbFileAttachment(this.selected, this.attachements, this.selectedTenantInfoList,vlink,this.vlinkTitle);
         }else if(this.actionName.equals("Edit")){
-            zkbFileAttachmentService.updateZkbFileAttachment(this.selected, this.selectedTenantInfoList);
+            zkbFileAttachmentService.updateZkbFileAttachment(this.selected, this.selectedTenantInfoList,vlink,this.vlinkTitle);
         }
-
         this.cancel();
     }
 
@@ -204,6 +215,8 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
 
     public void cancel() {
         this.selected = null;
+        this.vlink = null;
+        this.vlinkTitle = null;
         this.selectedTenantInfoList = new ArrayList<>();
         this.attachements = new ArrayList<>();
     }
@@ -390,5 +403,21 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
 
     public void setMainDirectory(String mainDirectory) {
         this.mainDirectory = mainDirectory;
+    }
+
+    public String getVlink() {
+        return vlink;
+    }
+
+    public void setVlink(String vlink) {
+        this.vlink = vlink;
+    }
+
+    public String getVlinkTitle() {
+        return vlinkTitle;
+    }
+
+    public void setVlinkTitle(String vlinkTitle) {
+        this.vlinkTitle = vlinkTitle;
     }
 }

@@ -3361,6 +3361,7 @@
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','ServiceManual','维修手册','ServiceManual',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','OperationManual','运营手册','OperationManual',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','OperationVideo','运营视频','OperationVideo',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','MaintenanceList','保养清单','MaintenanceList',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbAttachmentType','Others','其他','Others',NULL,-1);
 
@@ -5013,3 +5014,39 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SiteInconsistent', '所选设备的院区信息不一致', 'The campus information of the selected device is inconsistent', NULL, '-1');
 --YHAAO-18322 维修流程-维修工单报表 错误提示问题
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'siteCannotEmpty', '院区不能为空', 'Site cannot be empty', NULL, '-1');
+-- YHAAO-18549 重点医疗设备使用状况报表以年度统计
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','reportType','报表类型','Report type',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('keyAssetReportType','1','月度分析','Monthly analysis',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('keyAssetReportType','2','年度分析','Annual analysis',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','checkItemNum','检查项目数','Number of inspection items',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','Year','年份','Year',NULL,-1);
+--YHAAO-18932
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','FileNeedHisAssetData','文件中填写要导入的联机设备数据','Fill in the file with the online device data to be imported',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','HospitalCode','医院机构代码','hospitalCode',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','PresetValue','预置值','eq_lb',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','EqId','设备唯一识别编号','eq_id',NULL,	-1	);
+--YHAAO-18934
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','HisDepartmentCode','His科室代码','DepartmentCode',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','HisDepartmentName','His科室名称','DepartmentName',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','TyBz','是否停用','TyBz',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','FileNeedHisDepartmentData','文件中填写要导入的科室数据','Fill in the department data to be imported in the file',NULL,	-1	);
+
+-- 保养附件类型
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','PmReport','保养报告','PmReport',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','MeReport','计量报告','MeReport',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','AuReport','质控报告','AuReport',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','PIReport','巡检报告','PIReport',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('pmAttachments','Other','其他','Other',NULL,	-1	);
+
+-- YHAAO-19442 资产分类
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetTypeGroup', '资产分类', 'Asset Type Group', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetTypeGroupEncoded', '资产分类编码', 'Asset Type Group Encoding', NULL, '-1');
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetClassificationEdit', '资产分类编辑', 'Asset classification editing', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetClassificationImport', '资产分类导入', 'Asset classification Import', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetClassificationManagement', '资产分类管理', 'Asset classification management', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CreateAssetClassification', '新增资产分类', 'Create asset classification', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetTypeGroup', '资产分类', 'Asset classification', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'classificationCode', '资产分类编码', 'classificationCode', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ImportGroupingInBatch', '批量导入资产分类信息', 'ImportGroupingInBatch', NULL, '-1');

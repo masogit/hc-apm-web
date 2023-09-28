@@ -146,17 +146,6 @@
                                                          update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                                     </h:panelGroup>
 
-                                    <h:panelGroup rendered="false">
-                                        <label class="label">#{msg.brand}</label>
-                                        <p:selectOneMenu id="brand" value="#{assetCreateController.assetInfo.brand}" converter="brandConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.brand} #{msg.ValidationRequire}" >
-                                            <f:selectItem itemLabel="" />
-                                            <f:selectItems value="#{assetCreateController.getBrandList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
-                                            <p:column>
-                                                <h:outputText value="#{t.name}"/>
-                                            </p:column>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>
-
                                 </p:panelGrid>
                             </p:fieldset>
 

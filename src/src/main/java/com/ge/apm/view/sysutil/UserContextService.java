@@ -14,6 +14,7 @@ import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.web.cboard.CBoardController;
 import com.ge.healthcare.cn.common.cons.ApmFeature;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
@@ -96,10 +97,13 @@ public class UserContextService implements Serializable {
         userContextService.getTenantInfo();
         userContextService.getListCustomRole(user.getId());
         userContextService.getListSysRole(user.getId());
-        if (userContextService.isOpenNewMenuRoles()) {
+        if (StringUtils.isNotEmpty(userContextService.tenant.getFeatureList())) {
             userContextService.getFunctionListByFeatureAndRoles();
             userContextService.getFeatureList();
             userContextService.getApmSysRole();
+            CustomPermissionEvaluator.apmFeatures = userContextService.apmFeatures;
+            CustomPermissionEvaluator.apmFunctionList = userContextService.apmFunctionList;
+            CustomPermissionEvaluator.apmSystemRoles = userContextService.apmSystemRoles;
         }
     }
 
@@ -175,36 +179,33 @@ public class UserContextService implements Serializable {
      * @return boolean
      */
     public boolean accessContain() {
-        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (CollectionUtils.isNotEmpty(bySiteUID)) {
-            return BooleanUtils.isTrue(bySiteUID.get(0).getWhethertoenableunattended()) && BooleanUtils.isTrue(bySiteUID.get(0).getIsiotenabled());
+        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(getCurrentUserAccount().getSiteUID());
+        if (null != config) {
+            return BooleanUtils.isTrue(config.getWhethertoenableunattended()) && BooleanUtils.isTrue(config.getIsiotenabled());
         }
         return false;
     }
 
     public boolean enableSiteToSiteAllocation() {
-        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (bySiteUID == null || bySiteUID.isEmpty()) {
+        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(getCurrentUserAccount().getSiteUID());
+        if  (null == config ) {
             return false;
         }
-        WorkflowConfig workflowConfig = bySiteUID.get(0);
-        return workflowConfig.getEnableSiteToSiteAllocation() != null && workflowConfig.getEnableSiteToSiteAllocation();
+        return config.getEnableSiteToSiteAllocation() != null && config.getEnableSiteToSiteAllocation();
     }
     public boolean enableAssetPreview() {
-        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (bySiteUID == null || bySiteUID.isEmpty()) {
+        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(getCurrentUserAccount().getSiteUID());
+        if  (null == config ) {
             return false;
         }
-        WorkflowConfig workflowConfig = bySiteUID.get(0);
-        return workflowConfig.getEnableAssetPreview() != null && workflowConfig.getEnableAssetPreview();
+        return config.getEnableAssetPreview() != null && config.getEnableAssetPreview();
     }
     public boolean enableSendRepair() {
-        List<WorkflowConfig> bySiteUID = WebUtil.getBean(WorkflowConfigRepository.class).findBySiteUID(getCurrentUserAccount().getSiteUID());
-        if (bySiteUID == null || bySiteUID.isEmpty()) {
+        WorkflowConfig config = WebUtil.getBean(ConfigService.class).findConfigBySite(getCurrentUserAccount().getSiteUID());
+        if (null == config ) {
             return false;
         }
-        WorkflowConfig workflowConfig = bySiteUID.get(0);
-        return workflowConfig.getEnableSendRepair() != null && workflowConfig.getEnableSendRepair();
+        return config.getEnableSendRepair() != null && config.getEnableSendRepair();
     }
 
     public boolean hasNotAnyRole(String roleList) {
@@ -386,7 +387,8 @@ public class UserContextService implements Serializable {
             String userName = getUserLoginName();
             if ("".equals(userName)) {
                 HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-                userName = UserContext.getUsername(request);
+                final Object attribute = request.getSession().getAttribute(CBoardController.LOGIN_NAME_KEY);
+                userName = Optional.ofNullable(UserContext.getUsername(request)).orElse(String.valueOf(attribute));
                 if(UserContext.ANONYMOUS_USER.equals(userName))
                     userName = null;
             }
@@ -398,6 +400,17 @@ public class UserContextService implements Serializable {
             userAccount = dao.getByLoginName(userName);
         }
         return userAccount;
+    }
+
+    public void setAssetTypeGroup() {
+        if (CustomPermissionEvaluator.apmFeatures.contains("CONFIG_ASSET_TYPE_GROUP")) {
+            userAccount.setEnableAssetTypeGroup(true);
+            AssetTypeGroupRepository assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+            List<AssetTypeGroup> assetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchyByUser(userAccount.getUid());
+            Map<String, AssetTypeGroup> assetTypeGroupMap = assetTypeGroupList.stream().collect(Collectors.toMap(AssetTypeGroup::getEncoded, t -> t));
+            userAccount.setAssetTypeGroupList(assetTypeGroupList);
+            userAccount.setAssetTypeGroupMap(assetTypeGroupMap);
+        }
     }
 
     public boolean isIBTenant() {
@@ -519,7 +532,10 @@ public class UserContextService implements Serializable {
     public Set<String> getFeatureList() {
         if (CollectionUtils.isEmpty(apmFeatures)) {
             apmFeatures = ((List<String>)JSON.parse(getTenantInfo().getFeatureList())).stream().collect(Collectors.toSet());
+            CustomPermissionEvaluator.apmFeatures = apmFeatures;
         }
+        // 设置资产分类
+        setAssetTypeGroup();
         return apmFeatures;
     }
 
@@ -536,6 +552,7 @@ public class UserContextService implements Serializable {
                 addRoleIfTrue(user.getMvsRoleType() == 1 || user.getMvsRoleType() == 3, ApmSystemRole.MVSAdmin);
                 addRoleIfTrue(user.getMvsRoleType() == 2, ApmSystemRole.MVSFE);
             }
+            CustomPermissionEvaluator.apmSystemRoles = apmSystemRoles;
         }
         return apmSystemRoles;
     }
@@ -551,14 +568,43 @@ public class UserContextService implements Serializable {
             apmFunctionList = new HashSet<>();
             List<CustomRole> customRoles = getCustomRole(getUserID());
             Set<ApmSystemRole> sysRoles = getApmSysRole();
-            customRoles.forEach(customRole -> apmFunctionList.addAll((List<String>)JSON.parse(customRole.getFunctionList())));
+            customRoles.forEach(customRole -> {
+                if (StringUtils.isNotEmpty(customRole.getFunctionList())) {
+                    apmFunctionList.addAll((List<String>)JSON.parse(customRole.getFunctionList()));
+                }
+            });
             Set<String> featureList = getFeatureList();
             List<ApmFeature> features = Arrays.asList(ApmFeature.values()).stream().filter(feature -> featureList.contains(feature.name())).collect(Collectors.toList());
             features.forEach(feature -> apmFunctionList.addAll(feature.getFunctionList().stream()
                     .filter(function -> sysRoles.stream().anyMatch(function.getRoleList()::contains) || CollectionUtils.isEmpty(function.getRoleList()))
                     .map(ApmFunction::name).collect(Collectors.toSet())));
+            if (BooleanUtils.isTrue(getUserAccountApprove())) {
+                apmFunctionList.add(ApmFunction.REPAIR_APPROVE_PROCESS_VIEW.name());
+            }
+            //租户额外特殊处理
+            functionSpecial();
+
+            CustomPermissionEvaluator.apmFunctionList = apmFunctionList;
         }
         return apmFunctionList;
+    }
+
+    private void functionSpecial() {
+        if (needScrappedControl()) {
+            List<CustomRole> customRoles = getCustomRole(getUserID());
+            Set<String> functions = new HashSet<>();
+            customRoles.forEach(customRole -> {
+                if (StringUtils.isNotEmpty(customRole.getFunctionList())) {
+                    functions.addAll((List<String>)JSON.parse(customRole.getFunctionList()));
+                }
+            });
+            if (!functions.contains(ApmFunction.ASSET_SCRAP_VIEW.name())) {
+                apmFunctionList.remove(ApmFunction.ASSET_SCRAP_VIEW.name());
+            }
+            if (!functions.contains(ApmFunction.ASSET_SCRAPED_VIEW.name())) {
+                apmFunctionList.remove(ApmFunction.ASSET_SCRAPED_VIEW.name());
+            }
+        }
     }
 
     public static UserAuth getCustomRoleAuth(Integer userId, String authKey) {
@@ -1214,11 +1260,6 @@ public class UserContextService implements Serializable {
 
     }
 
-    public Boolean isYunNanFuWai(String tenantName){
-        logger.warn(tenantName);
-        return this.getTenantInfo().getName().equals("云南省阜外心血管病医院");
-    }
-
     public static Boolean isHospitalName(String tenantName){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         TenantInfo currentTenantInfo = userContextService.getTenantInfo();
@@ -1285,18 +1326,9 @@ public class UserContextService implements Serializable {
         if(activeSupplierFlag == null){
             activeSupplierFlag = Boolean.FALSE;
             UserAccount user = getCurrentUserAccount();
-            WorkflowConfigRepository workflowConfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
-            List<WorkflowConfig> workflowConfigList = workflowConfigDao.findBySiteUID(user.getSiteUID());
-            if(CollectionUtils.isEmpty(workflowConfigList)){
-                workflowConfigList = workflowConfigDao.findBySiteUID(user.getHospitalUID());
-            }
-            if(CollectionUtils.isEmpty(workflowConfigList)){
-                workflowConfigList = workflowConfigDao.findBySiteUID(user.getInstitutionUID());
-            }
-            if(CollectionUtils.isEmpty(workflowConfigList)){
-                workflowConfigList = workflowConfigDao.findBySiteUID(user.getTenantUID());
-            }
-            if (CollectionUtils.isNotEmpty(workflowConfigList) && BooleanUtils.isTrue(workflowConfigList.get(0).getActiveSupplier())) {
+            ConfigService configService = WebUtil.getBean(ConfigService.class);
+            WorkflowConfig configBySite = configService.findConfigBySite(user.getSiteUID());
+            if (BooleanUtils.isTrue(configBySite.getActiveSupplier())) {
                 activeSupplierFlag = Boolean.TRUE;
             }
         }

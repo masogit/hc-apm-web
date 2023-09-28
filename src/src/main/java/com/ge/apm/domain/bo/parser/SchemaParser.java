@@ -10,6 +10,7 @@ import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ge.apm.domain.bo.MaintenanceTemplate.Widget.PICTURE;
 import static com.ge.apm.domain.bo.MaintenanceTemplate.Widget.TEXT;
 
 /**
@@ -49,6 +50,9 @@ public class SchemaParser {
                         break;
                     case Label:
                         rows.add(SEMICOLON_JOINER.join(item.getLabel(), TEXT.apply(wrap(item.getResKey()))));
+                        break;
+                    case Picture:
+                        rows.add(SEMICOLON_JOINER.join(item.getLabel(), PICTURE.apply(wrap(item.getKey()))));
                         break;
                     case Switch:
                     case Select:

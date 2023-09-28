@@ -52,7 +52,7 @@
 
                     <h:panelGrid id="filterType" columns="2" >
                         <p:commandButton process="@this" update="HisAssetsPickList filterType" actionListener="#{hisAssetGroupEditController.setSubEquipment(false)}"  rendered="true" disabled="#{!hisAssetGroupEditController.selected.getIsSubEquipment()}" value="主设备"/>
-                        <p:commandButton process="@this" update="HisAssetsPickList filterType" actionListener="#{hisAssetGroupEditController.setSubEquipment(true)}"  rendered="true" disabled="#{hisAssetGroupEditController.selected.getIsSubEquipment()}" value="子设备"/>
+                        <p:commandButton process="@this" update="HisAssetsPickList filterType" actionListener="#{hisAssetGroupEditController.setSubEquipment(true)}"  rendered="false" disabled="#{hisAssetGroupEditController.selected.getIsSubEquipment()}" value="子设备"/>
                     </h:panelGrid>
 
                 </p:panelGrid>

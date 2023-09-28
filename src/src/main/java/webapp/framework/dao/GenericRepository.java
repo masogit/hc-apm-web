@@ -41,4 +41,6 @@ public interface GenericRepository<E> extends PagingAndSortingRepository<E, Long
      * Lookup entities having at least one String attribute matching the passed pattern. Mostly used from autocomplete components.
      */
     List<E> find(String pattern);
+
+    long count(final List<SearchFilter> filterFilter);
 }

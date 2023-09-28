@@ -54,9 +54,7 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
     @Override
     protected void init() {
         super.init();
-
         dao = WebUtil.getBean(ZkbContractRepository.class);
-        String encodeStr = WebUtil.getRequestParameter("str");
         zkbContractImportService = WebUtil.getBean(ZkbContractImportService.class);
         zkbContractService = WebUtil.getBean(ZkbContractService.class);
         currentUser = UserContextService.getCurrentUserAccount();

@@ -49,9 +49,9 @@
                         </p:column>
 
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{measuringTypeConfigController.prepareCreate}" update=":measuringTypeConfigEditDlg" oncomplete="PF('measuringTypeConfigEditDialog').show()" />
-                            <p:commandButton id="editButton" actionListener="#{measuringTypeConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":measuringTypeConfigEditDlg" oncomplete="PF('measuringTypeConfigEditDialog').show()" disabled="#{empty measuringTypeConfigController.selected.id}"/>
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{measuringTypeConfigController.delete}" update=":measuringTypeConfigListForm:datalist" disabled="#{empty measuringTypeConfigController.selected.id}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{measuringTypeConfigController.prepareCreate}" update=":measuringTypeConfigEditDlg" oncomplete="PF('measuringTypeConfigEditDialog').show()" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_CATEGORY_EDIT')}"/>
+                            <p:commandButton id="editButton" actionListener="#{measuringTypeConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":measuringTypeConfigEditDlg" oncomplete="PF('measuringTypeConfigEditDialog').show()" disabled="#{empty measuringTypeConfigController.selected.id}" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_CATEGORY_EDIT')}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{measuringTypeConfigController.delete}" update=":measuringTypeConfigListForm:datalist" disabled="#{empty measuringTypeConfigController.selected.id}" rendered="#{userContextService.accessContainsFunctionMenu('MEASURE_CATEGORY_DELETE')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
                         </f:facet>

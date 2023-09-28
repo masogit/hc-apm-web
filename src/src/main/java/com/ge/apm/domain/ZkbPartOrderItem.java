@@ -67,6 +67,39 @@ public class ZkbPartOrderItem implements Serializable {
     @Column(name = "order_no")
     private String orderNo;
 
+    @Transient
+    private String unrealStatus;
+
+    @Transient
+    private String unrealPartName;
+
+    @Transient
+    private String cbStatus;
+
+    public String getCbStatus() {
+        return cbStatus;
+    }
+
+    public void setCbStatus(String cbStatus) {
+        this.cbStatus = cbStatus;
+    }
+
+    public String getUnrealPartName() {
+        return unrealPartName;
+    }
+
+    public void setUnrealPartName(String unrealPartName) {
+        this.unrealPartName = unrealPartName;
+    }
+
+    public String getUnrealStatus() {
+        return unrealStatus;
+    }
+
+    public void setUnrealStatus(String unrealStatus) {
+        this.unrealStatus = unrealStatus;
+    }
+
     public String getActualPartNo() {
         return actualPartNo;
     }

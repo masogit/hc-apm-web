@@ -134,6 +134,12 @@
                                             <p:ajax listener="#{orgInfoController.checkHospitalUcmid()}" process="@this"  update=":growl" ></p:ajax>
                                         </p:inputText>
                                     </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.HospitalCode}</label>
+                                        <p:inputText id="orgCode" value="#{orgInfoController.orgCode}" required="false" requiredMessage="#{msg.orgCode} #{msg.ValidationRequire}">
+                                            <p:ajax listener="#{orgInfoController.checkOrgCode()}" process="@this"  update=":growl" ></p:ajax>
+                                        </p:inputText>
+                                    </h:panelGroup>
                                     <br/>
                                     <p:spacer></p:spacer>
                                     <p:commandButton style="width: 90px;margin-top: -10px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>

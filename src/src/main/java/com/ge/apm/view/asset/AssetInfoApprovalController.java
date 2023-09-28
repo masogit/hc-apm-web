@@ -81,8 +81,11 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
     }
 
     public String checkItem() {
-        String url = "assetUid=".concat(selected.getUid().toString());
-        return "ApprovalItemDetail.xhtml?faces-redirect=true&str=" + UrlParamUtil.encodeUrlQueryString(url);
+        String operation = "ApprovalItemDetail.xhtml?actionName=Edit&selectedid=" + selected.getUid().toString()
+                + "&asset_name=" + selected.getName()
+                + "&terminate=" + false
+                + "&approval=" + true;
+        return UrlEncryptController.encodeUrlParam(operation);
     }
 
     public List<V2_BlobObject> getPicList() {

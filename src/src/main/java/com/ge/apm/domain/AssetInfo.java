@@ -179,7 +179,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 使用科室UID
     private String assetDeptUID;
     
-    @Column(name = "asset_type", columnDefinition = "CHAR(32)") // 设备类型, 支持自定义
+    @Column(name = "asset_type") // 设备类型, 支持自定义
     private String assetType;
     
     @Column(name = "asset_CDFA_type") // CDFA设备类型

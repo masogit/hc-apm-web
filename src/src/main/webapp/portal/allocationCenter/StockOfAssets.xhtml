@@ -78,11 +78,18 @@
                         <p:column headerText="设备名称" sortBy="#{asset.asset_name}" filterBy="#{asset.asset_name}" filterMatchMode="LIKE">
                             <h:outputText value="#{asset.name}"/>
                         </p:column>
-
-                        <p:column headerText="设备编号" sortBy="#{asset.asset_num}" filterBy="#{asset.asset_num}" filterMatchMode="LIKE">
-                            <h:outputText value="#{asset.departNum}"/>
-                        </p:column>
-
+                        <c:choose>
+                            <c:when test="#{'4'.equals(userContextService.getCurrentUserTenantInfo().getCustomTenant())}">
+                                <p:column headerText="设备二维码" sortBy="#{asset.qr_code}" filterBy="#{asset.qr_code}" filterMatchMode="EQ" width="150">
+                                    <h:outputText value="#{asset.qrCode}"/>
+                                </p:column>
+                            </c:when>
+                            <c:otherwise>
+                                <p:column headerText="设备编号" sortBy="#{asset.asset_num}" filterBy="#{asset.asset_num}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{asset.departNum}"/>
+                                </p:column>
+                            </c:otherwise>
+                        </c:choose>
                         <p:column headerText="设备型号" sortBy="#{asset.asset_function_type}" filterBy="#{asset.asset_function_type}" filterMatchMode="LIKE">
                             <h:outputText value="#{asset.functionType}"/>
                         </p:column>

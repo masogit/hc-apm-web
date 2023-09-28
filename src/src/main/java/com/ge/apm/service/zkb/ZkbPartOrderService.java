@@ -9,9 +9,9 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.primefaces.event.FileUploadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +27,7 @@ import webapp.framework.web.WebUtil;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -43,6 +44,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Autowired
     private ZkbPartOrderRepository zkbPartOrderRepository;
+
 
     @Autowired
     private ZkbPartOrderItemRepository zkbPartOrderItemRepository;
@@ -106,6 +108,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Autowired
     ZkbContractCatQuotaHistoryService zkbContractCatQuotaHistoryService;
+
+    @Autowired
+    ZkbUnrealRepository zkbUnrealRepository;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -985,6 +990,104 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(!nextFlag){
             ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
             subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
+        }
+    }
+
+    public void getUnrealData(ZkbPartOrder zkbPartOrder){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        for(ZkbPartOrderItem i : zkbPartOrder.getZkbPartOrderItems()){
+            List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getSrNum(),i.getPartNo());
+            if(zkbUnrealList != null && zkbUnrealList.size() > 0){
+                StringBuilder sb = new StringBuilder();
+                for(ZkbUnreal u : zkbUnrealList){
+                    sb.append(format.format(u.getCreatedDate()) + "判定为不真实；");
+                }
+                i.setUnrealStatus(sb.toString());
+            }
+        }
+    }
+
+    public String getProbeUnrealData(ZkbPartOrder zkbPartOrder, String showCatListFlag){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findBySrNumAndItemNo(zkbPartOrder.getSrNum(),zkbPartOrder.getCatNo());
+        StringBuilder sb = new StringBuilder();
+        for(ZkbUnreal u : zkbUnrealList){
+            sb.append(format.format(u.getCreatedDate()) + "判定为不真实；");
+        }
+        return sb.toString();
+    }
+
+    public List<ZkbUnrealVo> getUnrealCheckBoxList(List<ZkbPartOrderItem> zkbPartOrderItems,String partOrderId,ZkbPartOrder zkbPartOrder){
+        List<ZkbUnrealVo> zkbUnrealVos = new ArrayList<>();
+
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+            for(ZkbPartOrderItem i : zkbPartOrderItems){
+                List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findByPartOrderIdAndItemNo(partOrderId, i.getPartNo());
+                ZkbUnrealVo v = new ZkbUnrealVo();
+                v.setItemNo(i.getPartNo());
+                if(zkbUnrealList != null && zkbUnrealList.size() > 0){
+                    ZkbUnreal u = zkbUnrealList.get(0);
+                    v.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
+                    v.setCbStatus(CopyByInvok.F);
+                }else{
+                    v.setUnrealPartName(i.getPartNo()+ "(" + i.getPartName() + ")");
+                    v.setCbStatus(CopyByInvok.T);
+                }
+                zkbUnrealVos.add(v);
+            }
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+            ZkbUnrealVo u = new ZkbUnrealVo();
+            u.setItemNo(zkbPartOrder.getCatNo());
+            List<ZkbUnreal> zkbUnrealList = zkbUnrealRepository.findByPartOrderIdAndItemNo(partOrderId, zkbPartOrder.getCatNo());
+            if(zkbUnrealList != null && zkbUnrealList.size() > 0){
+                u.setUnrealPartName(zkbPartOrder.getCatNo());
+                u.setCbStatus(CopyByInvok.F);
+            }else{
+                u.setUnrealPartName(zkbPartOrder.getCatNo());
+                u.setCbStatus(CopyByInvok.T);
+            }
+            zkbUnrealVos.add(u);
+        }
+        return zkbUnrealVos;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void unrealNext(ZkbPartOrder zkbPartOrder,String[] selectedOptions,UserAccount userAccount,String reason){
+        List<ZkbUnreal> zkbUnrealList = new ArrayList<>();
+        AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+        for (int i =0; i < selectedOptions.length;i++){
+            //判断数据库是否存在如果存在进行更新操作，不存在则进行insert
+            List<ZkbUnreal> existList = zkbUnrealRepository.findByPartOrderIdAndItemNo(zkbPartOrder.getId(), selectedOptions[i]);
+            if(existList!= null && existList.size() > 0){
+                ZkbUnreal zkbUnreal = existList.get(0);
+                zkbUnreal.setCreatedDate(new Date());
+                zkbUnreal.setCreatedBy(userAccount.getName());
+                zkbUnreal.setReason(reason);
+                zkbUnrealList.add(zkbUnreal);
+            }else{
+                ZkbUnreal zkbUnreal = new ZkbUnreal();
+                zkbUnreal.setOrderType(zkbPartOrder.getOrderType());
+                zkbUnreal.setPartOrderNo(zkbPartOrder.getPartOrderNo());
+                zkbUnreal.setPartOrderId(zkbPartOrder.getId());
+                zkbUnreal.setSrNum(zkbPartOrder.getSrNum());
+                zkbUnreal.setSysId(assetInfo.getSystemId());
+                zkbUnreal.setItemNo(selectedOptions[i]);
+                zkbUnreal.setCreatedBy(userAccount.getName());
+                zkbUnreal.setCreatedDate(new Date());
+                zkbUnreal.setReason(reason);
+                zkbUnrealList.add(zkbUnreal);
+            }
+        }
+        zkbUnrealRepository.save(zkbUnrealList);
+    }
+
+
+    public boolean probeUnrealCheck(ZkbPartOrder zkbPartOrder, String showCatListFlag){
+        List<ZkbUnreal> existList = zkbUnrealRepository.findByPartOrderIdAndItemNo(zkbPartOrder.getId(), zkbPartOrder.getCatNo());
+        if(existList!= null && existList.size() > 0){
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -3100,7 +3203,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Transactional(rollbackFor = Exception.class)
     public void saveContractAsset(ZkbContract zkbContract, ZkbContractAsset zkbContractAsset,Date now){
         if(zkbContractAsset.getMaintainStartDate() != null && zkbContractAsset.getMaintainEndDate() != null){
-            //Date now = new Date();
             if(now.getTime() >= zkbContractAsset.getMaintainStartDate().getTime() && now.getTime() <= zkbContractAsset.getMaintainEndDate().getTime()){
                 return;
             }else{
@@ -3204,6 +3306,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
         List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
         return zkbPartOrderItems;
+    }
+
+    public List<String> getZkbTestName(){
+        List<String> names = zkbPartOrderRepository.getZkbTestName();
+        return CollectionUtils.isNotEmpty(names)?names:new ArrayList<String>();
     }
 
     public List<ZkbPartOrderCat> queryPartOrderCat(Date contractDate){

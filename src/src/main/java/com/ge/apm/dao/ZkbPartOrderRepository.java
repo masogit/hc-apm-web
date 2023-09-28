@@ -84,7 +84,7 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      */
     @Query(value = "SELECT coalesce(count(zkbp.id),0) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where zkbc.contract_type <> 'CCSB' and zkbp.order_type = ?2 and zkbp.ordered_date< ?1 " +
             "AND (zkbp.status!='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed' and zkbp.status != 'UnOrderedReject' and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' and zkbp.status != 'DirectorReject') and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
-    Integer fetchUnReturnCountOfCCSB(Date orderedDate,String orderType,String tenantUID);
+    Integer fetchUnReturnCountOfCCSB(Date orderedDate, String orderType, String tenantUID);
 
 
 
@@ -98,7 +98,7 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT sum(qty) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where zkbp.order_type = ?2 and zkbp.ordered_date< ?1 and " +
             "zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') " +
             " and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' and zkbp.status != 'DirectorReject'", nativeQuery = true)
-    Integer fetchApplyPartsQty(Date orderedDate,String orderType,String tenantUID);
+    Integer fetchApplyPartsQty(Date orderedDate, String orderType, String tenantUID);
 
     /**
      * ccsb类型的合同数据在生成积分的时候需要剔除 获取备件申请数量
@@ -110,10 +110,10 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT coalesce(sum(qty),0) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where zkbc.contract_type <> 'CCSB' and zkbp.order_type = ?2 and zkbp.ordered_date< ?1 and " +
             "zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') " +
             " and zkbp.status != 'TechnicalReject' and zkbp.status != 'ManageReject' and zkbp.status != 'OrderedReject' and zkbp.status != 'CommercialReject' and zkbp.status != 'FourHundredCancel' and zkbp.status != 'DirectorReject'", nativeQuery = true)
-    Integer fetchApplyPartsQtyOfCCSB(Date orderedDate,String orderType,String tenantUID);
+    Integer fetchApplyPartsQtyOfCCSB(Date orderedDate, String orderType, String tenantUID);
 
     @Query(value = "SELECT * from zkb_part_order where order_type = ?3 and ordered_date< ?1  and contract_id in ?2 and (status = 'PartReturned' or status = 'Returned' or status = 'Closed')", nativeQuery = true)
-    List<ZkbPartOrder> findReturnId(Date orderedDate,List<String> contractIdList,String orderType);
+    List<ZkbPartOrder> findReturnId(Date orderedDate, List<String> contractIdList, String orderType);
 
     @Query(value = "SELECT * from zkb_part_order where online_engineer = ?1", nativeQuery = true)
     List<ZkbPartOrder> findByOnline(String zkbPartOrderUserConfigId);
@@ -129,6 +129,10 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT * from zkb_part_order order by request_date desc ", nativeQuery = true)
     List<ZkbPartOrder> findAllPartOrder();
 
+    @Query(value = "SELECT * from zkb_part_order where asset_id = ?1 and id != ?2 order by created_date desc LIMIT 1 ", nativeQuery = true)
+    ZkbPartOrder findByAssetIdTopOne(String assetId, String id);
 
+    @Query(value = "select  t.name from user_account t inner join tenant_info tt ON t.tenant_uid=tt.uid where tt.type='3' and t.login_name like 'test.%' ", nativeQuery = true)
+    List<String> getZkbTestName();
 }
 

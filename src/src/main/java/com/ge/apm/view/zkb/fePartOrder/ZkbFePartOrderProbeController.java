@@ -1,9 +1,6 @@
 package com.ge.apm.view.zkb.fePartOrder;
 
-import com.ge.apm.dao.ZkbContractCatQuotaHistoryRepository;
-import com.ge.apm.dao.ZkbContractCatRepository;
-import com.ge.apm.dao.ZkbContractRepository;
-import com.ge.apm.dao.ZkbFePartOrderRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
@@ -220,6 +217,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     private String notGeAssetBox;
 
+    private I18nMessageRepository i18nDao;
+
     @Override
     protected void init() {
         super.init();
@@ -232,6 +231,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         zkbContractCatRepository = WebUtil.getBean(ZkbContractCatRepository.class);
         zkbContractCatQuotaHistoryRepository = WebUtil.getBean(ZkbContractCatQuotaHistoryRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         this.loginName=currentUser.getLoginName();
         this.userName=currentUser.getName();
         this.userUid=currentUser.getUid();
@@ -598,10 +598,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                     }
 
                 }
-                if(!this.checkShowSN())
-                {
+                if(!this.checkShowSN()){
                     this.selected.setContractCatId(null);
-                    this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+                    if("f".equals(notGeAsset)){
+                        this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+                    }
                 }
             }
         logger.info("2  ZKB - 2022：zkbContract" + this.contractList.get(0).getProbeQuota()+"ProbeQuotaSpecial:"+this.contractList.get(0).getProbeQuotaSpecial()+"ProbeQuotaNormal:"+this.contractList.get(0).getProbeQuotaNormal());
@@ -703,6 +704,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         String dateStr = DateUtil.getFormatStrByDate(this.selected.getReportDate(), format);
         Date reportDate = DateUtil.getDateByFormatStr(dateStr, format);
         //GE FE合同到期后400下单前增加Commercial角色进行审批  且不是599合同
+        //人工叫报修时间  备件探头叫申请时间  申请时间如果小于开始时间，大于结束时间需要commercial
         if (((reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0) && !"Y".equals(zkbContract.getFiveNineNineFlag()))&&!"t".equals(this.selected.getNotGeAsset())){
             workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString();
         }
@@ -1250,6 +1252,15 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 }
             }
         }
+    }
+
+    public List<I18nMessage> getZkbPoProbeQuotaType(String notGeAsset){
+        List <I18nMessage> i18nMessages = new ArrayList<I18nMessage>();
+        i18nMessages = i18nDao.getByMsgType("ZkbPoProbeQuotaType");
+        if("t".equals(notGeAsset)){//非 ge 设备 去掉高值探头类型
+            i18nMessages  = i18nMessages.stream().filter(s -> !s.getMsgKey().equals("High")).collect(Collectors.toList());
+        }
+        return i18nMessages;
     }
 
     public Boolean getContractError() {

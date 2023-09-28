@@ -41,7 +41,7 @@
                         selection="#{maintainConfigController.listSelected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                         rowKey="#{item.id}" sortOrder="descending" sortBy="#{item.id}"
                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                        currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{maintainConfigController.customRoleAuth.authSearch}">
+                        currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIGITEM_VIEW')}">
                			<p:column selectionMode="multiple" style="width:32px;text-align:center" exportable="false">
 						</p:column>
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
@@ -72,13 +72,13 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
                                 actionListener="#{maintainConfigController.prepareCreate}" update=":maintainConfigCreateDlg"
-                                oncomplete="PF('maintainConfigCreateDialog').show()" onclick="NurseSiteMaintain.on()" rendered="#{maintainConfigController.customRoleAuth.authCreate}"/>
+                                oncomplete="PF('maintainConfigCreateDialog').show()" onclick="NurseSiteMaintain.on()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIGITEM_EDIT')}"/>
                             <p:commandButton id="editButton" actionListener="#{maintainConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
                                 update=":maintainConfigEditDlg" oncomplete="PF('maintainConfigEditDialog').show()"
-                                disabled="#{(empty maintainConfigController.listSelected) or (maintainConfigController.listSelected.size()>1)}" onclick="NurseSiteMaintain.on()" rendered="#{maintainConfigController.customRoleAuth.authModify}"/>
+                                disabled="#{(empty maintainConfigController.listSelected) or (maintainConfigController.listSelected.size()>1)}" onclick="NurseSiteMaintain.on()" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIGITEM_EDIT')}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
                                 actionListener="#{maintainConfigController.delete}" update=":maintainConfigListForm:datalist"
-                                disabled="#{empty maintainConfigController.listSelected}" rendered="#{maintainConfigController.customRoleAuth.authDelete}">
+                                disabled="#{empty maintainConfigController.listSelected}" rendered="#{userContextService.accessContainsFunctionMenu('NURSESITE_CONFIGITEM_EDIT')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteNurseSiteMaintainConfig}" icon="ui-icon-alert" />
                             </p:commandButton>
                         </f:facet>

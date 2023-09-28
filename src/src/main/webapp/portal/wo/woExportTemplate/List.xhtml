@@ -46,9 +46,6 @@
                         <p:column headerText="#{msg.TemplateFile}" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
                                   filterMatchMode="EQ">
                             <p:commandLink value="#{item.fileName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(item.storageId)}" styleClass="p-mr-2"/>
-<!--                            <p:link href="#{fileDownloadService.getFileUrl(item.storageId)}">-->
-<!--                                <h:outputText value="#{item.fileName}"/>-->
-<!--                            </p:link>-->
                         </p:column>
 
                         <f:facet name="{Toolbar}">
@@ -56,16 +53,16 @@
                                              actionListener="#{workOrderExportTemplateController.prepareCreate}"
                                              update=":WoExportTemplateEditDlg"
                                              oncomplete="PF('WoExportTemplateEditDialog').show()"
-                                             disabled="#{workOrderExportTemplateController.existsSiteTemplate()}"/>
+                                             disabled="#{workOrderExportTemplateController.existsSiteTemplate()}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_EDIT')}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
                                              actionListener="#{workOrderExportTemplateController.prepareEdit()}"
                                              update=":WoExportTemplateEditDlg"
                                              oncomplete="PF('WoExportTemplateEditDialog').show()"
-                                             disabled="#{empty workOrderExportTemplateController.selected}"/>
+                                             disabled="#{empty workOrderExportTemplateController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_EDIT')}"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
                                              actionListener="#{workOrderExportTemplateController.delete}"
                                              update=":WoExportTemplateEditDlg,datalist"
-                                             disabled="#{empty workOrderExportTemplateController.selected}">
+                                             disabled="#{empty workOrderExportTemplateController.selected}" rendered="#{userContextService.accessContainsFunctionMenu('REPAIR_TEMPLATE_DELETE')}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                            icon="ui-icon-warning"/>
                             </p:commandButton>

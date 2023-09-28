@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.common.WechatSendMsgService;
@@ -17,12 +18,11 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,7 +41,7 @@ public class AssetCreateService {
     @Autowired
     I18nMessageRepository i18nDao;
     @Autowired
-    private TenantInfoRepository tenantDao;
+    private ConfigCacheService configCacheService;
     @Autowired
     protected BlobFileService blobService;
     @Autowired
@@ -78,7 +78,7 @@ public class AssetCreateService {
     private V2_PmOrderService pmService;
 
     public String getTenantName(String uid) {
-        TenantInfo si = tenantDao.findByuid(uid);
+        TenantInfo si = configCacheService.getTenantByUid(uid);
         if (si != null) {
             return si.getName();
         } else {
@@ -264,26 +264,31 @@ public class AssetCreateService {
     public Boolean needAssetApproval(String siteUid){
         OrgInfo siteOrg = orgDao.getByUid(siteUid);
         List<String> siteUidList = Arrays.asList(siteOrg.getTenantUID(),siteOrg.getInstitutionUID(),siteOrg.getHospitalUID(),siteOrg.getSiteUID());
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
-        return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
+        List<CustomRole> customRoles = customeRoleDao.findCustomRolesBySiteUIdsAndFunction(siteUidList, ApmFunction.ASSET_AUDIT_APPROVE.name());
+        //List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
+        if (!CollectionUtils.isEmpty(customRoles)) {
+            List<UserAccount> userAccounts = userDao.findCustomRoleUser(customRoles.stream().map(CustomRole::getId).collect(Collectors.toList()));
+            return !CollectionUtils.isEmpty(userAccounts);
+        }
+        return false;
     }
     
     public Boolean needShowAssetApprovalByUser(String userUid){
-        /*UserAccount user = userDao.getByUid(userUid);
-        List<String> siteUidList = uuaService.getUserAccessibleSiteList(userUid).stream().filter(item->item.getOrgType()<4).map(OrgInfo::getUid).distinct().collect(Collectors.toList());
-        siteUidList.addAll(Arrays.asList(user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID()));
-        List<String> collect = siteUidList.stream().distinct().collect(Collectors.toList());
-        collect.removeIf(Objects::isNull);
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(collect);*/
         UserAccount user = userDao.getByUid(userUid);
         List<String> orgList = new ArrayList<String>();
         orgList.add(user.getTenantUID());
         orgList.add(user.getInstitutionUID());
         orgList.add(user.getHospitalUID());
         orgList.add(user.getSiteUID());
-//        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList1(orgList,userUid);
-        List<WorkflowConfig> wcList =getWWorkflowConfig(orgList,user);
-        return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
+//        List<WorkflowConfig> wcList =getWWorkflowConfig(orgList,user);
+//        return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
+        List<CustomRole> customRoles = customeRoleDao.findCustomRolesBySiteUIdsAndFunction(orgList, ApmFunction.ASSET_AUDIT_APPROVE.name());
+        //List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
+        if (!CollectionUtils.isEmpty(customRoles)) {
+            List<UserAccount> userAccounts = userDao.findCustomRoleUser(customRoles.stream().map(CustomRole::getId).collect(Collectors.toList()));
+            return !CollectionUtils.isEmpty(userAccounts);
+        }
+        return false;
     }
     private List<WorkflowConfig> getWWorkflowConfig(List<String> orgList,UserAccount user){
         List<WorkflowConfig> bySiteUIDList = wcDao.getBySiteUIDList(orgList);

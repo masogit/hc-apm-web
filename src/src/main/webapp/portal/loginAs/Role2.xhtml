@@ -106,6 +106,22 @@
                                 </p:tab>
                             </c:otherwise>
                         </c:choose>
+
+
+                        <p:tab title="#{msg.AssetTypeGroup}" class="ui-g-12"   rendered="#{userContextService.accessContainsFunctionMenu('CONFIG_ASSET_GROUP')}" >
+                            <p:scrollPanel style="height: 300px; border: 0;" mode="native">
+
+                                <p:tree id="authGroupTree" class="tree" style="border:0;height:362px" value="#{userAccountController.assetTypeGroupTree}" selection="#{userAccountController.selectedAssetTypeGroupNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
+                                    <p:ajax event="select" listener="#{userAccountController.onSelectAssetTypeGroupTreeNode}" />
+                                    <p:ajax event="unselect" listener="#{userAccountController.onUnselectAssetTypeGroupTreeNode}" />
+
+                                    <p:treeNode type="assetTypeGroup">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:tab>
+
                     </p:tabView>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{userAccountController.saveRoles}" value="#{msg.Save}" update="display2,:RoleEditDlg,:UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'RoleEditDialog');"/>
