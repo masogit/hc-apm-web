@@ -3,6 +3,7 @@ package com.ge.apm.dao;
 import java.util.List;
 import java.util.Set;
 
+import com.ge.apm.domain.UserAccount;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;

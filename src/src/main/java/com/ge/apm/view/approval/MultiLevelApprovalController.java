@@ -1,5 +1,7 @@
 package com.ge.apm.view.approval;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.BudgetApplication;
@@ -9,6 +11,8 @@ import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.core.WechatParam;
+import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -82,6 +86,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     private boolean newSignature = true;
     private boolean isAgree = true;
     private boolean needSignature = false;
+
+    private boolean isReturnApproval=false;
 
     @Override
     protected GenericRepositoryUUID<MultiLevelApproval> getDAO() {
@@ -274,6 +280,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                     this.isAgree = true;
                 }else if(agree == 2){
                     this.isAgree = false;
+                }else if(agree==3){
+                    this.isReturnApproval=true;
                 }
                 this.needSignature = true;
                 // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
@@ -290,12 +298,27 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }else if(agree == 2){
             this.isAgree = false;
             this.getMultiLevelApprovalPersionAndSubmitByDisagree();
+        }else if(agree == 3){
+            this.returnApprove();
         }
 
     }
 
+
+
     public void returnApprove() throws Exception {
         MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+
+        int level = 0;
+        for (int i=1;i<nodes.size();i++){
+            if(nodes.get(i-1).getNodeName().equals(nodeName)){
+                level=i;
+            }
+        }
+        if(level==0 || level>multiLevelApproval.getApprovalLevelNow() || multiLevelApproval.getApprovalLevelNow()==1 || multiLevelApproval.getApprovalLevelNow()==level){
+            return;
+        }
+
         boolean approvalIng = multiLevelApproval.getApprovalIng();
         if(approvalIng){
             WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
@@ -306,9 +329,12 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         if(this.needSignature){
             multiLevelApproval.setAuditSignature(this.signatureId);
         }
-        multiLevelApprovalService.getMultiLevelApprovalReturn(multiLevelApproval,approvalOpinion);
+        multiLevelApprovalService.getMultiLevelApprovalReturn(multiLevelApproval,approvalOpinion,level);
         selected = null;
         this.needSignature = false;
+        this.isReturnApproval=false;
+        this.nodes=null;
+        this.nodeName=null;
         this.resetSignature();
     }
 
@@ -364,6 +390,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             }
         }
 
+        if(this.isReturnApproval){
+            this.returnApprove();
+            return;
+        }
         if(this.isAgree){
             this.getMultiLevelApprovalPersonByAgree();
         }else{
@@ -376,5 +406,28 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         this.signatureContent = null;
         this.signatureContentStream = null;
         this.newSignature = true;
+    }
+
+
+    @Getter@Setter
+    private  List<ApprovalNode> nodes;
+    @Getter@Setter
+    private String nodeName;
+
+    public List<ApprovalNode> getApprovalNode(){
+        MultiLevelApprovalConfig multiLevelApprovalConfig = multiLevelApprovalService.getApproveWorkflowConfig(selected.getWorkflowConfigApproveUid());
+        String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+        if (null != approvalItem) {
+            List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {
+            });
+            nodes= approvalNodes;
+            return approvalNodes;
+        }
+        return null;
+    }
+
+
+    public List<ApprovalNode> getNodes(){
+        return nodes;
     }
 }
