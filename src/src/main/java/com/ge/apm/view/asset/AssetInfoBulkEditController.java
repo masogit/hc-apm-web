@@ -488,12 +488,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 }
             }
         }
+        Integer assetDeptId = selected.getAssetDeptId();
         for (AssetInfo assetInfo : newList ) {
             idList.add(assetInfo.getId());
             selected.setIsValid(assetInfo.getIsValid());
             selected.setIbDeviceStatus(assetInfo.getIbDeviceStatus());
             selected.setConnectToInsite(assetInfo.getConnectToInsite());
-            if(selected.getAssetDeptId()==0){
+            if(assetDeptId == null || assetDeptId == 0){
                 selected.setAssetDeptId(assetInfo.getAssetDeptId());
             }
             selected.setSiteId(assetInfo.getSiteId());
