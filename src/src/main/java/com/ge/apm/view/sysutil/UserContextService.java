@@ -7,6 +7,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
@@ -1026,11 +1027,8 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isYiMaiYangGuangTenant() {
-        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
-        if (tenantOptionConfigOptional.isPresent() && tenantOptionConfigOptional.get().getSynchronizeWorkOrder()!=null) {
-            return tenantOptionConfigOptional.get().getSynchronizeWorkOrder();
-        }
-        return false;
+        TenantOptionConfig tenantOptionConfig = WebUtil.getBean(ConfigCacheService.class).getTenantOptionConfigByUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
+        return tenantOptionConfig.getSynchronizeWorkOrder();
     }
 
     public static boolean isYiMaiYangGuangTenantForServer() {
@@ -1243,19 +1241,8 @@ public class UserContextService implements Serializable {
     }
 
     public static boolean isAllowAssetBatchUpdate() {
-        TenantOptionConfigRepository tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
-        Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
-
-        if (!tenantOptionConfigOptional.isPresent()) {
-            return false;
-        }
-
-        TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
-
-        if (null == tenantOptionConfig.getAllowAssetBatchUpdate()) {
-            return false;
-        }
-
+        ConfigCacheService configCacheService = WebUtil.getBean(ConfigCacheService.class);
+        TenantOptionConfig tenantOptionConfig = configCacheService.getTenantOptionConfigByUid(UserContextService.getCurrentUserAccount().getTenantUID());
         return tenantOptionConfig.getAllowAssetBatchUpdate();
 
     }
@@ -1309,13 +1296,8 @@ public class UserContextService implements Serializable {
      * @return
      */
     public Boolean isActiveSupplier(){
-        Boolean flag = Boolean.FALSE;
-        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(getCurrentUserTenantInfo().getUid());
-        if (tenantOptionConfigOptional.isPresent()) {
-            TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
-            flag = tenantOptionConfig.getActiveSupplier();
-        }
-        return flag;
+        TenantOptionConfig tenantOptionConfigOptional = WebUtil.getBean(ConfigCacheService.class).getTenantOptionConfigByUid(getCurrentUserTenantInfo().getUid());
+        return tenantOptionConfigOptional.getActiveSupplier();
     }
 
     /**
