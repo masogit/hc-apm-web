@@ -3,9 +3,11 @@ package com.ge.apm.service.common;
 
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.TenantOptionConfigRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.TenantOptionConfig;
 import com.ge.apm.domain.WorkflowConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  *
@@ -31,6 +34,8 @@ public class ConfigCacheService {
     @Autowired
     private TenantInfoRepository tenantDao;
 
+    @Autowired
+    private TenantOptionConfigRepository tenantOptionConfigRepository;
 
 
     @Cacheable(cacheNames = "springCache", key = "'OrgInfo_Uid.'+#uid")
@@ -54,11 +59,26 @@ public class ConfigCacheService {
     }
 
 
+    @Cacheable(cacheNames = "springCache", key = "'TenantOptionConfig_Uid.'+#uid")
+    public TenantOptionConfig getTenantOptionConfigByUid(String uid){
+
+        TenantOptionConfig tenantOptionConfig = new TenantOptionConfig();
+
+        Optional<TenantOptionConfig> res = tenantOptionConfigRepository.findByTenantUid(uid);
+        tenantOptionConfig.setTenantUid(uid);
+        tenantOptionConfig.setOrderByCreateTimeByDefault(res.map(i->i.getOrderByCreateTimeByDefault()).orElse(false));
+        tenantOptionConfig.setShowIsPm(res.map(i->i.getShowIsPm()).orElse(false));
+        tenantOptionConfig.setActiveSupplier(res.map(i->i.getActiveSupplier()).orElse(false));
+        tenantOptionConfig.setAllowAssetBatchUpdate(res.map(i->i.getAllowAssetBatchUpdate()).orElse(false));
+        tenantOptionConfig.setSynchronizeWorkOrder(res.map(i->i.getSynchronizeWorkOrder()).orElse(false));
+
+        return tenantOptionConfig;
+    }
+
     @Cacheable(cacheNames = "springCache", key = "'TenantInfo_Uid.'+#uid")
     public TenantInfo getTenantByUid(String uid){
         return tenantDao.findByuid(uid);
     }
-
 
 
     @CacheEvict(cacheNames = "springCache", key = "'WorkflowConfig_siteUid.'+#siteUid")
@@ -71,6 +91,10 @@ public class ConfigCacheService {
 
     @CacheEvict(cacheNames = "springCache", key = "'OrgInfo_Uid.'+#uid")
     public void  cleanOrgInfoCacheByUid (String uid){
+    }
+
+    @CacheEvict(cacheNames = "springCache", key = "'TenantOptionConfig_Uid.'+#uid")
+    public void  cleanTenantOptionConfigByUid (String uid){
     }
 
 }
