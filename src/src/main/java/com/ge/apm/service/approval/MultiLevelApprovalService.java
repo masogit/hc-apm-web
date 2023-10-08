@@ -863,6 +863,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         budgetApplicationRepository.save(budget);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void getMultiLevelApprovalReturn(MultiLevelApproval multiLevelApprovalNew, String approvalOpinion,int returnLevel) {
 
         MultiLevelApproval multiLevelApproval = multiLevelApprovalNew;
@@ -971,5 +972,119 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             }
         }
 
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void getMultiLevelApprovalDirectDelivery(MultiLevelApproval multiLevelApprovalNew, String approvalOpinion) {
+
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalNew;
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        MultiLevelApprovalConfig multiLevelApprovalConfig = this.getApproveWorkflowConfig(multiLevelApproval.getWorkflowConfigApproveUid());
+
+        List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
+        MultiLevelApproval multiLevelApprovalReturn = list.get(list.size() - 2);
+
+        if(multiLevelApprovalReturn.getApprovalNodeStatus()!=ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_RETURN){
+           return;
+        }
+
+        if (multiLevelApprovalConfig != null) {
+            multiLevelApproval.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+            multiLevelApproval.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE);
+            multiLevelApproval.setActualApproverName(userAccount.getName());
+            multiLevelApproval.setActualApproverDate(new Date());
+            multiLevelApproval.setActualApproverUid(userAccount.getUid());
+            multiLevelApproval.setApprovalOpinion(approvalOpinion);
+            multiLevelApproval.setApprovalIng(true);
+            int approvalLevel = multiLevelApproval.getApprovalLevel();
+            int level = multiLevelApprovalReturn.getApprovalLevel();
+
+            multiLevelApproval.setApprovalLevelNow(level);
+            //更新审批数据
+            multiLevelApprovalRepository.save(multiLevelApproval);
+            //更新审批进度
+
+                if (null != list) {
+                    for (int i = 0; i < list.size(); i++) {
+                        MultiLevelApproval multi = list.get(i);
+                        if (multi != null && multi.getApprovalLevelNow() != level) {
+                            multi.setApprovalLevelNow(level);
+                            multiLevelApprovalRepository.save(multi);
+                        }
+                    }
+                }
+
+            String approvalItem = multiLevelApprovalConfig.getApprovalItem();
+            if (null != approvalItem) {
+                List<WechatParam> paramList = ListUtil.newArrayList();
+                List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {
+                });
+                if (approvalNodes != null) {
+                    MultiLevelApproval date = multiLevelApprovalNew;
+                    int maxNodeId = approvalNodes.size();
+                    if (level == 1) {//退回第一节点
+
+                        //没有特殊处理
+                    }
+                    com.ge.apm.domain.ApprovalNode node = approvalNodes.get(level-1);
+                    if (node != null) {
+                        boolean usingRole = node.getUsingRole();
+                        if (usingRole) {//角色审批，根据角色拉取用户进行审批
+                            List<Integer> nodeRoleUids = node.getRoleUids();
+                            if (nodeRoleUids != null) {
+                                List<UserAccount> userAccounts = userAccountRepository.getApprovalPersonByRoleId(nodeRoleUids);
+                                for (UserAccount user : userAccounts) {
+                                    if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
+                                        paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
+                                    }
+                                }
+                                //保存角色到审批流中
+                                date.setApprovalType(ApprovalConstant.ROLE_APPROVAL_TYPE);
+                                Object[] objects = nodeRoleUids.toArray();
+                                String str = StringUtils.join(objects, ",");
+                                date.setApprovalUid(str);
+                            }
+                        } else {//用户审批
+                            List<String> userUids = node.getUserUids();
+                            List<String> uids=  getRoleApproveCondition(node,multiLevelApproval.getBusinessUid());
+                            if(CollectionUtils.isNotEmpty(uids)){
+                                userUids.addAll(uids);
+                                userUids = userUids.stream().distinct().collect(Collectors.toList());
+                            }
+                            List<UserAccount> userAccounts = userAccountRepository.findByUidIn(userUids);
+                            for (UserAccount user : userAccounts) {
+                                if (!ObjectUtil.isAllEmpty(user.getWeChatId(), user.getAppAlias())) {
+                                    paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
+                                }
+                            }
+                            date.setApprovalType(ApprovalConstant.USER_APPROVAL_TYPE);
+                            Object[] objects = userUids.toArray();
+                            String str = StringUtils.join(objects, ",");
+                            date.setApprovalUid(str);
+                        }
+                        date.setApprovalStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);
+                        date.setApprovalNodeStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_WAITING);
+                        date.setApprovalLevel(level);
+                        date.setCreatedBy(userAccount.getLoginName());
+                        date.setApprovalIng(false);
+                        date.setApprovalLevelNow(level);
+                        date.setInitiateApproverUid(null);
+                        date.setCreatedDate(new Date());
+                        date.setId(null);
+                        date.setActualApproverName(null);
+                        date.setActualApproverDate(null);
+                        date.setApprovalOpinion(null);
+                        //生成下条待审批数据
+                        multiLevelApprovalRepository.save(date);
+                        if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP) {
+                            //TODO 需要跟新报废表  assetScrap
+                        }
+                        //审批同意时 给审批人发送微信
+                        String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
+                        this.sendWxMsg(paramList, message, "待审批","");
+                    }
+
+                }
+            }
+        }
     }
 }

@@ -89,6 +89,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     private boolean isReturnApproval=false;
 
+    private boolean isDirectDelivery=false;
+
     @Override
     protected GenericRepositoryUUID<MultiLevelApproval> getDAO() {
         return multiLevelApprovalRepository;
@@ -282,6 +284,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                     this.isAgree = false;
                 }else if(agree==3){
                     this.isReturnApproval=true;
+                }else if(agree==4){
+                    this.isDirectDelivery=true;
                 }
                 this.needSignature = true;
                 // 如果勾选了‘备件审核需要签名’，校验是否已经签名 弹出签名窗口
@@ -300,6 +304,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             this.getMultiLevelApprovalPersionAndSubmitByDisagree();
         }else if(agree == 3){
             this.returnApprove();
+        }else if(agree==4){
+            this.directDelivery();
         }
 
     }
@@ -337,7 +343,25 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         this.nodeName=null;
         this.resetSignature();
     }
+    public void directDelivery() throws Exception {
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
 
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
+            return;
+        }
+        this.isAgree = false;
+
+        if(this.needSignature){
+            multiLevelApproval.setAuditSignature(this.signatureId);
+        }
+        multiLevelApprovalService.getMultiLevelApprovalDirectDelivery(multiLevelApproval,approvalOpinion);
+        selected = null;
+        this.needSignature = false;
+        this.isDirectDelivery=false;
+        this.resetSignature();
+    }
 
 
     public void getSignature() {
@@ -394,6 +418,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             this.returnApprove();
             return;
         }
+        if(this.isDirectDelivery){
+            this.directDelivery();
+            return;
+        }
         if(this.isAgree){
             this.getMultiLevelApprovalPersonByAgree();
         }else{
@@ -430,4 +458,19 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     public List<ApprovalNode> getNodes(){
         return nodes;
     }
+
+    public boolean  getReturn(){
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+        List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalService.getMultiLevelApproval(multiLevelApproval);
+        if(multiLevelApprovals.size()>2){
+            MultiLevelApproval multiLevelApprovalReturn = multiLevelApprovals.get(multiLevelApprovals.size() - 2);
+            if(multiLevelApprovalReturn.getApprovalNodeStatus()==ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_RETURN){
+                return  true;
+            }
+        }else{
+            return false;
+        }
+        return false;
+    }
+
 }

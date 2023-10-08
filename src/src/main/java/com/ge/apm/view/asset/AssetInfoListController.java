@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.CustomPermissionEvaluator;
@@ -70,7 +71,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
     private I18nMessageRepository i18nDao;
-    private TenantOptionConfigRepository tenantOptionConfigRepository;
+    private ConfigCacheService configCacheService;
     private AssetHistoryService assetHistoryService;
     private RelRuleAssetRepository relRuleAssetRepository;
     private UserRoleRepository userRoleRepository;
@@ -186,7 +187,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         terminate = Boolean.parseBoolean(WebUtil.getRequestParameter("terminate"));
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
-        tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
@@ -268,8 +269,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("lifecycle", SearchFilter.Operator.EQ,newLifecyle));
         }
         selected = null;
-            Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
-            if (tenantOptionConfigOptional.isPresent() && tenantOptionConfigOptional.get().getOrderByCreateTimeByDefault()) {
+        TenantOptionConfig tenantOptionConfig = configCacheService.getTenantOptionConfigByUid(user.getTenantUID());
+            if (tenantOptionConfig.getOrderByCreateTimeByDefault()) {
                 if(pageRequest.getSort() !=null){
                     Sort sortCreatedDate = new Sort(Sort.Direction.DESC, "createdDate");
                     pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortCreatedDate));
@@ -775,12 +776,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public Boolean showIsPm() {
-        Boolean flag = Boolean.FALSE;
-        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
-        if (tenantOptionConfigOptional.isPresent()) {
-            flag = tenantOptionConfigOptional.get().getShowIsPm();
-        }
-        return flag;
+        return configCacheService.getTenantOptionConfigByUid(user.getTenantUID()).getShowIsPm();
     }
 
     public String getRelRuleStatusName(String uid,Boolean isPm) {
