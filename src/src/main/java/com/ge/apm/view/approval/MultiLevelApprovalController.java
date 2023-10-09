@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -52,6 +53,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
 
     private AssetScrapRepository assetScrapDao;
+    private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
+
 
     @Setter
     @Getter
@@ -107,6 +110,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         workflowService = WebUtil.getBean(WorkflowService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         assetScrapDao = WebUtil.getBean(AssetScrapRepository.class);
+        assetDepartmentConvertRepository = WebUtil.getBean(AssetDepartmentConvertRepository.class);
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -158,6 +162,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 assetScraps.add(assetScrap);
                 primaryApprovalData = assetScrap;
                 secondaryApprovalData =assetScraps;
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+                List<AssetDepartmentConvert> assetDepartmentConverts = new ArrayList<>();
+                assetDepartmentConverts.add(assetDepartmentConvert);
+                primaryApprovalData = assetDepartmentConvert;
+                secondaryApprovalData =assetDepartmentConvert;
                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");

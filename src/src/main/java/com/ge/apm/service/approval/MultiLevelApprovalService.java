@@ -46,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -95,6 +96,11 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     @Autowired
     private UserOrgInfoRepository userOrgDao;
+    @Autowired
+    private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
+    @Autowired
+    private OrgInfoRepository orgInfoRepository;
+
 
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
@@ -317,6 +323,14 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 //
                 updateAssetScrap(multiLevelApproval, ApprovalConstant.SCRAP_STATUS_REVIEW_REFUSE, userAccount, approvalOpinion);
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                AssetDepartmentConvert byId = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+                byId.setCurrentStatus(4);
+                byId.setLastModifiedDate(new Date());
+                byId.setLastModifiedBy(userAccount.getLoginName());
+                byId.setApprovalReason(approvalOpinion);
+                assetDepartmentConvertRepository.save(byId);
                 break;
             //备件审批
             default:
@@ -610,6 +624,33 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                                 updateAssetScrap(multiLevelApproval, ApprovalConstant.SCRAP_STATUS_SUCCESS, userAccount, approvalOpinion);
                                 break;
+                            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                                AssetDepartmentConvert byId = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+                                byId.setCurrentStatus(3);
+                                byId.setLastModifiedBy(userAccount.getLoginName());
+                                byId.setLastModifiedDate(new Date());
+                                byId.setTransferInName(userAccount.getLoginName());
+                                byId.setTransferInAt(new Date());
+                                byId.setTransferInUid(userAccount.getUid());
+                                assetDepartmentConvertRepository.save(byId);
+                                AssetInfo assetInfoByUid = assetInfoDao.getByUid(byId.getAssetUid());
+                                OrgInfo orgInfo = orgInfoRepository.getByUid(byId.getInDeptUid());
+                                assetInfoByUid.setClinicalDeptUID(byId.getInDeptUid());
+                                assetInfoByUid.setClinicalDeptId(orgInfo.getId());
+                                assetInfoByUid.setClinicalDeptName(byId.getInDeptName());
+                                assetInfoByUid.setLastModifiedDate(new Date());
+                                assetInfoByUid.setLastModifiedBy(userAccount.getLoginName());
+                                assetInfoDao.save(assetInfoByUid);
+
+                                MqContext mqContext = new MqContext();
+                                mqContext.setClassName("MultiLevelApprovalService");
+                                mqContext.setServiceName("hc-apm-web");
+                                mqContext.setMethodName("getMultiLevelApprovalPersonByAgree");
+                                mqContext.setDescribe("资产转科审核同意");
+                                UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+                                mqUtils.sendAssetToMQ(assetInfoByUid,currentUserAccount,mqContext);
+
+                                break;
                             default:
                                 throw new RuntimeException("New Business type not handled yet");
                         }
@@ -704,7 +745,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             userAccounts.forEach(item->paramList.add(new WechatParam(item.getWeChatId(), item.getAppAlias())));
             String message = ApprovalConstant.WX_MESSAGE_AGREE_1 + businessType+ ApprovalConstant.WX_MESSAGE_AGREE_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_AGREE_3;
             this.sendWxMsg(paramList, message,"审批通过","");
-            }
+        }
 
     }
 
@@ -768,7 +809,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     /**
      * @param type        0 维修工单, 1 保养工单
-     * @param isAgreeType 0 不同意, 1 同意
+     *
      */
     private void generateSparePartsBuyList(int type, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList, UserAccount userAccount) {
         if (accessorySparePartsRequestList != null && !accessorySparePartsRequestList.isEmpty()) {
@@ -814,6 +855,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 return ApprovalConstant.BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 return ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP_NAME;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                return ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT_NAME;
         }
         return null;
     }
