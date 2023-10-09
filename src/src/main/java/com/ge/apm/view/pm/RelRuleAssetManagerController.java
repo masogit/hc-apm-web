@@ -573,7 +573,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             }).collect(Collectors.toList());
             List<SearchFilter> assetSearchFilters=new ArrayList<>();
             assetSearchFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN,collect));
-            addFilterAssetTypeGroup(assetSearchFilters);
+//            addFilterAssetTypeGroup(assetSearchFilters);
             List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(assetSearchFilters);
 			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
 			excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);
@@ -616,7 +616,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		} else {
 			searchFilters.add(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
 		}
-        addFilterAssetTypeGroup(searchFilters);
+//        addFilterAssetTypeGroup(searchFilters);
         List<AssetInfo> allAssets =  assetInfoRepository.findBySearchFilter(searchFilters);
 		return allAssets;
 	}
