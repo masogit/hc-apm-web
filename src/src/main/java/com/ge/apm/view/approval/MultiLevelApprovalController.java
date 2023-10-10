@@ -462,7 +462,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             });
             nodes= approvalNodes;
             Integer approvalLevelNow = selected.getApprovalLevelNow();
-            approvalNodes= approvalNodes.stream().limit(approvalLevelNow-1).collect(Collectors.toList());
+            if(approvalLevelNow!=0){
+                approvalNodes= approvalNodes.stream().limit(approvalLevelNow-1).collect(Collectors.toList());
+
+            }
 
             return approvalNodes;
         }
