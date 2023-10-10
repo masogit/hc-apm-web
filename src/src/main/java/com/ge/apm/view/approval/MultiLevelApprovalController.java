@@ -36,6 +36,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -460,6 +461,9 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {
             });
             nodes= approvalNodes;
+            Integer approvalLevelNow = selected.getApprovalLevelNow();
+            approvalNodes= approvalNodes.stream().limit(approvalLevelNow-1).collect(Collectors.toList());
+
             return approvalNodes;
         }
         return null;
