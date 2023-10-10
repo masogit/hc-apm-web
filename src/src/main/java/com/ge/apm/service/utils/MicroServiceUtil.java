@@ -19,12 +19,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.*;
 
-import javax.imageio.ImageIO;
-import javax.tools.FileObject;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -33,6 +29,13 @@ import java.util.*;
 @Component
 public class MicroServiceUtil extends MicroServiceInvoker {
 
+    public String getBaseUrl() {
+        return super.baseURL;
+    }
+
+    public String getWebContextUrl() {
+        return super.webContextUrl;
+    }
 
     public InputStream downloadRepeatedReadFile(String fileId) {
         HttpHeaders headers = new HttpHeaders();

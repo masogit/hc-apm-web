@@ -40,7 +40,7 @@ public class MicroServiceInvoker {
     protected RestTemplate template;
 
     @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
-    private String baseURL;
+    protected String baseURL;
 
     @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
     protected String downLoadURL;
@@ -48,9 +48,11 @@ public class MicroServiceInvoker {
     @Value("#{systemEnvironment['DOCXTOPDF_URL'] ?: urlProperties.docxtopdf}")
     protected String docxToPdfUrl;
 
+    @Value("#{wxProperties.qrcode_web_context_url}")
+    protected String webContextUrl;
+
     @Autowired
     protected BlobObjectRepository blobObjectRepository;
-
 
     @PostConstruct
     public void initRestTemplate(){
