@@ -590,8 +590,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
                                 paramList.clear();
                                 //推送消息到临床(该工单的报修人)
-                                Integer requestId = v2WorkOrder.getServiceRequest().getRequestorId();
-                                UserAccount requestUser = userAccountRepository.getById(requestId);
+                                String initiateApproverUid1 = multiLevelApproval.getInitiateApproverUid();
+//                                Integer requestId = v2WorkOrder.getServiceRequest().getRequestorId();
+                                UserAccount requestUser = userAccountRepository.getByUid(initiateApproverUid1);
 //                                paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
                                 //设备科长(可见范围内包含该设备的所有医学工程处主任)
 //                                int roleId = roleDao.getIdByName("AssetHead");
