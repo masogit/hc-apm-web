@@ -590,16 +590,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
                                 paramList.clear();
                                 //推送消息到临床(该工单的报修人)
-                                String initiateApproverUid1 = multiLevelApproval.getInitiateApproverUid();
+//                                String initiateApproverUid1 = multiLevelApproval.getInitiateApproverUid();
 //                                Integer requestId = v2WorkOrder.getServiceRequest().getRequestorId();
-                                UserAccount requestUser = userAccountRepository.getByUid(initiateApproverUid1);
+//                                UserAccount requestUser = userAccountRepository.getByUid(initiateApproverUid1);
 //                                paramList.add(new WechatParam(user.getWeChatId(), user.getAppAlias()));
                                 //设备科长(可见范围内包含该设备的所有医学工程处主任)
 //                                int roleId = roleDao.getIdByName("AssetHead");
                                 String clinicalDeptUID = v2WorkOrder.getAssetInfo().getClinicalDeptUID();
 //                                List<String> uid = userRoleDao.findOrgUidByRoleId(clinicalDeptUID, roleId);
                                 List<UserAccount> userAccounts=userAccountRepository.findUserByClinicalDeptUID(clinicalDeptUID,"AssetHead");
-                                userAccounts.add(requestUser);
+//                                userAccounts.add(requestUser);
                                 UserAccount finalUser = user;
                                 userAccounts = userAccounts.stream().distinct().filter(item -> !item.getUid().equals(finalUser.getUid())).collect(Collectors.toList());
                                 userAccounts.stream().forEach(item->paramList.add(new WechatParam(item.getWeChatId(), item.getAppAlias())));
@@ -1003,13 +1003,15 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         date.setActualApproverDate(null);
                         date.setApprovalOpinion(null);
                         //生成下条待审批数据
-                        multiLevelApprovalRepository.save(date);
+                        MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                         if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP) {
                             //TODO 需要跟新报废表  assetScrap
                         }
                         //审批同意时 给审批人发送微信
                         String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                        this.sendWxMsg(paramList, message, "待审批","");
+                        String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
+
+                        this.sendWxMsg(paramList, message, "待审批",linkUrl);
                     }
 
                 }
@@ -1118,13 +1120,14 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                         date.setActualApproverDate(null);
                         date.setApprovalOpinion(null);
                         //生成下条待审批数据
-                        multiLevelApprovalRepository.save(date);
+                        MultiLevelApproval multiLevel = multiLevelApprovalRepository.save(date);
                         if (multiLevelApproval.getBusinessType() == ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP) {
                             //TODO 需要跟新报废表  assetScrap
                         }
                         //审批同意时 给审批人发送微信
                         String message = ApprovalConstant.WX_MESSAGE_APPROVAL_1 + ApprovalConstant.WX_MESSAGE_APPROVAL_2 + date.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_APPROVAL_3;
-                        this.sendWxMsg(paramList, message, "待审批","");
+                        String linkUrl="/wx/approvals/" + multiLevel.getId()+"?showType=0";
+                        this.sendWxMsg(paramList, message, "待审批",linkUrl);
                     }
 
                 }
