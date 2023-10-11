@@ -328,7 +328,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
 
         int level = 0;
-        for (int i=1;i<nodes.size();i++){
+        for (int i=1;i<=nodes.size();i++){
             if(nodes.get(i-1).getNodeName().equals(nodeName)){
                 level=i;
             }
