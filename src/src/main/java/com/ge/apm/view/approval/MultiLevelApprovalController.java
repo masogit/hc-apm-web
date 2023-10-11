@@ -460,16 +460,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         if (null != approvalItem) {
             List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {
             });
-            nodes= approvalNodes;
             Integer approvalLevelNow = selected.getApprovalLevelNow();
             if(approvalLevelNow!=0){
                 approvalNodes= approvalNodes.stream().limit(approvalLevelNow-1).collect(Collectors.toList());
-
             }
-
-            return approvalNodes;
+            nodes= approvalNodes;
+            return nodes;
         }
-        return null;
+        return new ArrayList<>();
     }
 
 
