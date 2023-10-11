@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -28,21 +29,51 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     @Column(name = "asset_id")
     private Integer assetId;
     @Column(name = "current_status")
-    private Integer  currentStatus;   //当前状态 1申请中  2 审核中  3完成  4申请拒绝  5审核拒绝
+    private Integer  currentStatus;   //当前状态 1待审核(临床申请待审核)  2 审核中(多级审核中)  3完成(报废流程结束多级审批完成)  4申请拒绝(临床申请拒绝)  5审核拒绝(多级审批拒绝)
 
 
     private Integer level;   //当前审级别
     @Column(name = "asset_name")
     private String  assetName;
 
+
+    @Column(name = "clinical_dept_id")
+    private Integer clinicalDeptId;//所属科室
+
+    @Column(name = "clinical_dept_uid")
+    private String clinicalDeptUid;//设备所属科室
+
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;//所属科室
+
+    @Column(name="asset_dept_num")
+    private String assetDeptNum; //设备编号
+
+    @Column(name = "financing_num")
+    private String financingNum;//资产编号
+
+
+
     @Column(name = "created_by", nullable = true, length = 50, updatable = false)
-    @JsonIgnore
     private String createdBy;
 
     @Column(name = "created_date", nullable = true)
     @CreatedDate
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdDate;
+
+
+
+    @Column(name = "approval_uid", nullable = true, length = 50, updatable = false)
+    private String approvalUid; //工程师审核人
+    @Column(name = "approval_by", nullable = true, length = 50, updatable = false)
+    private String approvalBy; //工程师审核人
+
+    @Column(name = "approval_date", nullable = true)
+    @CreatedDate
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date approvalDate;//工程师审核时间
+
 
     @Column(name = "request_user_uid")
     private String requestUserUid;
@@ -52,14 +83,12 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     private Integer requestType; //请求类型   1 临床申请  2工程师申请
 
     @Column(name = "last_modified_by", length = 50)
-    @JsonIgnore
     private String lastModifiedBy;
 
     @Column(name = "last_modified_date")
     @LastModifiedDate
-    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastModifiedDate = new Date();
-
     @Column(name = "apply_reason")
     private String applyReason;//申请理由
     @Column(name = "approval_reason")
@@ -80,20 +109,54 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUid;
 
+    @Column(name="apply_audit_signature")
+    private String applyAuditSignature;  //申请签名
+
+    @Column(name="approval_audit_signature")
+    private String approvalAuditSignature;  //申请审核签名
 
 
 
+    @Column(name = "audit_uid", columnDefinition = "TEXT")
+    private String auditUid;   //待审核人uid
 
 
-
-    public void setId(String id) {
-        this.id = id;
+    public AssetScrap() {
     }
+
+    public Double getTotalPrice() {
+        return  0.00;
+    }
+
+
+    @Override
+    public BigDecimal getTotalPriceToBigDecimal() {
+        return new BigDecimal(0);
+    }
+
+    @Override
+    public String getBusinessNumber() {
+        return businessNumber;
+    }
+
+    @Override
+    public String getBusinessUid() {
+        return getId();
+    }
+
+    @Override
+    public int getBusinessType() {
+        return ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP;
+    }
+
 
     public String getId() {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getAssetUid() {
         return assetUid;
@@ -103,12 +166,28 @@ public class AssetScrap implements Serializable , ApprovableTarget {
         this.assetUid = assetUid;
     }
 
-    public Integer  getCurrentStatus() {
+    public Integer getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(Integer assetId) {
+        this.assetId = assetId;
+    }
+
+    public Integer getCurrentStatus() {
         return currentStatus;
     }
 
     public void setCurrentStatus(Integer currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 
     public String getAssetName() {
@@ -135,6 +214,22 @@ public class AssetScrap implements Serializable , ApprovableTarget {
         this.createdDate = createdDate;
     }
 
+    public String getRequestUserUid() {
+        return requestUserUid;
+    }
+
+    public void setRequestUserUid(String requestUserUid) {
+        this.requestUserUid = requestUserUid;
+    }
+
+    public Integer getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(Integer requestType) {
+        this.requestType = requestType;
+    }
+
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -150,49 +245,6 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
-
-
-
-    public Integer getAssetId() {
-        return assetId;
-    }
-
-    public void setAssetId(Integer assetId) {
-        this.assetId = assetId;
-    }
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public Double getTotalPrice() {
-        return  0.00;
-    }
-
-    @Override
-    public BigDecimal getTotalPriceToBigDecimal() {
-        return new BigDecimal(0);
-    }
-
-    @Override
-    public String getBusinessNumber() {
-        return businessNumber;
-    }
-
-    @Override
-    public String getBusinessUid() {
-        return getId();
-    }
-
-    @Override
-    public int getBusinessType() {
-        return ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP;
-    }
-
 
     public String getApplyReason() {
         return applyReason;
@@ -213,7 +265,6 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     public void setBusinessNumber(String businessNumber) {
         this.businessNumber = businessNumber;
     }
-
 
     public String getTenantUid() {
         return tenantUid;
@@ -247,20 +298,93 @@ public class AssetScrap implements Serializable , ApprovableTarget {
         this.siteUid = siteUid;
     }
 
-
-    public String getRequestUserUid() {
-        return requestUserUid;
+    public String getApplyAuditSignature() {
+        return applyAuditSignature;
     }
 
-    public void setRequestUserUid(String requestUserUid) {
-        this.requestUserUid = requestUserUid;
+    public void setApplyAuditSignature(String applyAuditSignature) {
+        this.applyAuditSignature = applyAuditSignature;
     }
 
-    public Integer getRequestType() {
-        return requestType;
+    public String getApprovalAuditSignature() {
+        return approvalAuditSignature;
     }
 
-    public void setRequestType(Integer requestType) {
-        this.requestType = requestType;
+    public void setApprovalAuditSignature(String approvalAuditSignature) {
+        this.approvalAuditSignature = approvalAuditSignature;
+    }
+
+    public Integer getClinicalDeptId() {
+        return clinicalDeptId;
+    }
+
+    public void setClinicalDeptId(Integer clinicalDeptId) {
+        this.clinicalDeptId = clinicalDeptId;
+    }
+
+    public String getClinicalDeptUid() {
+        return clinicalDeptUid;
+    }
+
+    public void setClinicalDeptUid(String clinicalDeptUid) {
+        this.clinicalDeptUid = clinicalDeptUid;
+    }
+
+    public String getClinicalDeptName() {
+        return clinicalDeptName;
+    }
+
+    public void setClinicalDeptName(String clinicalDeptName) {
+        this.clinicalDeptName = clinicalDeptName;
+    }
+
+    public String getAssetDeptNum() {
+        return assetDeptNum;
+    }
+
+    public void setAssetDeptNum(String assetDeptNum) {
+        this.assetDeptNum = assetDeptNum;
+    }
+
+    public String getFinancingNum() {
+        return financingNum;
+    }
+
+    public void setFinancingNum(String financingNum) {
+        this.financingNum = financingNum;
+    }
+
+
+    public String getApprovalBy() {
+        return approvalBy;
+    }
+
+    public void setApprovalBy(String approvalBy) {
+        this.approvalBy = approvalBy;
+    }
+
+    public Date getApprovalDate() {
+        return approvalDate;
+    }
+
+    public void setApprovalDate(Date approvalDate) {
+        this.approvalDate = approvalDate;
+    }
+
+
+    public String getApprovalUid() {
+        return approvalUid;
+    }
+
+    public void setApprovalUid(String approvalUid) {
+        this.approvalUid = approvalUid;
+    }
+
+    public String getAuditUid() {
+        return auditUid;
+    }
+
+    public void setAuditUid(String auditUid) {
+        this.auditUid = auditUid;
     }
 }
