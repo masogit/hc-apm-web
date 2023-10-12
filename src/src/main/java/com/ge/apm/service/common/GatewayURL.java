@@ -161,7 +161,10 @@ public enum GatewayURL {
     // jimureport
     JI_MU_REPORT("/apmReport/jmreport/view"),
 
-    ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply")
+    ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply"),
+
+    // davinci
+    DAVINCI_EXTERNAL("/davinci/externalSharePageLink")
 
     ;
     private final String url;

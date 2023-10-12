@@ -1,8 +1,6 @@
 package com.ge.apm.view.report;
 
 import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,13 +9,31 @@ import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.Arrays;
-import java.util.List;
 
 @ManagedBean
 @ViewScoped
 public class DaVinciController {
     Logger logger = LoggerFactory.getLogger(DaVinciController.class);
+
+    private String dashboardId;
+    private MicroServiceUtil microServiceUtil;
+
+    @PostConstruct
+    protected void init() {
+        microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
+        dashboardId = WebUtil.getRequestParameter("dashboardId");
+    }
+
+    public String openNewWindowView(String configItemValue) {
+        return "/portal/asset/info/DaVinciView.xhtml?faces-redirect=true&dashboardId=" + configItemValue;
+    }
+
+    public String view() {
+        String daVinciShareLink = microServiceUtil.getDaVinciShareLink(UserContextService.getAccessToken(), dashboardId);
+        logger.info("daVinciShareLink ================================== {}", daVinciShareLink);
+        return daVinciShareLink;
+    }
+/*
 
     private String daVinciUrl;
 
@@ -43,4 +59,5 @@ public class DaVinciController {
 //        return daVinciUrl + "&apmToken=Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTExdGp6eDEiLCJhdXRoIjoiQXNzZXRIZWFkLEFzc2V0U3RhZmYsQXVkaXRTdGFmZixIb3NwaXRhbEhlYWQsSVRBZG1pbixNdWx0aUxldmVsQXVkaXRvcixTcGFyZVBhcnRzQWRtaW4sU3VwZXJBZG1pbiIsInVpZCI6Ijk3OGZmNTBhMzI2NzQyYjE5ZjM0NTZmNzYyNDAxMjE5IiwidXNlcklkIjo4MDA1LCJleHAiOjE2OTk1MTY0ODF9.ZpSzpvIcmNmmgTpL6OMT5lGpLZdDUMfX1tM3PsVlg91qIY5yQfDm4qSFm7Jm2zYTUlfecKD5P23UA5zX0kQFpg";
         return daVinciUrl + "&apmToken=" + UserContextService.getAccessToken();
     }
+*/
 }

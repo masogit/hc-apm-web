@@ -406,4 +406,16 @@ public class MicroServiceUtil extends MicroServiceInvoker {
 
         return null;
     }
+
+    public String getDaVinciShareLink(String token, String dashboardId) {
+        String webContextUrl = getWebContextUrl();
+        String daVinciShareLink = GatewayURL.DAVINCI_EXTERNAL.toString();
+        String url = webContextUrl + daVinciShareLink + "?dashboardId=" + dashboardId + "&token=" + token;
+        logger.info("getDaVinciShareLink url ================================== {}", daVinciShareLink);
+        ResponseEntity<String> response = template.getForEntity(url, String.class);
+        if (isOkay(response)) {
+            return response.getBody();
+        }
+        return "";
+    }
 }
