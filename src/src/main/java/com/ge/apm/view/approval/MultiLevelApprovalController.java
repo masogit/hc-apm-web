@@ -1,6 +1,7 @@
 package com.ge.apm.view.approval;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -55,6 +56,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
     private AssetScrapRepository assetScrapDao;
     private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
+
+    private AssetInfoRepository assetInfoRepository;
 
 
     @Setter
@@ -112,6 +115,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         blobService = WebUtil.getBean(BlobFileService.class);
         assetScrapDao = WebUtil.getBean(AssetScrapRepository.class);
         assetDepartmentConvertRepository = WebUtil.getBean(AssetDepartmentConvertRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -159,10 +163,13 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
-                List<AssetScrap> assetScraps = new ArrayList<>();
-                assetScraps.add(assetScrap);
-                primaryApprovalData = assetScrap;
-                secondaryApprovalData =assetScraps;
+                AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
+                JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
+                jsonObject.put("assetInfo",asset);
+                List<Object> objects = new ArrayList<>();
+                objects.add(jsonObject);
+                primaryApprovalData = objects;
+                secondaryApprovalData =objects;
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
                 AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
