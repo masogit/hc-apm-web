@@ -617,12 +617,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 //设备科长(可见范围内包含该设备的所有医学工程处主任)
 //                                int roleId = roleDao.getIdByName("AssetHead");
                                 String clinicalDeptUID = v2WorkOrder.getAssetInfo().getClinicalDeptUID();
-//                                List<String> uid = userRoleDao.findOrgUidByRoleId(clinicalDeptUID, roleId);
                                 userAccounts=userAccountRepository.findUserByClinicalDeptUID(clinicalDeptUID,"AssetHead");
-//                                userAccounts.add(requestUser);
-                                UserAccount finalUser = user;
-                                userAccounts = userAccounts.stream().distinct().filter(item -> !item.getUid().equals(finalUser.getUid())).collect(Collectors.toList());
-                                userAccounts.stream().forEach(item->paramList.add(new WechatParam(item.getWeChatId(), item.getAppAlias())));
+                                userAccounts.add(user);
+                                userAccounts.stream().distinct().forEach(item->paramList.add(new WechatParam(item.getWeChatId(), item.getAppAlias())));
                                 String message = ApprovalConstant.WX_MESSAGE_AGREE_1 + businessType + ApprovalConstant.WX_MESSAGE_AGREE_2 + multiLevelApproval.getBusinessNumber() + ApprovalConstant.WX_MESSAGE_AGREE_3;
                                 this.sendWxMsg(paramList, message,"审批通过","");
                                 break;
@@ -774,14 +771,13 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             //推送消息到临床(该工单的报修人)
             UserAccount user = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
             userAccounts.add(user);
-            if(assetScrap.getRequestUserUid()!=assetScrap.getApprovalUid()){
+            if(!assetScrap.getRequestUserUid().equals(assetScrap.getApprovalUid())){
                 //责任工程师(提交审核时，该工单的当前owner)
                 UserAccount approvalUser = userAccountRepository.getByUid(assetScrap.getApprovalUid());
                 userAccounts.add(approvalUser);
             }
             List<WechatParam> paramList = ListUtil.newArrayList();
-            String businessType = this.getBusinessType(multiLevelApproval.getBusinessType());
-            userAccounts.forEach(item->paramList.add(new WechatParam(item.getWeChatId(), item.getAppAlias())));
+            userAccounts.stream().distinct().forEach(item->paramList.add(new WechatParam(item.getWeChatId(), item.getAppAlias())));
             HashMap<String, Object> map = combineMsg("审批通过", assetScrap, assetInfo, null, userAccount);
             sendWxMsg(map,userAccounts);
         }
