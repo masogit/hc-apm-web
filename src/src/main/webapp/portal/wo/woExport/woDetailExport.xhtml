@@ -95,6 +95,15 @@
                         <f:convertNumber pattern="0" type="number"/>
                     </p:inputNumber>
                 </h:panelGroup>
+
+                <h:panelGroup rendered="#{workOrderDetailExportController.enableAssetTypeGroup}">
+                    <label class="label">#{msg.assetTypeGroup}</label>
+                    <p:autoComplete dropdown="true" value="#{workOrderDetailExportController.filterAssetTypeName}"
+                                    scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderDetailExportController.completeAssetTypeGroupList}">
+                        <p:ajax event="itemSelect" listener="#{workOrderDetailExportController.onAssetTypeGroupChange}" />
+                        <p:ajax listener="#{workOrderDetailExportController.onAssetTypeGroupChange}" />
+                    </p:autoComplete>
+                </h:panelGroup>
             </p:panelGrid>
 
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">

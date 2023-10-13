@@ -102,6 +102,10 @@ public class WorkOrderDetailExportService {
             String searchStr = (String)filterMap.get("searchStr");
             searchFilters.add(new SearchFilter("searchStr", SearchFilter.Operator.EQ, searchStr));
         }
+        if (filterMap.containsKey("assetTypeGroupEncodedSet")) {
+            Set<String> assetTypeGroupEncodedSet = (Set<String>) filterMap.get("assetTypeGroupEncodedSet");
+            searchFilters.add(new SearchFilter("assetInfo.assetType", SearchFilter.Operator.IN, assetTypeGroupEncodedSet));
+        }
 
         List<WorkOrderDetailPojo> workOrderDetailList = null;
         if(!searchFilters.isEmpty()){
