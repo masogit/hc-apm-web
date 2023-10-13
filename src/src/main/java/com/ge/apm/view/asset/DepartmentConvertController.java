@@ -5,6 +5,7 @@ import com.ge.apm.dao.SiteToSiteAllocationRepository;
 import com.ge.apm.domain.AssetDepartmentConvert;
 import com.ge.apm.domain.SiteToSiteAllocation;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -35,6 +36,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     private UaaService uuaService;
     private Date filterBeginTime;
     private Date returnAtTime;
+
     @Override
     protected AssetDepartmentConvertRepository getDAO() {
         return dao;
@@ -42,8 +44,8 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
 
     @Override
     protected void init() {
-        dao=WebUtil.getBean(AssetDepartmentConvertRepository.class);
-        uuaService=WebUtil.getBean(UaaService.class);
+        dao = WebUtil.getBean(AssetDepartmentConvertRepository.class);
+        uuaService = WebUtil.getBean(UaaService.class);
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -53,15 +55,15 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
     protected Page<AssetDepartmentConvert> loadData(PageRequest pageRequest) {
         //        searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
         setUserSearchFilters();
-        if(oneSearchStr != null){
+        if (oneSearchStr != null) {
             this.updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("assetDeptNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
-        if(filterBeginTime != null){
-            searchFilters.add(new SearchFilter("transferOutAt", SearchFilter.Operator.GTE,filterBeginTime));
+        if (filterBeginTime != null) {
+            searchFilters.add(new SearchFilter("transferOutAt", SearchFilter.Operator.GTE, filterBeginTime));
         }
-        if(returnAtTime != null){
-            searchFilters.add(new SearchFilter("transferInAt", SearchFilter.Operator.GTE,returnAtTime));
+        if (returnAtTime != null) {
+            searchFilters.add(new SearchFilter("transferInAt", SearchFilter.Operator.GTE, returnAtTime));
         }
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
@@ -81,6 +83,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
             this.removeFilterOnField("assetNumber");
         }
     }
+
     //根据登录人信息配置权限
     private void setUserSearchFilters() {
         if (searchFilters == null) {
@@ -113,7 +116,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         cellStyle.setBorderTop(BorderStyle.THICK);
 
         for (int i = 0; i < header.getPhysicalNumberOfCells(); i++) {
-           Cell cell = header.getCell(i);
+            Cell cell = header.getCell(i);
 
             cell.setCellStyle(cellStyle);
         }
@@ -135,17 +138,38 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         this.returnAtTime = returnAtTime;
     }
 
-    public String getFileName(){
-        String result="借用信息";
+    public String getFileName() {
+        String result = "设备转科信息";
         try {
-            String formatStr="yyyyMMddHHmmss";
-            SimpleDateFormat format=new SimpleDateFormat(formatStr);
+            String formatStr = "yyyyMMddHHmmss";
+            SimpleDateFormat format = new SimpleDateFormat(formatStr);
             String format1 = format.format(new Date());
-            result+="_"+format1;
+            result += "_" + format1;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
     }
 
+    public String getStatus(Integer status) {
+
+        String stringStatus = null;
+        switch (status) {
+            case 1:
+                stringStatus="转入确认中";
+                break;
+            case 2:
+                stringStatus="审批中";
+                break;
+            case 3:
+            case 4:
+                stringStatus="已完成";
+                break;
+            default:
+                break;
+
+
+        }
+        return stringStatus;
+    }
 }

@@ -10,6 +10,7 @@ import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.mq.MqUtils;
 import com.ge.apm.service.asset.AssetHistoryService;
+import com.ge.apm.service.asset.AssetInfoToBeTerminatedService;
 import com.ge.apm.service.asset.AssetLifecyleService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.WechatSendMsgService;
@@ -100,6 +101,9 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
     private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
     @Autowired
     private OrgInfoRepository orgInfoRepository;
+
+    @Autowired
+    private AssetInfoToBeTerminatedService assetInfoToBeTerminatedService;
 
 
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
@@ -350,6 +354,10 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 AssetInfo assetInfo = assetInfoDao.findByUid(assetScrap.getAssetUid());
                 ArrayList<UserAccount> userAccounts = new ArrayList<>();
                 userAccounts.add(user);
+                if(!assetScrap.getRequestUserUid().equals(assetScrap.getApprovalUid())){
+                    UserAccount applyUser = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
+                    userAccounts.add(applyUser);
+                }
                 HashMap<String, Object> map = combineMsg("审批失败", assetScrap, assetInfo, null, userAccount);
                 sendWxMsg(map,userAccounts);
                 break;
@@ -759,12 +767,16 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         assetScrap.setLastModifiedDate(new Date());
         assetScrap.setApprovalReason(approvalOpinion);
         assetScrapDao.save(assetScrap);
+        AssetInfo assetInfo = assetInfoDao.getById(assetScrap.getAssetId());
+
         if (status == ApprovalConstant.SCRAP_STATUS_SUCCESS) {
-            AssetInfo assetInfo = assetInfoDao.getById(assetScrap.getAssetId());
 
 
-            processToBeTerminated(assetInfo);
-
+            UserAccount applyUser = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
+            //待报废
+//            processToBeTerminated(assetInfo);
+            //报废
+            assetInfoToBeTerminatedService.terminateAsset(assetInfo,applyUser);
 
             //设备科长(可见范围内包含该设备的所有医学工程处主任)
             List<UserAccount> userAccounts=userAccountRepository.findUserByClinicalDeptUID(assetInfo.getClinicalDeptUID(),"AssetHead");
