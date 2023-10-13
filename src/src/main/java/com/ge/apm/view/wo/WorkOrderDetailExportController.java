@@ -189,7 +189,11 @@ public class WorkOrderDetailExportController implements Serializable {
             Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByName, currentAssetTypeGroupList);
             assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
         } else {
-            assetTypeGroupEncodedSet = Collections.emptySet();
+            if (enableAssetTypeGroup) {
+                assetTypeGroupEncodedSet = currentAssetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+            } else {
+                assetTypeGroupEncodedSet = Collections.emptySet();
+            }
         }
     }
 

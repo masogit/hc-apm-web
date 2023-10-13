@@ -460,6 +460,13 @@ public class WorkOrderReportProvider {
                 sb.append(" and wo.created_date>='" + value + "' ");
             } else if (tempColumn.equals("createdDateEnd")) {
                 sb.append(" and wo.created_date<'" + value + "' ");
+            } else if (tempColumn.equals("assetInfo.assetType")) {
+                String str = "";
+                for (Object obj : (Set<Object>) value) {
+                    str += "'" + obj + "',";
+                }
+                str = str.substring(0, str.length() - 1);
+                sb.append(" and ai.asset_type in (" + str + ") ");
             }
         }
 
