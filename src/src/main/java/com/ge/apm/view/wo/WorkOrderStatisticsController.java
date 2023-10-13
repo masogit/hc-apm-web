@@ -1,13 +1,20 @@
 package com.ge.apm.view.wo;
 
+import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.AssetTypeGroup;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.WorkOrderReport;
+import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.WorkOrderStatisticsService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.web.WebUtil;
@@ -15,9 +22,13 @@ import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2017/12/12.
@@ -56,10 +67,17 @@ public class WorkOrderStatisticsController {
 
         initOrgTree();
 
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
+        currentAssetTypeGroupList = currentUser.getAssetTypeGroupList();
+        enableAssetTypeGroup = currentUser.isEnableAssetTypeGroup();
+        if (enableAssetTypeGroup) {
+            assetTypeGroupEncodedSet = currentAssetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+        }
     }
 
     public void previewData(){
-        worList = wosServic.createData(selectedOrg, startTime, endTime, statisticsType);
+        worList = wosServic.createData(selectedOrg, startTime, endTime, statisticsType, assetTypeGroupEncodedSet);
     }
 
     public void initOrgTree() {
@@ -138,6 +156,39 @@ public class WorkOrderStatisticsController {
 
         return siteName + "/" + deptName;
 
+    }
+
+    private AssetTypeGroupRepository assetTypeGroupRepository;
+    private AssetTypeGroupService assetTypeGroupService;
+    private Set<String> assetTypeGroupEncodedSet;
+    private List<AssetTypeGroup> currentAssetTypeGroupList;
+    @Getter
+    @Setter
+    private String filterAssetTypeName;
+    @Getter @Setter
+    private boolean enableAssetTypeGroup;
+
+    public List<String> completeAssetTypeGroupList(String query) {
+        if (currentAssetTypeGroupList == null) {
+            return Collections.emptyList();
+        }
+        List<AssetTypeGroup> res = this.currentAssetTypeGroupList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query))
+                .collect(Collectors.toList());
+        return res.stream().map(AssetTypeGroup::getName).distinct().collect(Collectors.toList());
+    }
+
+    public void onAssetTypeGroupChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterAssetTypeName = (String) ((SelectEvent) event).getObject();
+        }
+        if (filterAssetTypeName != null) {
+            List<AssetTypeGroup> assetTypeGroupsMatchingByName = this.currentAssetTypeGroupList.stream().filter(item -> item.getName().equals(filterAssetTypeName)).collect(Collectors.toList());
+            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByName, currentAssetTypeGroupList);
+            assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+        } else {
+            assetTypeGroupEncodedSet = Collections.emptySet();
+        }
     }
 
     public UserAccount getCurrentUser() {

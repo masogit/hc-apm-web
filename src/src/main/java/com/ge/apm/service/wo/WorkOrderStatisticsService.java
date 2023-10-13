@@ -4,11 +4,14 @@ import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.WorkOrderReport;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2017/12/13.
@@ -27,7 +30,7 @@ public class WorkOrderStatisticsService {
     @Autowired
     private WorkOrderReportMapper worDao;
 
-    public List<WorkOrderReport> createData(OrgInfo selectedOrg, Date startTime, Date endTime, String statisticsType){
+    public List<WorkOrderReport> createData(OrgInfo selectedOrg, Date startTime, Date endTime, String statisticsType, Set<String> assetTypeGroupEncodedSet){
 
         String tenantUID = null;
         String institutionUID = null;
@@ -35,6 +38,7 @@ public class WorkOrderStatisticsService {
         String siteUID = null;
         String startDate = null;
         String endDate = null;
+        String assetTypeGroupEncodedStr = null;
 
         if(selectedOrg != null && selectedOrg.getOrgLevel() == 0){
             tenantUID = selectedOrg.getUid();
@@ -54,22 +58,25 @@ public class WorkOrderStatisticsService {
         if(endTime != null){
             endDate = TimeUtils.getStrDate(endTime, null) + " 23:59:59";
         }
+        if (ObjectUtil.isNotEmpty(assetTypeGroupEncodedSet)){
+            assetTypeGroupEncodedStr = String.join("','", assetTypeGroupEncodedSet);
+        }
 
         List<WorkOrderReport> woReportList = null;
         if(STATISTICS_TYPE_DEPART.equals(statisticsType)){
-            woReportList = worDao.statisticsByDepart(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
+            woReportList = worDao.statisticsByDepart(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate, assetTypeGroupEncodedStr);
         }else if(STATISTICS_TYPE_ASSETTYPE.equals(statisticsType)){
-            woReportList = worDao.statisticsByAssetGroup(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
+            woReportList = worDao.statisticsByAssetGroup(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate, assetTypeGroupEncodedStr);
         }else if(STATISTICS_TYPE_DEPART_AND_ASSETTYPE.equals(statisticsType)){
-            woReportList = worDao.statisticsByDepartAndAssetGroup(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
+            woReportList = worDao.statisticsByDepartAndAssetGroup(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate, assetTypeGroupEncodedStr);
         }else if(STATISTICS_TYPE_ASSETNAME.equals(statisticsType)){
-            woReportList = worDao.statisticsByAssetName(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
+            woReportList = worDao.statisticsByAssetName(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate, assetTypeGroupEncodedStr);
         }else if(STATISTICS_TYPE_FAULTTYPE.equals(statisticsType)){
-            woReportList = worDao.statisticsByCaseType(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
+            woReportList = worDao.statisticsByCaseType(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate, assetTypeGroupEncodedStr);
         }else if(STATISTICS_TYPE_STAFF.equals(statisticsType)){
-            woReportList = worDao.statisticsByStaff(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
+            woReportList = worDao.statisticsByStaff(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate, assetTypeGroupEncodedStr);
         }else if(STATISTICS_TYPE_CASELOAD.equals(statisticsType)){
-            woReportList = worDao.statisticsCaseloadByDepartment(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate);
+            woReportList = worDao.statisticsCaseloadByDepartment(tenantUID, institutionUID, hospitalUID, siteUID, startDate, endDate, assetTypeGroupEncodedStr);
         }
 
         return woReportList;
