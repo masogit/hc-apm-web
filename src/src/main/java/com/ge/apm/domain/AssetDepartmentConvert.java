@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.constant.ApprovalConstant;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -33,7 +33,6 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
     @Column(name="asset_dept_num")
     private String assetDeptNum; //设备编号
 
-
     @Column(name = "financing_num")
     private String financingNum;//资产编号
 
@@ -41,7 +40,6 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
     private String assetSerialNum; //序列号
     @Column(name = "function_type")
     private String functionType;//设备型号
-
     @Column(name="asset_qr_code")
     private String assetQrCode; //二维码
     @Column(name="out_dept_uid")
@@ -64,7 +62,9 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name="created_date")
     private Date createdDate;
+
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -75,11 +75,6 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name="transfer_in_at")
     private Date transferInAt; //转入时间
-
-    @Column(name="transfer_out_remark")
-    private String transferOutRemark; //转出备注
-    @Column(name="transfer_in_remark")
-    private String transferInRemark; //转入备注
 
 
     @Column(name = "current_status")
@@ -92,6 +87,7 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
     @Column(name="approval_audit_signature")
     private String approvalAuditSignature;  //申请审核签名
 
+    @Column(name="business_number")
     private String businessNumber;   //业务单号
 
     @Column(name = "last_modified_by", length = 50)
@@ -107,6 +103,31 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
     private String applyReason;//申请理由
     @Column(name = "approval_reason")
     private String approvalReason;//审核内容
+
+    @Column(name = "approval_uid", nullable = true)
+    private String approvalUid; //审核人
+    @Column(name = "approval_by", nullable = true)
+    private String approvalBy; //审核人
+
+    @Column(name = "approval_date", nullable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date approvalDate;//审核时间
+
+
+    @Column(name="out_site_uid")
+    private String outSiteUid;
+    @Column(name="out_site_name")
+    private String outSiteName;
+    @Column(name="in_site_uid")
+    private String inSiteUid;
+    @Column(name="in_site_name")
+    private String inSiteName;
+
+
+
+
+
+
     public String getId() {
         return id;
     }
@@ -245,21 +266,6 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
         this.transferInAt = transferInAt;
     }
 
-    public String getTransferOutRemark() {
-        return transferOutRemark;
-    }
-
-    public void setTransferOutRemark(String transferOutRemark) {
-        this.transferOutRemark = transferOutRemark;
-    }
-
-    public String getTransferInRemark() {
-        return transferInRemark;
-    }
-
-    public void setTransferInRemark(String transferInRemark) {
-        this.transferInRemark = transferInRemark;
-    }
 
     public Integer getCurrentStatus() {
         return currentStatus;
@@ -361,5 +367,63 @@ public class AssetDepartmentConvert implements Serializable , ApprovableTarget {
 
     public void setFunctionType(String functionType) {
         this.functionType = functionType;
+    }
+
+
+    public String getOutSiteUid() {
+        return outSiteUid;
+    }
+
+    public void setOutSiteUid(String outSiteUid) {
+        this.outSiteUid = outSiteUid;
+    }
+
+    public String getOutSiteName() {
+        return outSiteName;
+    }
+
+    public void setOutSiteName(String outSiteName) {
+        this.outSiteName = outSiteName;
+    }
+
+    public String getInSiteUid() {
+        return inSiteUid;
+    }
+
+    public void setInSiteUid(String inSiteUid) {
+        this.inSiteUid = inSiteUid;
+    }
+
+    public String getInSiteName() {
+        return inSiteName;
+    }
+
+    public void setInSiteName(String inSiteName) {
+        this.inSiteName = inSiteName;
+    }
+
+
+    public String getApprovalUid() {
+        return approvalUid;
+    }
+
+    public void setApprovalUid(String approvalUid) {
+        this.approvalUid = approvalUid;
+    }
+
+    public String getApprovalBy() {
+        return approvalBy;
+    }
+
+    public void setApprovalBy(String approvalBy) {
+        this.approvalBy = approvalBy;
+    }
+
+    public Date getApprovalDate() {
+        return approvalDate;
+    }
+
+    public void setApprovalDate(Date approvalDate) {
+        this.approvalDate = approvalDate;
     }
 }

@@ -25,7 +25,7 @@
         <div class="ui-g">
             <div class="ui-g-12">
                 <div class="ui-g-12 card cardTitle">
-                    <p:outputLabel class="pageTitle" value="科室借调情况"/>
+                    <p:outputLabel class="pageTitle" value="设备转科情况"/>
                 </div>
                 <div class="ui-g-12 card">
                     <h:form id="searchForm">
@@ -35,7 +35,7 @@
                             </p:inputText>
                             <h:panelGroup id='searchButtons'>
                                 <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":IouListForm :searchForm"  rendered="#{empty departmentConvertController.oneSearchStr}"/>
-                                <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":IouListForm :searchForm" actionListener="#{departmentConvertController.setOneSearchStr('')}" rendered="#{not empty departmentSecondmentController.oneSearchStr}"/>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":IouListForm :searchForm" actionListener="#{departmentConvertController.setOneSearchStr('')}" rendered="#{not empty departmentConvertController.oneSearchStr}"/>
                             </h:panelGroup>
 
                         </h:panelGrid>
@@ -54,22 +54,17 @@
                             <p:ajax event="filter" listener="#{departmentConvertController.onFilter}" update=""/>
                             <!--sharedId-->
                             <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-
                                 <h:outputText value="#{item.assetName}"/>
                             </p:column>
-
                             <p:column headerText="设备编号" sortBy="#{item.assetDeptNum}" filterBy="#{item.assetDeptNum}" filterMatchMode="LIKE">
                                 <h:outputText value="#{item.assetDeptNum}"/>
                             </p:column>
                             <p:column headerText="资产编号" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
                                 <h:outputText value="#{item.financingNum}"/>
                             </p:column>
-
                             <p:column headerText="序列号" sortBy="#{item.assetSerialNum}" filterBy="#{item.assetSerialNum}" filterMatchMode="LIKE">
                                 <h:outputText value="#{item.assetSerialNum}"/>
                             </p:column>
-
-
                             <p:column headerText="型号" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
                                 <h:outputText value="#{item.functionType}"/>
                             </p:column>
@@ -111,7 +106,7 @@
                             </p:column>
 
                             <p:column headerText="转科状态"   filterBy="#{item.currentStatus}" filterMatchMode="LIKE">
-                                <h:outputText value="#{item.currentStatus}"/>
+                                <h:outputText value="#{departmentConvertController.getStatus(item.currentStatus)}"/>
                             </p:column>
 
                             <f:facet name="{Toolbar}">
