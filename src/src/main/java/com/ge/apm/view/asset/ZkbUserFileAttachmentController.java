@@ -89,20 +89,19 @@ public class ZkbUserFileAttachmentController extends GenericCRUDUUIDController<F
     /**
      *列表查询
      */
-    public void loadData()
-    {
-        String tenantUID = currentUser.getTenantUID();
-        if(StringUtils.isEmpty(tenantUID))
-        {
+    public void loadData(){
+        if(StringUtils.isNotBlank(currentUser.getTenantUID()) && this.zkbFileDirectoryService.checkEffectiveContract(currentUser.getTenantUID())){
+            v2_BlobObjectList=this.v2_BlobObjectService.loadZkbOrderHistoryData(this.mainDirectory,
+                    this.secondDirectory,
+                    this.objectName,
+                    this.boSubType,
+                    this.operationType,
+                    currentUser.getTenantUID());
+        }else{
             v2_BlobObjectList=null;
             return;
         }
-        v2_BlobObjectList=this.v2_BlobObjectService.loadZkbOrderHistoryData(this.mainDirectory,
-                this.secondDirectory,
-                this.objectName,
-                this.boSubType,
-                this.operationType,
-                tenantUID);
+
     }
     /**
      * 获取所有主目录信息
