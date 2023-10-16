@@ -418,7 +418,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             }
             List<SearchFilter> userFilter = getAssetFilter();
             assetFilters.addAll(userFilter);
-            addFilterAssetTypeGroup(assetFilters);
+//            addFilterAssetTypeGroup(assetFilters);
             return assetInfoRepository.findBySearchFilter(assetFilters);
         }
         return new ArrayList<>();

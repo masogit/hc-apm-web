@@ -1,12 +1,11 @@
 package com.ge.apm.view.wo;
 
-import com.ge.healthcare.cn.common.utils.map.MapUtil;
+import com.ge.apm.dao.AssetTypeGroupRepository;
+import com.ge.apm.domain.*;
+import com.ge.apm.domain.dto.V2WorkOrderReportDto;
+import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
@@ -22,6 +21,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
@@ -34,6 +34,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +73,7 @@ public class WorkOrderReportExportController implements Serializable {
     private UserAccount currentUser;
     private OrgInfoRepository orgDao;
     private TenantInfoRepository tenantInfoRepository;
+
 
     private List<OrgInfo> institutionList;
     private List<OrgInfo> hospitalList;
@@ -119,6 +121,8 @@ public class WorkOrderReportExportController implements Serializable {
     protected void init() {
         userContextService = WebUtil.getBean(UserContextService.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
         workOrderExportService = WebUtil.getBean(WorkOrderExportService.class);
         workOrderPublishRenderService = WebUtil.getBean(WorkOrderPublishRenderService.class);
         workOrderExportTemplateService = WebUtil.getBean(WorkOrderExportTemplateService.class);
@@ -149,6 +153,11 @@ public class WorkOrderReportExportController implements Serializable {
         loadClinicalDept();
         currentOwnerList = ucService.getWorkerList(null,"");
         currentOwnerList.addAll(ucService.getExternalWorkerList(currentUser.getTenantUID()).stream().filter(item-> !currentOwnerList.contains(item)).collect(Collectors.toList()));
+        currentAssetTypeGroupList = currentUser.getAssetTypeGroupList();
+        enableAssetTypeGroup = currentUser.isEnableAssetTypeGroup();
+        if (enableAssetTypeGroup) {
+            assetTypeGroupEncodedSet = currentAssetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+        }
         needTwoSubStatus = isConfigNeedTwoSubStatusByUser(userContextService.getLoginUser());
     }
     
@@ -204,7 +213,9 @@ public class WorkOrderReportExportController implements Serializable {
     }
 
     public void exportAllWoByAssetInfoId(Integer assetInfoId) {
-        exportWoData(workOrderExportService.createPreviewWorkOrderData(null, null, null, null, null, null,null,null, null, null, null,MapUtil.newHashMap(),null, assetInfoId));
+        V2WorkOrderReportDto v2WorkOrderReportDto = new V2WorkOrderReportDto();
+        v2WorkOrderReportDto.setAssetInfoId(assetInfoId);
+        exportWoData(workOrderExportService.createPreviewWorkOrderData(v2WorkOrderReportDto));
     }
 
     public void exportSelectedWo() {
@@ -236,7 +247,9 @@ public class WorkOrderReportExportController implements Serializable {
     }
 
     public void exportAllWoDocxByAssetInfoId(Integer assetInfoId) {
-        export2Docx(workOrderExportService.createPreviewWorkOrderData(null, null, null, null, null, null,null,null, null, null, null,MapUtil.newHashMap(),null, assetInfoId));
+        V2WorkOrderReportDto v2WorkOrderReportDto = new V2WorkOrderReportDto();
+        v2WorkOrderReportDto.setAssetInfoId(assetInfoId);
+        export2Docx(workOrderExportService.createPreviewWorkOrderData(v2WorkOrderReportDto));
     }
 
     public void exportSelectedWoDocx() {
@@ -308,12 +321,23 @@ public class WorkOrderReportExportController implements Serializable {
                 }
             }
 
-
-            //workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
-//            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId);
-            workOrderList = workOrderExportService.createPreviewWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId, null);
+            V2WorkOrderReportDto v2WorkOrderReportDto = new V2WorkOrderReportDto();
+            v2WorkOrderReportDto.setStartTime(startTime);
+            v2WorkOrderReportDto.setEndTime(endTime);
+            v2WorkOrderReportDto.setClosedStartTime(closedStartTime);
+            v2WorkOrderReportDto.setClosedEndTime(closedEndTime);
+            v2WorkOrderReportDto.setFilterParts(filterParts);
+            v2WorkOrderReportDto.setFilterTotalPrice(filterTotalPrice);
+            v2WorkOrderReportDto.setCurrentStepId(currentStepId);
+            v2WorkOrderReportDto.setSelectedOrg(selectedOrg);
+            v2WorkOrderReportDto.setClinicalDept(filterDeptOrg);
+            v2WorkOrderReportDto.setCurrentOwner(filterCurrentOwner);
+            v2WorkOrderReportDto.setStatusList(getStatusList());
+            v2WorkOrderReportDto.setClinicalDeptList(clinicalDeptList);
+            v2WorkOrderReportDto.setFilterMap(filterMap);
+            v2WorkOrderReportDto.setAssetTypeGroupEncodedSet(assetTypeGroupEncodedSet);
+            workOrderList = workOrderExportService.createPreviewWorkOrderData(v2WorkOrderReportDto);
         }
-
     }
 
     private void showMsgBox(String msg) {
@@ -388,7 +412,42 @@ public class WorkOrderReportExportController implements Serializable {
         res.sort(new PinYinComparatorByName());
         return res;
     }
-    
+
+    private AssetTypeGroupRepository assetTypeGroupRepository;
+    private AssetTypeGroupService assetTypeGroupService;
+    private Set<String> assetTypeGroupEncodedSet;
+    private List<AssetTypeGroup> currentAssetTypeGroupList;
+    @Getter @Setter
+    private String filterAssetTypeName;
+    @Getter @Setter
+    private boolean enableAssetTypeGroup;
+
+    public List<String> completeAssetTypeGroupList(String query) {
+        if (currentAssetTypeGroupList == null) {
+            return Collections.emptyList();
+        }
+        List<AssetTypeGroup> res = this.currentAssetTypeGroupList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query))
+                .collect(Collectors.toList());
+        return res.stream().map(AssetTypeGroup::getName).distinct().collect(Collectors.toList());
+    }
+
+    public void onAssetTypeGroupChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterAssetTypeName = (String) ((SelectEvent) event).getObject();
+        }
+        if (filterAssetTypeName != null) {
+            List<AssetTypeGroup> assetTypeGroupsMatchingByName = this.currentAssetTypeGroupList.stream().filter(item -> item.getName().equals(filterAssetTypeName)).collect(Collectors.toList());
+            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByName, currentAssetTypeGroupList);
+            assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+        } else {
+            if (enableAssetTypeGroup) {
+                assetTypeGroupEncodedSet = currentAssetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+            } else {
+                assetTypeGroupEncodedSet = Collections.emptySet();
+            }
+        }
+    }
 
     public void filterSiteByHospital() {
         siteList = orgDao.findByParentUIDAndOrgTypeOrderByNameAsc(this.getCurrentHospitalUID(), 3);

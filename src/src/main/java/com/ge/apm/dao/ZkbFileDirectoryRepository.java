@@ -1,5 +1,6 @@
 package com.ge.apm.dao;
 
+import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.domain.ZkbFileDirectory;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -62,4 +63,9 @@ public interface ZkbFileDirectoryRepository extends GenericRepositoryUUID<ZkbFil
     @Query(value = "select count(id) from zkb_file_directory where name = ?1 and id in (SELECT parent_id from zkb_file_directory where LEVEL = ?3 and name = ?2);",nativeQuery = true)
     Integer findDirecotryCount(String mainDirectory,String secondDirectory,Integer level);
 
+
+
+
+    @Query(value = "select * from zkb_contract t where t.tenant_uid =?1 and t.start_date <= to_date(to_char(now(), 'yyyyMMdd'), 'yyyyMMdd') and t.end_date >= to_date(to_char(now(), 'yyyyMMdd'), 'yyyyMMdd')",nativeQuery = true)
+    List<ZkbContract> getEffectiveContract(String tenantUid);
 }

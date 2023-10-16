@@ -125,12 +125,16 @@ public interface ApprovalConstant {
     int BUSINESS_TYPE_ADVERSE_EVENTS = 13; // 不良事件上报
     int BUSINESS_TYPE_BUDGET_MANAGEMENT = 14; // 预算管理
     int BUSINESS_TYPE_ASSET_SCRAP = 15; // 设备报废流程
+    int BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT = 16; // 资产转科
 
     String BUSINESS_TYPE_BUDGET_MANAGEMENT_NAME = "预算管理"; // 预算管理
 
 
     String BUSINESS_TYPE_ADVERSE_EVENTS_NAME = "不良事件上报"; // 不良事件上报
-    String BUSINESS_TYPE_ASSET_SCRAP_NAME = "资产报废"; // 资产报废
+    String BUSINESS_TYPE_ASSET_SCRAP_NAME = "设备报废"; // 资产报废
+
+    String BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT_NAME = "设备转科"; // 资产转科
+
     /**
      * 档案信息修改 是否需要审批标识
      * 1.资产维修审批中 2.资产维修不需要审批
