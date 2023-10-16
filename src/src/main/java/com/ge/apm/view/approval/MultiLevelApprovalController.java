@@ -292,6 +292,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }else if(this.businessTypeFlag == 15){
             AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
             siteUid = assetScrap.getSiteUid();
+        }else if(this.businessTypeFlag == 16){
+            AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+            AssetInfo byUid = assetInfoRepository.findByUid(assetDepartmentConvert.getAssetUid());
+            siteUid=byUid.getSiteUID();
         }
 
         if(StringUtils.isNotEmpty(siteUid)){
