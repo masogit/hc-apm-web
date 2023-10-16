@@ -73,6 +73,14 @@
                                              required="false" requiredMessage="#{msg.EndTime} #{msg.ValidationRequire}"
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
+                            <h:panelGroup rendered="#{assetWorkOrderController.enableAssetTypeGroup}">
+                                <label class="label">#{msg.assetTypeGroup}</label>
+                                <p:autoComplete dropdown="true" value="#{assetWorkOrderController.filterAssetTypeName}"
+                                                scrollHeight="300"  forceSelection="true" completeMethod="#{assetWorkOrderController.completeAssetTypeGroupList}">
+                                    <p:ajax event="itemSelect" listener="#{assetWorkOrderController.onAssetTypeGroupChange}" />
+                                    <p:ajax listener="#{assetWorkOrderController.onAssetTypeGroupChange}" />
+                                </p:autoComplete>
+                            </h:panelGroup>
                         </p:panelGrid>
 
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">

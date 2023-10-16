@@ -1123,14 +1123,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     //转入待报废
     public String processToBeTerminated() {
-//        int originStatus = selected.getStatus();
-//        AssetInfo oldAssetInfo = assetHistoryService.depCopy(selected);
-//        this.selected.setStatus(4);
-//        update();
-//        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
-//        assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
-        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
-        assetScrapService.apply(selected.getId(),"请求报废");
+        int originStatus = selected.getStatus();
+        AssetInfo oldAssetInfo = assetHistoryService.depCopy(selected);
+        this.selected.setStatus(4);
+        update();
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
+        assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
+//        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
+//        assetScrapService.apply(selected.getId(),"请求报废");
         return "AssetList?faces-redirect=true";
     }
 

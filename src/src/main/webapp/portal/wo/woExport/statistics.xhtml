@@ -41,6 +41,14 @@
                     <label class="label">*#{msg.RequestEndTime}</label>
                     <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  id="endTime_s" value="#{workOrderStatisticsController.endTime}"  required="true" requiredMessage="#{msg.EndTime} #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
+                <h:panelGroup rendered="#{workOrderStatisticsController.enableAssetTypeGroup}">
+                    <label class="label">#{msg.assetTypeGroup}</label>
+                    <p:autoComplete dropdown="true" value="#{workOrderStatisticsController.filterAssetTypeName}"
+                                    scrollHeight="300"  forceSelection="true" completeMethod="#{workOrderStatisticsController.completeAssetTypeGroupList}">
+                        <p:ajax event="itemSelect" listener="#{workOrderStatisticsController.onAssetTypeGroupChange}" />
+                        <p:ajax listener="#{workOrderStatisticsController.onAssetTypeGroupChange}" />
+                    </p:autoComplete>
+                </h:panelGroup>
             </p:panelGrid>
         </p:fieldset>
         <p:fieldset legend="#{msg.StatisticalMethod}">

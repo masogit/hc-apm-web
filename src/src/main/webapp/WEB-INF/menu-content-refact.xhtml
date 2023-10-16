@@ -30,6 +30,7 @@
                 <p:menuitem id="um094" value="#{msg.SupplierEvaluation}" outcome="/portal/supplier/EvaluationList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_SUPPLIER_EVALUATION_VIEW')}"/>
                 <p:menuitem value="#{msg.keyAssetDataInput}" outcome="/portal/keyAssetReport/dataInputList.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_KEYASSETDATAINPUT_EDIT')}"/>
                 <p:menuitem id="um095" value="#{msg.importMvsDataFile}" outcome="/portal/asset/mvsImport/mvsImport.xhtml" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_MVS_DATA_IMPORT')}"/>
+                <p:menuitem id="um097" value="#{msg.deviceOverdue}" action="#{daVinciController.openNewWindowView(superAdminConfigItemController.getDefaultValue('deviceOverdue'))}" rendered="#{userContextService.accessContainsFunctionMenu('ASSET_DEVICE_OVERDUE_VIEW')}"><a/></p:menuitem>
             </p:submenu>
 
             <!-- 特种设备管理 -->

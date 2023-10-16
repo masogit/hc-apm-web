@@ -1,6 +1,7 @@
 package com.ge.apm.view.approval;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
@@ -19,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import sun.misc.BASE64Decoder;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -35,6 +37,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -52,6 +55,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
 
 
     private AssetScrapRepository assetScrapDao;
+    private AssetDepartmentConvertRepository assetDepartmentConvertRepository;
+
+    private AssetInfoRepository assetInfoRepository;
+
 
     @Setter
     @Getter
@@ -107,6 +114,8 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         workflowService = WebUtil.getBean(WorkflowService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         assetScrapDao = WebUtil.getBean(AssetScrapRepository.class);
+        assetDepartmentConvertRepository = WebUtil.getBean(AssetDepartmentConvertRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
     }
 
     public void getApprovalContentByCurrentApproval(MultiLevelApproval multiLevelApproval) {
@@ -154,10 +163,20 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_SCRAP:
                 AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
-                List<AssetScrap> assetScraps = new ArrayList<>();
-                assetScraps.add(assetScrap);
-                primaryApprovalData = assetScrap;
-                secondaryApprovalData =assetScraps;
+                AssetInfo asset = assetInfoRepository.findByUid(assetScrap.getAssetUid());
+                JSONObject jsonObject = (JSONObject) JSON.toJSON(assetScrap);
+                jsonObject.put("assetInfo",asset);
+                List<Object> objects = new ArrayList<>();
+                objects.add(jsonObject);
+                primaryApprovalData = objects;
+                secondaryApprovalData =objects;
+                break;
+            case ApprovalConstant.BUSINESS_TYPE_ASSET_DEPARTMENT_CONVERT:
+                AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+                List<AssetDepartmentConvert> assetDepartmentConverts = new ArrayList<>();
+                assetDepartmentConverts.add(assetDepartmentConvert);
+                primaryApprovalData = assetDepartmentConvert;
+                secondaryApprovalData =assetDepartmentConvert;
                 break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
@@ -273,6 +292,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         }else if(this.businessTypeFlag == 15){
             AssetScrap assetScrap = assetScrapDao.findById(multiLevelApproval.getBusinessUid());
             siteUid = assetScrap.getSiteUid();
+        }else if(this.businessTypeFlag == 16){
+            AssetDepartmentConvert assetDepartmentConvert = assetDepartmentConvertRepository.findById(multiLevelApproval.getBusinessUid());
+            AssetInfo byUid = assetInfoRepository.findByUid(assetDepartmentConvert.getAssetUid());
+            siteUid=byUid.getSiteUID();
         }
 
         if(StringUtils.isNotEmpty(siteUid)){
@@ -316,7 +339,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
 
         int level = 0;
-        for (int i=1;i<nodes.size();i++){
+        for (int i=1;i<=nodes.size();i++){
             if(nodes.get(i-1).getNodeName().equals(nodeName)){
                 level=i;
             }
@@ -448,10 +471,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         if (null != approvalItem) {
             List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>() {
             });
+            Integer approvalLevelNow = selected.getApprovalLevelNow();
+            if(approvalLevelNow!=0){
+                approvalNodes= approvalNodes.stream().limit(approvalLevelNow-1).collect(Collectors.toList());
+            }
             nodes= approvalNodes;
-            return approvalNodes;
+            return nodes;
         }
-        return null;
+        return new ArrayList<>();
     }
 
 

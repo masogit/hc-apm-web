@@ -1,16 +1,22 @@
 package com.ge.apm.web.wo;
 
+import com.ge.apm.dao.AssetTypeGroupRepository;
 import com.ge.apm.dao.mapper.WorkOrderReportMapper;
+import com.ge.apm.domain.AssetTypeGroup;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.AssetWorkOrder;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.AssetWorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -21,6 +27,7 @@ import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,6 +50,7 @@ public class AssetWorkOrderController implements Serializable {
     private TreeNode orgTree;
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
+    private UserAccount currentUser;
 
     private Integer filterAssetGroup;
     private OrgInfo filterDeptOrg;
@@ -56,6 +64,15 @@ public class AssetWorkOrderController implements Serializable {
         assetWorkOrderService = WebUtil.getBean(AssetWorkOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
+        currentAssetTypeGroupList = currentUser.getAssetTypeGroupList();
+        enableAssetTypeGroup = currentUser.isEnableAssetTypeGroup();
+        if (enableAssetTypeGroup) {
+            assetTypeGroupEncodedSet = currentAssetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+        }
 
         this.loadData();
         this.initOrgTree();
@@ -63,8 +80,7 @@ public class AssetWorkOrderController implements Serializable {
     }
 
     public void loadData() {
-        List<SearchFilter> searchFilters = new ArrayList<>();
-        assetWorkOrderList = assetWorkOrderService.loadAssetWorkOrderData(selectedOrg, filterDeptOrg, filterAssetGroup, searchStr, clinicalDeptList, startDate, endDate);
+        assetWorkOrderList = assetWorkOrderService.loadAssetWorkOrderData(selectedOrg, filterDeptOrg, filterAssetGroup, searchStr, clinicalDeptList, startDate, endDate, assetTypeGroupEncodedSet);
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
@@ -113,6 +129,43 @@ public class AssetWorkOrderController implements Serializable {
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
+    }
+
+    private AssetTypeGroupRepository assetTypeGroupRepository;
+    private AssetTypeGroupService assetTypeGroupService;
+    private Set<String> assetTypeGroupEncodedSet;
+    private List<AssetTypeGroup> currentAssetTypeGroupList;
+    @Getter
+    @Setter
+    private String filterAssetTypeName;
+    @Getter @Setter
+    private boolean enableAssetTypeGroup;
+
+    public List<String> completeAssetTypeGroupList(String query) {
+        if (currentAssetTypeGroupList == null) {
+            return Collections.emptyList();
+        }
+        List<AssetTypeGroup> res = this.currentAssetTypeGroupList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query))
+                .collect(Collectors.toList());
+        return res.stream().map(AssetTypeGroup::getName).distinct().collect(Collectors.toList());
+    }
+
+    public void onAssetTypeGroupChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterAssetTypeName = (String) ((SelectEvent) event).getObject();
+        }
+        if (filterAssetTypeName != null) {
+            List<AssetTypeGroup> assetTypeGroupsMatchingByName = this.currentAssetTypeGroupList.stream().filter(item -> item.getName().equals(filterAssetTypeName)).collect(Collectors.toList());
+            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByName, currentAssetTypeGroupList);
+            assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+        } else {
+            if (enableAssetTypeGroup) {
+                assetTypeGroupEncodedSet = currentAssetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+            } else {
+                assetTypeGroupEncodedSet = Collections.emptySet();
+            }
+        }
     }
 
     public List<AssetWorkOrder> getAssetWorkOrderList() {
