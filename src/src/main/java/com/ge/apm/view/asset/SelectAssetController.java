@@ -8,6 +8,7 @@ import com.ge.apm.domain.*;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.model.DefaultTreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -296,6 +297,12 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             if (user.isEnableAssetTypeGroup()) {
                 orgFilters.add(new SearchFilter("assetType", SearchFilter.Operator.IN, user.getAssetTypeGroupMap().keySet(), "1*"));
             }
+            List<AssetInfo> assetList = dao.findBySearchFilter(orgFilters);
+
+            assetList.forEach(item -> {
+                TreeNode assetNode = new DefaultTreeNode("asset", item, orgNode);
+//             assetNode.setRowKey(item.getUid());
+            });
         }
     }
     

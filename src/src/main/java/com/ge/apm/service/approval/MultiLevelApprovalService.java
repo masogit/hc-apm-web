@@ -978,12 +978,12 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             //更新审批数据
             multiLevelApprovalRepository.save(multiLevelApproval);
             //更新审批进度
-            if (level > 1) {
+            if (level > 0) {
                 List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
                 if (null != list) {
                     for (int i = 0; i < list.size(); i++) {
                         MultiLevelApproval multi = list.get(i);
-                        if (multi != null && multi.getApprovalLevelNow() != level) {
+                        if (multi != null ) {
                             multi.setApprovalLevelNow(returnLevel);
                             multiLevelApprovalRepository.save(multi);
                         }
@@ -1116,7 +1116,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 if (null != list) {
                     for (int i = 0; i < list.size(); i++) {
                         MultiLevelApproval multi = list.get(i);
-                        if (multi != null && multi.getApprovalLevelNow() != level) {
+                        if (multi != null) {
                             multi.setApprovalLevelNow(level);
                             multiLevelApprovalRepository.save(multi);
                         }
