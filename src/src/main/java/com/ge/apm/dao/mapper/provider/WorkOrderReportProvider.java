@@ -68,7 +68,7 @@ public class WorkOrderReportProvider {
                 ",SUM(CASE WHEN wo.status = 1 THEN 1 ELSE 0 END) as openCount" +
                 ",SUM(CASE WHEN wo.status = 2 THEN 1 ELSE 0 END) as closeCount" +
                 ",SUM(CASE WHEN wo.status = 3 THEN 1 ELSE 0 END) as cleanCount" +
-                ",SUM ( wo.total_man_hour) AS totalManHour" +
+                ",SUM ( wo.man_hour) AS totalManHour" +
                 ",SUM ( COALESCE(cow.man_hours, 0) ) AS collaboratedManHour" +
                 ",COALESCE(AVG ( uawco.man_hours) , 0) AS collaborateManHour" +
                 ",SUM(CASE WHEN wo.status = 2 THEN date(wo.close_time)-date(wo.created_date) ELSE 0 END) as totalSpendTime " +
