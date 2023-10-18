@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="不真实列表"/>
+            </div>
+
+            <div class="ui-g-12 card">
+
+                <h:form id="zkbUnrealListForm">
+                    <p:dataTable id="datalist" value="#{zkbUnrealController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbUnrealController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="filter" listener="#{zkbUnrealController.onFilter}" />
+
+                        <p:column headerText="类型" filterBy="#{item.orderType}"  filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbPartOrderType',item.orderType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="备件申请" itemValue="Parts"/>
+                                    <f:selectItem itemLabel="探头申请" itemValue="Probe"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="申请单号" filterBy="#{item.partOrderNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.partOrderNo}"/>
+                        </p:column>
+
+                        <p:column headerText="工单号" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.srNum}"/>
+                        </p:column>
+                        <p:column headerText="Sys ID" filterBy="#{item.sysId}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.sysId}"/>
+                        </p:column>
+                        <p:column headerText="备件号/探头号" filterBy="#{item.itemNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.itemNo}"/>
+                        </p:column>
+                        <p:column headerText="判定日期" >
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="判定人" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.createdBy}"/>
+                        </p:column>
+                        <p:column headerText="不真实判定原因" filterBy="#{item.reason}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.reason}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="ZKB_Unreal_Export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>

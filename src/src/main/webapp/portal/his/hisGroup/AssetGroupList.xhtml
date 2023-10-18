@@ -48,9 +48,9 @@
                             <h:outputText value="#{hisAssetGroupListController.getAssetCountsByGroupUidAndDeptUid(item.assetGroupUid,item.clinicalDeptUid)}"/>
                         </p:column>
 
-                        <p:column headerText="是否子设备" sortBy="#{item.isSubEquipment}">
-                            <h:outputText value="#{item.isSubEquipment eq false ? '否': '是'}"/>
-                        </p:column>
+<!--                        <p:column headerText="是否子设备" sortBy="#{item.isSubEquipment}">-->
+<!--                            <h:outputText value="#{item.isSubEquipment eq false ? '否': '是'}"/>-->
+<!--                        </p:column>-->
 
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":tabGroup:hisTagEditForm" actionListener="#{hisAssetGroupListController.prepareCreate}" oncomplete="PF('hisTagEditDialog').show()"/>

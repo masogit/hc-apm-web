@@ -1,5 +1,6 @@
 package com.ge.apm.view.measuring;
 
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -62,6 +63,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     private int currentMonthCount = 0;
     private int nextMonthCount = 0;
+    private String queryAssetUID;
     private Boolean flag = true;
     private Boolean measurementRepairVisible;
     private Map<String, Boolean> selectedMap;
@@ -105,6 +107,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
         WorkflowConfig woc = workflowService.getWorkflowByOrg(currentUser.getSiteUID());
         measurementRepairVisible = woc != null && woc.getMeasurementRepair() !=null && woc.getMeasurementRepair();
+        String enCodeParameters = WebUtil.getRequestParameter("str");
+        queryAssetUID = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
         this.selectedMap = MapUtil.newHashMap();
         this.searchFilters = new ArrayList<>();
         totalMeasureExpireMonths();
@@ -139,6 +143,10 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     private Wrapper<AssetInfo> convert() {
         Wrapper<AssetInfo> wrapper = new EntityWrapper<>();
+        if (ObjectUtil.isNotEmpty(queryAssetUID)) {
+            wrapper.eq("ai.uid", queryAssetUID);
+            return wrapper;
+        }
         if (!this.hasFilterOnField("siteUID")) {
             UserAccount user = UserContextService.getCurrentUserAccount();
             List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());

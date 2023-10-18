@@ -3,6 +3,7 @@ package com.ge.apm.view.uaa;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.orginfo.OrgInfoService;
@@ -56,7 +57,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private String  contactPerson;
     private String  contactPhone;
     private Integer failureType;
+    private String orgCode;
     private UserCommonService userCommonService;
+    private ConfigCacheService configCacheService;
 
     private OrgInfo currentOrg;
 
@@ -72,6 +75,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         userCommonService = WebUtil.getBean(UserCommonService.class);
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
         clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
+        configCacheService = WebUtil.getBean(ConfigCacheService.class);
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         blobObjectService = WebUtil.getBean(BlobFileService.class);
@@ -215,6 +219,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode=null;
         if (selected == null) {
             return;
         }
@@ -332,6 +337,19 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return false;
     }
 
+    public boolean checkOrgCode() {
+        if (StringUtils.isEmpty(orgCode)) {
+            return false;
+        }
+        OrgInfo orgInfo = dao
+                .findFirstByTenantUIDAndOrgCode(selected.getTenantUID(), orgCode);
+        if (orgInfo != null&&!orgCode.equals(selected.getOrgCode())) {
+            WebUtil.addErrorMessage(orgCode + "已经存在");
+            return true;
+        }
+        return false;
+    }
+
     public void saveSelectedOrg() {
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)) {
@@ -344,7 +362,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         if (selected.getOrgType() == 2 && checkHospitalUcmid()) {
             return;
         }
-
+        if (selected.getOrgType() == 2 && checkOrgCode()) {
+            return;
+        }
         boolean isNew = selected.getId() == null;
 
         selected.setShortName(orgName);
@@ -352,12 +372,14 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         selected.setName(name);
         selected.setNameEn(orgNameEn);
         selected.setHospitalUcmid(hospitalUcmid);
+        selected.setOrgCode(orgCode);
         selected.setStatus(status);
         selected.setAddress(address);
         selected.setContactPerson(contactPerson);
         selected.setContactPhone(contactPhone);
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
+        configCacheService.cleanOrgInfoCacheByUid(selected.getUid());
 
         if (isNew) {
             //如果是增加小科室，并且它的父科室已经属于用户，则把小科室的权限可见性也加进去。
@@ -372,6 +394,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
                         found.setOrgUid(selected.getUid());
                         found.setOrgType(4);
                         userOrgDao.save(found);
+                        configCacheService.cleanOrgInfoCacheByUid(found.getOrgUid());
                     }
                 }
             }
@@ -394,6 +417,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         address = null;
         contactPerson = null;
         contactPhone = null;
+        orgCode = null;
     }
 
     public void buildOrdTree46AfterSave(String institutionUID) {
@@ -408,6 +432,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
         OrgInfo parentClinicalDeptOrg = (OrgInfo) parentClinicalDeptNode.getData();
         dao.save(parentClinicalDeptOrg);
+        configCacheService.cleanOrgInfoCacheByUid(parentClinicalDeptOrg.getUid());
         assetInfoRepository.updateClinicalName(parentClinicalDeptOrg.getName(), parentClinicalDeptOrg.getUid());
 
         for (TreeNode child : parentClinicalDeptNode.getChildren()) {
@@ -447,6 +472,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         if (canDelete()) {
             int tenantId = selected.getSiteId();
             String institutionUID = selected.getInstitutionUID();
+            configCacheService.cleanOrgInfoCacheByUid(selected.getUid());
             super.delete();
             if(tenantId==46){
                 buildOrdTree46AfterSave(institutionUID);
@@ -625,6 +651,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgName = selected.getShortName();
         orgNameEn = selected.getNameEn();
         hospitalUcmid = selected.getHospitalUcmid();
+        orgCode = selected.getOrgCode();
         status = selected.getStatus();
         address = selected.getAddress();
         contactPerson = selected.getContactPerson();
@@ -686,6 +713,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         this.hospitalUcmid = hospitalUcmid;
     }
 
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
     public boolean getIsCreateInstitutionDisabled() {
         return UserContextService.isOnlyLocalITAdmin();
     }

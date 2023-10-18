@@ -2,11 +2,19 @@ package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.ZkbAssetQrCodeInfoRepository;
 import com.ge.apm.dao.mapper.ZkbAssetStatisticMapper;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbAssetQrCodeInfo;
 import com.ge.apm.domain.ZkbAssetStatistic;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -52,6 +65,15 @@ public class ZkbAssetStatisticService {
      * excel sheet 名称
      */
     public static final String SHEET_ASSET_STATISTIC_LIST = "ASSET STATISTIC LIST";
+
+    private final String[] HEADER_FIELD_CN_NAME = {"代理商","systemID","是否设备无法粘贴二维码","无法粘贴二维码原因","无法贴码原因归类"};//header名
+    private final String[] HEADER_FIELD = {"tenantName","systemId","canNotPastQrCode","reason","reasonCategorize"};  //字段名
+    private final String[] HEADER_FIELD_REQUIRED = {"tenantName","systemId","canNotPastQrCode"};  //必填字段名
+
+    private final String SCRAPPED = "已拆机或已报废";
+    private final String NOTALLOWED = "与医院无保修，医院不允许贴码";
+    private final String NOTFIND = "设备找不到";
+    private final String OTHER = "其他";
 
     @Autowired
     private ZkbAssetQrCodeInfoRepository zkbAssetQrCodeInfoRepository;
@@ -171,7 +193,7 @@ public class ZkbAssetStatisticService {
 
     public void regenerateZkbAssetQrCodeInfo(List<SearchFilter> searchFilter){
         //先清除已过期的合同中关联的设备、已修改system_id和已失效的设备数据
-        zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo(new Date());
+        zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo(getDateStr());
         // TODO 查出所有合同有效内关联设备的贴码数据，兼顾历史数据的更新。只限于WEB端，Schedule微服务那边只查询为"NULL"、"N"的数据
         List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(null);
         if(zkbAssetQrCodeInfoList == null || zkbAssetQrCodeInfoList.size() == 0){
@@ -181,6 +203,12 @@ public class ZkbAssetStatisticService {
         for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList){
             handleQRCodeInfo(zkbAssetQrCodeInfo);
         }
+    }
+
+    private String getDateStr()
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+        return formatter.format(new Date());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -222,4 +250,85 @@ public class ZkbAssetStatisticService {
         }
         zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
     }
+
+
+    public List<ZkbAssetQrCodeInfo> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
+        List<ZkbAssetQrCodeInfo> tempQrCodeInfoList = new ArrayList<>();
+        Workbook workbook = this.createExcel(file);
+        Sheet sheet = workbook.getSheetAt(0);
+        if (sheet == null) {
+            return null;
+        }
+        for(int j = 0 ; j < sheet.getLastRowNum(); j ++){
+            Row row = sheet.getRow(j+1);
+            String errorInfo = "";
+            ZkbAssetQrCodeInfo qssetQrCodeInfo = new ZkbAssetQrCodeInfo();
+            for(int i = 0 ; i< HEADER_FIELD.length ; i++){
+                String mtName = "set"+HEADER_FIELD[i].substring(0, 1).toUpperCase() + HEADER_FIELD[i].substring(1);
+                if(Optional.ofNullable(row.getCell(i)).isPresent() && StringUtils.isNotBlank(CellType.NUMERIC.equals(row.getCell(i).getCellTypeEnum()) ?
+                        new DecimalFormat("##############.#####").format(row.getCell(i).getNumericCellValue()) : row.getCell(i).getStringCellValue())){
+                    String opt = CellType.NUMERIC.equals(row.getCell(i).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(i).getNumericCellValue()) : row.getCell(i).getStringCellValue();
+                    try {
+                        Method method = ZkbAssetQrCodeInfo.class.getMethod(mtName,String.class);
+                        method.invoke(qssetQrCodeInfo, opt);
+                    } catch (Exception e) {
+                        logger.debug("handleExcel error"+e.getMessage());
+                    }
+                }else if(Arrays.asList(HEADER_FIELD_REQUIRED).contains(HEADER_FIELD[i])){
+                    errorInfo += "[请输入"+HEADER_FIELD_CN_NAME[i]+"]";
+                }
+            }
+            qssetQrCodeInfo.setExcelIdex(j + 1);
+            if (StringUtils.isNotBlank(errorInfo)) {
+                qssetQrCodeInfo.setErrorInfo(errorInfo);
+                tempQrCodeInfoList.add(qssetQrCodeInfo);
+                continue;
+            }
+            List<ZkbAssetQrCodeInfo> qssetQrCodeInfos = zkbAssetQrCodeInfoRepository.findByTenantNameAndSystemId(qssetQrCodeInfo.getTenantName(),qssetQrCodeInfo.getSystemId());
+            if(CollectionUtils.isEmpty(qssetQrCodeInfos)){
+                qssetQrCodeInfo.setErrorInfo("[数据不存在，请检查后重试！]");
+                tempQrCodeInfoList.add(qssetQrCodeInfo);
+                continue;
+            }else{
+                if("Y".equals(qssetQrCodeInfo.getCanNotPastQrCode())){
+                    if(StringUtils.isBlank(qssetQrCodeInfo.getReason())||StringUtils.isBlank(qssetQrCodeInfo.getReasonCategorize())){
+                        qssetQrCodeInfo.setErrorInfo("[是否设备无法粘贴二维码为Y时，无法贴码原因和原因归类为必填！]");
+                        tempQrCodeInfoList.add(qssetQrCodeInfo);
+                        continue;
+                    }
+                }else if("N".equals(qssetQrCodeInfo.getCanNotPastQrCode())){
+                    qssetQrCodeInfo.setReason(null);
+                    qssetQrCodeInfo.setReasonCategorize(null);
+                }
+                qssetQrCodeInfos.get(0).setCanNotPastQrCode(qssetQrCodeInfo.getCanNotPastQrCode());
+                qssetQrCodeInfos.get(0).setReason(qssetQrCodeInfo.getReason());
+                qssetQrCodeInfos.get(0).setReasonCategorize(qssetQrCodeInfo.getReasonCategorize());
+                zkbAssetQrCodeInfoRepository.save(this.convertDownBox(qssetQrCodeInfos.get(0)));
+            }
+        }
+        return tempQrCodeInfoList;
+    }
+
+    public Workbook createExcel(UploadedFile file) throws IOException {
+        Workbook workbook = null;
+        if (ExcelDocument.ExcelType.XLS.equals(ExcelDocument.parseTypeByFileName(file.getFileName()))) {
+            workbook = new HSSFWorkbook(file.getInputstream());
+        } else if (ExcelDocument.ExcelType.XLSX.equals(ExcelDocument.parseTypeByFileName(file.getFileName()))) {
+            workbook = new XSSFWorkbook(file.getInputstream());
+        }
+        return workbook;
+    }
+    public ZkbAssetQrCodeInfo convertDownBox(ZkbAssetQrCodeInfo qrCodeInfo){
+        if(SCRAPPED.equals(qrCodeInfo.getReasonCategorize())){
+            qrCodeInfo.setReasonCategorize("scrapped");
+        }else if (NOTALLOWED.equals(qrCodeInfo.getReasonCategorize())){
+            qrCodeInfo.setReasonCategorize("notAllowed");
+        }else if (NOTFIND.equals(qrCodeInfo.getReasonCategorize())){
+            qrCodeInfo.setReasonCategorize("notFind");
+        }else if (OTHER.equals(qrCodeInfo.getReasonCategorize())){
+            qrCodeInfo.setReasonCategorize("other");
+        }
+        return qrCodeInfo;
+    }
+
 }

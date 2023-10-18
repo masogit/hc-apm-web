@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+	  xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
 	<p:dialog id="SiteInfoEditVersionDlg" widgetVar="SiteInfoEditVersionDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="修改版本信息"
-		width="700px" height="600px;" maximizable="true">
+			  width="700px" height="600px;" maximizable="true">
 		<p:ajax event="close" update=":SiteInfoListForm:datalist" />
 		<h:form id="SiteInfoEditVersionForm" rendered="#{tenantInfoController.selected != null}">
 			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -24,21 +24,19 @@
 			<p:scrollPanel style="height: 500px; border: 0;" mode="native">
 				<p:tree id="tenantConfigTreeTable" class="tree" value="#{tenantInfoController.tenantConfigService.root}" selection="#{tenantInfoController.tenantConfigService.selectedNodes}" var="item" dynamic="false" cache="false" selectionMode="checkbox" highlight="true" >
 					<p:ajax event="select" listener="#{tenantInfoController.tenantConfigService.onSelectTenantConfig}" process="@this"/>
-                    <p:ajax event="unselect" listener="#{tenantInfoController.tenantConfigService.onUnSelectTenantConfig}" process="@this"/>
+					<p:ajax event="unselect" listener="#{tenantInfoController.tenantConfigService.onUnSelectTenantConfig}" process="@this"/>
 					<p:treeNode type="tenantConfigTree">
-                        <h:outputText value="#{item.label}"/>
-                    </p:treeNode>
+						<h:outputText value="#{item.label}"/>
+					</p:treeNode>
 				</p:tree>
 			</p:scrollPanel>
-			
 			<br />
 			<p:commandButton validateClient="true" actionListener="#{tenantInfoController.save}" value="#{msg.Save}" update=":growl" icon="ui-icon-check"
-				oncomplete="handleSubmit(args, 'SiteInfoEditVersionDialog');" />
-                   &nbsp;&nbsp;
-                   <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel"
-				onclick="PF('SiteInfoEditVersionDialog').hide()" />
+							 oncomplete="handleSubmit(args, 'SiteInfoEditVersionDialog');" />
+			&nbsp;&nbsp;
+			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel"
+							 onclick="PF('SiteInfoEditVersionDialog').hide()" />
 		</h:form>
 	</p:dialog>
-
 </ui:composition>
 </html>

@@ -3,6 +3,7 @@ package webapp.framework.dao;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
+
 /**
  * Shared base repository providing query by example and query by string pattern.
  */
@@ -22,6 +24,8 @@ public class GenericRepositoryUUIDImpl<E> extends SimpleJpaRepository<E, String>
     private ByExampleSpecification byExampleSpecification;
     private Class<E> type;
     private static final int MAX_VALUES_RETREIVED = 500;
+
+    private static final Logger logger = Logger.getLogger(GenericRepositoryUUIDImpl.class);
 
     public GenericRepositoryUUIDImpl(JpaEntityInformation<E, ?> entityInformation, EntityManager entityManager,
             ByExampleSpecification byExampleSpecification) {
@@ -46,8 +50,10 @@ public class GenericRepositoryUUIDImpl<E> extends SimpleJpaRepository<E, String>
     }
 
     public Page<E> findBySearchFilter(final List<SearchFilter> filterFilter, Pageable pageable){
-        if(filterFilter==null)
+        if(filterFilter==null) {
+            logger.warn("Query By SearchFilter Without SearchFilter , Return All data " + this.type.getName());
             return findAll(pageable);
+        }
         else{
             Specification<E> spec = BySearchFilterSpecification.bySearchFilter(filterFilter, type);
             return findAll(spec, pageable);
@@ -55,8 +61,10 @@ public class GenericRepositoryUUIDImpl<E> extends SimpleJpaRepository<E, String>
     }
 
     public List<E> findBySearchFilter(final List<SearchFilter> filterFilter){
-        if(filterFilter==null)
+        if(filterFilter==null) {
+            logger.warn("Query By SearchFilter Without SearchFilter , Return All data " + this.type.getName());
             return findAll();
+        }
         else{
             Specification<E> spec = BySearchFilterSpecification.bySearchFilter(filterFilter, type);
             return findAll(spec);
@@ -66,8 +74,10 @@ public class GenericRepositoryUUIDImpl<E> extends SimpleJpaRepository<E, String>
     @Override
 	public List<E> findBySearchFilter(List<SearchFilter> filterFilter, Sort sort) {
 		// TODO Auto-generated method stub
-    	if(filterFilter==null)
+    	if(filterFilter==null) {
+            logger.warn("Query By SearchFilter Without SearchFilter , Return All data " + this.type.getName());
             return findAll(sort);
+        }
         else{
             Specification<E> spec = BySearchFilterSpecification.bySearchFilter(filterFilter, type);
             return findAll(spec,sort);

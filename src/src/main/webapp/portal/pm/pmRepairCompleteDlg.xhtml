@@ -129,15 +129,72 @@
                             <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
-                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
-<!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
+
+                                    <h:panelGroup rendered="#{v2PmOrderController.verifyFileSuffixName(fileitem.objectType,'image')}">
+                                        <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                    </h:panelGroup>
+                                    <p:commandLink    value="#{fileitem.objectName}"   actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}"    ajax="false"  styleClass="p-mr-2"/>
+
+                                    <!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> -->
                                     <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </h:panelGrid>
                             </p:panel>
                         </p:dataGrid>
-                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                        <p:panelGrid>
+
+                            <p:commandButton validateClient="true"  value="添加"  icon="ui-icon-check"  update="addImag" oncomplete="PF('addImag').show()"/>
+                            <p:dialog id="addImag" widgetVar="addImag" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="添加附件" height="500" width="700">
+                                <h:form id="auditConfigItemEditForm">
+                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                        <h:panelGroup>
+                                            <label class="label">附件类型</label>
+                                            <p:selectOneMenu value="#{v2PmOrderController.fileTypeName}" required="true"  style="width: 95%;">
+                                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                                <f:selectItems value="#{v2PmOrderController.typeList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                                <p:ajax  update="@this type1" />
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                        <h:panelGroup id="showPanel">
+                                            <h:panelGroup>
+                                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pmTab:pmrepairCompleteDialogForm:pictureList"     disabled="#{v2PmOrderController.fileTypeName == null}"         auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                    <br/>
+                                </h:form>
+                            </p:dialog>
+
+
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <p:fieldset legend="保养前后照片" >
+                        <p:dataGrid id="pictureBeforeList" var="fileitem" value="#{v2PmOrderController.picBeforeList}" columns="5" layout="grid">
+                            <f:facet name="header">保养前照片</f:facet>
+                            <p:panel  style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%" >
+                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                    <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentByIdandType(fileitem.id, 'before')}" update="pictureBeforeList pmTab:pmrepairCompleteDialogForm:beforePic" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:dataGrid>
+                        <p:fileUpload id="beforePic" disabled="#{v2PmOrderController.disableUploadButton('before')}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadBefore}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this pictureBeforeList" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                        <p:dataGrid id="pictureAfterList" var="fileitem" value="#{v2PmOrderController.picAfterList}" columns="5" layout="grid">
+                            <f:facet name="header">保养后照片</f:facet>
+                            <p:panel  style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%" >
+                                    <p:graphicImage value="#{fileDownloadService.getFile(fileitem.objectStorageId)}" height="80" width="100" stream="false"/>
+                                    <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentByIdandType(fileitem.id, 'after')}" update="pictureAfterList pmTab:pmrepairCompleteDialogForm:afterPic" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:dataGrid>
+                        <p:fileUpload id="afterPic" disabled="#{v2PmOrderController.disableUploadButton('after')}" allowTypes="/(\.|\/)(jpeg|jpg|png)$/" fileUploadListener="#{v2PmOrderController.handleFileUploadAfter}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="@this pictureAfterList" auto="true" invalidFileMessage="图片类型应该为png,jpeg,jpg" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     </p:fieldset>
 
                     <p:growl id="msgs" showDetail="true" />

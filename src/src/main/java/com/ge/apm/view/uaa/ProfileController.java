@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.uaa.UserAccountHistoryService;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -41,7 +42,9 @@ public class ProfileController implements Serializable {
     private String password;
     private String originalTelephone=null;//原始
     private UserAccount loginUser;
-    UserAccountService userAccountService;
+
+    private UserAccountService userAccountService;
+    private UserAccountHistoryService userAccountHistoryService;
 
     
     @PostConstruct
@@ -59,6 +62,7 @@ public class ProfileController implements Serializable {
         	myAccount.setIsUnbunding(true);
         }
         userAccountService = WebUtil.getBean(UserAccountService.class);
+        userAccountHistoryService = WebUtil.getBean(UserAccountHistoryService.class);
     }
     
     public UserAccount getMyAccount() {
@@ -102,9 +106,11 @@ public class ProfileController implements Serializable {
         boolean isRepeated = userAccountService.whetherTheCallIsRepeated(myAccount.getTelephone(),loginUser);
         if(isRepeated){//重复
             myAccount.setTelephone(originalTelephone);
+            userAccountHistoryService.save(UserAccount.HistoryAction.UPDATE.name(), myAccount);
             userAccountDao.save(myAccount);
             WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
         }else{
+            userAccountHistoryService.save(UserAccount.HistoryAction.UPDATE.name(), myAccount);
             userAccountDao.save(myAccount);
             WebUtil.addSuccessMessage(WebUtil.getMessage("UserAccount")+WebUtil.getMessage("Updated"));
         }
@@ -133,6 +139,7 @@ public class ProfileController implements Serializable {
         myAccount.setLastModifiedDate(TimeUtil.now());
         myAccount.setLastModifiedBy(myAccount.getLoginName());
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        userAccountHistoryService.save(UserAccount.HistoryAction.RESET_PASSWORD.name(), myAccount);
         userAccountDao.save(myAccount);
 
         password = "";

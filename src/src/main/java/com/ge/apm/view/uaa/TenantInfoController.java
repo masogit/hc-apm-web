@@ -1,18 +1,26 @@
 package com.ge.apm.view.uaa;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.apm.service.uaa.AdminConsoleService;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmFeature;
+import com.ge.healthcare.cn.common.cons.ApmFeatureVersion;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -29,36 +37,93 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
 public class TenantInfoController extends JpaCRUDController<TenantInfo> {
-	private static final Logger logger = Logger.getLogger(TenantInfoController.class);
-	private static org.slf4j.Logger log = LoggerFactory.getLogger(TenantInfoController.class);
+	private static final Logger log = LoggerFactory.getLogger(TenantInfoController.class);
 
-	TenantInfoRepository dao = null;
+	TenantInfoRepository dao;
 	UserAccountRepository userAccountRepository;
 	UserAccount loginUser;
 	TenantInfoConfigService tenantConfigService;
 	AssetInfoRepository assetInfoRepository;
 	TableDefinitionRepository tbDao;
 	OrgInfoRepository orgInfoDao;
+	private ConfigCacheService configCacheService;
 
 	boolean tempAlready = false;
 	String type = "";
 
+	@Getter@Setter
+	List<UserAccount> activePersons;
+	@Getter@Setter
+	private List<ApmFeature> allFeatures;
+	@Getter@Setter
+	private List<ApmFeature> features;
+	@Getter@Setter
+	private Set<String> allSelectedMenuFeatures;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesAsset;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesApprove;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesInstall;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesSpecialAsset;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesParts;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesRepair;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesMaintain;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesMeasure;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesNurseSite;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesKnowledge;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesAdjust;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesAudit;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesPerformance;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesBudget;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesHisPerformance;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesReportCenter;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesAssetAccountDashboard;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesAuditConfig;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesMvsAsset;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesLogAudit;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesDeviceDataReview;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesSupplierTenant;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesConfig;
+
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesConfigAssetGroup;
+	@Getter@Setter
+	private List<String> selectedMenuFeaturesPlatform;
+
 	private boolean isTestTenant = false;
 	private boolean isShowTestTenant = true;
-	private static final Integer NORMAL_Tenant_STATUS = 0; //NORMALTenant
-	private static final Integer TEST_Tenant_STATUS = -1; //TestTenant
+	private static final Integer NORMAL_TENANT_STATUS = 0; //NORMALTenant
+	private static final Integer TEST_TENANT_STATUS = -1; //TestTenant
 	private static final Integer LX_USER_TYPE = -1; // lixiang user type
 
-	@Getter
-	@Setter
+	@Getter@Setter
 	private boolean disableCreateTemplateBt = false; // 如果编辑状态初是'通用版',添加模版按钮就设置为灰色
 
 	public boolean createOrEdit() {
@@ -75,18 +140,19 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		loginUser = UserContextService.getCurrentUserAccount();
 		dao = WebUtil.getBean(TenantInfoRepository.class);
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+		configCacheService = WebUtil.getBean(ConfigCacheService.class);
 		tenantConfigService = WebUtil.getBean(TenantInfoConfigService.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		tbDao = WebUtil.getBean(TableDefinitionRepository.class);
 		orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
-
+		allFeatures = Arrays.asList(ApmFeature.values()).stream().collect(Collectors.toList());
+		features = allFeatures;
 		//判断是否是理想用户
 		if(LX_USER_TYPE.equals(loginUser.getType())){
 			this.isShowTestTenant = Boolean.FALSE;
 		}else {
 			this.isShowTestTenant = Boolean.TRUE;
 		}
-
 	}
 
 	@Override
@@ -100,10 +166,10 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
-			searchFilters = new ArrayList<SearchFilter>();
+			searchFilters = new ArrayList<>();
 		}
 		if(LX_USER_TYPE.equals(loginUser.getType())){
-			searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.NE, TEST_Tenant_STATUS));
+			searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.NE, TEST_TENANT_STATUS));
 		}
 		return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
@@ -155,9 +221,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		return thisTenant.getId() == 46;
 	}
 	public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
-		// TODO Auto-generated method stub
 		super.prepareCreate();
 		selected.setHaveIbDevice(true);
+		selected.setEnablesNewMenu(true);
 		tenantConfigService.init();
 		this.type = type;
         this.isTestTenant = Boolean.FALSE;
@@ -165,14 +231,12 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	@Override
 	public void prepareEdit() {
-		// TODO Auto-generated method stub
 		super.prepareEdit();
 		parseTenantConfig();
 		this.type="edit";
 	}
 
 	public void prepareEdit(String type) {
-		// TODO Auto-generated method stub
 		super.prepareEdit();
 		parseTenantConfig();
 		this.type = type;
@@ -191,16 +255,42 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		tempAlready = false;
 
 		//判断是否是测试租户
-		if(TEST_Tenant_STATUS.equals(selected.getTestStatus())){
+		if(TEST_TENANT_STATUS.equals(selected.getTestStatus())){
 			this.isTestTenant = Boolean.TRUE;
 		}else{
 			this.isTestTenant = Boolean.FALSE;
+		}
+		initActivePersons();
+	}
+
+	private void initActivePersons() {
+		activePersons = null;
+		if (StringUtils.isNotEmpty(selected.getActiveUsers())) {
+			activePersons = new ArrayList<>();
+			activePersons.addAll(userAccountRepository.getByIds(Arrays.stream(selected.getActiveUsers().split(","))
+							.map(Integer::parseInt)
+							.collect(Collectors.toSet())).stream().filter(u -> BooleanUtils.isFalse(u.getIsDeleted()) && BooleanUtils.isFalse(u.getIsDisable())).collect(Collectors.toList()));
+			if (null != selected.getActiveUserId()) {
+				Optional<UserAccount> userAccount = activePersons.stream()
+						.filter(obj -> obj.getId().compareTo(selected.getActiveUserId()) == 0)
+						.findFirst();
+				if (!userAccount.isPresent()) {
+					UserAccount account = userAccountRepository.findById(selected.getActiveUserId());
+					if (BooleanUtils.isFalse(account.getIsDeleted()) && BooleanUtils.isFalse(account.getIsDisable())) {
+						activePersons.add(account);
+					}
+				}
+			}
 		}
 	}
 
 	@Transactional
 	@Override
 	public void save() {
+		if (CollectionUtils.isNotEmpty(activePersons)) {
+			selected.setActiveUsers(activePersons.stream().map(obj -> String.valueOf(obj.getId()))
+					.collect(Collectors.joining(",")));
+		}
 		if (type.equalsIgnoreCase("create")) {// 如果租户已经创建过则退出
 			List<TenantInfo> byName = dao.getByName(this.selected.getName());
 			if (byName.size() > 0) {
@@ -208,11 +298,14 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				RequestContext.getCurrentInstance().addCallbackParam("tenantEstablished", true);
 				return;
 			}
+			Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst();
+			selected.setFeatureList(JSON.toJSONString(features.get().getFeatureList()));
+			selected.setEnablesNewMenu(true);
 		}
 		this.selected.setTenantConfig(tenantConfigService.getJSONStr());
+		log.info("save/updating... TenantInfo , tenantName:{},tenantConfig:{}", this.selected.getName(), this.selected.getTenantConfig());
 		this.selected.setLastModifiedDate(new Date());
 		super.save();
-
 		if (!StringUtils.isEmpty(this.selected.getUid())) {
 			OrgInfo tenantOrg = orgInfoDao.findFirstByTenantUIDAndOrgType(this.selected.getUid(), 0);
 			if (tenantOrg != null) {
@@ -221,7 +314,53 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				orgInfoDao.save(tenantOrg);
 			}
 		}
+		if (!isOpenNewMenuRoles() && !type.equalsIgnoreCase("create")) {
+			analyseMenus(selected);
+		}
 		log.info("save/update TenantInfo successful, tenantName:{}", this.selected.getName());
+	}
+
+	@Transactional
+	public void saveFeature() {
+		selected.setLastModifiedDate(new Date());
+		allSelectedMenuFeatures.clear();
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAsset);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesApprove);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesInstall);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesSpecialAsset);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesParts);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesRepair);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesMaintain);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesMeasure);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesNurseSite);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesKnowledge);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAdjust);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAudit);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesPerformance);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesBudget);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesHisPerformance);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesReportCenter);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAssetAccountDashboard);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesAuditConfig);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesMvsAsset);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesLogAudit);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesSupplierTenant);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesDeviceDataReview);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesConfig);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesConfigAssetGroup);
+		allSelectedMenuFeatures.addAll(selectedMenuFeaturesPlatform);
+		if (CollectionUtils.isNotEmpty(allSelectedMenuFeatures)) {
+			selected.setFeatureList(JSON.toJSONString(allSelectedMenuFeatures));
+		} else {
+			WebUtil.addErrorMessage("租户功能模块不能为空已");
+			return;
+		}
+		JSONObject jsonObject = JSON.parseObject(selected.getTenantConfig());
+		jsonObject.remove("edition");
+		jsonObject.put("edition", tenantConfigService.getEdition());
+		selected.setTenantConfig(jsonObject.toJSONString());
+		dao.save(selected);
+		configCacheService.cleanTenantCacheByUid(selected.getUid());
 	}
 
 	List<TableDefinition> tbList = new ArrayList<TableDefinition>();
@@ -294,6 +433,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void markDeleted() {
 		selected.setIsDeleted(true);
 		dao.save(selected);
+		configCacheService.cleanTenantCacheByUid(selected.getUid());
 	}
 
 	@Override
@@ -315,17 +455,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	@Override
 	public void onAfterNewObject(TenantInfo tenant, boolean isOK) {
-		if (!isOK)
-			return;
-		/*
-		 * // import field code type data for this site try{ String sql =
-		 * "insert into i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) select distinct msg_type, msg_key, value_zh, value_en, value_tw, %d as site_id from i18n_message where msg_type in (select msg_type from field_code_type)"
-		 * ; NativeSqlUtil.execute(String.format(sql, site.getId()), null); }
-		 * catch(Exception ex){ logger.error(ex.getMessage(), ex); }
-		 */
-
-		// and create an default org for this site
-		// String orgUID = UUID.randomUUID().toString().replace("-", "");
+		if (!isOK) return;
 		OrgInfo org = new OrgInfo();
 		org.setSiteId(tenant.getId());
 
@@ -381,12 +511,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	@Transactional
 	public void onAfterUpdateObject(TenantInfo tenant, boolean isOK) {
 		/* 如果由非通用版改成通用版，查找tabledef表(tenantUid,name)有没有存在模版，没有的话添加 */
-		// String config=tenantConfig.getJSONStr();
-
-		// List<TableDefinition> tbList= new ArrayList<TableDefinition>();
-		if (!isOK) {
-			return;
-		}
+		if (!isOK) return;
 		if (selected.getIsEnabled() != null && selected.getIsEnabled()) {
 			// 如果超级管理员激活某个租户，则激活该租户下的所有用户
 			userAccountRepository.updateMembersStatus(selected.getUid());
@@ -400,7 +525,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void onBeforeNewObject(TenantInfo tenant) {
 		tenant.setLastModifiedDate(new Date());
 		tenant.setCreatedDate(new Date());
-		tenant.setTestStatus(NORMAL_Tenant_STATUS);
+		tenant.setTestStatus(NORMAL_TENANT_STATUS);
 		tenant.setIsEnabled(false);
 		super.onBeforeNewObject(tenant);
 	}
@@ -432,9 +557,9 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		}
 
 		if(this.isTestTenant){
-			tenantInfo.setTestStatus(TEST_Tenant_STATUS);
+			tenantInfo.setTestStatus(TEST_TENANT_STATUS);
 		}else{
-            tenantInfo.setTestStatus(NORMAL_Tenant_STATUS);
+            tenantInfo.setTestStatus(NORMAL_TENANT_STATUS);
         }
 
 	}
@@ -454,8 +579,53 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	private void parseTenantConfig() {
 		String configJsonStr = this.selected.getTenantConfig();
+		buildFeature(selected.getFeatureList());
 		tenantConfigService.parseStr(configJsonStr);
 	}
+
+	private void buildFeature(String featureList) {
+		if (StringUtils.isNotEmpty(featureList)) {
+			allSelectedMenuFeatures = ((List<String>) JSON.parse(featureList)).stream().collect(Collectors.toSet());
+			selectedMenuFeaturesAsset = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("ASSET")).collect(Collectors.toList());
+			selectedMenuFeaturesApprove = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("MULTILEVEL")).collect(Collectors.toList());
+			selectedMenuFeaturesInstall = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("INSTALL")).collect(Collectors.toList());
+			selectedMenuFeaturesSpecialAsset = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("SPECIAL")).collect(Collectors.toList());
+			selectedMenuFeaturesParts = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PARTS")).collect(Collectors.toList());
+			selectedMenuFeaturesRepair = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("REPAIR")).collect(Collectors.toList());
+			selectedMenuFeaturesMaintain = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("MAINTAIN")).collect(Collectors.toList());
+			selectedMenuFeaturesMeasure = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("MEASURE")).collect(Collectors.toList());
+			selectedMenuFeaturesNurseSite = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("NURSESITE")).collect(Collectors.toList());
+			selectedMenuFeaturesKnowledge = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("KNOWLEDGE")).collect(Collectors.toList());
+			selectedMenuFeaturesAdjust = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("ADJUST")).collect(Collectors.toList());
+			selectedMenuFeaturesAudit = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("AUDIT")).collect(Collectors.toList());
+			selectedMenuFeaturesPerformance = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PERFORMANCE")).collect(Collectors.toList());
+			selectedMenuFeaturesBudget = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("BUDGET")).collect(Collectors.toList());
+			selectedMenuFeaturesHisPerformance = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("HISPERFORMANCE")).collect(Collectors.toList());
+			selectedMenuFeaturesReportCenter = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("REPORT_CENTER")).collect(Collectors.toList());
+			selectedMenuFeaturesAssetAccountDashboard = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("ASSET_ACCOUNT_DASHBOARD")).collect(Collectors.toList());
+			selectedMenuFeaturesAuditConfig = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("AUDIT_CONFIG")).collect(Collectors.toList());
+			selectedMenuFeaturesMvsAsset = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("MVS_ASSET")).collect(Collectors.toList());
+			selectedMenuFeaturesLogAudit = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("LOG_AUDIT")).collect(Collectors.toList());
+			selectedMenuFeaturesSupplierTenant = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("SUPPLIER_TENANT")).collect(Collectors.toList());
+			selectedMenuFeaturesDeviceDataReview = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("DEVICEDATAPREVIEW")).collect(Collectors.toList());
+			selectedMenuFeaturesConfig = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("CONFIG") && !f.equals("CONFIG_ASSET_TYPE_GROUP") ).collect(Collectors.toList());
+			selectedMenuFeaturesConfigAssetGroup = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("CONFIG_ASSET_TYPE_GROUP")).collect(Collectors.toList());
+			selectedMenuFeaturesPlatform = allSelectedMenuFeatures.stream().filter(f -> f.startsWith("PLATFORM")).collect(Collectors.toList());
+		}
+	}
+
+	public boolean isOpenNewMenuRoles() {
+		if (selected == null) {
+			return false;
+		}
+		return selected.getEnablesNewMenu() && StringUtils.isNotEmpty(selected.getFeatureList());
+	}
+
+	public void changeListener() {
+		Optional<ApmFeatureVersion> features = Arrays.stream(ApmFeatureVersion.values()).filter(f -> f.name().equals(tenantConfigService.getEdition())).collect(Collectors.toSet()).stream().findFirst();
+		buildFeature(JSON.toJSONString(features.get().getFeatureList()));
+	}
+
 	public String getType() {
 		return type;
 	}
@@ -486,5 +656,34 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	public void setShowTestTenant(boolean showTestTenant) {
 		isShowTestTenant = showTestTenant;
+	}
+
+	private void analyseMenus(TenantInfo tenantInfo) {
+		WebUtil.getBean(AdminConsoleService.class).analyseMenu(tenantInfo);
+	}
+
+	public List<UserAccount> getUserAccounts() {
+		List<UserAccount> userAccounts = userAccountRepository.findByTenantUID(selected.getUid());
+		userAccounts = userAccounts.stream().filter(u -> BooleanUtils.isFalse(u.getIsDeleted()) && BooleanUtils.isFalse(u.getIsDisable())).collect(Collectors.toList());
+		if (selected != null && selected.getActiveUserId() != null) {
+			Optional<UserAccount> userAccount = userAccounts.stream()
+					.filter(obj -> obj.getId().compareTo(selected.getActiveUserId()) == 0)
+					.findFirst();
+			if (!userAccount.isPresent()) {
+				UserAccount account = userAccountRepository.findById(selected.getActiveUserId());
+				if (BooleanUtils.isFalse(account.getIsDeleted()) && BooleanUtils.isFalse(account.getIsDisable())) {
+					userAccounts.add(account);
+				}
+			}
+		}
+		return userAccounts;
+	}
+
+	public String getNameWithOrgName(UserAccount user) {
+		OrgInfo org = orgInfoDao.getByUid(user.getOrgInfoUID());
+		if(4 == org.getOrgType()){
+			return user.getName() + "-" + org.getParentOrg().getName() + "-" + org.getName();
+		}
+		return user.getName() + "-" + org.getName();
 	}
 }

@@ -6,7 +6,6 @@ import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
@@ -53,8 +52,6 @@ public class UserCommonService {
     @Autowired
     private MeasureRequestApiService measureRequestApiService;
 
-    @Autowired
-    private TenantInfoRepository tenantInfoRepository;
 
     @Autowired
     private AssetInfoRepository assetInfoRepository;

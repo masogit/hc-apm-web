@@ -7,8 +7,6 @@ package com.ge.apm.service.common;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
@@ -34,38 +32,11 @@ public class ConfigService {
     private WorkflowConfigRepository configDao;
 
     @Autowired
-    private OrgInfoRepository orgDao;
-
-    @Autowired
-    private TenantInfoRepository tenantDao;
+    private ConfigCacheService cacheService;
 
     public WorkflowConfig findConfigBySite(String siteUid) {
-        OrgInfo org = orgDao.findByUid(siteUid);
-        List<WorkflowConfig> configList = configDao.findBySiteUID(siteUid);
-        if (isInsulateTenant(org.getTenantUID())) {
-            if (null != configList && !configList.isEmpty()) {
-                return configList.get(0);
-            }else{
-                return null;
-            }
-        }
-
-        if (null != configList && !configList.isEmpty()) {
-            return configList.get(0);
-        }
-        configList = configDao.findBySiteUID(org.getHospitalUID());
-        if (null != configList && !configList.isEmpty()) {
-            return configList.get(0);
-        }
-        configList = configDao.findBySiteUID(org.getInstitutionUID());
-        if (null != configList && !configList.isEmpty()) {
-            return configList.get(0);
-        }
-        configList = configDao.findBySiteUID(org.getTenantUID());
-        if (null != configList && !configList.isEmpty()) {
-            return configList.get(0);
-        }
-        return null;
+        OrgInfo org = cacheService.findOrgByUid(siteUid);
+        return cacheService.findConfigBySite(siteUid, isInsulateTenant(org.getTenantUID()), org);
     }
 
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories(WorkflowConfig config) {
@@ -91,64 +62,13 @@ public class ConfigService {
     }
 
     public boolean isNeedAssetApprover(String siteUid) {
-        OrgInfo org = orgDao.findByUid(siteUid);
-        TenantInfo tenant = tenantDao.findByuid(org.getTenantUID());
-        List<WorkflowConfig> configList = configDao.findBySiteUID(siteUid);
-        if (tenant.getInsulate()!=null && tenant.getInsulate()) {
-            if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
-                return true;
-            }else{
-                return false;
-            }
-        }
-
-        if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
-            return true;
-        }
-        configList = configDao.findBySiteUID(org.getHospitalUID());
-        if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
-            return true;
-        }
-        configList = configDao.findBySiteUID(org.getInstitutionUID());
-        if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
-            return true;
-        }
-        configList = configDao.findBySiteUID(org.getTenantUID());
-        if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
-            return true;
-        }
-
-        return false;
+        WorkflowConfig config = findConfigBySite(siteUid);
+        return Optional.ofNullable(config).map(i->null!=i.getAssetApprover()).orElse(false);
     }
 
     public boolean isAssetNeedAudit(String siteUid) {
-        OrgInfo org = orgDao.findByUid(siteUid);
-        TenantInfo tenant = tenantDao.findByuid(org.getTenantUID());
-        WorkflowConfig workflowConfig = configDao.findFirstBySiteUID(siteUid);
-        if (tenant.getInsulate()!=null && tenant.getInsulate()) {
-            return isAssetNeedAudit(workflowConfig);
-        }
-
-        if (null != workflowConfig && isAssetNeedAudit(workflowConfig)) {
-            return true;
-        }
-
-        workflowConfig = configDao.findFirstBySiteUID(org.getHospitalUID());
-        if (null != workflowConfig && isAssetNeedAudit(workflowConfig)) {
-            return true;
-        }
-
-        workflowConfig = configDao.findFirstBySiteUID(org.getInstitutionUID());
-        if (null != workflowConfig && isAssetNeedAudit(workflowConfig)) {
-            return true;
-        }
-
-        workflowConfig = configDao.findFirstBySiteUID(org.getTenantUID());
-        if (null != workflowConfig && isAssetNeedAudit(workflowConfig)) {
-            return true;
-        }
-
-        return false;
+        WorkflowConfig config = findConfigBySite(siteUid);
+        return isAssetNeedAudit(config);
     }
 
     private boolean isAssetNeedAudit(WorkflowConfig workflowConfig) {
@@ -170,35 +90,13 @@ public class ConfigService {
     }
 
     public boolean isInsulateTenant(String tenantUid){
-        TenantInfo tenant = tenantDao.findByuid(tenantUid);
-        return tenant.getInsulate()!=null && tenant.getInsulate();
+        TenantInfo tenant = cacheService.getTenantByUid(tenantUid);
+        return Optional.ofNullable(tenant).map(i->null!=i.getInsulate()).orElse(false);
     }
 
     public Optional<WorkflowConfig> findInheritableWorkflowConfigByCurrentUser() {
-
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-
-        WorkflowConfig workflowConfig = configDao.findFirstBySiteUID(currentUserAccount.getSiteUID());
-        if (isInsulateTenant(currentUserAccount.getTenantUID())) {
-            return Optional.ofNullable(workflowConfig);
-        }
-
-        if (null != workflowConfig) {
-            return Optional.of(workflowConfig);
-        }
-
-        workflowConfig = configDao.findFirstBySiteUID(currentUserAccount.getHospitalUID());
-        if (null != workflowConfig) {
-            return Optional.of(workflowConfig);
-        }
-
-        workflowConfig = configDao.findFirstBySiteUID(currentUserAccount.getInstitutionUID());
-        if (null != workflowConfig) {
-            return Optional.of(workflowConfig);
-        }
-
-        workflowConfig = configDao.findFirstBySiteUID(currentUserAccount.getTenantUID());
-        return Optional.ofNullable(workflowConfig);
+        return Optional.ofNullable(findConfigBySite(currentUserAccount.getSiteUID()));
     }
 
     //是否待报废权限控制

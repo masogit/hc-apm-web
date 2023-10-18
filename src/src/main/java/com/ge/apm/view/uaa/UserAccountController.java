@@ -1,7 +1,5 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.healthcare.cn.common.utils.collection.ListUtil;
-import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
@@ -12,11 +10,10 @@ import com.ge.apm.service.api.UserApiService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.security.UserDetailsServiceImpl;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.uaa.UserAccountExportService;
-import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.uaa.*;
 import com.ge.apm.service.utils.*;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmSystemRole;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
@@ -74,7 +71,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
      *
      */
     private static final long serialVersionUID = -1L;
-
+    public static final String IT_ADMIN_ROLE = "后台运营管理";
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
     public static final String SYSTEM_ACTIVE_ROLE = "系统激活专用";
     public static final String SYSTEM_ACTIVE = "ActivationPerson";
@@ -100,7 +97,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private OrgInfo selectedUserOrg;
 
-    private  Boolean oldIsDisable;
+    private Boolean oldIsDisable;
 
     private UserCommonService userCommonService;
 
@@ -125,10 +122,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private UserApiService userApi;
 
     private UserAccountExportService userAccountExportService;
-    
+
     private StreamedContent exportFile;
 
     private SysRoleRepository sysRoleRepository;
+
+    private SupplierUserRepository supplierUserRepository;
+
+    private UserAccountHistoryService userAccountHistoryService;
 
     private CustomRoleRepository customRoleRepository;
     private ZkbIbCrossUserStatusRepository zkbIbCrossUserStatusRepository;
@@ -155,10 +156,21 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     TreeNode deleteTreeNode = new DefaultTreeNode("root", null, null);
     boolean deleteDisabled = true;
-    boolean  selectAllButton = false;
+    boolean selectAllButton = false;
     private OrgInfo orgInfo46 = new OrgInfo();//初始化GE46号节点
-    private String originalTelephone=null;//原始
+    private String originalTelephone = null;//原始
     private Integer originaSelectId;
+
+    public boolean isPropagateSelectionUp() {
+        return propagateSelectionUp;
+    }
+
+    public void setPropagateSelectionUp(boolean propagateSelectionUp) {
+        this.propagateSelectionUp = propagateSelectionUp;
+    }
+
+    private boolean propagateSelectionUp = true;
+
 
     public Integer getOriginaSelectId() {
         return originaSelectId;
@@ -220,14 +232,18 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.retrieval = retrieval;
     }
 
-    private Boolean confirmDestroy=false;
+    private Boolean confirmDestroy = false;
 
+    private AssetTypeGroupService assetTypeGroupService;
 
+    private UserAssetTypeGroupMapper userAssetTypeGroupMapper;
+
+    private UserAssetGroupRepository userAssetGroupDao;
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<>();
         filterBySite = false;
-        userOrgInfoRepository= WebUtil.getBean(UserOrgInfoRepository.class);
+        userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(UserAccountRepository.class);
         userAccountMapper = WebUtil.getBean(UserAccountMapper.class);
@@ -244,11 +260,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         jsonTemplateRepository = WebUtil.getBean(JsonTemplateRepository.class);
         protocol = jsonTemplateRepository.findByType(3);
-        userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
+        userAccountExportService = WebUtil.getBean(UserAccountExportService.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         userDetailsService = WebUtil.getBean(UserDetailsServiceImpl.class);
         zkbIbCrossUserStatusRepository = WebUtil.getBean(ZkbIbCrossUserStatusRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
+        supplierUserRepository = WebUtil.getBean(SupplierUserRepository.class);
+        userAccountHistoryService = WebUtil.getBean(UserAccountHistoryService.class);
+        assetTypeGroupService= WebUtil.getBean(AssetTypeGroupService.class);
+
+        userAssetTypeGroupMapper = WebUtil.getBean(UserAssetTypeGroupMapper.class);
+        userAssetGroupDao = WebUtil.getBean(UserAssetGroupRepository.class);
 
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
@@ -259,15 +281,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         //判断是否是理想用户
-        if(LX_USER_TYPE.equals(loginUser.getType())){
+        if (LX_USER_TYPE.equals(loginUser.getType())) {
             this.isShowButton = Boolean.FALSE;
-        }else {
+        } else {
             this.isShowButton = Boolean.TRUE;
         }
 
     }
 
-    public boolean isLocale(){
+    public boolean isLocale() {
         return "zh".equalsIgnoreCase(LocaleHolder.getLocale().toString());
     }
 
@@ -287,53 +309,55 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setTenantUid(String tenantUid) {
         this.tenantUid = tenantUid;
-        if(selectedTenant!=null && selectedTenant.getUid().equals(tenantUid)) return;
-        
+        if (selectedTenant != null && selectedTenant.getUid().equals(tenantUid)) return;
+
         searchFilters.clear();
         selectedOrg = null;
-        
+        selected = null;
         selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
-        if (selectedTenant!=null&&selectedTenant.getId()!= 46) { // skip building tenant org tree for apm ib user
+        if (selectedTenant != null && selectedTenant.getId() != 46) { // skip building tenant org tree for apm ib user
             rebuildOrgTree();
             TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
             if (null != selectedOrgNode) {
                 selectedOrgNode.setSelected(true);
                 TreeNodeUtil.expandParentsNodes(selectedOrgNode);
             }
-        }else{
+        } else {
             orgTree = null;
         }
         updateRoleList();
     }
-    
+
     // TreeNodeName Filter
     private String treeNodeNameFilter;
+
     public String getTreeNodeNameFilter() {
         return treeNodeNameFilter;
     }
+
     public void setTreeNodeNameFilter(String treeNodeNameFilter) {
         this.treeNodeNameFilter = treeNodeNameFilter;
     }
-    
+
     public void rebuildOrgTree() {
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
-        if(UserContextService.isOnlyLocalITAdmin()){
+        if (UserContextService.isOnlyLocalITAdmin()) {
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
-        }else{
+        } else {
             orgTree = uaaService.buildOrgTree(tenantUid, "", -1, -1);
         }
     }
-    
-    public void filterTreeNode(){
-        if (selectedTenant!=null&&selectedTenant.getId()== 46) {
+
+    public void filterTreeNode() {
+        if (selectedTenant != null && selectedTenant.getId() == 46) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListWithClinicalDept(loginUser.getUid(), treeNodeNameFilter, selectedTenant.getId());
             OrgInfo tenant = orgInfoDao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
             orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
             uaaService.expendedTreeNode(orgTree, treeNodeNameFilter, -1, -1);
-        }else{
+        } else {
             uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
         }
     }
@@ -364,9 +388,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     protected UserAccountRepository getDAO() {
         return dao;
     }
-    
-    private void generateListSearchFilter(){
-    	if (selectedOrg == null) {
+
+    private void generateListSearchFilter() {
+        if (selectedOrg == null) {
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
         } else {
             if (selectedOrg.getId() == -1) {
@@ -376,7 +400,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                if (selectedOrg.getOrgType()  == 4) {
+                if (selectedOrg.getOrgType() == 4) {
                     //clinical dept may include child clinical dept
                     OrgInfoClinicalDeptService clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
                     List<OrgInfo> allClinicals = clinicalDeptService.collectChildClinicalDept(selectedOrg);
@@ -386,42 +410,42 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 }
             }
         }
-        boolean nameFilter=false;
-        Object nameValue="";
-        for(SearchFilter filter: searchFilters){
-        	if(filter.fieldName.equals("name")){
-        		nameFilter=true;
-        		nameValue=filter.value;
-        		filter.conditionPath="1*2*3+";
-        	}
+        boolean nameFilter = false;
+        Object nameValue = "";
+        for (SearchFilter filter : searchFilters) {
+            if (filter.fieldName.equals("name")) {
+                nameFilter = true;
+                nameValue = filter.value;
+                filter.conditionPath = "1*2*3+";
+            }
         }
-        if(nameFilter){
-        	nameValue=((String)nameValue).toLowerCase();
-        	searchFilters.add(new SearchFilter("namePyCode",SearchFilter.Operator.LIKE,nameValue,"1*2*3+"));
+        if (nameFilter) {
+            nameValue = ((String) nameValue).toLowerCase();
+            searchFilters.add(new SearchFilter("namePyCode", SearchFilter.Operator.LIKE, nameValue, "1*2*3+"));
         }
     }
 
     @Override
     protected Page<UserAccount> loadData(PageRequest pageRequest) {
-    	generateListSearchFilter();
-        Boolean isDisable =false;
-        for (SearchFilter searchFilter :searchFilters) {
+        generateListSearchFilter();
+        Boolean isDisable = false;
+        for (SearchFilter searchFilter : searchFilters) {
             if ("isDisable".equals(searchFilter.fieldName)) {
-                isDisable= (Boolean) searchFilter.value;
+                isDisable = (Boolean) searchFilter.value;
                 break;
             }
         }
         searchFilters.removeIf(e -> e.fieldName.equals("isDisable"));
-        searchFilters.add(new SearchFilter("isDisable", SearchFilter.Operator.EQ,isDisable,"1*3+"));
-        if(!isDisable){
-            searchFilters.add(new SearchFilter("isDisable", SearchFilter.Operator.IsNull,null,"1*3+"));
+        searchFilters.add(new SearchFilter("isDisable", SearchFilter.Operator.EQ, isDisable, "1*3+"));
+        if (!isDisable) {
+            searchFilters.add(new SearchFilter("isDisable", SearchFilter.Operator.IsNull, null, "1*3+"));
         }
-        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ,false,"1*4+"));
-        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.IsNull,null,"1*4+"));
-        Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
-        for(UserAccount user: pageUserAccount){
+        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*4+"));
+        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.IsNull, null, "1*4+"));
+        Page<UserAccount> pageUserAccount = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        for (UserAccount user : pageUserAccount) {
             List<OrgInfo> orgListByUid = this.deptList.stream().filter(item -> item.getId().equals(user.getOrgInfoId())).collect(Collectors.toList());
-            if(!orgListByUid.isEmpty()) {
+            if (!orgListByUid.isEmpty()) {
                 user.setOrgInfo(orgListByUid.get(0));
             }
         }
@@ -452,17 +476,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.selected.setTags(existingTags);
 
     }
-    public String Escape(int type){
-        if(1==type){
+
+    public String Escape(int type) {
+        if (1 == type) {
             return "集团";
-        }else if(2==type){
+        } else if (2 == type) {
             return "医院";
-        }
-        else if(3==type){
+        } else if (3 == type) {
             return "院区";
-        }else if(4==type){
+        } else if (4 == type) {
             return "科室";
-        }else{
+        } else {
             return "顶级";
         }
     }
@@ -496,18 +520,24 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         assignedRoles = new ArrayList<>();
 //        permissionGroups = uaaService.getPermissionGroups(selected.getTenantUID());
         assignedPermissionGroupUidList = uaaService.getPermissionGroupsByUserUid(selected.getUid());
-        if(loginUser.getType() != null && loginUser.getType() == UserAccount.LI_XIANG){
+        if (loginUser.getType() != null && loginUser.getType() == UserAccount.LI_XIANG) {
             SysRoleVO sysRoleVO = getVOBySysRoleName(SYSTEM_ACTIVE);
-            if(sysRoleVO == null){
+            if (sysRoleVO == null) {
                 logger.error("cann't find system role by ActivationPerson");
                 return;
             }
             roleListVO.add(sysRoleVO);
             assignedRoles.add(sysRoleVO.getRoleDesc());
-        }else{
+        } else {
             roleListVO = uaaService.getSysRoleVO(selected.getTenantUID());
+
+            if (uaaService.isOpenNewMenuRoles(selected.getTenantUID())) {
+                Set<String> tenantSysRoles = uaaService.getSysRoleListByTenantUid(selected.getTenantUID());
+                Set<String> tenantCustomRoles = uaaService.getTenantCustomRoles(selected.getTenantUID()).stream().map(CustomRole::getName).collect(Collectors.toSet());
+                roleListVO = roleListVO.stream().filter(role -> tenantSysRoles.contains(role.getName()) || tenantCustomRoles.contains(role.getName())).collect(Collectors.toList());
+            }
             List<CustomRole> customRoles = customRoleRepository.findCustomRolesByUserId(selected.getId());
-            if(CollectionUtils.isNotEmpty(customRoles)){
+            if (CollectionUtils.isNotEmpty(customRoles)) {
                 for (CustomRole customRole : customRoles) {
                     assignedRoles.add(customRole.getName());
                 }
@@ -545,9 +575,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }*/
     }
 
-    public SysRoleVO getVOBySysRoleName(String sysRoleName){
-        SysRole sr =sysRoleRepository.getByName(sysRoleName);
-        if(sr != null){
+    public SysRoleVO getVOBySysRoleName(String sysRoleName) {
+        SysRole sr = sysRoleRepository.getByName(sysRoleName);
+        if (sr != null) {
             SysRoleVO srVO = new SysRoleVO();
             srVO.setId(sr.getId());
             srVO.setName(sr.getName());
@@ -557,12 +587,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         return null;
     }
+
     //根据orgInfoUid删除对应权限 并且动态更新树形结构。
-    public void deleteOrgInfoTable(String orgInfoUid){
+    public void deleteOrgInfoTable(String orgInfoUid) {
         //1.先找到参数中的位置
-        getTreeNodes46(accessOrgTree,orgInfoUid);
+        getTreeNodes46(accessOrgTree, orgInfoUid);
         setTreeNodes46(deleteTreeNode, false);
-        if(unselectInstitutions.size()==0){//如果不在树中间，则只遍历删除当前节点及子节点。
+        if (unselectInstitutions.size() == 0) {//如果不在树中间，则只遍历删除当前节点及子节点。
             unselectUidss.add(orgInfoUid);
         }
         while (deleteTreeNode.getParent() != null) {
@@ -572,19 +603,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         List<TreeNode> nowSelectNode2 = Arrays.asList(selectedAccessOrgNodes);//当前选中的node转换为list方便去掉重复的。
         List<TreeNode> nowSelectNode = new ArrayList<TreeNode>(nowSelectNode2);
-        Iterator<TreeNode> it=nowSelectNode.iterator();
-        while(it.hasNext()) {
-            TreeNode m=it.next();
-            if(selectedAccessOrgNodesCopy.contains(m)) {
+        Iterator<TreeNode> it = nowSelectNode.iterator();
+        while (it.hasNext()) {
+            TreeNode m = it.next();
+            if (selectedAccessOrgNodesCopy.contains(m)) {
                 it.remove();
             }
         }
-        selectedAccessOrgNodes=nowSelectNode.toArray(new TreeNode[0]);
+        selectedAccessOrgNodes = nowSelectNode.toArray(new TreeNode[0]);
         List<String> orgList = orgInfoDao.getOrgInfoUidsByparentUid(orgInfoUid);
         Iterator<OrgInfo> it2 = orgInfoTableData46.iterator();
-        while(it2.hasNext()) {
-            OrgInfo m=it2.next();
-            if(orgList.contains(m.getUid())) {
+        while (it2.hasNext()) {
+            OrgInfo m = it2.next();
+            if (orgList.contains(m.getUid())) {
                 it2.remove();
             }
         }
@@ -599,10 +630,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private void getTreeNodes46(TreeNode root, String orgInfoUid) {
         OrgInfo orgInfo = (OrgInfo) root.getData();
-        if(root.getParent()!=null && orgInfo.getUid().equals(orgInfoUid)){
+        if (root.getParent() != null && orgInfo.getUid().equals(orgInfoUid)) {
             deleteTreeNode = root;
             unselectInstitutions.add(orgInfo.getInstitutionUID());
-        }else{
+        } else {
             for (TreeNode item : root.getChildren()) {
                 getTreeNodes46(item, orgInfoUid);
             }
@@ -615,37 +646,38 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         //如果租户不是院区隔离时，修改用户角色时保证有LocalITAdmin角色的用户，LocalITAdmin角色不丢失
         TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
-        if((ti.getInsulate() == null || !ti.getInsulate())){
+        if ((ti.getInsulate() == null || !ti.getInsulate())) {
             List<UserRole> tempUserRole = selected.getUserRoleList().stream().filter(item -> item.getRole().getName().equals("LocalITAdmin")).collect(Collectors.toList());
-            if(!tempUserRole.isEmpty()){
+            if (!tempUserRole.isEmpty()) {
                 this.assignedRoles.add(tempUserRole.get(0).getRole().getRoleDesc());
             }
         }
 
         //如果登陆用户角色是LocalITAdmin，修改用户角色保证有ITAdmin角色的用户，ITAdmin角色不丢失
-        if(UserContextService.isOnlyLocalITAdmin()){
+        if (UserContextService.isOnlyLocalITAdmin()) {
             List<UserRole> tempUserRole = selected.getUserRoleList().stream().filter(item -> item.getRole().getName().equals("ITAdmin")).collect(Collectors.toList());
-            if(!tempUserRole.isEmpty()){
+            if (!tempUserRole.isEmpty()) {
                 this.assignedRoles.add(tempUserRole.get(0).getRole().getRoleDesc());
             }
         }
 
-        if(ti.getType() != null && ti.getType().equals(3)){
-            try{
-                uaaService.addZkbIbCrossUserStatus(selected,assignedRoles);
-                if(ti.getTestStatus() != null && ti.getTestStatus() != -1){
-                    uaaService.addZkbFeSupplierAdminUser(selected,assignedRoles);
+        if (ti.getType() != null && ti.getType().equals(3)) {
+            try {
+                uaaService.addZkbIbCrossUserStatus(selected, assignedRoles);
+                if (ti.getTestStatus() != null && ti.getTestStatus() != -1) {
+                    uaaService.addZkbFeSupplierAdminUser(selected, assignedRoles);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        uaaService.setUserRoles(selected, assignedRoles);
+        uaaService.setUserRoles(false, selected, assignedRoles);
 //        uaaService.setUserPermissionGroup(selected, assignedPermissionGroupUidList);
         updateUserScope();
         userApi.resetUser(selected.getLoginName());
         selected.getUserRoleList().clear();
+        userAssetTypeUpdate();
         selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("UserRole") + WebUtil.getMessage("Updated"));
         treeDeleteUrgOidList = new ArrayList();//初始化操作
@@ -653,11 +685,54 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         unselectInstitutions = new ArrayList();
         unselectUidss = new ArrayList();
         deleteTreeNode = new DefaultTreeNode("root", null, null);
-        selectedAccessOrgNodesCopy =new ArrayList<TreeNode>();
+        selectedAccessOrgNodesCopy = new ArrayList<TreeNode>();
         deleteDisabled = true;
-        selectAllButton=false;
-        accessOrgTree = new  DefaultTreeNode("root", null, null);
+        selectAllButton = false;
+        accessOrgTree = new DefaultTreeNode("root", null, null);
     }
+
+    private void userAssetTypeUpdate() {
+        Set<AssetTypeGroup> selectedSysAuthGroups = gatherUserAuthGroup();
+        updateUserAuthGroup(selected, selectedSysAuthGroups);
+
+    }
+    public Set<AssetTypeGroup> gatherUserAuthGroup() {
+        Set<AssetTypeGroup> selectedSysAuthGroups = new HashSet<>();
+        readSelectedNodesInAssetTypeGroupTree(assetTypeGroupTree, selectedSysAuthGroups);
+
+        return selectedSysAuthGroups;
+    }
+    private void readSelectedNodesInAssetTypeGroupTree(TreeNode node, Set<AssetTypeGroup> selectedTreeNodeList) {
+        if (node.isSelected()) {
+            if (node.getParent() != null && node.getParent().isSelected()) {
+                return;
+            } else {
+                selectedTreeNodeList.add((AssetTypeGroup)node.getData());
+            }
+        } else {
+            for (TreeNode item : node.getChildren()) {
+                readSelectedNodesInAssetTypeGroupTree(item, selectedTreeNodeList);
+            }
+        }
+    }
+    private void updateUserAuthGroup(UserAccount userAccount, Set<AssetTypeGroup> selectedSysAuthGroups) {
+        userAssetTypeGroupMapper.removeAuthGroupByUser(userAccount.getUid());
+
+
+        selectedSysAuthGroups.stream().forEach(item -> {
+            UserAssetGroup userAuthGroup = new UserAssetGroup();
+            userAuthGroup.setUserUid(userAccount.getUid());
+            userAuthGroup.setAssetGroupUid(item.getUid());
+//            userAuthGroup.setClassificationPath(item.getClassificationPath());
+            userAssetGroupDao.save(userAuthGroup);
+        });
+        if (loginUser.getLoginName().equals(userAccount.getLoginName())) {
+            // 如果修改的用户为当前登录用户，重新设置当前登录用户的资产分类
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            userContextService.setAssetTypeGroup();
+        }
+    }
+
 
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
@@ -668,6 +743,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public TreeNode getOrgTree() {
         return orgTree;
     }
+
     private TreeNode selectedNode;
 
     public TreeNode getSelectedNode() {
@@ -675,9 +751,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void setSelectedNode(TreeNode selectedNode) {
-    	if(selectedNode==null){
-    		return;
-    	}
+        if (selectedNode == null) {
+            return;
+        }
         this.selectedNode = selectedNode;
     }
 
@@ -724,7 +800,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (isOk && this.crudActionName.equals("Edit")) {
             //YHAAO-4354 keep user scope on edit
             //if org change, delete old user org
-            if (!object.getOrgInfoUID().equals(previousOrgUid) ) {
+            if (!object.getOrgInfoUID().equals(previousOrgUid)) {
                 uaaService.clearUserScope(object.getUid());
                 uaaService.clearUserOrgAfterOrgUpdate(object.getUid());
                 uaaService.setDefaultScope(object);
@@ -740,47 +816,53 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (isMultiLevelAuditor() || isAuditor()) {
             return;
         }
-        if(userAssociationVerification(selected)){
+        if (userAssociationVerification(selected)) {
             return;
         }
         if (canDelete()) {
+            String oldLoginName = selected.getLoginName();//Zkb获取旧的LoginName，以用于插入Zkb穿越用户状态表
             selected.setIsDeleted(true);
             selected.setLoginName(selected.getLoginName() + "-" + ZipUtil.makeRandomPassword(5));
             selected.setLastModifiedBy(loginUser.getLoginName());
             selected.setLastModifiedDate(new Timestamp(System.currentTimeMillis()));
             selected.setWeChatId(null);
+            selected.setTelephone(null);
+            userAccountHistoryService.save(UserAccount.HistoryAction.DELETE.name(), selected);
             dao.save(selected);
-            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
-            /* 物理删除
-            log.info("start delete user, uid: {}",this.selected.getUid());
+            supplierUserRepository.deleteUserWxApp(selected.getId());
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
 
             TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
             if(ti.getType() != null && ti.getType().equals(3)){
                 try{
-                    uaaService.deleteZkbIbCrossUserStatus(selected);
+                    uaaService.deleteZkbIbCrossUserStatus(selected, oldLoginName);
                 }catch (Exception e){
                     e.printStackTrace();
                 }
             }
+            userAssetGroupDao.deleteByUserUid(selected.getUid());
+
+            /* 物理删除
+            log.info("start delete user, uid: {}",this.selected.getUid());
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
             userAccountService.deleteUserAccount(this.selected);
             userApi.removeUser(selected.getLoginName());*/
-
         }
     }
-    private boolean userAssociationVerification(UserAccount selected){
+
+    private boolean userAssociationVerification(UserAccount selected) {
         List<String> errorMsg = userAccountService.userAssociationVerification(selected);
-        if(CollectionUtils.isNotEmpty(errorMsg)){
+        if (CollectionUtils.isNotEmpty(errorMsg)) {
             for (String s : errorMsg) {
                 WebUtil.addErrorMessage(s);
             }
-            log.info("删除用户失败，msg:{}",JSONObject.toJSONString(errorMsg));
+            log.info("删除用户失败，msg:{}", JSONObject.toJSONString(errorMsg));
             return true;
         }
         return false;
     }
 
-    private boolean isMultiLevelAuditor(){
+    private boolean isMultiLevelAuditor() {
         MultiLevelApprovalConfigMapper multiLevelApprovalConfigMapper = WebUtil.getBean(MultiLevelApprovalConfigMapper.class);
         boolean isMultiLevelAuditor = multiLevelApprovalConfigMapper.countApprovalItemIncludeUserUid(selected.getUid()) > 0;
         if (isMultiLevelAuditor) {
@@ -789,7 +871,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         return isMultiLevelAuditor;
     }
 
-    private boolean isAuditor(){
+    private boolean isAuditor() {
         AuditGroupConfigurationMapper auditGroupConfigurationMapper = WebUtil.getBean(AuditGroupConfigurationMapper.class);
         boolean isAuditor = auditGroupConfigurationMapper.countGroupMemberItemIncludeUserUid(selected.getUid()) > 0;
         if (isAuditor) {
@@ -910,20 +992,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             user.setSiteUID(selectedUserOrg.getSiteUID());
             user.setOrgLevel(selectedUserOrg.getOrgLevel());
         }
-        if(!user.getIsActive()){
+        if (!user.getIsActive()) {
             TenantInfo tenant = tenantInfoRepository.findByuid(user.getTenantUID());
-            if(tenant.getIsEnabled()){
+            if (tenant.getIsEnabled()) {
                 user.setIsActive(true);
                 user.setActiveTime(new Date());
-            }else{
+            } else {
                 user.setIsActive(false);
             }
         }
-        if(user.getIsLocked()){
+        if (user.getIsLocked()) {
             //lockAccount();
             selected.setIsLocked(true);
             selected.setLockTime(TimeUtil.timeNow().toDate());
-        }else{
+        } else {
             //unlockAccount();
             selected.setIsLocked(false);
             selected.setPasswordErrorCount(0);
@@ -939,12 +1021,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         Boolean newIsDisable = Boolean.TRUE.equals(selected.getIsDisable());
-        if(!newIsDisable.equals(oldIsDisable) && (isMultiLevelAuditor() || isAuditor() || !isDisable())){
+        if (!newIsDisable.equals(oldIsDisable) && (isMultiLevelAuditor() || isAuditor() || !isDisable())) {
             return;
         }
         if (!StringUtils.isEmpty(selected.getPlainPassword())) {
             String checkResult = PasswordUtil.checkPwd(selected.getPlainPassword());
-            if(!StringUtils.isEmpty(checkResult)) {
+            if (!StringUtils.isEmpty(checkResult)) {
                 WebUtil.addErrorMessage(checkResult);
                 RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("validationFailed", true);
@@ -952,8 +1034,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
 
-        if(crudActionName.equals("Edit") && Boolean.TRUE.equals(selected.getIsDisable())){
-            if(userAssociationVerification(selected)){
+        if (crudActionName.equals("Edit") && Boolean.TRUE.equals(selected.getIsDisable())) {
+            if (userAssociationVerification(selected)) {
                 RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("validationFailed", true);
                 return;
@@ -977,13 +1059,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 }
             }
             boolean flag = userAccountService.checkUser(selected);
-            if(!flag){
+            if (!flag) {
                 selected.setTelephone(originalTelephone);
                 userAccountEditFlag = false;
                 return;
             }
             isRepeatedAfter();
-        } catch(NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
         }
 
@@ -993,15 +1075,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private void isRepeatedAfter() {
         userAccountEditFlag = true;
         super.save();
-        if (Boolean.TRUE.equals(selected.getIsLocked())) {
+        if (Boolean.TRUE.equals(selected.getIsLocked()) || Boolean.TRUE.equals(selected.getIsDisable())) {
             userApi.removeUser(selected.getLoginName());
         } else {
             userApi.resetUser(selected.getLoginName());
         }
-        log.info("save/update user to user_account successful, id: {}",selected.getId());
+        log.info("save/update user to user_account successful, id: {}", selected.getId());
 
         saveTags();
-        log.info("add new tags to user_tags successful, uid: {}",selected.getUid());
+        log.info("add new tags to user_tags successful, uid: {}", selected.getUid());
 
         if (this.crudActionName.equals("Create")) {
             updateUserRole(loginUser.getType());
@@ -1032,24 +1114,29 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     @Transactional
-    public void updateUserRole(Integer creatorUserType){
+    public void updateUserRole(Integer creatorUserType) {
         List<String> role = new ArrayList<>();
-        if(creatorUserType != null && creatorUserType.equals(LX_USER_TYPE)){
+        if (creatorUserType != null && creatorUserType.equals(LX_USER_TYPE)) {
             role.add(SYSTEM_ACTIVE_ROLE);
-        }else{
-            role.add(DEFAULT_USER_ROLE);
+        } else {
+            Set<String> roles = uaaService.getSysRoleListByTenantUid(selected.getTenantUID());
+            if (roles.contains(ApmSystemRole.ClinicalStaff.name())) {
+                role.add(DEFAULT_USER_ROLE);
+            } else {
+                role.add(IT_ADMIN_ROLE);
+            }
         }
-        uaaService.setUserRoles(selected, role);
+        uaaService.setUserRoles(true, selected, role);
         uaaService.setDefaultScope(selected);
 
         //绑定新建用户和该用户所在层级的以下层级
-        if(46!=selected.getSiteId()){
-            userOrgInfoList=new ArrayList<>();
+        if (46 != selected.getSiteId()) {
+            userOrgInfoList = new ArrayList<>();
             accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
             List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
             setSelectedOrgTree(accessOrgTree, orgList);
-            prePareForScopeForNewUser(selected,accessOrgTree);
-            userOrgInfoList= userOrgInfoList.stream().filter(item-> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
+            prePareForScopeForNewUser(selected, accessOrgTree);
+            userOrgInfoList = userOrgInfoList.stream().filter(item -> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
             userOrgInfoRepository.save(userOrgInfoList);
         }
 
@@ -1058,7 +1145,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void resetPassword() {
         if (this.selected.getSiteUID() != null) {
             //判断操作权限
-            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+            if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())) {
                 return;
             }
         }
@@ -1074,7 +1161,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
         }
 
-
+        userAccountHistoryService.save(UserAccount.HistoryAction.RESET_PASSWORD.name(), selected);
         dao.save(selected);
         WebUtil.addSuccessMessage(WebUtil.getMessage("ResetSuccess"));
     }
@@ -1082,7 +1169,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void lockAccount() {
         if (this.selected.getSiteUID() != null) {
             //判断操作权限
-            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+            if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())) {
                 return;
             }
         }
@@ -1095,7 +1182,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void unlockAccount() {
         if (this.selected.getSiteUID() != null) {
             //判断操作权限
-            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+            if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())) {
                 return;
             }
         }
@@ -1116,7 +1203,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedUserOrg = orgInfoDao.getByUid(selected.getOrgInfoUID());
         oldIsDisable = selected.getIsDisable() != null && selected.getIsDisable();
         filterTreeNodeByUid();
-        if(selected.getId() != null){
+        if (selected.getId() != null) {
             List<String> existingTags = userTagsMapper.getTagsByUser(selected.getUid());
             this.selected.setTags(existingTags);
         }
@@ -1134,39 +1221,42 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private TreeNode accessOrgTree;
     private TreeNode[] selectedAccessOrgNodes;
     private List<TreeNode> selectedAccessOrgNodesCopy = new ArrayList<TreeNode>();
+
     private void prepareUserScope() {
         List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
-        if(46==selected.getSiteId()){
+        if (46 == selected.getSiteId()) {
             //查询权限结合 给表格填充数据。
             orgInfoTableData46 = orgList;//给表格数据赋值。
-            accessOrgTree = new  DefaultTreeNode("root", null, null);
-            retrieval=null;
+            accessOrgTree = new DefaultTreeNode("root", null, null);
+            retrieval = null;
 
-        }else{
+        } else {
+            retrieval = null;
+            propagateSelectionUp = true;
             accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
             //List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
             setSelectedOrgTree(accessOrgTree, orgList);
             TreeNodeUtil.expandTreeNode(accessOrgTree);
         }
-
+        loadAssetTypeGroup();
     }
 
     List<UserOrgInfo> userOrgInfoList;
 
-    public void prePareForScopeForNewUser(UserAccount ua,TreeNode node){
-        if(node.getChildren().size()==0){
+    public void prePareForScopeForNewUser(UserAccount ua, TreeNode node) {
+        if (node.getChildren().size() == 0) {
             return;
         }
         for (TreeNode item : node.getChildren()) {
-            if(item.isSelected()){
-                OrgInfo orgInfo =(OrgInfo)item.getData();
+            if (item.isSelected()) {
+                OrgInfo orgInfo = (OrgInfo) item.getData();
                 UserOrgInfo userOrgInfo = new UserOrgInfo();
                 userOrgInfo.setOrgUid(orgInfo.getUid());
                 userOrgInfo.setUserUid(ua.getUid());
                 userOrgInfo.setOrgType(orgInfo.getOrgType());
                 userOrgInfoList.add(userOrgInfo);
             }
-            prePareForScopeForNewUser(ua,item);
+            prePareForScopeForNewUser(ua, item);
         }
     }
 
@@ -1187,7 +1277,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             if (node.getParent() != null && node.getParent().isSelected()) {
                 return;
             } else {
-                selectedTreeNodeList.add((OrgInfo)node.getData());
+                selectedTreeNodeList.add((OrgInfo) node.getData());
             }
         } else {
             for (TreeNode item : node.getChildren()) {
@@ -1195,9 +1285,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
     }
+
     private void readSelectedOrgTree46(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
         if (node.isSelected() && !"0".equals(node.getRowKey())) {
-            if (node.getParent() != null ) {
+            if (node.getParent() != null) {
                 OrgInfo orgInfo = (OrgInfo) node.getData();
                 selectedTreeNodeList.add(orgInfo);
                 treeDeleteUrgOidList.add(orgInfo.getUid());
@@ -1215,31 +1306,31 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
 //        Set<OrgInfo> selectedOrgList = new HashSet<>(uaaService.getOrgListByPermissionGroup(ObjectUtil.isNotEmpty(assignedPermissionGroupUidList) ? assignedPermissionGroupUidList : ListUtil.toList("-1")));
         Set<OrgInfo> selectedOrgList = new HashSet<>();
-        if(46==selected.getSiteId()){
+        if (46 == selected.getSiteId()) {
             //only add parent if all children is selected
             readSelectedOrgTree46(accessOrgTree, selectedOrgList);
             //if site is not selected, which means not all clinical are selected. then we add all the selected clinical.
             addMissingChildClinical(accessOrgTree, selectedOrgList);
-        }else{
+        } else {
             //only add parent if all children is selected
             readSelectedOrgTree(accessOrgTree, selectedOrgList);
             //if site is not selected, which means not all clinical are selected. then we add all the selected clinical.
             addMissingChildClinical(accessOrgTree, selectedOrgList);
         }
 
-        userAccountService.updateUserOrg(selected.getUid(), selectedOrgList,treeDeleteUrgOidList,selected.getSiteId(),unselectInstitutions,unselectUidss,selectAllButton,orgInfo46,orgInfoTableData46);
+        userAccountService.updateUserOrg(selected, selectedOrgList, treeDeleteUrgOidList, unselectInstitutions, unselectUidss, selectAllButton, orgInfo46, orgInfoTableData46);
     }
-
 
 
     /**
      * 大科室下面可以有小科室，如果选择了把小科室加进来，这样不影响已有的应用
+     *
      * @param node
      * @param selectedTreeNodeList
      */
     private void addMissingChildClinical(TreeNode node, Set<OrgInfo> selectedTreeNodeList) {
 
-        OrgInfo data = (OrgInfo)node.getData();
+        OrgInfo data = (OrgInfo) node.getData();
         if (data == null) {
             //root
             for (TreeNode item : node.getChildren()) {
@@ -1268,20 +1359,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void onSelectAccessTreeNode46(NodeSelectEvent event) {
-        if(orgInfoTableData46.size()==1 && "GE后台运维".equals(orgInfoTableData46.get(0).getName())){
+        if (orgInfoTableData46.size() == 1 && "GE后台运维".equals(orgInfoTableData46.get(0).getName())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning!", "如要继续操作，请先删除顶级权限！"));
             return;
         }
         setTreeNodes(event.getTreeNode(), true);
-        updateOrgInfoTable("1",null);
+        updateOrgInfoTable("1", null);
     }
 
-    private void updateOrgInfoTable(String type ,OrgInfo unOrgInfo) {
+    private void updateOrgInfoTable(String type, OrgInfo unOrgInfo) {
         //1.先生成对应的关系列表
         Set<OrgInfo> selectedOrgList = new HashSet<>();
         readSelectedOrgTree46(accessOrgTree, selectedOrgList);
         addMissingChildClinical(accessOrgTree, selectedOrgList);
-        List<OrgInfo> orginfos  = new ArrayList(selectedOrgList);
+        List<OrgInfo> orginfos = new ArrayList(selectedOrgList);
         //if("2".equals(type)){
         //    orgInfoTableData46 = orginfos;
         //    return;
@@ -1289,25 +1380,25 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         //2.遍历关系列表与orgInfoTable表。如果发现是属于同一个集团的就把表中的字段删掉然后添加上新生成的关系
         Set<String> eqInstitutionUids = new HashSet<String>();//存放相等InstitutionUID的集合，以后统一删除与添加
         for (int i = 0; i < orgInfoTableData46.size(); i++) {//遍历当前表格，如果 institution_uid一样则删掉，换上新的institution_uid的数据
-            for (int j = 0; j <orginfos.size() ; j++) {
-                if(orgInfoTableData46.get(i).getInstitutionUID().equals(orginfos.get(j).getInstitutionUID())){
+            for (int j = 0; j < orginfos.size(); j++) {
+                if (orgInfoTableData46.get(i).getInstitutionUID().equals(orginfos.get(j).getInstitutionUID())) {
                     eqInstitutionUids.add(orgInfoTableData46.get(i).getInstitutionUID());//如果相等则放入集合
                 }
             }
         }
         //找到有相同的InstitutionUID以后orgInfoTableData46先删除有此id的数据，再添加selectedOrgList 有此id的数据
-        Iterator<OrgInfo> it=orgInfoTableData46.iterator();
-        while(it.hasNext()) {
-            OrgInfo orgInfo=it.next();
-            if(eqInstitutionUids.contains(orgInfo.getInstitutionUID())) {
+        Iterator<OrgInfo> it = orgInfoTableData46.iterator();
+        while (it.hasNext()) {
+            OrgInfo orgInfo = it.next();
+            if (eqInstitutionUids.contains(orgInfo.getInstitutionUID())) {
                 it.remove();
             }
         }
-        Iterator<OrgInfo> it2=orgInfoTableData46.iterator();
-        if("2".equals(type)){
-            while(it2.hasNext()) {
-                OrgInfo orgInfo=it2.next();
-                if(unOrgInfo.getInstitutionUID().equals(orgInfo.getInstitutionUID())) {
+        Iterator<OrgInfo> it2 = orgInfoTableData46.iterator();
+        if ("2".equals(type)) {
+            while (it2.hasNext()) {
+                OrgInfo orgInfo = it2.next();
+                if (unOrgInfo.getInstitutionUID().equals(orgInfo.getInstitutionUID())) {
                     it2.remove();
                 }
             }
@@ -1315,19 +1406,31 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         orgInfoTableData46.addAll(orginfos);
     }
 
-    public void filterNode(){
-        if(retrieval==null){
-            retrieval="";
+    public void filterNode() {
+        if (retrieval == null) {
+            retrieval = "";
         }
-        accessOrgTree = uaaService.getOrgTreeBySite46(selected.getSiteUID(),retrieval);
+        accessOrgTree = uaaService.getOrgTreeBySite46(selected.getSiteUID(), retrieval);
         List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
         setSelectedOrgTree(accessOrgTree, orgList);
         TreeNodeUtil.expandTreeNode(accessOrgTree);
         accessOrgTree.getChildren().get(0).setSelectable(false);
         deleteDisabled = false;
     }
+
+    public void getFilteredNodes() {
+        if (StringUtils.isEmpty(retrieval)) {
+            propagateSelectionUp = true;
+        } else {
+            if (!accessOrgTree.getChildren().get(0).isSelected()) {
+                propagateSelectionUp = false;
+            }
+        }
+        uaaService.filterTreeNode(accessOrgTree, retrieval, -1, -1);
+    }
+
     //全选按钮 （只保存GE后台运维的uid）(页面上表格也只显示GE后台运维的iD)
-    public void selectAll(){
+    public void selectAll() {
         selectAllButton = true;//1.标为全选
         //2.获取GE后台运维的节点，更新表格，删除按钮置灰
         //deleteDisabled = true;//删除按钮置灰
@@ -1359,7 +1462,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void onUnselectAccessTreeNode46(NodeUnselectEvent event) {
-        if(orgInfoTableData46.size()==1 && "GE后台运维".equals(orgInfoTableData46.get(0).getName())){
+        if (orgInfoTableData46.size() == 1 && "GE后台运维".equals(orgInfoTableData46.get(0).getName())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning!", "如要继续操作，请先删除顶级权限！"));
             return;
         }
@@ -1372,7 +1475,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
             node = node.getParent();
         }
-        updateOrgInfoTable("2" , orgInfo);
+        updateOrgInfoTable("2", orgInfo);
     }
 
     private void setTreeNodes46(TreeNode root, Boolean isSelected) {
@@ -1438,36 +1541,31 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private List<String> items;
 
     @Transactional
-    public void confirmActivation(){
-        if(loginUser.getIsActive()){
+    public void confirmActivation() {
+        if (loginUser.getIsActive()) {
             WebUtil.addSuccessMessage(WebUtil.getMessage("ActivateSuccess"));
             return;
         }
         loginUser.setIsActive(true);
         loginUser.setActiveTime(new Date());
         dao.save(loginUser);
-        List<UserRole> roles = loginUser.getUserRoleList();
-        SysRole sysRole = sysRoleRepository.getByName(SYSTEM_ACTIVE);
-        if(sysRole != null){
-            roles = roles.stream().filter(role -> role.getRoleId() == sysRole.getId()).collect(Collectors.toList());
-            if(CollectionUtils.isNotEmpty(roles)){
-                TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-                tenant.setIsEnabled(true);
-                tenant.setActiveTime(new Date());
-                tenant.setActiveUserId(loginUser.getId());
-                tenant.setActiveType(1);
-                tenantInfoRepository.save(tenant);
-                dao.updateMembersStatus(loginUser.getTenantUID());
-            }
+        if (hasAuthority()) {
+            TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+            tenant.setIsEnabled(true);
+            tenant.setActiveTime(new Date());
+            tenant.setActiveUserId(loginUser.getId());
+            tenant.setActiveType(1);
+            tenantInfoRepository.save(tenant);
+            dao.updateMembersStatus(loginUser.getTenantUID());
             WebUtil.addSuccessMessage(WebUtil.getMessage("ActivateSuccess"));
-        }else{
+        } else {
             logger.info("not active person !");
         }
 
     }
 
     @Transactional
-    public void activeTenant(){
+    public void activeTenant() {
         TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         tenant.setIsEnabled(true);
         tenant.setActiveTime(new Date());
@@ -1478,21 +1576,29 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         WebUtil.addSuccessMessage(WebUtil.getMessage("ActivateSuccess"));
     }
 
-    public boolean needActive(){
+    public boolean needActive() {
         TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-        if(tenant != null && tenant.getIsEnabled() == false){
+        if (tenant != null && tenant.getIsEnabled() == false) {
             return false;
         }
         return true;
     }
 
-    public boolean hasAuthority(){
-        return loginUser.getUserRoleNames().contains("系统激活专用") ? true : false;
+    public boolean hasAuthority() {
+        if (loginUser.getUserRoleNames().contains("系统激活专用")) {
+            return true;
+        }
+        TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+        if (StringUtils.hasText(tenant.getActiveUsers())) {
+            String[] userIds = tenant.getActiveUsers().split(",");
+            return Arrays.stream(userIds).anyMatch(String.valueOf(loginUser.getId())::equals);
+        }
+        return false;
     }
 
-    public void logout(){
+    public void logout() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if(auth != null){
+        if (auth != null) {
             ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
             HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
             HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
@@ -1501,11 +1607,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         WebUtil.redirectTo("/login.xhtml");
     }
 
-    public void updateAgree(){
-        if(CollectionUtils.isNotEmpty(items)){
+    public void updateAgree() {
+        if (CollectionUtils.isNotEmpty(items)) {
             String str = items.get(0);
             agree = Integer.parseInt(str) == 1 ? true : false;
-        }else{
+        } else {
             agree = false;
         }
     }
@@ -1543,15 +1649,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void loginAs() {
-        if(this.selected==null) return;
+        if (this.selected == null) return;
 
         //call microServices to get Access Token...
-        try{
+        try {
             ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
             HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
             MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
 
-            String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword(),request.getHeader("User-Agent"));
+            String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword(), request.getHeader("User-Agent"));
             request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
 
             //make sure microservice works before apm web
@@ -1559,7 +1665,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
             attemptSwitchUserInSpringSecurityContext(this.selected);
 
-        }catch(Exception e){
+        } catch (Exception e) {
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
@@ -1572,19 +1678,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         SecurityContextHolder.getContext().setAuthentication(targetUserRequest);
     }
 
-    public void exportAll(){
-    	generateListSearchFilter();
-    	List<UserAccount> listUserAccount=dao.findBySearchFilter(searchFilters);
-		if(listUserAccount==null || listUserAccount.size()==0){
-			WebUtil.addErrorMessage(WebUtil.getMessage("NoData"));
-			return;
-		}
-		userAccountExportService.supplementUserAccount(listUserAccount);
-		downloadFile(userAccountExportService.parseUserAccountToMap(listUserAccount));
-	}
-    
-    private void downloadFile(List<Map<String,Object>> data){
-		try {
+    public void exportAll() {
+        generateListSearchFilter();
+        List<UserAccount> listUserAccount = dao.findBySearchFilter(searchFilters);
+        if (listUserAccount == null || listUserAccount.size() == 0) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoData"));
+            return;
+        }
+        userAccountExportService.supplementUserAccount(listUserAccount);
+        downloadFile(userAccountExportService.parseUserAccountToMap(listUserAccount));
+    }
+
+    private void downloadFile(List<Map<String, Object>> data) {
+        try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/userAccount/APM_UserAccount_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = userAccountExportService.exportData(doc, data);
@@ -1594,41 +1700,41 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         } catch (IOException ex) {
             logger.error(ex.getMessage());
         }
-	}
+    }
 
-	public String getCurrentUserRoleNames(Integer userId){
+    public String getCurrentUserRoleNames(Integer userId) {
         List<SysRole> sysRoles = getSystemRolesByUserId(userId);
         StringBuilder sb = new StringBuilder();
-        if(CollectionUtils.isNotEmpty(sysRoles)){
-            for (SysRole sysRole :sysRoles) {
+        if (CollectionUtils.isNotEmpty(sysRoles)) {
+            for (SysRole sysRole : sysRoles) {
                 sb.append(sysRole.getRoleDesc()).append(" ");
             }
         }
         List<CustomRole> customRoles = getCustomRoleByUserId(userId);
-        if(CollectionUtils.isNotEmpty(customRoles)){
-            for (CustomRole customRole :customRoles) {
+        if (CollectionUtils.isNotEmpty(customRoles)) {
+            for (CustomRole customRole : customRoles) {
                 sb.append(customRole.getName()).append(" ");
             }
         }
         return sb.toString();
     }
-    
-    public List<SysRole> getSystemRolesByUserId(Integer userId){
+
+    public List<SysRole> getSystemRolesByUserId(Integer userId) {
         return sysRoleRepository.getSysRoles(userId);
     }
 
-    public List<CustomRole> getCustomRoleByUserId(Integer userId){
+    public List<CustomRole> getCustomRoleByUserId(Integer userId) {
         return customRoleRepository.findCustomRolesByUserId(userId);
     }
 
-	public StreamedContent getExportFile() {
-		return exportFile;
-	}
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
 
-	public void setExportFile(StreamedContent exportFile) {
-		this.exportFile = exportFile;
-	}
-        
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+
     public List<String> autoCompleteDeptName(String query) {
         if (deptList == null) {
             return Collections.emptyList();
@@ -1636,34 +1742,35 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         List<OrgInfo> res = this.deptList.stream()
                 .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
                 .collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
 
-    private  String filterClinicalDeptOrg = null;
+    private String filterClinicalDeptOrg = null;
+
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
         }
-        if(filterClinicalDeptOrg==null) return;
-        
+        if (filterClinicalDeptOrg == null) return;
+
         List<OrgInfo> orgListByName = this.deptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
-        if(orgListByName.size()<1)
+        if (orgListByName.size() < 1)
             selectedUserOrg = null;
-        else{
+        else {
             selectedUserOrg = orgListByName.get(0);
         }
     }
-    
-    public String getSelectedOrgName(){
-        if(selectedUserOrg==null)  return "";
-        
+
+    public String getSelectedOrgName() {
+        if (selectedUserOrg == null) return "";
+
         return selectedUserOrg.getName();
     }
-    
-    public void setSelectedOrgName(String orgName){
+
+    public void setSelectedOrgName(String orgName) {
         //ignore the input orgName, just provide a Setter for UI input Component
     }
 
@@ -1725,8 +1832,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     //判断租户是否是46号租户 是返回true 否返回false
-    public boolean judgeTheUser(){
-        if(null==selected || null==selected.getSiteId()){
+    public boolean judgeTheUser() {
+        if (null == selected || null == selected.getSiteId()) {
             return false;
         }
         return 46 == selected.getSiteId();
@@ -1736,8 +1843,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         return selectedTenant != null && selectedTenant.getId() == 46;
     }
 
-    public void filterTreeNodeByUid(){
-        if (selectedTenant!=null&&selectedTenant.getId()== 46&&selectedUserOrg!=null&& !StringUtils.isEmpty(selectedUserOrg.getInstitutionUID())) {
+    public void filterTreeNodeByUid() {
+        if (selectedTenant != null && selectedTenant.getId() == 46 && selectedUserOrg != null && !StringUtils.isEmpty(selectedUserOrg.getInstitutionUID())) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListByUid(selectedUserOrg.getInstitutionUID());
             OrgInfo tenant = orgInfoDao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
@@ -1763,7 +1870,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public Boolean enableDestroyTenant() {
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-        return Objects.equals(2,tenantInfo.getActiveType());
+        return Objects.equals(2, tenantInfo.getActiveType());
     }
 
     public Boolean getConfirmDestroy() {
@@ -1772,5 +1879,60 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setConfirmDestroy(Boolean confirmDestroy) {
         this.confirmDestroy = confirmDestroy;
+    }
+
+
+    private TreeNode assetTypeGroupTree;
+    private TreeNode[] selectedAssetTypeGroupNodes;
+
+
+    public TreeNode getAssetTypeGroupTree() {
+        return assetTypeGroupTree;
+    }
+
+    public TreeNode[] getSelectedAssetTypeGroupNodes() {
+        return selectedAssetTypeGroupNodes;
+    }
+
+    public void setSelectedAssetTypeGroupNodes(TreeNode[] selectedAssetTypeGroupNodes) {
+        this.selectedAssetTypeGroupNodes = selectedAssetTypeGroupNodes;
+    }
+
+    public void onSelectAssetTypeGroupTreeNode(NodeSelectEvent event) {
+        setTreeNodes(event.getTreeNode(), true);
+    }
+
+
+
+    public void onUnselectAssetTypeGroupTreeNode(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
+        }
+    }
+
+    private void loadAssetTypeGroup() {
+        assetTypeGroupTree = assetTypeGroupService.buildAssetTypeGroupInTree();
+
+        List<String> userAssetGroups = userAssetTypeGroupMapper.findAssetGroupByUser(this.selected.getUid());
+
+        setSelectedSysAuthGroupTree(assetTypeGroupTree, userAssetGroups);
+
+    }
+    private void setSelectedSysAuthGroupTree(TreeNode node, List<String> userAuthGroupUids) {
+        if (node.getData() instanceof AssetTypeGroup) {
+            AssetTypeGroup assetTypeGroup = (AssetTypeGroup) node.getData();
+            if (userAuthGroupUids.contains(assetTypeGroup.getUid())) {
+                node.setSelected(true);
+            } else if (node.getParent() != null && node.getParent().isSelected()) {
+                node.setSelected(true);
+            }
+        }
+
+        for (TreeNode item : node.getChildren()) {
+            setSelectedSysAuthGroupTree(item, userAuthGroupUids);
+        }
     }
 }

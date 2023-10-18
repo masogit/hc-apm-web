@@ -1,18 +1,25 @@
 package com.ge.apm.view.wo;
 
+import com.ge.apm.dao.AssetTypeGroupRepository;
+import com.ge.apm.domain.AssetTypeGroup;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.WorkOrderDetailPojo;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.WorkOrderDetailExportService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.map.HashedMap;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
@@ -23,6 +30,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -78,6 +86,8 @@ public class WorkOrderDetailExportController implements Serializable {
         uaaService = WebUtil.getBean(UaaService.class);
         ucService = WebUtil.getBean(UserCommonService.class);
         workOrderDetailExportService = WebUtil.getBean(WorkOrderDetailExportService.class);
+        assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
+        assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
 
@@ -85,7 +95,11 @@ public class WorkOrderDetailExportController implements Serializable {
         loadClinicalDept();
         currentOwnerList = ucService.getWorkerList(null,"");
         currentOwnerList.addAll(ucService.getExternalWorkerList(currentUser.getTenantUID()).stream().filter(item-> !currentOwnerList.contains(item)).collect(Collectors.toList()));
-
+        currentAssetTypeGroupList = currentUser.getAssetTypeGroupList();
+        enableAssetTypeGroup = currentUser.isEnableAssetTypeGroup();
+        if (enableAssetTypeGroup) {
+            assetTypeGroupEncodedSet = currentAssetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+        }
     }
 
     public void initOrgTree() {
@@ -147,6 +161,42 @@ public class WorkOrderDetailExportController implements Serializable {
         return res;
     }
 
+    private AssetTypeGroupRepository assetTypeGroupRepository;
+    private AssetTypeGroupService assetTypeGroupService;
+    private Set<String> assetTypeGroupEncodedSet;
+    private List<AssetTypeGroup> currentAssetTypeGroupList;
+    @Getter @Setter
+    private String filterAssetTypeName;
+    @Getter @Setter
+    private boolean enableAssetTypeGroup;
+
+    public List<String> completeAssetTypeGroupList(String query) {
+        if (currentAssetTypeGroupList == null) {
+            return Collections.emptyList();
+        }
+        List<AssetTypeGroup> res = this.currentAssetTypeGroupList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query))
+                .collect(Collectors.toList());
+        return res.stream().map(AssetTypeGroup::getName).distinct().collect(Collectors.toList());
+    }
+
+    public void onAssetTypeGroupChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            filterAssetTypeName = (String) ((SelectEvent) event).getObject();
+        }
+        if (filterAssetTypeName != null) {
+            List<AssetTypeGroup> assetTypeGroupsMatchingByName = this.currentAssetTypeGroupList.stream().filter(item -> item.getName().equals(filterAssetTypeName)).collect(Collectors.toList());
+            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByName, currentAssetTypeGroupList);
+            assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+        } else {
+            if (enableAssetTypeGroup) {
+                assetTypeGroupEncodedSet = currentAssetTypeGroupList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+            } else {
+                assetTypeGroupEncodedSet = Collections.emptySet();
+            }
+        }
+    }
+
     public void previewData(){
         Map<String, Object> filterMap = new HashedMap();
 
@@ -189,6 +239,9 @@ public class WorkOrderDetailExportController implements Serializable {
         }
         if(searchStr != null && !searchStr.trim().equals("")){
             filterMap.put("searchStr", searchStr);
+        }
+        if (ObjectUtil.isNotEmpty(assetTypeGroupEncodedSet)) {
+            filterMap.put("assetTypeGroupEncodedSet", assetTypeGroupEncodedSet);
         }
 
         workOrderDetailPojoList = workOrderDetailExportService.createWorkOrderDetailData(filterMap);

@@ -3,9 +3,11 @@ package com.ge.apm.service.asset;
 import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetTerminationReportTemplateRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.ApmStreamedContent;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.AssetTerminationReportTemplate;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
@@ -46,6 +48,9 @@ public class ExportToBeTerminatedAppraisalService {
 
     @Autowired
     private BlobFileService blobService;
+
+    @Autowired
+    private OrgInfoRepository orgInfoRepository;
 
     public List<AssetInfo> getAssetInfo(InputStream inputstream, String tenantUid, Set<String> siteIds) throws Exception {
         ExcelDocumentStreamingReader reader = new ExcelDocumentStreamingReader(inputstream, 0, 1, null, null);
@@ -112,11 +117,13 @@ public class ExportToBeTerminatedAppraisalService {
         Map<String, Object> datas = new HashMap<>();
         Set<String> departmentName = new HashSet<>();
         Set<String> terminalCause = new HashSet<>();
+        Set<String> siteName = new HashSet<>();
         List<Map<ASSET_DETAIL, Object>> list = new ArrayList<>();
         for (String id : selectedIds) {
             AssetInfo assetInfo = assetInfoRepository.findByUid(id);
             setValue(departmentName, assetInfo.getClinicalDeptName(), WebUtil.getMessage("Inconsistent"));
             setValue(terminalCause, assetInfo.getTerminationCause(), WebUtil.getMessage("ReasonInconsistent"));
+            setValue(siteName, assetInfo.getSiteUID(), WebUtil.getMessage("SiteInconsistent"));
             Map<ASSET_DETAIL, Object> map = new HashMap<>();
             map.put(financing_num, assetInfo.getFinancingNum());
             map.put(asset_name, assetInfo.getName());
@@ -137,6 +144,16 @@ public class ExportToBeTerminatedAppraisalService {
         datas.put("asset_detail_table", list);
         datas.put("asset_department_name", departmentName.stream().findFirst().orElse(""));
         datas.put("asset_termination_cause", terminalCause.stream().findFirst().orElse(""));
+
+        String assetSiteName = "";
+        if(siteName.size() > 0){
+            OrgInfo orgInfo = orgInfoRepository.findByUid(siteName.stream().findFirst().get());
+            if(null != orgInfo){
+                assetSiteName = orgInfo.getName();
+            }
+        }
+        datas.put("asset_site_name", assetSiteName);
+
         return datas;
     }
 

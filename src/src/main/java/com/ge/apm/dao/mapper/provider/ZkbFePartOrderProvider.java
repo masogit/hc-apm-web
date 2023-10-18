@@ -53,6 +53,7 @@ public class ZkbFePartOrderProvider {
         StringBuilder sb = new StringBuilder();
         sb.append(" SELECT  ai.system_id, " +
                 " ai.function_type, " +
+                " ai.manufacture, " +
                 " ac.ID AS contract_id, " +
                 " ai.tenant_uid, "+
                 " ai.clinical_dept_name AS hospital_name, " +
@@ -111,6 +112,7 @@ public class ZkbFePartOrderProvider {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT TT.name as comments,\n" +
                 "       t.qr_code,\n" +
+                "       T.manufacture,\n " +
                 "       t.uid,\n" +
                 "       t.name,\n" +
                 "       t.depart_num,\n" +
@@ -145,6 +147,7 @@ public class ZkbFePartOrderProvider {
                 "                       t.name,\n" +
                 "                      t.depart_num,\n" +
                 "                  t.clinical_dept_name,\n" +
+                "                   t.manufacture, \n" +
                 "                       t.function_type,\n" +
                 "                       t.system_id,\n" +
                 "                       t.asset_group,\n" +
@@ -172,9 +175,8 @@ public class ZkbFePartOrderProvider {
     {
         List<SearchFilter> filters = (List<SearchFilter>) params.get("filters");
         StringBuilder sb = new StringBuilder();
-        sb=sb.append(" SELECT distinct fe.* from zkb_fe_part_order fe " +
-                " INNER JOIN asset_info ass on fe.system_id = ass.system_id and  ass.is_deleted = 'false'" +
-                " INNER JOIN tenant_info tenant ON tenant.uid = ass.tenant_uid and tenant.TYPE = 3 " +
+        sb=sb.append(" SELECT fe.*,ass.qr_code,ass.depart_num from zkb_fe_part_order fe " +
+                " INNER JOIN asset_info ass on fe.system_id = ass.system_id and  fe.tenant_uid = ass.tenant_uid and  ass.is_deleted = 'false'" +
                 " where 1=1");
         String filter = buildFilter_queryZkbFePartDetail(filters);
         sb=sb.append(filter);
